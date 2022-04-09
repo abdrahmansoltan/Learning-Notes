@@ -7,6 +7,7 @@
 - [styling (hyperlinks / buttons)](#styling-hyperlinks--buttons)
 - [Box Model](#box-model)
 - [Display](#display)
+  - [pseudo Elements/Classes](#pseudo-elementsclasses)
 - [Text - Font](#text---font)
 - [Box Shadow](#box-shadow)
 - [images](#images)
@@ -101,16 +102,39 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
     visibility: hidden;
     ```
 
+### pseudo Elements/Classes
+
 - _note_ : **pseudo elements** are inline elements, so you can convert them to `inline-block` to control padding
 - _note_ : you can't add **pseudo elements** like `::before` to `img` element, instead use it on a `div` that contains the `img`
 - _note_ : you can't hover on something that have a negative `z-index`
 - _note_ : when you have a sliding item (animate from right to center like a **sidebar**) => use this :
+
   ```css
   body,
   html {
     overflow-x: hidden;
   }
   ```
+
+- when you have `pseudo element` like `::before` that has no content, you have 2 choises :
+
+  - `width` / `height` in `px,rem`
+  - `width` / `height` in `%` relative to the **parent element**
+
+    - for this we use padding-top/bottom to simulate height ![pseudo element](./img/pseudo%20element.PNG)
+
+      ```css
+      /* outer circle */
+      .step-img-box::before {
+        width: 60%;
+
+        this mimik -> "height: 60%;"
+        padding-bottom: 60%;
+
+        background-color: #fdf2e9;
+        z-index: -2;
+      }
+      ```
 
 ---
 
