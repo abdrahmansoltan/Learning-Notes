@@ -79,6 +79,28 @@ A semantic element clearly describes its meaning to both the browser and the dev
 - **BEM** (Block - Element - Modifier)
   ![bem](./img/bem.jpg)
 
+- also you can use `helper class` which is used when you have an item that is used many times but in one place of its use we want to add a css-propery to it 'like margin-right-small'
+
+  ```html
+  <a href="#" class="btn btn--full margin-right-sm">click here!</a>
+  ```
+
+  ```css
+  /* HELPER/SETTINGS CLASSES */
+
+  .margin-right-sm {
+    margin-right: 1.6rem !important;
+  }
+
+  .margin-bottom-md {
+    margin-bottom: 4.8rem !important;
+  }
+
+  .center-text {
+    text-align: center;
+  }
+  ```
+
 ---
 
 ## Form
