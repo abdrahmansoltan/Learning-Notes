@@ -327,7 +327,11 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
     font-family: inherit;
     color: inherit;
   }
+  ```
 
+- to select the `input-placeholder` in css we use `pseudo element` --> `input::placeholder`
+
+  ```css
   .cta-form input::placeholder {
     color: #aaa;
   }

@@ -8,7 +8,11 @@
 - [tricks](#tricks)
 - [Architecturing files](#architecturing-files)
 - [Form](#form)
-- [Accessibility](#accessibility)
+- [Accessibility & Performance](#accessibility--performance)
+  - [images](#images)
+    - [`fav-icon`](#fav-icon)
+    - [background img in css](#background-img-in-css)
+    - [image size optimization](#image-size-optimization)
 - [DOM (document object model)](#dom-document-object-model)
 
 ---
@@ -105,41 +109,102 @@ A semantic element clearly describes its meaning to both the browser and the dev
 
 ## Form
 
-- you can use [netlify](https://www.netlify.com/) to manage your forms without `Js` => by inserting `name` attribute to each `input` element and writing this at at the `form` element:
+- you can use [netlify](https://docs.netlify.com/forms/setup/?_ga=2.17094910.693790722.1649686633-761975974.1648039605) to manage your forms without `Js` => by inserting `name` attribute to each `input` element and writing this at at the `form` element:
   ```html
   <form class="cta-form" name="sign-up" netlify></form>
   ```
 
 ---
 
-## Accessibility
+## Accessibility & Performance
 
 [LightHouse](https://developers.google.com/web/tools/lighthouse) => but note that you should do it when it's deployed on a real server and not offline in your pc (local server)
 
 - use `meta` tags
 - use `descriptive`
-- `fav-icon` => [website for doing all this](https://www.favicon-generator.org/)
 
-  - use `fav-icon` for **Browsers** and meke sure to resize it to **64px**
-  - use `fav-icon` for **apple / android** devices and meke sure to resize it
+---
 
-- to reduce size of images => [squoosh](https://squoosh.app/) and use the `webp` format, but check compatibility with browsers or use it with fallback img and let the browsers choose
+### images
 
-  ```html
-  <picture>
-    <source srcset="img/hero.webp" type="image/webp" />
-    <source srcset="img/hero-min.png" type="image/png" />
+#### `fav-icon`
 
-    <img
-      src="img/hero-min.png"
-      class="hero-img"
-      alt="Woman enjoying food, meals in storage container, and food bowls on a table"
-    />
-  </picture>
+[website for doing all this](https://www.favicon-generator.org/)
+
+- use `fav-icon` for **Browsers** and make sure to resize it to **64px**
+- for `apple` --> use resized favicon
+
+- for `android` :
+
+  - create `manifest.webmanifest` file which contains this code :
+
+  ```webmanifest
+  {
+    "icons": [
+      { "src": "img/favicon-192.png", "type": "image/png", "sizes": "192x192" },
+      { "src": "img/favicon-512.png", "type": "image/png", "sizes": "512x512" }
+    ]
+  }
   ```
+
+  - also add this to `html` `<head>`
+
+    ```html
+    <link rel="manifest" href="manifest.webmanifest" />
+    ```
+
+---
+
+#### background img in css
+
+- when you use **background img** in css and want it to be `Accessible` in `HTML` to write `alt` for screen readers
+
+  - `role` describes the role of an element in programs that can make use of it, such as screen readers or magnifiers.
+
+  - `aria-label` attribute defines a string value that labels an interactive element.
+  - in `HTML` :
+
+    ```html
+    <div class="cta-img-box" role="img" aria-label="Womanenjoying food"></div>
+    ```
+
+  - in `CSS` :
+    ```css
+    .cta-img-box {
+      background-image: url("../img/eating.jpg");
+      background-size: cover;
+    }
+    ```
+
+---
+
+#### image size optimization
+
+- to reduce size of images => [squoosh](https://squoosh.app/) and use the `webp` format
+
+  - but check `compatibility` with browsers **or** use it with `fallback img` and let the browsers choose by itself.
+
+```html
+<picture>
+  <source srcset="img/hero.webp" type="image/webp" />
+  <source srcset="img/hero-min.png" type="image/png" />
+
+  <!-- browser will choose which src it can display and displays it in the <img> element below -->
+
+  <img
+    src="img/hero-min.png"
+    class="hero-img"
+    alt="Woman enjoying food, meals in storage container, and food bowls on a table"
+  />
+</picture>
+```
 
 ---
 
 ## DOM (document object model)
 
 Here the **Tree structure** is the operation that make html code looks the way it does on the browser(rendered)
+
+```
+
+```
