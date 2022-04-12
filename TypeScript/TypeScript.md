@@ -2,8 +2,12 @@
 
 - [INDEX](#index)
 - [Installing](#installing)
-  - [running](#running)
-  - [Configuring TypeScript](#configuring-typescript)
+  - [Compiling](#compiling)
+    - [Compiling one TS file](#compiling-one-ts-file)
+    - [Compiling intire project with all its files](#compiling-intire-project-with-all-its-files)
+  - [Configuring & Compiling TypeScript](#configuring--compiling-typescript)
+    - [Compiling one TS file](#compiling-one-ts-file-1)
+    - [Compiling intire project with all its files](#compiling-intire-project-with-all-its-files-1)
 - [TypeScript Basics](#typescript-basics)
   - [Typing](#typing)
   - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
@@ -11,19 +15,29 @@
   - [`arrays`](#arrays)
   - [`enum`](#enum)
   - [`Objects and Interfaces`](#objects-and-interfaces)
+    - [`Objects`](#objects)
+    - [`Interfaces`](#interfaces)
   - [`unknown`](#unknown)
   - [`Union Types`](#union-types)
   - [`Literal Types`](#literal-types)
-  - [Type Aliases](#type-aliases)
+  - [Type Aliases ---(custom type)](#type-aliases----custom-type)
   - [function](#function)
     - [`function type`](#function-type)
     - [`void`](#void)
     - [`never`](#never)
-- [Type Assertions](#type-assertions)
+- [Type Assertions / Type Casting](#type-assertions--type-casting)
 - [Classes](#classes)
-    - [Access Modifiers](#access-modifiers)
+  - [Using Interfaces with classes](#using-interfaces-with-classes)
+  - [Access Modifiers](#access-modifiers)
 - [Generics](#generics)
 - [Promises](#promises)
+- [Decorators (not complete yet ...)](#decorators-not-complete-yet-)
+  - [Decorator configuration](#decorator-configuration)
+- [Namespace](#namespace)
+- [Bundling Typescript with Webpack](#bundling-typescript-with-webpack)
+  - [For Development](#for-development)
+  - [For Production](#for-production)
+- [3rd Party JS-Libraries for TypeScript](#3rd-party-js-libraries-for-typescript)
 
 ---
 
@@ -43,7 +57,9 @@ npm i --save-dev @types/node
 
 ---
 
-### running
+### Compiling
+
+#### Compiling one TS file
 
 - `tsc` is the command used to compile `typescript` to `javascript`
 
@@ -57,6 +73,8 @@ npm i --save-dev @types/node
 
 ---
 
+#### Compiling intire project with all its files
+
 - To use TypeScript, you need to add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
 
   - this command will `transpile` TypeScript to JavaScript
@@ -69,7 +87,33 @@ npm i --save-dev @types/node
 
 ---
 
-### Configuring TypeScript
+### Configuring & Compiling TypeScript
+
+#### Compiling one TS file
+
+- `tsc` is the command used to compile `typescript` to `javascript`
+
+- un `html` file -> always use the javascript file and not the `TS` file
+
+- `watch mode` : like live-server
+
+  ```bash
+  tsc app.ts --watch   # or --w
+  ```
+
+---
+
+#### Compiling intire project with all its files
+
+- To use TypeScript, you need to add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
+
+  - this command will `transpile` TypeScript to JavaScript
+
+  ```json
+  "scripts": {
+      "build": "npx tsc"
+    },
+  ```
 
 - Add the default TypeScript configuration file
 
@@ -108,13 +152,13 @@ npm i --save-dev @types/node
 }
 ```
 
-- target - sets what version of JS TypeScript will be transpiled to.
-- module - sets what module system will be used when transpiling. - Node.js uses the common.js module system by default
+- `target` - sets what version of JS TypeScript will be transpiled to.
+- `module` - sets what module system will be used when transpiling. - Node.js uses the common.js module system by default
   lib - is used to say what libraries your code is using. In this case, ES2018 and the DOM API
-- outDir - where you want your src code to output to. Often named build, prod, or server (when using it serverside)
-- strict - enable strict typing
-- noImplicitAny - disallow the "any" type (covered in TypeScript Basics)
-- exclude - directories to exclude in compiling
+- `outDir` - where you want your src code to output to. Often named build, prod, or server (when using it serverside)
+- `strict` - enable strict typing
+- `noImplicitAny` - disallow the "any" type (covered in TypeScript Basics)
+- `exclude` - directories to exclude in compiling
 - for `Depuging` --> use `"sourceMap": true`
 
 ---
@@ -189,6 +233,8 @@ console.log(Colors.RED); // red
 
 ### `Objects and Interfaces`
 
+#### `Objects`
+
 ```ts
 // not good and hard to read
 // note that --> in object type we use `;` but in value section we use ','
@@ -199,6 +245,8 @@ let student: { name: string; age: number; enrolled: boolean } = {
   // instead we use interfaces
 };
 ```
+
+#### `Interfaces`
 
 - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something. Interfaces can be used to create functions but are most commonly seen to create objects.
 - Use `PascalCase` for naming `interfaces`.
@@ -274,7 +322,7 @@ function combine(
 
 ---
 
-### Type Aliases
+### Type Aliases ---(custom type)
 
 Type aliases can be used to "create" your own types. You're not limited to storing union types though - you can also provide an alias to a (possibly complex) object type.
 
@@ -341,9 +389,15 @@ function generateError(message: string, code: number): never {
 
 ---
 
-## Type Assertions
+## Type Assertions / Type Casting
 
 Type Assertions are used to tell TypeScript that even though TypeScript thinks it should be one type, it is actually a different type. Common to see when a type is unknown
+
+- Type assertions helps you to force types when you are not in control of them.
+  Typecasting refers to `type conversions`
+- There are two ways to do type assertions
+  - `Bracket` syntax --> `let length: number = (<string>lengthField);`
+  - Use `as` --> `let length: number = (lengthField as string);`
 
 ```js
 const myFunc = (student: unknown): string => {
@@ -351,10 +405,6 @@ const myFunc = (student: unknown): string => {
   return newStudent;
 }
 ```
-
----
-
----
 
 ## Classes
 
@@ -371,13 +421,44 @@ class Student {
 }
 ```
 
-#### Access Modifiers
+### Using Interfaces with classes
+
+- it uses the word `implements`
+- a `class` can **implement** multiple `interfaces`
+- it ensures that a class follows the guideline of the interface even if we have repeated code (**repeating the type stuff**)
+- in the code below, we want `Person` class to be `Greetable`
+
+```ts
+interface Greetable {
+  name: string;
+  age?: number; // optional parameter/property
+
+  greet(phrase: string): void;
+}
+
+class Person implements Greetable {
+  name: string;
+  age = 30;
+
+  constructor(n: string) {
+    this.name = n;
+  }
+
+  greet(phrase: string) {
+    console.log(phrase + " " + this.name);
+  }
+}
+```
+
+---
+
+### Access Modifiers
 
 used to declare how accessible a variable should be
 
-- `public`
+- `public` : not necessary
 - `private` : private properties can only be accessed and modified from the class itself.
-- `protected` : protected properties can be accessed by the class itself and child classes.
+- `protected` : protected properties can be accessed by the class itself **and child classes**.
 
 ```js
 // ex :
@@ -396,7 +477,7 @@ class Student {
 class Graduate extends Student {
   studentMajor: string; // public by default
   public constructor(grade: number, id: number, major: string ){
-      super(grade, id);
+    super(grade, id);
       this.studentId = id; // TypeScript Error: Property 'studentId' is private and only accessible within class 'Student'.
       this.studentGrade = grade; // Accessable because parent is protected
       this.studentMajor = major;
@@ -408,6 +489,21 @@ const myStudent = new Graduate(3, 1234, 'computer science');
 console.log(myStudent.id()); //  prints 1234
 myStudent.studentId = 1235; // TypeScript Error: Property 'studentId' is private and only accessible within class 'Student'.
 console.log(myStudent.id()); // prints 1235
+```
+
+- you can also use these access modifiers in the constructor function instead of writing them many times
+
+```ts
+class Department {
+  // private id: string;
+  // private name: string;
+  private employees: string[] = [];
+
+  constructor(private id: string, public name: string) {
+    // this.id = id;
+    // this.name = n;
+  }
+
 ```
 
 ---
@@ -436,6 +532,20 @@ const getItem = <T>(arr: T[]): T => {
 
 In the first function, we have a function that takes in a number array and outputs the second number of the array. But what if we don't want to work with numbers? What if we want to work with strings? Well, we would need to create a second function. Or, we can use a generic, and whatever type we use when we call the function will translate to its return as well.
 
+- another example
+
+```ts
+// function takes object that contains certain type(T) and another object that contains certain type(U)
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+  return Object.assign(objA, objB);
+}
+// "extends" here is a (Type Constraint)
+
+// here first obj contains type(string) and the second obj contains type(number)
+const mergedObj = merge({ name: "Max", hobbies: ["Sports"] }, { age: 30 });
+console.log(mergedObj);
+```
+
 ---
 
 ## Promises
@@ -447,3 +557,141 @@ In the first function, we have a function that takes in a number array and outpu
 const myFunc = async ():Promise<void> => { // do stuff };
 
 ```
+
+---
+
+## Decorators (not complete yet ...)
+
+Decorators provide a way to add both annotations and a meta-programming syntax for class declarations and members.
+
+### Decorator configuration
+
+- To enable experimental support for decorators, you must enable the experimentalDecorators compiler option either on the command line or in your tsconfig.json
+
+  ```bash
+  # command line
+  tsc --target ES5 --experimentalDecorators
+  ```
+
+  ```json
+  // tsconfig.json:
+  {
+    "compilerOptions": {
+      "target": "ES5",
+      "experimentalDecorators": true
+    }
+  }
+  ```
+
+---
+
+## Namespace
+
+look at it online
+
+---
+
+## Bundling Typescript with Webpack
+
+```bash
+npm install webpack webpack-cli webpack-dev-server typescript ts-loader --save-dev
+```
+
+### For Development
+
+- in `package.json` add this script :
+
+  ```json
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack"
+    },
+  ```
+
+- For `development` --> create `webpack.config.js` file that contains this :
+
+  ```js
+  const path = require("path");
+
+  module.exports = {
+    mode: "development",
+    entry: "./src/app.ts",
+    output: {
+      filename: "bundle.js",
+      path: path.resolve(__dirname, "dist"),
+      publicPath: "dist",
+    },
+
+    // this part is for Adding TypeScript Support with the ts-loader Package
+
+    devtool: "inline-source-map",
+    module: {
+      rules: [
+        {
+          test: /\.ts$/, // regular expression
+          use: "ts-loader",
+          exclude: /node_modules/,
+        },
+      ],
+    },
+    resolve: {
+      extensions: [".ts", ".js"],
+    },
+  };
+  ```
+
+---
+
+### For Production
+
+- in `package.json` add this script :
+
+  ```json
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "webpack --config webpack.config.prod.js"
+    },
+  ```
+
+- install `clean-webpack-plugin` package to clean the `dist` folder whenever we **rebuild** the project
+
+```bash
+npm i --save-dev clean-webpack-plugin
+```
+
+- For `Production` --> create `webpack.config.prod.js` file that contains this :
+
+  ```js
+  const path = require("path");
+  const CleanPlugin = require("clean-webpack-plugin");
+
+  module.exports = {
+    mode: "production",
+    entry: "./src/app.ts",
+    output: {
+      filename: "bundle.js",
+      path: path.resolve(__dirname, "dist"),
+    },
+    devtool: "none",
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          use: "ts-loader",
+          exclude: /node_modules/,
+        },
+      ],
+    },
+    resolve: {
+      extensions: [".ts", ".js"],
+    },
+    plugins: [new CleanPlugin.CleanWebpackPlugin()],
+  };
+  ```
+
+---
+
+## 3rd Party JS-Libraries for TypeScript
+
+- search for library's name like this : `lodash types` and go to the npm page and follow the steps and it will also take you to
+  [here](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types)
