@@ -5,14 +5,13 @@
   - [Compiling](#compiling)
     - [Compiling one TS file](#compiling-one-ts-file)
     - [Compiling intire project with all its files](#compiling-intire-project-with-all-its-files)
-  - [Configuring & Compiling TypeScript](#configuring--compiling-typescript)
-    - [Compiling one TS file](#compiling-one-ts-file-1)
-    - [Compiling intire project with all its files](#compiling-intire-project-with-all-its-files-1)
-- [TypeScript Basics](#typescript-basics)
-  - [Typing](#typing)
+- [Typing](#typing)
+  - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
+  - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
   - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
-- [Types](#types)
+- [TypeScript Types](#typescript-types)
   - [`arrays`](#arrays)
+  - [`tuple`](#tuple)
   - [`enum`](#enum)
   - [`Objects and Interfaces`](#objects-and-interfaces)
     - [`Objects`](#objects)
@@ -46,12 +45,11 @@
 - [refrence](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
 
 ```bash
-$ npm i typescript    # save to dependencies
 $ npm i typescript --save-dev    # save to devDependencies
 
 npm i --save-dev ts-node
 
-npm i --save-dev @types/node
+npm i --save-dev @types/node  # type definitions
 
 ```
 
@@ -61,39 +59,9 @@ npm i --save-dev @types/node
 
 #### Compiling one TS file
 
-- `tsc` is the command used to compile `typescript` to `javascript`
+- `tsc` -> `TypeScript Combiler` is the command used to compile `typescript` to `javascript`
 
-- un `html` file -> always use the javascript file and not the `TS` file
-
-- `watch mode` : like live-server
-
-  ```bash
-  tsc app.ts --watch   # or --w
-  ```
-
----
-
-#### Compiling intire project with all its files
-
-- To use TypeScript, you need to add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
-
-  - this command will `transpile` TypeScript to JavaScript
-
-  ```json
-  "scripts": {
-      "build": "npx tsc"
-    },
-  ```
-
----
-
-### Configuring & Compiling TypeScript
-
-#### Compiling one TS file
-
-- `tsc` is the command used to compile `typescript` to `javascript`
-
-- un `html` file -> always use the javascript file and not the `TS` file
+- in `html` file -> always use the javascript file and not the `TS` file
 
 - `watch mode` : like live-server
 
@@ -163,15 +131,36 @@ npm i --save-dev @types/node
 
 ---
 
-## TypeScript Basics
+## Typing
 
-### Typing
+![typing](./img/typing.PNG)
+
+### Statically vs dynamically typed
+
+- `Statically-typed` do type checking at compile-time
+- `dynamically-typed` do type checking at runtime
+
+---
+
+### Strongly vs weakly typed
+
+- `Weakly-typed` languages make conversions between unrelated types implicitly
+- `Strongly-typed` languages don't allow implicit conversions between unrelated types.
 
 - JavaScript is `Weakly-Typed`.
 
+  - it allows for `type coercion`
   - This means that types are assigned by the interpreter based on the data and makes an educated guess when the code's intention is ambiguous. This can lead to unintended results.
 
-- TypeScript is a static and strong typed superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
+```js
+let x = 21; // type assigned as int at runtime.
+let y = x + "dot";
+// This code will run without any error. As Javascript is a weakly-typed language, it allows implicit conversion between unrelated types.
+```
+
+---
+
+- `TypeScript` is a `static and strong typed` superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
 
 ![typescript](./img/typescript.PNG)
 
@@ -201,25 +190,31 @@ npm i --save-dev @types/node
 
 ---
 
-## Types
+## TypeScript Types
 
 ### `arrays`
 
 ```ts
-// 1) Array
 let arr: string[]; // array of strings
-let arr2: (string | number)[]; // array of strings or numbers
+// or :
+let arr: Array<string>;
 
-// 2) Tuple
+let arr2: (string | number)[]; // array of strings or numbers
+```
+
+### `tuple`
+
+```ts
 // When you know exactly what data will be in the array with a fixed length and their type-order, and you will not be adding to the array or modifying the type for any value
 let arr: [string, number, string]; // ['cat', 7, 'dog']
 ```
 
 ### `enum`
 
-- An enum in TypeScript is a collection of `constants`. That’s it.
+- An enum in TypeScript is a collection of `constants` / `static strings`. That’s it.
 - You use an enum when you have a constant set of values that will not be changed.
 - it assigns labels to numbers
+- it's like `Object.freeze`
 
 ```ts
 enum Colors {
@@ -248,6 +243,7 @@ let student: { name: string; age: number; enrolled: boolean } = {
 
 #### `Interfaces`
 
+- it's a blueprint for `object's items`
 - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something. Interfaces can be used to create functions but are most commonly seen to create objects.
 - Use `PascalCase` for naming `interfaces`.
 
@@ -255,6 +251,7 @@ let student: { name: string; age: number; enrolled: boolean } = {
 interface Student {
   name: string;
   age: number;
+  gender?: stromg; // (?) means that it's optional
   enrolled: boolean;
 }
 let newStudent: Student = { name: "Maria", age: 10, enrolled: true };
@@ -327,6 +324,7 @@ function combine(
 Type aliases can be used to "create" your own types. You're not limited to storing union types though - you can also provide an alias to a (possibly complex) object type.
 
 - Type aliases do not create a new type; they rename a type. Therefore, you can use it to type an object and give it a descriptive name.
+- it's same as `interface`
 - once a type alias is created, it can not be added to; it can only be extended.
 
 ```ts
@@ -391,7 +389,7 @@ function generateError(message: string, code: number): never {
 
 ## Type Assertions / Type Casting
 
-Type Assertions are used to tell TypeScript that even though TypeScript thinks it should be one type, it is actually a different type. Common to see when a type is unknown
+Type Assertions are used to tell TypeScript that even though TypeScript thinks it should be one type, it is actually a different type **that you want**. Common to see when a type is unknown
 
 - Type assertions helps you to force types when you are not in control of them.
   Typecasting refers to `type conversions`
