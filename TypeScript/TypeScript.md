@@ -32,6 +32,8 @@
 - [Promises](#promises)
 - [Decorators (not complete yet ...)](#decorators-not-complete-yet-)
   - [Decorator configuration](#decorator-configuration)
+  - [Decorator Composition](#decorator-composition)
+  - [Class Decorator](#class-decorator)
 - [Namespace](#namespace)
 - [Bundling Typescript with Webpack](#bundling-typescript-with-webpack)
   - [For Development](#for-development)
@@ -560,7 +562,11 @@ const myFunc = async ():Promise<void> => { // do stuff };
 
 ## Decorators (not complete yet ...)
 
-Decorators provide a way to add both annotations and a meta-programming syntax for class declarations and members.
+Decorators are a way to decorate members of a class, or a class itself, with extra functionality. When you apply a decorator to a class or a class member, you are actually calling a function that is going to receive details of what is being decorated, and the decorator implementation will then be able to transform the code dynamically, adding extra functionality, and reducing boilerplate code.
+
+- They are a way to have `metaprogramming` in TypeScript, which is a programming technique that enables the programmer to create code that uses other code from the application itself as data.
+
+---
 
 ### Decorator configuration
 
@@ -580,6 +586,98 @@ Decorators provide a way to add both annotations and a meta-programming syntax f
     }
   }
   ```
+
+---
+
+### Decorator Composition
+
+Decorator Composition is an important concept as it allows us to use multiple decorators on a single class member or declarations. The evaluation of these compositions is similar to the function composition that we will see in our mathematics class `(i.e (f ∘ g)(x) is equivalent to f(g(x)))`.
+
+- the expression for each decorator will be evaluated from `top to bottom`
+- the results are called from `bottom to top`
+
+```ts
+function outer() {
+  console.log("Outer: expression");
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    console.log("Outer: result");
+  };
+}
+
+function inner() {
+  console.log("Inner: expression");
+  return function (
+    target: any,
+    propertyKey: string,
+    descriptor: PropertyDescriptor
+  ) {
+    console.log("Inner: result");
+  };
+}
+
+class DecoratorComposition {
+  @outer()
+  @inner()
+  run() {}
+}
+const decoratorComposition = new DecoratorComposition();
+decoratorComposition.run();
+// resu;ts:
+// Outer: expression
+// Inner: expression
+// Inner: result
+// Outer: result
+```
+
+---
+
+### Class Decorator
+
+Class Decorator is very similar to inheriting from another class.
+
+```ts
+const classDecorator = (target: Function) => {
+  // do something with your class
+};
+
+@classDecorator
+class Rocket {}
+```
+
+```ts
+// ---------Using Decorator--------- //
+function BankCard(constructor: Function) {
+  constructor.prototype.cardId = Math.floor(Math.random() * 1000);
+}
+
+@BankCard
+class HSBCBankCard {
+  name: string;
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+// ---------Using class extends--------- //
+class BankCard {
+  cardId: number;
+  constructor() {
+    this.cardId = Math.floor(Math.random() * 1000);
+  }
+}
+
+class HSBCBankCard extends BankCard {
+  name: string;
+  constructor(name: string) {
+    super();
+    this.name = name;
+  }
+}
+```
 
 ---
 

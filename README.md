@@ -10,6 +10,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [TypeScript](#typescript)
 - [Node.js](#nodejs)
 - [Databases](#databases)
+- [React](#react)
 
 ---
 
@@ -86,3 +87,17 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Database-SQL](./Databases/Database-SQL.md)
 
 - [MongoDB](./Databases/MongoDB.md)
+
+---
+
+## React
+
+- [React](./React/01-React.md)
+
+- [Hooks](./React/02-Hooks.md)
+
+- [Class-Components](./React/03-Class-Components.md)
+
+- [Redux](./React/04-Redux.md)
+
+- [React-Deployment](./React/05-Deployment.md)
