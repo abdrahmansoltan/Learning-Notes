@@ -10,7 +10,9 @@ This repository contains notes from my learning Journey to be a reference for an
 - [TypeScript](#typescript)
 - [Node.js](#nodejs)
 - [Databases](#databases)
+- [Frameworks](#frameworks)
 - [React](#react)
+- [Angular](#angular)
 
 ---
 
@@ -90,6 +92,12 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ---
 
+## Frameworks
+
+- [Frameworks](./Angular/1-Frameworks.md)
+
+---
+
 ## React
 
 - [React](./React/01-React.md)
@@ -101,3 +109,9 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Redux](./React/04-Redux.md)
 
 - [React-Deployment](./React/05-Deployment.md)
+
+---
+
+## Angular
+
+- [Angular](./Angular/2-Angular.md)

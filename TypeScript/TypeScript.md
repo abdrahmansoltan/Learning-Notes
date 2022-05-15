@@ -30,7 +30,7 @@
   - [Access Modifiers](#access-modifiers)
 - [Generics](#generics)
 - [Promises](#promises)
-- [Decorators (not complete yet ...)](#decorators-not-complete-yet-)
+- [Decorators](#decorators)
   - [Decorator configuration](#decorator-configuration)
   - [Decorator Composition](#decorator-composition)
   - [Class Decorator](#class-decorator)
@@ -258,6 +258,8 @@ interface Student {
 }
 let newStudent: Student = { name: "Maria", age: 10, enrolled: true };
 ```
+
+> we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be trans[iled to Javascript 
 
 ---
 
@@ -560,7 +562,7 @@ const myFunc = async ():Promise<void> => { // do stuff };
 
 ---
 
-## Decorators (not complete yet ...)
+## Decorators
 
 Decorators are a way to decorate members of a class, or a class itself, with extra functionality. When you apply a decorator to a class or a class member, you are actually calling a function that is going to receive details of what is being decorated, and the decorator implementation will then be able to transform the code dynamically, adding extra functionality, and reducing boilerplate code.
 
@@ -638,6 +640,9 @@ decoratorComposition.run();
 ### Class Decorator
 
 Class Decorator is very similar to inheriting from another class.
+
+- Decorators are functions that accepts functions as a parameter as it's applied to functions or classes
+-
 
 ```ts
 const classDecorator = (target: Function) => {
