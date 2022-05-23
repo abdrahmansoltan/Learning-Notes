@@ -1,0 +1,163 @@
+## INDEX
+
+- [INDEX](#index)
+- [Configuring](#configuring)
+  - [Installation](#installation)
+- [Jest Syntax](#jest-syntax)
+- [Testing Asynchronous Code](#testing-asynchronous-code)
+  - [1-Promises](#1-promises)
+  - [2- Async/Await](#2--asyncawait)
+  - [3- Callbacks](#3--callbacks)
+  - [Checking number of assertions](#checking-number-of-assertions)
+- [Testing React components](#testing-react-components)
+  - [Snapshot Testing](#snapshot-testing)
+  - [Redux testing](#redux-testing)
+
+---
+
+## Configuring
+
+### Installation
+
+```bash
+npm install --save-dev jest
+```
+
+- `json`
+
+  ```json
+  "scripts": {
+    "test": "jest"
+  },
+  ```
+
+---
+
+## Jest Syntax
+
+- Use the `describe` keyword followed by a short description of what the suite is testing and one or more specs.
+- A best practice is to start a sentence with `“it”` and then complete the sentence with the description of what the suite is testing.
+
+  ```js
+  describe("suite description", () => {
+    it("describes the spec", () => {
+      const myVar = true;
+      expect(myVar).toBe(true);
+    });
+  });
+  ```
+
+---
+
+## Testing Asynchronous Code
+
+Jest needs to know **when** the code it is testing has completed, before it can move on to another test. Jest has several ways to handle this:
+
+### 1-Promises
+
+- Return a promise from your test, and Jest will wait for that promise to resolve. If the promise is rejected, the test will fail.
+
+```js
+test("the data is peanut butter", () => {
+  return fetchData().then((data) => {
+    expect(data).toBe("peanut butter");
+  });
+});
+```
+
+### 2- Async/Await
+
+- To write an async test, use the async keyword in front of the function passed to test.
+
+```js
+test("the data is peanut butter", async () => {
+  const data = await fetchData();
+  expect(data).toBe("peanut butter");
+});
+```
+
+### 3- Callbacks
+
+- If you don't use promises, you can use callbacks. For example, let's say that fetchData, instead of returning a promise, expects a callback, i.e. fetches some data and calls callback(null, data) when it is complete. You want to test that this returned data is the string 'peanut butter'.
+
+- By default,**Jest tests complete once they reach the end of their execution**. That means this test will not work as intended with Async code
+
+  - The problem is that the test will complete as soon as fetchData completes, before ever calling the callback.
+
+- There is an alternate form of test that fixes this. Instead of putting the test in a function with an empty argument, use a single argument called `done`. **Jest will wait until the done callback is called before finishing the test**.
+
+```js
+// ---------------------------Don't do this!--------------------------- //
+test("the data is peanut butter", () => {
+  function callback(error, data) {
+    if (error) {
+      throw error;
+    }
+    expect(data).toBe("peanut butter");
+  }
+
+  fetchData(callback);
+});
+
+// ------------------------------Do this!------------------------------ //
+test("the data is peanut butter", (done) => {
+  function callback(error, data) {
+    if (error) {
+      done(error);
+      return;
+    }
+    try {
+      expect(data).toBe("peanut butter");
+      done();
+    } catch (error) {
+      done(error);
+    }
+  }
+
+  fetchData(callback);
+});
+```
+
+---
+
+### Checking number of assertions
+
+`expect.assertions(number)`
+
+- It verifies that a certain number of assertions are called during a test. This is **often useful when testing asynchronous code**, in order to make sure that assertions in a callback actually got called.
+
+```js
+test("doAsync calls both callbacks", () => {
+  expect.assertions(2); // ensures that both callbacks actually get called
+  function callback1(data) {
+    expect(data).toBeTruthy();
+  }
+  function callback2(data) {
+    expect(data).toBeTruthy();
+  }
+
+  doAsync(callback1, callback2);
+});
+```
+
+---
+
+## Testing React components
+
+[enzyme](https://www.npmjs.com/package/enzyme): it allows us to render components
+
+- **phases**:
+
+  ![aaa](./img/aaa.JPG)
+
+### Snapshot Testing
+
+It's an useful tool whenever you want to make sure your UI does not change unexpectedly.
+
+- in react to see if component changed without rendering it each time
+
+### Redux testing
+
+- `Testing reducers`: It's straight forward as reducer-functions are **pure functions**
+
+- `Testing actions`:

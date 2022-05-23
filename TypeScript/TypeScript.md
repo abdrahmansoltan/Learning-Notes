@@ -4,7 +4,7 @@
 - [Installing](#installing)
   - [Compiling](#compiling)
     - [Compiling one TS file](#compiling-one-ts-file)
-    - [Compiling intire project with all its files](#compiling-intire-project-with-all-its-files)
+    - [Compiling entire project with all its files](#compiling-entire-project-with-all-its-files)
 - [Typing](#typing)
   - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
   - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
@@ -47,7 +47,7 @@
 - [refrence](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
 
 ```bash
-$ npm i typescript --save-dev    # save to devDependencies
+npm i typescript --save-dev    # save to devDependencies
 
 npm i --save-dev ts-node
 
@@ -73,7 +73,7 @@ npm i --save-dev @types/node  # type definitions
 
 ---
 
-#### Compiling intire project with all its files
+#### Compiling entire project with all its files
 
 - To use TypeScript, you need to add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
 
@@ -247,6 +247,8 @@ let student: { name: string; age: number; enrolled: boolean } = {
 
 - it's a blueprint for `object's items`
 - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something. Interfaces can be used to create functions but are most commonly seen to create objects.
+- types & interfaces are similar but:
+  - interfaces are **extendable** like classes unlike `types` which are not
 - Use `PascalCase` for naming `interfaces`.
 
 ```js
@@ -259,7 +261,7 @@ interface Student {
 let newStudent: Student = { name: "Maria", age: 10, enrolled: true };
 ```
 
-> we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be trans[iled to Javascript 
+> we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be trans[iled to Javascript
 
 ---
 

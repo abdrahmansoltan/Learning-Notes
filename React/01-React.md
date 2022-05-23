@@ -11,11 +11,17 @@
 - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
   - [How does it work?](#how-does-it-work)
 - [Router](#router)
+  - [Set Up](#set-up)
   - [Using it](#using-it)
+  - [Dynamic Routes](#dynamic-routes)
+  - [Programmaticaly navigation](#programmaticaly-navigation)
+    - [changing the page's url](#changing-the-pages-url)
+    - [Accessing the page's url](#accessing-the-pages-url)
+  - [Prompt](#prompt)
 - [Styling and CSS](#styling-and-css)
-  - [Importing css files](#importing-css-files)
   - [Inline style](#inline-style)
   - [Styled-components](#styled-components)
+    - [Other casess](#other-casess)
   - [CSS Modules](#css-modules)
 - [Components](#components)
   - [why components](#why-components)
@@ -29,7 +35,7 @@
 - [Component Props](#component-props)
   - [single prop](#single-prop)
   - [Multiple props](#multiple-props)
-- [Communicating Between Components in React](#communicating-between-components-in-react)
+- [Communicating Between Components](#communicating-between-components)
   - [From Parent to Child](#from-parent-to-child)
   - [From Child to Parent](#from-child-to-parent)
   - [lifting the state up](#lifting-the-state-up)
@@ -38,8 +44,7 @@
 - [Handling Events](#handling-events)
   - [Events in HTML vs React](#events-in-html-vs-react)
   - [Data binding](#data-binding)
-- [React.memo()](#reactmemo)
-- [Error Boundaries](#error-boundaries)
+- [Forms](#forms)
 - [Interview Questions](#interview-questions)
 
 ---
@@ -178,7 +183,7 @@ React.createElement(
 
 React Router turns React projects into single-page applications. It does this by providing a number of specialized components that manage the creation of links, manage the app's URL, provide transitions when navigating between different URL locations, and so much more.
 
-### Using it
+### Set Up
 
 - first install it
 
@@ -237,7 +242,6 @@ React Router turns React projects into single-page applications. It does this by
   ```
 
   ```js
-
   function Home() {
     // in `Home.jsx`
     return (
@@ -249,20 +253,159 @@ React Router turns React projects into single-page applications. It does this by
   }
   ```
 
----
-
-## Styling and CSS
-
-### Importing css files
+- `<switch>` **ONLY IN VERSION 5** -> `<Routes>` in version 6:
+  - It Renders the first child `<Route>` or `<Redirect>` that matches the location.
+  - makes sure that only one component from components with matching routes are displayed
+  - it displays the first match it finds, so the order is important or you can use `exact`
+  - to make a "not found page" make: `path="*"`
 
 ```js
-import "./search-box.styles.css";
-// note that this css file will be available to all files as webpack bundels all css files into one
+import { Route, Switch } from "react-router";
 
-<Card className={`search ${this.props.className}`}>
+<Switch>
+  <Route exact path="/">
+    <Home />
+  </Route>
+  <Route path="/about">
+    <About />
+  </Route>
+</Switch>;
+```
+
+- `exact` matches the full-path **ONLY IN VERSION 5**
+
+  - not needed in v6
+
+- `<Redirect>` **ONLY IN VERSION 5**: navigate to a new location. The new location will override the current location
+  - for **V6**: we use `<Navigate>`
+
+```js
+<Redirect to="/somewhere/else" />
+
+<Navigate to="/somewhere/else" />
+
+// Or
+<Redirect
+  to={{
+    pathname: "/login",
+    search: "?utm=your+face",
+    state: { referrer: currentLocation }
+  }}
+/>
+
 ```
 
 ---
+
+### Using it
+
+- when you want to change the page's URL, we don't use `<a>` as it will make the page **reload**(make a new request)
+- Instead we use `<Link>` from `react-router-dom`
+
+```js
+import { Link } from "react-router-dom";
+
+<Link to="/about">About Us</Link>;
+```
+
+- To use link with **highlighting the active link** --> use `<NavLink>`
+  - it sets a css-class to the clicked link
+
+```js
+import { NavLink } from "react-router-dom";
+
+// VERSION 5
+<NavLink aciveClassName="name_of_the_class" to="/about">
+  About Us
+</NavLink>;
+
+// VERSION 6
+<NavLink
+  className={(navData) => (navData.isActive ? "name_of_the_class" : "")}
+  to="/about"
+>
+  About Us
+</NavLink>;
+```
+
+---
+
+### Dynamic Routes
+
+- here we use query-parameters `/:`
+- to access this **param** we use `useParams` hook
+
+```js
+<Route path="/product/:id" component={Product} />
+```
+
+```js
+// in Product.component.jsx
+import { useParams } from "react-router-dom";
+
+const params = useParams();
+// or const {productId} = useParams()
+
+console.log(params.productId);
+```
+
+---
+
+### Programmaticaly navigation
+
+#### changing the page's url
+
+- **V5** it's done using `useHistory()` hook
+- **V6** it's done using `useNavigate()` hook
+
+- `history.replace` vs `history.push`:
+  - in case of `push` - a new record is added in the history, and user can go back
+  - in case of `replace` it deletes the last record and puts the new one. So if you will not use the go back, Usually when redirecting from an invalid url
+
+```js
+import { useHistory } from "react-router-dom";
+
+const history = useHistory();
+
+// ...in a handler-function
+history.push("/home");
+
+//-----------------------------//
+// V6
+const navigate = useNavigate();
+
+// ...in a handler-function
+navigate("/home", { push: true });
+```
+
+#### Accessing the page's url
+
+It's done using `useLocation()` hook
+
+- usually used to access query-parameters
+
+```js
+import { useLocation } from "react-router-dom";
+
+const location = useLocation();
+
+// for parameters
+const queryParams = new URLSearchParameters(location.search);
+
+const something = queryParams.get("wanted_param");
+```
+
+---
+
+### Prompt
+
+Used to prompt the user before navigating away from a page. When your application enters a state that should prevent the user from navigating away (like a form is half-filled out), render a `<Prompt>`.
+
+- [Guide](https://v5.reactrouter.com/core/api/Prompt)
+
+---
+
+## Styling and CSS
 
 ### Inline style
 
@@ -302,8 +445,11 @@ function HelloWorldComponent() {
 [styled-components](https://styled-components.com/) package
 
 - `Styled-components` is a library built for React and React Native developers. It allows you to use component-level styles in your applications. Styled-components leverage a mixture of JavaScript and CSS using a technique called `CSS-in-JS`.
-- `Styled-components` are based on `tagged template literals`, meaning actual CSS code is written between backticks when styling your components. This gives developers the flexibility of reusing their CSS code from one project to another.
+
+- `Styled-components` are based on `tagged template literals`, meaning actual CSS code is written between backticks when styling your components.
+
 - With styled-components, there is no need to map your created components to external CSS styles.
+
 - [more info](https://www.section.io/engineering-education/working-with-styled-components-in-react/#what-are-Styled-components)
 - for pseudo elements / classes use `&` like in `sass`
 
@@ -312,20 +458,28 @@ npm install --save styled-components
 ```
 
 ```js
+// in file.styles.jsx
+
 import styled from "styled-components";
 
 // Create a Title component that'll render an <h1> tag with some styles
-const Title = styled.h1`
+export const Title = styled.h1`
   font-size: 1.5em;
   text-align: center;
   color: palevioletred;
 `;
 
 // Create a Wrapper component that'll render a <section> tag with some styles
-const Wrapper = styled.section`
+export const Wrapper = styled.section`
   padding: 4em;
   background: papayawhip;
 `;
+
+//-------------------------------------------------------------//
+
+// in file.component.jsx
+
+// import {Title, Wrapper} from ..
 
 // Use Title and Wrapper like any other React component – except they're styled!
 render(
@@ -335,13 +489,12 @@ render(
 );
 ```
 
-- Adapting based on props
+- Adapting based on `props`
 
 ```js
+// Adapt the colors based on primary prop
 const Button = styled.button`
-  /* Adapt the colors based on primary prop */
-  background: ${(props) => (props.primary ? "palevioletred" : "white")};
-  color: ${(props) => (props.primary ? "white" : "palevioletred")};
+  background-color: ${(props) => (props.primary ? "red" : "white")};
 
   font-size: 1em;
   margin: 1em;
@@ -360,11 +513,38 @@ render(
 
 ---
 
+#### Other casess
+
+- router
+
+  ```js
+  import { Link } from "react-router-dom";
+
+  const NavLink = styled(Link)`
+    /* style for Link Component */
+  `;
+  ```
+
+- Sass `Mixins`
+
+  ```js
+  import { css } from "react-router-dom";
+
+  const shlabel = css`
+    /* style for the mixin */
+  `;
+
+  // in other compoent
+  @include shlabel
+  ```
+
+---
+
 ### CSS Modules
 
 CSS Modules let you use the same CSS class name in different files without worrying about naming clashes.
 
-- EX :
+- you must give the css-file this format : `.module.css`
 
 ```css
 /* in Button.module.css */
@@ -375,11 +555,12 @@ CSS Modules let you use the same CSS class name in different files without worry
 ```
 
 ```js
-import styles from "./Button.module.css"; // Import css modules stylesheet as styles
+// in button.component.jsx
+
+import styles from "./Button.module.css"; // Import styles object from the css file
 
 const Button = () => {
-  // reference as a js object
-  return <button className={styles.errorMessage}>Error Button</button>;
+export   return <button className={styles.errorMessage}>Error Button</button>;
   // note: if the class name is not  a single word like "btn--inner" we then use bracket notation for the styles object => className={styles["btn--inner"]}
 };
 
@@ -401,10 +582,12 @@ const Button = () => {
 
 ### List Components
 
-- we can use the array `map` method to iterate over our list items
-- to map them from JavaScript primitive to HTML elements. Each element must receive a **mandatory** `key` prop
+- we can use the array `map` method to iterate over our list items to map them from JavaScript primitive to HTML elements.
 
-- `Keys` : Keys help React identify which items have changed, are added, or are removed. Keys should be given to the elements inside the array to give the elements a stable identity.
+  - Each element must receive a **mandatory** `key` prop
+
+- `Keys` : Keys help React identify which items have changed, been added, or been removed. so that react only updates this item and not the whole list of items.
+  - Keys should be given to the elements inside the array to give the elements a stable identity.
 
 ```js
 const numbers = [1, 2, 3, 4, 5];
@@ -445,6 +628,8 @@ const List = () => {
   - empty brakets `<> </>` : not recommended as vs-code won't know how to organize the code
   - Fragment `<React.Fragment> </React.Fragment>`
 
+---
+
 ### Portals
 
 Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
@@ -460,10 +645,12 @@ ReactDOM.createPortal(child, container);
 // The first argument (child) is any renderable React child, such as an element, string, or fragment. The second argument (container) is a DOM element.
 ```
 
+---
+
 ### Refs
 
 - [reference](https://blog.logrocket.com/complete-guide-react-refs/)
-- The escape hatches are refs, which allow us to access DOM properties directly. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in clutch.
+- The escape hatches are refs, which allow us to access DOM properties directly. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
 
 > Note: refs are escape hatches for React developers, and we should try to avoid using them if possible.
 
@@ -532,7 +719,7 @@ function Message({ greet, who }) {
 
 ---
 
-## Communicating Between Components in React
+## Communicating Between Components
 
 [reference](https://www.pluralsight.com/guides/react-communicating-between-components)
 
@@ -646,6 +833,7 @@ const Expenses = (props) => {
 Data binding in React can be achieved by using a `controlled input`. A controlled input is achieved by binding the `value` to a `state variable` and an `onChange` event to change the state as the `input value` changes.
 
 ```js
+// 2 way data-binding because of (value={value})
 const App = () => {
   const [value, setValue] = useState("Hello World");
   const handleChange = (e) => setValue(e.target.value);
@@ -660,57 +848,15 @@ const App = () => {
 
 ---
 
-## React.memo()
+## Forms
 
-- When deciding to update DOM, React first renders your component, then compares the result with the previous render. If the render results are different, React updates the DOM.
-- When a component is wrapped in React.memo(), React renders the component and memoizes the result. Before the next render, if the new props are the same, React reuses the memoized result **skipping the next rendering.**
-
----
-
-## Error Boundaries
-
-Error Boundaries basically provide some sort of boundaries or checks on errors, They are React components that are used to handle JavaScript errors in their `child component tree`.
-
-- Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed. Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
-- must be used in `class-components`
-- Error boundaries work like a JavaScript `catch {} block`, but for components.
-
-```js
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    // You can also log the error to an error reporting service
-    logErrorToMyService(error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return this.props.children;
-  }
-}
-
-// Then you can use it as a regular component:
-<ErrorBoundary>
-  <MyWidget />
-</ErrorBoundary>;
-```
+[Here](https://formik.org/)
 
 ---
 
 ## Interview Questions
+
+[React Interview Questions & Answers](https://github.com/sudheerj/reactjs-interview-questions)
 
 - Why React Hook useState uses const and not let?
 

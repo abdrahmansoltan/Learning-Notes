@@ -125,8 +125,7 @@
   - `emit` triggers an event
   - `on` observes an event and wait until it occurs
 
-  <img src='./img/observer.PNG' width=48%>
-  <img src='./img/observer2.PNG' width=48%>
+  ![observer](./img/observer.png)
 
 ```js
 const EventEmitter = require("events"); // class

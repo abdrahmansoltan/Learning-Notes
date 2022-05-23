@@ -3,9 +3,12 @@
 - [INDEX](#index)
 - [class component](#class-component)
 - [Component Constructor](#component-constructor)
+  - [State](#state)
+  - [Setting the state](#setting-the-state)
   - [Props in the Constructor](#props-in-the-constructor)
 - [component life-Cycles](#component-life-cycles)
   - [Order of executing:](#order-of-executing)
+- [Error Boundaries](#error-boundaries)
 
 ---
 
@@ -13,15 +16,13 @@
 
 - Before React 16.8, Class components were the only way to track state and lifecycle on a React component. Function components were considered "state-less".
 
-- With the addition of `Hooks`, `Function components` are now almost equivalent to Class components. The differences are so minor that you will probably never need to use a Class component in React.
-
 - we inheret from the `component` **parent-Class** in order to use the `props` => `extends React.Component`
 - The component also requires a `render()` method, this method returns HTML.
 
 ```js
-import { component } from "react";
+import { Component } from "react";
 
-class Welcome extends React.Component {
+class Welcome extends Component {
   render() {
     return <h1>Hello, {this.props.name}</h1>;
   }
@@ -32,8 +33,11 @@ class Welcome extends React.Component {
 
 ## Component Constructor
 
-- The constructor function is where you initiate the component's properties.
-- In React, component properties should be kept in an object called `state`
+- The `constructor function` is where you initiate the component's properties.
+
+### State
+
+- In React, component properties should be kept in an **object** called `state`
 - `state` in class-component is **Always** an `object` but in functional-component it is any type
 - `setState` -> re-invoke the `render()` method from the `component` class
 
@@ -50,6 +54,21 @@ class Car extends React.Component {
   }
 }
 ```
+
+---
+
+### Setting the state
+
+```js
+this.setState({ stateName: updatedStateValue });
+
+// OR
+this.setState((prevState) => ({
+  stateName: prevState.stateName + 1,
+}));
+```
+
+---
 
 ### Props in the Constructor
 
@@ -121,5 +140,48 @@ class Clock extends React.Component {
 2. `render()` method
 3. `componentDid...` methods -> (setting the new state)
 4. rerender using `render()` method again
+
+---
+
+## Error Boundaries
+
+Error Boundaries basically provide some sort of boundaries or checks on errors, They are React components that are used to handle JavaScript errors in their `child component tree`.
+
+- Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed. Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
+- must be used in `class-components`
+- Error boundaries work like a JavaScript `catch {} block`, but for components.
+
+```js
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // You can also log the error to an error reporting service
+    logErrorToMyService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+
+// Then you can use it as a regular component:
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>;
+```
 
 ---

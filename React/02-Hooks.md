@@ -7,15 +7,13 @@
   - [Using the state](#using-the-state)
 - [Effect Hook](#effect-hook)
   - [useEffect](#useeffect)
-  - [useEffect cleanup function](#useeffect-cleanup-function)
+    - [useEffect cleanup function](#useeffect-cleanup-function)
 - [useReducer()](#usereducer)
 - [useContext()](#usecontext)
   - [Prop drilling](#prop-drilling)
   - [Soulution](#soulution)
   - [useContext Hook](#usecontext-hook)
 - [Hooks Rules](#hooks-rules)
-- [useCallback()](#usecallback)
-- [useMemo()](#usememo)
 - [Custom Hooks](#custom-hooks)
 
 ---
@@ -87,7 +85,7 @@ function FavoriteColor() {
 ## Effect Hook
 
 - when changing the state => the **whole function-component** `rerenders`.
-- data fetching(`HTTP requests`), subscriptions, or manually changing the DOM from React components. We call these operations `“side effects`” (or `“effects”` for short) because they can affect other components and **can’t be done during rendering.**
+- Data fetching(`HTTP requests`), subscriptions, or manually changing the DOM from React components. We call these operations `side effects` (or `effects` for short) because they can affect other components and **can’t be done during rendering.**
   - so such `sideEffects` shouldn't go directly inside the component-function as it will create bugs
 - The Effect Hook, `useEffect`, adds the ability to perform side effects from a function component. It serves the same purpose as `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount` in React classes, but unified into a single API
 
@@ -95,11 +93,11 @@ function FavoriteColor() {
 
 ![useEffect](./img/sideEffects.PNG)
 
-- When you call `useEffect`, you’re telling React to run your `“effect”` function after flushing changes to the `DOM`. Effects are declared inside the component so they have access to its props and state. By default, React runs the effects after every render — including the first render.
+- When you call `useEffect`, you’re telling React to run your `effect` function after flushing changes to the `DOM`. Effects are declared inside the component so they have access to its props and state. By default, React runs the effects after every render — including the first render.
 
 <img src="./img/react-useeffect-callback-3.svg" style="background-color: #fff">
 
-### useEffect cleanup function
+#### useEffect cleanup function
 
 - it saves applications from unwanted behaviors like memory leaks by cleaning up effects. In doing so, we can optimize our application’s performance.
 - it allows us to tidy up our code before our component unmounts. When our code runs and reruns for every render, useEffect also cleans up after itself using the cleanup function.
@@ -126,29 +124,56 @@ useEffect(() => {
 ![useReducer](./img/reducer.PNG)
 
 - in `useState()` the state management logic takes a good part of the component body.
-  - That's a problem because the React component in nature should contain the logic that calculates the output. But the state management logic is a different concern that should be managed in a separate place. Otherwise, you get a mix of state management and rendering logic in one place, and that's difficult to read, maintain, and test!
+
+  - That's a problem because the React component in nature should contain the logic that calculates the output. But the state management logic is a different concern that should be managed in a separate place. Otherwise, you get a mix of state management and rendering logic in one place, and that's difficult to read, maintain, and test! as the order of depending states may differ and cause wrong action!
+
 - `useReducer()` does so by extracting the state management out of the component.
 
 - Use-Cases :
 
   - When you have states that belongs together
-  - if you have state updates that depend on other state.
+  - if you have a state updates (is setted) that depend on other state.
+  - If you find yourself keeping track of multiple pieces of state that rely on complex logic
 
-- The hook returns an `array of 2 items`: the `current state` and the `dispatch function`.
+- It's similar to `useState()` as the hook returns an `array of 2 items`: the `current state` and the `dispatch function`.
+- `reducer function` can be outside the component as it doesn't use any items from the component, it only uses **items rendered by react**
+
+---
 
 ![usereducer](./img/useReducer.PNG)
+
+- `reducer function` contains your custom state logic(different senarios).
+  - after executing the senario-code, you should return a new state object
+- `initialState` can be a simple value but generally will contain an **object** as it's for more complex state.
+- `dispatch` : is what we call in order to update the state --> it's like `setState()`
+  - it will call the `reducer function` for us with `argument = action-object`
+- `action` is an **object** that tells the reducer how to change the state.
+  - It must contain a **type** property
+  - It can contain an optional **payload** object wich has properties you want to add to the state(parameters to be used)
+- Finally: when state is updated the component gets rerendered just like in `useState()`
+
+![usereducer](./img/reducer2.svg)
 
 ```js
 import { useReducer } from "react";
 
 // reducer function can be here outside the component
 
-function MyComponent() {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const action = {
-    type: "ActionType",
-  };
-  return <button onClick={() => dispatch(action)}>Click me</button>;
+const [state, dispatch] = useReducer(reducer, initialState);
+
+function reducer(state, action) {
+  let newState;
+  switch (action.type) {
+    case "increase":
+      newState = { counter: state.counter + 1 };
+      break;
+    case "descrease":
+      newState = { counter: state.counter - 1 };
+      break;
+    default:
+      throw new Error();
+  }
+  return newState;
 }
 ```
 
@@ -285,53 +310,6 @@ function Component5() {
 ## Hooks Rules
 
 ![rules](./img/rules.PNG)
-
----
-
-## useCallback()
-
-[read here](ff)
-
-- It's an optimization technique for functions especially in `react.memo()`
-
-> "Every callback function should be memoized to prevent useless re-rendering of child components that use the callback function"
-
-```js
-mport React, { useCallback } from 'react';
-function MyComponent() {
-  const handleClick = useCallback(() => {
-    // handle the click event
-  }, []);
-  return <MyChild onClick={handleClick} />;
-}
-```
-
-## useMemo()
-
-- The React useMemo Hook returns a `memoized` value.
-  - Think of memoization as `caching` a value so that it does not need to be recalculated.
-- only runs when one of its dependencies update This can improve performance.
-- usually with high-computation operations like `sorting`, `a result-value from for-loop
-
-- The `useMemo` and `useCallback` Hooks are similar. The main difference is that useMemo returns a memoized value`(reference-values like objects & Arrays)` and useCallback returns a memoized function.
-  `
-
-```js
-import { useState, useMemo } from "react";
-import ReactDOM from "react-dom";
-
-const App = () => {
-  const [count, setCount] = useState(0);
-  const [todos, setTodos] = useState([]);
-  const calculation = useMemo(() => expensiveCalculation(count), [count]);
-
-  const increment = () => {
-    setCount((c) => c + 1);
-  };
-  const addTodo = () => {
-    setTodos((t) => [...t, "New Todo"]);
-  };
-```
 
 ---
 

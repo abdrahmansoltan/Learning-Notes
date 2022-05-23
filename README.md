@@ -90,6 +90,8 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [MongoDB](./Databases/MongoDB.md)
 
+- [GraphQL](./Databases/GraphQL.md)
+
 ---
 
 ## Frameworks
