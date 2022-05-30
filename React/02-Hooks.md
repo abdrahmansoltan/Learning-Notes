@@ -3,8 +3,13 @@
 - [INDEX](#index)
 - [Functional Components](#functional-components)
 - [Component's State](#components-state)
+  - [State is Async](#state-is-async)
   - [Difference between state and props](#difference-between-state-and-props)
   - [Using the state](#using-the-state)
+- [UseRef Hook](#useref-hook)
+  - [Why use it ?](#why-use-it-)
+  - [The Reference object](#the-reference-object)
+  - [Example](#example)
 - [Effect Hook](#effect-hook)
   - [useEffect](#useeffect)
     - [useEffect cleanup function](#useeffect-cleanup-function)
@@ -30,6 +35,14 @@ here each time the state change the entire function get called and rerendered un
 
 - `setState()` schedules an update to a component’s state object. When state changes, the component responds by `re-rendering`.
   - it happens `ASynchronously` as react finds the best strategy to change it, so it's better to use a callback function inside of `setState`
+
+### State is Async
+
+- Notice that the state changes **asynchronously**
+
+> you can check that with console.logging the state inside tha handler function that sets the state
+
+---
 
 ### Difference between state and props
 
@@ -78,6 +91,67 @@ function FavoriteColor() {
     </>
   );
 }
+```
+
+---
+
+## UseRef Hook
+
+It allows you to persist values between renders.
+
+It can be used to store a mutable value that does not cause a re-render when updated.
+
+It can be used to access a DOM element directly.
+
+- usually used For:
+  - **form-input**
+  - Accessing DOM elements
+
+### Why use it ?
+
+If we tried to count how many times our application renders using the `useState` Hook, we would be caught in an infinite loop since this Hook itself causes a re-render.
+
+To avoid this, we can use the useRef Hook.
+
+---
+
+### The Reference object
+
+the variable you use `useRef` with will become an object with a **current** property which contains the referenced element
+
+---
+
+### Example
+
+```js
+// Using useRef to focus the input
+
+import { useRef } from "react";
+
+function App() {
+  const inputElement = useRef();
+
+  const focusInput = () => {
+    inputElement.current.focus();
+  };
+
+  return (
+    <>
+      <input type="text" ref={inputElement} />
+      <button onClick={focusInput}>Focus Input</button>
+    </>
+  );
+}
+```
+
+**Note**: You can also access form-inputs with useState ->
+
+```js
+ handleChange(e) {
+  setState(e.target.value);
+}
+
+<input type="text" value={state} onChange={handleChange} />
 ```
 
 ---

@@ -12,7 +12,10 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Databases](#databases)
 - [Frameworks](#frameworks)
 - [React](#react)
+- [Next js](#next-js)
 - [Angular](#angular)
+- [Vue](#vue)
+- [Git](#git)
 
 ---
 
@@ -114,6 +117,26 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ---
 
+## Next js
+
+[Next js](./Nextjs/1-Nextjs.md)
+
+---
+
 ## Angular
 
 - [Angular](./Angular/2-Angular.md)
+
+---
+
+## Vue
+
+- [Vue](./Vue/1-Vue.md)
+- [Vuex](./Vue/2-Vuex.md)
+
+---
+
+## Git
+
+- [Git](./Git/02-Github.md)
+- [Github](./Git/01-Git.md)

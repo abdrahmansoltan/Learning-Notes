@@ -228,6 +228,16 @@ Starting from `Node.js 13.2.0` now `node.js` supports ECMAScript modules, known 
   - The module's file extension is .mjs
   - Or the module's nearest parent folder has `{ "type": "module" }` in `package.json`
 
+- **NOTE**: You must specify the file extension when importing
+
+```js
+// won't work
+import notFoundMiddleware from "./middlewares/not-found";
+
+// will work
+import notFoundMiddleware from "./middlewares/not-found.js";
+```
+
 ---
 
 ### Module vs Package

@@ -14,7 +14,7 @@
   - [Set Up](#set-up)
   - [Using it](#using-it)
   - [Dynamic Routes](#dynamic-routes)
-  - [Programmaticaly navigation](#programmaticaly-navigation)
+  - [Programmatically navigation](#programmatically-navigation)
     - [changing the page's url](#changing-the-pages-url)
     - [Accessing the page's url](#accessing-the-pages-url)
   - [Prompt](#prompt)
@@ -45,6 +45,7 @@
   - [Events in HTML vs React](#events-in-html-vs-react)
   - [Data binding](#data-binding)
 - [Forms](#forms)
+- [Environmental Variables](#environmental-variables)
 - [Interview Questions](#interview-questions)
 
 ---
@@ -301,6 +302,7 @@ import { Route, Switch } from "react-router";
 
 - when you want to change the page's URL, we don't use `<a>` as it will make the page **reload**(make a new request)
 - Instead we use `<Link>` from `react-router-dom`
+- **Note**: `<Link>` can be represented as `<a>` in **css**
 
 ```js
 import { Link } from "react-router-dom";
@@ -351,7 +353,7 @@ console.log(params.productId);
 
 ---
 
-### Programmaticaly navigation
+### Programmatically navigation
 
 #### changing the page's url
 
@@ -851,6 +853,15 @@ const App = () => {
 ## Forms
 
 [Here](https://formik.org/)
+
+---
+
+## Environmental Variables
+
+in `.env` file:
+
+- You must create custom environment variables beginning with `REACT_APP_`
+- [Docs](https://create-react-app.dev/docs/adding-custom-environment-variables/#adding-development-environment-variables-in-env)
 
 ---
 
