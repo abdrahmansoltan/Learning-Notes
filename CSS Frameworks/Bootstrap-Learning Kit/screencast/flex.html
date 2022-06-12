@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap 5 Learning Kit – Screencast – Utilities: Flex</title>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../css/zenburn.css">
+    <link rel="stylesheet" href="../css/styles.css">
+    <!-- Styling to better show these examples -->
+    <style type="text/css">
+      .d-flex,
+      .d-inline-flex {
+        background-color: #f8f9fa;
+      }
+      .d-flex div {
+        border: 1px solid white;
+        background-color: #6c757d;
+        color: white;
+        padding: 0.5rem;
+      }
+      [class*=align-items-],
+      [data-example="alignSelf"],
+      [class*=align-content-] {
+        height: 200px;
+      }
+      .responsive-examples {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+          <h1 class="mb-0 h4"><a href="../index.html" class="navbar-brand">Bootstrap 5 Learning Kit</a></h1>
+          <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarDropdown" aria-controls="navbarDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarDropdown">
+            <ul class="navbar-nav me-auto">
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Layout</a>
+                <div class="dropdown-menu">
+                  <a href="container.html" class="dropdown-item">Container</a>
+                  <a href="grid.html" class="dropdown-item">Grid</a>
+                  <a href="columns.html" class="dropdown-item">Columns</a>
+                  <a href="gutters.html" class="dropdown-item">Gutters</a>
+                  <a href="utilities-for-layout.html" class="dropdown-item d-none">Utilities for layout</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Content</a>
+                <div class="dropdown-menu">
+                  <a href="typography.html" class="dropdown-item">Typography</a>
+                  <a href="images.html" class="dropdown-item">Images</a>
+                  <a href="tables.html" class="dropdown-item">Tables</a>
+                  <a href="figures.html" class="dropdown-item">Figures</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Forms</a>
+                <div class="dropdown-menu">
+                  <a href="overview.html" class="dropdown-item">Overview</a>
+                  <a href="form-control.html" class="dropdown-item">Form control</a>
+                  <a href="select.html" class="dropdown-item">Select</a>
+                  <a href="checks-radios.html" class="dropdown-item">Checks and radios</a>
+                  <a href="range.html" class="dropdown-item">Range</a>
+                  <a href="input-group.html" class="dropdown-item">Input group</a>
+                  <a href="floating-labels.html" class="dropdown-item">Floating labels</a>
+                  <a href="layout.html" class="dropdown-item">Layout</a>
+                  <a href="validation.html" class="dropdown-item">Validation</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Components</a>
+                <div class="dropdown-menu">
+                  <a href="accordion.html" class="dropdown-item">Accordion</a>
+                  <a href="alerts.html" class="dropdown-item">Alerts</a>
+                  <a href="badge.html" class="dropdown-item">Badge</a>
+                  <a href="breadcrumb.html" class="dropdown-item">Breadcrumb</a>
+                  <a href="buttons.html" class="dropdown-item">Buttons</a>
+                  <a href="button-group.html" class="dropdown-item">Button group</a>
+                  <a href="card.html" class="dropdown-item">Card</a>
+                  <a href="carousel.html" class="dropdown-item">Carousel</a>
+                  <a href="close-button.html" class="dropdown-item">Close button</a>
+                  <a href="collapse.html" class="dropdown-item">Collapse</a>
+                  <a href="dropdowns.html" class="dropdown-item">Dropdowns</a>
+                  <a href="list-group.html" class="dropdown-item">List group</a>
+                  <a href="modal.html" class="dropdown-item">Modal</a>
+                  <a href="navs-tabs.html" class="dropdown-item">Navs and tabs</a>
+                  <a href="navbar.html" class="dropdown-item">Navbar</a>
+                  <a href="offcanvas.html" class="dropdown-item">Offcanvas</a>
+                  <a href="pagination.html" class="dropdown-item">Pagination</a>
+                  <a href="placeholders.html" class="dropdown-item">Placeholders</a>
+                  <a href="popovers.html" class="dropdown-item">Popovers</a>
+                  <a href="progress.html" class="dropdown-item">Progress</a>
+                  <a href="scrollspy.html" class="dropdown-item">Scrollspy</a>
+                  <a href="spinners.html" class="dropdown-item">Spinners</a>
+                  <a href="toasts.html" class="dropdown-item">Toasts</a>
+                  <a href="tooltips.html" class="dropdown-item">Tooltips</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Helpers</a>
+                <div class="dropdown-menu">
+                  <a href="clearfix.html" class="dropdown-item">Clearfix</a>
+                  <a href="colored-links.html" class="dropdown-item">Colored links</a>
+                  <a href="ratio.html" class="dropdown-item">Ratio</a>
+                  <a href="position-helpers.html" class="dropdown-item">Position</a>
+                  <a href="stacks.html" class="dropdown-item">Stacks</a>
+                  <a href="visually-hidden.html" class="dropdown-item">Visually hidden</a>
+                  <a href="stretched-link.html" class="dropdown-item">Stretched link</a>
+                  <a href="text-truncation.html" class="dropdown-item">Text truncation</a>
+                  <a href="vertical-rule.html" class="dropdown-item">Vertical rule</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Utilities</a>
+                <div class="dropdown-menu">
+                  <a href="background.html" class="dropdown-item">Background</a>
+                  <a href="borders.html" class="dropdown-item">Borders</a>
+                  <a href="colors.html" class="dropdown-item">Colors</a>
+                  <a href="display.html" class="dropdown-item">Display</a>
+                  <a href="flex.html" class="dropdown-item">Flex</a>
+                  <a href="float.html" class="dropdown-item">Float</a>
+                  <a href="interactions.html" class="dropdown-item">Interactions</a>
+                  <a href="opacity.html" class="dropdown-item">Opacity</a>
+                  <a href="overflow.html" class="dropdown-item">Overflow</a>
+                  <a href="position-utilities.html" class="dropdown-item">Position</a>
+                  <a href="shadows.html" class="dropdown-item">Shadows</a>
+                  <a href="sizing.html" class="dropdown-item">Sizing</a>
+                  <a href="spacing.html" class="dropdown-item">Spacing</a>
+                  <a href="text.html" class="dropdown-item">Text</a>
+                  <a href="vertical-align.html" class="dropdown-item">Vertical align</a>
+                  <a href="visibility.html" class="dropdown-item">Visibility</a>
+                </div>
+              </li>
+            </ul>
+            <div class="btn-group btn-group-sm" role="group" aria-label="Toggle section">
+              <a href="../reference/flex.html" class="btn btn-secondary">Reference</a>
+              <a href="../practice/flex.html" class="btn btn-secondary">Practice</a>
+              <a href="../screencast/flex.html" class="btn btn-dark">Screencast</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="container mt-3">
+        <div class="row">
+          <div class="col-12 col-lg-3 sticky-top">
+            <div class="sticky-top js-sidebar">
+              <div class="card d-none d-lg-block">
+                <h5 class="card-header">Page Navigation:</h5>
+                <div class="list-group list-group-flush" id="page-navigation"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-9">
+            <h2 class="component display-4">Flex</h2>
+            <hr>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Container</h3>
+              <div class="code-live">
+                <div>Flexbox container</div>
+                <div>Inline flexbox container</div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Direction</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Row</h4>
+                <div>
+                  <div>Flex direction row</div>
+                  <div>Flex direction row</div>
+                  <div>Flex direction row</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Row-reverse</h4>
+                <div>
+                  <div>Flex direction row-reverse</div>
+                  <div>Flex direction row-reverse</div>
+                  <div>Flex direction row-reverse</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Column</h4>
+                <div>
+                  <div>Flex direction column</div>
+                  <div>Flex direction column</div>
+                  <div>Flex direction column</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Column-reverse</h4>
+                <div>
+                  <div>Flex direction column-reverse</div>
+                  <div>Flex direction column-reverse</div>
+                  <div>Flex direction column-reverse</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Justify content</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Start</h4>
+                <div>
+                  <div>Justify content start</div>
+                  <div>Justify content start</div>
+                  <div>Justify content start</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Center</h4>
+                <div>
+                  <div>Justify content center</div>
+                  <div>Justify content center</div>
+                  <div>Justify content center</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">End</h4>
+                <div>
+                  <div>Justify content end</div>
+                  <div>Justify content end</div>
+                  <div>Justify content end</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Between</h4>
+                <div>
+                  <div>Justify content between</div>
+                  <div>Justify content between</div>
+                  <div>Justify content between</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Around</h4>
+                <div>
+                  <div>Justify content around</div>
+                  <div>Justify content around</div>
+                  <div>Justify content around</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Align items</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Start</h4>
+                <div>
+                  <div>Align items start</div>
+                  <div>Align items start</div>
+                  <div>Align items start</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Center</h4>
+                <div>
+                  <div>Align items center</div>
+                  <div>Align items center</div>
+                  <div>Align items center</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">End</h4>
+                <div>
+                  <div>Align items end</div>
+                  <div>Align items end</div>
+                  <div>Align items end</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Baseline</h4>
+                <div>
+                  <div>Align items baseline</div>
+                  <div>Align items baseline</div>
+                  <div>Align items baseline</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Stretch</h4>
+                <div>
+                  <div>Align items stretch</div>
+                  <div>Align items stretch</div>
+                  <div>Align items stretch</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Align self</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Start</h4>
+                <div data-example="alignSelf">
+                  <div>Align self start</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Center</h4>
+                <div data-example="alignSelf">
+                  <div>Align self center</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">End</h4>
+                <div data-example="alignSelf">
+                  <div>Align self end</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Baseline</h4>
+                <div data-example="alignSelf">
+                  <div>Align self baseline</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Stretch</h4>
+                <div data-example="alignSelf">
+                  <div>Align self stretch</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Auto margins</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Horizontal</h4>
+                <div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                  <div>Margin left auto</div>
+                </div>
+                <div>
+                  <div>Margin right auto</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Vertical</h4>
+                <div>
+                  <div>Margin bottom auto</div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                </div>
+                <div>
+                  <div>Flex item</div>
+                  <div>Flex item</div>
+                  <div>Margin top auto</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Fill</h3>
+              <div class="code-live">
+                <div>
+                  <div>Flex fill</div>
+                  <div>Flex fill</div>
+                  <div>Flex fill</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Grow</h3>
+              <div class="code-live">
+                <div>
+                  <div>Flex grow</div>
+                  <div>Flex grow</div>
+                  <div>Flex grow</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Shrink</h3>
+              <div class="code-live">
+                <div>
+                  <div>Flex shrink</div>
+                  <div>Flex shrink</div>
+                  <div>Flex shrink</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Wrap</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Nowrap</h4>
+                <div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                  <div>Flex-wrap nowrap</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Wrap</h4>
+                <div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                  <div>Flex-wrap wrap</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Wrap-reverse</h4>
+                <div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                  <div>Flex-wrap reverse</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Order</h3>
+              <p>order-first (-1), order-0 to order-5 and order-last (6)</p>
+              <div class="code-live">
+                <div>
+                  <div>First, but last</div>
+                  <div>Second, but number 5</div>
+                  <div>Third, but number 4</div>
+                  <div>Fourth, but number 3</div>
+                  <div>Fifth, but first</div>
+                  <div>Last, but unordered, so number 2</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Align content</h3>
+              <div class="code-live">
+                <h4 class="h5 text-muted mt-3">Start</h4>
+                <div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                  <div>Align content start</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Center</h4>
+                <div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                  <div>Align content center</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">End</h4>
+                <div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                  <div>Align content end</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Between</h4>
+                <div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                  <div>Align content between</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Around</h4>
+                <div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                  <div>Align content around</div>
+                </div>
+                <h4 class="h5 text-muted mt-3">Stretch</h4>
+                <div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                  <div>Align content stretch</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="code-example mb-5" data-css='.d-flex,&#10;.d-inline-flex {&#10;&#9;background-color: #f8f9fa;&#10;}&#10;.d-flex div {&#10;&#9;border: 1px solid white;&#10;&#9;background-color: #6c757d;&#10;&#9;color: white;&#10;&#9;padding: 0.5rem;&#10;}&#10;[class*=align-items-],&#10;[data-example="alignSelf"],&#10;[class*=align-content-] {&#10;&#9;height: 200px;&#10;}&#10;.responsive-examples {&#10;&#9;display: none;&#10;}'>
+              <h3 class="component-variation text-muted">Responsive examples</h3>
+              <p>Responsive utility classes exist for all the flexbox utilities: display, flex-direction, justify-content, align-items, align-self, flex-wrap, order and align-content. The examples are hidden on the screen, but can be viewed in the source code or by clicking "Toggle code" below.</p>
+              <div class="code-live">
+                <div class="responsive-examples">
+                  <div>Display flex for small devices and up</div>
+                  <div>Display inline-flex for medium devices and up</div>
+                  <div>Display flex for all devices and set flex direction to row for large devices and up</div>
+                  <div>Display flex for all devices and set flex direction to row-reverse for extra large devices and up</div>
+                  <div>Display flex for all devices and set flex direction to column for extra extra large devices and up</div>
+                  <div>Display flex for all devices and set flex direction to column-reverse for small devices and up</div>
+                  <div>Display flex for all devices and justify content to the start for medium devices and up</div>
+                  <div>Display flex for all devices and justify content to the center for large devices and up</div>
+                  <div>Display flex for all devices and justify content to the end for extra large devices and up</div>
+                  <div>Display flex for all devices and justify content between for extra extra large devices and up</div>
+                  <div>Display flex for all devices and justify content around for small devices and up</div>
+                  <div>Display flex for all devices and align items to the start for medium devices and up</div>
+                  <div>Display flex for all devices and align items to the center for large devices and up</div>
+                  <div>Display flex for all devices and align items to the end for extra large devices and up</div>
+                  <div>Display flex for all devices and align items to the baseline for extra extra large devices and up</div>
+                  <div>Display flex for all devices and align items to stretch for small devices and up</div>
+                  <div>
+                    <div>Align self to the start for medium devices and up</div>
+                  </div>
+                  <div>
+                    <div>Align self to the center for large devices and up</div>
+                  </div>
+                  <div>
+                    <div>Align self to the end for extra large devices and up</div>
+                  </div>
+                  <div>
+                    <div>Align self to the baseline for extra extra large devices and up</div>
+                  </div>
+                  <div>
+                    <div>Align self to stretch for small devices and up</div>
+                  </div>
+                  <div>
+                    <div>Fill item for medium devices and up</div>
+                  </div>
+                  <div>
+                    <div>Grow item for large devices and up</div>
+                  </div>
+                  <div>
+                    <div>Shrink item for extra large devices and up</div>
+                  </div>
+                  <div>Display flex for all devices and make items not wrap for extra extra large devices and up</div>
+                  <div>Display flex for all devices and make items wrap for small devices and up</div>
+                  <div>Display flex for all devices and make items wrap in reverse for medium devices and up</div>
+                  <div>
+                    <div>Set the order to 3 for large devices and up</div>
+                    <div>Set the order to 2 for extra large devices and up</div>
+                    <div>Set the order to 1 for extra extra large devices and up</div>
+                  </div>
+                  <div>Display flex for all devices and align content to the start for small devices and up</div>
+                  <div>Display flex for all devices and align content to the center for medium devices and up</div>
+                  <div>Display flex for all devices and align content to the end for large devices and up</div>
+                  <div>Display flex for all devices and align content around for extra large devices and up</div>
+                  <div>Display flex for all devices and align content to stretch for extra extra large devices and up</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script src="../js/highlight.pack.js"></script>
+    <script src="../js/clipboard.min.js"></script>
+    <script src="../js/script.js"></script>
+  </body>
+</html>

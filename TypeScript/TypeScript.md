@@ -644,7 +644,6 @@ decoratorComposition.run();
 Class Decorator is very similar to inheriting from another class.
 
 - Decorators are functions that accepts functions as a parameter as it's applied to functions or classes
--
 
 ```ts
 const classDecorator = (target: Function) => {

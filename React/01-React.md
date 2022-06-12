@@ -55,7 +55,7 @@
 - `npx` is used to execute commands without installing dependencies
 
 ```bash
-npx create-react-app my-app # equivilant to installing react globally first then >> creating react app
+npx create-react-app my-app # equivalent to installing react globally first then >> creating react app
 
 # to run it again
 cd my-app

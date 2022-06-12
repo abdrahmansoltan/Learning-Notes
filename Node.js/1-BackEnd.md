@@ -39,9 +39,9 @@
 
   ![Backend](./img/backend1.PNG)
 
-- we don't do all this in the `client-side` because we have things in server that shouldn't be done in browser like `sequrity`,`transactions`,`authentication`
+- we don't do all this in the `client-side` because we have things in server that shouldn't be done in browser like `security`,`transactions`,`authentication`
 
-- A **Backend** Consists of Three Parts:
+- **Backend** Consists of Three Parts:
   - `server` : the computing resource that listens to requests from the frontend
   - `Application` : code that runs on the server to process requests and return responses
   - `database` : the part of the backend that is responsible for storing and organizing data
@@ -94,7 +94,7 @@ An API is the interface or gateway through which we interact with an external pr
 
 ## same origin policy ( SOP ) & CORS
 
-The Same Origin Policy (SOP) allows a browser to restrict access to resources relating to one origin to being permitted only via other resources from that same origin. (by default that is the behaviour configured in browsers)
+The Same Origin Policy (SOP) allows a browser to restrict access to resources relating to one origin to being permitted only via other resources from that same origin. (by default that is the behavior configured in browsers)
 
 - usually when using client-side on a port & server-side on another port
   - `React` : port3000
@@ -102,7 +102,7 @@ The Same Origin Policy (SOP) allows a browser to restrict access to resources re
 
 ### `Origin`
 
-- it's compination of (domain, scheme, or port)
+- it's combination of (domain, scheme, or port)
 - whenever something in the img below changes, we get a different `origin`
   ![origin](./img/origin.PNG)
 

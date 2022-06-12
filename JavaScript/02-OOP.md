@@ -39,7 +39,9 @@
 ### prototypal inheritance (delegation)
 
 - if a property or a method can't be found in a certain object, javascript will look into its `prototype`
+  - accessing the properties & methods of the parent class
 - look at the `protoType chain` in the PDF
+  - another illustration of the chain: ![alt](./img/protoType%20chain.PNG)
 
 ---
 
@@ -66,13 +68,14 @@
 
 - _notes_
 
-  1. Classes are NOT hoisted
-  2. Classes are first-class citizens
-  3. Classes are executed in strict mode
+  1. There're no **classes** in Javascript, this is just **syntactic sugar**
+  2. Classes are NOT hoisted
+  3. Classes are first-class citizens
+  4. Classes are executed in strict mode
 
 ### `getter` & `setter`
 
-- `getter` : 
+- `getter` :
   - show a method as a property
   - get value out of an object by writing a property instead of writing a method
 - `setter` :

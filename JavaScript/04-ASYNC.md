@@ -43,6 +43,8 @@
 - JavaScript is always `synchronous` and `single-threaded`
 - **but** when `js` runs on certain environments like `browser` or `node.js` --> it allows us to write `asyncronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object
 
+> **Async** means that "we don't have it right now"
+
 ---
 
 ## Building a Promise
@@ -172,10 +174,12 @@ setTimeout(() => {
 ### Promises / Fetch API
 
 - `Promise` : An object that is used as a placeholder for the future result of an asynchronous operation.
+- or: it's an object that may produce a single value some time in the future, either a resolved-value or a (reason that it's rejected)
 
   <img src='./img/promise.png' width=48%>
   <img src='./img/promise_state_inspect.png' width=48%>
 
+- **fetch()**: returns a **promise**
 - Benefits of `promises`
   - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
   - Instead of nesting callbacks, we can chain promises for a

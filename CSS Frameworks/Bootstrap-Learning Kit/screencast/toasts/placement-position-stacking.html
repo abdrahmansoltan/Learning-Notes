@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap 5 Learning Kit – Screencast – Components: Toasts</title>
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/zenburn.css">
+    <link rel="stylesheet" href="../../css/styles.css">
+  </head>
+  <body class="iframe">
+
+    <div class="code-example" data-js="var toastElements = document.querySelectorAll(&apos;.toast&apos;);&#10;for (var i = 0; i < toastElements.length; i++) {&#10;&#9;new bootstrap.Toast(toastElements[i]).show();&#10;}">
+      <div class="code-live">
+        
+      </div>
+    </div>
+
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/highlight.pack.js"></script>
+    <script src="../../js/clipboard.min.js"></script>
+    <script src="../../js/script.js"></script>
+    
+    <!-- Enable all toasts -->
+    <script>
+      var toastElements = document.querySelectorAll('.toast');
+      for (var i = 0; i < toastElements.length; i++) {
+        new bootstrap.Toast(toastElements[i]).show();
+      }
+    </script>
+  </body>
+</html>

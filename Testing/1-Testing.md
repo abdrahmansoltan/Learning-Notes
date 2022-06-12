@@ -3,11 +3,15 @@
 - [INDEX](#index)
 - [Testing](#testing)
   - [Testing Pyramid](#testing-pyramid)
+  - [Snapshot Testing](#snapshot-testing)
+  - [Sanity Test](#sanity-test)
+  - [(AAA) Pattern](#aaa-pattern)
   - [BDD vs TDD](#bdd-vs-tdd)
     - [Behavior Driven Development (BDD)](#behavior-driven-development-bdd)
     - [Test-Driven Development (TDD)](#test-driven-development-tdd)
   - [Test Design Best Practices](#test-design-best-practices)
-  - [Suites and Specs](#suites-and-specs)
+  - [Testing Setup](#testing-setup)
+- [Suites and Specs](#suites-and-specs)
   - [Matchers](#matchers)
     - [Comparisons](#comparisons)
     - [Truthiness](#truthiness)
@@ -17,19 +21,29 @@
     - [othermatchers](#othermatchers)
 - [Backend: Endpoint Testing (HTTP assertions)](#backend-endpoint-testing-http-assertions)
   - [Framework for Endpoint Testing](#framework-for-endpoint-testing)
-- [Performing Tasks Before and After Tests](#performing-tasks-before-and-after-tests)
+- [Testing Hooks](#testing-hooks)
   - [Teardown of Suites](#teardown-of-suites)
-    - [`beforeEach` and `afterEach`](#beforeeach-and-aftereach)
-    - [`beforeAll` and `afterAll`](#beforeall-and-afterall)
+  - [`beforeEach` and `afterEach`](#beforeeach-and-aftereach)
+  - [`beforeAll` and `afterAll`](#beforeall-and-afterall)
   - [Skipping or Specifying Tests](#skipping-or-specifying-tests)
-- [Mock Testing](#mock-testing)
+- [Spies & Mocks (SideEffects)](#spies--mocks-sideeffects)
+  - [Spies](#spies)
+  - [Mock Testing](#mock-testing)
 
 ---
 
 ## Testing
 
-- Introducing testing into your project as a priority and first action allows you to code in a way that writing concise and accurate code that takes into consideration edge cases right from the beginning
+**Testing**: is the process of checking that an application is functioning as expected
+
+- 2 Types of tests:
+
+  - Manual
+  - Automated
+
 - `Unit tests` test individual pieces of code.
+
+  ![unit-test](./img/unit-test.PNG)
 
 ### Testing Pyramid
 
@@ -39,9 +53,31 @@
 
   - the difference between Unit Testing and Integration Testing is the use of third-party integration.
 
-- Jasmine can be used for `End-to-End Testing` with a tool call `Selenium` to emulate user interactions.
+- Jasmine/Jest can be used for `End-to-End Testing` with a tool call `Selenium` to emulate user interactions.
 
-- For `UI Testing`, Jasmine is simply not helpful.
+### Snapshot Testing
+
+- Snapshot tests assert that the current output is same as the output before.
+- The main difference between snapshot testing and functional/unit tests is, snapshot tests never assert the correct behavior of the application functionality but does an output comparison instead.
+
+### Sanity Test
+
+is just a casual term to mean that you're testing/confirming/validating something that should follow very clear and simple logic. It's asking someone else to confirm that you are not **insane** and that what seems to make sense to you also makes sense to them
+
+- Usually at the beginning of the testing process
+
+```js
+expect(true).toBe(true);
+```
+
+---
+
+### (AAA) Pattern
+
+**Arrange** - **Act** - **Assert**
+
+![aaa](./img/aaa.JPG)
+![aaa](./img/aaa2.png)
 
 ---
 
@@ -50,7 +86,7 @@
 #### Behavior Driven Development (BDD)
 
 - tests are focused on how the `user` interacts with the application
-- A development style built on `Test Driven Development` where the focus is** user interaction and stakeholders**.
+- A development style built on `Test Driven Development` where the focus is **user interaction and stakeholders**.
 - `Jasmine` is recognized as a Behavior Driven Development testing framework.
 
 #### Test-Driven Development (TDD)
@@ -59,7 +95,11 @@
 - It focuses on writing unit and integration tests that produce expected results.
 - Test Driven Development Cycle
 
+  ![alt](./img/tdd2.png)
   ![alt](./img/tdd.png)
+  ![alt](./img/TDD3.PNG)
+
+  > Refactor here is for the code-implementation to find more optimized solution, and **not refactor the test**
 
 ---
 
@@ -74,7 +114,13 @@
 
 ---
 
-### Suites and Specs
+### Testing Setup
+
+![test-setup](./img/test-setup.PNG)
+
+---
+
+## Suites and Specs
 
 - `Spec`: an individual test
 - `Suite`: a collection of similar tests related to one function
@@ -171,7 +217,7 @@ describe("Test endpoint responses", () => {
 
 ---
 
-## Performing Tasks Before and After Tests
+## Testing Hooks
 
 ### Teardown of Suites
 
@@ -182,7 +228,7 @@ describe("Test endpoint responses", () => {
   - Run only a specific test
   - Skip one or more tests
 
-#### `beforeEach` and `afterEach`
+### `beforeEach` and `afterEach`
 
 - `beforeEach` takes a callback function where we can tell the test to perform a task before each test is run.
 
@@ -208,7 +254,7 @@ describe("Test endpoint responses", () => {
   });
   ```
 
-#### `beforeAll` and `afterAll`
+### `beforeAll` and `afterAll`
 
 - perform an operation once before/after **all the specs** in a suite
 
@@ -223,6 +269,8 @@ describe("Test endpoint responses", () => {
 ### Skipping or Specifying Tests
 
 ![Skipping](./img/Skipping.PNG)
+
+Here the idea is to eliminate any **pollution** (any test that affect the result of another test)
 
 ```js
 xdescribe("A spec", function () {
@@ -240,13 +288,35 @@ fdescribe("A spec", function () {
 
 ---
 
-## Mock Testing
+## Spies & Mocks (SideEffects)
+
+![spies-mocks](./img/spies-mocks.PNG)
+
+### Spies
+
+It's when you want to see if the function was called, but aren't interested in what the function does.
+
+- `The Jest Object`:
+  - It keeps track to the changes in the function
+  - It is automatically in scope within every test file. The methods in the jest object help create mocks and let you control Jest's overall behavior.
+
+```js
+import { jest } from "jest";
+const mockFn = jest.fn();
+mockFn();
+expect(mockFn).toHaveBeenCalled();
+```
+
+---
+
+### Mock Testing
 
 ![mock](./img/mock.jpg)
 
-Mock testing is an approach to unit testing that lets you make assertions about how the (code under test) is interacting with other system modules. In mock testing, the dependencies(Ex:databse) are replaced with objects that simulate the behaviour of the real ones.
+Mock testing is an approach to unit testing that lets you make assertions about how the (code under test) is interacting with other system modules. In mock testing, the dependencies(Ex:database) are replaced with objects that simulate the behavior of the real ones.
 
-- The purpose of mocking is to isolate and focus on the code being tested and not on the behaviour or state of external dependencies.
+- The purpose of mocking is to isolate and focus on the code being tested and not on the behavior or state of external dependencies.
+  - it does so by changing the functionality of the function to take a **shortcut**.
 - It's used if a function takes a long time to be executed or a promise with a lot of data
 
 [mock function in Jest](https://jestjs.io/docs/mock-functions)

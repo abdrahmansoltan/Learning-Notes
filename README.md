@@ -16,6 +16,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Angular](#angular)
 - [Vue](#vue)
 - [Git](#git)
+- [Testing](#testing)
 
 ---
 
@@ -41,6 +42,10 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [BackEnd](./Node.js/1-BackEnd.md)
 
+- [FrontEnd](./Internet/FrontEnd.md)
+
+- [API](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/08_Programming%20Foundations%20APIs%20and%20Web%20Services/Notes.md)
+
 ---
 
 ## HTML-CSS
@@ -48,6 +53,9 @@ This repository contains notes from my learning Journey to be a reference for an
 - [HTML](./HTML-CSS-SASS/03-HTML.md)
 
 - [CSS](./HTML-CSS-SASS/04-CSS.md)
+- CSS Frameworks:
+  - [Sass](./CSS%20Frameworks/Sass.md)
+  - [Tailwind](./CSS%20Frameworks/Tailwind.md)
 
 ---
 
@@ -65,6 +73,8 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [JavaScript-ARC](./JavaScript/06-ARCHITECTURE.md)
 
+- [JavaScript-Advanced_concepts](./JavaScript/00-JS_Advanced_concepts.md)
+
 ---
 
 ## TypeScript
@@ -75,13 +85,13 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Node.js
 
-- [Node.js](./Node.js/2-Node..md)
+- [Node.js](./Node.js/2-Node.md)
 
 - [Node-FileSystem](./Node.js/4-Node-FileSystem.md)
 
 - [Express](./Node.js/3-Express.md)
 
-- [Node-Sequrity](./Node.js/5-Node-Sequrity%26Authentication.md)
+- [Node-Security](./Node.js/5-Node-Sequrity%26Authentication.md)
 
 ---
 
@@ -133,6 +143,8 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [Vue](./Vue/1-Vue.md)
 - [Vuex](./Vue/2-Vuex.md)
+- [Composition API](./Vue/3-Composition-API.md)
+- [Testing Vue](./Vue/4-Testing-Vue.md)
 
 ---
 
@@ -140,3 +152,11 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [Git](./Git/02-Github.md)
 - [Github](./Git/01-Git.md)
+
+---
+
+## Testing
+
+- [Testing](./Testing/1-Testing.md)
+- [Jasmine](./Testing/2-Jasmine.md)
+- [Jest](./Testing/3-Jest.md)

@@ -3,15 +3,18 @@
 - [INDEX](#index)
 - [Configuring](#configuring)
   - [Installation](#installation)
+  - [Linting](#linting)
 - [Jest Syntax](#jest-syntax)
 - [Testing Asynchronous Code](#testing-asynchronous-code)
   - [1-Promises](#1-promises)
   - [2- Async/Await](#2--asyncawait)
   - [3- Callbacks](#3--callbacks)
   - [Checking number of assertions](#checking-number-of-assertions)
+- [Concurrent Tests](#concurrent-tests)
 - [Testing React components](#testing-react-components)
   - [Snapshot Testing](#snapshot-testing)
   - [Redux testing](#redux-testing)
+- [Mock Testing](#mock-testing)
 
 ---
 
@@ -30,6 +33,14 @@ npm install --save-dev jest
     "test": "jest"
   },
   ```
+
+---
+
+### Linting
+
+EsLint will throw errors when using **test** global-object in the node environment, so:
+
+- add `jest: true` to the **env** in **.eslintrc.js** file
 
 ---
 
@@ -84,7 +95,7 @@ test("the data is peanut butter", async () => {
 
   - The problem is that the test will complete as soon as fetchData completes, before ever calling the callback.
 
-- There is an alternate form of test that fixes this. Instead of putting the test in a function with an empty argument, use a single argument called `done`. **Jest will wait until the done callback is called before finishing the test**.
+- There is an alternate form of test that fixes this. Instead of putting the test in a function with an empty argument, use a single argument called **(done)**. -> **Jest will wait until the done callback is called before finishing the test**.
 
 ```js
 // ---------------------------Don't do this!--------------------------- //
@@ -142,6 +153,12 @@ test("doAsync calls both callbacks", () => {
 
 ---
 
+## Concurrent Tests
+
+Use `test.concurrent` or `describe.concurrent` if you want the test to run concurrently (parallel).
+
+---
+
 ## Testing React components
 
 [enzyme](https://www.npmjs.com/package/enzyme): it allows us to render components
@@ -161,3 +178,10 @@ It's an useful tool whenever you want to make sure your UI does not change unexp
 - `Testing reducers`: It's straight forward as reducer-functions are **pure functions**
 
 - `Testing actions`:
+
+---
+
+## Mock Testing
+
+![fn](./img/jest-fn.PNG)
+![timers](./img/jest-timers.PNG)

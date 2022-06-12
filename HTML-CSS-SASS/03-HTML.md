@@ -3,10 +3,12 @@
 - [INDEX](#index)
 - [Static vs Dynamic websites](#static-vs-dynamic-websites)
 - [HTML](#html)
-- [semantic HTML](#semantic-html)
+- [Semantic HTML](#semantic-html)
+  - [Why ?](#why-)
+  - [Semantic tags](#semantic-tags)
 - [some inline elements to be aware of:](#some-inline-elements-to-be-aware-of)
 - [tricks](#tricks)
-- [Architecturing files](#architecturing-files)
+- [Files-Architecture](#files-architecture)
 - [Form](#form)
 - [Accessibility & Performance](#accessibility--performance)
   - [images](#images)
@@ -14,6 +16,7 @@
     - [background img in css](#background-img-in-css)
     - [image size optimization](#image-size-optimization)
 - [DOM (document object model)](#dom-document-object-model)
+- [Notes](#notes)
 
 ---
 
@@ -40,15 +43,42 @@
 
 ---
 
-## semantic HTML
+## Semantic HTML
 
 A semantic element clearly describes its meaning to both the browser and the developer.
 
-- used for search engine optimization(understanding structure of content)
-- also for accessability (screen reader)
-- Semantic elements = elements with a meaning
-  - Examples of non-semantic elements: `<div>` and `<span>` - Tells nothing about its content.
+> **Semantic elements = HTML-code (elements) with meaning**
+
+- Examples of non-semantic elements: `<div>` and `<span>` - Tells nothing about its content.
   - Examples of semantic elements: `<form>, <table>`, and `<article>`
+
+Writing Semantic HTML means that tags are never chosen based on the way they appear in a web browser, instead, they’re chosen based on the importance and structure of the content.
+
+> We shouldn’t use `<h1>` just because of its large text size. The same goes for other HTML elements. HTML should be coded to represent the data that will be populated with and not based on its default style.
+
+---
+
+### Why ?
+
+Why do we need to tell the browser what our HTML elements represent?
+
+- **SEO**
+
+  - For example, keywords enclosed in an `<h1>` tag are given more importance than those enclosed in an `<p>`. By putting your most important keywords higher up in the hierarchy, you’re effectively telling search engines what your page is about and why people searching for those keywords would be interested in your content, hence improving the Search Engine Optimization of your page.
+
+- **Accessibility**
+
+  - Because semantic HTML uses elements for their given purpose, it’s easier for both people and machines to read and understand it. Making applications accessible not only ensures equal access for people with disabilities but also benefits people without disabilities by allowing them to customize their experiences. Creating a clear hierarchy for the page allows other tools and devices to properly serve up your content.
+
+- **Easy Maintenance**
+  - makes it easier to maintain the code and have a well-organized code.
+
+---
+
+### Semantic tags
+
+![tags](./img/semantic.png)
+![tags](./img/symantic2.jpeg)
 
 ---
 
@@ -78,12 +108,13 @@ A semantic element clearly describes its meaning to both the browser and the dev
 
 ---
 
-## Architecturing files
+## Files-Architecture
 
 - **BEM** (Block - Element - Modifier)
   ![bem](./img/bem.jpg)
+  ![bem](./img/bem2.PNG)
 
-- also you can use `helper class` which is used when you have an item that is used many times but in one place of its use we want to add a css-propery to it 'like margin-right-small'
+- also you can use `helper class` which is used when you have an item that is used many times but in one place of its use we want to add a css-property to it 'like margin-right-small'
 
   ```html
   <a href="#" class="btn btn--full margin-right-sm">click here!</a>
@@ -205,6 +236,8 @@ A semantic element clearly describes its meaning to both the browser and the dev
 
 Here the **Tree structure** is the operation that make html code looks the way it does on the browser(rendered)
 
-```
+---
 
-```
+## Notes
+
+- **hero**: is first section of the page that we want the user to focus on (the headline)

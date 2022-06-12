@@ -4,6 +4,8 @@
 - [styling Types](#styling-types)
 - [selectors](#selectors)
   - [css selector specificity](#css-selector-specificity)
+    - [Calculation:](#calculation)
+    - [Notes:](#notes)
 - [styling (hyperlinks / buttons)](#styling-hyperlinks--buttons)
 - [Box Model](#box-model)
 - [Display](#display)
@@ -14,6 +16,7 @@
 - [LAYOUTS](#layouts)
   - [Float](#float)
   - [Flexbox](#flexbox)
+    - [flex-wrap](#flex-wrap)
   - [GRID](#grid)
 - [Variables](#variables)
 - [icons / SVG](#icons--svg)
@@ -22,7 +25,6 @@
 - [Form](#form)
 - [media queries](#media-queries)
 - [Scrolling](#scrolling)
-- [Saas](#saas)
 
 ---
 
@@ -32,6 +34,8 @@
 2. internal style
 3. external style
 
+> **Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations, when more than one rule applies to a certain element.
+
 ---
 
 ## selectors
@@ -39,7 +43,7 @@
 - Type(element) selectors => p,div,..
 - Class selectors
 - ID selectors
-- decendant selectors => selector in a selector, ex: `p em`
+- descendant selectors => selector in a selector, ex: `p em`
 - **Examples** from [reference](https://www.w3schools.com/cssref/css_selectors.asp)
 
   - `.name1.name2` => Selects all elements with both name1 and name2 set within its class attribute
@@ -47,14 +51,29 @@
   - `div > p` => Selects all `<p>` elements where the parent is a `<div>` element (direct child)
   - `div + p` => Selects the first `<p>` element that is placed **immediately** after `<div>` elements
   - `p ~ ul` => Selects every `<ul>` element that is preceded by a `<p>` element (siblings)
+    - **All** `<ul>` after `<p>`
   - `[target]` => Selects all elements with a target attribute
   - `:not(p)` => Selects every element that is not a `<p>` element
   - `:nth-child(n)` => [nthmaster](http://nthmaster.com/)
 
 ### css selector specificity
 
-<img src='./img/specificity.svg' width=48%>
-<img src='./img/specificity2.png' width=48%>
+If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
+
+#### Calculation:
+
+- Start at 0
+- add 100 for each ID value
+- add 10 for each class value (or pseudo-class or attribute selector)
+- add 1 for each element selector or pseudo-element.
+
+![specificity](./img/specificity.svg)
+![specificity](./img/specificity2.png)
+
+#### Notes:
+
+- `*` has specificity of **0**
+- Specificity in CSS only concerns selectors, not their associated declarations. **!important** applies to a declaration, so it alone plays no role in specificity.
 
 ---
 
@@ -79,6 +98,8 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 - **Collapsing margins** : it's when we have 2 margins(only vertical margins) that occupied the same space, so only one of them will be visible to the page which is the larger one and **not** their sum ![Margin Collapse](./img/MarginCollapse.png)
 - **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/border-collapse.png)
 - between sections use padding not margin
+
+> **THE VISUAL FORMATTING MODEL**: Algorithm that calculates boxes and determines the layout of theses boxes, for each element in the render tree, in order to determine the final layout of the page.
 
 ---
 
@@ -116,25 +137,26 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
   }
   ```
 
-- when you have `pseudo element` like `::before` that has no content, you have 2 choises :
+- when you have `pseudo element` like `::before` that has no content, you have 2 choices :
 
   - `width` / `height` in `px,rem`
   - `width` / `height` in `%` relative to the **parent element**
 
-    - for this we use padding-top/bottom to simulate height ![pseudo element](./img/pseudo%20element.PNG)
+  - for this we use padding-top/bottom to simulate height
+    ![pseudo element](./img/pseudo%20element.PNG)
 
-      ```css
-      /* outer circle */
-      .step-img-box::before {
-        width: 60%;
+    ```css
+    /* outer circle */
+    .step-img-box::before {
+      width: 60%;
 
-        this mimik -> "height: 60%;"
-        padding-bottom: 60%;
+      this mimik -> "height: 60%;"
+      padding-bottom: 60%;
 
-        background-color: #fdf2e9;
-        z-index: -2;
-      }
-      ```
+      background-color: #fdf2e9;
+      z-index: -2;
+    }
+    ```
 
 ---
 
@@ -142,9 +164,15 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 
 - `white-space: no wrap` => this forces it to automatically go to next line when reaching max-width
 - `text-overflow:elipsis` => when text passes the max-width, it shows this `...`at the max-width limit as indication of more text available
-- in the `html` element we set the `font-size` to 62.5% and not 10px => because we wabt ti respect the user's font-size settings.
+- in the `html` element we set the `font-size` to 62.5% and not 10px => because we want to respect the user's font-size settings.
 - `rem` (root element) vs `em` (parent element) : ![rem-em](./img/rem-em.png)
+  - **em** ->
+    - em are measured relative to their **parent font-size**, if used to specify font-size;
+    - em are measured relative to the **current font-size**, if used to specify lengths;
+  - **rem** -> is relative to the html (root) font-size
 - for more fun font use => [Rubik](https://fonts.google.com/specimen/Rubik)
+
+![units](./img/units.PNG)
 
 ---
 
@@ -154,7 +182,7 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 
 - x-offset: means in x-direction (horizontal)
 - y-offset: means in y-direction (vertical)
-- blur-radius: strength of blurness (Optional)
+- blur-radius: strength of blueness (Optional)
 - spread-radius: expand or grow the radius of the shadow (Optional)
 - color: the color of box-shadow (Optional)
 - **Trick** to add border from the inside and not outside => ex: `box-shadow: inset 0 0 0 3px #fff;`
@@ -222,6 +250,21 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 - for flexItems => `flex-basis` is used as a width if row-direction, and a height if column-direction, (by default it's set to `auto`)
 - for flexItems => try not to use `width` and use `flex-basis` with remembering that if it doesn't work that means that the `flex-shrink` is set to 1 not 0
 - flex containers act as a **Block element**, so note this when you apply it to a small item in order to center its contents, you can change it using `display: inline-flex`
+
+#### flex-wrap
+
+It defines whether the flex items are forced in a single line or can be flowed into multiple lines. If set to multiple lines, it also defines the cross-axis which determines the direction new lines are stacked in.
+
+> The **cross axis** is the axis perpendicular to the main axis.
+
+- **nowrap** (default): single-line which may cause the container to overflow
+  ![wrap](./img/nowrap.PNG)
+  - It means that when the end of line is reached, make the items smaller to fit the line together
+- **wrap**: multi-lines, direction is defined by flex-direction
+  ![wrap](./img/wrap.PNG)
+  - It means that when the end of line is reached, make the items keep their width and go to next line
+- **wrap-reverse**: multi-lines, opposite to direction defined by flex-direction
+  ![wrap](./img/wrap-reverse.PNG)
 
 ---
 
@@ -347,19 +390,22 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   ```
 
-  because without this meta, responsive web design won't work on physical mobile devices as their browser will zoom the paga out by default untill it fits the screen, and by writing this line of code we make sure that it will fit their screen width
+  Because without this meta, responsive web design won't work on physical mobile devices as their browser will zoom the page out by default until it fits the screen, and by writing this line of code we make sure that it will fit their screen width
 
 - **Bugs** : `rem` and `em` do NOT depend on html font-size in **media queries**! Instead, 1rem = 1em = 16px => so use `em`
 
-```css
-/* BELOW 1344px(84*16px) (Smaller desktops) */
+  ```css
+  /* BELOW 1344px(84*16px) (Smaller desktops) */
 
-@media (max-width: 84em) {
-  .hero {
-    max-width: 120rem; // it's ok to use (rem) inside it as normal
+  @media (max-width: 84em) {
+    .hero {
+      max-width: 120rem; // it's ok to use (rem) inside it as normal
+    }
   }
-}
-```
+  ```
+
+we do breaks when **design breaks**
+![responsive](./img/responsive.PNG)
 
 ---
 
@@ -412,7 +458,3 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
       ```
 
 ---
-
-## Saas
-
-- **7-1** pattern ![7-1 pattern](./img/sass-architecture.jpg)

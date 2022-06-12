@@ -80,7 +80,7 @@ ng generate module <name of module>
 
 ### Compilation
 
-transfering code to machine code
+transferring code to machine code
 
 - types:
 
