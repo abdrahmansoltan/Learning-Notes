@@ -30,6 +30,7 @@ Vuex is a **state management pattern + library** for Vue.js applications. It ser
 
 ![vuex](./img/vuex1.PNG)
 ![vuex](./img/vuex2.PNG)
+![vuex-benefits](./img/vuex-benefits.PNG)
 
 - Application Structure
 
@@ -202,7 +203,9 @@ export default {
 
 ## Mutations
 
-- must be **synchronous**
+- Must be **synchronous**
+- in the store-options you can use **strict mode** that prevents mutation of the store's state outside of the mutation
+  - Only use it in `development mode` as it reduces performance
 - To perform a mutation, use `commit`
   ```js
   this.$store.commit("name of method(mutation) in the mutations");

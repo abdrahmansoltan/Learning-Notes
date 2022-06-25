@@ -12,8 +12,8 @@
   - [Lexical scope](#lexical-scope)
 - [Functional Programming](#functional-programming)
   - [currying-vs-partial Application](#currying-vs-partial-application)
-  - [closure](#closure)
-    - [Benefits:](#benefits)
+  - [Closure](#closure)
+    - [Benefits](#benefits)
   - [Pure Functions](#pure-functions)
   - [Referential Transparency](#referential-transparency)
   - [composition](#composition)
@@ -87,7 +87,9 @@
     ![type coercion](./img/TypeCoercion2.PNG)
 
 - convert string to number using :
-  - `unary` operator (it's a `+` or `-` before the string number) => `console.log(+"565")`
+  - `unary` operator
+    - it's a `+` or `-` before the string number => `console.log(+"565")`
+    - it's a `!` before something => `console.log(! (x > 4) )`
   - `parseint()` or `parsefloat()` => `parseint(100Ahmed)` = 100
 
 ---
@@ -104,7 +106,9 @@
 
 ### Lexical scope
 
-(range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in**.
+Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope.
+
+> (range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in**.
 
 - It's where the function was called
 
@@ -127,28 +131,19 @@
 
 ---
 
-### closure
+### Closure
 
-- look at the slides
+> The ability to treat functions as values
+
 - A closure is the combination of a function bundled together (`enclosed`) with references to its surrounding state (the lexical environment). In other words, **a closure gives you access to an outer function's scope from an inner function**. In JavaScript, closures are created every time a function is created, at function creation time.
 - A closure makes sure that a function doesn’t loose connection to variables that existed at the function’s birth place
 
   ```javascript
-  let f;
-  const g = function () {
-    // lexical scope
-    const a = 5;
-    f = function () {
-      // closure
-      console.log(a * 2); // (a) is outside :)
-    };
-  };
-
-  g(); // now a = 5 and f() is defined but not yet called
-
-  f(); // now f() will be called with access to (a) even after g() has bed moved from the call-stack
-
-  console.dir(f); // to access closures variables
+  function multiplier(factor) {
+    return (number) => number * factor;
+  }
+  let twice = multiplier(2);
+  console.log(twice(5)); // → 10
   ```
 
 - using callback function which has arguments (Passing "argument" into handler) :
@@ -166,7 +161,7 @@
 
 - when you want to turn **block-scope** into a **functional-scope** -> use **IIFE**
 
-#### Benefits:
+#### Benefits
 
 - It's usually memory-efficient as it caches the values inside its block-scoped in case that it was called again
 - Encapsulation: prevent unwanted access to inner variables/functions
@@ -228,10 +223,12 @@ let compose = (fn1, fn2) => fn2(fn1);
 ## notes
 
 - `console` is not built in js, but it's from the `webApi`
-- ( \` ) is caled a backticks
+- ( \` ) is called a backticks
 - **Statements Vs Expressions** :
   - expression we get a value from it like `5+4` or `Ternary Operator` or `short circuiting` and then you can use it in a `${}`
   - Statements doesn't return a value
+- **Recursion**: has one problem, in typical JavaScript implementations, it’s about three times slower than the looping version. Running through
+  a simple loop is generally cheaper than calling a function multiple times.
 - **Strict mode** :
   - It is not a statement, but a literal expression, ignored by earlier versions of JavaScript.
   - The purpose of `"use strict"` is to indicate that the code should be executed in "strict mode".
@@ -257,4 +254,31 @@ let compose = (fn1, fn2) => fn2(fn1);
   // or anything because everything is an "object"
   ```
 
----
+- **Var** vs **const** & **let**
+
+  - **Var** is function-scoped (not block-scoped) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use it outside the function-scope**
+
+    ```js
+    function f() {
+      // It can be accessible any where (within) this function
+      //
+      var a = 10;
+      console.log(a); // 10
+    }
+    f();
+
+    // A cannot be accessible
+    // outside of function
+    console.log(a); // ReferenceError: a is not defined
+
+    // ---------------------------------------------------------------
+
+    if (true) {
+      // It can be accessible any where
+      var a = 10;
+      console.log(a); // 10
+    }
+    console.log(a); // 10
+    ```
+
+  - **let** is both function-scoped and block-scoped, **means you can't use it outside the function-scope & block-scope**

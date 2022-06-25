@@ -3,24 +3,28 @@
 - [INDEX](#index)
 - [Git](#git)
   - [advantages of distributed version control](#advantages-of-distributed-version-control)
+- [Diff](#diff)
 - [commit message](#commit-message)
   - [Writing a commit message guidelines](#writing-a-commit-message-guidelines)
   - [Hash values (SHA-1)](#hash-values-sha-1)
   - [The HEAD pointer](#the-head-pointer)
 - [Branches](#branches)
   - [commands](#commands)
-    - [Merging](#merging)
+  - [Git stash](#git-stash)
+  - [Merging](#merging)
+    - [Fast Forward Merge](#fast-forward-merge)
+    - [Types](#types)
   - [notes](#notes)
 - [Git Three Trees (Git workflow)](#git-three-trees-git-workflow)
 - [Git commands Notes](#git-commands-notes)
 - [Modifying commits](#modifying-commits)
   - [Changing The Last Commit](#changing-the-last-commit)
-  - [Reverting A Commit](#reverting-a-commit)
   - [Undo changes](#undo-changes)
-    - [Going to any previous commit](#going-to-any-previous-commit)
+    - [Going to any previous commit (Time Traveling)](#going-to-any-previous-commit-time-traveling)
     - [Undo change in working directory](#undo-change-in-working-directory)
   - [Resetting Commits](#resetting-commits)
     - [removing commits](#removing-commits)
+  - [Reverting A Commit](#reverting-a-commit)
   - [Deleting Data Summary](#deleting-data-summary)
 - [Git add](#git-add)
 - [Git Tag](#git-tag)
@@ -50,6 +54,15 @@ Git is software that keeps track of changes that you make to files and directori
 
 ---
 
+## Diff
+
+> **git diff**: lists all the changes in the working directory that are not staged
+
+- `git diff HEAD` compares the changes in the (working directory & staged area) to the last commit
+- `git diff --staged` compares the changes in the staged files to the committed versions.
+
+---
+
 ## commit message
 
 **commit** is a snapshot or checkpoint in your local repo
@@ -71,9 +84,13 @@ Git is software that keeps track of changes that you make to files and directori
 
 ### The HEAD pointer
 
-It's the place where we left off in our repository with what we've committed.
+**It's a pointer to the latest commit on the Branch**
+
+> It's the place where we left off in our repository with what we've committed.
 
 - The main difference between the `^` and the `~` is when a commit is created from a merge. A merge commit has two parents. With a merge commit, the `^` reference is used to indicate the first parent of the commit while `^2` indicates the second parent. The first parent is the branch you were on when you ran git merge while the second parent is the branch that was merged in.
+
+![head](./img/head3.PNG)
 
 <img src='./img/head1.PNG' width = 48%>
 <img src='./img/head2.PNG' width = 48%>
@@ -103,14 +120,51 @@ A branch is a pin pointed arrow to a commit. When you first create a repository,
   # create a new branch called : "nathan"
   git branch nathan
 
-  git checkout nathan
   # Switched to the branch "nathan"
+  git checkout nathan
+  git switch nathan
 
   # or in one line
   git checkout -b nathan # create a branch and switch to it all in one command
+  git switch -c nathan # create a branch and switch to it all in one command
   ```
 
-#### Merging
+---
+
+### Git stash
+
+![stashing](./img/stashing.png)
+
+**Why ?**
+
+- when you are on a branch and do some new work, but don't make any commits, then you want to switch back to another branch:
+  - The changes come with you to the destination branch, or git won't let you switch before committing first
+
+**git stash** temporarily shelves (or stashes) changes you've made to your working copy so you can work on something else, and then come back and re-apply them later on.
+
+![stash](./img/stash.png)
+
+---
+
+### Merging
+
+**Merge commits** are unique against other commits in the fact that they **have two parent commits**.
+
+- When creating a merge commit Git will attempt to auto magically merge the separate histories for you.
+- If Git encounters a piece of data that is changed in both histories it will be unable to automatically combine them.
+  - This scenario is a version control conflict and Git will need user intervention to continue.
+
+---
+
+#### Fast Forward Merge
+
+A fast-forward merge can occur when there is a linear path from the current branch tip to the target branch.
+
+![merge](./img/merge3.PNG)
+
+---
+
+#### Types
 
 ![merge](./img/merge.PNG)
 ![merge](./img/merge2.PNG)
@@ -176,8 +230,7 @@ git merge "nathan"
 ## Git commands Notes
 
 - moving a file and **renaming** a file are the same thing. Because moving a file to a new file path, is a way of renaming it So we're actually going to use "move" as the way to rename it. So "git + mv" for short, that's "git + move" and we move the "second_file.txt" to be "secondary_file.txt".
-- `git diff` compares the changes in the working directory files to the staging index
-  - `git diff --staged` compares staged files to the repository versions.
+
 - always make atomic commits
 - **Compare commits** :
 
@@ -190,7 +243,7 @@ git merge "nathan"
 
 - Undo working directory changes
 
-  - `git checkout -- <name of file in the working directory that is unstaged>`
+  - `git checkout -- <name of file in the working directory that is un-staged>`
 
 ---
 
@@ -198,42 +251,47 @@ git merge "nathan"
 
 ### Changing The Last Commit
 
-- `Amend` means It's taking what's in the last commit, bringing it down, adding your new stuff to it, and recommitting it, and generating a new SHA in the process.
+- **Amend** means It's taking what's in the last commit, bringing it down, adding your new stuff to it, and recommitting it, and generating a new SHA in the process.
+
+  - used if you forgot to add files to a commit or you want to re-write the commit-message
+
+  ![amend](./img/amend.png)
 
 ```bash
+# first add or remove files to/from staging area, then run:
 git commit --amend # --amend flag, you can alter the most-recent commit.
-```
-
-### Reverting A Commit
-
-- When you tell Git to revert a specific commit, Git takes the changes that were made in commit and does the exact opposite of them.
-- `Reverting` creates a new commit that reverts or undo a previous commit.
-
-```bash
-git revert <SHA-of-commit-to-revert>
 ```
 
 ---
 
 ### Undo changes
 
-#### Going to any previous commit
+#### Going to any previous commit (Time Traveling)
 
 ```sh
 # Here we go to new brach (Detached head) with the specified commit
 git checkout <SHA-of-commit-to-go-to>
 ```
 
-**Note**: Don't forget for create new branch from the **Detached head** and if you want you can merge it to your main branch
+> **Note**: Don't forget for create new branch from the **Detached head** and if you want you can merge it to your main branch
+> ![detached head](./img/detached%20head.PNG)
+
+- To go back to the normal head: use `git switch <(main/master) or the name of the branch>`
 
 ---
 
 #### Undo change in working directory
 
 ```sh
+# remove changes (from working directory)
 git checkout <name of the file or . or -A>
-# Or
+# Or using the new command (restore)
 git restore <name of the file or . or -A>
+```
+
+```sh
+# remove staged changes (from staging area to working directory)
+git restore --staged <name of the file or . or -A>
 ```
 
 ```sh
@@ -256,6 +314,8 @@ git clean .
 #### removing commits
 
 ```bash
+git reset --hard <the previous-commit-SHA you want to go to>
+
 git reset --hard HEAD       # (removing HEAD)
 
 git reset --hard HEAD^      # (removing the commit before HEAD)
@@ -278,6 +338,17 @@ git reset --soft HEAD~1  # go back ONE commit
 ```
 
 - going between commits is **dangerous** so we use `branches`
+
+---
+
+### Reverting A Commit
+
+- When you tell Git to revert a specific commit, Git takes the changes that were made in commit and does the exact opposite of them.
+- `Reverting` **creates a new commit** that reverts or undo a previous commit.
+
+```bash
+git revert <SHA-of-commit-to-revert-to>
+```
 
 ---
 
@@ -307,6 +378,9 @@ git ls-files
 ---
 
 ## Git Tag
+
+Usually for **versioning**
+![versioning](./img/versioning.PNG)
 
 ```bash
 git tag -a v1.0 # tag the most recent commit

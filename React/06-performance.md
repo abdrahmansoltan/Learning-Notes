@@ -16,9 +16,13 @@
 
 - When a component is wrapped in React.memo(), React renders the component and memoizes the result. Before the next render, if the `new props` are the same, React reuses the memoized result **skipping the next rendering.**
 
-> This comes at a cost of storing the previos component in memory and comparing it each time, so It's best to use it if you have big component that has a lot of child-components.
+> This comes at a cost of storing the previous component in memory and comparing it each time, so It's best to use it if you have big component that has a lot of child-components.
 
-- **NOTE**: If you have a component wrapped in `React.memo()` and the props from the parent-component is a **callback-function** for and event or other -> you should put the callback in a `useCallback()` hook as each time the parent element renders it will also render the callback-function unless it's in an `useCallback()` hook.
+**NOTE**:
+
+- If you have a component wrapped in `React.memo()` and the props from the parent-component is a **callback-function** for and event or other -> you should put the callback in a `useCallback()` hook as each time the parent element renders it will also render the callback-function unless it's in an `useCallback()` hook.
+- watch out for props that is a **reference type** (e.g functions,objects,arrays,..) as they will be recreated each time the parent component rerenders which will make the prop different each time
+  - To solve this we use [useCallback](#usecallback)
 
 ---
 

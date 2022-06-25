@@ -15,6 +15,8 @@
   - [Snapshot Testing](#snapshot-testing)
   - [Redux testing](#redux-testing)
 - [Mock Testing](#mock-testing)
+  - [Timer Mocks](#timer-mocks)
+  - [HTTP Requests (axios)](#http-requests-axios)
 
 ---
 
@@ -183,5 +185,29 @@ It's an useful tool whenever you want to make sure your UI does not change unexp
 
 ## Mock Testing
 
+> Tests must not depend on external services. Use mocking tools such as jest.mock to avoid it.
+
 ![fn](./img/jest-fn.PNG)
+
+### Timer Mocks
+
+[Timer Mocks](https://jestjs.io/docs/timer-mocks)
 ![timers](./img/jest-timers.PNG)
+
+### HTTP Requests (axios)
+
+```js
+// import axios
+
+jest.mock("axios");
+
+// telling it to make it use this function when it's called
+jest.mock("axios", () => ({
+  get: () => Promise.resolve({ data: [{ val: 1 }] }),
+}));
+
+// or
+
+// to simulate what axios return from GET-REQUEST
+axios.get.mockResolvedValue({ data: [{ val: 1 }] });
+```

@@ -2,7 +2,6 @@
 
 - [INDEX](#index)
 - [Types of state](#types-of-state)
-  - [Disadvantages of Contex](#disadvantages-of-contex)
 - [Installation](#installation)
 - [Redux](#redux)
   - [Core Concept](#core-concept)
@@ -35,19 +34,6 @@
 
 ![alt](./img/states-com.PNG)
 
-### Disadvantages of Contex
-
-1- Complex Setup
-
-- can lead to deeply-nested jsx code and huge context-provider components
-  ![alt](./img/contextDisadvantages.PNG)
-
-2- Performance
-
-- context is not optimized for high-frequency state changes
-
----
-
 ## Installation
 
 ```sh
@@ -59,7 +45,7 @@ npm install react-redux
 npm install --save-dev @redux-devtools/core
 ```
 
-`React-Redux` library lets your React components talk to a Redux store.
+> Redux can work with any javascript project not just React, so we use **React-Redux** library lets your React components talk to a Redux store.
 
 ---
 
@@ -71,14 +57,14 @@ Redux is really:
 
 - A single store containing "global" state
 - Dispatching plain object actions to the store when something happens in the app
-- Pure reducer functions looking at those actions and returning immutably updated state
+- Pure reducer functions looking at those actions and **returning immutably updated state**
 
 ### Core Concept
 
 ![alt](./img/redux.PNG)
 
 - one central data(state) store
-- components subscripe to the store-data(state)
+- components subscribe to the store-data(state)
 - components **Never directly manipulate** the store-data, instead we use `Reducer-function`
 
 ---
@@ -222,6 +208,7 @@ const dispatch = useDispatch();
 
 // setCurrentUser() function generates an action
 dispatch(setCurrentUser(user));
+dispatch({ type: something, payload: {} });
 ```
 
 ---
@@ -235,6 +222,7 @@ import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../store/user/user.selector";
 
 const currentUser = useSelector(selectCurrentUser);
+const counter = useSelector(state () => state.counter);
 ```
 
 ---
@@ -260,7 +248,7 @@ import { createSelector } from "reselect";
 // creating a memoized (CASHED) version of selectCategories (This is what will run if nothing changed)
 const selectCategoryReducer = (state) => state.categories;
 
-// creating dependencies for the chashed values
+// creating dependencies for the changed values
 export const selectCategories = createSelector(
   [selectCategoryReducer],
   (categoriesSlice) => categoriesSlice.categories
@@ -401,7 +389,7 @@ const asyncFunctionMiddleware = (storeAPI) => (next) => (action) => {
 
 Redux already has "**async function** middleware", called the Redux "Thunk" middleware.
 
-- It allows the application to fire actions, and these actions don't have to flow in the redux-default-data-flow **in a syncronous way** but instead it (read from the store or dispatch actions within the middleware) **in an asyncronous way**
+- It allows the application to fire actions, and these actions don't have to flow in the redux-default-data-flow **in a synchronous way** but instead it (read from the store or dispatch actions within the middleware) **in an asynchronous way**
 - it receives `async-actions` in the form of `functions`
   - Redux takes the function and passes into it a `dispatch` as a parameter
   - now we can dispatch new actions in this Thunk, so that we can abstract some logic in the Thunk and so that Actions can be dispatched outside the component

@@ -6,12 +6,14 @@
 - [Working With Remotes](#working-with-remotes)
   - [Sending Commits](#sending-commits)
   - [Pulling Changes](#pulling-changes)
+    - [`Git pull`](#git-pull)
     - [`Git fetch`](#git-fetch)
   - [Forking a Repository](#forking-a-repository)
 - [Pull Request](#pull-request)
   - [Staying In Sync With A Remote Repository](#staying-in-sync-with-a-remote-repository)
     - [Include Upstream Changes](#include-upstream-changes)
-- [Squash Commits](#squash-commits)
+- [Git rebase](#git-rebase)
+  - [Interactive Rebase : Squash Commits](#interactive-rebase--squash-commits)
   - [Force Pushing](#force-pushing)
 - [Notes](#notes)
 
@@ -72,12 +74,24 @@ git push origin master
 
 ### Pulling Changes
 
+> ![remote](./img/remote2.PNG)
+> So, I have to use **git (pull or push)** to make them catch-up like this:
+> ![remote](./img/remote3.PNG)
+
+---
+
+![remote](./img/remote4.PNG)
+
+#### `Git pull`
+
 ```bash
 # retrieve the commits from the master branch on the origin remote repository.
 git pull origin master
 ```
 
 #### `Git fetch`
+
+![fetch](./img/fetch.PNG)
 
 Git fetch is used to retrieve commits from a remote repository's branch but **it does not automatically merge the local branch with the remote tracking branch after those commits have been received**.
 
@@ -139,7 +153,26 @@ When working with a project that you've forked. The original project's maintaine
 
 ---
 
-## Squash Commits
+## Git rebase
+
+> **Rebasing**: it's used in 2 ways:
+>
+> - as an alternative to merging
+> - as a cleanup too
+>
+> It's like we're **rewriting history** or **changing the base of the branch** and having more **linear structure**
+
+- The problem:
+  ![rebase](./img/rebase0.PNG)
+  ![rebase_result](./img/rebase_result.PNG)
+
+![rebase_warning](./img/rebase_warning.PNG)
+
+---
+
+### Interactive Rebase : Squash Commits
+
+![interactive_rebase](./img/interactive_rebase.PNG)
 
 To squash commits together, we use the extremely powerful `git rebase` command.
 

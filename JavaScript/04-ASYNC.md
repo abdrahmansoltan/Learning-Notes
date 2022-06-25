@@ -2,7 +2,7 @@
 
 - [INDEX](#index)
 - [Notes](#notes)
-- [Is JavaScript a `syncronous` or `asyncronous` ?](#is-javascript-a-syncronous-or-asyncronous-)
+- [Is JavaScript a `synchronous` or `asynchronous` ?](#is-javascript-a-synchronous-or-asynchronous-)
 - [Building a Promise](#building-a-promise)
   - [creating a promise](#creating-a-promise)
   - [Promisifying](#promisifying)
@@ -38,10 +38,10 @@
 
 ---
 
-## Is JavaScript a `syncronous` or `asyncronous` ?
+## Is JavaScript a `synchronous` or `asynchronous` ?
 
 - JavaScript is always `synchronous` and `single-threaded`
-- **but** when `js` runs on certain environments like `browser` or `node.js` --> it allows us to write `asyncronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object
+- **but** when `js` runs on certain environments like `browser` or `node.js` --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object
 
 > **Async** means that "we don't have it right now"
 

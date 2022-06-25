@@ -18,6 +18,7 @@
   - [Prop drilling](#prop-drilling)
   - [Soulution](#soulution)
   - [useContext Hook](#usecontext-hook)
+  - [Context Limitations](#context-limitations)
 - [Hooks Rules](#hooks-rules)
 - [Custom Hooks](#custom-hooks)
 
@@ -62,9 +63,6 @@ props (short for “properties”) and state are both plain JavaScript objects. 
 
   - The React `useState` Hook allows us to track state in a (function component).
   - it `must` be written inside the `component` function
-  - `useState` accepts an `initial state` and returns an `array` with two elements:
-    - The current state.
-    - A function that updates the state.
 
 ```js
 // in the top of the file
@@ -91,6 +89,17 @@ function FavoriteColor() {
     </>
   );
 }
+```
+
+- `useState` accepts an `initial state` and returns an `array` with two elements:
+  - The current state.
+  - A function that updates the state.
+
+```js
+// updating state with depending on previous state
+const total = setTotal((state) => {
+  return state + 4;
+});
 ```
 
 ---
@@ -163,13 +172,16 @@ function App() {
   - so such `sideEffects` shouldn't go directly inside the component-function as it will create bugs
 - The Effect Hook, `useEffect`, adds the ability to perform side effects from a function component. It serves the same purpose as `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount` in React classes, but unified into a single API
 
+> **Side-Effects**: Tasks that must happen outside of the component-evaluation and render-cycle, as they might block rendering (ex: HTTP request)
+
 ### useEffect
 
 ![useEffect](./img/sideEffects.PNG)
 
 - When you call `useEffect`, you’re telling React to run your `effect` function after flushing changes to the `DOM`. Effects are declared inside the component so they have access to its props and state. By default, React runs the effects after every render — including the first render.
 
-<img src="./img/react-useeffect-callback-3.svg" style="background-color: #fff">
+> it happens after all other functions and state
+> <img src="./img/react-useeffect-callback-3.svg" style="background-color: #fff">
 
 #### useEffect cleanup function
 
@@ -223,7 +235,7 @@ useEffect(() => {
   - it will call the `reducer function` for us with `argument = action-object`
 - `action` is an **object** that tells the reducer how to change the state.
   - It must contain a **type** property
-  - It can contain an optional **payload** object wich has properties you want to add to the state(parameters to be used)
+  - It can contain an optional **payload** object which has properties you want to add to the state(parameters to be used)
 - Finally: when state is updated the component gets rerendered just like in `useState()`
 
 ![usereducer](./img/reducer2.svg)
@@ -378,6 +390,18 @@ function Component5() {
   );
 }
 ```
+
+---
+
+### Context Limitations
+
+- shouldn't be used to replace all components-communications and **Props**
+- Complex Setup
+  ![alt](./img/contextDisadvantages2.PNG)
+- can lead to deeply-nested jsx code and huge context-provider components
+  ![alt](./img/contextDisadvantages.PNG)
+- Performance
+- context is not optimized for high-frequency state changes
 
 ---
 

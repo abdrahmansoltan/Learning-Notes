@@ -33,6 +33,7 @@
 - [Props](#props)
 - [Communicate between Components](#communicate-between-components)
   - [Event emitter](#event-emitter)
+    - [using v-model with custom components](#using-v-model-with-custom-components)
     - [model-view](#model-view)
   - [Provide / Inject](#provide--inject)
     - [Provide](#provide)
@@ -53,6 +54,9 @@
   - [Route Meta Fields](#route-meta-fields)
     - [Using meta for navigation guards](#using-meta-for-navigation-guards)
   - [Navigation Guards](#navigation-guards)
+- [Modes and Environment Variables](#modes-and-environment-variables)
+  - [Modes](#modes)
+  - [Environment Variables](#environment-variables)
 - [Performance](#performance)
   - [Loading data](#loading-data)
   - [Code Splitting - Lazy Loading](#code-splitting---lazy-loading)
@@ -263,6 +267,8 @@ To Access event object
 - in the element (**inline**) -> `$event`
 - in the methods (**external**) -> `event`
 
+> Best Practice: use **$event**
+
 ```html
 <!-- using $event special variable -->
 <button @click="warn('Form cannot be submitted yet.', $event)">Submit</button>
@@ -309,6 +315,7 @@ In-template expressions are very convenient, but they are meant for simple opera
 - It's used when you have dependent data
   - It only re calculate tne function if any dependency inside it changed
 - it has to return a value
+- It prevents us from writing **Imperative code**
 
 ```js
 export default {
@@ -337,6 +344,8 @@ export default {
 // here it's called without ()
 <span>{{ publishedBooksMessage }}</span>
 ```
+
+> **You can use it with dynamic-classes or styles**
 
 ---
 
@@ -635,6 +644,10 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
         required:true,
         validator: propValue => {
         return propValue < 1200;
+          },
+          // or
+        validator(propValue) {
+        return propValue < 1200;
           }
          }
       },
@@ -642,7 +655,7 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
 
 - In the **parent component**:
 
-  - if you want to pass a prop of any type other than `string` like Boolean -> you must write it with `v-bind:` or `:`
+  - if you want to pass a prop of any type other than `string` like **Boolean** -> you must write it with `v-bind:` or `:`
 
     ```html
     <ButtonCounter :isEnabled="true" />
@@ -707,9 +720,51 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
   <child-component @methodName_usedIn_parentComponent="handling_method" />
 
   <!-- Or handling it (inline) -->
+  <!-- in this case to access the payload we use ($event) -->
 
   <child-component @methodName_usedIn_parentComponent="role=$event" />
-  <!-- the payload will be the $event -->
+  ```
+
+---
+
+#### using v-model with custom components
+
+Custom events can also be used to create custom inputs that work with **v-model**.
+
+For this to actually work though, the `<input>` inside the component must:
+
+- Bind the value attribute to the **modelValue** prop
+- On input, emit an **update:modelValue** event with the new value
+
+  ```vue
+  <!-- CustomInput.vue  (child component) -->
+  <script>
+  export default {
+    props: ["modelValue"],
+    emits: ["update:modelValue"],
+  };
+  </script>
+
+  <template>
+    <input
+      :value="modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
+    />
+  </template>
+  ```
+
+- And now in the parent component we use this:
+
+  ```html
+  <!-- in parent component -->
+  <!-- instead of this -->
+  <CustomInput
+    :modelValue="searchText"
+    @update:modelValue="newValue => searchText = newValue"
+  />
+
+  <!-- use this -->
+  <CustomInput v-model="searchText" />
   ```
 
 ---
@@ -800,6 +855,8 @@ export default {
 
 It's like `children` in react
 
+> It allow parent-component to inject (dynamic-HTML-content) that can be rendered inside a child component
+
 The `<slot>` element is a slot outlet that indicates where the parent-provided slot content should be rendered.
 
 ![slots](./img/slots.png)
@@ -863,6 +920,7 @@ IT HAS TO BE ON A `<template>` TAGS
 
 - manually
 - [VeeValidate](https://vee-validate.logaretm.com/v4/)
+  - [VeeValidate2](https://www.section.io/engineering-education/form-validation-in-vue.js-using-veevalidate/)
 
 ---
 
@@ -960,7 +1018,8 @@ history: createWebHistory(process.env.BASE_URL);
 +------------------+                  +-----------------+
 ```
 
-- **Note**: you must use ` <router-view></router-view>` in the parent route to show the place for the nested(child) route
+- **Note**: you must use ` <router-view />` in the parent route to show the place for the nested(child) route
+  - it's a global component registered in the `main.js` file
 
 #### Dynamic params
 
@@ -1004,10 +1063,20 @@ history: createWebHistory(process.env.BASE_URL);
 ### Navigate programmatically
 
 ```js
-this.$router.push("/");
+// literal string path
+this.$router.push("/users/eduardo");
 
-// Or
-this.$router.replace("/"); // same as push but prevents going backwards
+// object with path
+this.$router.push({ path: "/users/eduardo" });
+
+// named route with params to let the router build the url --> (params="/:username")
+this.$router.push({ name: "user", params: { username: "eduardo" } });
+
+// with query, resulting in /register?plan=private
+this.$router.push({ path: "/register", query: { plan: "private" } });
+
+// with hash, resulting in /about#team
+this.$router.push({ path: "/about", hash: "#team" });
 ```
 
 ---
@@ -1096,6 +1165,29 @@ if (to.name === "teams") {
 
 ---
 
+## Modes and Environment Variables
+
+### Modes
+
+> There are three modes:
+>
+> - **development** is used by vue-cli-service serve
+> - **test** is used by vue-cli-service test:unit
+> - **production** is used by vue-cli-service build and vue-cli-service test:e2e
+
+### Environment Variables
+
+```sh
+.env                # loaded in all cases
+.env.local          # loaded in all cases, ignored by git
+.env.[mode]         # only loaded in specified mode
+.env.[mode].local   # only loaded in specified mode & ignored by git
+```
+
+- **Note**: only `NODE_ENV`, `BASE_URL`, and variables that start with **VUE*APP*** will be statically embedded into the client bundle with `webpack.DefinePlugin`. It is to avoid accidentally exposing a private key on the machine that could have the same name.
+
+---
+
 ## Performance
 
 ### Loading data
@@ -1109,11 +1201,13 @@ To make the page loads with the data already loaded:
 
 ### Code Splitting - Lazy Loading
 
-**Usually in router file**
+> Usually in **router** file
 
 - **Webpack Chunk**: a file that is separate from the bundle can still be loaded into the bundle
 
 This is used to load components only when the page that contain the components is accessed
+
+> **Lazy**: Don't do work(importing) until necessary
 
 ```js
 // instead of this:
@@ -1165,6 +1259,18 @@ vue add <name of the plugin>
 - when you want to change a property that is being rendered you should modify it and not create a new property -> to make vue **rerenders** it
 
   - Ex: array of items: you should use `splice` to remove item instead of using (filter as it will create new array)
+
+- To fix **eslint** error :
+
+  ```js
+  // .eslintrc.js
+  module.exports = {
+    rules: {
+      "prettier/prettier": ["error", { endOfLine: "auto" }],
+      "vue/multi-word-component-names": 0,
+    },
+  };
+  ```
 
 - when using a **modal** try using
 

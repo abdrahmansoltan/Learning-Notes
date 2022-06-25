@@ -32,6 +32,10 @@
   - [fragment](#fragment)
   - [Portals](#portals)
   - [Refs](#refs)
+  - [Smart vs Dumb components](#smart-vs-dumb-components)
+  - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
+    - [Controlled components](#controlled-components)
+    - [Uncontrolled components](#uncontrolled-components)
 - [Component Props](#component-props)
   - [single prop](#single-prop)
   - [Multiple props](#multiple-props)
@@ -45,6 +49,8 @@
   - [Events in HTML vs React](#events-in-html-vs-react)
   - [Data binding](#data-binding)
 - [Forms](#forms)
+  - [Form-Input](#form-input)
+  - [Validation](#validation)
 - [Environmental Variables](#environmental-variables)
 - [Interview Questions](#interview-questions)
 
@@ -120,6 +126,7 @@ npm start
 - **JSX** = "HTML in JavaScript"
 - it's a "Syntactic sugar", does not run in the
   browser like this!
+- It's like functions as when react sees them it **invokes them**
 - in older versions of react : to use `JSX` you had to write this in the file :
   ```js
   import React from "react";
@@ -176,7 +183,9 @@ React.createElement(
 
 1. React generates a new Virtual DOM for our application.
 2. React compares the initial Virtual DOM (representing the current html DOM) to the new Virtual DOM.
-3. Based on the comparison above, React runs its “Diffing Algorithm” to calculate the minimum number of operations to update the initial Virtual DOM to the new Virtual DOM.
+3. Based on the comparison above, React runs its **Diffing Algorithm** to calculate the minimum number of operations to update the initial Virtual DOM to the new Virtual DOM.
+
+> **Re-Evaluating Components !== Re-Rendering the DOM** > ![rerender](./img/rerender.PNG)
 
 ---
 
@@ -627,7 +636,7 @@ const List = () => {
 ### fragment
 
 - Each custom component must return only `one root element`, so you should wrap it's contents in a :
-  - empty brakets `<> </>` : not recommended as vs-code won't know how to organize the code
+  - empty brackets `<> </>` : not recommended as vs-code won't know how to organize the code
   - Fragment `<React.Fragment> </React.Fragment>`
 
 ---
@@ -636,23 +645,29 @@ const List = () => {
 
 Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
 
-- it helps for more `symantic HTML`
-  - without portals ![portal](./img/portals.PNG)
-  - with portals ![portal](./img/portals2.PNG)
+- it helps for more `semantic HTML`
+  -usually with **modals**
+- without portals ![portal](./img/portals.PNG)
+- with portals ![portal](./img/portals2.PNG)
+
+Portals need 2 things:
+
+- the child is a React element
+- (the container): the DOM location(node) to which the portal should be injected
 
 ```js
 import ReactDOM from "react-dom";
 
 ReactDOM.createPortal(child, container);
-// The first argument (child) is any renderable React child, such as an element, string, or fragment. The second argument (container) is a DOM element.
 ```
 
 ---
 
 ### Refs
 
-- [reference](https://blog.logrocket.com/complete-guide-react-refs/)
-- The escape hatches are refs, which allow us to access DOM properties directly. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
+[reference](https://blog.logrocket.com/complete-guide-react-refs/)
+
+- **Allow us to access DOM properties directly**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
 
 > Note: refs are escape hatches for React developers, and we should try to avoid using them if possible.
 
@@ -672,6 +687,81 @@ ReactDOM.createPortal(child, container);
   };
   export default ActionButton;
   ```
+
+---
+
+### Smart vs Dumb components
+
+**Dumb components** are also called ‘presentational’ components because their only responsibility is to present something to the DOM. Once that is done, the component is done with it.
+
+**Smart components** (or container components) on the other hand have a different responsibility. Because they have the burden of being smart, they are the ones that keep track of state and care about how the app works.
+
+---
+
+### Controlled vs. uncontrolled components
+
+In React, there are two ways to handle **Form data** in our components.
+
+#### Controlled components
+
+Controlled components are those in which form data is handled by the component’s state.
+
+It is the one that takes its current value through props and notifies changes through callbacks like onChange. A parent component "controls" it by handling the callback and managing its own state and passing the new values as props to the controlled component. You could also call this a "dumb component".
+
+```js
+function App() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  function onSubmit() {
+    console.log("Name value: " + name);
+    console.log("Email value: " + email);
+  }
+  return (
+    <form onSubmit={onSubmit}>
+      <input
+        type="text"
+        name="name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+      <input
+        type="email"
+        name="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+      />
+      <input type="submit" value="Submit" />
+    </form>
+  );
+}
+```
+
+#### Uncontrolled components
+
+Uncontrolled components are those for which the form data is handled by the DOM itself. “Uncontrolled” refers to the fact that these components are not controlled by React state.
+
+It is the one that stores its own state internally, and you query the DOM using a ref to find its current value when you need it. This is a bit more like traditional HTML.
+
+> components that use **ref** are uncontrolled, as they aren't controlled by React
+
+```js
+function App() {
+  function onSubmit() {
+    console.log("Name value: " + window.name.value);
+    console.log("Email value: " + window.email.value);
+  }
+  return (
+    <form onSubmit={onSubmit}>
+      <input type="text" name="name" id="name" required />
+      <input type="email" name="email" id="email" required />
+      <input type="submit" value="Submit" />
+    </form>
+  );
+}
+```
 
 ---
 
@@ -853,6 +943,19 @@ const App = () => {
 ## Forms
 
 [Here](https://formik.org/)
+
+### Form-Input
+
+to access input-value:
+
+- use **state**
+  - this is preferred if you will do something on the input-value (like resetting the input-value after submitting)
+- use **refs**
+  - if you want to just access the value without modifying it
+
+### Validation
+
+![validation](./img/forms.PNG)
 
 ---
 

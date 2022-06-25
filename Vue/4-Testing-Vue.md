@@ -9,12 +9,19 @@
   - [Vue Test Utils](#vue-test-utils)
 - [mount](#mount)
   - [Second parameter](#second-parameter)
+  - [find() vs get()](#find-vs-get)
 - [Events](#events)
-- [find() vs get()](#find-vs-get)
 - [Stubs and Shallow-Mount](#stubs-and-shallow-mount)
-  - [RouterLinkStub](#routerlinkstub)
+  - [Stub](#stub)
+  - [Shallow-Mount](#shallow-mount)
+  - [Router Mocking](#router-mocking)
+    - [RouterLinkStub](#routerlinkstub)
+    - [Mocking `$route` and `$router`](#mocking-route-and-router)
 - [Testing Asynchronous Behavior](#testing-asynchronous-behavior)
+  - [Telling Vue to rerender manually](#telling-vue-to-rerender-manually)
+    - [flushPromises](#flushpromises)
   - [Async outside vue](#async-outside-vue)
+- [Testing Vuex](#testing-vuex)
 
 ---
 
@@ -53,15 +60,34 @@ It is a set of utility functions aimed to simplify testing Vue.js components. It
 
 ## mount
 
-| mount                                                                                                                                                                                          | shallowMount                                                                                                                                                                                                                              |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| takes the Vue component as a first argument and returns its vue instance along with some helper which is used to interact with a component instance like set `props`, `trigger` `clicks`, etc. | also works similar to the `mount` method the main difference is **shallowMount doesn’t render child components** so that it allows us to test the component in isolation to make sure that child components are not included in the test. |
+| mount                                                                                                                                                                                                    | shallowMount                                                                                                                                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| takes the Vue component as a first argument and returns its vue instance along with some helper which is used to interact with a component instance like set `props`, `slots` , `trigger` `clicks`, etc. | also works similar to the `mount` method the main difference is **shallowMount doesn’t render child components** so that it allows us to test the component in isolation to make sure that child components are not included in the test. |
 
 - `.toMatch` -> checks for a text within another piece of text (check that a string matches a regular expression)
 
 ### Second parameter
 
 the second parameter of **mount** creates an object to modify data in the component
+
+> Another way is to use the **setData()** method, the different here that it's Asynchronous method so the test will run first before it finishes, wo we should make the test-callbackFunction Async and also to await the setData-method
+
+---
+
+### find() vs get()
+
+- **find**: Returns Wrapper of first DOM node or Vue component matching selector.
+  - if item doesn't exist it will return **Undefined**, so the test won't fail
+  - You should use find when searching for an element that may not exist.
+- **get**: Works just like find **but will throw an error** if nothing matching the given selector is found, So the test will fail.
+  - You should use this method when getting an element that should exist and it will provide a nice error message if that is not the case.
+
+> Try to use **attributes** when finding elements/components instead of (element-selector or class/id )
+> EX: `.find(["data-test=navbar"])`
+
+- **findComponent**: It returns Wrapper of first matching Vue component, use it with:
+  - [routerlinkstub](#routerlinkstub)
+  - any component
 
 ---
 
@@ -71,20 +97,16 @@ the second parameter of **mount** creates an object to modify data in the compon
 
 ---
 
-## find() vs get()
-
-> Try to use **attributes** when finding elements/components instead of (element-selector or class/id )
-> EX: `.find(["data-test=navbar"])`
-
----
-
 ## Stubs and Shallow-Mount
 
-**Stub** is where you replace an existing implementation of a custom component with a dummy component that doesn't do anything at all, which can simplify an otherwise complex test.
+### Stub
 
-It's a replacement or stand-in for a real component, we can use it to simplify tests by focusing on the component under test
+**Stub**: is a **replacement to an existing implementation of a custom component** with a dummy component that doesn't do anything at all, which can simplify an otherwise complex test.
 
-- A common example is when you would like to test something in a component that appears very high in the component hierarchy.
+- We can use it to simplify tests by focusing on the component under test.
+- A common examples is when you:
+  - would like to test something in a component that appears very high in the component hierarchy -> **component with a lot of nested children**.
+  - the component you are testing uses a **global component**
 
 ```js
 test("stubs component with custom template", () => {
@@ -108,11 +130,38 @@ test("stubs component with custom template", () => {
 
 ---
 
-### RouterLinkStub
+### Shallow-Mount
+
+shallow are focused on a specific component. shallow can be useful for testing advanced components in complete isolation. If you just have one or two components that are not relevant to your tests, consider using mount in combination with stubs instead of shallow. **The more you stub, the less production-like your test becomes.**
+
+- shallow mounting option that will automatically stub out all the child components:
+
+  ```js
+  test("shallow stubs out all child components", () => {
+    const wrapper = mount(ComplexComponent, {
+      shallow: true,
+    });
+
+    console.log(wrapper.html());
+    /*
+      <h1>Welcome to Vue.js 3</h1>
+      <complex-a-stub></complex-a-stub>
+      <complex-b-stub></complex-b-stub>
+      <complex-c-stub></complex-c-stub>
+    */
+  });
+  ```
+
+---
+
+### Router Mocking
+
+#### RouterLinkStub
 
 A component to stub the Vue Router router-link component.
 
-> as the router is in the upper level of the app and in testing each component is tested isolated, so we use stub to replace the router
+> - `<router-link>` and `<router-vue>` are registered as global-components, So our tests don't understand where they are coming from.
+> - As the router is in the upper level of the app and in testing each component is tested isolated, so we use stub to replace the router
 
 - You can use this component to find a router-link component in the render tree.
 
@@ -127,6 +176,46 @@ const wrapper = mount(Component, {
 expect(wrapper.findComponent(RouterLinkStub).props().to).toBe("/some/path");
 ```
 
+> **Note**: You can use a beforeEach for if you are testing router-link multiple times or you can create a helper-function (factory-function):
+
+```js
+// factory-function
+const createConfig = () => ({
+  global: {
+    stubs: {
+      "router-link": RouterLinkStub,
+    },
+  },
+});
+
+// code
+const wrapper = mount(Component, createConfig());
+```
+
+---
+
+#### Mocking `$route` and `$router`
+
+Sometimes you want to test that a component does something with parameters from the `$route` and `$router` objects. To do that, you can pass custom mocks to the Vue instance.
+
+```js
+import { shallowMount } from "@vue/test-utils";
+
+const $route = {
+  path: "/some/path",
+};
+
+const wrapper = shallowMount(Component, {
+  mocks: {
+    $route, // ES6-object-property
+  },
+});
+
+wrapper.vm.$route.path; // /some/path
+```
+
+> You also can use a helper-function if you are using it multiple times
+
 ---
 
 ## Testing Asynchronous Behavior
@@ -135,6 +224,49 @@ There are two types of asynchronous behavior you will encounter in your tests:
 
 1. Updates applied by Vue
 2. Asynchronous behavior outside of Vue (ex: `promises`)
+
+---
+
+### Telling Vue to rerender manually
+
+> A nice rule to follow is to
+>
+> - always await on mutations like **trigger** or **setProps**.
+> - If your code relies on something async, like calling axios, add an **await** to the **flushPromises** call as well.
+
+in tests, when you mount the component then do an action that should (make vue rerenders the component), it doesn't do so as you should here tell it manually to do so using **vm** and **nextTick**
+
+```js
+button.trigger("click");
+await Vue.nextTick();
+
+// It's the same as this:
+await button.trigger("click");
+```
+
+---
+
+#### flushPromises
+
+It flushes all pending resolved promise handlers.
+
+> makes all promises resolve then go to next line
+
+```js
+import { shallowMount } from "@vue/test-utils";
+import flushPromises from "flush-promises";
+import Foo from "./Foo";
+jest.mock("axios");
+
+it("fetches async when a button is clicked", async () => {
+  const wrapper = shallowMount(Foo);
+  wrapper.find("button").trigger("click");
+  await flushPromises();
+  expect(wrapper.text()).toBe("value");
+});
+```
+
+---
 
 ### Async outside vue
 
@@ -164,3 +296,12 @@ it("fetches async when a button is clicked", (done) => {
   });
 });
 ```
+
+---
+
+## Testing Vuex
+
+There's 2 methods:
+
+- Testing with a Real Vuex Store
+- Testing with a Mock Store
