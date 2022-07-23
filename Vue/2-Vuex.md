@@ -149,10 +149,11 @@ export default {
 
 ### Getters
 
-instead of accessing the state's data directly, we use **getters** which help in **memory-caching**
+Instead of accessing the state's data directly, we use **getters** which help in **memory-caching**
 
 > caching because they use **closures**
 
+- Getters can invoke other getters
 - It's recommended to use **Arrow Functions**
 
 ```js

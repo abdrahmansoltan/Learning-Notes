@@ -12,9 +12,6 @@
 - [Pull Request](#pull-request)
   - [Staying In Sync With A Remote Repository](#staying-in-sync-with-a-remote-repository)
     - [Include Upstream Changes](#include-upstream-changes)
-- [Git rebase](#git-rebase)
-  - [Interactive Rebase : Squash Commits](#interactive-rebase--squash-commits)
-  - [Force Pushing](#force-pushing)
 - [Notes](#notes)
 
 ---
@@ -137,7 +134,7 @@ When working with a project that you've forked. The original project's maintaine
 ![pr](./img/pr3.png)
 ![pr](./img/pr4.png)
 
-- To get commits from a source repository into your forked repository on GitHub you need to:
+- To stay up to date and get commits from a source repository into your forked repository on GitHub you need to:
 
   - get the cloneable URL of the source repository
 
@@ -150,52 +147,6 @@ When working with a project that you've forked. The original project's maintaine
   - merge the `upstream`'s branch into a local branch
 
   - push the newly updated local branch to your origin repo
-
----
-
-## Git rebase
-
-> **Rebasing**: it's used in 2 ways:
->
-> - as an alternative to merging
-> - as a cleanup too
->
-> It's like we're **rewriting history** or **changing the base of the branch** and having more **linear structure**
-
-- The problem:
-  ![rebase](./img/rebase0.PNG)
-  ![rebase_result](./img/rebase_result.PNG)
-
-![rebase_warning](./img/rebase_warning.PNG)
-
----
-
-### Interactive Rebase : Squash Commits
-
-![interactive_rebase](./img/interactive_rebase.PNG)
-
-To squash commits together, we use the extremely powerful `git rebase` command.
-
-- telling Git to use `HEAD~3` as the base where all of the other commits (`HEAD~2`, `HEAD~1`, and `HEAD`) will connect to.
-  ```bash
-  # move commits to have a new base
-  git rebase -i HEAD~3
-  ```
-- The `-i` in the command stands for "interactive".
-
-![rebase](./img/rebase.png)
-![rebase](./img/rebase2.PNG)
-![rebase](./img/rebase3.PNG)
-
-- note: create a `backup branch` before rebasing, so that it's easy to return to your previous state. If you're happy with the rebase, then you can just delete the backup branch!
-
-![rebase](./img/rebase4.PNG)
-
----
-
-### Force Pushing
-
-Using `git rebase` creates a new commit with a new SHA. When you try using `git push` to send this commit up to GitHub, GitHub knew that accepting the push would erase the three separate commits, so it rejected it. So you have to force push the commits through using `git push -f`
 
 ---
 

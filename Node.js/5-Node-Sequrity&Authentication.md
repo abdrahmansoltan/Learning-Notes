@@ -11,6 +11,7 @@
     - [`salt`](#salt)
 - [Authorization](#authorization)
   - [API Key](#api-key)
+  - [Cookie-vs-Token](#cookie-vs-token)
   - [Sessions](#sessions)
   - [JSON Web Tokens (JWTs)](#json-web-tokens-jwts)
     - [Parts of a JSON Web Token](#parts-of-a-json-web-token)
@@ -50,11 +51,11 @@
 
 ```js
 // in app.js file
-const cors = require("cors");
+const cors = require('cors');
 
 // CORS
 const corsOptions = {
-  origin: "http://localhost:3001",
+  origin: 'http://localhost:3001',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
@@ -185,11 +186,21 @@ HTTP is stateless. All the requests are stateless. However, there are situations
   - in `sessions` : the server have to do additional step (make a request to the `database` to look up the session)
 - Most of the modern web applications use JWT for authentication for reasons including scalability and mobile device authentication.
 
+---
+
+### Cookie-vs-Token
+
+![cookie-vs-token](./img/cookie-vs-token.png)
+
+There're pros and cons for each, and based on situation we choose what suits us, more on that [here](https://developer.okta.com/blog/2022/02/08/cookies-vs-tokens)
+
+---
+
 ### Sessions
 
 ![sessions](./img/sessions.PNG)
 
-Here, the server will create a session for the user after the user logs in. The session id is then stored on a cookie on the user’s browser. While the user stays logged in, the cookie would be sent along with every subsequent request. The server can then compare the session id stored on the cookie against the session information stored in the memory to verify user’s identity and sends response with the corresponding state!
+Here, the server will create a session for the user after the user logs in. The session id is then **stored on a cookie on the user’s browser**. While the user stays logged in, the cookie would be sent along with every subsequent request. The server can then compare the session id stored on the cookie against the session information stored in the memory to verify user’s identity and sends response with the corresponding state!
 
 ---
 

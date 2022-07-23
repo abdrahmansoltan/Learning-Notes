@@ -16,9 +16,11 @@
   - [`Objects and Interfaces`](#objects-and-interfaces)
     - [`Objects`](#objects)
     - [`Interfaces`](#interfaces)
+    - [Partial Type](#partial-type)
   - [`unknown`](#unknown)
   - [`Union Types`](#union-types)
   - [`Literal Types`](#literal-types)
+    - [String Literal Types](#string-literal-types)
   - [Type Aliases ---(custom type)](#type-aliases----custom-type)
   - [function](#function)
     - [`function type`](#function-type)
@@ -261,7 +263,38 @@ interface Student {
 let newStudent: Student = { name: "Maria", age: 10, enrolled: true };
 ```
 
-> we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be trans[iled to Javascript
+> we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be transpiled to Javascript
+
+#### Partial Type
+
+The partial type is simple to use as it only requires to pass a type **T** where **T** can be any object type regardless of whether it is a defined type.
+
+> It generates a new type based on the input type/object/interface **with all the property-keys being optional**
+
+```ts
+Partial<MyType>
+Partial<MyInterface>
+Partial<{}>
+```
+
+```ts
+// no need to update all the property keys to be optional
+interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  categories: string[];
+  tags: string[];
+  featureImageUrl?: string;
+  content: string;
+}
+
+// Partial<Blog> generates a new type based on Blog with all the property
+// keys being optional
+const draft: Partial<Blog> = {
+  title: "What kind of title should I type?",
+};
+```
 
 ---
 
@@ -271,6 +304,8 @@ let newStudent: Student = { name: "Maria", age: 10, enrolled: true };
 - Requires a `type check`
 - `unknown` is recommended over `any` because it provides **safer typing** — you have to use type assertion or narrow to a specific type if you want to perform operations on unknown.
 
+> **Type Guard** : protects us from doing something unless we check the type first
+
 ```ts
 let userInput: unknown;
 let userName: string;
@@ -278,7 +313,7 @@ let userName: string;
 userInput = 5;
 userInput = "Max";
 
-// type assertion
+// type assertion or (Type Guard)
 if (typeof userInput === "string") {
   userName = userInput;
 }
@@ -296,32 +331,51 @@ studentPhone = "(555) 555 - 5555";
 studentPhone = 5555555555;
 ```
 
+---
+
 ### `Literal Types`
 
+The main idea here is that we provide type & value for the variable, usually using **const**
+
+```ts
+// We're making a guarantee that this variable
+// helloWorld will never change, by using const.
+
+// So, TypeScript sets the type to be "Hello World", not string
+const helloWorld = "Hello World";
+
+// On the other hand, a let can change, and so the compiler declares it a string
+let hiWorld = "Hi World";
+```
+
+#### String Literal Types
+
 - A `literal` is a more concrete sub-type of a collective type. What this means is that "Hello World" is a string, but a string is not "Hello World" inside the type system.
-- usually usesd with `union-types`
+- usually used with `union-types`
 
 - There are **three** sets of literal types available in TypeScript today: `strings`, `numbers`, and `booleans`, by using literal types you can allow an exact value which a string, number, or boolean must have.
 - ex :
 
-```ts
-function combine(
-  input1: number | string,
-  input2: number | string,
-  resultConversion: "as-number" | "as-text" // Literal Types
-) {
-  let result;
-  if (
-    (typeof input1 === "number" && typeof input2 === "number") ||
-    resultConversion === "as-number"
-  ) {
-    result = +input1 + +input2;
-  } else {
-    result = input1.toString() + input2.toString();
+  ```ts
+  type Easing = "ease-in" | "ease-out" | "ease-in-out";
+
+  class UIElement {
+    animate(dx: number, dy: number, easing: Easing) {
+      if (easing === "ease-in") {
+        // ...
+      } else if (easing === "ease-out") {
+      } else if (easing === "ease-in-out") {
+      } else {
+        // It's possible that someone could reach this
+        // by ignoring your types though.
+      }
+    }
   }
-  return result;
-}
-```
+
+  let button = new UIElement();
+  button.animate(0, 0, "ease-in");
+  button.animate(0, 0, "uneasy");
+  ```
 
 ---
 

@@ -40,6 +40,7 @@
     - [Inject](#inject)
 - [Slots](#slots)
   - [named-slots](#named-slots)
+  - [slot-props](#slot-props)
 - [Forms](#forms)
   - [Form Validation](#form-validation)
 - [Routing](#routing)
@@ -884,6 +885,7 @@ IT HAS TO BE ON A `<template>` TAGS
     <slot name="header"></slot>
   </header>
   <main>
+    <!-- Fallback Content -->
     <slot></slot>
   </main>
   <footer>
@@ -900,6 +902,25 @@ IT HAS TO BE ON A `<template>` TAGS
     <!-- content for the header slot -->
   </template>
 </BaseLayout>
+```
+
+---
+
+### slot-props
+
+It's a way for the child to pass data to a slot when rendering it.
+![vslots](./img/vslots.svg)
+
+```html
+<!-- In Child: MyComponent.vue -->
+<div>
+  <slot :text="greetingMessage" :count="1"></slot>
+</div>
+<!--------------------------------------------------->
+<!-- In parent -->
+<MyComponent v-slot="slotProps">
+  {{ slotProps.text }} {{ slotProps.count }}
+</MyComponent>
 ```
 
 ---
@@ -988,6 +1009,9 @@ router.afterEach(function(to, from) {
 });
 ```
 
+> **Note**: You can use `alias` instead of `redirect`, so that you can have 2 routes that point to the same component
+> `alias : "/teams"`
+
 ---
 
 #### History
@@ -1047,10 +1071,10 @@ history: createWebHistory(process.env.BASE_URL);
     linkExactActiveClass:"text-yellow-500", // replacing the active class with this class
     ```
 
-  - also in the link you can set the active class for this link only (usually with the page logo in the navbar):
+  - also in the link you can set the active class for this link only using `exact-active-class="no-active"`, (usually with the page logo in the navbar):
 
     ```js
-    <router-link exact-active-class="no-active"></router-link>
+    <router-link to="/" exact-active-class="no-active"></router-link>
     ```
 
 - `<router-link></router-link>` acts like `<a>` in **css**
@@ -1134,14 +1158,24 @@ we use this:
 
 ### Navigation Guards
 
-They are used to guard navigations. either by redirecting it or canceling it. There are a number of ways to hook into the route navigation process: globally, per-route, or in-component.
+Here we have **global-guards** & **local-guards** & **Per-Route Guard**
+
+They are used to guard navigations. either by redirecting it or canceling it. There are a number of ways to hook into the route navigation process: globally, per-route, or in-component (locally).
 
 > it can be in the route-object or in the component's script or the router-file outside the route-object
 
-- `beforeEach()`
-- `beforeEnter()`
-- `beforeRouteLeave()`
-- `beforeRouteEnter()`
+- Global Guards:
+
+  - `beforeEach()`
+
+- In-Component Guards (local guards):
+
+  - `beforeEnter()`
+
+- Per-Route Guard (in routes array):
+  - `beforeRouteLeave()`
+  - `beforeRouteEnter()`
+  - `beforeRouteUpdate()`
 
 ```js
 // to confirm navigation:
@@ -1184,7 +1218,10 @@ if (to.name === "teams") {
 .env.[mode].local   # only loaded in specified mode & ignored by git
 ```
 
-- **Note**: only `NODE_ENV`, `BASE_URL`, and variables that start with **VUE*APP*** will be statically embedded into the client bundle with `webpack.DefinePlugin`. It is to avoid accidentally exposing a private key on the machine that could have the same name.
+- **Notes**:
+
+  - Don't forget to restart serve if it is currently running.
+  - only `NODE_ENV`, `BASE_URL`, and variables that start with **VUE*APP*** will be statically embedded into the client bundle with `webpack.DefinePlugin`. It is to avoid accidentally exposing a private key on the machine that could have the same name.
 
 ---
 

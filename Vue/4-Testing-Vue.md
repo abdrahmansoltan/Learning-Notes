@@ -21,7 +21,10 @@
   - [Telling Vue to rerender manually](#telling-vue-to-rerender-manually)
     - [flushPromises](#flushpromises)
   - [Async outside vue](#async-outside-vue)
+- [Composable helper functions](#composable-helper-functions)
 - [Testing Vuex](#testing-vuex)
+  - [Testing getters](#testing-getters)
+- [Testing with Composition-API](#testing-with-composition-api)
 
 ---
 
@@ -106,7 +109,7 @@ the second parameter of **mount** creates an object to modify data in the compon
 - We can use it to simplify tests by focusing on the component under test.
 - A common examples is when you:
   - would like to test something in a component that appears very high in the component hierarchy -> **component with a lot of nested children**.
-  - the component you are testing uses a **global component**
+  - The component you are testing uses a **global component**
 
 ```js
 test("stubs component with custom template", () => {
@@ -299,9 +302,37 @@ it("fetches async when a button is clicked", (done) => {
 
 ---
 
+## Composable helper functions
+
+When using **Route, Router, Vuex, ..**, each time you have to initiate the thing you are using with tools like `useRouter` and others and then use **computed** function to get reactive value from them -> So you can move them to individual helper functions than can be used multiple times
+
+```js
+import { computed } from "vue";
+import { useRoute } from "vue-router";
+
+const useConfirmRoute = (routeName: any) => {
+  const route = useRoute();
+  return computed(() => route.name === routeName);
+};
+
+export default useConfirmRoute;
+```
+
+---
+
 ## Testing Vuex
 
 There's 2 methods:
 
 - Testing with a Real Vuex Store
 - Testing with a Mock Store
+
+### Testing getters
+
+![getters](./img/test-getters.PNG)
+
+---
+
+## Testing with Composition-API
+
+here when you use Router, Vuex or other outer objects, now you have to **mock** them like with **axios** instead of just mocking the `$router` object in the Options-API

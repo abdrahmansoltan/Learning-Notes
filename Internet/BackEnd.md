@@ -24,6 +24,15 @@
   - [Continuous Deployment](#continuous-deployment)
   - [Pipeline](#pipeline)
   - [Github Actions](#github-actions)
+- [SSH](#ssh)
+  - [How It Works](#how-it-works)
+  - [Different Encryption Techniques](#different-encryption-techniques)
+    - [Symmetric Encryption](#symmetric-encryption)
+    - [Asymmetric Encryption](#asymmetric-encryption)
+    - [Hashing](#hashing)
+  - [Connecting using SSH](#connecting-using-ssh)
+- [Security](#security)
+- [NGINX](#nginx)
 
 ---
 
@@ -178,9 +187,9 @@ The Same Origin Policy (SOP) allows a browser to restrict access to resources re
     - ex :
 
       ```ts
-      app.get("/articles/:id", (_req: Request, res: Response) => {
+      app.get('/articles/:id', (_req: Request, res: Response) => {
         try {
-          res.send("this is the SHOW route");
+          res.send('this is the SHOW route');
         } catch (err) {
           res.status(400);
           res.json(err);
@@ -247,3 +256,75 @@ The difference is that instead of deploying your application manually, you set i
 
 - `ci.yml` file : contains configuration for the workflow
   - contains steps to be performed by the `Continuous Integration Server`
+
+---
+
+## SSH
+
+**Secure Shell Protocol (SSH)**: is a network protocol that allows users to access, control, and modify their remote servers over the internet.
+
+- **secure way to access a computer over an unsecured network**.
+
+![SSH](./img/ssh.PNG)
+
+### How It Works
+
+- The most popular SSH client is **PuTTY**
+
+The SSH command consists of 3 distinct parts:
+
+```sh
+ssh {user}@{host}
+```
+
+---
+
+### Different Encryption Techniques
+
+1. Symmetrical encryption
+2. Asymmetrical encryption
+3. Hashing
+
+#### Symmetric Encryption
+
+is a form of encryption where a secret key is used for both encryption and decryption of a message by both the client and the host.
+![Symmetric Encryption](./img/Symmetric%20Encryption.webp)
+
+> Symmetrical encryption is often called **shared key** or **shared secret encryption**.
+
+#### Asymmetric Encryption
+
+Unlike symmetrical encryption, asymmetrical encryption uses two separate keys for encryption and decryption. These two keys are known as the **public key** and the **private key**. Together, both these keys form a public-private key pair.
+
+![Asymmetric Encryption](./img/asymmetric-encryption.webp)
+
+> A public key can be used by any individual to encrypt a message and can only be decrypted by the recipient who possesses their particular private key, and vice versa.
+
+#### Hashing
+
+One-way-hash functions differ from the above two forms of encryption in the sense that they are never meant to be decrypted. They generate a unique value of a fixed length for each input that shows no clear trend which can be exploited. This makes them practically impossible to reverse.
+
+---
+
+### Connecting using SSH
+
+- You can use the password provided but it can be compromised by hacker
+- You can Create SSH Keys -> **rsa**
+
+---
+
+## Security
+
+![Security](./img/security.PNG)
+
+---
+
+## NGINX
+
+![NGINX](./img/NGINX.svg)
+
+NGINX is open source software for `web serving`, `reverse proxying`, `caching`, `load balancing`, `media streaming`, and more.
+
+- NGINX can also function as a proxy server for email (IMAP, POP3, and SMTP) and a reverse proxy and load balancer for HTTP, TCP, and UDP servers.
+
+> **proxy server** is a go‑between or intermediary server that forwards requests for content from multiple clients to different servers across the Internet.

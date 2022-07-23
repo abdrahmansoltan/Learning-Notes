@@ -4,11 +4,12 @@
 - [Composition API](#composition-api)
   - [Why use it ?](#why-use-it-)
   - [Differences](#differences)
-- [reactivity](#reactivity)
+- [Reactivity](#reactivity)
   - [ref](#ref)
-  - [reactive function](#reactive-function)
-- [Computed](#computed)
+  - [Computed](#computed)
 - [LifeCycles Hooks](#lifecycles-hooks)
+  - [reactive function](#reactive-function)
+  - [toRef](#toref)
 - [Mixins](#mixins)
 - [props](#props)
   - [Using destructed props](#using-destructed-props)
@@ -48,9 +49,11 @@ It's an alternative syntax for writing components
 
 ---
 
-## reactivity
+## Reactivity
 
 It's the process of **updating the template** whenever a change in the data occurs.
+
+> It's the equivalent of **computed & reactive-data** in options-API
 
 ### ref
 
@@ -89,24 +92,10 @@ export default {
 
 ---
 
-### reactive function
+### Computed
 
-Returns a reactive proxy of the **object** and not **Primitive values** like **ref**.
-
-- here we use it with object-properties to be able to access the object's properties (nested properties)
-- here we can't use `spread operator {...}` as it will make us lose reactivity
-
-```js
-const user = reactive({
-  name: "John",
-  age: 20,
-});
-```
-
----
-
-## Computed
-
+- It's reactive-ready function from **Vue**
+  - The function inside it -> returns a **reactive object**
 - it's **read-only** (can't assign values to properties inside of it)
 
 ---
@@ -115,6 +104,54 @@ const user = reactive({
 
 ![lifecycle](./img/lifecycle3.PNG)
 ![lifecycle](./img/lifecycle4.PNG)
+
+---
+
+### reactive function
+
+Returns a reactive proxy of the **object** and not **Primitive values** like **ref**.
+
+- here we use it with object-properties to be able to access the object's properties (nested properties)
+- now we don't have to use the `value` property as it help us from going so deep into the object to get values from it
+- here we can't use `spread operator {...}` or `destructuring` as **it will make us lose reactivity**
+
+```js
+const user = reactive({
+  name: "John",
+  age: 20,
+});
+
+const title = computed(() => `${user.name} with age of ${user.age}`);
+
+// this won't work!
+const { name, age } = user;
+const title = computed(() => `${name} with age of ${age}`);
+```
+
+---
+
+### toRef
+
+Can be used to create a ref for a property on a source reactive object. The created ref is synced with its source property: mutating the source property will update the ref, and vice-versa.
+
+```js
+const state = reactive({
+  foo: 1,
+  bar: 2,
+});
+
+const fooRef = toRef(state, "foo"); // creating connection to  the "foo" property in the "state" object
+
+// mutating the ref updates the original
+fooRef.value++;
+console.log(state.foo); // 2
+
+// mutating the original also updates the ref
+state.foo++;
+console.log(fooRef.value); // 3
+```
+
+> if the object has a lot of properties that you want them to be reactive -> use [toRefs()](https://vuejs.org/api/reactivity-utilities.html#torefs)
 
 ---
 

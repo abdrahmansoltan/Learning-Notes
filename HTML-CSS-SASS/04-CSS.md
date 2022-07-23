@@ -55,6 +55,8 @@
   - `[target]` => Selects all elements with a target attribute
   - `:not(p)` => Selects every element that is not a `<p>` element
   - `:nth-child(n)` => [nthmaster](http://nthmaster.com/)
+  - `owl selector` -> applies to the elements with is not the first one
+    ![owl-selector](./img/owl-selector.png)
 
 ### css selector specificity
 
@@ -208,10 +210,7 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 
   - ```css
     div {
-      background-image: linear-gradient(
-          rgba(34, 34, 34, 0.6),
-          rgba(34, 34, 34, 0.6)
-        ), url(hero.jpg);
+      background-image: linear-gradient(rgba(34, 34, 34, 0.6), rgba(34, 34, 34, 0.6)), url(hero.jpg);
       background-size: cover;
     }
     ```
@@ -339,12 +338,7 @@ It defines whether the flex items are forced in a single line or can be flowed i
 
 - HTML :
   ```html
-  <article
-    id="electric-cars"
-    data-columns="3"
-    data-index-number="12314"
-    data-parent="cars"
-  >
+  <article id="electric-cars" data-columns="3" data-index-number="12314" data-parent="cars">
     ...
   </article>
   ```
@@ -355,7 +349,7 @@ It defines whether the flex items are forced in a single line or can be flowed i
     content: attr(data-parent);
   }
 
-  article[data-columns="3"] {
+  article[data-columns='3'] {
     width: 400px;
   }
   ```
@@ -434,24 +428,24 @@ we do breaks when **design breaks**
     - then in JS file :
 
       ```javascript
-      const allLinks = document.querySelectorAll("a:link");
+      const allLinks = document.querySelectorAll('a:link');
 
       allLinks.forEach(function (link) {
-        link.addEventListener("click", function (e) {
+        link.addEventListener('click', function (e) {
           e.preventDefault();
-          const href = link.getAttribute("href");
+          const href = link.getAttribute('href');
 
           // Scroll back to top
-          if (href === "#")
+          if (href === '#')
             window.scrollTo({
               top: 0,
-              behavior: "smooth",
+              behavior: 'smooth',
             });
 
           // Scroll to other links
-          if (href !== "#" && href.startsWith("#")) {
+          if (href !== '#' && href.startsWith('#')) {
             const sectionEl = document.querySelector(href);
-            sectionEl.scrollIntoView({ behavior: "smooth" });
+            sectionEl.scrollIntoView({ behavior: 'smooth' });
           }
         });
       });

@@ -369,6 +369,7 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
 
 ---
 
+
 ## Deployment
 
 - the `dist` folder is the one that will be moved in the deployment-service like [netlify](https://www.netlify.com/)

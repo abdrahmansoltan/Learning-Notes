@@ -11,10 +11,15 @@
 - [Files-Architecture](#files-architecture)
 - [Form](#form)
 - [Accessibility & Performance](#accessibility--performance)
-  - [images](#images)
-    - [`fav-icon`](#fav-icon)
-    - [background img in css](#background-img-in-css)
-    - [image size optimization](#image-size-optimization)
+  - [tab key](#tab-key)
+  - [Keyboard Events](#keyboard-events)
+  - [Screen readers](#screen-readers)
+    - [ARIA Roles](#aria-roles)
+      - [Live region roles](#live-region-roles)
+- [images](#images)
+  - [`fav-icon`](#fav-icon)
+  - [background img in css](#background-img-in-css)
+  - [image size optimization](#image-size-optimization)
 - [DOM (document object model)](#dom-document-object-model)
 - [Notes](#notes)
 
@@ -154,11 +159,67 @@ Why do we need to tell the browser what our HTML elements represent?
 - use `meta` tags
 - use `descriptive`
 
+### tab key
+
+A keyboard user typically uses the Tab key to navigate through interactive elements on a web `page—links`, `buttons`, `fields` for inputting text, etc. When an item is tabbed to, it has keyboard "`focus`" and can be activated or manipulated with the keyboard. A sighted keyboard user must be provided with a visual indicator of the element that currently has keyboard focus. Focus indicators are provided automatically by web browsers.
+
+- `tab` -> go forward
+- `shift + tab` -> go backwards
+
+Elements that are affected by `tab` are the one which the user interacts with like: `<input>`, `<a>`, `<iframe>`, ..
+
+**tabindex** attribute:
+
+- it makes the element tabable
+
+  ```html
+  <div tabindex="0">W3Schools</div>
+  ```
+
+  ![tabIndex](./img/tabIndex.png)
+
+> `Document.activeElement` -> read-only property of the Document interface returns the Element within the DOM that currently has focus.
+
+### Keyboard Events
+
+> find what is the number for each keyboard key from here: [keycode.info](https://www.keycode.info)
+
+You can use keyboard events to do stuff
+
+- `keydown`
+- `keypress`
+- `keyup`
+
+![keyboard-events](./img/keyboard-events.png)
+
 ---
 
-### images
+### Screen readers
 
-#### `fav-icon`
+- **Alt Text**
+  ![altText](./img/altText.png)
+- **Hiding elements**
+  ![Hiding elements](./img/hiding.png)
+  ![Hiding elements](./img/hiding2.png)
+
+#### ARIA Roles
+
+ARIA roles provide **semantic meaning to content**, allowing screen readers and other tools to present and support interaction with object in a way that is consistent with user expectations of that type of object. ARIA roles can be used to describe elements that don't natively exist in HTML or exist but don't yet have full browser support.
+
+You can find more here along with roles to use -> [here](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles)
+
+##### Live region roles
+
+Live Region roles are used to define elements with **content that will be dynamically changed** ex:(`chat`). Sighted users can see dynamic changes when they are visually noticeable. These roles help low vision and blind users know if content has been updated. Assistive technologies, like screen readers, can be made to announce dynamic content changes:
+
+---
+
+
+---
+
+## images
+
+### `fav-icon`
 
 [website for doing all this](https://www.favicon-generator.org/)
 
@@ -186,7 +247,7 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ---
 
-#### background img in css
+### background img in css
 
 - when you use **background img** in css and want it to be `Accessible` in `HTML` to write `alt` for screen readers
 
@@ -202,14 +263,14 @@ Why do we need to tell the browser what our HTML elements represent?
   - in `CSS` :
     ```css
     .cta-img-box {
-      background-image: url("../img/eating.jpg");
+      background-image: url('../img/eating.jpg');
       background-size: cover;
     }
     ```
 
 ---
 
-#### image size optimization
+### image size optimization
 
 - to reduce size of images => [squoosh](https://squoosh.app/) and use the `webp` format
 
