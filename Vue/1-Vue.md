@@ -23,7 +23,10 @@
   - [Dynamic styling](#dynamic-styling)
   - [Scoped styling](#scoped-styling)
   - [Transitions](#transitions)
+    - [Transition vs animation](#transition-vs-animation)
     - [Transition Classes](#transition-classes)
+    - [Transition mode](#transition-mode)
+    - [Animating with JavaScript Hooks](#animating-with-javascript-hooks)
 - [Rendering Conditional Content & List-items](#rendering-conditional-content--list-items)
   - [Conditional](#conditional)
   - [List-items](#list-items)
@@ -87,12 +90,12 @@ It's a JavaScript framework for building user interfaces. It builds on top of st
   app({
     data() {
       return {
-        message: "Hello Vue!",
+        message: 'Hello Vue!',
       };
     },
   });
 
-  app.mount("#app");
+  app.mount('#app');
 </script>
 ```
 
@@ -108,12 +111,18 @@ It uses **Proxy** which uses `set` method to update properties
 
   ![proxy](./img/proxy.PNG)
 
+  - **How proxy works?** -> it's for reactivity
+    ![proxy](./img/proxy2.PNG)
+    ![proxy](./img/proxy3.PNG)
+    - It's done using (**track** all properties that are changing) and (**trigger** function that would update new things accordingly)
+
 ---
 
 ### Instance LifeCycle
 
 ![lifecycle](./img/lifecycle2.PNG)
 ![lifecycle](./img/lifecycle.PNG)
+![lifecycle](./img/lifecycle5.PNG)
 
 #### mounted
 
@@ -135,11 +144,11 @@ The most basic form of **data binding** is text interpolation using the "Mustach
 
 ### Directives
 
-A directive is a template token that tells Vue how we want to handle our DOM.
-
+A directive is a template token that tells Vue how we want to handle our DOM.P
 It's used to tell vue to set the value of an html-attribute
 
 ![Directives](./img/directives.jpg)
+![Directives](./img/v-elements.png)
 
 ```html
 <!-- Examples -->
@@ -172,7 +181,7 @@ Vue **v-model** is a directive. It tells Vue that we want to create a two-way da
   export default {
     data() {
       return {
-        value: "Hello World",
+        value: 'Hello World',
       };
     },
   };
@@ -249,9 +258,9 @@ Note from **stackoverflow**:
 
 ![methods](./img/methods.PNG)
 
-> Don't use Arrow-functions as methods as it will miss-up the binding that vue makes. Instead use ES6-methods
+> Don't use **Arrow-functions** as methods as it will miss-up the binding that vue makes using **this** keyword. Instead use ES6-methods
 
-- **computed properties** can never be asynchronous as you expect value to be returned from them, UNLIKE **watchers** which are made for async actions without returning anything
+- **computed properties** can never be **asynchronous** as you expect value to be returned from them, UNLIKE **watchers** which are made for async actions without returning anything
 
 ---
 
@@ -275,9 +284,7 @@ To Access event object
 <button @click="warn('Form cannot be submitted yet.', $event)">Submit</button>
 
 <!-- using inline arrow function -->
-<button @click="(event) => warn('Form cannot be submitted yet.', event)">
-  Submit
-</button>
+<button @click="(event) => warn('Form cannot be submitted yet.', event)">Submit</button>
 ```
 
 ```js
@@ -299,6 +306,9 @@ methods: {
 It is a very common need to call event.`preventDefault()` or event.`stopPropagation()` inside event handlers.
 Instead we use **Event Modifiers**
 
+![modifiers](./img/modifiers.png)
+![modifiers](./img/modifiers2.png)
+
 ```html
 !-- the submit event will no longer reload the page -->
 <form @submit.prevent="onSubmit"></form>
@@ -317,6 +327,7 @@ In-template expressions are very convenient, but they are meant for simple opera
   - It only re calculate tne function if any dependency inside it changed
 - it has to return a value
 - It prevents us from writing **Imperative code**
+- in `HTML`, it's used in `{{}}` or in `v-for` like normal properties and not in the place of **methods**
 
 ```js
 export default {
@@ -354,7 +365,10 @@ export default {
 
 Computed properties allow us to declaratively compute derived values. However, there are cases where we need to perform **"side effects"** in reaction to state changes - for example, mutating the DOM, or changing another piece of state based on the result of an async operation.
 
-With Options API, we can use the watch option to trigger a function whenever a **reactive property** changes:
+- usually when the computed property depends on more than one thing
+- also use it when you want to do something when condition happens or promise fulfilled
+
+> With Options API, we can use the watch option to trigger a function whenever a **reactive property** changes
 
 ```js
 export default {
@@ -392,6 +406,8 @@ export default {
 <p>{{ answer }}</p>
 ```
 
+![watchers](./img/watcher.png)
+
 ---
 
 ## Styling
@@ -402,6 +418,10 @@ here we use
 
 - `v-bind:style` or `:style`
 - `v-bind:class` or `:class` --> you can use computed properties with it
+- in the style object,
+  - you can write the css property in a normal way but in a single quotes
+  - or in a **camelCase** without quotes
+  - the value is always in quotes
 
 ```html
 <div :style="{}"></div>
@@ -431,6 +451,15 @@ It's to make the styles scoped to its component
 
 > You can also use Native CSS animations: (transitions, animation)
 
+---
+
+#### Transition vs animation
+
+![CSS transition vs animation](./img/CSS%20transition%20vs%20animation.webp)
+![CSS transition vs animation](./img/CSS%20transition%20vs%20animation2.jpg_large)
+
+---
+
 #### Transition Classes
 
 ![transitions](./img/transitions.png)
@@ -451,6 +480,7 @@ Named Transitions
 ```html
 <template>
   <button @click="show = !show">Toggle</button>
+  <!-- TRansition component -->
   <Transition>
     <p v-if="show">hello</p>
   </Transition>
@@ -493,6 +523,35 @@ Named Transitions
 
 ---
 
+#### Transition mode
+
+the entering and leaving elements are **animated at the same time**, and we may have to make them `position: absolute` to avoid the layout issue when both elements are present in the DOM.
+
+in some cases this isn't an option, or simply isn't the desired behavior.
+
+- We may want the leaving element to be animated out first, and for the entering element to only be inserted after the leaving animation has finished.
+- we can enable this behavior by passing `<Transition>` a mode prop:
+
+```HTML
+<Transition mode="out-in">
+  ...
+</Transition>
+```
+
+> `<Transition>` also supports `mode="in-out"`, although it's much less frequently used.
+>
+> `<Transition>` can also be used around **dynamic components**
+
+---
+
+#### Animating with JavaScript Hooks
+
+It makes animation more free unlike in `css`
+
+the methods are from [GSAP - GreenSock](https://greensock.com/gsap/)
+
+---
+
 ## Rendering Conditional Content & List-items
 
 ![conditional-lists](./img/conditional-lists.png)
@@ -517,7 +576,14 @@ Here we can use
 
 ```html
 <li v-for="goal in goals" :key="goal.id">{{goal.name}}</li>
+<li v-for="(goal,i) in goals" :key="goal.id">{{goal.name}} and index is {{i}}</li>
 ```
+
+- You can use the list for numbers
+
+  ```html
+  <li v-for="num in 5" :key="num">{{num}}</li>
+  ```
 
 ---
 
@@ -543,7 +609,7 @@ Here we can use
 
 <!-- In Parent -->
 <script>
-  import ButtonCounter from "./ButtonCounter.vue";
+  import ButtonCounter from './ButtonCounter.vue';
 
   export default {
     // Component Registration
@@ -563,7 +629,7 @@ Here we can use
 
 ### Dynamic Components
 
-Sometimes, it's useful to dynamically switch between components, like in a tabbed interface:
+Sometimes, it's useful to dynamically switch between components, like in a **tabbed interface**(tabs):
 
 - instead of using multiple
 
@@ -591,6 +657,9 @@ When switching between multiple components with `<component :is="...">`, a compo
 </KeepAlive>
 ```
 
+`Tabs` example:
+![dynamic-components](./img/dynamic-components.png)
+
 ---
 
 ### Global Components
@@ -602,11 +671,11 @@ To be able to use component inside the entire app without importing each time
 
 // import the component
 
-import { createApp } from "vue";
+import { createApp } from 'vue';
 const app = createApp({ App });
 
 // 2 arguments: (name-registered-that-will-be-used, the-actual-component)
-app.component("MyComponent", the_imported_component);
+app.component('MyComponent', the_imported_component);
 ```
 
 ---
@@ -635,6 +704,8 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
     },
   ```
 
+  - **default value**:
+    ![props-default](./img/props-default.png)
   - **Validating props**:
     - inside it you can't access the component's properties as it hasn't been created yet
     ```js
@@ -662,23 +733,26 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
     <ButtonCounter :isEnabled="true" />
     ```
 
-```html
-<!-- in the child: BlogPost.vue -->
-<script>
-  export default {
-    props: ["title"],
-  };
-</script>
+    ```html
+    <!-- in the child: BlogPost.vue -->
+    <script>
+      export default {
+        props: ['title'],
+      };
+    </script>
 
-<template>
-  <h4>{{ title }}</h4>
-</template>
+    <template>
+      <h4>{{ title }}</h4>
+    </template>
 
-<!-- In parent -->
-<BlogPost title="My journey with Vue" />
-<!-- Or using message-property -->
-<BlogPost :title="message" />
-```
+    <!-- In parent -->
+    <BlogPost title="My journey with Vue" />
+    <!-- Or using message-property -->
+    <BlogPost :title="message" />
+    ```
+
+**Note**:
+![props-camelCase](./img/props-camelCase.png)
 
 ---
 
@@ -741,16 +815,13 @@ For this to actually work though, the `<input>` inside the component must:
   <!-- CustomInput.vue  (child component) -->
   <script>
   export default {
-    props: ["modelValue"],
-    emits: ["update:modelValue"],
+    props: ['modelValue'],
+    emits: ['update:modelValue'],
   };
   </script>
 
   <template>
-    <input
-      :value="modelValue"
-      @input="$emit('update:modelValue', $event.target.value)"
-    />
+    <input :value="modelValue" @input="$emit('update:modelValue', $event.target.value)" />
   </template>
   ```
 
@@ -759,10 +830,7 @@ For this to actually work though, the `<input>` inside the component must:
   ```html
   <!-- in parent component -->
   <!-- instead of this -->
-  <CustomInput
-    :modelValue="searchText"
-    @update:modelValue="newValue => searchText = newValue"
-  />
+  <CustomInput :modelValue="searchText" @update:modelValue="newValue => searchText = newValue" />
 
   <!-- use this -->
   <CustomInput v-model="searchText" />
@@ -779,10 +847,7 @@ For this to actually work though, the `<input>` inside the component must:
 ![modelValue](./img/modelValue.PNG)
 
 ```html
-<CustomInput
-  :modelValue="searchText"
-  @update:modelValue="newValue => searchText = newValue"
-/>
+<CustomInput :modelValue="searchText" @update:modelValue="newValue => searchText = newValue" />
 ```
 
 ---
@@ -800,7 +865,7 @@ it's like **context**: it prevents props-drilling
 // in the upper component
 export default {
   provide: {
-    message: "hello!",
+    message: 'hello!',
   },
 };
 ```
@@ -811,7 +876,7 @@ export default {
 export default {
   data() {
     return {
-      message: "hello!",
+      message: 'hello!',
     };
   },
   provide() {
@@ -826,11 +891,11 @@ export default {
 - In addition to providing data in a component, we can also provide at the app level:
 
   ```js
-  import { createApp } from "vue";
+  import { createApp } from 'vue';
 
   const app = createApp({});
 
-  app.provide(/* key */ "message", /* value */ "hello!");
+  app.provide(/* key */ 'message', /* value */ 'hello!');
   ```
 
 #### Inject
@@ -840,7 +905,7 @@ Injections are resolved **before** the component's own state, so you can access 
 ```js
 // in the lower component
 export default {
-  inject: ["message"],
+  inject: ['message'],
   data() {
     return {
       // initial data based on injected value
@@ -918,9 +983,7 @@ It's a way for the child to pass data to a slot when rendering it.
 </div>
 <!--------------------------------------------------->
 <!-- In parent -->
-<MyComponent v-slot="slotProps">
-  {{ slotProps.text }} {{ slotProps.count }}
-</MyComponent>
+<MyComponent v-slot="slotProps">{{ slotProps.text }} {{ slotProps.count }}</MyComponent>
 ```
 
 ---
@@ -940,6 +1003,7 @@ It's a way for the child to pass data to a slot when rendering it.
 ### Form Validation
 
 - manually
+  - **Tip**: you can use `.lazy` event modifier with large text area so that you don't annoy user when typing
 - [VeeValidate](https://vee-validate.logaretm.com/v4/)
   - [VeeValidate2](https://www.section.io/engineering-education/form-validation-in-vue.js-using-veevalidate/)
 
@@ -1088,19 +1152,19 @@ history: createWebHistory(process.env.BASE_URL);
 
 ```js
 // literal string path
-this.$router.push("/users/eduardo");
+this.$router.push('/users/eduardo');
 
 // object with path
-this.$router.push({ path: "/users/eduardo" });
+this.$router.push({ path: '/users/eduardo' });
 
 // named route with params to let the router build the url --> (params="/:username")
-this.$router.push({ name: "user", params: { username: "eduardo" } });
+this.$router.push({ name: 'user', params: { username: 'eduardo' } });
 
 // with query, resulting in /register?plan=private
-this.$router.push({ path: "/register", query: { plan: "private" } });
+this.$router.push({ path: '/register', query: { plan: 'private' } });
 
 // with hash, resulting in /about#team
-this.$router.push({ path: "/about", hash: "#team" });
+this.$router.push({ path: '/about', hash: '#team' });
 ```
 
 ---
@@ -1126,17 +1190,17 @@ Sometimes, you might want to **attach arbitrary information to routes** like tra
 ```js
 const routes = [
   {
-    path: "/posts",
+    path: '/posts',
     component: PostsLayout,
     children: [
       {
-        path: "new",
+        path: 'new',
         component: PostsNew,
         // only authenticated users can create posts
         meta: { requiresAuth: true },
       },
       {
-        path: ":id",
+        path: ':id',
         component: PostsDetail,
         // anybody can read a post
         meta: { requiresAuth: false },
@@ -1188,12 +1252,12 @@ next(false);
 
 // ---------------------------------- //
 // to cancel navigation and redirect to another route:
-next("/teams");
+next('/teams');
 // Or
-if (to.name === "teams") {
+if (to.name === 'teams') {
   next();
 } else {
-  next({ name: "teams" });
+  next({ name: 'teams' });
 }
 ```
 
@@ -1248,16 +1312,16 @@ This is used to load components only when the page that contain the components i
 
 ```js
 // instead of this:
-import a1 from "@/components/a1";
-import a2 from "@/components/a2";
-import b1 from "@/components/b1";
-import b2 from "@/components/b2";
+import a1 from '@/components/a1';
+import a2 from '@/components/a2';
+import b1 from '@/components/b1';
+import b2 from '@/components/b2';
 
 // use this:
-const a1 = () => import("@/components/a1");
-const a2 = () => import("@/components/a2");
-const b1 = () => import("@/components/b1");
-const b2 = () => import("@/components/b2");
+const a1 = () => import('@/components/a1');
+const a2 = () => import('@/components/a2');
+const b1 = () => import('@/components/b1');
+const b2 = () => import('@/components/b2');
 ```
 
 #### Webpack Chunks
@@ -1265,8 +1329,8 @@ const b2 = () => import("@/components/b2");
 Same as above + you can group multiple imports in the same file for webpack
 
 ```js
-const a1 = () => import(/* webpackChunkName: "file1" */ "@/components/a1");
-const a2 = () => import(/* webpackChunkName: "file1" */ "@/components/a2");
+const a1 = () => import(/* webpackChunkName: "file1" */ '@/components/a1');
+const a2 = () => import(/* webpackChunkName: "file1" */ '@/components/a2');
 ```
 
 ---
@@ -1303,8 +1367,8 @@ vue add <name of the plugin>
   // .eslintrc.js
   module.exports = {
     rules: {
-      "prettier/prettier": ["error", { endOfLine: "auto" }],
-      "vue/multi-word-component-names": 0,
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
+      'vue/multi-word-component-names': 0,
     },
   };
   ```
@@ -1350,7 +1414,7 @@ vue add <name of the plugin>
 
   ```html
   <script>
-    import { nextTick } from "vue";
+    import { nextTick } from 'vue';
 
     export default {
       data() {
@@ -1363,11 +1427,11 @@ vue add <name of the plugin>
           this.count++;
 
           // DOM not yet updated
-          console.log(document.getElementById("counter").textContent); // 0
+          console.log(document.getElementById('counter').textContent); // 0
 
           await nextTick();
           // DOM is now updated
-          console.log(document.getElementById("counter").textContent); // 1
+          console.log(document.getElementById('counter').textContent); // 1
         },
       },
     };

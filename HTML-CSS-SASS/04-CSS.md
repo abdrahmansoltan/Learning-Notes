@@ -325,6 +325,7 @@ It defines whether the flex items are forced in a single line or can be flowed i
 - `transform` is more efficient than `position` for animation
 - to change anchor point of element => `transform-origin`, find more [here](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin)
 
+  ![transform-origin](./img/transform-origin2.png)
   ![transform-origin](./img/transform-origin.png)
 
 - when using 3d animation / transform => use `prespective` property on the parent element

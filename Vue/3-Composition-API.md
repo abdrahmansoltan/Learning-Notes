@@ -26,11 +26,15 @@ It's an alternative syntax for writing components
 ![composition api](./img/composition%20api.PNG)
 ![options api](./img/composition%20api2.PNG)
 
+- new syntax for the `setup`
+  ![composition api](./img/options%20api2.png)
+
 ---
 
 ### Why use it ?
 
-- Better Typescript support
+- Better **Typescript** support
+  - as it's made and written in **Typescript**
 - Better Organization
 
   - related code(data+methods) are close to each other
@@ -67,7 +71,7 @@ It's the process of **updating the template** whenever a change in the data occu
 
 ```vue
 <script>
-import { ref } from "vue";
+import { ref } from 'vue';
 
 export default {
   setup() {
@@ -117,7 +121,7 @@ Returns a reactive proxy of the **object** and not **Primitive values** like **r
 
 ```js
 const user = reactive({
-  name: "John",
+  name: 'John',
   age: 20,
 });
 
@@ -140,7 +144,7 @@ const state = reactive({
   bar: 2,
 });
 
-const fooRef = toRef(state, "foo"); // creating connection to  the "foo" property in the "state" object
+const fooRef = toRef(state, 'foo'); // creating connection to  the "foo" property in the "state" object
 
 // mutating the ref updates the original
 fooRef.value++;
@@ -170,7 +174,7 @@ var myMixin = {
   },
   methods: {
     hello: function () {
-      console.log("hello from mixin!");
+      console.log('hello from mixin!');
     },
   },
 };
@@ -214,7 +218,7 @@ If you destructure the props object, the destructured variables **will lose reac
 If you really need to destructure the props, or need to pass a prop into an external function while retaining reactivity, you can do so with the **toRefs()** and **toRef()** utility APIs
 
 ```js
-import { toRefs, toRef } from "vue";
+import { toRefs, toRef } from 'vue';
 
 export default {
   setup(props) {
@@ -224,7 +228,7 @@ export default {
     console.log(title.value);
 
     // OR, turn a single property on `props` into a ref
-    const title = toRef(props, "title");
+    const title = toRef(props, 'title');
   },
 };
 ```
@@ -270,7 +274,7 @@ export default {
 Because we don't have access to **this** inside of setup, we cannot directly access `this.$router or this.$route` anymore. Instead we use the **useRouter** function:
 
 ```js
-import { useRouter, useRoute } from "vue-router";
+import { useRouter, useRoute } from 'vue-router';
 
 export default {
   setup() {
@@ -279,7 +283,7 @@ export default {
 
     function pushWithQuery(query) {
       router.push({
-        name: "search",
+        name: 'search',
         query: {
           ...route.query,
         },
