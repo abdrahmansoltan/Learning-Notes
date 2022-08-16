@@ -6,7 +6,7 @@
 - [Semantic HTML](#semantic-html)
   - [Why ?](#why-)
   - [Semantic tags](#semantic-tags)
-- [some inline elements to be aware of:](#some-inline-elements-to-be-aware-of)
+- [some inline elements to be aware of](#some-inline-elements-to-be-aware-of)
 - [tricks](#tricks)
 - [Files-Architecture](#files-architecture)
 - [Form](#form)
@@ -19,7 +19,11 @@
 - [images](#images)
   - [`fav-icon`](#fav-icon)
   - [background img in css](#background-img-in-css)
-  - [image size optimization](#image-size-optimization)
+  - [image size optimization (responsive images)](#image-size-optimization-responsive-images)
+    - [HTML `<picture>` Element](#html-picture-element)
+    - [srcset](#srcset)
+    - [Background images](#background-images)
+    - [Which to use ?](#which-to-use-)
 - [DOM (document object model)](#dom-document-object-model)
 - [Notes](#notes)
 
@@ -70,6 +74,7 @@ Why do we need to tell the browser what our HTML elements represent?
 - **SEO**
 
   - For example, keywords enclosed in an `<h1>` tag are given more importance than those enclosed in an `<p>`. By putting your most important keywords higher up in the hierarchy, you’re effectively telling search engines what your page is about and why people searching for those keywords would be interested in your content, hence improving the Search Engine Optimization of your page.
+  - That's why you should **use only one** `<h1>` in the html page
 
 - **Accessibility**
 
@@ -85,9 +90,12 @@ Why do we need to tell the browser what our HTML elements represent?
 ![tags](./img/semantic.png)
 ![tags](./img/symantic2.jpeg)
 
+- `<section>` element usually starts with heading element `h2`
+- `<nav>` element usually contains **unordered list** element `ul`
+
 ---
 
-## some inline elements to be aware of:
+## some inline elements to be aware of
 
 > inline elements in HTML aren't effected by [width/height] properties
 
@@ -146,6 +154,7 @@ Why do we need to tell the browser what our HTML elements represent?
 ## Form
 
 - you can use [netlify](https://docs.netlify.com/forms/setup/?_ga=2.17094910.693790722.1649686633-761975974.1648039605) to manage your forms without `Js` => by inserting `name` attribute to each `input` element and writing this at at the `form` element:
+
   ```html
   <form class="cta-form" name="sign-up" netlify></form>
   ```
@@ -214,7 +223,6 @@ Live Region roles are used to define elements with **content that will be dynami
 
 ---
 
-
 ---
 
 ## images
@@ -261,6 +269,7 @@ Live Region roles are used to define elements with **content that will be dynami
     ```
 
   - in `CSS` :
+
     ```css
     .cta-img-box {
       background-image: url('../img/eating.jpg');
@@ -270,19 +279,29 @@ Live Region roles are used to define elements with **content that will be dynami
 
 ---
 
-### image size optimization
+### image size optimization (responsive images)
 
 - to reduce size of images => [squoosh](https://squoosh.app/) and use the `webp` format
 
   - but check `compatibility` with browsers **or** use it with `fallback img` and let the browsers choose by itself.
 
+#### HTML `<picture>` Element
+
+- The HTML `<picture>` element gives web developers more flexibility in specifying image resources.
+  - The `<picture>` element contains one or more `<source>` elements, each referring to different images through the srcset attribute. This way the browser can choose the image that best fits the current view and/or device.
+- Each `<source>` element has a **media** attribute that defines when the image is the most suitable.
+
+- It's used to Render images conditionally (show one and hide the other)
+here, we use `<picture>` symantec element
+- Note: Always specify an `<img>` element as the **last child element** of the `<picture>` element. The `<img>` element is used by browsers that do not support the `<picture>` element, or if none of the `<source>` tags match.
+
 ```html
 <picture>
+  <!-- browser will choose which src it can display and displays it in the <img> element below -->
   <source srcset="img/hero.webp" type="image/webp" />
   <source srcset="img/hero-min.png" type="image/png" />
 
-  <!-- browser will choose which src it can display and displays it in the <img> element below -->
-
+  <!-- fall-up (default) image (if the previous didn't render) -->
   <img
     src="img/hero-min.png"
     class="hero-img"
@@ -290,6 +309,49 @@ Live Region roles are used to define elements with **content that will be dynami
   />
 </picture>
 ```
+
+Or Show different images for different screen sizes:
+
+  ```html
+  <picture>
+    <source media="(min-width: 650px)" srcset="img_food.jpg">
+    <source media="(min-width: 465px)" srcset="img_car.jpg">
+    <img src="img_girl.jpg">
+  </picture>
+  ```
+
+#### srcset
+
+There're new attributes for `<img>` element used to provide several additional source images along with hints to help the browser pick the right one:
+
+- `srcset`
+- `sizes`
+
+> - the names and width of images in **Pixels**
+> - **sizes** -> represents the hole on the web page 
+
+```html
+<img srcset="elva-fairy-480w.jpg 480w,
+             elva-fairy-800w.jpg 800w"
+     sizes="(max-width: 600px) 480px,
+            800px"
+     src="elva-fairy-800w.jpg"
+     alt="Elva dressed as a fairy">
+
+<!-- same as : -->
+<img 
+  src="elva-fairy-480w.jpg"
+  width="480"
+>
+
+```
+
+#### Background images
+
+for that we use media queries as we put each image in each media
+
+#### Which to use ?
+![responsive-images](./img/responsive-images.png)
 
 ---
 

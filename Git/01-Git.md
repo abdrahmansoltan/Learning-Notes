@@ -12,6 +12,7 @@
   - [commands](#commands)
   - [Git stash](#git-stash)
   - [Recommended stash commands:](#recommended-stash-commands)
+  - [Advance stashing](#advance-stashing)
   - [Merging](#merging)
     - [Fast Forward Merge](#fast-forward-merge)
     - [Types](#types)
@@ -161,15 +162,21 @@ A branch is a pin pointed arrow to a commit. When you first create a repository,
 **git stash** temporarily shelves (or stashes) changes you've made to your working copy so you can work on something else, and then come back and re-apply them later on.
 
 ![stash](./img/stash.png)
-![stash](./img/stash2.png)
-![stash](./img/stash3.png)
-![stash](./img/stash4.png)
+
 
 ---
 
 ### Recommended stash commands:
 
 ![stash](./img/stash-recommended.png)
+
+---
+
+### Advance stashing
+
+![stash](./img/stash2.png)
+![stash](./img/stash3.png)
+![stash](./img/stash4.png)
 
 ---
 

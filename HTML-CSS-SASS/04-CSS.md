@@ -4,8 +4,8 @@
 - [styling Types](#styling-types)
 - [selectors](#selectors)
   - [css selector specificity](#css-selector-specificity)
-    - [Calculation:](#calculation)
-    - [Notes:](#notes)
+    - [Calculation](#calculation)
+    - [Notes](#notes)
 - [styling (hyperlinks / buttons)](#styling-hyperlinks--buttons)
 - [Box Model](#box-model)
 - [Display](#display)
@@ -13,6 +13,7 @@
 - [Text - Font](#text---font)
 - [Box Shadow](#box-shadow)
 - [images](#images)
+  - [clip-path](#clip-path)
 - [LAYOUTS](#layouts)
   - [Float](#float)
   - [Flexbox](#flexbox)
@@ -62,7 +63,7 @@
 
 If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
 
-#### Calculation:
+#### Calculation
 
 - Start at 0
 - add 100 for each ID value
@@ -72,7 +73,7 @@ If there are two or more CSS rules that point to the same element, the selector 
 ![specificity](./img/specificity.svg)
 ![specificity](./img/specificity2.png)
 
-#### Notes:
+#### Notes
 
 - `*` has specificity of **0**
 - Specificity in CSS only concerns selectors, not their associated declarations. **!important** applies to a declaration, so it alone plays no role in specificity.
@@ -98,6 +99,7 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 - inline elements respect padding & margin **only** for (right/left)
 - to make global reset for margin/padding => use `*` and not `body`
 - **Collapsing margins** : it's when we have 2 margins(only vertical margins) that occupied the same space, so only one of them will be visible to the page which is the larger one and **not** their sum ![Margin Collapse](./img/MarginCollapse.png)
+  - this is not the same for **padding** as they get added together
 - **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/border-collapse.png)
 - between sections use padding not margin
 
@@ -124,6 +126,8 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
     /* 3) Hide it from screen readers */
     visibility: hidden;
     ```
+
+- `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
 
 ### pseudo Elements/Classes
 
@@ -165,13 +169,15 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 ## Text - Font
 
 - `white-space: no wrap` => this forces it to automatically go to next line when reaching max-width
-- `text-overflow:elipsis` => when text passes the max-width, it shows this `...`at the max-width limit as indication of more text available
+- `text-overflow:ellipsis` => when text passes the max-width, it shows this `...`at the max-width limit as indication of more text available
 - in the `html` element we set the `font-size` to 62.5% and not 10px => because we want to respect the user's font-size settings.
 - `rem` (root element) vs `em` (parent element) : ![rem-em](./img/rem-em.png)
   - **em** ->
-    - em are measured relative to their **parent font-size**, if used to specify font-size;
-    - em are measured relative to the **current font-size**, if used to specify lengths;
+    - em are measured relative to their **parent font-size**, if used to specify **font-size**
+    - em are measured relative to the **current font-size**, if used to specify **lengths**
+      - as length/gap/spacing using `em` in `<p>` will be smaller than in `<h1>`
   - **rem** -> is relative to the html (root) font-size
+- `line-height`: if we didn't use a unit then it's relevant to the **font size**
 - for more fun font use => [Rubik](https://fonts.google.com/specimen/Rubik)
 
 ![units](./img/units.PNG)
@@ -217,13 +223,17 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 
 - change color of image from `filter` property
 
-  - make imgae color **black** => `filter: brightness(0);`
-  - make imgae color **grey** =>
+  - make image color **black** => `filter: brightness(0);`
+  - make image color **grey** =>
+
     ```css
     filter: brightness(0);
     opacity: 50%;
     ```
+
   - also you can try `filter: greyscale/blur/invert`
+
+### clip-path
 
 - `clip-path` => [clippy](https://bennettfeely.com/clippy/)
   ![clip-path](./img/clip-path.webp)
@@ -239,6 +249,9 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 - **Collapse Height**: If this parent element contained nothing but floated elements, the height of it would literally collapse to nothing. This isn’t always obvious if the parent doesn’t contain any visually noticeable background, but it is important to be aware of. ![collapse](./img/collapseFloat.webp)
   - > to fix it we use `clear:both` on the parent element
 - we use `clear` property when we want the surrounding element to not be floated around element with a `float` property
+- there's a new way to clear float --> `display: flow-root`
+  - The element generates a **block container** box, and lays out its contents using flow layout. It always establishes a new block formatting context for its contents. It provides a better solution to the most use cases of the "clearfix" hack.
+  - It always establishes a new block formatting context for its contents.
 
 ---
 
@@ -246,13 +259,18 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 
 - default value for `align-items` is **stretch**
 - for flexItems => `flex-grow/shrink` if set to zero, this means that the item is not allowed to grow/shrink
-- for flexItems => `flex-basis` is used as a width if row-direction, and a height if column-direction, (by default it's set to `auto`)
-- for flexItems => try not to use `width` and use `flex-basis` with remembering that if it doesn't work that means that the `flex-shrink` is set to 1 not 0
+- **justify-content**:
+  ![flex-justify-content](./img/flex-justify-content.png)
+- **flex-basis** -> use it instead of `width` for **flex-items**:
+  - for flexItems => `flex-basis` is used as a width-percentile if row-direction, and a height if column-direction, (by default it's set to `auto`)
+  - for flexItems => try not to use `width` and use `flex-basis` with remembering that if it doesn't work that means that the `flex-shrink` is set to 1 not 0
+    ![basis](./img/flex-basis1.gz)
+    ![basis](./img/flex-basis2.gz)
 - flex containers act as a **Block element**, so note this when you apply it to a small item in order to center its contents, you can change it using `display: inline-flex`
 
 #### flex-wrap
 
-It defines whether the flex items are forced in a single line or can be flowed into multiple lines. If set to multiple lines, it also defines the cross-axis which determines the direction new lines are stacked in.
+It defines whether the flex items are forced in a single line or can be flowed into multiple lines (**wrapped into new line**). If set to multiple lines, it also defines the cross-axis which determines the direction new lines are stacked in.
 
 > The **cross axis** is the axis perpendicular to the main axis.
 
@@ -276,6 +294,7 @@ It defines whether the flex items are forced in a single line or can be flowed i
 
 - instead of px or fr you can use `minmax()` => ex: `minmax(20px, auto)`
 
+  - It's used to prevent grid cells from gitting too **small** / **big**
   - note: using a 1fr as the max value will ensure that the track expands and takes up the available space
   - `minmax` can’t handle responsive design by itself. We need to handle that by ourselves
 
@@ -289,7 +308,7 @@ It defines whether the flex items are forced in a single line or can be flowed i
 
 - `auto` vs `fr`
 
-  - `auto` is shy (jest take the required space that fits its content)
+  - `auto` is shy (just takes the required space that fits its content)
   - `fr` is greedy (take the remaining space available)
 
 - `fr` could be used with any values to determine relationship between rows/columns like:
@@ -299,15 +318,21 @@ It defines whether the flex items are forced in a single line or can be flowed i
   ```
 
 - if you don't know the size of page but you know the number of columns:
+
   ```css
   grid-template-column: repeat(auto-fill, minmax(200px, 1fr));
   ```
+
+- **overlapping grid items**:
+  - Grid allows cells to overlap with each other
+  ![overlapping grid items](./img/overlapping%20grid%20items.png)
 
 ---
 
 ## Variables
 
 - usually in the `:root` selector
+  - because the `:root` selector includes all elements and pseudo elements in the DOM unlike `*` selector
 - when using the variable, I can use a **Fall-back variable/ value** after a comma => ex: `div{color:var(--primary,black)}`
 
 ---
@@ -338,11 +363,13 @@ It defines whether the flex items are forced in a single line or can be flowed i
 - For example to show the parent data on the article you can use generated content in CSS with the attr() function:
 
 - HTML :
+
   ```html
   <article id="electric-cars" data-columns="3" data-index-number="12314" data-parent="cars">
     ...
   </article>
   ```
+
 - CSS
 
   ```css
@@ -387,6 +414,8 @@ It defines whether the flex items are forced in a single line or can be flowed i
 
   Because without this meta, responsive web design won't work on physical mobile devices as their browser will zoom the page out by default until it fits the screen, and by writing this line of code we make sure that it will fit their screen width
 
+- there's a value of `landscape / portrait` instead of `max-width` for **media queries**
+
 - **Bugs** : `rem` and `em` do NOT depend on html font-size in **media queries**! Instead, 1rem = 1em = 16px => so use `em`
 
   ```css
@@ -419,6 +448,7 @@ we do breaks when **design breaks**
   - **using JS** => (work with all)
 
     - add this library to html file (for safari)
+
       ````html
       <script
         defer
@@ -426,6 +456,7 @@ we do breaks when **design breaks**
       ></script>
       ```
       ````
+
     - then in JS file :
 
       ```javascript

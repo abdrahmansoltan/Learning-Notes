@@ -7,17 +7,22 @@
 - [JavaScript Engine](#javascript-engine)
   - [call-stack & Memory-heap](#call-stack--memory-heap)
 - [Types](#types)
+  - [`==` vs `===`](#-vs-)
+  - [Type Coercion](#type-coercion)
 - [Implicit vs Explicit](#implicit-vs-explicit)
 - [Scope](#scope)
   - [Lexical scope](#lexical-scope)
 - [Functional Programming](#functional-programming)
   - [currying-vs-partial Application](#currying-vs-partial-application)
   - [Closure](#closure)
+    - [Function returning Functions](#function-returning-functions)
     - [Benefits](#benefits)
   - [Pure Functions](#pure-functions)
   - [Referential Transparency](#referential-transparency)
   - [composition](#composition)
 - [JS : The weird parts](#js--the-weird-parts)
+  - [Types](#types-1)
+  - [Numbers](#numbers)
   - [short circuiting => **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
 - [notes](#notes)
 
@@ -50,7 +55,7 @@
 
 ## JavaScript Engine
 
-- javascript uses best of (Interpreted & Compiled) languages ---> **Jit Compiler**
+- javascript uses best of (**Interpreted** & **Compiled**) languages ---> **Jit Compiler**
 
   ![alt](./img/js-engine.PNG)
 
@@ -76,13 +81,21 @@
   ![pvr](./img/permatives%20vs%20reference.PNG)
   - `value` at a specific `address` (**in the `call stack`**) is immutable ,,, but in the `Heap` its mutable
   - `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack`
-- **Type Coercion** : it's the automatic or implicit conversion of values from one data type to another
+  
+### `==` vs `===`
+
+- If you know the types in comparison: prefer `==` as it's faster
+- if `===` would always be equivalent to `==` in your code, using it everywhere sends a wrong semantic signal : **protecting myself since I don't know'trust the types**
+
+### Type Coercion
+
+it's the automatic or implicit conversion of values from one data type to another
   ![type coercion](./img/TypeCoercion.png)
 
-  - empty object {} /array [] => true
-  - empty string "" => false
+- empty object {} /array [] => true
+- empty string "" => false
 
-  - `+` vs `-` :
+- `+` vs `-` :
 
     ![type coercion](./img/TypeCoercion2.PNG)
 
@@ -91,6 +104,8 @@
     - it's a `+` or `-` before the string number => `console.log(+"565")`
     - it's a `!` before something => `console.log(! (x > 4) )`
   - `parseint()` or `parsefloat()` => `parseint(100Ahmed)` = 100
+
+- `string to boolean`: ![coercion](./img/coercion2.png)
 
 ---
 
@@ -106,20 +121,27 @@
 
 ### Lexical scope
 
+> **It's where the function was called**
+
 Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope.
 
 > (range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in**.
 
-- It's where the function was called
-
 - it determines our available variables
 - variable defined outside a function can be accessible inside another function defined after the variable declaration.
+  - this accessible item is sometimes called a **Backpack** or **Persistent lexical scope referenced data (PLSRD)**
+  - each execution of the function gets its own separated **Backpack**
+- the opposite is **dynamic scope** --> It doesn't exist in JavaScript
 
 ![lexical](./img/fig2.png)
+
+> **Note**: if variable is assign a value but never declared in a scope or block -> it automatically gets declared in the global scope
 
 ---
 
 ## Functional Programming
+
+> Functional programming is about **Verbs** (actions), & object oriented programming is about **pronouns** (objects and things)
 
 ### currying-vs-partial Application
 
@@ -134,6 +156,11 @@ Each local scope can also see all the local scopes that contain it, and all scop
 ### Closure
 
 > The ability to treat functions as values
+
+![closure](./img/closure.PNG)
+![closure](./img/closure1.png)
+one of the biggest examples of closures is **timers**: ![closure](./img/closure2.PNG)
+![closure](./img/closure3.PNG)
 
 - A closure is the combination of a function bundled together (`enclosed`) with references to its surrounding state (the lexical environment). In other words, **a closure gives you access to an outer function's scope from an inner function**. In JavaScript, closures are created every time a function is created, at function creation time.
 - A closure makes sure that a function doesn’t loose connection to variables that existed at the function’s birth place
@@ -151,19 +178,30 @@ Each local scope can also see all the local scopes that contain it, and all scop
   ```javascript
   // handleHover is a function with 2 parameters(e,opacity)
   // Method 1
-  nav.addEventListener("mouseover", function (e) {
+  nav.addEventListener('mouseover', function (e) {
     handleHover(e, 0.5);
   });
 
   // Method 2 (see example for explanation)
-  nav.addEventListener("mouseover", handleHover.bind(0.5));
+  nav.addEventListener('mouseover', handleHover.bind(0.5));
   ```
 
 - when you want to turn **block-scope** into a **functional-scope** -> use **IIFE**
+  - usually used to prevent variable to be in the global scope like here:
+    ![IIFE](./img/iife.PNG)
+
+#### Function returning Functions
+
+this is a form of **Closure**, as in this example:![func calls func](./img/closure4.png)
+
+- most importantly -> `generatedFunc` **doesn't have any connection to** `createFunction`, as:
+  - here `generatedFunc` is not equal to `createFunction` function
+  - but it's equal to "what `createFunction` function has returned **when it was created(ran)**"
 
 #### Benefits
 
 - It's usually memory-efficient as it caches the values inside its block-scoped in case that it was called again
+  ![closure](./img/closure5.png)
 - Encapsulation: prevent unwanted access to inner variables/functions
 
 ---
@@ -201,13 +239,28 @@ let compose = (fn1, fn2) => fn2(fn1);
 
 ## JS : The weird parts
 
+### Types
+
 - `null` vs `undefined`
   ![null-undefined](./img/null-undefined.png)
-- `null` is you set it to empty, `undefined` it's empty because it has not been set.
+- `null` is you set it to **empty**,
+- `undefined` it's empty because it **has not been set** / **Doesn't currently have a value**.
 - or `null` is empty on purpose, while `undefined` is still empty.
 - `undefined` means a variable has been declared but has not yet been assigned a value
-- `null` is an assignment value. It can be assigned to a variable as a representation of no value.
-- `typeof NaN` = `Number`
+- `null` is an assignment value. It can be assigned to a variable as a representation of **no value**.
+
+---
+
+### Numbers
+
+- **NaN**:
+  - `typeof NaN` = `Number` --> as it's **invalid number**
+  - example of `NaN` -> **division on strings** -> `"apple" / 3`
+  - `Nan === NaN` --> **false**
+
+- **Negative zero**:
+
+---
 
 ### short circuiting => **nullish coalescing operator** `??`
 
@@ -247,8 +300,8 @@ let compose = (fn1, fn2) => fn2(fn1);
   });
 
   Object.freeze([
-    { value: 250, description: "Sold old TV 📺", user: "jonas" },
-    { value: -45, description: "Groceries 🥑", user: "jonas" },
+    { value: 250, description: 'Sold old TV 📺', user: 'jonas' },
+    { value: -45, description: 'Groceries 🥑', user: 'jonas' },
   ]);
 
   // or anything because everything is an "object"
@@ -282,3 +335,4 @@ let compose = (fn1, fn2) => fn2(fn1);
     ```
 
   - **let** is both function-scoped and block-scoped, **means you can't use it outside the function-scope & block-scope**
+  - if you used **const** in a `for loop` -> `for ( i = 0; i < 3; i++) {}` you will get error, as you won't be able to re-assign `i`

@@ -48,6 +48,8 @@
 ## ES6 Classes
 
 - here we have `class declaration` / `class expression` like function => as `classes` are in fact `function`
+  - **class** automatically creates a **function + object** combo
+    ![class](./img/class.png)
 
   ```javascript
   // Class expression
@@ -87,7 +89,7 @@
 
 ## `object.create()`
 
-- enables you to create prototypes
+- enables you to create prototypes from other objects
 
 ```javascript
 const PersonProto = {
@@ -199,6 +201,8 @@ steven.init('Jay', 2010, 'Computer Science');
 - Method chaining is the mechanism of calling a method on another method of the same object. This ensures a cleaner and readable code.
 - Method chaining uses `this` keyword in the object's class to access its methods.When a method returns `this`, it simply returns an instance of the object in which it is returned. in another word, to chain methods together :
   - we need to make sure that each method we define has a return value so that we can call another method on it.
+  -
+  -
   - ```javascript
     withdraw(val) {
       this.deposit(-val);

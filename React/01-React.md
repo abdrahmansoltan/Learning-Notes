@@ -227,7 +227,7 @@ React Router turns React projects into single-page applications. It does this by
       // rapping the component in a routes and the route specify the endpoint
       <Routes>
         <Route path="/home" element={<Home />} />
-        {//means that when route matches "/home" -> render the Home component}
+        // means that when route matches "/home" -> render the Home component
       </Routes>
     );
   }

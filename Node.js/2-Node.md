@@ -51,6 +51,14 @@
 
   ![engine](./img/how%20js%20works.jpg)
 
+- Benefits (features we get) of running Javascript in Browser:
+  - devtools
+  - console
+  - sockets
+  - network requests -> `fetch / xhr`
+  - HTML DOM -> `document`
+  - Timer -> `setTimeOut`
+
 ---
 
 ### Node.js Runtime

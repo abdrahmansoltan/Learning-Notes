@@ -196,6 +196,10 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
 
 `JavaScript bundling` is an optimization technique you can use to reduce the number of **server requests** for JavaScript files. Bundling accomplishes this by merging multiple JavaScript files together into one file to reduce the number of page requests.
 
+> Difference:
+> - Parcel is good for teaching and small exambles as it doesn't require configuration
+> Webpack is better for large production
+
 ![Bundling](./img/Bundling.png)
 
 ### Parcel

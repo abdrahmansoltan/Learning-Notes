@@ -33,8 +33,9 @@
 ## Notes
 
 - if you are using hosted version of an Api => don't forget to put `defer` in the `<script>` part of it in the HTML `<head>`
-- in `event loop` : `callback functions` that are coming from promises go to `microTasks queue` not the `callback queue`. (see the **pdf**)
-- `microTasks queue` has priority over `callback queue` in `event loop`
+- in `event loop` :
+  - `callback functions` that are coming from **promises** go to **microTasks queue** not the `callback queue`.
+  - **microTasks queue** has priority over **callback queue** in `event loop`
 
 ---
 
@@ -57,20 +58,18 @@
 ```javascript
 // creating the promise
 const lotteryPromise = new Promise(function (resolve, reject) {
-  console.log("Lotter draw is happening 🔮");
+  console.log('Lotter draw is happening 🔮');
   setTimeout(function () {
     if (Math.random() >= 0.5) {
-      resolve("You WIN 💰");
+      resolve('You WIN 💰');
     } else {
-      reject(new Error("You lost your money 💩"));
+      reject(new Error('You lost your money 💩'));
     }
   }, 2000);
 });
 
 // using the promise
-lotteryPromise
-  .then((res) => console.log(res))
-  .catch((err) => console.error(err));
+lotteryPromise.then((res) => console.log(res)).catch((err) => console.error(err));
 ```
 
 ### Promisifying
@@ -107,13 +106,13 @@ Promise.reject(new Error('Problem!')).catch(x => console.error(x)
 ```javascript
 const getCountryData = function (country) {
   const request = new XMLHttpRequest();
-  request.open("GET", `https://restcountries.eu/rest/v2/name/${country}`);
+  request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
   // (method-type, string containing the URL)
   request.send();
   // we can't do this : const data = request.send();  because the results arn't there yet and we have to wait for it
 
   // instead we add eventListener on it for when it (loads)
-  request.addEventListener("load", function () {
+  request.addEventListener('load', function () {
     const [data] = JSON.parse(this.responseText);
     // THEN => use the data object to get what you want in its properties
   });
@@ -128,39 +127,39 @@ const getCountryData = function (country) {
 ```javascript
 // AJAX call country 1
 const request = new XMLHttpRequest();
-request.open("GET", `https://restcountries.eu/rest/v2/name/Egypt`);
+request.open('GET', `https://restcountries.eu/rest/v2/name/Egypt`);
 request.send();
 
-request.addEventListener("load", function () {
+request.addEventListener('load', function () {
   const [data] = JSON.parse(this.responseText);
 
   // Get neighbour country (2)
   const [neighbour] = data.borders;
 
-  if (!neighbour) throw new Error("No neighbour found!");
+  if (!neighbour) throw new Error('No neighbour found!');
 
   // AJAX call country 2
   const request2 = new XMLHttpRequest();
-  request2.open("GET", `https://restcountries.eu/rest/v2/alpha/${neighbour}`);
+  request2.open('GET', `https://restcountries.eu/rest/v2/alpha/${neighbour}`);
   request2.send();
 
-  request2.addEventListener("load", function () {
+  request2.addEventListener('load', function () {
     const data2 = JSON.parse(this.responseText);
     console.log(data2);
 
-    renderCountry(data2, "neighbour");
+    renderCountry(data2, 'neighbour');
   });
 });
 
 // another example
 setTimeout(() => {
-  console.log("1 second passed");
+  console.log('1 second passed');
   setTimeout(() => {
-    console.log("2 seconds passed");
+    console.log('2 seconds passed');
     setTimeout(() => {
-      console.log("3 second passed");
+      console.log('3 second passed');
       setTimeout(() => {
-        console.log("4 second passed");
+        console.log('4 second passed');
       }, 1000);
     }, 1000);
   }, 1000);
@@ -179,7 +178,11 @@ setTimeout(() => {
   <img src='./img/promise.png' width=48%>
   <img src='./img/promise_state_inspect.png' width=48%>
 
-- **fetch()**: returns a **promise**
+- **fetch()**: returns a **promise object** which has 3 properties:
+  ![fetch](./img/fetch.png)
+  - `value` --> at first it's empty
+  - `onFulfilled` --> it's an **array** that has the code that will Javascript run when `value` property gets filled
+  - `onRejection` --> it's an **array** that has the code that will Javascript run when error occurs
 - Benefits of `promises`
   - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
   - Instead of nesting callbacks, we can chain promises for a
@@ -191,8 +194,7 @@ setTimeout(() => {
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
     .then((response) => {
       console.log(response); // promise object
-      if (!response.ok)
-        throw new Error(`Country not found (${response.status})`);
+      if (!response.ok) throw new Error(`Country not found (${response.status})`);
       return response.json();
       // (.json()) is a method available on all response objects that are coming from (fetch()) function
       // also (.json()) returns a new promise => so we have to return it like we did
@@ -233,8 +235,7 @@ if (!response.ok) throw new Error(`error is : (${response.status})`);
 fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
   .then(
     (response) => {
-      if (!response.ok)
-        throw new Error(`Country not found (${response.status})`);
+      if (!response.ok) throw new Error(`Country not found (${response.status})`);
 
       return response.json();
     },
@@ -303,13 +304,13 @@ fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
 function resolveAfter2Seconds() {
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve("resolved");
+      resolve('resolved');
     }, 2000);
   });
 }
 
 async function asyncCall() {
-  console.log("calling...");
+  console.log('calling...');
   const result = await resolveAfter2Seconds();
   console.log(result); // "resolved"
   // this is the same as
@@ -338,13 +339,13 @@ asyncCall();
 
   ```javascript
   async function f() {
-    await Promise.reject(new Error("Whoops!"));
+    await Promise.reject(new Error('Whoops!'));
   }
 
   // …is the same as this:
 
   async function f() {
-    throw new Error("Whoops!");
+    throw new Error('Whoops!');
   }
   ```
 
@@ -353,7 +354,7 @@ asyncCall();
   ```javascript
   async function f() {
     try {
-      let response = await fetch("/no-user-here");
+      let response = await fetch('/no-user-here');
       let user = await response.json();
     } catch (err) {
       // catches errors both in fetch and response.json
@@ -376,21 +377,15 @@ asyncCall();
   ```javascript
   const get3Countries = async function (c1, c2, c3) {
     try {
-      const [data1] = await getJSON(
-        `https://restcountries.com/v3.1/name/${c1}`
-      );
-      const [data2] = await getJSON(
-        `https://restcountries.com/v3.1/name/${c2}`
-      );
-      const [data3] = await getJSON(
-        `https://restcountries.com/v3.1/name/${c3}`
-      );
+      const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
+      const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+      const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`);
       console.log([data1.capital[0], data2.capital[0], data3.capital[0]]);
     } catch (err) {
       console.error(err);
     }
   };
-  get3Countries("portugal", "canada", "tanzania");
+  get3Countries('portugal', 'canada', 'tanzania');
   ```
 
 ---
@@ -415,7 +410,7 @@ const loadAll = async function (imgArr) {
     console.error(err);
   }
 };
-loadAll(["img/img-1.jpg", "img/img-2.jpg", "img/img-3.jpg"]);
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
 ```
 
 ### `Promise.any()`
@@ -424,8 +419,8 @@ loadAll(["img/img-1.jpg", "img/img-2.jpg", "img/img-3.jpg"]);
 
 ```javascript
 const promise1 = Promise.reject(0);
-const promise2 = new Promise((resolve) => setTimeout(resolve, 100, "quick"));
-const promise3 = new Promise((resolve) => setTimeout(resolve, 500, "slow"));
+const promise2 = new Promise((resolve) => setTimeout(resolve, 100, 'quick'));
+const promise3 = new Promise((resolve) => setTimeout(resolve, 500, 'slow'));
 const promiseArr = [promise1, promise2, promise3];
 
 Promise.any(promiseArr).then((value) => console.log(value));
@@ -438,11 +433,11 @@ Promise.any(promiseArr).then((value) => console.log(value));
 
 ```javascript
 const promise1 = new Promise((resolve, reject) => {
-  setTimeout(resolve, 500, "one");
+  setTimeout(resolve, 500, 'one');
 });
 
 const promise2 = new Promise((resolve, reject) => {
-  setTimeout(resolve, 100, "two");
+  setTimeout(resolve, 100, 'two');
 });
 
 Promise.race([promise1, promise2]).then((value) => {
@@ -459,9 +454,7 @@ Promise.race([promise1, promise2]).then((value) => {
 
 ```javascript
 const promise1 = Promise.resolve(3);
-const promise2 = new Promise((resolve, reject) =>
-  setTimeout(reject, 100, "foo")
-);
+const promise2 = new Promise((resolve, reject) => setTimeout(reject, 100, 'foo'));
 const promises = [promise1, promise2];
 
 Promise.allSettled(promises).then((results) =>
