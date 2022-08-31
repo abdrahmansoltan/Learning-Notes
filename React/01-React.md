@@ -58,7 +58,7 @@
 
 ## installation
 
-- `npx` is used to execute commands without installing dependencies
+- `npx` is used to execute commands without installing dependencies (**install something and running it immediately**)
 
 ```bash
 npx create-react-app my-app # equivalent to installing react globally first then >> creating react app
@@ -128,10 +128,12 @@ npm start
   browser like this!
 - It's like functions as when react sees them it **invokes them**
 - in older versions of react : to use `JSX` you had to write this in the file :
+
   ```js
   import React from "react";
   // we don't have to write it anymore
   ```
+
 - what [Babel](https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=Q&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.17.9&externalPlugins=&assumptions=%7B%7D) do to jsx :
 
 ```js
@@ -145,11 +147,14 @@ React.createElement(
   "React.js is a library for building user interfaces."
 );
 ```
+>
+> - if you don't have attributes you can use `{}` or `null` instead
+> - to have multiple child elements -> use an array
 
 ### Dynamic expressions in JSX
 
 - to write javascript expressions in JSX => `{your_expression}`
-- it must be `expressions` and not `declarations` or `blocks`
+- it must be **expressions** and not **declarations** or **blocks**
 - **NOTE** : when you write a `array` in JSX, the JSX automatically `joins` the `array`, that's why you can't use `forEach`
 
   ```js
@@ -207,6 +212,7 @@ React Router turns React projects into single-page applications. It does this by
   import { BrowserRouter } from "react-router-dom";
 
   // then wrap the app in a BrowserRouter fragment
+  // You may also use different types of router like "hashRouter"
 
   root.render(
     <React.StrictMode>
@@ -216,6 +222,8 @@ React Router turns React projects into single-page applications. It does this by
     </React.StrictMode>
   );
   ```
+
+  > **StrictMode**: provides additional warnings when using legacy or soon to be deprecated code.
 
 - now in `app.js`
 
@@ -579,6 +587,8 @@ export   return <button className={styles.errorMessage}>Error Button</button>;
 <button class="Button_error_ax7yz">Error Button</button>;
 ```
 
+> **Note**: we use `className` word instead of `class` because in Javascript, `class` word is reserved for ES6 Classes
+
 ---
 
 ## Components
@@ -643,7 +653,7 @@ const List = () => {
 
 ### Portals
 
-Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
+Portals provide a first-class way to render children into a DOM node that exists **outside the DOM hierarchy** of the parent component.
 
 - it helps for more `semantic HTML`
   -usually with **modals**
@@ -660,33 +670,6 @@ import ReactDOM from "react-dom";
 
 ReactDOM.createPortal(child, container);
 ```
-
----
-
-### Refs
-
-[reference](https://blog.logrocket.com/complete-guide-react-refs/)
-
-- **Allow us to access DOM properties directly**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
-
-> Note: refs are escape hatches for React developers, and we should try to avoid using them if possible.
-
-- You can gain access to the actual HTML element by creating a React reference and passing it to the element itself.
-
-  - This way, at any time in the lifecycle of the component, we can access the actual HTML element at `buttonRef.current`
-
-  ```js
-  import React, { useRef } from "react";
-  const ActionButton = ({ label, action }) => {
-    const buttonRef = useRef(null);
-    return (
-      <button onClick={action} ref={buttonRef}>
-        {label}
-      </button>
-    );
-  };
-  export default ActionButton;
-  ```
 
 ---
 

@@ -9,23 +9,29 @@
   - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
   - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
   - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
+- [TypeScript](#typescript)
+  - [why use Typescript](#why-use-typescript)
 - [TypeScript Types](#typescript-types)
-  - [`arrays`](#arrays)
-  - [`tuple`](#tuple)
+  - [`Array`](#array)
+  - [`Tuple`](#tuple)
   - [`enum`](#enum)
   - [`Objects and Interfaces`](#objects-and-interfaces)
     - [`Objects`](#objects)
     - [`Interfaces`](#interfaces)
     - [Partial Type](#partial-type)
   - [`unknown`](#unknown)
-  - [`Union Types`](#union-types)
+  - [`Union & Intersection Types`](#union--intersection-types)
+    - [Union types](#union-types)
+    - [Intersection types](#intersection-types)
+- [Type Guard](#type-guard)
   - [`Literal Types`](#literal-types)
     - [String Literal Types](#string-literal-types)
-  - [Type Aliases ---(custom type)](#type-aliases----custom-type)
+  - [Type Aliases -- (custom type)](#type-aliases----custom-type)
   - [function](#function)
     - [`function type`](#function-type)
     - [`void`](#void)
     - [`never`](#never)
+    - [this keyword types](#this-keyword-types)
 - [Type Assertions / Type Casting](#type-assertions--type-casting)
 - [Classes](#classes)
   - [Using Interfaces with classes](#using-interfaces-with-classes)
@@ -108,11 +114,11 @@ npm i --save-dev @types/node  # type definitions
 ```json
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es5", // which level of JS-support to target
     "module": "commonjs",
     "lib": ["ES2018", "DOM"],
 
-    "outDir": "./build", // distination folder will have JS files
+    "outDir": "./build", // destination folder will have JS files
 
     "rootDir": "./src", // just include src folder that has TS files
 
@@ -127,11 +133,11 @@ npm i --save-dev @types/node  # type definitions
 - `target` - sets what version of JS TypeScript will be transpiled to.
 - `module` - sets what module system will be used when transpiling. - Node.js uses the common.js module system by default
   lib - is used to say what libraries your code is using. In this case, ES2018 and the DOM API
-- `outDir` - where you want your src code to output to. Often named build, prod, or server (when using it serverside)
+- `outDir` - where you want your src code to output to. Often named build, prod, or server (when using it server-side)
 - `strict` - enable strict typing
 - `noImplicitAny` - disallow the "any" type (covered in TypeScript Basics)
 - `exclude` - directories to exclude in compiling
-- for `Depuging` --> use `"sourceMap": true`
+- for `Debugging` --> use `"sourceMap": true`
 
 ---
 
@@ -142,7 +148,7 @@ npm i --save-dev @types/node  # type definitions
 ### Statically vs dynamically typed
 
 - `Statically-typed` do type checking at compile-time
-- `dynamically-typed` do type checking at runtime
+- `dynamically-typed` do type-checking at runtime
 
 ---
 
@@ -161,16 +167,6 @@ let x = 21; // type assigned as int at runtime.
 let y = x + "dot";
 // This code will run without any error. As Javascript is a weakly-typed language, it allows implicit conversion between unrelated types.
 ```
-
----
-
-- `TypeScript` is a `static and strong typed` superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
-
-![typescript](./img/typescript.PNG)
-
-- why use Typescript ?
-
-![typescript](./img/whytypescript.PNG)
 
 ---
 
@@ -194,9 +190,29 @@ let y = x + "dot";
 
 ---
 
+## TypeScript
+
+**TypeScript** is a **static and strongly typed** superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
+
+![typescript](./img/typescript.PNG)
+
+### why use Typescript
+
+- It allows you, as a code author, to leave more of your intent “on the page”
+- It has the potential to move some kinds of errors from **runtime** (users) to **compile time** , ex:
+  - Values that are potentially absent (null or undefined)
+  - Incomplete refactoring
+  - Breakage around internal code contracts (e.g., an argument becomes required)
+- It serves as the foundation for a great code authoring experience
+  - `Example`: in-editor autocomplete
+
+![typescript](./img/whytypescript.PNG)
+
+---
+
 ## TypeScript Types
 
-### `arrays`
+### `Array`
 
 ```ts
 let arr: string[]; // array of strings
@@ -206,12 +222,15 @@ let arr: Array<string>;
 let arr2: (string | number)[]; // array of strings or numbers
 ```
 
-### `tuple`
+### `Tuple`
+
+ When you know exactly what data will be in the array with a **fixed length** and their **type-order**, and you will not be adding to the array or modifying the type for any value
 
 ```ts
-// When you know exactly what data will be in the array with a fixed length and their type-order, and you will not be adding to the array or modifying the type for any value
 let arr: [string, number, string]; // ['cat', 7, 'dog']
 ```
+
+Gautcha -> when using array-methods like `pop`, `push` typescript doesn't raise errors as it assumes that the method won't change the array-structure
 
 ### `enum`
 
@@ -250,7 +269,8 @@ let student: { name: string; age: number; enrolled: boolean } = {
 - it's a blueprint for `object's items`
 - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something. Interfaces can be used to create functions but are most commonly seen to create objects.
 - types & interfaces are similar but:
-  - interfaces are **extendable** like classes unlike `types` which are not
+  - interfaces are **extendable** from other interfaces like classes unlike `types` which are not
+    - you can extend interfaces/classes using the word -> `implements`
 - Use `PascalCase` for naming `interfaces`.
 
 ```js
@@ -300,11 +320,10 @@ const draft: Partial<Blog> = {
 
 ### `unknown`
 
+- Requires a `type check` (**type guard**)
 - used when the type of the thing being typed is `unknown`. Used heavily for `type assertion`
-- Requires a `type check`
 - `unknown` is recommended over `any` because it provides **safer typing** — you have to use type assertion or narrow to a specific type if you want to perform operations on unknown.
-
-> **Type Guard** : protects us from doing something unless we check the type first
+  - `any` -> can be used for `console.log()` content
 
 ```ts
 let userInput: unknown;
@@ -321,9 +340,14 @@ if (typeof userInput === "string") {
 
 ---
 
-### `Union Types`
+### `Union & Intersection Types`
+
+#### Union types
+
+A union type has a very specific technical definition that comes from set theory, but it’s completely fine to think of it as **OR** for types.
 
 - used when more than one type can be used
+- you shouldn't use it with type `any`, as it's like multiplying by `zero` as it will equal that the type will be `any` (`zero`)
 
 ```ts
 let studentPhone: number | string;
@@ -331,11 +355,49 @@ studentPhone = "(555) 555 - 5555";
 studentPhone = 5555555555;
 ```
 
+#### Intersection types
+
+Intersection types also have a name and definition that comes from set theory, but they can be thought of as **AND** for types.
+
+- Intersection types in TypeScript can be described using the `&` operator.
+
+```ts
+function makeWeek(): Date & { end: Date } {
+  //⬅ return type
+ 
+  const start = new Date()
+  const end = new Date(start.valueOf() + ONE_WEEK)
+ 
+  return { ...start, end } // kind of Object.assign
+}
+ 
+const thisWeek = makeWeek()
+thisWeek.toISOString()
+// --->   
+        // const thisWeek: Date & {
+        //     end: Date;
+        // }
+thisWeek.end.toISOString() // ---> (property) end: Date
+```
+
+- This is quite different than what we saw with union types — this is quite literally a `Date` and `{ end: Date}` mashed together, and we have access to everything immediately.
+
+---
+
+## Type Guard
+
+**Type Guard** : protects us from doing something unless we check the type first
+
+- it control the flow of code using the type of something
+- this process is called **Narrowing**
+  - as it narrows our choice with the type-guard condition
+- usually used with [unknown type](#unknown) or [Union & Intersection Types](#union--intersection-types)
+
 ---
 
 ### `Literal Types`
 
-The main idea here is that we provide type & value for the variable, usually using **const**
+The main idea here is that we provide **type & value** for the variable, usually using **const**
 
 ```ts
 // We're making a guarantee that this variable
@@ -379,13 +441,13 @@ let hiWorld = "Hi World";
 
 ---
 
-### Type Aliases ---(custom type)
+### Type Aliases -- (custom type)
 
 Type aliases can be used to "create" your own types. You're not limited to storing union types though - you can also provide an alias to a (possibly complex) object type.
 
 - Type aliases do not create a new type; they rename a type. Therefore, you can use it to type an object and give it a descriptive name.
 - it's same as `interface`
-- once a type alias is created, it can not be added to; it can only be extended.
+- once a type alias is created, it can't be added to.
 
 ```ts
 type User = { name: string; age: number };
@@ -414,7 +476,7 @@ function greet(user: User) {
 
 ```ts
 let combineValues: (a: number, b: number) => number;
-// here the condition is to have 2 number-paraneters & return a number
+// here the condition is to have 2 number-parameters & return a number
 
 function add(n1: number, n2: number) {
   return n1 + n2;
@@ -426,6 +488,7 @@ combineValues = add; // this works as (add) is a function that matches the condi
 #### `void`
 
 - used as a return type when the function returns **nothing**
+- or means that the function's return value **should be ignored**
 
   ```ts
   function printResult(num: number): void {
@@ -435,7 +498,10 @@ combineValues = add; // this works as (add) is a function that matches the condi
 
 #### `never`
 
-- used as a return type when the function will never return anything as it crashes due to an `error`, such as with functions that throw errors or infinite loops
+- used as a return type when the function will never return anything **as it crashes due to an error**, such as with functions that throw errors or infinite loops
+  - as when it's reached, it means that something that wasn't supposed to be reached (returned), was actually reached due to error in code
+- it's a form of **bottom types**, which are types that describes no possible values allowed by the system
+- it works when there's **nothing** left --> **never**
 
 ```ts
 function generateError(message: string, code: number): never {
@@ -444,6 +510,42 @@ function generateError(message: string, code: number): never {
   // while (true) {}
 }
 ```
+
+#### this keyword types
+
+- Sometimes we have a free-standing function that has a strong opinion around what `this` will end up being, at the time it is invoked.
+- For example, if we had a DOM event listener for a button:
+
+  ```html
+  <button onClick="myClickHandler">Click Me!</button>
+  ```
+
+- We could define myClickHandler as follows:
+
+  ```ts
+  function myClickHandler(event: Event) {
+    this.disabled = true
+  // 'this' implicitly has type 'any' because it does not have a type annotation.
+  }
+  
+  myClickHandler(new Event("click")) // seems ok
+  ```
+
+- TypeScript isn’t happy with us. Despite the fact that we know that this will be element that fired the event, the compiler doesn’t seem to be happy with us using it in this way.
+  - To address the problem, we need to give this function a `this` **type**
+
+  ```ts
+  function myClickHandler(
+    this: HTMLButtonElement,
+    event: Event
+  ) {
+    this.disabled = true
+            
+  // (property) HTMLButtonElement.disabled: boolean
+  }
+  
+  myClickHandler(new Event("click")) // seems no longer ok
+  ```
 
 ---
 
@@ -568,7 +670,10 @@ class Department {
 
 ## Generics
 
-A generic is a way to write a function that is reusable across different types.
+A generic is a way to write a function that is reusable across different types, by using **type parameters**
+
+>**type parameters**: can be thought of as **function arguments, but for types**
+> - Functions may return different values, depending on the arguments you pass them.
 
 - why not just use `any`?
   - `any` allows for any type to go in, and any type to come out.
@@ -576,7 +681,7 @@ A generic is a way to write a function that is reusable across different types.
   - `Generics` introduce the `Type Variable`
     - Rather than being a variable that accepts values, it's a variable that accepts types and is denoted with angle brackets myFunc`<T>`
 
-```js
+```ts
 // Typed Function
 const getItem = (arr: number[]): number => {
   return arr[1];

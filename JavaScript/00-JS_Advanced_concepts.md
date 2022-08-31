@@ -18,8 +18,11 @@
     - [Function returning Functions](#function-returning-functions)
     - [Benefits](#benefits)
   - [Pure Functions](#pure-functions)
+  - [Iteration vs. Recursion](#iteration-vs-recursion)
+    - [Recursion performance](#recursion-performance)
+    - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
   - [Referential Transparency](#referential-transparency)
-  - [composition](#composition)
+  - [Composition](#composition)
 - [JS : The weird parts](#js--the-weird-parts)
   - [Types](#types-1)
   - [Numbers](#numbers)
@@ -141,15 +144,18 @@ Each local scope can also see all the local scopes that contain it, and all scop
 
 ## Functional Programming
 
-> Functional programming is about **Verbs** (actions), & object oriented programming is about **pronouns** (objects and things)
+> - Functional programming is about **Verbs** (actions)
+>   - it's like a black box that takes something in and returns something out
+> - object oriented programming is about **pronouns** (objects and things) -> "keep state to yourself and send/receive messages"
 
 ### currying-vs-partial Application
 
 ![currying-vs-partialapplication](./img/currying-vs-partialapplication.jpeg)
 
 - **currying**: one argument at a time
-  - It is translating a function that takes multiple arguments into a sequence of functions, each accepting one argument.
+  - It is translating a function that takes multiple arguments into a sequence of **single-argument-functions**, each accepting one argument.
 - **partial application**: The process of applying a function to some of its arguments. The partially applied function gets returned for later use.
+- these 2 concepts use **Closures**
 
 ---
 
@@ -164,6 +170,7 @@ one of the biggest examples of closures is **timers**: ![closure](./img/closure2
 
 - A closure is the combination of a function bundled together (`enclosed`) with references to its surrounding state (the lexical environment). In other words, **a closure gives you access to an outer function's scope from an inner function**. In JavaScript, closures are created every time a function is created, at function creation time.
 - A closure makes sure that a function doesn’t loose connection to variables that existed at the function’s birth place
+- inner function can remember outer function's scope
 
   ```javascript
   function multiplier(factor) {
@@ -208,8 +215,86 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
 ### Pure Functions
 
-- **Pure function**: Function without side effects. Does not depend on external variables. Given the same inputs, always returns the same outputs
-  - **side-effects**: are about MODIFICATION and not count if we created new item
+- **Pure function**: Function **without side effects**. Does not depend on external variables. Given the same inputs, always **returns** the same outputs
+  - pure function **must** return something
+- **side-effects**: are about MODIFICATION and doesn't count if we created new item
+  - usually it's anything that the function does other that returning a value
+
+---
+
+### Iteration vs. Recursion
+
+In **functional programming**, we avoid `mutable state`, and therefore avoid `iterative loops` using for or while. As an alternative to iteration, we use **recursion** to break down the problem into smaller ones.
+
+A recursive function has two parts:
+
+- `Base case`: condition(s) under which the function returns an output without making a recursive call
+- `Recursive case`: condition(s) under which the function calls itself to return the output
+
+#### Recursion performance
+
+recursion sometimes take long time as it calls multiple functions at the same time which occupies the **call stack**
+
+- one solution is to use **memoization (caching)**
+- another solution is to use **tail call optimization**
+  - **Note**: not all JavaScript engines implements **tail calls**
+
+---
+
+#### first-class functions and higher order functions
+
+- **first class functions** is just a feature that a programming language either has or does not have. (All it means is that all functions are values.),It's just a concept.
+    ![first class objects](./img/first%20class%20objects.png)
+- There are however **higher order functions** in practice, which are possible because the language supports `first class functions`.
+  - ![higher order functions](./img/higher%20order%20functions.png)
+- ex: `call`, `apply`, `bind` :
+
+  - `call` => calls a function with the given lexical context as parameter (`call` is the one that calls the function)
+
+    ```javascript
+    let human = { name: 'Ahmed' };
+    function sayName(greeting) {
+      console.log(greeting + ' ' + this.name);
+    }
+    sayName.call(human, 'Hi!'); // Outputs Hi! Ahmed
+    ```
+
+  - `apply` => is just like `call()` except that it accepts arguments in array
+    - it's not used in modern javascript because we can instead use `spread operator ...` with `call()`
+
+    ```javascript
+    let human = { name: ‘Ahmed’ }
+    function sayName(greeting, city) {
+      console.log(greeting + ' ' + this.name + ' from ' + city)
+    }
+    sayName.apply(human, ['Hi', 'Cairo']) // Outputs Hi! Ahmed from Cairo
+    ```
+
+  - `bind` => is somewhat special. It is a higher-order function which means when you invoke it => **it returns a new function where `this` keyword is bound**. The function returned is curried, meaning you can call it multiple times to provide different arguments in each call.
+
+    - _note_ => `bind` doesn't call the function that's why it's used in `eventListeners`
+    - it's also used to set arguments so that we won't have to write them each time
+
+    ```javascript
+    let human = { name: 'Ahmed' };
+    function sayName(greeting, city) {
+      console.log(greeting + ' ' + this.name + ' from ' + city);
+    }
+
+    let greet = sayName.bind(human);
+    greet('Hi!', 'Cairo'); // Outputs Hi! Ahmed from Cairo
+    greet('Hello!', 'Alex'); // Outputs Hello! Ahmed from Makati
+
+    // ----------Partial Application---------- //
+    // here if you don't want to specify (this) keyword => use (null), as (typeof null = "object")
+    const add = function (a, b) {
+      return a + b;
+    };
+    const add2 = add.bind(null, 2);
+    // now : a=2
+
+    add2(10) === 12;
+    ```
 
 ---
 
@@ -219,19 +304,17 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
 ---
 
-### composition
+### Composition
 
-In functiona Programming, Composition takes the place of inheritance in OOP.
+It is the **combination of two functions into one**, that when applied, returns the result of the chained functions.
 
-It is the combination of two functions into one, that when applied, returns the result of the chained functions.
+> In functional Programming, Composition **takes the place of inheritance in OOP**.
 
-- Composition is a fancy term which means "combining pure functions to build more complicated ones".
+- Composition is a fancy term which means "combining pure functions to build more complicated ones" (make complex programs out of simple functions).
+
+![composition](./img/composition.png)
 
 ```js
-let compose = function (fn1, fn2) {
-  return fn2(fn1);
-};
-//or
 let compose = (fn1, fn2) => fn2(fn1);
 ```
 

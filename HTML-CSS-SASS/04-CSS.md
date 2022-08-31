@@ -3,6 +3,7 @@
 - [INDEX](#index)
 - [styling Types](#styling-types)
 - [selectors](#selectors)
+  - [[attribute^=value] Selector](#attributevalue-selector)
   - [css selector specificity](#css-selector-specificity)
     - [Calculation](#calculation)
     - [Notes](#notes)
@@ -19,9 +20,15 @@
   - [Flexbox](#flexbox)
     - [flex-wrap](#flex-wrap)
   - [GRID](#grid)
-- [Variables](#variables)
+- [Variables (custom properties)](#variables-custom-properties)
+  - [Variables inheritance](#variables-inheritance)
+  - [variables token: Number, string, images](#variables-token-number-string-images)
+  - [Css variables with Javascript](#css-variables-with-javascript)
+- [calc()](#calc)
+  - [Advantages](#advantages)
 - [icons / SVG](#icons--svg)
 - [Animation / transition](#animation--transition)
+  - [Animating background](#animating-background)
 - [data attributes](#data-attributes)
 - [Form](#form)
 - [media queries](#media-queries)
@@ -58,6 +65,16 @@
   - `:nth-child(n)` => [nthmaster](http://nthmaster.com/)
   - `owl selector` -> applies to the elements with is not the first one
     ![owl-selector](./img/owl-selector.png)
+
+### [attribute^=value] Selector
+
+The `[attribute^=value]` selector matches every element whose attribute value **begins** with a specified value.
+
+```css
+div[class^="test-"] {
+  background: #ffff00;
+}
+```
 
 ### css selector specificity
 
@@ -164,6 +181,17 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
     }
     ```
 
+> You can use `::before` and `::after` to write content after repeated elements like in **tables** or **lists**
+>
+> - like unit after the number -> **kg**, **meter**,...
+> - like words before number -> **weight:**, **length:**,...
+>
+> ```css
+> td:nth-of-type(3)::after {
+> content: "kg" 
+> }
+> ```
+
 ---
 
 ## Text - Font
@@ -174,13 +202,15 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 - `rem` (root element) vs `em` (parent element) : ![rem-em](./img/rem-em.png)
   - **em** ->
     - em are measured relative to their **parent font-size**, if used to specify **font-size**
-    - em are measured relative to the **current font-size**, if used to specify **lengths**
+    - em are measured relative to the **current font-size**, if used to specify **lengths (spacing)**
       - as length/gap/spacing using `em` in `<p>` will be smaller than in `<h1>`
   - **rem** -> is relative to the html (root) font-size
 - `line-height`: if we didn't use a unit then it's relevant to the **font size**
 - for more fun font use => [Rubik](https://fonts.google.com/specimen/Rubik)
 
 ![units](./img/units.PNG)
+
+For font-size scales -> [type-scale.com](https://type-scale.com/)
 
 ---
 
@@ -329,11 +359,228 @@ It defines whether the flex items are forced in a single line or can be flowed i
 
 ---
 
-## Variables
+## Variables (custom properties)
 
+- they're also called **custom properties**
 - usually in the `:root` selector
-  - because the `:root` selector includes all elements and pseudo elements in the DOM unlike `*` selector
-- when using the variable, I can use a **Fall-back variable/ value** after a comma => ex: `div{color:var(--primary,black)}`
+  - because the `:root` pseudo-class selector resolve to the `<html>` element which includes all elements and pseudo elements in the **DOM** unlike `*` selector
+    - in **HTML** --> `:root`=`html` but with higher specificity
+- when using the variable, I can use a **Fall-back variable/ value** after a **comma** (`,`) and you can make many fallbacks => ex:
+
+  ```css
+  div {
+    color:var(--primary,black)
+  
+    /* to request the fallback value manually -> use (initial) */
+    color: initial
+  }
+  ```
+
+- rules of **scope** like in Javascript also applies in css variables, but:
+  - Sass variables are scoped on `{}` blocks (**block-scoped**) (**lexical-scoped**)
+  - css variables are scoped on elements (**element-scoped**) (**dynamic-scoped**)
+    - this is great if you want the variable-value to only be applied in this element only
+
+```css
+:root {
+  --main-bg-color: coral;
+}
+
+#div1 {
+  background-color: var(--main-bg-color);
+}
+```
+
+---
+
+### Variables inheritance
+
+- css variables are **inherited** from the parent element if it's declared in the parent element to the (`classes` / `pseudo-elements` / `pseudo-classes` / `IDs`) in the same element
+
+  ```css
+  button {
+  --color: red;
+  color: var(--color);
+  }
+
+  button:hover {
+  background: black;
+  color: var(--color);
+  }
+
+  button.pink {
+  border-color: #f06;
+  color: var(--color);
+  }
+
+  button.pink:hover {
+  background: #f06;
+  color: var(--color);
+  }
+  ```
+
+- you can disable inheritance by setting the property to `initial` on `*`
+
+  ```css
+  * {
+  --corner-size: initial;
+  }
+
+  p {
+  --corner-size: 1em;
+  }
+  ```
+
+- another way to control or limit inheritance is to **register property** using: `@property`:
+  - `@property` allows us to register our `properties` / `variables` and control how they behave, but watch out for **browser support**
+
+  ```css
+  @property --corner-size {
+    syntax: "*";
+    inherits: false;
+    initial-value: 2em;
+  }
+
+  p {
+  --corner-size: 1em;
+  }
+    ```
+
+---
+
+### Invalid At Computed Values Time (IACVT)
+
+> **Parse time** (specified values), it's When the actual CSS code is `read`, `parsed`, and `converted` to a tree of objects (**CSSOM**). One and done operation.
+>
+> **computed value**: An intermediate runtime representation where most relative values are absolutized but not all.
+>
+> - this is when relative units are resolved to `px`
+>
+> **used value**: The final stage, when values are fully resolved to be used for painting.
+>
+> - this is when % widths are resolved to `px`
+
+**IACVT**: it's when calling the variable result in error (due to empty value or wrong value or unsupported value by browser), so the value will be set to `unset` which is equivalent to `initial`
+
+- Fallbacks can also trigger **IACVT**
+
+```css
+/* Ex: */
+div {
+background: red;
+background: var(--accent-color, 42px);
+/* result will be (color-transparent) */
+}
+```
+
+![IACVT](./img/IACVT.png)
+
+---
+
+### variables token: Number, string, images
+
+![tokens](./img/tokens.png)
+
+you can  make the variable contains :
+
+- a piece of text that is used in defining property-value, like `--to: to;`
+
+  ```css
+  html {
+  --type: "linear-gradient(";
+  background: var(--type) white, black );
+  color: red;
+  }
+  ```
+
+- a number without a unit like `--p: 65;`
+  - use variables for pure-data like `65`, not css-values like `65%`
+    - this way you can use the number for any css-value with any unit unlike if you made the variable with css-value
+    - but watch out for numbers as string or integers as here we don't have **type-coercion**
+    - **Tip:** Prefer abstract `0` to `1` percentages than absolute pixel lengths
+      - 0-1 can be converted to a length:
+
+        ```css
+        calc(var(--mouse-x) * 100vw);
+        /* …but the reverse isn’t possible */
+        ```
+
+- img string
+
+  ```css
+  .img1 {
+    --img: "cat1.jpg";
+    background: url("imgs/" var(--img));
+
+    /* note we can't make the url as (variable can't be URL-content) */
+    --img: "imgs/cat1.jpg";
+    background: url(var(--img)); /* css bug */
+  }
+  ```
+
+  ![string-variable](./img/css-variable-string.png)
+
+---
+
+### Css variables with Javascript
+
+You can **get / set** css-variable-value of an element in javascript by having the variable declared in the root before, then change it's value locally in the element styles:
+
+```js
+// Get variable from inline style
+element.style.getPropertyValue("--foo");
+
+// Get variable from wherever
+getComputedStyle(element).getPropertyValue("--foo");
+
+// Set variable on inline style
+element.style.setProperty("--foo", 38 + 4);
+
+// --------------------------------------------------- //
+
+// or change it in the root element
+let root = document.documentElement;
+
+document.addEventListener("pointermove", evt => {
+ let x = evt.clientX / innerWidth;
+ let y = evt.clientY / innerHeight;
+ root.style.setProperty("--mouse-x", x);
+ root.style.setProperty("--mouse-y", y);
+});
+```
+
+---
+
+## calc()
+
+it's the ability to do math in css
+
+- compatible with `length`, `frequency`, `angle`, `time`, `number` and `integer`
+
+### Advantages
+
+- can mix different units when performing calculations (not possible in `Sass`)
+
+  ```css
+  .thing {
+    width: 60%; /* fallback if needed */
+    width: calc(100% -3em);
+  }
+  ```
+
+- make math easier to understand
+
+  ```css
+  /* instead of this*/
+  .column-1-7 {
+  width: 14.2857%;
+  }
+
+  /* we can do this*/
+  .column-1-7 {
+  width: calc(100% / 7);
+  }
+  ```
 
 ---
 
@@ -353,7 +600,21 @@ It defines whether the flex items are forced in a single line or can be flowed i
   ![transform-origin](./img/transform-origin2.png)
   ![transform-origin](./img/transform-origin.png)
 
-- when using 3d animation / transform => use `prespective` property on the parent element
+- when using 3d animation / transform => use `perspective` property on the parent element
+
+### Animating background
+
+you can't use `background` in `transition` property, so if you want to animate the background you can use `box-shadow` with `inset` instead:
+
+```css
+button {
+  transition: 1s;
+}
+
+button:hover {
+  box-shadow: 0 0 0 2em red inset;
+}
+```
 
 ---
 

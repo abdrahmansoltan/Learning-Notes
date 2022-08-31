@@ -5,7 +5,7 @@
 - [exporting](#exporting)
   - [1. Named Exports (Zero or more exports per module)](#1-named-exports-zero-or-more-exports-per-module)
   - [2. Default Exports (One per module)](#2-default-exports-one-per-module)
-- [importing reference](#importing-reference)
+- [Importing](#importing)
   - [1. for Named Exports](#1-for-named-exports)
   - [2. Import a module for its side effects only](#2-import-a-module-for-its-side-effects-only)
   - [3. Importing defaults](#3-importing-defaults)
@@ -82,7 +82,9 @@ export default function name1(…) { … } // also class, function*
 
 ---
 
-## importing [reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports)
+## Importing
+
+[reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports)
 
 ### 1. for Named Exports
 
@@ -100,6 +102,10 @@ import { export1 as alias1 } from "module-name";
 // Import multiple exports from module
 import { export1, export2 } from "module-name";
 ```
+
+> It's preferred for large libraries like `lodash` and `reactDom`
+>
+> - so you only import what you need from them
 
 ---
 
@@ -197,6 +203,7 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
 `JavaScript bundling` is an optimization technique you can use to reduce the number of **server requests** for JavaScript files. Bundling accomplishes this by merging multiple JavaScript files together into one file to reduce the number of page requests.
 
 > Difference:
+>
 > - Parcel is good for teaching and small exambles as it doesn't require configuration
 > Webpack is better for large production
 
@@ -229,6 +236,7 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
     ```
 
   - importing any static assets like `images, icons,...` that are not `programming-files` when importing them (as its location is change when Bundling) => we do it like this:
+
     ```js
     import icons from "../img/icons.svg"; // Parcel version 1
     import icons from "url:../../img/icons.svg"; // Parcel version 2 (now)
@@ -236,6 +244,7 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
 
 - `parcel` is also capable of bundling `sass` files into `css` files
   - this is done by `npm i sass`, and making sure that you are referencing the sass file in the `index.html` file
+
     ```html
     <link rel="stylesheet" href="src/sass/main.scss" />
     ```
@@ -372,7 +381,6 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
   ```
 
 ---
-
 
 ## Deployment
 

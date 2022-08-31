@@ -4,14 +4,18 @@
 - [Static vs Dynamic websites](#static-vs-dynamic-websites)
 - [HTML](#html)
 - [Semantic HTML](#semantic-html)
-  - [Why ?](#why-)
+  - [Why Semantic?](#why-semantic)
   - [Semantic tags](#semantic-tags)
 - [some inline elements to be aware of](#some-inline-elements-to-be-aware-of)
 - [tricks](#tricks)
 - [Files-Architecture](#files-architecture)
-- [Form](#form)
-- [Accessibility & Performance](#accessibility--performance)
-  - [tab key](#tab-key)
+- [Forms](#forms)
+  - [Form elements](#form-elements)
+  - [Autofill Forms](#autofill-forms)
+  - [Form validation](#form-validation)
+  - [How is the Form data is transferred?](#how-is-the-form-data-is-transferred)
+- [Accessibility](#accessibility)
+  - [`tab` keyboard-key](#tab-keyboard-key)
   - [Keyboard Events](#keyboard-events)
   - [Screen readers](#screen-readers)
     - [ARIA Roles](#aria-roles)
@@ -40,12 +44,20 @@
 ## HTML
 
 - **HyperText** is a form of text in which documents can refer(link) to other documents and resources
+- **markup language** allows you to annotate text, and these annotations provide additional meaning to the contents of a document
 - **void(empty) element** is html element with no contents and no closing tag
-- **Head element** is for things that are not visible in the browser window or things that descripe the document
+- **Head element** is for things that are not visible in the browser window or things that describe the document
+  - This contains information about the page
 - **Body element** is for things that are visible in the browser window
 - **DOCTYPE** let the browser know that we are using html in this file, without it the browser will go to `Quirks mode`
-- `<meta charset="UTF-8">` is as the letters we use in the English language
-- **Attribute** is a piece of data used to descripe elements
+
+    ```html
+    <!DOCTYPE html>
+    ```
+
+- `<meta charset="UTF-8">` is as the letters we use in the English language (**character encoding**)
+  - Specify character encoding **at first of the document**
+- **Attribute** is a piece of data used to describe elements
 - **href** : HyperText Reference
 - **HTML Entity** is symbols that start with `&` ex: _copyright_[&copy;], _non-breaking space_[&nbsp;]
   - find more here: [html entities](https://www.w3schools.com/html/html_entities.asp)
@@ -58,8 +70,10 @@ A semantic element clearly describes its meaning to both the browser and the dev
 
 > **Semantic elements = HTML-code (elements) with meaning**
 
-- Examples of non-semantic elements: `<div>` and `<span>` - Tells nothing about its content.
-  - Examples of semantic elements: `<form>, <table>`, and `<article>`
+- Examples of non-semantic elements: `<div>` and `<span>` -
+  - they tell us nothing about their content.
+  - Avoid `<span>` and `<div>` elements as much as possible
+- Examples of semantic elements: `<form>, <table>`, and `<article>`
 
 Writing Semantic HTML means that tags are never chosen based on the way they appear in a web browser, instead, they’re chosen based on the importance and structure of the content.
 
@@ -67,7 +81,7 @@ Writing Semantic HTML means that tags are never chosen based on the way they app
 
 ---
 
-### Why ?
+### Why Semantic?
 
 Why do we need to tell the browser what our HTML elements represent?
 
@@ -79,6 +93,7 @@ Why do we need to tell the browser what our HTML elements represent?
 - **Accessibility**
 
   - Because semantic HTML uses elements for their given purpose, it’s easier for both people and machines to read and understand it. Making applications accessible not only ensures equal access for people with disabilities but also benefits people without disabilities by allowing them to customize their experiences. Creating a clear hierarchy for the page allows other tools and devices to properly serve up your content.
+    - **EX:** What if instead of using a semantically correct tag for a paragraph like `<p>` we use a `<div>` instead? The reading machine will never understand that it must make a pause before and after the paragraph reading. Therefore, the user experience for that visually impaired person will be deficient.
 
 - **Easy Maintenance**
   - makes it easier to maintain the code and have a well-organized code.
@@ -87,11 +102,47 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ### Semantic tags
 
+**HTML5** brought with it a new set of semantic tags some of them especially thought to avoid unnecessary use of `<div>` and `<span>`
+
 ![tags](./img/semantic.png)
 ![tags](./img/symantic2.jpeg)
 
 - `<section>` element usually starts with heading element `h2`
+  - very useful to split our main content into smaller groups of content.
+  - can be nested
+- `<section>` and `<article>` are workmates, not relatives.
+  - These elements were not conceived to be part of a hierarchy (parent & child elements), in fact, they are made for working together.
+  - you can use them one inside another without any problem.
 - `<nav>` element usually contains **unordered list** element `ul`
+- `<footer>` -> `Credits`, `copyrights`, `sitemaps`, `secondary navbars`, etc. All these types of elements can be grouped inside a `<footer>` tag.
+- `<main>` -> There can be **only one**, one document, one `<main>` element. This semantic element is especially useful for search engine optimization.
+  - When web bots get to your page, the `<main>` element will be yelling READ ME! So don't overlook it.
+- If it is not **main**, put it aside! --> `<aside>`
+  - content related but not a part of the main content
+  - Use it when you need to label extra content, for example, `newsfeeds`, `commercial offers`, `newsletter form`, etc.
+- `<figure>` --> self-contained element that can be placed or removed at will.
+  - useful when it comes to group auxiliary (additional / helper) content.
+  - its sidekick `<figcaption>` element, which is placed as first or last child of figure element
+
+  ```html
+  <figure>
+      <img src="logo.png" alt="">
+      <figcaption>Slogan</figcaption>
+    </figure>
+  ```
+
+- `<blockquote>` and `<q>` --> these two elements commonly used for marking up **quotations**
+  - Don’t put quotes to `<q>` element, as Quotes are provided by the browser.
+
+- `<address>` element only for contact information
+  - or email address, social network account, street address, telephone number, or something you can get in touch with.
+
+  ```html
+  <address>Contact: <a href="https://twitter.com/hail2u_">Kyo Nagashima</a></address>
+  ```
+
+- `role` attribute can be used to also specify the role of the element in the page (specially for **screen readers**)
+  - `<header role="banner">`
 
 ---
 
@@ -118,6 +169,11 @@ Why do we need to tell the browser what our HTML elements represent?
   - **radio** => for only one option
   - **checkbox** => for one/more options
 - in FORM when choosing option or inserting input field => what is sent is what in the **value** attribute
+- for progress-bars -> use `<progress>` element with `max` attribute
+
+  ```html
+  <progress max="100" value="50"> 50%</progress>
+  ```
 
 ---
 
@@ -151,7 +207,103 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ---
 
-## Form
+## Forms
+
+### Form elements
+
+- `<label>` makes the form control accessible to screen readers, and provides a bigger target, since you can tap or click the label to set focus on the control.
+
+- `<textarea>` element is used to enter multiple lines of text
+- `name` attribute to identify the data the user enters with the control. If you submit the form, this name is included in the request.
+- `<select>` element gives users a list of options to select from
+  - The browser by default uses the first option in the list if user didn't select an option,
+  - With the `selected` attribute you can pre-select one option.
+- `<fieldset>` element is used to group form controls.
+  - Every `<fieldset>` element requires a `<legend>` element, which is used to describe the group of form controls
+
+  ```html
+  <fieldset>
+    <legend>What is your favorite web technology</legend>
+
+    <label for="html">HTML</label>
+    <input type="radio" name="webfeature" value="html" id="html">
+
+    <label for="css">CSS</label>
+    <input type="radio" name="webfeature" value="css" id="css">
+
+  </fieldset>
+  ```
+
+- `<button>` element is used to submit a form
+  - Every `<button>` element inside a form works as a Submit button by default. Sometimes you don't want this. To disable the default Submit behavior, you can add **type="button"** to the `<button>`. This tells the browser that the `<button>` should not submit the form.
+  - You can also use an `<input>` element with type="submit" instead of a `<button>` element. The input looks and behaves just like a `<button>`. Instead of using a `<label>` element to describe the `<input>`, use the value attribute instead.
+
+    ```html
+    <input type="submit" value="Submit">
+    ```
+
+---
+
+### Autofill Forms
+
+Autofill can help with re-entering data. You enter your address once. From now on, your browser will offer you the option to fill in the same address for other forms automatically.
+
+- Use sensible attribute values
+  - Browsers can identify the data type by looking at the **attributes** of a form control.
+  - Do you have a field where users should enter their email address? Use email as a value for the name, id, and type attribute. Three hints for the browser that this is an email field.
+- use The `autocomplete` attribute
+
+  ```html
+  <input type="text" name="name" id="name" autocomplete="name">
+  ```
+
+---
+
+### Form validation
+
+- The `required` attribute tells the browser that the field is mandatory. The browser also tests if the entered data matches the format of the `type`.
+  - if the `type="email"` The email field shown in the example is only valid if it's not empty and if the entered data is a valid email address.
+- `minlength` attribute is used to set minimum length of the input **text-value**
+  - For **numerical input types** use `min` and `max` to achieve the same result.
+- `Pattern` attribute
+  - you can define a regular expression as the value.
+
+    ```html
+    <!-- Here, only lowercase letters are allowed, and the user has to enter at least two characters, and not more than twenty. -->
+    <input required pattern="[a-z]{2,20}" type="text" id="animal" name="animal">
+    ```
+
+- Style invalid form controls
+  - You can use the `:invalid` pseudo-class to add styles to invalid form controls. In addition, there is also the `:valid` pseudo-class for styling valid form elements.
+
+  ```css
+  input:invalid {
+  border: 2px solid red;
+  }
+  ```
+
+  - > **Note:** In practice :invalid is tricky to work with. Invalid form fields are already marked as :`invalid` before user interaction, which may confuse users. The `:user-invalid` pseudo-class solves this issue, as the styles are only applied after user interaction. Learn more about `:user-invalid`.
+
+---
+
+### How is the Form data is transferred?
+
+- When a form is submitted (for example, when the user clicks the Submit button), the browser makes a **request**. A script can respond to that request and process the data.
+  - **script** (running on the server or the client) is needed to process the form. It may `validate the data`, `save it into a database`, or `do other operations` based on the form data.
+- By default, form data is sent as a **GET** request, with the submitted data appended to the URL.
+  - If the data is shareable, you can use the GET method. This way the data will be
+    - added to your `browser history` as it is included in the URL.
+    - `Search forms` often use this. This way you can bookmark a search result page.
+- you can instruct the form to use a **POST** request by changing the method attribute.
+  - By doing that, The data will not be visible in the URL and can only be accessed from a frontend or backend script.
+
+    ```html
+    <form method="post">
+      <!-- code -->
+    </form>
+    ```
+
+  - The data will be encrypted (if you use HTTPS) and only accessible by the backend script that processes the request. The data is not visible in the URL. A common example is a sign-in form.
 
 - you can use [netlify](https://docs.netlify.com/forms/setup/?_ga=2.17094910.693790722.1649686633-761975974.1648039605) to manage your forms without `Js` => by inserting `name` attribute to each `input` element and writing this at at the `form` element:
 
@@ -161,33 +313,35 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ---
 
-## Accessibility & Performance
+## Accessibility
 
-[LightHouse](https://developers.google.com/web/tools/lighthouse) => but note that you should do it when it's deployed on a real server and not offline in your pc (local server)
+### `tab` keyboard-key
 
-- use `meta` tags
-- use `descriptive`
-
-### tab key
-
-A keyboard user typically uses the Tab key to navigate through interactive elements on a web `page—links`, `buttons`, `fields` for inputting text, etc. When an item is tabbed to, it has keyboard "`focus`" and can be activated or manipulated with the keyboard. A sighted keyboard user must be provided with a visual indicator of the element that currently has keyboard focus. Focus indicators are provided automatically by web browsers.
+A keyboard user typically uses the Tab key to navigate through interactive elements on a web `page—links`, `buttons`, `fields` for inputting text, etc. When an item is tabbed to, it has keyboard `focus` and can be activated or manipulated with the keyboard. A sighted keyboard user must be provided with a visual indicator of the element that currently has keyboard focus. Focus indicators are provided automatically by web browsers.
 
 - `tab` -> go forward
 - `shift + tab` -> go backwards
 
 Elements that are affected by `tab` are the one which the user interacts with like: `<input>`, `<a>`, `<iframe>`, ..
 
-**tabindex** attribute:
+- elements which are non-interactive are not affected by `tab`
+- the order of focusing on element using `tab` is called **tab-order**
+  - this order is by how elements are presented in the **DOM** and not the order by css-style
 
-- it makes the element tabable
+`tabindex` attribute:
+
+- it makes the element tabbable
 
   ```html
   <div tabindex="0">W3Schools</div>
   ```
 
   ![tabIndex](./img/tabIndex.png)
+  - usually the negative-value is when you want to manage focus by javascript
 
 > `Document.activeElement` -> read-only property of the Document interface returns the Element within the DOM that currently has focus.
+
+---
 
 ### Keyboard Events
 
@@ -217,11 +371,25 @@ ARIA roles provide **semantic meaning to content**, allowing screen readers and 
 
 You can find more here along with roles to use -> [here](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles)
 
+> Bootstrap uses class `.sr-only` to only show the element to **screen readers**, what it does is it does every possible way to hide the element from the page like this:
+
+```css
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+
+}
+```
+
 ##### Live region roles
 
 Live Region roles are used to define elements with **content that will be dynamically changed** ex:(`chat`). Sighted users can see dynamic changes when they are visually noticeable. These roles help low vision and blind users know if content has been updated. Assistive technologies, like screen readers, can be made to announce dynamic content changes:
-
----
 
 ---
 
@@ -293,7 +461,9 @@ Live Region roles are used to define elements with **content that will be dynami
 
 - It's used to Render images conditionally (show one and hide the other)
 here, we use `<picture>` symantec element
-- Note: Always specify an `<img>` element as the **last child element** of the `<picture>` element. The `<img>` element is used by browsers that do not support the `<picture>` element, or if none of the `<source>` tags match.
+- **Notes:**
+  - Always specify a fallback `<img>` element as the **last child element** of the `<picture>` element.
+  - The `<img>` element is used by browsers that do not support the `<picture>` element, or if none of the `<source>` tags match.
 
 ```html
 <picture>
@@ -328,7 +498,7 @@ There're new attributes for `<img>` element used to provide several additional s
 - `sizes`
 
 > - the names and width of images in **Pixels**
-> - **sizes** -> represents the hole on the web page 
+> - **sizes** -> represents the hole on the web page
 
 ```html
 <img srcset="elva-fairy-480w.jpg 480w,
@@ -351,6 +521,7 @@ There're new attributes for `<img>` element used to provide several additional s
 for that we use media queries as we put each image in each media
 
 #### Which to use ?
+
 ![responsive-images](./img/responsive-images.png)
 
 ---
@@ -364,3 +535,8 @@ Here the **Tree structure** is the operation that make html code looks the way i
 ## Notes
 
 - **hero**: is first section of the page that we want the user to focus on (the headline)
+- **empty elements**: elements that do not have any words between an opening and closing tag, ex: `<hr />`
+- Another type of list element is **Description List element (`<dl>`)**
+  - consists of a series of terms and their definitions.
+  - `<dl>` element works with pairs of `<dt>` and `<dd>` elements.
+- use `<section>` element instead of `<div>`

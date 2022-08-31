@@ -21,7 +21,7 @@
 - [Redux-persist](#redux-persist)
 - [Redux Async Data Flow [Side-Effects]](#redux-async-data-flow-side-effects)
   - [Redux Middleware and Side Effects](#redux-middleware-and-side-effects)
-  - [Examples of MiddleWares:](#examples-of-middlewares)
+  - [Examples of MiddleWares](#examples-of-middlewares)
 - [Redux Thunk Middleware](#redux-thunk-middleware)
 - [Redux Saga Middleware](#redux-saga-middleware)
   - [Saga vs Thunk](#saga-vs-thunk)
@@ -76,6 +76,9 @@ Redux is really:
 ![alt](./img/redux2.PNG)
 
 - usually, you don't use `usecontext` with `Redux` at the same time as data can be stored in redux
+- some people try to replace redux with `useReducer`, but they will need a lot of plugins to get similar result of redux
+
+> **Note**: `Redux` & `useReducer` both use **context api** to give different components access to the store within the application
 
 ---
 
@@ -155,16 +158,21 @@ this exported function will be called by the `useSelector() Hook`
 
 ### user.reducer.js
 
-- `Note`: in the reducer, you should **never mutate the previos state**, You must always return new state-object as it's a **Reference-Type**, so do it for memory-management and so that you don't get unwanted side-effects
+**Notes**:
+
+- in the reducer, you should **never mutate the previous state**, **You must always return new state-object** as it's a **Reference-Type**, so do it for memory-management and so that you don't get unwanted side-effects
+- You have to return something and ideally, it should be the unchanged state if there's nothing you need to do to it.
+- Prefer flat objects, so that you won't accidentally do a shallow clone of the previous state
 
 ```js
 import { USER_ACTION_TYPES } from "./user.types";
 
+// it's better to declare the initial state here instead of in createStore function so that this initial-state is only for this reducer-function 
 export const USER_INITIAL_STATE = {
   currentUser: null,
 };
 
-// here we neep to manually-provide the state with initial state as it doesn't have access to the useReduce-Hook & in the beginning the (previos state is undefined)
+// here we need to manually-provide the state with initial state as it doesn't have access to the useReduce-Hook & in the beginning the (previous state is undefined)
 export const userReducer = (state = USER_INITIAL_STATE, action = {}) => {
   const { type, payload } = action;
 
@@ -350,7 +358,7 @@ By itself, a `Redux store` doesn't know anything about async logic. **It only kn
 
 ![sideEffects](./img/sideEffects3.PNG)
 
-### Examples of MiddleWares:
+### Examples of MiddleWares
 
 ```js
 import { client } from "../api/client";

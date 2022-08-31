@@ -7,8 +7,10 @@
   - [Difference between state and props](#difference-between-state-and-props)
   - [Using the state](#using-the-state)
 - [UseRef Hook](#useref-hook)
-  - [Why use it ?](#why-use-it-)
+  - [Refs](#refs)
   - [The Reference object](#the-reference-object)
+  - [useRef](#useref)
+    - [Why use it ?](#why-use-it-)
   - [Example](#example)
 - [Effect Hook](#effect-hook)
   - [useEffect](#useeffect)
@@ -106,27 +108,62 @@ const total = setTotal((state) => {
 
 ## UseRef Hook
 
-It allows you to persist values between renders.
+### Refs
 
-It can be used to store a mutable value that does not cause a re-render when updated.
+[reference](https://blog.logrocket.com/complete-guide-react-refs/)
 
-It can be used to access a DOM element directly.
+- **Allow us to access DOM properties directly**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
+- can be very useful when dealing with different frameworks like `react + JQuery` or `react + Angular`
 
-- usually used For:
-  - **form-input**
-  - Accessing DOM elements
+> Note: refs are escape hatches for React developers, and we should try to avoid using them if possible.
 
-### Why use it ?
+- You can gain access to the actual HTML element by creating a React reference and passing it to the element itself.
 
-If we tried to count how many times our application renders using the `useState` Hook, we would be caught in an infinite loop since this Hook itself causes a re-render.
+  - This way, at any time in the lifecycle of the component, we can access the actual HTML element at `buttonRef.current`
 
-To avoid this, we can use the useRef Hook.
+  ```js
+  import React, { useRef } from "react";
+  const ActionButton = ({ label, action }) => {
+    const buttonRef = useRef(null);
+    return (
+      <button onClick={action} ref={buttonRef}>
+        {label}
+      </button>
+    );
+  };
+  export default ActionButton;
+  ```
 
 ---
 
 ### The Reference object
 
-the variable you use `useRef` with will become an object with a **current** property which contains the referenced element
+the variable you use `useRef` with will become a frozen object with a **current** property which contains the referenced element
+
+---
+
+### useRef
+
+- It allows you to persist values between renders.
+
+- It can be used to store a mutable value that does not cause a re-render when updated.
+
+- It can be used to access a DOM element directly.
+
+- usually used For:
+  - **form-input**
+  - Accessing DOM elements
+    - used when you need to have programmatic access to a DOM node
+
+#### Why use it ?
+
+If we tried to count how many times our application renders using the `useState` Hook, we would be caught in an infinite loop since this Hook itself causes a re-render.
+
+> **ref**: is like I have one value that I need to refer to the exact same thing across all renders, so that different renders have access to one exact version of the state
+>
+> **useRef** make sure we get same thing each render
+
+To avoid this, we can use the useRef Hook.
 
 ---
 
@@ -290,10 +327,10 @@ Context provides a way to pass data through the component tree without having to
 - React Context is a way to manage state globally.
   - it stores data in a external object so that it can be accessed globally.
 - Context is designed to share data that can be considered `global` for a tree of React components, such as the current authenticated user, theme, or preferred language.
+- It's sometimes used instead of `Redux` by a lot of users
 - we'll use the `Context Provider` to wrap the tree of components that need the state Context.
-
   - `Context Provider` Wrap child components in the Context Provider and supply the state value.
-
+- we'll use the `Context Consumer` to get values from the state Context.
 - `without context` (Passing "props" through nested components:)
 
   ```js
@@ -416,3 +453,41 @@ function Component5() {
 - When you have component logic that needs to be used by multiple components, we can extract that logic to a custom Hook
   - they're reusable functions.
 - Custom Hooks start with "`use`". Example: `useFetch`
+
+- Example:
+
+  ```js
+  // in useBreedList.js
+  import { useState, useEffect } from "react";
+
+  const localCache = {};
+
+  export default function useBreedList(animal) {
+    const [breedList, setBreedList] = useState([]);
+    const [status, setStatus] = useState("unloaded");
+
+    useEffect(() => {
+      if (!animal) {
+        setBreedList([]);
+      } else if (localCache[animal]) {
+        setBreedList(localCache[animal]);
+      } else {
+        requestBreedList();
+      }
+
+      async function requestBreedList() {
+        setBreedList([]);
+        setStatus("loading");
+        const res = await fetch(
+          `http://pets-v2.dev-apis.com/breeds?animal=${animal}`
+        );
+        const json = await res.json();
+        localCache[animal] = json.breeds || [];
+        setBreedList(localCache[animal]);
+        setStatus("loaded");
+      }
+    }, [animal]);
+
+    return [breedList, status];
+  }
+  ```
