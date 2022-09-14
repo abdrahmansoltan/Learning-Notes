@@ -31,7 +31,6 @@
 - [Custom Components (fragment)](#custom-components-fragment)
   - [fragment](#fragment)
   - [Portals](#portals)
-  - [Refs](#refs)
   - [Smart vs Dumb components](#smart-vs-dumb-components)
   - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
     - [Controlled components](#controlled-components)
@@ -657,6 +656,7 @@ Portals provide a first-class way to render children into a DOM node that exists
 
 - it helps for more `semantic HTML`
   -usually with **modals**
+  - The word “**modal**” means that the visitor can’t interact with the rest of the page, press other buttons, etc, until they have dealt with the window. In this case – until they press “OK”.
 - without portals ![portal](./img/portals.PNG)
 - with portals ![portal](./img/portals2.PNG)
 

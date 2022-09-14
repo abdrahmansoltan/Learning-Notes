@@ -147,8 +147,14 @@ npm i --save-dev @types/node  # type definitions
 
 ### Statically vs dynamically typed
 
-- `Statically-typed` do type checking at compile-time
-- `dynamically-typed` do type-checking at runtime
+- `Statically-typed` do type checking at **compile-time**
+- `dynamically-typed` do type-checking at **runtime** as there exist data types, but variables are not bound to any of them.
+
+  ```js
+  // no error
+  let message = 'hello';
+  message = 123456;
+  ```
 
 ---
 
@@ -164,7 +170,7 @@ npm i --save-dev @types/node  # type definitions
 
 ```js
 let x = 21; // type assigned as int at runtime.
-let y = x + "dot";
+let y = x + 'dot';
 // This code will run without any error. As Javascript is a weakly-typed language, it allows implicit conversion between unrelated types.
 ```
 
@@ -224,7 +230,7 @@ let arr2: (string | number)[]; // array of strings or numbers
 
 ### `Tuple`
 
- When you know exactly what data will be in the array with a **fixed length** and their **type-order**, and you will not be adding to the array or modifying the type for any value
+When you know exactly what data will be in the array with a **fixed length** and their **type-order**, and you will not be adding to the array or modifying the type for any value
 
 ```ts
 let arr: [string, number, string]; // ['cat', 7, 'dog']
@@ -241,9 +247,9 @@ Gautcha -> when using array-methods like `pop`, `push` typescript doesn't raise 
 
 ```ts
 enum Colors {
-  RED = "red",
-  WHITE = "white",
-  BLUE = "blue",
+  RED = 'red',
+  WHITE = 'white',
+  BLUE = 'blue'
 }
 
 console.log(Colors.RED); // red
@@ -257,9 +263,9 @@ console.log(Colors.RED); // red
 // not good and hard to read
 // note that --> in object type we use `;` but in value section we use ','
 let student: { name: string; age: number; enrolled: boolean } = {
-  name: "Maria",
+  name: 'Maria',
   age: 10,
-  enrolled: true,
+  enrolled: true
   // instead we use interfaces
 };
 ```
@@ -280,7 +286,7 @@ interface Student {
   gender?: stromg; // (?) means that it's optional
   enrolled: boolean;
 }
-let newStudent: Student = { name: "Maria", age: 10, enrolled: true };
+let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
 ```
 
 > we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be transpiled to Javascript
@@ -292,9 +298,7 @@ The partial type is simple to use as it only requires to pass a type **T** where
 > It generates a new type based on the input type/object/interface **with all the property-keys being optional**
 
 ```ts
-Partial<MyType>
-Partial<MyInterface>
-Partial<{}>
+Partial < MyType > Partial < MyInterface > Partial<{}>;
 ```
 
 ```ts
@@ -312,7 +316,7 @@ interface Blog {
 // Partial<Blog> generates a new type based on Blog with all the property
 // keys being optional
 const draft: Partial<Blog> = {
-  title: "What kind of title should I type?",
+  title: 'What kind of title should I type?'
 };
 ```
 
@@ -330,10 +334,10 @@ let userInput: unknown;
 let userName: string;
 
 userInput = 5;
-userInput = "Max";
+userInput = 'Max';
 
 // type assertion or (Type Guard)
-if (typeof userInput === "string") {
+if (typeof userInput === 'string') {
   userName = userInput;
 }
 ```
@@ -351,7 +355,7 @@ A union type has a very specific technical definition that comes from set theory
 
 ```ts
 let studentPhone: number | string;
-studentPhone = "(555) 555 - 5555";
+studentPhone = '(555) 555 - 5555';
 studentPhone = 5555555555;
 ```
 
@@ -364,20 +368,20 @@ Intersection types also have a name and definition that comes from set theory, b
 ```ts
 function makeWeek(): Date & { end: Date } {
   //⬅ return type
- 
-  const start = new Date()
-  const end = new Date(start.valueOf() + ONE_WEEK)
- 
-  return { ...start, end } // kind of Object.assign
+
+  const start = new Date();
+  const end = new Date(start.valueOf() + ONE_WEEK);
+
+  return { ...start, end }; // kind of Object.assign
 }
- 
-const thisWeek = makeWeek()
-thisWeek.toISOString()
-// --->   
-        // const thisWeek: Date & {
-        //     end: Date;
-        // }
-thisWeek.end.toISOString() // ---> (property) end: Date
+
+const thisWeek = makeWeek();
+thisWeek.toISOString();
+// --->
+// const thisWeek: Date & {
+//     end: Date;
+// }
+thisWeek.end.toISOString(); // ---> (property) end: Date
 ```
 
 - This is quite different than what we saw with union types — this is quite literally a `Date` and `{ end: Date}` mashed together, and we have access to everything immediately.
@@ -404,10 +408,10 @@ The main idea here is that we provide **type & value** for the variable, usually
 // helloWorld will never change, by using const.
 
 // So, TypeScript sets the type to be "Hello World", not string
-const helloWorld = "Hello World";
+const helloWorld = 'Hello World';
 
 // On the other hand, a let can change, and so the compiler declares it a string
-let hiWorld = "Hi World";
+let hiWorld = 'Hi World';
 ```
 
 #### String Literal Types
@@ -419,14 +423,14 @@ let hiWorld = "Hi World";
 - ex :
 
   ```ts
-  type Easing = "ease-in" | "ease-out" | "ease-in-out";
+  type Easing = 'ease-in' | 'ease-out' | 'ease-in-out';
 
   class UIElement {
     animate(dx: number, dy: number, easing: Easing) {
-      if (easing === "ease-in") {
+      if (easing === 'ease-in') {
         // ...
-      } else if (easing === "ease-out") {
-      } else if (easing === "ease-in-out") {
+      } else if (easing === 'ease-out') {
+      } else if (easing === 'ease-in-out') {
       } else {
         // It's possible that someone could reach this
         // by ignoring your types though.
@@ -435,8 +439,8 @@ let hiWorld = "Hi World";
   }
 
   let button = new UIElement();
-  button.animate(0, 0, "ease-in");
-  button.animate(0, 0, "uneasy");
+  button.animate(0, 0, 'ease-in');
+  button.animate(0, 0, 'uneasy');
   ```
 
 ---
@@ -451,18 +455,18 @@ Type aliases can be used to "create" your own types. You're not limited to stori
 
 ```ts
 type User = { name: string; age: number };
-const u1: User = { name: "Max", age: 30 }; // this works!
+const u1: User = { name: 'Max', age: 30 }; // this works!
 
 // another ex
 
 function greet(user: { name: string; age: number }) {
-  console.log("Hi, I am " + user.name);
+  console.log('Hi, I am ' + user.name);
 }
 // to this :
 type User = { name: string; age: number };
 
 function greet(user: User) {
-  console.log("Hi, I am " + user.name);
+  console.log('Hi, I am ' + user.name);
 }
 ```
 
@@ -492,7 +496,7 @@ combineValues = add; // this works as (add) is a function that matches the condi
 
   ```ts
   function printResult(num: number): void {
-    console.log("Result: " + num);
+    console.log('Result: ' + num);
   }
   ```
 
@@ -524,27 +528,25 @@ function generateError(message: string, code: number): never {
 
   ```ts
   function myClickHandler(event: Event) {
-    this.disabled = true
-  // 'this' implicitly has type 'any' because it does not have a type annotation.
+    this.disabled = true;
+    // 'this' implicitly has type 'any' because it does not have a type annotation.
   }
-  
-  myClickHandler(new Event("click")) // seems ok
+
+  myClickHandler(new Event('click')); // seems ok
   ```
 
 - TypeScript isn’t happy with us. Despite the fact that we know that this will be element that fired the event, the compiler doesn’t seem to be happy with us using it in this way.
+
   - To address the problem, we need to give this function a `this` **type**
 
   ```ts
-  function myClickHandler(
-    this: HTMLButtonElement,
-    event: Event
-  ) {
-    this.disabled = true
-            
-  // (property) HTMLButtonElement.disabled: boolean
+  function myClickHandler(this: HTMLButtonElement, event: Event) {
+    this.disabled = true;
+
+    // (property) HTMLButtonElement.disabled: boolean
   }
-  
-  myClickHandler(new Event("click")) // seems no longer ok
+
+  myClickHandler(new Event('click')); // seems no longer ok
   ```
 
 ---
@@ -605,7 +607,7 @@ class Person implements Greetable {
   }
 
   greet(phrase: string) {
-    console.log(phrase + " " + this.name);
+    console.log(phrase + ' ' + this.name);
   }
 }
 ```
@@ -672,7 +674,8 @@ class Department {
 
 A generic is a way to write a function that is reusable across different types, by using **type parameters**
 
->**type parameters**: can be thought of as **function arguments, but for types**
+> **type parameters**: can be thought of as **function arguments, but for types**
+>
 > - Functions may return different values, depending on the arguments you pass them.
 
 - why not just use `any`?
@@ -705,7 +708,7 @@ function merge<T extends object, U extends object>(objA: T, objB: U) {
 // "extends" here is a (Type Constraint)
 
 // here first obj contains type(string) and the second obj contains type(number)
-const mergedObj = merge({ name: "Max", hobbies: ["Sports"] }, { age: 30 });
+const mergedObj = merge({ name: 'Max', hobbies: ['Sports'] }, { age: 30 });
 console.log(mergedObj);
 ```
 
@@ -761,24 +764,16 @@ Decorator Composition is an important concept as it allows us to use multiple de
 
 ```ts
 function outer() {
-  console.log("Outer: expression");
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    console.log("Outer: result");
+  console.log('Outer: expression');
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    console.log('Outer: result');
   };
 }
 
 function inner() {
-  console.log("Inner: expression");
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    console.log("Inner: result");
+  console.log('Inner: expression');
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    console.log('Inner: result');
   };
 }
 
@@ -872,32 +867,32 @@ npm install webpack webpack-cli webpack-dev-server typescript ts-loader --save-d
 - For `development` --> create `webpack.config.js` file that contains this :
 
   ```js
-  const path = require("path");
+  const path = require('path');
 
   module.exports = {
-    mode: "development",
-    entry: "./src/app.ts",
+    mode: 'development',
+    entry: './src/app.ts',
     output: {
-      filename: "bundle.js",
-      path: path.resolve(__dirname, "dist"),
-      publicPath: "dist",
+      filename: 'bundle.js',
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: 'dist'
     },
 
     // this part is for Adding TypeScript Support with the ts-loader Package
 
-    devtool: "inline-source-map",
+    devtool: 'inline-source-map',
     module: {
       rules: [
         {
           test: /\.ts$/, // regular expression
-          use: "ts-loader",
-          exclude: /node_modules/,
-        },
-      ],
+          use: 'ts-loader',
+          exclude: /node_modules/
+        }
+      ]
     },
     resolve: {
-      extensions: [".ts", ".js"],
-    },
+      extensions: ['.ts', '.js']
+    }
   };
   ```
 
@@ -923,30 +918,30 @@ npm i --save-dev clean-webpack-plugin
 - For `Production` --> create `webpack.config.prod.js` file that contains this :
 
   ```js
-  const path = require("path");
-  const CleanPlugin = require("clean-webpack-plugin");
+  const path = require('path');
+  const CleanPlugin = require('clean-webpack-plugin');
 
   module.exports = {
-    mode: "production",
-    entry: "./src/app.ts",
+    mode: 'production',
+    entry: './src/app.ts',
     output: {
-      filename: "bundle.js",
-      path: path.resolve(__dirname, "dist"),
+      filename: 'bundle.js',
+      path: path.resolve(__dirname, 'dist')
     },
-    devtool: "none",
+    devtool: 'none',
     module: {
       rules: [
         {
           test: /\.ts$/,
-          use: "ts-loader",
-          exclude: /node_modules/,
-        },
-      ],
+          use: 'ts-loader',
+          exclude: /node_modules/
+        }
+      ]
     },
     resolve: {
-      extensions: [".ts", ".js"],
+      extensions: ['.ts', '.js']
     },
-    plugins: [new CleanPlugin.CleanWebpackPlugin()],
+    plugins: [new CleanPlugin.CleanWebpackPlugin()]
   };
   ```
 

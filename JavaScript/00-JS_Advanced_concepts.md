@@ -5,6 +5,7 @@
   - [Compiled Language](#compiled-language)
   - [Interpreted Language](#interpreted-language)
 - [JavaScript Engine](#javascript-engine)
+  - [How the engine works ?](#how-the-engine-works-)
   - [call-stack & Memory-heap](#call-stack--memory-heap)
 - [Types](#types)
   - [`==` vs `===`](#-vs-)
@@ -24,7 +25,7 @@
   - [Referential Transparency](#referential-transparency)
   - [Composition](#composition)
 - [JS : The weird parts](#js--the-weird-parts)
-  - [Types](#types-1)
+  - [Advanced Types](#advanced-types)
   - [Numbers](#numbers)
   - [short circuiting => **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
 - [notes](#notes)
@@ -46,8 +47,10 @@
 
 ### Interpreted Language
 
+- The interpreter translates and runs code **one statement at a time**
+  - each line of code is translated to machine-code one-by-one as the script is run.
+  - the interpreter always looks for **variables** and **function declarations** before going through each section of a script, line-by-line.
 - Errors found when the code is run
-- The interpreter translates and runs code one statement at a time
 - Interpreter starts running the code quickly
 - Interpreted code runs more slowly
 - it's more fit to `javascript` as JS runs on the browser
@@ -64,6 +67,12 @@
 
 - is `javascript` an interpreted language ?
   - yes, **initially** but it evolved to use compilers as well based on the implementation
+
+### How the engine works ?
+
+1. The engine (embedded if it’s a browser) reads (**“parses”**) the script.
+2. Then it converts (**“compiles”**) the script to machine code.
+3. And then the machine code runs, pretty fast.
 
 ### call-stack & Memory-heap
 
@@ -84,31 +93,46 @@
   ![pvr](./img/permatives%20vs%20reference.PNG)
   - `value` at a specific `address` (**in the `call stack`**) is immutable ,,, but in the `Heap` its mutable
   - `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack`
-  
+
 ### `==` vs `===`
 
 - If you know the types in comparison: prefer `==` as it's faster
 - if `===` would always be equivalent to `==` in your code, using it everywhere sends a wrong semantic signal : **protecting myself since I don't know'trust the types**
+- NOTES:
+
+  - logical operators (like `&&`) allow you to compare the results of more than one comparison operator (like `===`).
+  - The value `undefined` shouldn’t be compared to other values:
+
+    ```js
+    alert(undefined > 0); // false
+    alert(undefined < 0); // false
+    alert(undefined == 0); // false
+
+    // "null" only equals "undefined"
+    alert(undefined == null); // true
+    ```
 
 ### Type Coercion
 
 it's the automatic or implicit conversion of values from one data type to another
-  ![type coercion](./img/TypeCoercion.png)
+![type coercion](./img/TypeCoercion.png)
 
 - empty object {} /array [] => true
 - empty string "" => false
 
 - `+` vs `-` :
 
-    ![type coercion](./img/TypeCoercion2.PNG)
+  ![type coercion](./img/TypeCoercion2.PNG)
 
 - convert string to number using :
+
   - `unary` operator
     - it's a `+` or `-` before the string number => `console.log(+"565")`
     - it's a `!` before something => `console.log(! (x > 4) )`
   - `parseint()` or `parsefloat()` => `parseint(100Ahmed)` = 100
 
 - `string to boolean`: ![coercion](./img/coercion2.png)
+  - `Boolean("0");` --> **true**
 
 ---
 
@@ -121,6 +145,14 @@ it's the automatic or implicit conversion of values from one data type to anothe
 ---
 
 ## Scope
+
+- **local variables:** The interpreter creates local variables when the function is run, and removes them as soon as the function has finished its task. This means that:
+  - If the function runs twice, the variable can have different values each time.
+  - Two different functions can use variables with the same name without any kind of naming conflict
+- **global variables:**: Global variables are stored **in memory** for as long as the web page is loaded into the web browser. This means they take up more memory than local variables, and it also increases the risk of naming conflicts
+  - For these reasons, you should use local variables wherever possible
+
+---
 
 ### Lexical scope
 
@@ -174,7 +206,7 @@ one of the biggest examples of closures is **timers**: ![closure](./img/closure2
 
   ```javascript
   function multiplier(factor) {
-    return (number) => number * factor;
+    return number => number * factor;
   }
   let twice = multiplier(2);
   console.log(twice(5)); // → 10
@@ -196,6 +228,12 @@ one of the biggest examples of closures is **timers**: ![closure](./img/closure2
 - when you want to turn **block-scope** into a **functional-scope** -> use **IIFE**
   - usually used to prevent variable to be in the global scope like here:
     ![IIFE](./img/iife.PNG)
+  - Often used to ensure that the variable names do not conflict with each other (especially if the page uses more than one script).
+  - also used for
+    - code that only needs to run once within a task, rather than repeatedly being called by other parts of the script.
+    - As an argument when a function is called
+    - In event handlers and listeners
+    - To prevent conflicts between two scripts that might use the same variable names
 
 #### Function returning Functions
 
@@ -244,12 +282,12 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 #### first-class functions and higher order functions
 
 - **first class functions** is just a feature that a programming language either has or does not have. (All it means is that all functions are values.),It's just a concept.
-    ![first class objects](./img/first%20class%20objects.png)
+  ![first class objects](./img/first%20class%20objects.png)
 - There are however **higher order functions** in practice, which are possible because the language supports `first class functions`.
   - ![higher order functions](./img/higher%20order%20functions.png)
 - ex: `call`, `apply`, `bind` :
 
-  - `call` => calls a function with the given lexical context as parameter (`call` is the one that calls the function)
+  - `call` => calls a function with the given lexical context as parameter (`call` it's like calling the `this` of the one object that calls the function)
 
     ```javascript
     let human = { name: 'Ahmed' };
@@ -260,6 +298,7 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     ```
 
   - `apply` => is just like `call()` except that it accepts arguments in array
+
     - it's not used in modern javascript because we can instead use `spread operator ...` with `call()`
 
     ```javascript
@@ -322,14 +361,14 @@ let compose = (fn1, fn2) => fn2(fn1);
 
 ## JS : The weird parts
 
-### Types
+### Advanced Types
 
 - `null` vs `undefined`
   ![null-undefined](./img/null-undefined.png)
-- `null` is you set it to **empty**,
+- `null` is you set it to **empty**, (a variable with no value - it may have had one at some point, but no longer has a value)
 - `undefined` it's empty because it **has not been set** / **Doesn't currently have a value**.
 - or `null` is empty on purpose, while `undefined` is still empty.
-- `undefined` means a variable has been declared but has not yet been assigned a value
+- `undefined` means a variable has been declared but **has not yet been assigned a value**
 - `null` is an assignment value. It can be assigned to a variable as a representation of **no value**.
 
 ---
@@ -337,6 +376,7 @@ let compose = (fn1, fn2) => fn2(fn1);
 ### Numbers
 
 - **NaN**:
+
   - `typeof NaN` = `Number` --> as it's **invalid number**
   - example of `NaN` -> **division on strings** -> `"apple" / 3`
   - `Nan === NaN` --> **false**
@@ -348,6 +388,8 @@ let compose = (fn1, fn2) => fn2(fn1);
 ### short circuiting => **nullish coalescing operator** `??`
 
 - it's like (or `||`) but works in a different way and can actually return `false value` ![nullish coalescing operator](./img/nullish%20coalescing%20operator.webp)
+  - if `a` is defined, then `a`.
+  - if `a` isn’t defined, then `b`.
 - **Optional chaining** `?.` :
   ![Optional chaining](./img/Optional%20chaining.webp)
   - is a safe way to access nested object properties, even if an intermediate property doesn’t exist.
@@ -368,8 +410,11 @@ let compose = (fn1, fn2) => fn2(fn1);
 - **Strict mode** :
   - It is not a statement, but a literal expression, ignored by earlier versions of JavaScript.
   - The purpose of `"use strict"` is to indicate that the code should be executed in "strict mode".
-  - Strict mode changes (previously accepted "bad syntax") into real errors
-  - as an example, in normal JavaScript, mistyping a variable name creates a new global variable. In strict mode, this will throw an error, making it impossible to accidentally create a global variable.
+    - Please make sure that `"use strict"` is **at the top of your scripts**, otherwise strict mode may not be enabled.
+  - Strict mode changes the (previously accepted "bad syntax") into real errors
+    - as an example, in normal JavaScript, mistyping a variable name creates a new global variable. In strict mode, this will throw an error, making it impossible to accidentally create a global variable.
+  - **Should we write it ?**
+    - Modern JavaScript supports `“classes”` and `“modules”`, that enable `use strict` automatically. So we don’t need to add the `"use strict"` directive.
 - `Refactoring the code` : means the process of restructuring code without changing or adding to its external behavior and functionality.
 - in `DOM` => `:root` element is called `document.documentElement`
 - to make anything `immutable` : `Object.freeze()`
@@ -379,12 +424,12 @@ let compose = (fn1, fn2) => fn2(fn1);
   ```js
   Object.freeze({
     jonas: 1500,
-    matilda: 100,
+    matilda: 100
   });
 
   Object.freeze([
     { value: 250, description: 'Sold old TV 📺', user: 'jonas' },
-    { value: -45, description: 'Groceries 🥑', user: 'jonas' },
+    { value: -45, description: 'Groceries 🥑', user: 'jonas' }
   ]);
 
   // or anything because everything is an "object"
@@ -392,7 +437,7 @@ let compose = (fn1, fn2) => fn2(fn1);
 
 - **Var** vs **const** & **let**
 
-  - **Var** is function-scoped (not block-scoped) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use it outside the function-scope**
+  - **Var** is function-scoped (not block-scoped) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
 
     ```js
     function f() {
@@ -419,3 +464,16 @@ let compose = (fn1, fn2) => fn2(fn1);
 
   - **let** is both function-scoped and block-scoped, **means you can't use it outside the function-scope & block-scope**
   - if you used **const** in a `for loop` -> `for ( i = 0; i < 3; i++) {}` you will get error, as you won't be able to re-assign `i`
+
+- There is a widespread practice to use constants (named using capital letters and underscores) as aliases for difficult-to-remember values that are known prior to execution.
+
+  ```js
+  const COLOR_ORANGE = '#FF7F00';
+  ```
+
+- short-circuiting ->
+
+  ```js
+  alert( alert(1) && alert(2) ); // undefined
+  // as alert doesn't return anything (returns undefined)
+  ```

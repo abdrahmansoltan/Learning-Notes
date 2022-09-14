@@ -12,6 +12,7 @@
 - [Gulp.js](#gulpjs)
   - [Gulp vs Webpack](#gulp-vs-webpack)
 - [Pugjs](#pugjs)
+- [SEO](#seo)
 
 ---
 
@@ -105,3 +106,15 @@ It's a **templating engine** designed to render HTML in server-side technologies
 - It's another way for writing HTML code with ability to write **HTML components**
 
 ---
+
+## SEO
+
+Search engine optimization is the practice of trying to help your site appear nearer the top of search engine results when people look for the topics that your website covers.
+
+- At the heart of SEO is the idea of working out which terms people are likely to enter into a search engine to find your site and then using these terms in the right places on your site to increase the chances that search engines will show a link to your site in their results.
+- SEO is often split into two areas:
+  - **on-page techniques**
+    - methods you can use on your web pages to improve their rating in search engines.
+  - **off-page techniques**
+    - Getting other sites to link to you
+    - Search engines help determine how to rank your site by looking at the number of other sites that link to yours.

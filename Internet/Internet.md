@@ -79,6 +79,7 @@ Internet Protocol addresses are numbers that computers use to identify each othe
   - **checksum value** that helps the recipient detect if a packet was damaged in transit.
 - transmission speed of packets depend on bandwidth as packet consists of bytes
   - bandwidth is number of bytes ber second
+    - amount of data the hosting company will send to your site's visitors.
 - in order to send the `0 / 1` data we want a way which has low data-loss and can transfer for long distances, thats why we use light and not electricity
   - light is transmitted in **fiber / copper** cables
 

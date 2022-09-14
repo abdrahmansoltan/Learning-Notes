@@ -96,6 +96,8 @@ An API is the interface or gateway through which we interact with an external pr
 
 The Same Origin Policy (SOP) allows a browser to restrict access to resources relating to one origin to being permitted only via other resources from that same origin. (by default that is the behavior configured in browsers)
 
+- both pages must agree for data exchange and must contain special JavaScript code that handles it.
+
 - usually when using client-side on a port & server-side on another port
   - `React` : port3000
   - `node` : port8000

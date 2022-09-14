@@ -1,9 +1,11 @@
 ## INDEX
 
 - [INDEX](#index)
+- [Object Oriented Paradigm](#object-oriented-paradigm)
 - [Constructor Function](#constructor-function)
   - [Methods](#methods)
-  - [prototypal inheritance (delegation)](#prototypal-inheritance-delegation)
+- [prototypal inheritance (delegation)](#prototypal-inheritance-delegation)
+  - [Why we do this?](#why-we-do-this)
 - [ES6 Classes](#es6-classes)
   - [`getter` & `setter`](#getter--setter)
 - [`object.create()`](#objectcreate)
@@ -14,6 +16,15 @@
 - [METHOD CHAINING](#method-chaining)
 - [Encapsulation](#encapsulation)
 - [notes](#notes)
+
+---
+
+## Object Oriented Paradigm
+
+- the word **Paradigm** means an approach to to something in an organized way with clear structure
+- oop paradigm is replacement of procedural paradigm by making each different thing in an object
+
+> Javascript object oriented way is very different from other OOP languages as in the background javascript is actually **faking** the implementation as **Javascript is a prototypal-language and not object-oriented-language**
 
 ---
 
@@ -36,20 +47,36 @@
 
   - what happens is that we **link (point)** `__proto__` property of `jonas` instance to the `prototype` property of the `Person` Constructor Function (class).
 
-### prototypal inheritance (delegation)
+---
+
+## prototypal inheritance (delegation)
 
 - if a property or a method can't be found in a certain object, javascript will look into its `prototype`
   - accessing the properties & methods of the parent class
 - look at the `protoType chain` in the PDF
   - another illustration of the chain: ![alt](./img/protoType%20chain.PNG)
 
+### Why we do this?
+
+why we do this instead of declaring the function with the class properties each time we instantiate a new class (object) ?
+
+- because we don't want to create the same function that have same functionality each time for each object
+- instead we move all these methods (functions) to a parent object so that it won't be created each time (**Bundle all common functions together + Make a Bond to that object by a hidden property -> `__proto__`**)
+  - `__proto__` hidden property is added in the background using the **"new"** keyword that points to the **prototype** object-property in the parent class
+  - > also empty object `this` is created using the **"new"** keyword
+- all is that is possible because (functions in JS are both **function & objects combo**)
+
+> **NOTE:** other built in objects like arrays have the hidden `__proto__` property
+
 ---
 
 ## ES6 Classes
 
 - here we have `class declaration` / `class expression` like function => as `classes` are in fact `function`
+
   - **class** automatically creates a **function + object** combo
-    ![class](./img/class.png)
+    - the object created will have the methods added to the **automatically** created `prototype` object of the class, instead of manually adding the methods to the `prototype` object
+      ![class](./img/class.png)
 
   ```javascript
   // Class expression
@@ -100,7 +127,7 @@ const PersonProto = {
   init(firstName, birthYear) {
     this.firstName = firstName;
     this.birthYear = birthYear;
-  },
+  }
 };
 
 // ------------- using object.create ------------- //
@@ -108,13 +135,13 @@ const PersonProto = {
 // mehtod-1
 // make (PersonProto) to be the prototype of (steven)
 const steven = Object.create(PersonProto);
-steven.name = "Steven";
+steven.name = 'Steven';
 steven.birthYear = 2002;
 steven.calcAge();
 
 // mehtod-2
 const sarah = Object.create(PersonProto);
-sarah.init("Sarah", 1979);
+sarah.init('Sarah', 1979);
 sarah.calcAge();
 ```
 
@@ -162,9 +189,12 @@ class StudentCl extends PersonCl {
     super(fullName, birthYear);
     this.course = course;
   }
-  // prototypes are automatically inhereted with (extends) word
+  // prototypes are automatically inherited with (extends) word
 }
 ```
+
+- `super()` -> creates a hidden property `__proto__` to the object but here `__proto__` won't point to `prototype` of the parent object instead it will point to the **objectCreator constructor function of the parent class**
+  - then the result (return value) from the `objectCreator constructor function` will be put in the created `this` property
 
 ### **METHOD-3** : using `object.create()`
 
@@ -179,8 +209,9 @@ const PersonProto = {
     },
   }
 
-
-// 1st step : set the proto of the subClass from the superClass
+//-------------How subclassing works?-------------//
+// 1st step : set the __proto__ of the subClass from the __proto__ of the superClass
+// as object is (object + function) combo -> (if it doesn't find the property --> go to obj prototype & if it doesn't find the method --> go to function prototype)
 const StudentProto = Object.create(PersonProto);
 
 // 2nd step : add init properties to the subClass
@@ -200,15 +231,15 @@ steven.init('Jay', 2010, 'Computer Science');
 
 - Method chaining is the mechanism of calling a method on another method of the same object. This ensures a cleaner and readable code.
 - Method chaining uses `this` keyword in the object's class to access its methods.When a method returns `this`, it simply returns an instance of the object in which it is returned. in another word, to chain methods together :
+
   - we need to make sure that each method we define has a return value so that we can call another method on it.
-  -
-  -
-  - ```javascript
-    withdraw(val) {
-      this.deposit(-val);
-      return this;
-    }
-    ```
+
+  ```javascript
+   withdraw(val) {
+     this.deposit(-val);
+     return this;
+   }
+  ```
 
 ---
 
@@ -277,3 +308,4 @@ class Account {
 
 - `static methods` are not available for instances
 - if you want a class method to be automatically called when an instance of the class is created, then you should put this method in the `constructor()`
+- in old syntax if we didn't use the word **"new"**, then **this** keyword will point to the `window` object
