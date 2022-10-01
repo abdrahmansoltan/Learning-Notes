@@ -1,32 +1,33 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Notes](#notes)
-- [Is JavaScript a `synchronous` or `asynchronous` ?](#is-javascript-a-synchronous-or-asynchronous-)
-- [Building a Promise](#building-a-promise)
-  - [creating a promise](#creating-a-promise)
-  - [Promisifying](#promisifying)
-  - [resolve /reject a promise](#resolve-reject-a-promise)
-- [consume promise : (Old Way)](#consume-promise--old-way)
-  - [AJAX Call : `XMLHttpRequest`](#ajax-call--xmlhttprequest)
-  - [Callback Hell](#callback-hell)
-- [consume promise : (Modern Way)](#consume-promise--modern-way)
-  - [Promises / Fetch API](#promises--fetch-api)
-  - [Handling Rejected Promises (2 ways)](#handling-rejected-promises-2-ways)
-    - [handling uncaught error](#handling-uncaught-error)
-    - [1. Pass a second callback function in `.then()` method](#1-pass-a-second-callback-function-in-then-method)
-    - [2. using `.catch()` at the end of the promise chain](#2-using-catch-at-the-end-of-the-promise-chain)
-  - [`finally` method](#finally-method)
-- [consume promise (ES7)](#consume-promise-es7)
-  - [Consuming Promises with Async/Await](#consuming-promises-with-asyncawait)
-  - [Error Handling With try...catch](#error-handling-with-trycatch)
-- [Sequence promises vs Parallel promises](#sequence-promises-vs-parallel-promises)
-  - [Sequence promises](#sequence-promises)
-  - [Parallel promises methods](#parallel-promises-methods)
-    - [`Promise.all()`](#promiseall)
-  - [`Promise.any()`](#promiseany)
-  - [`Promise.race()`](#promiserace)
-  - [`Promise.allSettled()`](#promiseallsettled)
+  - [Notes](#notes)
+  - [Is JavaScript a `synchronous` or `asynchronous` ?](#is-javascript-a-synchronous-or-asynchronous-)
+  - [Building a Promise](#building-a-promise)
+    - [creating a promise](#creating-a-promise)
+    - [Promisifying](#promisifying)
+    - [resolve /reject a promise](#resolve-reject-a-promise)
+  - [consume promise : (Old Way)](#consume-promise--old-way)
+    - [AJAX Call : `XMLHttpRequest`](#ajax-call--xmlhttprequest)
+    - [Callback Hell](#callback-hell)
+  - [consume promise : (Modern Way)](#consume-promise--modern-way)
+    - [Promises / Fetch API](#promises--fetch-api)
+    - [Handling Rejected Promises (2 ways)](#handling-rejected-promises-2-ways)
+      - [handling uncaught error](#handling-uncaught-error)
+      - [1. Pass a second callback function in `.then()` method](#1-pass-a-second-callback-function-in-then-method)
+      - [2. using `.catch()` at the end of the promise chain](#2-using-catch-at-the-end-of-the-promise-chain)
+    - [`finally` method](#finally-method)
+  - [consume promise (ES7)](#consume-promise-es7)
+    - [Consuming Promises with Async/Await](#consuming-promises-with-asyncawait)
+    - [Error Handling With try...catch](#error-handling-with-trycatch)
+  - [Sequence promises vs Parallel promises](#sequence-promises-vs-parallel-promises)
+    - [Sequence promises](#sequence-promises)
+    - [Parallel promises methods](#parallel-promises-methods)
+      - [`Promise.all()`](#promiseall)
+    - [`Promise.any()`](#promiseany)
+    - [`Promise.race()`](#promiserace)
+    - [`Promise.allSettled()`](#promiseallsettled)
+  - [Working with data from other servers (Proxy)](#working-with-data-from-other-servers-proxy)
 
 ---
 
@@ -41,8 +42,9 @@
 
 ## Is JavaScript a `synchronous` or `asynchronous` ?
 
-- JavaScript is always `synchronous` and `single-threaded`
-- **but** when `js` runs on certain environments like `browser` or `node.js` --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object
+- JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability
+- **but** when `js` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object
+- so **Javascript has no timer**, as the timer-function is **Web-browser feature**
 
 > **Async** means that "we don't have it right now"
 
@@ -69,7 +71,7 @@ const lotteryPromise = new Promise(function (resolve, reject) {
 });
 
 // using the promise
-lotteryPromise.then((res) => console.log(res)).catch((err) => console.error(err));
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 ```
 
 ### Promisifying
@@ -86,13 +88,13 @@ const getPosition = function () {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
-getPosition().then((pos) => console.log(pos));
+getPosition().then(pos => console.log(pos));
 ```
 
 ### resolve /reject a promise
 
 ```javascript
-// immediatly resolve /reject a promise using thees methods from (promise) object
+// immediately resolve /reject a promise using thees methods from (promise) object
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem!')).catch(x => console.error(x)
 ```
@@ -103,13 +105,30 @@ Promise.reject(new Error('Problem!')).catch(x => console.error(x)
 
 ### AJAX Call : `XMLHttpRequest`
 
+**Ajax** is a technique for loading data into part of a page without having to refresh the entire page. The data is often sent in a format called JavaScript Object Notation `JSON`.
+
+- The ability to load new content into part of a page improves the user experience because the user does not have to wait for an entire page to load if only part of it is being updated. This has led to a rise in so-called **single page web applications** (web-based tools that feel more like software applications, even though they run in the browser).
+- Historically, **AJAX** was an acronym for the technologies used in asynchronous requests like this. It stood for **Asynchronous JavaScript And XML**. Since then, technologies have moved on and the term **Ajax** is now used to refer to a group of technologies that offer asynchronous functionality in the browser.
+- **Data formats:** Servers typically send back `HTML`, `XML`(which the browser turns into `HTML`), or `JSON`
+  - Browsers only let Ajax load `HTML` and `XML` from the **same domain name** as the rest of the page,
+    - but `JSON` can be called from any domain **(JSON-P/CORS)**
+  - **XML** -> The tags in an `XML` file should describe the data they contain. As a result, even if you have never seen the code to the left. you can see that the data describes information about several events. The `<events>` element contains several individual events. Each individual event is represented in its own `<event>` element.
+  - **JSON** :
+    - When `JSON` data is sent from a server to a web browser, it is transmitted as a **string**.
+    - When it reaches the browser, your script must then convert the string into a JavaScript object. This is known as **deserializing an object**.
+      - This is done using the `parse()` method of a built-in object called `JSON`. This is a global object, so you can use it without creating an instance of it first.
+    - The JSON object also has a method called `stringify()`, which converts objects into a string using `JSON` notation so it can be sent from the browser back to a server. This is also known as serializing an object.
+
+>To create an Ajax request, browsers use the `XMLHttpRequest` object.
+> When the server responds to the browser's request, the same `XMLHttpRequest` object will process the result.
+
 ```javascript
 const getCountryData = function (country) {
-  const request = new XMLHttpRequest();
-  request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`);
-  // (method-type, string containing the URL)
-  request.send();
-  // we can't do this : const data = request.send();  because the results arn't there yet and we have to wait for it
+  const request = new XMLHttpRequest(); // An instance of the  Object
+  request.open('GET', `https://restcountries.eu/rest/v2/name/${country}`); //  prepares the request
+  // 3 parameters --> (methodType, url of the page that will handle the request, A Boolean indicating if if should be asynchronous)
+  request.send(); // sends the prepared request to the server
+  // we can't do this : const data = request.send();  because the results aren't there yet and we have to wait for it
 
   // instead we add eventListener on it for when it (loads)
   request.addEventListener('load', function () {
@@ -133,21 +152,21 @@ request.send();
 request.addEventListener('load', function () {
   const [data] = JSON.parse(this.responseText);
 
-  // Get neighbour country (2)
-  const [neighbour] = data.borders;
+  // Get neighbor country (2)
+  const [neighbor] = data.borders;
 
-  if (!neighbour) throw new Error('No neighbour found!');
+  if (!neighbor) throw new Error('No neighbor found!');
 
   // AJAX call country 2
   const request2 = new XMLHttpRequest();
-  request2.open('GET', `https://restcountries.eu/rest/v2/alpha/${neighbour}`);
+  request2.open('GET', `https://restcountries.eu/rest/v2/alpha/${neighbor}`);
   request2.send();
 
   request2.addEventListener('load', function () {
     const data2 = JSON.parse(this.responseText);
     console.log(data2);
 
-    renderCountry(data2, 'neighbour');
+    renderCountry(data2, 'neighbor');
   });
 });
 
@@ -178,11 +197,12 @@ setTimeout(() => {
   <img src='./img/promise.png' width=48%>
   <img src='./img/promise_state_inspect.png' width=48%>
 
+- **fetch()**: doesn't has Execution context like other functions as it's a facade function (not from JavaScript)
 - **fetch()**: returns a **promise object** which has 3 properties:
   ![fetch](./img/fetch.png)
-  - `value` --> at first it's empty
-  - `onFulfilled` --> it's an **array** that has the code that will Javascript run when `value` property gets filled
-  - `onRejection` --> it's an **array** that has the code that will Javascript run when error occurs
+  - `value` --> at first it's empty (`undefined`)
+  - `onFulfilled` --> it's an **array** that has the code (functions) that will Javascript run when `value` property   gets filled
+  - `onRejection` --> it's an **array** that has the code (functions) that will Javascript run when error occurs
 - Benefits of `promises`
   - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
   - Instead of nesting callbacks, we can chain promises for a
@@ -192,14 +212,14 @@ setTimeout(() => {
 
   ```javascript
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
-    .then((response) => {
+    .then(response => {
       console.log(response); // promise object
       if (!response.ok) throw new Error(`Country not found (${response.status})`);
       return response.json();
       // (.json()) is a method available on all response objects that are coming from (fetch()) function
       // also (.json()) returns a new promise => so we have to return it like we did
     })
-    .then((data) => {
+    .then(data => {
       // the data we want
       //  do what you want with data object in this function
     });
@@ -209,8 +229,8 @@ setTimeout(() => {
 
   ```javascript
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
-    .then((response) => response.json())
-    .then((data) => {
+    .then(response => response.json())
+    .then(data => {
       console.log(data);
     });
   ```
@@ -234,18 +254,18 @@ if (!response.ok) throw new Error(`error is : (${response.status})`);
 ```javascript
 fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
   .then(
-    (response) => {
+    response => {
       if (!response.ok) throw new Error(`Country not found (${response.status})`);
 
       return response.json();
     },
-    (err) => alert(err.message)
+    err => alert(err.message)
   )
   .then(
-    (data) => {
+    data => {
       console.log(data);
     },
-    (err) => alert(err.message)
+    err => alert(err.message)
   );
 ```
 
@@ -259,16 +279,16 @@ fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
 
 ```javascript
 fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
-  .then((response) => {
+  .then(response => {
     // Throwing Errors Manually
     if (!response.ok) throw new Error(`Country not found (${response.status})`);
 
     return response.json();
   })
-  .then((data) => {
+  .then(data => {
     console.log(data);
   })
-  .catch((err) => {
+  .catch(err => {
     console.error(`${err} 💥💥💥`);
   });
 ```
@@ -302,7 +322,7 @@ fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
 
 ```javascript
 function resolveAfter2Seconds() {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       resolve('resolved');
     }, 2000);
@@ -314,7 +334,7 @@ async function asyncCall() {
   const result = await resolveAfter2Seconds();
   console.log(result); // "resolved"
   // this is the same as
-  resolveAfter2Seconds().then((res) => console.log(result));
+  resolveAfter2Seconds().then(res => console.log(result));
 }
 
 asyncCall();
@@ -401,7 +421,7 @@ asyncCall();
 ```javascript
 const loadAll = async function (imgArr) {
   try {
-    const imgs = imgArr.map(async (img) => await createImage(img));
+    const imgs = imgArr.map(async img => await createImage(img));
     // now imgs is an array of promises
 
     // now, we get values from the array of promises
@@ -419,11 +439,11 @@ loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
 
 ```javascript
 const promise1 = Promise.reject(0);
-const promise2 = new Promise((resolve) => setTimeout(resolve, 100, 'quick'));
-const promise3 = new Promise((resolve) => setTimeout(resolve, 500, 'slow'));
+const promise2 = new Promise(resolve => setTimeout(resolve, 100, 'quick'));
+const promise3 = new Promise(resolve => setTimeout(resolve, 500, 'slow'));
 const promiseArr = [promise1, promise2, promise3];
 
-Promise.any(promiseArr).then((value) => console.log(value));
+Promise.any(promiseArr).then(value => console.log(value));
 // expected output: "quick"
 ```
 
@@ -440,7 +460,7 @@ const promise2 = new Promise((resolve, reject) => {
   setTimeout(resolve, 100, 'two');
 });
 
-Promise.race([promise1, promise2]).then((value) => {
+Promise.race([promise1, promise2]).then(value => {
   console.log(value);
   // Both resolve, but promise2 is faster
 });
@@ -457,10 +477,21 @@ const promise1 = Promise.resolve(3);
 const promise2 = new Promise((resolve, reject) => setTimeout(reject, 100, 'foo'));
 const promises = [promise1, promise2];
 
-Promise.allSettled(promises).then((results) =>
-  results.forEach((result) => console.log(result.status))
-);
+Promise.allSettled(promises).then(results => results.forEach(result => console.log(result.status)));
 // expected output:
 // "fulfilled"
 // "rejected"
 ```
+
+---
+
+## Working with data from other servers (Proxy)
+
+**Ajax** works smoothly with data from your own server but - for security reasons - browsers do not load Ajax responses from other domains (known as **cross-domain requests**). There are three common workarounds:
+
+- **PROXY** file on the web server
+  - The first way to load data from a remote server is to create a file on your server that collects the data from the remote server (using a server-side language such as `ASP.net`, `PHP`, `NodeJS`, or `Ruby`). The other pages on your site then request the data from the file on your server (which in turn gets it from the remote server). This is called a **proxy**, because it acts on behalf of the other page.
+- **JSONP** (JSON with padding)
+  - involves adding a `<script>` element into the page, which loads the JSON data from another server. This works because there are no restrictions on the source of script in a `<script>` element.
+- **CROSS-ORIGIN RESOURCE SHARING (CORS)**
+  - involves adding extra information to the **HTTP headers** to let the browser and server know that they should be communicating with each other.

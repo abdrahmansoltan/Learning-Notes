@@ -1,23 +1,30 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Operators](#operators)
-- [Loops](#loops)
-  - [while loop](#while-loop)
-  - [for loop](#for-loop)
-- [Functions](#functions)
-  - [parameter types](#parameter-types)
-- [Scope (Namespaces) and NameBinding](#scope-namespaces-and-namebinding)
-  - [Namespaces](#namespaces)
-  - [NameBinding](#namebinding)
-- [OOP](#oop)
-  - [object memory location](#object-memory-location)
-  - [constructor](#constructor)
-  - [Encapsulation](#encapsulation)
-- [List](#list)
-  - [List methods](#list-methods)
-  - [List comprehension](#list-comprehension)
-- [Notes](#notes)
+  - [Operators](#operators)
+  - [Loops](#loops)
+    - [while loop](#while-loop)
+    - [for loop](#for-loop)
+  - [Functions](#functions)
+    - [parameter types](#parameter-types)
+  - [Scope (Namespaces) and NameBinding](#scope-namespaces-and-namebinding)
+    - [Namespaces](#namespaces)
+    - [NameBinding](#namebinding)
+  - [OOP](#oop)
+    - [object memory location](#object-memory-location)
+    - [constructor](#constructor)
+    - [Encapsulation](#encapsulation)
+  - [List](#list)
+    - [List methods](#list-methods)
+    - [List comprehension](#list-comprehension)
+  - [Tuples](#tuples)
+  - [String](#string)
+    - [String methods](#string-methods)
+    - [String Formatting](#string-formatting)
+    - [String formatting (new way)](#string-formatting-new-way)
+  - [List of lists (2D Array) Matrix](#list-of-lists-2d-array-matrix)
+    - [Position Neighbors](#position-neighbors)
+  - [Notes](#notes)
 
 ---
 
@@ -424,6 +431,210 @@ print(lst2)     # [5, 10, 17, 2]
 # new syntax
 lst2 = [i*i+1   for i in lst1]
 print(lst2)     # [5, 10, 17, 2]
+```
+
+---
+
+## Tuples
+
+- if you have a tuple with a single item, you need to use comma at the end
+
+  ```py
+  t = (10) # wrong
+  t = (10,) # right
+
+  # notice the different (string vs tuple)
+  print(('Hi') * 4)    # HiHiHiHi
+  print(('Hi',) * 4)   # ('Hi', 'Hi', 'Hi', 'Hi')
+  ```
+
+- you can't mutate the items in the tuple unlike lists
+- **unpacking**: to make a variable equal the rest of element from the beginning or the end or the middle, this is done using the **astrict `*` operator**
+
+  ```py
+  a, b, *c = 1, 2, 3, 4, 5
+  print(c) # [3, 4, 5]
+  ```
+
+- **Zip** function : when you have multiple **sequences** and want to iterate such that in each iteration you have a single item
+
+```py
+numbers = [1, 2, 3]
+letters = ['a', 'b', 'c']
+
+# zip class constructor: def __init__(self, *iterables)
+zipped = zip(numbers, letters)
+print(list(zipped))
+# [(1, 'a'), (2, 'b'), (3, 'c')]
+```
+
+---
+
+## String
+
+### String methods
+
+- `.find()`: if doesn't find the text it returns `-1`
+  - `.rfind()`: same as `find()` but returns `ValueError` if not found
+
+---
+
+### String Formatting
+
+```py
+name, age = 'mostafa', 33
+print(name, 'is', age, 'years old')             # 1 old way
+print(name + ' is ' + str(age) + ' years old')  # 2 old way
+
+# The first {} is replaced with mostafa
+# the 2nd is replaced with 33
+print('{} is {} years old'.format(name, age))   # mostafa is 33 years old
+
+# we call this string with curly braces {} as template
+
+
+#IndexError: tuple index out of range   - u need to provide 3 arguments
+#print('{}{}{}'.format('Hey'))
+
+print('{}{}{}'.format(1, 2, 3, 4, 5, 6))    # 123 - OK to provide more. Ignored
+```
+
+- Formatting with replacements fields
+
+  ```py
+  name, age = 'mostafa', 33
+
+  print('{0} is {1} years old'.format(name, age))     # mostafa is 33 years old
+
+  #print('{0} is {2} years old'.format(name, age))     # IndexError - no idx 2
+
+  print('{0} is {1} years old. Are you {1} years as {0}'.format(name, age))
+  # mostafa is 33 years old. Are you 33 years as mostafa
+  # pros: you provie positional argument once and use it many
+
+  print('{name} is {AGE} years old. Are you {AGE} years as {name}'.format(name=name, AGE=age))
+  # mostafa is 33 years old. Are you 33 years as mostafa
+  # similarly, we can use keyword arguments but flxible order!
+
+  # Be careful from mixing
+  print('{} is {age} years old'.format(name, age=age))    # mostafa is 33 years old
+  print('{0} is {age} years old'.format(name, age=age))   # mostafa is 33 years old
+
+  #print('{1} is {age} years old'.format(age=age, name))
+  # SyntaxError: positional argument follows keyword argument
+  #print('{1} is {age} years old'.format(name, age=age))   # IndexError
+  ```
+
+- Formatting with specified **width** of text place
+
+  - **right aligning**
+
+    ```py
+    for i in range(0, 20, 2):
+        print('Given i={:2}: i^4 = {:7} i^3 = {:4}'.format(i, i* i * i * i, i * i * i))
+
+    """
+    {1:7}: Format position 1 in field of 7 spaces
+
+    Given i= 0: i^4 =       0 i^3 =    0
+    Given i= 2: i^4 =      16 i^3 =    8
+    Given i= 4: i^4 =     256 i^3 =   64
+    Given i= 6: i^4 =    1296 i^3 =  216
+    Given i= 8: i^4 =    4096 i^3 =  512
+    Given i=10: i^4 =   10000 i^3 = 1000
+    Given i=12: i^4 =   20736 i^3 = 1728
+    Given i=14: i^4 =   38416 i^3 = 2744
+    Given i=16: i^4 =   65536 i^3 = 4096
+    Given i=18: i^4 =  104976 i^3 = 5832
+    """
+    ```
+
+  - **left aligning**
+
+    ```py
+    for i in range(0, 20, 2):
+      print('Given i={:<2}: i^4 = {:<7} i^3 = {:<4}'.format(i, i* i * i * i, i * i * i))
+
+    """
+    Using :<7 makes it left-aligned
+
+    Given i=0 : i^4 = 0       i^3 = 0
+    Given i=2 : i^4 = 16      i^3 = 8
+    Given i=4 : i^4 = 256     i^3 = 64
+    Given i=6 : i^4 = 1296    i^3 = 216
+    Given i=8 : i^4 = 4096    i^3 = 512
+    Given i=10: i^4 = 10000   i^3 = 1000
+    Given i=12: i^4 = 20736   i^3 = 1728
+    Given i=14: i^4 = 38416   i^3 = 2744
+    Given i=16: i^4 = 65536   i^3 = 4096
+    Given i=18: i^4 = 104976  i^3 = 5832
+    """
+    ```
+
+  - **formatting precision** -> `{value:width.precision}`
+
+    ```py
+    val = 71.01234567890123456789012345678901234567890123456789
+
+    print(val)                      #71.01234567890124 ==> 14 decisimal precision printed
+    print('{:20}'.format(val))      #   71.01234567890124 ==> total 20 output units, right-aligned
+    print('{:11f}'.format(val))     #  71.012346 ==>  print 11 units. Use default precision (typically 6)
+    print('{:11.3f}'.format(val))   #     71.012 ==> 11 output units, 3 of them precision
+    print('{:3.5f}'.format(val))    #71.01235 ==> 5 precision. It will have more priority
+    print('{:.8f}'.format(val))     #71.01234568 ==> 8 precision. No specific alignments
+    #print('{.8f}'.format(val))     #AttributeError
+
+    val = 2.67
+    print(val)                     #2.67
+    print('{:11f}'.format(val))    #   2.670000 ==>  trailing zeros  : 11 output units (6 is precision)
+    print('{:11.2f}'.format(val))  #       2.67   (.2f use 2 precision)
+    print('{:11.1f}'.format(val))  #        2.7   rounding
+    print('{:11.0f}'.format(val))  #          3   rounding
+
+    print('{:11.0f}'.format(2.5))  #          2   rounding to 2
+    print('{:11.0f}'.format(-2.5))  #        -2   rounding to -2
+    ```
+
+---
+
+### String formatting (new way)
+
+This is called **F-string**
+
+```py
+name, age = 'mostafa', 33
+# mostafa is 33 years old
+print(f'{name} is {age} years old')
+
+val = 71.0123456789012345678901234
+#     71.012
+print(f'{val:11.3f}')
+```
+
+---
+
+## List of lists (2D Array) Matrix
+
+![2d-array](./img/2d-array.png)
+
+- be aware of **shallow-copying**
+
+### Position Neighbors
+
+![Neighbors](./img/Neighbors.png)
+
+```py
+def get_neibghours(i, j):
+    # {down, right, up, left};
+    di = [1, 0, -1, 0]
+    dj = [0, 1, 0, -1]
+    return [(i+di[d], j+dj[d]) for d in range(4)]
+
+print(get_neibghours(0, 0))
+# [(1, 0), (0, 1), (-1, 0), (0, -1)]
+
+print(get_neibghours(3, 6))
+# [(4, 6), (3, 7), (2, 6), (3, 5)]
 ```
 
 ---

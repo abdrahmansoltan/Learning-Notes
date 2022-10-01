@@ -1,43 +1,51 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Git](#git)
-  - [advantages of distributed version control](#advantages-of-distributed-version-control)
-- [Diff](#diff)
-- [commit message](#commit-message)
-  - [Writing a commit message guidelines](#writing-a-commit-message-guidelines)
-  - [Hash values (SHA-1)](#hash-values-sha-1)
-  - [The HEAD pointer](#the-head-pointer)
-- [Branches](#branches)
-  - [commands](#commands)
-  - [Git stash](#git-stash)
-  - [Recommended stash commands:](#recommended-stash-commands)
-  - [Advance stashing](#advance-stashing)
-  - [Merging](#merging)
-    - [Fast Forward Merge](#fast-forward-merge)
-    - [Types](#types)
-  - [notes](#notes)
-- [Git rebase](#git-rebase)
-  - [Merge vs Rebase](#merge-vs-rebase)
-  - [Interactive Rebase : Squash Commits](#interactive-rebase--squash-commits)
-  - [Force Pushing](#force-pushing)
-- [Git Three Trees (Git workflow)](#git-three-trees-git-workflow)
-- [Git commands Notes](#git-commands-notes)
-- [Modifying commits](#modifying-commits)
-  - [Amend: Changing The Last Commit](#amend-changing-the-last-commit)
-  - [Undo changes](#undo-changes)
-    - [Going to any previous commit (Time Traveling)](#going-to-any-previous-commit-time-traveling)
-    - [Undo change in working directory](#undo-change-in-working-directory)
-  - [Resetting Commits](#resetting-commits)
-    - [removing commits](#removing-commits)
-  - [Reverting A Commit](#reverting-a-commit)
-  - [Deleting Data Summary](#deleting-data-summary)
-- [Git add](#git-add)
-- [Git Tag](#git-tag)
-- [Ignore files](#ignore-files)
-  - [How to Ignore empty directories](#how-to-ignore-empty-directories)
-- [Push](#push)
-  - [Pushing code explicitly](#pushing-code-explicitly)
+  - [Git](#git)
+    - [advantages of distributed version control](#advantages-of-distributed-version-control)
+  - [Diff](#diff)
+    - [Compare changes across branches](#compare-changes-across-branches)
+    - [Compare changes across commits](#compare-changes-across-commits)
+  - [commit message](#commit-message)
+    - [Writing a commit message guidelines](#writing-a-commit-message-guidelines)
+    - [Hash values (SHA-1)](#hash-values-sha-1)
+    - [The HEAD pointer](#the-head-pointer)
+  - [Branches](#branches)
+    - [commands](#commands)
+    - [Git stash](#git-stash)
+    - [Recommended stash commands](#recommended-stash-commands)
+    - [Advance stashing](#advance-stashing)
+    - [Merging](#merging)
+      - [Fast Forward Merge](#fast-forward-merge)
+      - [Types](#types)
+    - [notes](#notes)
+  - [Rebasing](#rebasing)
+    - [Merge vs Rebase](#merge-vs-rebase)
+    - [Interactive Rebase](#interactive-rebase)
+    - [Force Pushing](#force-pushing)
+  - [Git Three Trees (Git workflow)](#git-three-trees-git-workflow)
+  - [Git commands Notes](#git-commands-notes)
+  - [Modifying commits](#modifying-commits)
+    - [Amend: Changing The Last Commit](#amend-changing-the-last-commit)
+    - [Undo changes](#undo-changes)
+      - [Going to any previous commit (Time Traveling)](#going-to-any-previous-commit-time-traveling)
+      - [Undo change in working directory](#undo-change-in-working-directory)
+    - [Resetting Commits](#resetting-commits)
+      - [removing commits](#removing-commits)
+    - [Reverting A Commit](#reverting-a-commit)
+    - [Deleting Data Summary](#deleting-data-summary)
+  - [Git add](#git-add)
+  - [Git Tag](#git-tag)
+  - [Ignore files](#ignore-files)
+    - [How to Ignore empty directories](#how-to-ignore-empty-directories)
+  - [Reflogs](#reflogs)
+    - [Reflog commands](#reflog-commands)
+  - [Git behind the scenes](#git-behind-the-scenes)
+    - [Refs Folder](#refs-folder)
+    - [HEAD file](#head-file)
+    - [Objects Folder](#objects-folder)
+      - [Blobs](#blobs)
+      - [Trees](#trees)
 
 ---
 
@@ -62,10 +70,20 @@ Git is software that keeps track of changes that you make to files and directori
 
 ## Diff
 
-> **git diff**: lists all the changes in the working directory that are not staged
-
+- `git diff` lists all the changes in the working directory **that are not staged for the next commit** (shows only un-staged changes).
 - `git diff HEAD` compares the changes in the (working directory & staged area) to the last commit
 - `git diff --staged` compares the changes in the staged files to the committed versions.
+
+The results showing the difference between the different versions of the file are called --> **Chunks**
+![Chunk](./img/chunk.png)
+
+### Compare changes across branches
+
+- `git diff branch1..branch2` will list the changes between the tips of branch1 and branch2
+
+### Compare changes across commits
+
+- `git diff commit1-hash..commit2-hash` will list the changes between the tips of commit1 and commit2
 
 ---
 
@@ -90,9 +108,11 @@ Git is software that keeps track of changes that you make to files and directori
 - it's an ID number for each commit to reach each commit
 - Each hash value is not only unique, it's directly tied to the **contents** that are inside of it.
   - that's why it's called **content addressable source system**
-- The algorithm that Git uses is the **SHA-1 hash** algorithm.
+  ![SHA-1](./img/SHA-1.png)
+- The algorithm (hashing function) that Git uses is the **SHA-1 hash** algorithm.
+  - it generates **40 digits hexadecimal numbers**
 - why can't we change commits?
-  - because changing the data about the commit will have a new **SHA1 hash**
+  - because changing the data about the commit will have a new **SHA-1 hash**
   - and even if the files don't change, the created date will
 
 ### The HEAD pointer
@@ -104,8 +124,8 @@ Git is software that keeps track of changes that you make to files and directori
 
 - The main difference between the **hat**`^` and the **tilda**`~` is when a commit is created from a merge. A merge commit has two parents. With a merge commit, the `^` reference is used to indicate the first parent of the commit while `^2` indicates the second parent. The first parent is the branch you were on when you ran git merge while the second parent is the branch that was merged in.
 
-![refering-commits](./img/refering-commits.PNG)
-![refering-commits2](./img/refering-commits2.PNG)
+![refering-commits](./img/refering-commits.png)
+![refering-commits2](./img/refering-commits2.png)
 ![head](./img/head3.PNG)
 
 ---
@@ -114,17 +134,17 @@ Git is software that keeps track of changes that you make to files and directori
 
 A branch is a pin pointed arrow to a commit. When you first create a repository, the default branch you will commit too is the master branch.After you make commits, they will point forward on to the last commit you made on that master branch.
 
-<img src="./img/branches.png" style="background-color:white;">
+![branches](./img/branches.png)
 
 ### commands
 
-![branchname](./img/branches3.PNG)
+![branch commands](./img/branches3.PNG)
 
 - list available branches
 
   ```bash
-    git branch
-    # HEAD indicates wht branch is active
+  git branch
+  # HEAD indicates wht branch is active
   ```
 
 - Leaving the Master Branch
@@ -148,41 +168,76 @@ A branch is a pin pointed arrow to a commit. When you first create a repository,
   git checkout -
   ```
 
+- Delete branch
+
+  ```bash
+  git branch -d <branch-name>
+
+  # to force delete the branch (usually when it's not fully-merged)
+  git branch -D <branch-name>
+  ```
+
+- Rename branch (you have to be on that branch)
+
+  ```bash
+  git branch -m <oldname> <newname> # Any Branch
+  git branch -m <newname> # Current Branch
+
+  # to force delete the branch (usually when it's not fully-merged)
+  git branch -D <branch-name>
+  ```
+
 ---
 
 ### Git stash
 
-![stashing](./img/stashing.png)
+![stashing](./img/stashing.PNG)
 
 **Why ?**
 
-- when you are on a branch and do some new work, but don't make any commits, then you want to switch back to another branch:
-  - The changes come with you to the destination branch, or git won't let you switch before committing first
+- when you are on a branch and make some changes, but don't make any commits, then you want to switch back to another branch:
+  - The changes will come with you to the destination branch, or git won't let you switch before committing first **(if there's a conflict between the 2 branches)**
 
-**git stash** temporarily shelves (or stashes) changes you've made to your working copy so you can work on something else, and then come back and re-apply them later on.
+**git stash**:
+
+- helps you save changes that **you are not yet ready to commit**, you can stash changes and then come back to them later
+- temporarily shelves (or stashes) all uncommitted changes you've made to your working copy so you can work on something else, and then come back and re-apply them later on.
 
 ![stash](./img/stash.png)
 
-
 ---
 
-### Recommended stash commands:
+### Recommended stash commands
 
 ![stash](./img/stash-recommended.png)
+
+```sh
+git stash # same as `git stash save
+git stash pop # get what is in the stash
+
+git stash apply # to apply whatever is stashed without removing it from the stash
+```
 
 ---
 
 ### Advance stashing
 
-![stash](./img/stash2.png)
 ![stash](./img/stash3.png)
+
+```sh
+git stash list # to view all stashes (in order of their stashing)
+git stash apply stash@{2} # apply the stash with index 2 in the stash-list
+```
+
 ![stash](./img/stash4.png)
 
 ---
 
 ### Merging
 
-**Merge commits** are unique against other commits in the fact that they **have two parent commits**.
+**Merge commits** are unique against other commits in the fact that **they have two parent commits**.
+
+![merge-commit](./img/merge-commit.png)
 
 - When creating a merge commit Git will attempt to auto magically merge the separate histories for you.
 - If Git encounters a piece of data that is changed in both histories it will be unable to automatically combine them.
@@ -194,11 +249,19 @@ A branch is a pin pointed arrow to a commit. When you first create a repository,
 
 A fast-forward merge can occur when there is a linear path from the current branch tip to the target branch. (didn't do changes(commits) in **master** until merging)
 
+- here when we merge, all we do is **catch up to the same commit**
 - in this case there won't be a **merge-commit** in the **log**
 
 ![merge](./img/merge3.PNG)
 
-> sometimes you want to prevent this in order to know what branch(feature) caused a bug
+> **NOTE**: sometimes you want to prevent this in order to know what branch(feature) caused a bug (specially when merging pull request manually and not on github)
+>
+> - for this we use :
+>
+>   ```sh
+>   git merge --no-ff <branchName>
+>   ```
+>
 > ![no-fast-forward](./img/no-fast-forward.png)
 
 ---
@@ -248,18 +311,37 @@ git merge "nathan"
 
 ---
 
-## Git rebase
+## Rebasing
 
 > **Rebasing**: it's used in 2 ways:
 >
 > - as an alternative to merging
-> - as a cleanup too
+> - as a cleanup tool ([Interactive Rebase](#interactive-rebase))
 >
-> It's like we're **rewriting history** or **changing the base of the branch** and having more **linear structure** > ![rebase](./img/rebase5.PNG)
+> It's like we're **rewriting history** or **changing the base of the branch** and having more **linear structure** > ![rebase](./img/rebase5.png)
 
 - The problem:
   ![rebase](./img/rebase0.PNG)
-  ![rebase_result](./img/rebase_result.PNG)
+
+![rebase_result](./img/rebase_result.png)
+
+- when having conflict when rebasing:
+
+  - follow instructions
+
+  ```sh
+  # 1. fix conflict in the editor
+
+  # 2. add conflict files
+  git add <conflict files>
+
+  # 3. continue rebasing
+  git rebase --continue
+
+
+  # or to abort rebasing
+  git rebase --abort
+  ```
 
 ![rebase_Advantages](./img/rebase6.png)
 ![rebase_warning](./img/rebase_warning.PNG)
@@ -273,23 +355,36 @@ git merge "nathan"
 
 ---
 
-### Interactive Rebase : Squash Commits
+### Interactive Rebase
 
-![interactive_rebase](./img/interactive_rebase2.PNG)
-![interactive_rebase](./img/interactive_rebase3.PNG)
+Sometimes we want to `rewrite`, `delete`, `rename`, or `record` commits (before sharing them). We can do this using `git rebase`
+
+- here, instead on rebasing to a branch, we rebase to a specific series of commits **(in the same branch)** after we do adjustments to some commits
+  - we can specify how far we want to go back using:
+    - `SHA` of the commit
+    - `HEAD` reference
+
 ![interactive_rebase](./img/interactive_rebase.PNG)
+![interactive_rebase](./img/interactive_rebase2.png)
+![interactive_rebase](./img/interactive_rebase3.png)
+
+- after writing the command, the editor will open with options next to the commits:
+  ![interactive_rebase](./img/interactive_rebase5.png)
+  ![interactive_rebase](./img/interactive_rebase6.png)
 
 To squash commits together, we use the extremely powerful `git rebase` command.
 
 - telling Git to use `HEAD~3` as the base where all of the other commits (`HEAD~2`, `HEAD~1`, and `HEAD`) will connect to.
+
   ```bash
   # move commits to have a new base
   git rebase -i HEAD~3
   ```
+
 - The `-i` in the command stands for "interactive".
 
 ![rebase](./img/interactive_rebase4.png)
-![rebase](./img/rebase.png)
+![rebase](./img/rebase.PNG)
 ![rebase](./img/rebase2.PNG)
 ![rebase](./img/rebase3.PNG)
 
@@ -301,7 +396,11 @@ To squash commits together, we use the extremely powerful `git rebase` command.
 
 ### Force Pushing
 
-Using `git rebase` creates a new commit with a new SHA. When you try using `git push` to send this commit up to GitHub, GitHub knew that accepting the push would erase the three separate commits, so it rejected it. So you have to force push the commits through using `git push -f`
+Using `git rebase` creates a new commit with a new SHA. When you try using `git push` to send this commit up to GitHub, GitHub knew that accepting the push would erase the three separate commits, so it rejected it. So you have to force push the commits through using:
+
+```sh
+git push -f
+```
 
 ---
 
@@ -327,7 +426,9 @@ Using `git rebase` creates a new commit with a new SHA. When you try using `git 
 
 - moving a file and **renaming** a file are the same thing. Because moving a file to a new file path, is a way of renaming it So we're actually going to use "move" as the way to rename it. So "`git mv"` for short, that's "git + move" and we move the "second_file.txt" to be "secondary_file.txt".
 
-- always make atomic commits
+- always make **atomic commits**
+  - means that a commit should focus on a single thing
+  - this makes it much easier to undo changes later on, and makes your code easier to review.
 - **Compare commits** :
 
   ```bash
@@ -374,8 +475,16 @@ git commit --amend # --amend flag, you can alter the most-recent commit.
 git checkout <SHA-of-commit-to-go-to>
 ```
 
+- you will get this message: **"You are in detached HEAD state"**
+  - this is because **HEAD** points to **Current-branch reference** and not a specific commit, so when we make **HEAD** point to a specific commit, we become in a **"detached HEAD state (without a branch reference)"**
+
+![detached head](./img/detached%20head1.png)
+
 > **Note**: Don't forget for create new branch from the **Detached head** and if you want you can merge it to your main branch
-> ![detached head](./img/detached%20head.PNG) > ![detached head](./img/detached%20head2.PNG) > ![detached head](./img/detached%20head3.PNG)
+
+![detached head](./img/detached%20head.PNG)
+![detached head](./img/detached%20head2.png)
+![detached head](./img/detached%20head3.png)
 
 - To go back to the normal head: use `git switch <(main/master) or the name of the branch>`
 
@@ -383,22 +492,27 @@ git checkout <SHA-of-commit-to-go-to>
 
 #### Undo change in working directory
 
-```sh
-# remove changes (from working directory)
-git checkout <name of the file or . or -A>
-# Or using the new command (restore)
-git restore <name of the file or . or -A>
-```
+- Discard changes (**from working directory**), this revert the file/s back to whatever it was when you last committed
 
-```sh
-# remove staged changes (from staging area to working directory)
-git restore --staged <name of the file or . or -A>
-```
+  ```sh
+  git checkout HEAD <file or -A>
+  # or
+  git checkout <-- file or -A>
+  # Or using the new command (restore)
+  git restore <file or -A>
+  ```
 
-```sh
-# remove untracked changes(files) (from working directory)
-git clean .
-```
+- discard staged changes (un-stage changes ) **from staging area to working directory**
+
+  ```sh
+  git restore --staged <file or -A>
+  ```
+
+- remove untracked changes(files) (from working directory)
+
+  ```sh
+  git clean .
+  ```
 
 ---
 
@@ -406,6 +520,7 @@ git clean .
 
 - `Resetting` **erases commits! and changes history**
 
+  - it actually moves the branch pointer backwards, eliminating commits
   - so Don't do it in public repo
 
 - `--hard` : get rid of the commit **and** the changes done to the files.
@@ -417,6 +532,7 @@ git clean .
 #### removing commits
 
 ```bash
+# go back to a previous commit and remove the commits up to the specified SHA
 git reset --hard <the previous-commit-SHA you want to go to>
 
 git reset --hard HEAD       # (removing HEAD)
@@ -448,12 +564,14 @@ git reset --soft HEAD~1  # go back ONE commit
 
 ![revert](./img/revert.png)
 
-- When you tell Git to revert a specific commit, Git takes the changes that were made in commit and does the exact opposite of them.
-- `Reverting` **creates a new commit** that reverts or undo a previous commit.
-
 ```bash
 git revert <SHA-of-commit-to-revert-to>
 ```
+
+- When you tell Git to revert a specific commit, Git takes the changes that were made in commit and does the exact opposite of them.
+- `Reverting` **creates a new commit** that reverts or undo a previous commit.
+- why use it instead of `Reset` ?
+  - it comes to **collaboration**, as if you want to reserve some commits that other people already have on their machines, you should use `revert`
 
 ---
 
@@ -487,27 +605,39 @@ git revert <SHA-of-commit-to-revert-to>
 
 ## Git Tag
 
-Usually for **versioning**
+Tags are pointers that refer to particular points in Git-history, we can mark a particular moment in time with a tag, Tags are most often used to **mark version releases** in projects.
+
+- a tag always refers to the same commit, **It's just a label for a commit**
+  ![tags](./img/tags.png)
+
+**Semantic Versioning**: it outlines a standardized versioning system for software releases, it provides a consistent way for developers to give meaning to their software releases (how big of a change is this releas e?)
 ![versioning](./img/versioning.PNG)
 
 ```bash
+git tag # display all tags that are in the repository.
+
 git tag -a v1.0 # tag the most recent commit
 # "-a" flag tells Git to create an annotated tag(flag).
 
 # Adding A Tag To A Past Commit
 git tag -a v1.0 a87984
+# to replace tags from other commit --> `-f` to force it
 
 # Deleting A Tag To A Past Commit
 git tag -d v1.0
-
-git tag # display all tags that are in the repository.
 
 git log --decorate # The log output displays the newly created tag.
 # ex : commit 6fa5f34790808d9f4dccd0fa8fdbc40760102d6e (HEAD -> master, tag: v1.0)
 # or:
 git log --oneline --decorate
-
 ```
+
+- **Pushing Tags**:
+  - by default, `git push` command doesn't transfer tags to remote servers. if you have a lot of tags that you want to push up, you can use the `--tags` option to the command
+
+  ```sh
+  git push --tags
+  ```
 
 ---
 
@@ -532,20 +662,71 @@ git log --oneline --decorate
 
 ---
 
-## Push
+## Reflogs
 
-| GIT Push                                                                                                         | GIT Push origin                                                              |
-| ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| The remote repository is the origin                                                                              | The remote repository is not defined                                         |
-| We assume that remote repository is already defined and The work is implicitly pushed into the remote repository | In this, it has to be specified explicitly to be pushed into the repository. |
-| only for one repository                                                                                          | It can be used with single as well as multiple repositories                  |
+Git keeps a record of when the tips of branches and other references were updated in the repo. We can view and update these **reference logs** using the `git reflog` command
+
+> This will be in **logs/refs** folder in **.git** folder
+
+- in `heads` folder, you will find logs with each time we changed the **HEAD** of the branch (as we make more commits)
+- Git only keeps **reflogs** on your **local activity**, they're not shared with collaborators remotely
+  - reflogs also expire each 90 days
+
+### Reflog commands
+
+```sh
+# show the log of a specific reference (it defaults to HEAD)
+git reflog show <branch name> 
+```
+
+- things that you can't find with `git log` may be found with `git reflog`
+
+- passing `reflog` references
+  ![reflog](./img/reflog.png)
+
+  ```sh
+  git checkout HEAD@{2} # 2 moves ago
+  ```
+
+- one of the advantages is that we can use **reflog entries** to access commits that seem lost (reset) and are not appearing in `git log`
+
+```sh
+git reflog show master # look for that commit and copy its SHA-1
+git reset --hard <SHA of the commit> # will make the tip of your branch (the HEAD of the branch) to that commit
+```
 
 ---
 
-### Pushing code explicitly
+## Git behind the scenes
 
-![push](./img/push.PNG)
+This is inside `.git` directory
 
-- when you `push` -> **Always** specify `where` you push
+### Refs Folder
 
----
+- inside of it there's **heads** directory that contains one file per branch in the repository, each file
+  - is named after a branch
+  - contains the hash of the commit at the tip of the branch
+- there'a also **tags** and **remotes** directories
+
+### HEAD file
+
+It's a text file that keeps track of where **HEAD** points.
+
+- if it contains `ref/heads/master` this means that **HEAD** is pointing to the master branch
+- in detached HEAD, the HEAD file contains a commit hash instead of a branch-reference
+
+### Objects Folder
+
+it contains all the repo files, this is where Git stores the backups of (files, commits) in repo
+
+- the files are compressed and encrypted so that won't look like much! (**Hashed**)
+
+#### Blobs
+
+- They're **binary large objects**, they're the object type that Git uses to store the contents of files in a given repository,
+  - they just store the contents of a file
+
+#### Trees
+
+![trees](./img/trees.png)
+![trees](./img/trees2.png)

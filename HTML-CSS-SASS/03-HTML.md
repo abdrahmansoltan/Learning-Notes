@@ -744,7 +744,9 @@ Here the **Tree structure** is the operation that make html code looks the way i
     - So that CSS styles can be applied to elements that have specific values for these attributes
 - **hero**: is first section of the page that we want the user to focus on (the headline)
 - **empty elements**: elements that do not have any words between an opening and closing tag, ex: `<hr />`
-- Another type of list element is **Description List element (`<dl>`)**
-  - consists of a series of terms and their definitions.
-  - `<dl>` element works with pairs of `<dt>` and `<dd>` elements.
+- **Lists**:
+  - in `<ol>` element, you can use the attribute `reversed` to reverse the list items
+  - Another type of list element is **Description List element (`<dl>`)**
+    - consists of a series of 2 matching element (**terms** and their **definitions**) (key-value pairs).
+    - `<dl>` element works with pairs of `<dt>` and `<dd>` elements.
 - use `<section>` element instead of `<div>`

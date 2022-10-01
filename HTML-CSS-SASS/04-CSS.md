@@ -66,7 +66,7 @@
 2. internal style
 3. external style
 
-> **Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations, when more than one rule applies to a certain element.
+> **Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
 >
 > - **cascade** is the algorithm for solving conflicts where multiple CSS rules apply to an HTML element.
 
@@ -232,6 +232,8 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
 >   content: 'kg';
 > }
 > ```
+
+- You can check new pseudo classes -> `:has()`, `:where()`, `:is()`
 
 ---
 

@@ -134,6 +134,8 @@ It uses **Proxy** which uses `set` method to update properties
 
 ### Interpolation
 
+> **Data binding**: The task of keeping data synchronized between the two
+
 The most basic form of **data binding** is text interpolation using the "Mustache" syntax (double curly braces):
 
 ```html
@@ -439,7 +441,7 @@ here we use
 
 It's to make the styles scoped to its component
 
-`<styles scoped> `
+`<styles scoped>`
 
 ---
 
@@ -708,6 +710,7 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
     ![props-default](./img/props-default.png)
   - **Validating props**:
     - inside it you can't access the component's properties as it hasn't been created yet
+
     ```js
     props: {
       price: {
@@ -1106,7 +1109,7 @@ history: createWebHistory(process.env.BASE_URL);
 +------------------+                  +-----------------+
 ```
 
-- **Note**: you must use ` <router-view />` in the parent route to show the place for the nested(child) route
+- **Note**: you must use `<router-view />` in the parent route to show the place for the nested(child) route
   - it's a global component registered in the `main.js` file
 
 #### Dynamic params

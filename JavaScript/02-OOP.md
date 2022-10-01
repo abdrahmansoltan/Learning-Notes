@@ -1,21 +1,21 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Object Oriented Paradigm](#object-oriented-paradigm)
-- [Constructor Function](#constructor-function)
-  - [Methods](#methods)
-- [prototypal inheritance (delegation)](#prototypal-inheritance-delegation)
-  - [Why we do this?](#why-we-do-this)
-- [ES6 Classes](#es6-classes)
-  - [`getter` & `setter`](#getter--setter)
-- [`object.create()`](#objectcreate)
-- [Class Inheritance](#class-inheritance)
-  - [**METHOD-1** : using `Constructor Function`](#method-1--using-constructor-function)
-  - [**METHOD-2** : using `ES6 Classes`](#method-2--using-es6-classes)
-  - [**METHOD-3** : using `object.create()`](#method-3--using-objectcreate)
-- [METHOD CHAINING](#method-chaining)
-- [Encapsulation](#encapsulation)
-- [notes](#notes)
+  - [Object Oriented Paradigm](#object-oriented-paradigm)
+  - [Constructor Function](#constructor-function)
+    - [Methods](#methods)
+  - [prototypal inheritance (delegation)](#prototypal-inheritance-delegation)
+    - [Why we do this?](#why-we-do-this)
+  - [ES6 Classes](#es6-classes)
+    - [`getter` & `setter`](#getter--setter)
+  - [`object.create()`](#objectcreate)
+  - [Class Inheritance](#class-inheritance)
+    - [**METHOD-1** : using `Constructor Function`](#method-1--using-constructor-function)
+    - [**METHOD-2** : using `ES6 Classes`](#method-2--using-es6-classes)
+    - [**METHOD-3** : using `object.create()`](#method-3--using-objectcreate)
+  - [METHOD CHAINING](#method-chaining)
+  - [Encapsulation](#encapsulation)
+  - [notes](#notes)
 
 ---
 
@@ -29,6 +29,30 @@
 ---
 
 ## Constructor Function
+
+That's the main purpose of constructors – to implement reusable object creation code.
+
+- `Return` from constructors: Usually, constructors do not have a return statement. Their task is to write all necessary stuff into `this`, and it automatically becomes the result. But if there is a `return` statement, then:
+
+  - If `return` is called with an object, then the object is returned instead of `this`.
+  - If `return` is called with a primitive, it’s ignored.
+
+  ```js
+  function BigUser() {
+    this.name = 'John';
+    return { name: 'Godzilla' }; // <-- returns this object
+  }
+
+  alert(new BigUser().name); // Godzilla, got that object
+  ```
+
+- we can omit **parentheses** after new, if it has no arguments:
+
+  ```js
+  let user = new User(); // <-- no parentheses
+  // same as
+  let user = new User();
+  ```
 
 ### Methods
 
@@ -63,7 +87,10 @@ why we do this instead of declaring the function with the class properties each 
 - because we don't want to create the same function that have same functionality each time for each object
 - instead we move all these methods (functions) to a parent object so that it won't be created each time (**Bundle all common functions together + Make a Bond to that object by a hidden property -> `__proto__`**)
   - `__proto__` hidden property is added in the background using the **"new"** keyword that points to the **prototype** object-property in the parent class
-  - > also empty object `this` is created using the **"new"** keyword
+- When a function is executed with **new** keyword, it does the following steps:
+  - A new empty object is created and assigned to `this`.
+  - The function body executes. Usually it modifies `this`, adds new properties to it.
+  - The value of `this` is returned.
 - all is that is possible because (functions in JS are both **function & objects combo**)
 
 > **NOTE:** other built in objects like arrays have the hidden `__proto__` property
@@ -309,3 +336,19 @@ class Account {
 - `static methods` are not available for instances
 - if you want a class method to be automatically called when an instance of the class is created, then you should put this method in the `constructor()`
 - in old syntax if we didn't use the word **"new"**, then **this** keyword will point to the `window` object
+- Is it possible to create functions `A` and `B` so that `new A() == new B()`?
+
+  - Yes, it’s possible. If a function returns an object then `new` returns it instead of `this`.
+
+  ```js
+  let obj = {};
+
+  function A() {
+    return obj;
+  }
+  function B() {
+    return obj;
+  }
+
+  alert(new A() == new B()); // true
+  ```

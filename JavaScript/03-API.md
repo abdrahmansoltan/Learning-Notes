@@ -1,23 +1,45 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Notes](#notes)
-- [APIs Resources](#apis-resources)
-- [Geolocation API](#geolocation-api)
-- [Leaflet API](#leaflet-api)
-  - [installation](#installation)
-  - [code](#code)
-- [Local Storage](#local-storage)
+  - [Notes](#notes)
+  - [APIs Resources](#apis-resources)
+  - [HTML5 APIs](#html5-apis)
+  - [Geolocation API](#geolocation-api)
+  - [Leaflet API](#leaflet-api)
+    - [installation](#installation)
+    - [code](#code)
+  - [Local Storage](#local-storage)
+  - [Session storage](#session-storage)
+  - [History API](#history-api)
+    - [History Object](#history-object)
 
 ---
 
 ## Notes
 
 - if you are using hosted version of an Api => don't forget to put `defer` in the `<script>` part of it in the HTML `<head>`
+- **API key** is a set of letters and numbers that uniquely identify you to the application so the owners of the site can track how much you use the API and what you use it for.
 
 ---
+
 ## APIs Resources
+
 - [puplic-Api repo](https://github.com/public-apis/public-apis)
+
+---
+
+## HTML5 APIs
+
+a set of APls define that describe how to interact with features of web browsers.
+
+- each of the HTML5 APIs focuses on one or more objects that browsers implement to deliver specific functionality
+
+| API            | Description                                                         |
+| -------------- | ------------------------------------------------------------------- | -------------- |
+| geolocation    | How to tell where the user is located                               |
+| local Storage  | Store information in the browser (even when user closes tab/window) | sessionStorage |
+| sessionStorage | Store information in the browser while a **tab/window** is open     |
+| history        | How to access items from the browser's history                      |
 
 ---
 
@@ -35,6 +57,8 @@
   - **optional** object which provides options for retrieval of the position data.
 
 ```javascript
+// getCurrentPosition{success, fail)
+
 navigator.geolocation.getCurrentPosition(
   function (position) {
     console.log(position);
@@ -44,7 +68,7 @@ navigator.geolocation.getCurrentPosition(
     // console.log(`https://www.google.pt/maps/@${latitude},${longitude}`);
   },
   function () {
-    alert("Could not get your position");
+    alert('Could not get your position');
   }
 );
 ```
@@ -65,21 +89,21 @@ navigator.geolocation.getCurrentPosition(
 
 ```javascript
 // map from (L) object
-map = L.map("map").setView(coords, zoomLevel);
+map = L.map('map').setView(coords, zoomLevel);
 // setView method takes 2 parameters :
 // 1. coords => array of [latitude, longitude]
 // 2. zoomLevel => number of how much to set the zoom of the view
 
-L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
   attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 // the href can be change for different looks of the map
 
 // see (marker) on the documentation
 
 // Handling clicks on map
-map.on("click", callbackFunction);
+map.on('click', callbackFunction);
 ```
 
 ---
@@ -90,16 +114,22 @@ map.on("click", callbackFunction);
 - The keys and the values stored with localStorage are always in the `UTF-16 DOMString format`, which uses two bytes per character. As with objects, integer keys are automatically converted to `strings`.
 - localStorage is `Blocking`, so it can slow down the app
 - _note_ : when you `get` items from `localStorage`, they lose the `prototype Chain` they had
+- **1oca1Storage** is best suited to information that:
+  - Only changes at set intervals (such as timetables / price lists), which can be helpful to store offline.
+  - The user might want to come back and use again (such as saving preferences / settings).
 
 ```javascript
 // ---------------add data item to localStorage //object--------------- //
-localStorage.setItem("myCat", "Tom");
+localStorage.setItem('myCat', 'Tom');
 
 // ---------------reading the localStorage item--------------- //
-const cat = localStorage.getItem("myCat");
+const cat = localStorage.getItem('myCat');
+
+// ---------------Number of items stored--------------- //
+const itemsNum = localStorage.length;
 
 // ---------------removing the localStorage item--------------- //
-localStorage.removeItem("myCat");
+localStorage.removeItem('myCat');
 
 // ---------------removing all the localStorage //items--------------- //
 localStorage.clear();
@@ -112,3 +142,28 @@ const data = JSON.parse(localStorage.getItem('workouts'));
 ```
 
 ---
+
+## Session storage
+
+**sessionStorage** is more suited to information that:
+
+- Changes frequently (each time the user visits the site - such as whether they are logged in or location data).
+- Is personal and should not be viewed by other users of the device.
+
+---
+
+## History API
+
+If you move from one page to another, the browser's history remembers which pages you visited. But Ajax applications do not load new pages, so they can use the hi story API to update the location bar and history.
+
+- Because the history object is a child of the window object, you can use its name directly in the script; you can write `history. pushState()`, you do not need to write `window.history.pushState()`.
+
+  ```js
+  history.pushState(state, title, url);
+  ```
+
+### History Object
+
+The HTML5 history API describes the functionality of the history object in modern web browsers. It lets you access and update the browser history (but only for pages the user visited on your site).
+
+![history object](./img/history-object.png)

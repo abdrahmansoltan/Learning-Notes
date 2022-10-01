@@ -1,34 +1,36 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Compiled vs Interpreted Language](#compiled-vs-interpreted-language)
-  - [Compiled Language](#compiled-language)
-  - [Interpreted Language](#interpreted-language)
-- [JavaScript Engine](#javascript-engine)
-  - [How the engine works ?](#how-the-engine-works-)
-  - [call-stack & Memory-heap](#call-stack--memory-heap)
-- [Types](#types)
-  - [`==` vs `===`](#-vs-)
-  - [Type Coercion](#type-coercion)
-- [Implicit vs Explicit](#implicit-vs-explicit)
-- [Scope](#scope)
-  - [Lexical scope](#lexical-scope)
-- [Functional Programming](#functional-programming)
-  - [currying-vs-partial Application](#currying-vs-partial-application)
-  - [Closure](#closure)
-    - [Function returning Functions](#function-returning-functions)
-    - [Benefits](#benefits)
-  - [Pure Functions](#pure-functions)
-  - [Iteration vs. Recursion](#iteration-vs-recursion)
-    - [Recursion performance](#recursion-performance)
-    - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
-  - [Referential Transparency](#referential-transparency)
-  - [Composition](#composition)
-- [JS : The weird parts](#js--the-weird-parts)
-  - [Advanced Types](#advanced-types)
-  - [Numbers](#numbers)
-  - [short circuiting => **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
-- [notes](#notes)
+  - [Compiled vs Interpreted Language](#compiled-vs-interpreted-language)
+    - [Compiled Language](#compiled-language)
+    - [Interpreted Language](#interpreted-language)
+  - [JavaScript Engine](#javascript-engine)
+    - [How the engine works ?](#how-the-engine-works-)
+    - [call-stack & Memory-heap](#call-stack--memory-heap)
+  - [Types](#types)
+    - [`==` vs `===`](#-vs-)
+    - [Type Coercion](#type-coercion)
+  - [Implicit vs Explicit](#implicit-vs-explicit)
+  - [Scope](#scope)
+    - [Lexical scope](#lexical-scope)
+  - [Functional Programming](#functional-programming)
+    - [currying & partial Application](#currying--partial-application)
+    - [Closure](#closure)
+      - [Function returning Functions](#function-returning-functions)
+      - [Benefits](#benefits)
+    - [Generators](#generators)
+    - [Pure Functions](#pure-functions)
+    - [Iteration vs. Recursion](#iteration-vs-recursion)
+      - [Recursion performance](#recursion-performance)
+      - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
+    - [Referential Transparency](#referential-transparency)
+    - [Composition](#composition)
+    - [Functional Decoration](#functional-decoration)
+  - [JS : The weird parts](#js--the-weird-parts)
+    - [Advanced Types](#advanced-types)
+    - [Numbers](#numbers)
+    - [short circuiting => **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
+  - [notes](#notes)
 
 ---
 
@@ -76,14 +78,21 @@
 
 ### call-stack & Memory-heap
 
+**Heap**: a much larger part of the memory that stores everything allocated dynamically, that allows a faster code execution, and protects it from corruption and makes the execution faster.
+
 - Memory-heap: boxes which store datatypes -->error-> `memory leak`:
 
   - usually when you have values that has place in memory but not used
   - also common in **event listeners** which are always listening(waiting) for an event
 
 - call-stack -->error-> `stack overflow`: usually from **recursion**
-  - always the first thing in it is the **global-execution-context**
+  - always the first thing in it is the **global execution context** (Code / variable declared outside a function)
     ![global-execution-context](./img/global-execution-context.PNG)
+
+> **global execution context** consists of 2 things:
+>
+> - storing variables / function in **memory** (global state)
+> - performing functions execution in the **thread of execution (call stack)** where each function gets its own **mini execution context**
 
 ---
 
@@ -96,6 +105,7 @@
 
 ### `==` vs `===`
 
+- Because of **type coercion**, the strict equality operators `===` and `!==` result in fewer unexpected values than `==` and `!=` do.
 - If you know the types in comparison: prefer `==` as it's faster
 - if `===` would always be equivalent to `==` in your code, using it everywhere sends a wrong semantic signal : **protecting myself since I don't know'trust the types**
 - NOTES:
@@ -110,6 +120,7 @@
 
     // "null" only equals "undefined"
     alert(undefined == null); // true
+    alert(undefined === null); // false
     ```
 
 ### Type Coercion
@@ -117,8 +128,8 @@
 it's the automatic or implicit conversion of values from one data type to another
 ![type coercion](./img/TypeCoercion.png)
 
-- empty object {} /array [] => true
-- empty string "" => false
+- empty object `{}` /array `[]` => true
+- empty string `""` => false
 
 - `+` vs `-` :
 
@@ -156,7 +167,7 @@ it's the automatic or implicit conversion of values from one data type to anothe
 
 ### Lexical scope
 
-> **It's where the function was called**
+> **It's where the function was called (Functions are linked to the object they were defined within)**
 
 Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope.
 
@@ -176,24 +187,68 @@ Each local scope can also see all the local scopes that contain it, and all scop
 
 ## Functional Programming
 
-> - Functional programming is about **Verbs** (actions)
->   - it's like a black box that takes something in and returns something out
-> - object oriented programming is about **pronouns** (objects and things) -> "keep state to yourself and send/receive messages"
+- Functional programming is about **Verbs** (actions)
 
-### currying-vs-partial Application
+  - it's like a black box that takes something in and returns something out
+  - it depends on **Tiny functions**: Save every single line (or few lines) as its own function
+  - **Recombine/compose** Build up our application by using these small blocks of self-contained code combining them up line-by-line by referring to their human-readable name
+
+    ```js
+    // Todo list
+    pipe(
+      getPlayerName,
+      getFirstName,
+      properCase,
+      addUserLabel,
+      createUserTemplate
+    )([{ name: 'Abdelrahman', score: 3 }]);
+    ```
+
+  - the result that we will get a code that is:
+    - Easier to add features
+    - More readable
+    - Easier to debug
+
+- object oriented programming is about **pronouns** (objects and things) -> "keep state to yourself and send/receive messages"
+
+**functions :**
+
+- Reduce the potential impact of any given line to maybe 10 other lines (inside the function)
+- structure our code into individual pieces where almost every single line is **self-contained**
+- **No consequences** except on that line Each function’s only ‘consequence’ is to have its result given to specifically the next line of code (‘function call’) and not to any other lines
+
+---
+
+### currying & partial Application
 
 ![currying-vs-partialapplication](./img/currying-vs-partialapplication.jpeg)
 
 - **currying**: one argument at a time
   - It is translating a function that takes multiple arguments into a sequence of **single-argument-functions**, each accepting one argument.
 - **partial application**: The process of applying a function to some of its arguments. The partially applied function gets returned for later use.
+
+  - it's creating a new outer-function that calls our multi-argument function with the argument, and the multi-argument function stored conveniently in the **Backpack**
+
+  ```js
+  const multiply = (a, b) => a * b;
+  function prefillFunction(fn, prefilledValue) {
+    const inner = liveInput => {
+      const output = fn(liveInput, prefilledValue);
+      return output;
+    };
+    return inner;
+  }
+  const multiplyBy2 = prefillFunction(multiply, 2);
+  const result = multiplyBy2(5);
+  ```
+
 - these 2 concepts use **Closures**
 
 ---
 
 ### Closure
 
-> The ability to treat functions as values
+It's the ability to treat functions (when executed) as values
 
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
@@ -245,15 +300,82 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
 #### Benefits
 
-- It's usually memory-efficient as it caches the values inside its block-scoped in case that it was called again
-  ![closure](./img/closure5.png)
+- It's usually memory-efficient as it caches the values inside its block-scoped (where it was called) **(its local memory (like Backpack) + the returned value from the function)** in case that it was called again, this will be in the hidden property called `__scope__`.
+  - actually the **Backpack** doesn't contain "all" the local memory of the function, but it contains only the values/variables that will be used in the function body and will get rid of other unused things in the local memory using **garbage collection**
+    ![closure](./img/closure5.png)
+    - this is the main concept behind **iterator function**, where it persists a function called **returnNextElement**, which has:
+      1. Our underlying array itself
+      2. The position we are currently at in our ‘stream’ of elements
+      3. The ability to return the next element
+  - > So **iterators** turn our data into ‘streams’ of actual values we can access one after another.
+  - > JavaScript’s built in iterators are actually objects with a **next()** method that when called returns the next element from the ‘stream’/ flow
 - Encapsulation: prevent unwanted access to inner variables/functions
+
+---
+
+### Generators
+
+Once we start thinking of our data as flows (where we can pick of an element one-by-one) we can rethink how we produce those flows - JavaScript now lets us produce the flows using a function
+
+the Generator function allows us to exit and renter the execution-context of function manually, unlike iterators which this happens dynamically
+
+```js
+function* createFlow() {
+  const num = 10;
+  const newNum = yield num;
+  yield 5 + newNum;
+  yield 6;
+}
+const returnNextElement = createFlow();
+const element1 = returnNextElement.next(); // 10
+const element2 = returnNextElement.next(2); // 7 -> when we pass a value to the next() method, it will be evaluated as the yielded value and we will continue the function until we find another yield
+```
+
+- `returnNextElement` is a special object (a **generator object**) that when its `next` method is run starts (or continues) running createFlow **execution-context** until it hits `yield` and returns out the value being yielded **without continuing the function**
+
+  - We end up with a ‘stream’/flow of values that we can get one-by-one by running `returnNextElement.next()`
+  - And most importantly, for the first time we get to pause (‘suspend’) a function being run and then return to it by calling `returnNextElement.next()`
+
+- This is actually what happens behind the scene in **Asynchronous javascript**, as we want to:
+
+  1. Initiate a task that takes a long time (e.g. requesting data from the server)
+  2. Move on to more synchronous regular code in the meantime
+  3. Run some functionality once the requested data has come back
+
+  ```js
+  function doWhenDataReceived(value) {
+    returnNextElement.next(value);
+  }
+  function* createFlow() {
+    const data = yield fetch('http://twitter.com/will/tweets/1');
+    console.log(data);
+  }
+  const returnNextElement = createFlow();
+  const futureData = returnNextElement.next();
+  futureData.value.then(doWhenDataReceived);
+  ```
+
+  - Explanation of the code above:
+  ![generator](./img/generator-example.png)
+
+- **Async/await** simplifies all this and finally fixes the inversion of control problem of callbacks
+  - as it automatically triggers the function on the promise-resolution **(this functionality is still added to the micro-task queue though)**
+
+  ```js
+  async function createFlow() {
+    console.log('Me first');
+    const data = await fetch('https://twitter.com/will/tweets/1');
+    console.log(data);
+  }
+  createFlow();
+  console.log('Me second');
+  ```
 
 ---
 
 ### Pure Functions
 
-- **Pure function**: Function **without side effects**. Does not depend on external variables. Given the same inputs, always **returns** the same outputs
+- **Pure function**: Function **without side effects (predictable)**. Does not depend on external variables. Given the same inputs, always **returns** the same outputs
   - pure function **must** return something
 - **side-effects**: are about MODIFICATION and doesn't count if we created new item
   - usually it's anything that the function does other that returning a value
@@ -281,11 +403,14 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 #### first-class functions and higher order functions
 
-- **first class functions** is just a feature that a programming language either has or does not have. (All it means is that all functions are values.),It's just a concept.
+- **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values \***\*(can be assigned to variables**/**can be passed as arguments**/**can be returned as values from function)\*\***.),It's just a concept.
   ![first class objects](./img/first%20class%20objects.png)
 - There are however **higher order functions** in practice, which are possible because the language supports `first class functions`.
-  - ![higher order functions](./img/higher%20order%20functions.png)
-- ex: `call`, `apply`, `bind` :
+  ![higher order functions](./img/higher%20order%20functions.png)
+
+  - Easier to add features, more readable, easier to debug
+  - we can **chain** these higher order functions (pass the output of one as the input of the next)
+  - ex: `call`, `apply`, `bind` :
 
   - `call` => calls a function with the given lexical context as parameter (`call` it's like calling the `this` of the one object that calls the function)
 
@@ -335,9 +460,14 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     add2(10) === 12;
     ```
 
+- **reducer function** is the process (function) of taking 2 elements and do an operation on them and returning only one thing
+
 ---
 
 ### Referential Transparency
+
+- **Referential Transparency**: emphasizes that an expression (or function) in a JavaScript program may be replaced by its **value / returned value** or any other variable having the same value without changing the result of the program. As a result, methods should always return the same value for the given argument without any side effects
+- it's like **(I can replace the function-call with its returned-output and it’s the same)**
 
 ![referential transparency](./img/referential%20transparency.PNG)
 
@@ -345,9 +475,23 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 ### Composition
 
-It is the **combination of two functions into one**, that when applied, returns the result of the chained functions.
+It is the **combination of two functions into one**, that when applied, returns the result of the chained functions **(using reduction of the result value)**.
 
 > In functional Programming, Composition **takes the place of inheritance in OOP**.
+
+- Chaining with dots relies on JavaScript prototype feature - functions return arrays which have access to all the high-order-function (map, filter, reduce), but if I want to chain functions that just return a regular output:
+
+  ```js
+  const multiplyBy2 = x => x * 2;
+  const add3 = x => x + 3;
+  const divideBy5 = x => x / 5;
+  const initialResult = multiplyBy2(11);
+  const nextStep = add3(initialResult);
+  const finalStep = divideBy5(nextStep);
+  console.log('finalStep', finalStep);
+  ```
+
+  - **But that’s risky, people can overwrite**
 
 - Composition is a fancy term which means "combining pure functions to build more complicated ones" (make complex programs out of simple functions).
 
@@ -356,6 +500,39 @@ It is the **combination of two functions into one**, that when applied, returns 
 ```js
 let compose = (fn1, fn2) => fn2(fn1);
 ```
+
+**Function composition:**
+
+- **Easier to add features** -> This is the essential aspect of functional javascript - being able to list of our units of code by name and have them run one by one as independent, self-contained pieces
+- **More readable** -> `reduce` is often wrapped in compose to say ‘combine up’ the functions to run our data through them one by one. The style is ‘point free’
+- **Easier to debug** -> I know exactly the line of code my bug is in - it’s got a label!
+
+---
+
+### Functional Decoration
+
+we can convert functions more easily to make them suit our task Without writing a new function from scratch, it will appear as we edit the function's body, but in reality **we're creating new wrapper outer function and using its Backpack that contains our function we saved** --> **it's using closure to supercharge our functions**
+
+- here we want to edit the function `multiplyBy2()` to only run once
+
+  ```js
+  const oncify = convertMe => {
+    let counter = 0;
+    const inner = input => {
+      if (counter === 0) {
+        const output = convertMe(input);
+        counter++;
+        return output;
+      }
+      return 'Sorry';
+    };
+    return inner;
+  };
+  const multiplyBy2 = num => num * 2;
+  const oncifiedMultiplyBy2 = oncify(multiplyBy2);
+  oncifiedMultiplyBy2(10); // 20
+  oncifiedMultiplyBy2(7); // Sorry
+  ```
 
 ---
 
@@ -380,6 +557,7 @@ let compose = (fn1, fn2) => fn2(fn1);
   - `typeof NaN` = `Number` --> as it's **invalid number**
   - example of `NaN` -> **division on strings** -> `"apple" / 3`
   - `Nan === NaN` --> **false**
+  - `alert(isNaN("str"))` --> **true**
 
 - **Negative zero**:
 
@@ -392,9 +570,20 @@ let compose = (fn1, fn2) => fn2(fn1);
   - if `a` isn’t defined, then `b`.
 - **Optional chaining** `?.` :
   ![Optional chaining](./img/Optional%20chaining.webp)
+
   - is a safe way to access nested object properties, even if an intermediate property doesn’t exist.
   - enables you to read the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
+  - We can use `?.` for safe reading and deleting, but not writing
+
+  ```js
+    let user = null;
+
+    user?.name = "John"; // Error, doesn't work
+    // because it evaluates to: undefined = "John"
+  ```
+
 - without `strict mode`, `this` will point to the global object => `window`
+  - **this is important to note before start thinking**
 
 ---
 
@@ -474,6 +663,47 @@ let compose = (fn1, fn2) => fn2(fn1);
 - short-circuiting ->
 
   ```js
-  alert( alert(1) && alert(2) ); // undefined
+  alert(alert(1) && alert(2)); // undefined
   // as alert doesn't return anything (returns undefined)
+  ```
+
+- **How is every thing is an Object ?** --> If one would want to do something with a primitive, like a `string` or a `number`. It would be great to access them using **methods**.
+
+  - The language allows access to **methods** and **properties** of `strings`, `numbers`, `booleans` and `symbols`.
+  - In order for that to work, a special “**object wrapper**” that provides the extra functionality is created, and then is destroyed.
+  - you can also create this wrapper-object using constructor like `new`, but it's highly unrecommended. Things will go crazy in several places.
+
+    ```js
+    alert(typeof 0); // "number"
+    alert(typeof new Number(0)); // "object"!
+
+    let zero = new Number(0);
+    if (zero) {
+      // zero is true, because it's an object
+      alert('zero is truthy!?!');
+    }
+    ```
+
+  - On the other hand, using the same functions `String`/`Number`/`Boolean` without `new` is totally fine and useful thing. They convert a value to the corresponding type: to a string, a number, or a boolean (primitive).
+
+    ```js
+    let num = Number('123'); // convert a string to number
+    ```
+
+  - The special primitives `null` and `undefined` are exceptions. They have no corresponding “wrapper objects” and provide no methods. In a sense, they are “the most primitive”.
+
+- **NO JAVASCRIPT**
+
+  - If you have an `accordion menu`, `tabbed panels`, and `responsive slider` all hide some of their content by default. This content would be inaccessible to **visitors that do not have JavaScript enabled** if we didn't provide alternative styling.
+  - One way to solve this is by adding a class attribute whose value is **"no-js"** to the opening `<html>` tag. This class is then removed by JavaScript (using the `replace()` method of the String object)
+  - if JavaScript is enabled. The **"no-js"** class can then be used to provide styles targeted to visitors who do not have JavaScript enabled.
+
+  ```html
+  <!DOCTYPE html>
+  <html class="no-js"></html>
+  ```
+
+  ```js
+  var elDocument = document.documentElement;
+  elDocument.className = elDocument.className.replace(/(^|\s)no-js(\s|$)/, '$1');
   ```
