@@ -21,8 +21,8 @@
     - [Generators](#generators)
     - [Pure Functions](#pure-functions)
     - [Iteration vs. Recursion](#iteration-vs-recursion)
-      - [Recursion performance](#recursion-performance)
-      - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
+    - [Recursion & performance](#recursion--performance)
+    - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
     - [Referential Transparency](#referential-transparency)
     - [Composition](#composition)
     - [Functional Decoration](#functional-decoration)
@@ -386,22 +386,38 @@ const element2 = returnNextElement.next(2); // 7 -> when we pass a value to the 
 
 In **functional programming**, we avoid `mutable state`, and therefore avoid `iterative loops` using for or while. As an alternative to iteration, we use **recursion** to break down the problem into smaller ones.
 
+> **Recursion**: is a programming pattern that is useful in situations when a task can be naturally split into several tasks of the same kind, but simpler. Or when a task can be simplified into an easy action plus a simpler variant of the same task.
+>
+> - When a function solves a task, in the process it can call many other functions. A partial case of this is when a function calls itself. That’s called **recursion**.
+
 A recursive function has two parts:
 
 - `Base case`: condition(s) under which the function returns an output without making a recursive call
 - `Recursive case`: condition(s) under which the function calls itself to return the output
 
-#### Recursion performance
+Difference between iteration and recursion:
+
+- A recursive solution is usually shorter than an iterative one.
+- **Recursion**: has one problem, in typical JavaScript implementations, it’s about three times slower than the looping version. Running through a simple loop is generally cheaper than calling a function multiple times.
+- Any recursion can be rewritten as a loop. The loop variant usually can be made more effective.
+  - But sometimes the rewrite is non-trivial, especially when a function uses different recursive subcalls depending on conditions and merges their results or when the branching is more intricate. And the optimization may be unneeded and totally not worth the efforts.
+
+---
+
+### Recursion & performance
 
 recursion sometimes take long time as it calls multiple functions at the same time which occupies the **call stack**
 
 - one solution is to use **memoization (caching)**
 - another solution is to use **tail call optimization**
   - **Note**: not all JavaScript engines implements **tail calls**
+- The maximal recursion depth is limited by JavaScript engine. We can rely on it being 10000, some engines allow more, but 100000 is probably out of limit for the majority of them.
+- **Recursive structures**: A recursive (recursively-defined) data structure is a structure that replicates itself in parts.
+  - For examples: `HTML` and `XML documents`.
 
 ---
 
-#### first-class functions and higher order functions
+### first-class functions and higher order functions
 
 - **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values \***\*(can be assigned to variables**/**can be passed as arguments**/**can be returned as values from function)\*\***.),It's just a concept.
   ![first class objects](./img/first%20class%20objects.png)
@@ -594,8 +610,6 @@ we can convert functions more easily to make them suit our task Without writing 
 - **Statements Vs Expressions** :
   - expression we get a value from it like `5+4` or `Ternary Operator` or `short circuiting` and then you can use it in a `${}`
   - Statements doesn't return a value
-- **Recursion**: has one problem, in typical JavaScript implementations, it’s about three times slower than the looping version. Running through
-  a simple loop is generally cheaper than calling a function multiple times.
 - **Strict mode** :
   - It is not a statement, but a literal expression, ignored by earlier versions of JavaScript.
   - The purpose of `"use strict"` is to indicate that the code should be executed in "strict mode".

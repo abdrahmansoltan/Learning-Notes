@@ -25,6 +25,8 @@
   - [Configuration](#configuration)
   - [Web server vs Application server](#web-server-vs-application-server)
 - [Security](#security)
+- [> You can see security overview for any site from the **devtools**](#-you-can-see-security-overview-for-any-site-from-the-devtools)
+  - [OWASP](#owasp)
 - [Web Browsers](#web-browsers)
   - [Architecture of web browser](#architecture-of-web-browser)
   - [Roles of Rendering Engine](#roles-of-rendering-engine)
@@ -282,6 +284,48 @@ NGINX is open source software for **web serving**, **reverse proxying**, **cachi
 ![Security](./img/security.PNG)
 
 - **Firewall**: a network security device that monitors incoming and outgoing network traffic and decides whether to allow or block specific traffic based on a defined set of security rules
+
+> You can see security overview for any site from the **devtools**
+---
+
+### OWASP
+
+**Open Web Application Security Project (OWASP)**: is an an online community that produces articles, methodologies, documentation, tools, and technologies in the field of web application security.
+
+- **OWASP Top 10** is the list of the 10 most common application vulnerabilities. It also shows their risks, impacts, and countermeasures. Updated every three to four years, these're the ones for 2021:
+  - `Injection`
+    - A code injection happens when an attacker sends invalid data to the web application with the intention to make it do something that the application was not designed/programmed to do.
+    - the most common example around this security vulnerability is the **SQL query consuming untrusted data**
+    - The core of a code injection vulnerability is the lack of **validation** and **sanitization** of the data used by the web application
+  - `Broken authentication`
+    - A broken authentication vulnerability can allow an attacker to use manual and/or automatic methods to try to gain control over any account they want in a system – or even worse – to gain complete control over the system.
+    - Broken authentication usually refers to logic issues that occur on the application authentication’s mechanism, like bad session management prone to username enumeration – when a malicious actor uses brute-force techniques to either guess or confirm valid users in a system.
+    - To minimize broken authentication risks ->  **avoid leaving the login page for admins publicly accessible to all visitors of the website**
+      - ex:
+        - `/administrator on Joomla!`
+        - `/wp-admin/ on WordPress`
+      - **brute force** is the act of trying many possible combinations
+  - `Sensitive data exposure`
+    - It consists of compromising data that should have been protected (Credentials, Credit card numbers, Social Security Numbers, ...)
+    - one way to protect it on a website is by having an **SSL certificate**.
+  - `XML external entities (XXE)`
+    - is a type of attack against an application that parses **XML** input. This attack occurs when XML input containing a reference to an external entity is processed by a weakly configured XML parser.
+  - `Broken access control`
+    - In website security, access control means putting a limit on what sections or pages visitors can reach, depending on their needs.
+  - `Security misconfigurations`
+  - `Cross site scripting (XSS)`
+    - XSS attacks consist of injecting malicious client-side scripts into a website and using the website as a propagation method.
+    - The risks behind XSS is that it allows an attacker to inject content into a website and modify how it is displayed, forcing a victim’s browser to execute the code provided by the attacker while loading the page.
+  - `Insecure deserialization`
+    - The process of **serialization** is converting objects to byte strings.
+    - The process of **deserialization** is converting byte strings to objects.
+  - `Using components with known vulnerabilities`
+  - `Insufficient logging and monitoring`
+
+> - For more details->
+>   - [OWASP Top 10 Security Risks](https://sucuri.net/guides/owasp-top-10-security-vulnerabilities-2020/)
+>   - [Brute Force Attack](https://sucuri.net/guides/what-is-brute-force-attack/)
+> - OWASP Web Application Security Testing Checklist -> [here](https://github.com/0xRadi/OWASP-Web-Checklist)
 
 ---
 

@@ -8,6 +8,8 @@
   - [Leaflet API](#leaflet-api)
     - [installation](#installation)
     - [code](#code)
+  - [JSON](#json)
+    - [JSON Methods](#json-methods)
   - [Local Storage](#local-storage)
   - [Session storage](#session-storage)
   - [History API](#history-api)
@@ -105,6 +107,36 @@ L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 // Handling clicks on map
 map.on('click', callbackFunction);
 ```
+
+---
+
+## JSON
+
+So it’s easy to use JSON for data exchange when the client uses JavaScript and the server is written on `Ruby`/`PHP`/`Java`/Whatever.
+
+- **JSON** does not support comments. Adding a comment to JSON makes it invalid.
+  - There’s another format named [JSON5](http://json5.org/), which allows unquoted keys, comments etc. But this is a standalone library, not in the specification of the language.
+
+---
+
+### JSON Methods
+
+- `JSON.stringify` to convert objects into JSON.
+  - The resulting json string is called a **JSON-encoded or serialized or stringified or marshalled object**. We are ready to send it over the wire or put into a plain data store.
+  - this method has other parameters other than the object value
+    - `JSON.stringify(value, replacer, spaceIndents)`
+- `JSON.parse` to convert JSON back into an object (decode a JSON-string).
+  - `JSON.parse(str, [reviver])`
+    - `reviver`: is an Optional function(key,value) that will be called for each (key, value) pair and can transform the value.
+
+    ```js
+    let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
+
+    let meetup = JSON.parse(str, function (key, value) {
+      if (key == 'date') return new Date(value);
+      return value;
+    });
+    ```
 
 ---
 

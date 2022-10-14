@@ -8,7 +8,6 @@
     - [Semantic tags](#semantic-tags)
   - [some inline elements to be aware of](#some-inline-elements-to-be-aware-of)
   - [tricks](#tricks)
-  - [Files-Architecture](#files-architecture)
   - [Forms](#forms)
     - [Form elements](#form-elements)
     - [Autofill Forms](#autofill-forms)
@@ -219,36 +218,6 @@ Why do we need to tell the browser what our HTML elements represent?
 
   ```html
   <progress max="100" value="50">50%</progress>
-  ```
-
----
-
-## Files-Architecture
-
-- **BEM** (Block - Element - Modifier)
-  ![bem](./img/bem.jpg)
-  ![bem](./img/bem2.PNG)
-
-- also you can use `helper class` which is used when you have an item that is used many times but in one place of its use we want to add a css-property to it 'like margin-right-small'
-
-  ```html
-  <a href="#" class="btn btn--full margin-right-sm">click here!</a>
-  ```
-
-  ```css
-  /* HELPER/SETTINGS CLASSES */
-
-  .margin-right-sm {
-    margin-right: 1.6rem !important;
-  }
-
-  .margin-bottom-md {
-    margin-bottom: 4.8rem !important;
-  }
-
-  .center-text {
-    text-align: center;
-  }
   ```
 
 ---

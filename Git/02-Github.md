@@ -17,8 +17,11 @@
   - [Feature Branches workflow](#feature-branches-workflow)
   - [Fork & Clone workflow](#fork--clone-workflow)
     - [Include Upstream Changes to Stay In Sync](#include-upstream-changes-to-stay-in-sync)
+      - [Triangular workflow](#triangular-workflow)
 - [Pull Request](#pull-request)
+  - [Contributing to Open source projects](#contributing-to-open-source-projects)
 - [Notes](#notes)
+  - [Github shortcuts](#github-shortcuts)
 
 ---
 
@@ -219,6 +222,10 @@ When working with a project that you've forked. The original project's maintaine
 
 > This is called -> **Fork & Clone** workflow
 
+- The **upstream** repository is the base repository you created a fork from
+  - this isn't set up by default, you need to set it up manually
+- by adding the **upstream** remote, you can pull down changes that have been added to the original repository after you forked it.
+
 ![fork](./img/fork1.png)
 
 - adding second remote referring to `upstream`:
@@ -229,8 +236,10 @@ When working with a project that you've forked. The original project's maintaine
   ```
 
 ![fork](./img/fork2.png)
-![pr](./img/pr3.PNG)
-![pr](./img/pr4.PNG)
+
+##### Triangular workflow
+
+![trangular-workflow](./img/trangular-workflow.png)
 
 - To stay up to date and get commits from a source repository into your forked repository on GitHub you need to:
 
@@ -260,6 +269,12 @@ A pull request is a request to the original or source repository's maintainer to
 
 ---
 
+### Contributing to Open source projects
+
+![PR](./img/open-source.png)
+
+---
+
 ## Notes
 
 - `Assign yourself`
@@ -268,3 +283,9 @@ A pull request is a request to the original or source repository's maintainer to
 
 - in `Github desktop` you can select things to commit instead of making all the changes in one commit
   - to do this : `Highlight the lines you want`
+
+---
+
+### Github shortcuts
+
+![github shortcuts](./img/github-shortcuts.png)

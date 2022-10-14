@@ -10,6 +10,8 @@
     - [Writing a commit message guidelines](#writing-a-commit-message-guidelines)
     - [Hash values (SHA-1)](#hash-values-sha-1)
     - [The HEAD pointer](#the-head-pointer)
+      - [Referencing commits (`^` , `~`)](#referencing-commits---)
+    - [Commit metadata](#commit-metadata)
   - [Branches](#branches)
     - [commands](#commands)
     - [Git stash](#git-stash)
@@ -18,8 +20,9 @@
     - [Merging](#merging)
       - [Fast Forward Merge](#fast-forward-merge)
       - [Types](#types)
-    - [notes](#notes)
+    - [Useful notes](#useful-notes)
   - [Rebasing](#rebasing)
+    - [Rebasing with backup for extra safety](#rebasing-with-backup-for-extra-safety)
     - [Merge vs Rebase](#merge-vs-rebase)
     - [Interactive Rebase](#interactive-rebase)
     - [Force Pushing](#force-pushing)
@@ -42,10 +45,15 @@
     - [Reflog commands](#reflog-commands)
   - [Git behind the scenes](#git-behind-the-scenes)
     - [Refs Folder](#refs-folder)
-    - [HEAD file](#head-file)
+    - [heads folder](#heads-folder)
     - [Objects Folder](#objects-folder)
       - [Blobs](#blobs)
       - [Trees](#trees)
+  - [Useful Notes](#useful-notes-1)
+    - [Danger Zone](#danger-zone)
+      - [Local Destructive Operations](#local-destructive-operations)
+      - [Remote Destructive Operations (rewriting history)](#remote-destructive-operations-rewriting-history)
+    - [Recover lost work](#recover-lost-work)
 
 ---
 
@@ -56,6 +64,9 @@ Git is software that keeps track of changes that you make to files and directori
 - Git is referred to as a version control system or **VCS**
 - they're also called source code management tools or **SCM**
 - Git is **distributed version control**. Different users each maintain their own repositories instead of working from a central repository, and the changes are stored as sets or patches, and we're focused on tracking `changes`, not the versions of the documents.
+- At its core, Git is like a **key-value store**
+  - key -> Hash of the data (SHA-1)
+  - value -> Data
 - Git does not use **small** tracking files throughout a repository -- everything is contained within the .git directory in the top-level directory of the repository.
 - Git does not use small tracking files throughout a repository -- everything is contained within the .git directory in the top-level directory of the repository.
 
@@ -70,7 +81,7 @@ Git is software that keeps track of changes that you make to files and directori
 
 ## Diff
 
-- `git diff` lists all the changes in the working directory **that are not staged for the next commit** (shows only un-staged changes).
+- `git diff` lists all the changes in the working directory **that are not staged for the next commit** (shows only **unstaged changes**).
 - `git diff HEAD` compares the changes in the (working directory & staged area) to the last commit
 - `git diff --staged` compares the changes in the staged files to the committed versions.
 
@@ -89,10 +100,13 @@ The results showing the difference between the different versions of the file ar
 
 ## commit message
 
-**commit** is a snapshot or checkpoint in your local repo
+**commit** is a code-snapshot or checkpoint in your local repo
 
 ![commit-object](./img/commit-object.png)
+![commit-object](./img/commit-object2.png)
 ![commits](./img/commits.png)
+
+---
 
 ### Writing a commit message guidelines
 
@@ -103,34 +117,66 @@ The results showing the difference between the different versions of the file ar
 - clear and descriptive (explain what it does not why/how)
 - develop shorthand for your organization ex `"[css,js]"`, `"bugfix"`,`"#38405"` as issue number
 
+---
+
 ### Hash values (SHA-1)
 
 - it's an ID number for each commit to reach each commit
 - Each hash value is not only unique, it's directly tied to the **contents** that are inside of it.
-  - that's why it's called **content addressable source system**
+  - that's why it's called **content addressable source system** (as we use the content to generate the key)
   ![SHA-1](./img/SHA-1.png)
 - The algorithm (hashing function) that Git uses is the **SHA-1 hash** algorithm.
   - it generates **40 digits hexadecimal numbers**
+  - the value should always be the same if the given input is the same
 - why can't we change commits?
   - because changing the data about the commit will have a new **SHA-1 hash**
   - and even if the files don't change, the created date will
 
+---
+
 ### The HEAD pointer
 
-**It's a pointer to the latest commit on the Branch**
-![head](./img/head0.PNG)
+> **It's a pointer to the latest commit on the current Branch**
+>
+> - it usually points at the name of the current branch
+> - it can point at a commit too --> (**detached HEAD**)
+
+![head](./img/head0.png)
 
 > It's the place where we left off in our repository with what we've committed.
 
-- The main difference between the **hat**`^` and the **tilda**`~` is when a commit is created from a merge. A merge commit has two parents. With a merge commit, the `^` reference is used to indicate the first parent of the commit while `^2` indicates the second parent. The first parent is the branch you were on when you ran git merge while the second parent is the branch that was merged in.
+---
+
+#### Referencing commits (`^` , `~`)
+
+- The main difference between the **hat**`^` and the **tilda**`~` is:
+  - when a commit is created from a merge. A merge commit has two parents.
+  - With a merge commit, the `^` reference is used to indicate the first parent of the commit while `^2` indicates the second parent.
+  - The first parent is the branch you were on when you ran `git merge` while the second parent is the branch that was merged in.
 
 ![refering-commits](./img/refering-commits.png)
 ![refering-commits2](./img/refering-commits2.png)
 ![head](./img/head3.PNG)
 
+> if you don't specify a number when using `tilde ~` -> it uses **1** by default
+
+---
+
+### Commit metadata
+
+To get the content of the commit object:
+
+```sh
+git cat-file -p <SHA or first 5 characters>
+```
+
+![commit metadata](./img/commit-metadata.png)
+
 ---
 
 ## Branches
+
+> a **Branch** is just a **pointer** to a particular **commit**
 
 A branch is a pin pointed arrow to a commit. When you first create a repository, the default branch you will commit too is the master branch.After you make commits, they will point forward on to the last commit you made on that master branch.
 
@@ -305,7 +351,7 @@ git merge "nathan"
 
   ![branches](./img/branches2.PNG)
 
-### notes
+### Useful notes
 
 - You can't delete a branch that you are currently on, so you have to switch to another branch first.
 
@@ -345,6 +391,14 @@ git merge "nathan"
 
 ![rebase_Advantages](./img/rebase6.png)
 ![rebase_warning](./img/rebase_warning.PNG)
+
+---
+
+### Rebasing with backup for extra safety
+
+sometimes you want to rebase, but you're afraid that you will miss something up, no worries you can try this method:
+
+![rebase_proTip](./img/rebase_proTip.png)
 
 ---
 
@@ -411,9 +465,10 @@ git push -f
 
 - **working directory**, which contains changes that may not be tracked by Git yet
 
-  - In the working directory, the user can create new files or change existing files that do not yet exist in either the staging index or the repository, and **no Git command is required to do so**.
+  - In the working directory, the user can create new files or change existing files that do not yet exist in either the staging index(area) or the repository, and **no Git command is required to do so**.
 
-- **staging index**, which contains changes that we're about to commit into the repository
+- **staging index(area)**, which contains changes that we're about to commit into the repository
+  - > **NOTE:** a clean staging area isn't actually empty, as it actually contains the exact copy of the latest commit
 
   - `git add` : move from working to staging index
   - `git rm --cached` : remove from staging index
@@ -436,7 +491,12 @@ git push -f
   # here we tell git not to show me what's in a commit, but compare two different versions, and show me what changed between them
   ```
 
-  - `git show` => display info(content of commit) about a **one** given commit(most recent one)
+- `git show` => display info(content of commit) about a **one** given commit(most recent one)
+
+    ```sh
+    git show <commit> # show commit and contents
+    git show <commit>:<file> # look at file from another commit
+    ```
 
 - Undo working directory changes
 
@@ -458,6 +518,7 @@ git push -f
   ![amend](./img/amend.png)
   ![amend](./img/amend2.png)
   ![amend](./img/amend3.png)
+  ![amend](./img/amend4.png)
 
 ```bash
 # first add or remove files to/from staging area, then run:
@@ -487,6 +548,10 @@ git checkout <SHA-of-commit-to-go-to>
 ![detached head](./img/detached%20head3.png)
 
 - To go back to the normal head: use `git switch <(main/master) or the name of the branch>`
+
+> **dangling commits** -> are those commits that no longer be referenced in git (don't point to a branch), they will be garbage collected
+>
+> - example: when you make a commit from a `detached-HEAD`
 
 ---
 
@@ -520,7 +585,7 @@ git checkout <SHA-of-commit-to-go-to>
 
 - `Resetting` **erases commits! and changes history**
 
-  - it actually moves the branch pointer backwards, eliminating commits
+  - it actually moves the branch **HEAD-pointer** backwards, eliminating commits
   - so Don't do it in public repo
 
 - `--hard` : get rid of the commit **and** the changes done to the files.
@@ -588,7 +653,7 @@ git revert <SHA-of-commit-to-revert-to>
   - `*` => all items in the folder
   - `.` => remaining items in the folder
 
-- patching files to select what to add (usefull in debugging)
+- **Partial adding**: It's **patching** files to select what to add (useful in debugging)
 
   ```bash
   git add --patch <filename> # (or -p for short) partial add
@@ -609,12 +674,13 @@ Tags are pointers that refer to particular points in Git-history, we can mark a 
 
 - a tag always refers to the same commit, **It's just a label for a commit**
   ![tags](./img/tags.png)
+- **Annotated tags:** points to a commit, but stores additional information (`author`, `message` `date`)
 
 **Semantic Versioning**: it outlines a standardized versioning system for software releases, it provides a consistent way for developers to give meaning to their software releases (how big of a change is this releas e?)
 ![versioning](./img/versioning.PNG)
 
 ```bash
-git tag # display all tags that are in the repository.
+git tag # show all tags that are in the repository.
 
 git tag -a v1.0 # tag the most recent commit
 # "-a" flag tells Git to create an annotated tag(flag).
@@ -688,12 +754,12 @@ git reflog show <branch name>
   git checkout HEAD@{2} # 2 moves ago
   ```
 
-- one of the advantages is that we can use **reflog entries** to access commits that seem lost (reset) and are not appearing in `git log`
+- **IMPORTANT NOTE** -> one of the advantages is that we can use **reflog entries** to access commits (**removed commits**) that seem lost (reset) and are not appearing in `git log`
 
-```sh
-git reflog show master # look for that commit and copy its SHA-1
-git reset --hard <SHA of the commit> # will make the tip of your branch (the HEAD of the branch) to that commit
-```
+  ```sh
+  git reflog show master # look for that commit and copy its SHA-1
+  git reset --hard <SHA of the commit> # will make the tip of your branch (the HEAD of the branch) to that commit
+  ```
 
 ---
 
@@ -708,11 +774,17 @@ This is inside `.git` directory
   - contains the hash of the commit at the tip of the branch
 - there'a also **tags** and **remotes** directories
 
-### HEAD file
+### heads folder
 
 It's a text file that keeps track of where **HEAD** points.
 
 - if it contains `ref/heads/master` this means that **HEAD** is pointing to the master branch
+  - to know which branch the head is pointing at:
+
+    ```sh
+    cat .git/HEAD # ref: refs/heads/master
+    ```
+
 - in detached HEAD, the HEAD file contains a commit hash instead of a branch-reference
 
 ### Objects Folder
@@ -723,10 +795,48 @@ it contains all the repo files, this is where Git stores the backups of (files, 
 
 #### Blobs
 
+It's how Git stores Data
+
+![blob](./img/blob.png)
+
+- Where are blobs stored?
+  ![blob](./img/blobs2.png)
+
 - They're **binary large objects**, they're the object type that Git uses to store the contents of files in a given repository,
   - they just store the contents of a file
 
 #### Trees
 
 ![trees](./img/trees.png)
+
+- a tree contains pointers (using SHA-1) to
+  - blobs
+  - other trees
+  - and metadata (type of pointer (blob/tree)), filename, mode
 ![trees](./img/trees2.png)
+
+---
+
+## Useful Notes
+
+### Danger Zone
+
+#### Local Destructive Operations
+
+![danger](./img/danger1.png)
+
+#### Remote Destructive Operations (rewriting history)
+
+![danger](./img/danger2.png)
+
+---
+
+### Recover lost work
+
+![recover](./img/recover1.png)
+
+- undo a merge:
+![recover](./img/recover2.png)
+
+- finding commits that aren't referenced anymore:
+![recover](./img/recover3.png)

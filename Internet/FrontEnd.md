@@ -1,18 +1,18 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Progressive Web Apps PWA](#progressive-web-apps-pwa)
-  - [PWA Components](#pwa-components)
-    - [Manifest](#manifest)
-    - [Service Workers](#service-workers)
-    - [HTTPS](#https)
-- [Performance](#performance)
-  - [Minimize images](#minimize-images)
-  - [Critical Render PATCH](#critical-render-patch)
-- [Gulp.js](#gulpjs)
-  - [Gulp vs Webpack](#gulp-vs-webpack)
-- [Pugjs](#pugjs)
-- [SEO](#seo)
+  - [Progressive Web Apps PWA](#progressive-web-apps-pwa)
+    - [PWA Components](#pwa-components)
+      - [Manifest](#manifest)
+      - [Service Workers](#service-workers)
+      - [HTTPS](#https)
+  - [Performance](#performance)
+    - [Minimize images](#minimize-images)
+    - [Critical Render PATCH](#critical-render-patch)
+  - [Gulp.js](#gulpjs)
+    - [Gulp vs Webpack](#gulp-vs-webpack)
+  - [Pugjs](#pugjs)
+  - [SEO](#seo)
 
 ---
 

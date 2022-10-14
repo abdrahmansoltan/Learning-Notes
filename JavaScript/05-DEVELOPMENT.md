@@ -1,30 +1,28 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Notes](#notes)
-- [exporting](#exporting)
-  - [1. Named Exports (Zero or more exports per module)](#1-named-exports-zero-or-more-exports-per-module)
-  - [2. Default Exports (One per module)](#2-default-exports-one-per-module)
-- [Importing](#importing)
-  - [1. for Named Exports](#1-for-named-exports)
-  - [2. Import a module for its side effects only](#2-import-a-module-for-its-side-effects-only)
-  - [3. Importing defaults](#3-importing-defaults)
-  - [4. Importing (defaults + named) exports](#4-importing-defaults--named-exports)
-  - [5. Dynamic Imports](#5-dynamic-imports)
-- [modular pattern](#modular-pattern)
-- [NPM](#npm)
-  - [Steps](#steps)
-  - [Notes](#notes-1)
-- [Bundling (parcel / Webpack)](#bundling-parcel--webpack)
-  - [Parcel](#parcel)
-  - [Webpack](#webpack)
-    - [For Development](#for-development)
-    - [For Production](#for-production)
+  - [Notes](#notes)
+  - [Exporting & Importing code](#exporting--importing-code)
+    - [Exporting](#exporting)
+    - [Importing](#importing)
+  - [modular pattern](#modular-pattern)
+  - [Old vs Modern Javascript with Package managers](#old-vs-modern-javascript-with-package-managers)
+    - [NPM](#npm)
+      - [Task runner (npm scripts)](#task-runner-npm-scripts)
+    - [Yarn](#yarn)
+    - [Package manager Notes](#package-manager-notes)
+  - [Bundling (parcel / Webpack)](#bundling-parcel--webpack)
+    - [Parcel](#parcel)
+    - [Webpack](#webpack)
+      - [For Development](#for-development)
+      - [For Production](#for-production)
   - [Babel (`transpiling` & `Polyfilling`)](#babel-transpiling--polyfilling)
-  - [scripts](#scripts)
-- [Deployment](#deployment)
-  - [CI/CD](#cicd)
-    - [CI/CD using netlify](#cicd-using-netlify)
+    - [Transpiling code for new language features](#transpiling-code-for-new-language-features)
+      - [Configuring Webpack to use Babel](#configuring-webpack-to-use-babel)
+    - [Polyfilling](#polyfilling)
+  - [Deployment](#deployment)
+    - [CI/CD](#cicd)
+      - [CI/CD using netlify](#cicd-using-netlify)
 
 ---
 
@@ -41,122 +39,122 @@
 
 ---
 
-## exporting
+## Exporting & Importing code
+
+Most programming languages provide a way to import code from one file into another. JavaScript wasn’t originally designed with this feature, because JavaScript was designed to only run in the browser, with no access to the file system of the client’s computer (for security reasons). So for the longest time, organizing JavaScript code in multiple files required you to load each file with variables shared globally.
+
+In 2009, a project named CommonJS was started with the goal of specifying an ecosystem for JavaScript outside the browser. A big part of CommonJS was its specification for **modules**, which would finally allow JavaScript to import and export code across files like most programming languages, without resorting to global variables. The most well-known of implementation of CommonJS modules is **node.js**.
+
+---
+
+### Exporting
 
 - The `export` statement is used when creating JavaScript modules to export live bindings to functions, objects, or primitive values from the module so they can be used by other programs with the import statement.
 - Exported modules are in `strict mode` whether you declare them as such or not.
 - exports must happen in top-level code (global scope)
 
-- There are two types of exports
+There are two types of exports
 
-### 1. Named Exports (Zero or more exports per module)
+1. Named Exports (Zero or more exports per module)
 
-```javascript
-// Exporting individual features
-export let name1, name2, …, nameN; // also var, const
-export let name1 = …, name2 = …, …, nameN; // also var, const
-export function functionName(){...}
-export class ClassName {...}
+   ```javascript
+   // Exporting individual features
+   export let name1, name2, …, nameN; // also var, const
+   export let name1 = …, name2 = …, …, nameN; // also var, const
+   export function functionName(){...}
+   export class ClassName {...}
 
-// multiple exports with Renaming exports
-const totalPrice = 237;
-const totalQuantity = 23;
-export { totalPrice, totalQuantity as tq };
+   // multiple exports with Renaming exports
+   const totalPrice = 237;
+   const totalQuantity = 23;
+   export { totalPrice, totalQuantity as tq };
 
- // Exporting destructured assignments with renaming
- export const { name1, name2: bar } = obj;
-```
+   // Exporting destructured assignments with renaming
+   export const { name1, name2: bar } = obj;
+   ```
 
----
+2. Default Exports (One per module)
 
-### 2. Default Exports (One per module)
+   - here we don't export `declaration` or `variables` but we export `values` or `(expressions that already return values)`
 
-- here we don't export `declaration` or `variables` but we export `values` or `(expressions that already return values)`
-
-```javascript
-// Default exports
-export default (expression like "ternary operator","arrow function", "short circuiting" );
-export default function (…) { … } // also class, function*
-export default function name1(…) { … } // also class, function*
-```
+   ```javascript
+   // Default exports
+   export default (expression like "ternary operator","arrow function", "short circuiting" );
+   export default function (…) { … } // also class, function*
+   export default function name1(…) { … } // also class, function*
+   ```
 
 ---
 
-## Importing
+### Importing
 
 [reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports)
 
-### 1. for Named Exports
+1. for Named Exports
 
-```javascript
-// creating a `name-space` from importing => to use in the file
-import * as myModule from 'module-name';
-// now "myModule" will act as an object which has properties & mehtods we can use
-myModule.moduleFunc();
+   - It's preferred for large libraries like `lodash` and `reactDom`
+     - so you only import what you need from them
 
-// Import a single export from a module
-// "export1" must be the same name in the module
-import { export1 } from 'module-name';
-import { export1 as alias1 } from 'module-name';
+   ```javascript
+   // creating a `name-space` from importing => to use in the file
+   import * as myModule from 'module-name';
+   // now "myModule" will act as an object which has properties & mehtods we can use
+   myModule.moduleFunc();
 
-// Import multiple exports from module
-import { export1, export2 } from 'module-name';
-```
+   // Import a single export from a module
+   // "export1" must be the same name in the module
+   import { export1 } from 'module-name';
+   import { export1 as alias1 } from 'module-name';
 
-> It's preferred for large libraries like `lodash` and `reactDom`
->
-> - so you only import what you need from them
+   // Import multiple exports from module
+   import { export1, export2 } from 'module-name';
+   ```
 
----
+2. Import a module for its side effects only
 
-### 2. Import a module for its side effects only
+   - This runs the module's global code, but doesn't actually import any values.
 
-- This runs the module's global code, but doesn't actually import any values.
+   ```javascript
+   import 'module-name';
 
-```javascript
-import 'module-name';
+   // example : This works with dynamic imports
+   (async () => {
+     if (somethingIsTrue) {
+       // import module for side effects
+       await import('/modules/my-module.js');
+     }
+   })();
+   ```
 
-// example : This works with dynamic imports
-(async () => {
-  if (somethingIsTrue) {
-    // import module for side effects
-    await import('/modules/my-module.js');
-  }
-})();
-```
+3. Importing defaults
 
----
+   ```javascript
+   // here we can name it whatever we want as it was exported without a name
+   import myDefault from '/modules/my-module.js';
+   ```
 
-### 3. Importing defaults
+4. Importing (defaults + named) exports
 
-```javascript
-// here we can name it whatever we want as it was exported without a name
-import myDefault from '/modules/my-module.js';
-```
+   ```javascript
+   import add, { addToCart, totalPrice as price, tq } from './shoppingCart.js';
+   // here (add) is the default import
+   ```
 
-### 4. Importing (defaults + named) exports
+5. Dynamic Imports
 
-```javascript
-import add, { addToCart, totalPrice as price, tq } from './shoppingCart.js';
-// here (add) is the default import
-```
+   - The standard import syntax is static and will always result in all code in the imported module being evaluated at load time. In situations where you wish to load a module conditionally or on demand, you can use a dynamic import instead.
 
----
+   - To dynamically import a module, the `import` keyword may be called as a `function`. When used this way, it returns a `promise`.
 
-### 5. Dynamic Imports
+   ```javascript
+   import('/modules/my-module.js').then(module => {
+     // Do something with the module.
+     module.loadPageInto(main);
+   });
 
-- The standard import syntax is static and will always result in all code in the imported module being evaluated at load time. In situations where you wish to load a module conditionally or on demand, you can use a dynamic import instead.
-- To dynamically import a module, the `import` keyword may be called as a `function`. When used this way, it returns a `promise`.
-
-```javascript
-import('/modules/my-module.js').then(module => {
-  // Do something with the module.
-  module.loadPageInto(main);
-});
-
-// or using "await" keyword
-let module = await import('/modules/my-module.js');
-```
+   // or using "await" keyword
+   let module = await import('/modules/my-module.js');
+   ```
 
 ---
 
@@ -180,20 +178,151 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
 
 ---
 
-## NPM
+## Old vs Modern Javascript with Package managers
 
-### Steps
-
-1. `npm init`
-2. `npm install package-name`
-3. Bundling with [Parcel](https://parceljs.org/)
-4. writing `scripts`
+- in old javascript development when we wanted to include a library, we needed to download its `.js` file and include it before our main `.js` file in the `html` file
+  - The good thing was that it was easy enough to understand. The bad thing was that it was annoying to find and download new versions of libraries every time they would update.
+- Starting around 2010, several competing JavaScript package managers (`npm`, `yarn`, `Bower`) emerged to help automate the process of downloading and upgrading libraries from a central repository
+  - Note that `npm` was originally a package manager made specifically for `node.js`, a JavaScript runtime designed to run on the **server**, not the frontend (in the browser).
+  - Using package managers generally involves using a command line, which in the past was never required as a frontend dev
 
 ---
 
-### Notes
+### NPM
 
-- `devDependency` is like a tool that we need to build our application, But it's not a dependency that we actually include in our code.
+- `npm init`
+  - generate a new file named `package.json` This is a configuration file that npm uses to save all project information.
+    - it can be described as a manifest of your project that includes the packages and applications it depends on, information about its unique source control, and specific metadata like the project's name, description, and author.
+    - it is always structured in the JSON format, which allows it to be easily read as metadata and parsed by machines.
+  - > You can use `npm init --yes` to Instantly Initialize a Project
+- `npm install package-name`
+
+  - This command does two things:
+    1. first, it downloads all the code from the package into a folder called `node_modules`.
+    2. Second, it automatically modifies the `package.json` file to keep track of the package as a project dependency.
+
+> This is useful later when sharing a project with others — instead of sharing the `node_modules` folder (which can get very large), you only need to share the `package.json` file and other developers can install the required packages automatically with the command `npm install`
+
+- now to use the library/package, we have 2 choices:
+
+  1. **Use the `.js` file in the `node_modules/package_name` directory**
+
+     - This means we can link to the npm downloaded version of the package in the `index.html` file as follows:
+
+     ```html
+     <script src="node_modules/package_name.js"></script>
+     <script src="index.js"></script>
+     ```
+
+     - So the good thing is that we can now use npm to download and update our packages through the command line. The bad thing is right now we’re digging through the `node_modules` folder to find the location of each package and manually including it in our HTML. That’s pretty inconvenient
+
+  2. **Using a JavaScript module bundler (webpack)**
+
+     - using `node.js` modules. Instead of loading all of `package_name.js` with an HTML script tag, you can load it directly in the JavaScript file as follow:
+
+       ```js
+       // index.js
+       var moment = require('moment');
+
+       // rest of the main code
+       ```
+
+     - This is all great for `node.js`, but if we tried to use the above code in the browser, we get an error saying `require` is not defined. The browser doesn’t have access to the file system, which means loading modules in this way is very tricky — loading files has to be done dynamically, either synchronously (which slows down execution) or asynchronously (which can have timing issues).
+     - This is where a module bundler comes in. **A JavaScript module bundler is a tool that gets around the problem with a build step (which has access to the file system) to create a final output that is browser compatible (which doesn’t need access to the file system)**.
+       - In this case, we need a module bundler to find all require statements (which is invalid browser JavaScript syntax) and replace them with the actual contents of each required file. The final result is a single bundled JavaScript file (with no require statements)!
+     - > The most popular module bundler was [Browserify](https://browserify.org/), Around 2015, [webpack](https://webpack.js.org/) eventually became the more widely used module bundler (fueled by the popularity of the **React** frontend framework, which took full advantage of webpack’s various features).
+     - Now that we have webpack’s **dist/main.js** output, we are going to use it instead of `index.js` in the browser, as it contains invalid require statements. This would be reflected in the `index.html` file as follows:
+
+       ```html
+       <script src="dist/main.js"></script>
+       ```
+
+- Bundling with [Parcel](https://parceljs.org/)
+- writing `scripts`
+
+---
+
+#### Task runner (npm scripts)
+
+It is a tool that automates different parts of the build process. For frontend development, tasks include `minifying code`, `optimizing images`, `running tests`, etc.
+
+> In 2013, [Grunt](https://gruntjs.com/) was the most popular frontend task runner, with [Gulp](https://gulpjs.com/) (more about Gulp in [FrontEnd.md file](../Internet/FrontEnd.md)) following shortly after. Both rely on plugins that wrap other command line tools. Nowadays the most popular choice seems to be using the scripting capabilities built into the **npm package manager** itself, which doesn’t use plugins but instead works with other command line tools directly.
+
+it's the `entries` in the `scripts` field of the `package.json` file. The scripts field holds an object where you can specify various commands and scripts that you want to expose.
+
+> ![npm-scripts](./img/npm-scripts.png)
+> ![npm-lifecycle](./img/npm-lifecycle.png)
+>
+> - **shell/bash**: it's good at:
+>   - file i/o
+>   - chaining tasks
+>   - running tasks in series/parallel>
+>
+> - **node**: we can replace shell commands with node-implementations, like
+>   - `bash` -> `node`
+>   - `cat` -> `catw`
+>   - `mkdir` -> `mkdirp`
+>   - `rm` -> `rimraf`
+>   - `&` -> `npm-run-all -parallel`
+>
+> This is achievable because most packages come with shell commands
+
+- This is very useful when we have repetitive tasks and we have to automate them.
+
+- [reference](https://docs.npmjs.com/cli/v8/using-npm/scripts)
+
+- in `package.json` :
+
+  ```json
+  // you may have to remove the ("main" line) above "scripts" in the file or replace it with "default"
+  {
+    "default": "index.html",
+
+    "scripts": {
+      "start": "parcel index.html",
+      "build": "parcel build index.html --dist-dir ./dist"
+    }
+  }
+  ```
+
+> Note that the scripts in `package.json` can run webpack without having to specify the full path `./node_modules/.bin/parcel`, since `node.js` knows the location of each npm module path
+> ![npm-path](./img/npm-path.png)
+
+- These can be executed using the following command :
+
+  ```bash
+  # npm run <script-name>
+
+  npm run start
+  # or
+  npm start
+
+  # run this after finishing development and removed (dist, modules) folders and you are ready for deployment
+  npm run build
+  ```
+
+- there's also **npm lifehooks commands**, like:
+
+  ```json
+  {
+    "scripts": {
+      "preinstall": "",
+      "postinstall": ""
+    }
+  }
+  
+  ```
+
+---
+
+### Yarn
+
+---
+
+### Package manager Notes
+
+- **devDependency**: this saves it as a development dependency, which means it’s a package that you need in your development environment but not on your production server
+  - it's done with the `--save-dev` argument
 - `Bundling` with `parcel` creates a `script` not a `module`, so in html we shouldn't write `type="module"` in `<script>`
 
 ---
@@ -201,6 +330,8 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
 ## Bundling (parcel / Webpack)
 
 `JavaScript bundling` is an optimization technique you can use to reduce the number of **server requests** for JavaScript files. Bundling accomplishes this by merging multiple JavaScript files together into one file to reduce the number of page requests.
+
+A JavaScript **module bundler** is a tool that gets around the problem with a build step (which has access to the file system) to create a final output that is browser compatible (which doesn’t need access to the file system).
 
 > Difference:
 >
@@ -255,34 +386,67 @@ The module pattern is a special Design pattern in which we use IFFI (Immediately
 ### Webpack
 
 ```bash
+# installation
 npm install webpack webpack-cli webpack-dev-server --save-dev
 ```
 
 #### For Development
 
-- in `package.json` add this script :
+- run the webpack tool that was installed in the `node_modules` folder, start with the `index.js` file, find any `require()` statements, and replace them with the appropriate code to create a single output file (which by default is **dist/main.js**).
 
-  ```json
-  "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack"
-    },
+  - The `--mode=development` argument is to keep the JavaScript readable for developers, as opposed to a minified output with the argument `--mode=production`.
+
+  ```sh
+  ./node_modules/.bin/webpack index.js --mode=development
   ```
 
-- For `development` --> create `webpack.config.js` file that contains this :
+- Note that we’ll need to run the webpack command each time we change `index.js`. This is tedious, Webpack can read options from a config file in the root directory of the project named webpack.`config.js`
+
+  - create `webpack.config.js` file that contains this :
 
   ```js
+  // webpack.config.js
   const path = require('path');
 
   module.exports = {
     mode: 'development',
-    entry: './src/app.ts',
+    entry: './index.js',
     output: {
-      filename: 'bundle.js',
-      path: path.resolve(__dirname, 'dist'),
+      filename: 'main.js',
       publicPath: 'dist'
     }
   };
+  ```
+
+  - Now each time we change index.js, we can run webpack with the command:
+
+    ```sh
+    ./node_modules/.bin/webpack
+    ```
+
+- and to use it with a task-runner, in `package.json` add this script :
+
+  ```json
+  // (--progress) option to show the percent progress
+  "scripts": {
+    "build": "webpack --progress --mode=production",
+    "watch": "webpack --progress --watch"
+    },
+  ```
+
+- you can also use **webpack-dev-server**, a separate tool which provides a simple web server with live reloading. To install it as a development dependency:
+
+  ```sh
+  npm install webpack-dev-server --save-dev
+  ```
+
+  ```json
+  // package.json
+  "scripts": {
+    "build": "webpack --progress -p",
+    "watch": "webpack --progress --watch",
+    "serve": "webpack-dev-server --open"
+    },
   ```
 
 ---
@@ -324,40 +488,85 @@ npm i --save-dev clean-webpack-plugin
 
 ---
 
-### Babel (`transpiling` & `Polyfilling`)
+## Babel (`transpiling` & `Polyfilling`)
 
 How to make our modern code work on older engines that don’t understand recent features yet? -> There are two tools for that:
 
-1. **Transpilers** : special piece of software that translates source code to another source code. It can parse (“read and understand”) modern code and rewrite it using older syntax constructs, so that it’ll also work in outdated engines.
+### Transpiling code for new language features
 
-   ```js
-   // before running the transpiler
-   height = height ?? 100;
+**Transpiling** code means converting the code in one language to code in another similar language. This is an important part of frontend development — since browsers are slow to add new features, new languages were created with experimental features that transpile to browser compatible languages.
 
-   // after running the transpiler
-   height = height !== undefined && height !== null ? height : 100;
-   ```
+**Transpilers** : special piece of software that translates source code to another source code. It can parse (“read and understand”) modern code and rewrite it using older syntax constructs, so that it’ll also work in outdated engines.
 
-   - Usually, a developer runs the transpiler on their own computer, and then deploys the transpiled code to the server.
-   - **Babel** is one of the most prominent transpilers out there.
-   - Modern project build systems, such as **webpack**, provide a means to run a transpiler automatically on every code change, so it’s very easy to integrate into the development process.
+- **Babel** is not a new language but a transpiler that transpiles next generation JavaScript with features not yet available to all browsers (ES2015 and beyond) to older more compatible JavaScript (ES5).
+- **Typescript** is a language that is essentially identical to next generation JavaScript, but also adds optional static typing. Many people choose to use babel because it’s closest to vanilla JavaScript.
 
-2. **Polyfills** : is a piece of code (usually JavaScript on the Web) used to provide modern **functionality** on older browsers that do not natively support it.
+```js
+// before running the transpiler
+height = height ?? 100;
 
-   - New language features may include not only syntax constructs and operators, but also built-in **functions**. As we’re talking about new functions, not syntax changes, there’s no need to transpile anything here. We just need to declare the missing function.
-   - For example, `Math.trunc(n)` is a function that “cuts off” the decimal part of a number, e.g `Math.trunc(1.23)` returns 1.
+// after running the transpiler
+height = height !== undefined && height !== null ? height : 100;
+```
 
-   ```js
-   if (!Math.trunc) {
-     // if no such function
+- Usually, a developer runs the transpiler on their own computer, and then deploys the transpiled code to the server.
+- **Babel** is one of the most prominent transpilers out there.
 
-     Math.trunc = function (number) {
-       // Math.ceil and Math.floor exist even in ancient JavaScript engines
-       // they are covered later in the tutorial
-       return number < 0 ? Math.ceil(number) : Math.floor(number);
-     };
-   }
-   ```
+#### Configuring Webpack to use Babel
+
+Modern project build systems, such as **webpack**, provide a means to run a transpiler automatically on every code change, so it’s very easy to integrate into the development process.
+
+- We can configure webpack to use babel-loader by editing the webpack.`config.js` file as follows:
+
+```js
+// webpack.config.js
+module.exports = {
+  mode: 'development',
+  entry: './index.js',
+  output: {
+    filename: 'main.js',
+    publicPath: 'dist'
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        /* we’re telling webpack to look for any .js files (excluding ones in the node_modules folder) 
+        and apply babel transpilation using babel-loader with the @babel/preset-env preset.
+        */
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
+      }
+    ]
+  }
+};
+```
+
+---
+
+### Polyfilling
+
+**Polyfills** : is a piece of code (usually JavaScript on the Web) used to provide modern **functionality** on older browsers that do not natively support it.
+
+- New language features may include not only syntax constructs and operators, but also built-in **functions**. As we’re talking about new functions, not syntax changes, there’s no need to transpile anything here. We just need to declare the missing function.
+- For example, `Math.trunc(n)` is a function that “cuts off” the decimal part of a number, e.g `Math.trunc(1.23)` returns 1.
+
+  ```js
+  if (!Math.trunc) {
+    // if no such function
+
+    Math.trunc = function (number) {
+      // Math.ceil and Math.floor exist even in ancient JavaScript engines
+      // they are covered later in the tutorial
+      return number < 0 ? Math.ceil(number) : Math.floor(number);
+    };
+  }
+  ```
 
 - `Babel` is a JavaScript `transcompiler` that is mainly used to convert ECMAScript 2015+ (ES6+) code into a backwards compatible version of JavaScript that can be run by older JavaScript engines. Babel is a popular tool for using the newest features of the JavaScript programming language.
 
@@ -378,41 +587,6 @@ How to make our modern code work on older engines that don’t understand recent
     ```
 
 ---
-
-### scripts
-
-it's the `entries` in the `scripts` field of the `package.json` file. The scripts field holds an object where you can specify various commands and scripts that you want to expose.
-
-- This is very useful when we have repetitive tasks and we have to automate them.
-
-- [reference](https://docs.npmjs.com/cli/v8/using-npm/scripts)
-
-- in `package.json` :
-
-  ```json
-  // you may have to remove the ("main" line) above "scripts" in the file or replace it with "default"
-  {
-    "default": "index.html",
-
-    "scripts": {
-      "start": "parcel index.html",
-      "build": "parcel build index.html --dist-dir ./dist"
-    }
-  }
-  ```
-
-- These can be executed using the following command :
-
-  ```bash
-  # npm run <script-name>
-
-  npm run start
-  # or
-  npm start
-
-  # run this after finishing development and removed (dist, modules) folders and you are ready for deployment
-  npm run build
-  ```
 
 ---
 
