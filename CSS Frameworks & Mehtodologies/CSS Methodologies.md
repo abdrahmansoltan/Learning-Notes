@@ -5,7 +5,16 @@
   - [Object-Oriented CSS (OOCSS)](#object-oriented-css-oocss)
     - [OOCSS Example](#oocss-example)
   - [Block Element Modifier BEM](#block-element-modifier-bem)
-  - [Scalable Modular Architecture for CSS (SMACSS)](#scalable-modular-architecture-for-css-smacss)
+    - [BEM Notes](#bem-notes)
+  - [Scalable and Modular Architecture for CSS (SMACSS)](#scalable-and-modular-architecture-for-css-smacss)
+    - [SMACSS Categories](#smacss-categories)
+      - [Base](#base)
+      - [Layout](#layout)
+      - [Modules](#modules)
+        - [module variations](#module-variations)
+      - [State](#state)
+      - [Themes](#themes)
+    - [SMACSS Notes](#smacss-notes)
   - [Naming convention](#naming-convention)
     - [ITCSS](#itcss)
     - [BEMIT](#bemit)
@@ -31,14 +40,13 @@ CSS is notoriously difficult to manage in large, complex, rapidly-iterated syste
   - `Code formatting`
 
 - There is no “best” CSS methodology. Different approaches work better for different individuals/teams/projects.
+- All CSS methodologies tackle the scalability and maintainability problem in CSS by providing a class-based system for breaking up big web designs into lots of small, modular, discrete units. Each UI module can be reused over and over throughout a design, and even ported from one project to another if two projects share the same CSS methodology.
 
 CSS Methodologies:
 
 [Object-Oriented CSS (OOCSS)](#object-oriented-css-oocss)
 [Block, Element, Modifier (BEM)](#block-element-modifier-bem)
-[Scalable and Modular Architecture for CSS (SMACSS)](#scalable-modular-architecture-for-css-smacss)
-[SUIT CSS](#)
-[Systematic CSS](#)
+[Scalable and Modular Architecture for CSS (SMACSS)](#scalable-and-modular-architecture-for-css-smacss)
 
 ---
 
@@ -116,7 +124,9 @@ One goal of the OOCSS methodology is to reduce duplication of the same propertie
 
 ## Block Element Modifier BEM
 
-BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The idea behind BEM is to differentiate CSS classes that fulfill different roles. This is done by naming CSS classes in a way that indicates their role. It provides a rather strict way to arrange your CSS classes into independent modules.
+BEM stands for Block Element Modifier. It is a naming convention (**CSS class-naming system**) for classes in HTML and CSS. The idea behind BEM is to differentiate CSS classes that fulfill different roles. This is done by naming CSS classes in a way that indicates their role. It provides a rather strict way to arrange your CSS classes into independent modules.
+
+BEM gives everyone on a project a declarative syntax that they can share so that they’re on the same page.
 
 > BEM complements **OOCSS** because OOCSS doesn’t impose any particular class-naming convention.
 
@@ -135,22 +145,23 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
 ![BEM](./img/bem.PNG)
 ![bem](./img/bem.jpg)
 
-- **Block**: The sole root of the component, represents an object in your website. It is an independent, modular UI component. A block may be composed of multiple HTML elements, or even multiple blocks. For example:
+- **Block**: The sole root of the component, represents an object in your website. It is an independent (stand alone entity and meaningful on its own), modular UI component. A block may be composed of multiple HTML elements, or even multiple blocks. For example:
   - a person
   - a login form
   - a menu
   - a search form
-- **Element**: is a component within the block that performs a particular function. It should only make sense in the context of its block. For example:
+- **Element**: is a component within the block that performs a particular function. and it has no standalone meaning and is semantically tied to its block. It should only make sense in the context of its block. For example:
   - a hand
   - a login button
   - a menu item
   - a search input field
-- **Modifier**: is how we represent the variations of a block. For example:
+- **Modifier**: is how we represent the variations of a block (a flag orn a block or element used to change appearance and/or behavior). For example:
 
   - a tall/short person
   - a condensed login form (e.g. we’re hiding the labels in one version)
   - a menu modified to look differently for a footer or sitemap
   - a search input field with a particular button style
+  - A modifier can't be used alone
 
 - also you can use `helper class` which is used when you have an item that is used many times but in one place of its use we want to add a css-property to it 'like margin-right-small'
 
@@ -174,10 +185,13 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
   }
   ```
 
-**Notes**:
+---
+
+### BEM Notes
 
 - `BEM` helps us avoid **nesting**
 
+  - in BEM, **everything is a class and nothing is nested**. That makes CSS specificity very flat and low
   - BEM is a good way to build UI. The descriptive, sometimes long, class names are good for understanding straight away where this class/selector sits within your UI architecture. It also means you rarely need to nest selectors, a common downfall with Sass codebases. Usually when I’m nesting with BEM is when I want to target an element via HTML tag name, or to win a specificity battle when components styling overlaps.
   - also it proviedes more code-readability than nesting
 
@@ -193,6 +207,25 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
   }
   ```
 
+- **Sass and BEM**: For those of you writing Sass and enjoy nesting as a way of scoping styles, you can still author in a nested format, but get CSS that isn’t nested, with `@at-root`
+
+  ```scss
+  .block {
+    @at-root #{&}__element {
+    }
+    @at-root #{&}--modifier {
+    }
+  }
+
+  // gets you:
+  .block {
+  }
+  .block__element {
+  }
+  .block--modifier {
+  }
+  ```
+
 - A couple of subjective criticisms against BEM are:
   - The class names can end up being long and ugly
   - The naming convention is not intuitive to inexperienced developers
@@ -200,28 +233,60 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
 
 ---
 
-## Scalable Modular Architecture for CSS (SMACSS)
+## Scalable and Modular Architecture for CSS (SMACSS)
 
 > it's pronounced: **smacks**
 
-**SMACSS** is a CSS framework. it is more like a “**style guide**” than a rigid CSS framework. It focuses on five categories for its rules:
+**SMACSS** is a CSS framework. it is more like a “**style guide**” than a rigid CSS framework. It focuses on five categories for its rules
 
-- **Base**: Style rules that sets the default CSS properties of individual HTML elements. These are typically **CSS type selectors** like `html`, `body`, `a`, a`:hover`. This includes your CSS resets and would often be in its own base CSS file or at the start of your main CSS.
+- SMACSS is about:
+  - categorization ->
+    - [SMACSS Categories](#smacss-categories)
+      - every style we write serves one of these purposes whether we're aware of it or not
+    - isolating code allow for easier `reuse`, `testing` and `debugging`
+  - naming convention
+    - `modules` & `sub-modules`
+  - decoupling `css` from `html`
+    - only apply the styles you want to specific elements and not keeping it generalized to avoid cleaning up later and trying to undo the style effect for an element to apply new styles
+    - this is done as the `html` code usually isn't predictable (we aren't sure that the content won't change)
+    - **reduce the depth (depth applicability)** to only affect things that we want them to and to understand what html-elements will be affected by the class:
+      - use fewer selectors, preferably one
+      - use child selectors to limit depth or use `direct-descendent selector`
+  - state-based design
+    - things that indicate presentation
+    - `classes`, `pseudo-classes -> (hover)` , `attribute selectors`
+    - `media queries`
 
-  - Element selectors
-  - Css resets
-  - Normalize
+---
 
-- **Layout**: Style rules that are related to the structural layout of web pages. it divides a page into sections with elements like `header`, `footer`, and `article` and also `Containers`, the `grid`, etc.
+### SMACSS Categories
 
-  - They are prefixed with `layout-` or `l-`
-    ![smacss-layout](./img/smacss-layout.png)
+#### Base
 
-  - Major containing elements
-  - Grid systems
-  - How do you group your content?
+Style rules that sets the default CSS properties of individual HTML elements. These are typically **CSS type selectors** like `html`, `body`, `a`, a`:hover`. This includes your CSS resets and would often be in its own base CSS file or at the start of your main CSS.
+
+- Element selectors
+- Css resets
+- Normalize
+
+#### Layout
+
+Style rules that are related to the structural layout of web pages. it divides a page into sections with elements like `header`, `footer`, and `article` and also `Containers`, the `grid`, etc.
+
+- They are prefixed with `layout-` or `l-`
+  ![smacss-layout](./img/smacss-layout.png)
+
+- Major containing elements
+- Grid systems
+- summary -> it's how do you group your content?
 
   ```css
+  .layout-constrained {
+    width: 760px;
+  }
+  .layout-highlight {
+    background-color: #ccc;
+  }
   .layout-sidebar {
     width: 320px;
   }
@@ -230,12 +295,15 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
   }
   ```
 
-- **Modules**: Modular, reusable components in the design, the majority of your elements and thus doesn't require that you prefix them but you could do so if you choose.
+#### Modules
 
-  - Modules are given their own unique class names. Sub-components and variations are prefixed with the name of their parent module.
-  - Contained content
-  - majority of your site
-  - Child elements (su-modules) in SMACSS (like what an “element” is to a “block” in BEM) have the parent item prefixed with a **dash**. e.g. `menu` and `menu-item`.
+Modular, reusable components in the design, **the majority of your elements** and thus doesn't require that you prefix them but you could do so if you choose.
+
+- it's everything else other than the first 2 categories
+- Modules are given their own unique class names. Sub-components and variations are prefixed with the name of their parent module.
+- Contained content (isolated modules from each other)
+  - prevent styles from coming in or out
+- majority of your site
 
   ```css
   .call-to-action-button {
@@ -248,13 +316,46 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
   }
   ```
 
-- **State**: Style rules that specify the current state of something in the interface. It is used for the variations possible for each element (e.g. `active`, `inactive`, `expanded`, `hidden`).
+- elements that you might think that they should be categorized as `base` but they should be `modules`:
+  - `<button>`
+  - `<table>`
+  - `<input>`
+  - the reason why is that we want `base` styles to be lightweight and not crowded with properties like in `modules`, which these elements usually require
 
-  - These are **prefixed** with `is-`, e.g. `is-active`, `is-inactive`, `is-expanded`, `is-hidden` or are via pseudo-classes such as `:hover` and `:focus` or `media queries`.
+##### module variations
 
-  - `is-` prefix indicates:
-    - likelihood of javascript dependency
-    - a togglable state
+![smacss-modules](./img/smacss-modules.png)
+
+- they're **Child elements** (sub-modules) in SMACSS (like what an “element” is to a “block” in BEM) have the parent item prefixed with a **dash**. e.g. `menu` and `menu-item`.
+- always when seeing `sub-module` class, you will know that there's a `root-module` up there in the DOM. so we then have more code-readability
+
+  ```css
+  /* examples */
+
+  /* root-module */
+  .btn {
+  }
+  /* sub-module (module variations) */
+  .btn-large {
+  }
+  /* sub-module (module variations) */
+  .btn-search {
+  }
+  ```
+
+- You can use other alternatives like **BEM**
+  ![smacss-bem](./img/smacss-bem.png)
+
+#### State
+
+Style rules that specify the current state of something in the interface. It is used for the variations possible for each element (e.g. `active`, `inactive`, `expanded`, `hidden`).
+
+- These are **prefixed** with `is-`, e.g. `is-active`, `is-inactive`, `is-expanded`, `is-hidden` or are via pseudo-classes such as `:hover` and `:focus` or `media queries`.
+
+- `is-` prefix indicates:
+
+  - likelihood of **javascript dependency**
+  - a togglable state
 
   ```css
   .is-hidden {
@@ -262,12 +363,42 @@ BEM stands for Block Element Modifier. It is a **CSS class-naming system**. The 
   }
   ```
 
-- **Themes**: is similar to state but defines **how modules and layouts will look**.
-  - They are style rules that affect layout and modules, triggered by user preferences/actions/viewing contexts.
-  - They are more applicable for larger sites with shared elements that look different throughout. You would add theme variations on a per page or per section basis.
-  - ex: `fonts`, `color`
-  - only for on-the-fly changes (like displaying chinese language)
-  - usually aren't needed
+#### Themes
+
+is similar to state but defines **how modules and layouts will look**.
+
+- They are style rules that affect layout and modules, triggered by user preferences/actions/viewing contexts.
+- They are more applicable for larger sites with shared elements that look different throughout. You would add theme variations on a per page or per section basis.
+- ex: `fonts`, `color`
+
+  ```css
+  .theme-header {
+    /* not ".theme-red" */
+    color: red;
+  }
+  .theme-border {
+  }
+  .theme-background {
+  }
+
+  .text-xl {
+    font-size: 140%;
+  }
+  .text-s {
+    font-size: 90%;
+  }
+  ```
+
+- only for on-the-fly changes (like displaying chinese language)
+- usually aren't needed
+
+---
+
+### SMACSS Notes
+
+- you may find a file called `shame.css`:
+  - which says: "here we have some **custom-classes** this doesn't belong here and we need to clean this once we finish and put these custom classes where they belong"
+  - it should be **Temporary**
 
 ---
 
@@ -325,7 +456,7 @@ The most common types of namespace are
 
 #### Responsive Suffixes
 
-The next thing **BEMIT** adds to traditional BEM naming is responsive suffixes. These suffixes take the format ( **@<breakpoint>** ), and tell us this class when at this size:
+The next thing **BEMIT** adds to traditional BEM naming is responsive suffixes. These suffixes take the format ( `@<breakpoint>` ), and tell us this class when at this size:
 
 ```html
 <!-------------------------- Example -------------------------->

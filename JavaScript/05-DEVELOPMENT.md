@@ -11,6 +11,11 @@
       - [Task runner (npm scripts)](#task-runner-npm-scripts)
     - [Yarn](#yarn)
     - [Package manager Notes](#package-manager-notes)
+  - [Modules](#modules)
+    - [Problems with script loading](#problems-with-script-loading)
+    - [History of Modules](#history-of-modules)
+      - [CommonJS](#commonjs)
+      - [EcmaScript Modules (ESM)](#ecmascript-modules-esm)
   - [Bundling (parcel / Webpack)](#bundling-parcel--webpack)
     - [Parcel](#parcel)
     - [Webpack](#webpack)
@@ -250,10 +255,10 @@ It is a tool that automates different parts of the build process. For frontend d
 
 it's the `entries` in the `scripts` field of the `package.json` file. The scripts field holds an object where you can specify various commands and scripts that you want to expose.
 
-> ![npm-scripts](./img/npm-scripts.png)
-> ![npm-lifecycle](./img/npm-lifecycle.png)
+> ![npm-scripts](./img/npm-scripts.png) > ![npm-lifecycle](./img/npm-lifecycle.png)
 >
 > - **shell/bash**: it's good at:
+>
 >   - file i/o
 >   - chaining tasks
 >   - running tasks in series/parallel>
@@ -310,7 +315,6 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
       "postinstall": ""
     }
   }
-  
   ```
 
 ---
@@ -324,6 +328,64 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
 - **devDependency**: this saves it as a development dependency, which means it’s a package that you need in your development environment but not on your production server
   - it's done with the `--save-dev` argument
 - `Bundling` with `parcel` creates a `script` not a `module`, so in html we shouldn't write `type="module"` in `<script>`
+- if you're using `windows`, don't write scripts with **single quotation** as it won't work, so you'll have to use **double quotation**
+
+---
+
+## Modules
+
+### Problems with script loading
+
+- We have some problems when trying to run javascript in the browser:
+
+  - too many scripts
+    - that exceeds the max number of default simultaneous persistent connections per server/proxy
+  - unmaintainable scripts
+    - `scope`, `size`, `readability`, `fragility`, `monolith files`
+
+- solution:
+  - using **IIFE's**, as we treat each file as IIFE (revealing module), also this enables us to (**concatenate** files together): we can safely combine files without concern of scope collision!
+- we had other problems:
+  - "Full rebuilds every time there's a change"
+  - lots of IIFE's are **slow** -> [The cost of small modules](https://nolanlawson.com/2016/08/15/the-cost-of-small-modules/)
+
+---
+
+### History of Modules
+
+#### CommonJS
+
+- With the creation of `Node.js`, we needed a way to run Javascript outside of the browser, this is where `commonJS` was born
+
+  ```js
+  const path = require('path');
+  ```
+
+- `NPM` was created as a package strategy to share **commonJS node modules** across the entire ecosystem
+- Modules also had problems:
+  - No live bindings
+  - No browser support for commonJS
+  - slow module loader (slow) -> as it's **synchronous**
+- this is where **bundlers** and **linkers** started to get popular, but they also had problems
+- this led to a solution which is -> **ESM**
+
+#### EcmaScript Modules (ESM)
+
+It's a standard pattern for importing JavaScript modules.
+
+```js
+import { uniq, forOf, bar } from 'lodash-es';
+import * as utils from 'utils';
+
+export const uniqConst = uniq([1, 2, 2, 4]);
+```
+
+- it's different from **ES2015**
+- it's still not fully compatible with `Node.js`
+- but you may ask: "How do they work in the browser?"
+  - the answer is: "they're incredibly **SLOW**"; it's like unusable after 10 modules
+
+> **This is where WEBPACK was born**
 
 ---
 
@@ -339,6 +401,8 @@ A JavaScript **module bundler** is a tool that gets around the problem with a bu
 >   Webpack is better for large production
 
 ![Bundling](./img/Bundling.png)
+
+---
 
 ### Parcel
 
@@ -384,6 +448,8 @@ A JavaScript **module bundler** is a tool that gets around the problem with a bu
 ---
 
 ### Webpack
+
+It's a **module bundler**
 
 ```bash
 # installation
@@ -585,8 +651,6 @@ module.exports = {
 
     // if they are not installed automatically, install them manually
     ```
-
----
 
 ---
 

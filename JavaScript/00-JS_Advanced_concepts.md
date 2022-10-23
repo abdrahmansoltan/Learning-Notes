@@ -401,6 +401,7 @@ Difference between iteration and recursion:
 - **Recursion**: has one problem, in typical JavaScript implementations, it’s about three times slower than the looping version. Running through a simple loop is generally cheaper than calling a function multiple times.
 - Any recursion can be rewritten as a loop. The loop variant usually can be made more effective.
   - But sometimes the rewrite is non-trivial, especially when a function uses different recursive subcalls depending on conditions and merges their results or when the branching is more intricate. And the optimization may be unneeded and totally not worth the efforts.
+- A recursive solution is usually shorter than an iterative one.
 
 ---
 
@@ -409,11 +410,15 @@ Difference between iteration and recursion:
 recursion sometimes take long time as it calls multiple functions at the same time which occupies the **call stack**
 
 - one solution is to use **memoization (caching)**
+  - A loop-based algorithm is more memory-saving.
+  - The iterative solution uses a single context (place in memory which is the iteration index) changing `i` and result in the process. Its memory requirements are small, fixed and do not depend on `n`.
+
 - another solution is to use **tail call optimization**
   - **Note**: not all JavaScript engines implements **tail calls**
-- The maximal recursion depth is limited by JavaScript engine. We can rely on it being 10000, some engines allow more, but 100000 is probably out of limit for the majority of them.
+- The maximal recursion depth is limited by JavaScript engine. We can rely on it being `10000`, some engines allow more, but `100000` is probably out of limit for the majority of them.
 - **Recursive structures**: A recursive (recursively-defined) data structure is a structure that replicates itself in parts.
   - For examples: `HTML` and `XML documents`.
+    - `HTML-tag` may contain a list of: [`Text pieces`, `HTML comments`, `other HTML tags`]
 
 ---
 

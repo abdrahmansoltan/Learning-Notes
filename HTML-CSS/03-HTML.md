@@ -62,7 +62,8 @@
   <!DOCTYPE html>
   ```
 
-- **`<meta>`**  element lives inside the `<head>` element and contains information about that web page.
+- **`<meta>`** element lives inside the `<head>` element and contains information about that web page.
+
   - it tells search engines about your page, who created it, and whether or not it is time sensitive. (If the page is time sensitive, it can be set to expire.)
   - **`<meta charset="UTF-8">`** is as the letters we use in the English language (**character encoding**)
     - Specify character encoding **at first of the document**
@@ -70,21 +71,33 @@
   ```html
   <head>
     <title>Information About Your Pages</title>
-    
-    <meta name="description"
-    content="An Essay on Installation Art" />
-    <meta name="keywords"
-    content="installation, art, opinion" />
-    <meta name="robots"
-    content="nofollow" />
-    <meta http-equiv="author"
-    content="Jon Duckett" />
-    <meta http-equiv="pragma"
-    content="no-cache" />
-    <meta http-equiv="expires"
-    content="Fri, 04 Apr 2014 23:59:59 GMT" />
+
+    <meta name="description" content="An Essay on Installation Art" />
+    <meta name="keywords" content="installation, art, opinion" />
+    <meta name="robots" content="nofollow" />
+    <meta http-equiv="author" content="Jon Duckett" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="Fri, 04 Apr 2014 23:59:59 GMT" />
   </head>
   ```
+
+  - **`<meta name="viewport">`**
+
+    ```html
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    ```
+
+    - The browser's viewport is the area of the window in which web content can be seen. This is often not the same size as the rendered page, in which case the browser provides scrollbars for the user to scroll around and access all the content.
+    - Some mobile devices and other narrow screens render pages in a virtual window or viewport, which is usually wider than the screen, and then shrink the rendered result down so it can all be seen at once. Users can then pan and zoom to see different areas of the page. For example, if a mobile screen has a width of 640px, pages might be rendered with a virtual viewport of 980px, and then it will be shrunk down to fit into the 640px space.
+    - his is done because not all pages are optimized for mobile and break (or at least look bad) when rendered at a small viewport width. This **virtual viewport is a way to make non-mobile-optimized sites in general look better on narrow screen devices**.
+    - The basic properties of the "viewport" `<meta>` tag include:
+      - `width`: Controls the size of the viewport. It can be set to a specific number of pixels like width=600 or to the special value **device-width, which is 100vw, or 100% of the viewport width**. Minimum: 1. Maximum: 10000. Negative values: ignored.
+      - `height`: same
+      - `initial-scale`: Controls the zoom level when the page is first loaded. Minimum: 0.1. Maximum: 10. Default:1. Negative values: ignored.
+      - `minimum-scale`
+      - `maximum-scale`
+      - `user-scalable`: Controls whether zoom in and zoom out actions are allowed on the page. Valid values: 0, 1, yes, or no. Default: 1
+    ![meta-viewport](./img/meta-viewport.png)
 
 - **Attribute** is a piece of data used to describe elements
 - **href** : HyperText Reference
@@ -163,6 +176,7 @@ Why do we need to tell the browser what our HTML elements represent?
   ```
 
 - `<iframe>` is like a little window that has been cut into your page — and in that window you can see **another page**. The term iframe is an abbreviation of **inline frame**.
+
   - ex: to embed a Google Map into a page.
 
 - `<blockquote>` and `<q>` --> these two elements commonly used for marking up **quotations**
@@ -314,7 +328,7 @@ Autofill can help with re-entering data. You enter your address once. From now o
 - Every `<form>` element requires an action attribute. Its value is the **URL** for the page on the server that will receive the information in the form when it is submitted.
 
   ```html
-  <form action="http://www.example.com/subscribe.php" method="get">
+  <form action="http://www.example.com/subscribe.php" method="get"></form>
   ```
 
 - When a form is submitted (for example, when the user clicks the Submit button), the browser makes a **request**. A script can respond to that request and process the data.
@@ -506,7 +520,7 @@ Live Region roles are used to define elements with **content that will be dynami
 ### Image Formats
 
 - **JPEG** -> Whenever you have many different colors
-colors
+  colors
 - **JPEG** -> Whenever you have images with few colors or large areas of the same color (flat colors),
   - ex: logos, illustrations and diagrams.
 - **GIF or PNG** ->
@@ -568,6 +582,7 @@ colors
 ### image size optimization (responsive images)
 
 - why we use the built-in HTML `width` and `height` ?
+
   - Images often take longer to load than the (HTML and css) code that makes up the rest of the page, therefore, a good idea to specify the size of the image (in html or css) so that the browser can render the rest of the text on the page while **leaving the right amount of space for the image that is still loading** which allows it to render the rest of the page without waiting for the image to download.
 
   ```html
@@ -676,7 +691,7 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
     <td>Math</td>
     <td>Art</td>
   </tr>
- </table>
+</table>
 ```
 
 ### Table Notes

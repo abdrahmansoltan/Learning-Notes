@@ -1,26 +1,36 @@
-This repository contains notes from my learning Journey to be a reference for any information that I'd need at any time
-
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Programming](#programming)
-- [Internet-FrontEnd/BackEnd](#internet-frontendbackend)
-- [HTML-CSS](#html-css)
-- [JavaScript](#javascript)
-- [TypeScript](#typescript)
-- [Node.js](#nodejs)
-- [Databases](#databases)
-- [Frameworks](#frameworks)
-- [React](#react)
-- [Next js](#next-js)
-- [Angular](#angular)
-- [Vue](#vue)
-- [Git](#git)
-- [Testing](#testing)
+  - [Intro](#intro)
+  - [Programming Fundamentals](#programming-fundamentals)
+  - [Internet-FrontEnd/BackEnd](#internet-frontendbackend)
+  - [HTML-CSS](#html-css)
+    - [CSS Methodologies & Frameworks](#css-methodologies--frameworks)
+  - [JavaScript](#javascript)
+    - [JQuery](#jquery)
+  - [TypeScript](#typescript)
+  - [Node.js](#nodejs)
+  - [Databases](#databases)
+  - [Frameworks](#frameworks)
+  - [React](#react)
+  - [Next js](#next-js)
+  - [Angular](#angular)
+  - [Vue](#vue)
+  - [Git](#git)
+  - [Testing](#testing)
+    - [Unit Testing](#unit-testing)
+    - [Automation (E2E) Testing](#automation-e2e-testing)
 
 ---
 
-## Programming
+## Intro
+
+This repository contains notes from my learning Journey to be a reference for any information that I'd need at any time
+w
+
+---
+
+## Programming Fundamentals
 
 - [Programming-foundation-Fundamentals](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/01_Programming%20Foundations%20Fundamentals/Notes.md)
 
@@ -38,42 +48,41 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Internet-FrontEnd/BackEnd
 
-- [HTTP](./HTTP/HTTP.md)
-
-- [BackEnd](./Node.js/1-BackEnd.md)
-
+- [Internet](./Internet/Internet.md)
+- [HTTP](./Internet/HTTP.md)
 - [FrontEnd](./Internet/FrontEnd.md)
-
-- [API](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/08_Programming%20Foundations%20APIs%20and%20Web%20Services/Notes.md)
+- [BackEnd](./internet/../Internet/BackEnd.md)
+- [Docker](./Internet/Doc)
 
 ---
 
 ## HTML-CSS
 
-- [HTML](./HTML-CSS-SASS/03-HTML.md)
+- [HTML](./HTML-CSS/03-HTML.md)
+- [CSS](./HTML-CSS/04-CSS.md)
 
-- [CSS](./HTML-CSS-SASS/04-CSS.md)
-- CSS Frameworks:
-  - [Sass](./CSS%20Frameworks/Sass.md)
-  - [Tailwind](./CSS%20Frameworks/Tailwind.md)
+### CSS Methodologies & Frameworks
+
+- [CSS Methodologies](./CSS%20Frameworks%20%26%20Mehtodologies/CSS%20Methodologies.md)
+- [Sass](./CSS%20Frameworks%20%26%20Mehtodologies/Sass.md)
+- [Bootstrap](./CSS%20Frameworks%20%26%20Mehtodologies/Bootstrap.md)
+- [Tailwind](./CSS%20Frameworks%20%26%20Mehtodologies/Tailwind.md)
 
 ---
 
 ## JavaScript
 
-- [JavaScript](./JavaScript/01-%D9%80%D9%8DJS.md)
+- [JavaScript](./JavaScript/01-JS.md)
+- [JavaScript Advanced concepts](./JavaScript/00-JS_Advanced_concepts.md)
+- [OOP](./JavaScript/02-OOP.md)
+- [APIs](./JavaScript/03-API.md)
+- [ASYNC](./JavaScript/04-ASYNC.md)
+- [DEVELOPMENT](./JavaScript/05-DEVELOPMENT.md)
+- [ARCHITECTURE](./JavaScript/06-ARCHITECTURE.md)
 
-- [JavaScript-OOP](./JavaScript/02-OOP.md)
+### JQuery
 
-- [JavaScript-API](./JavaScript/03-API.md)
-
-- [JavaScript-ASYNC](./JavaScript/04-ASYNC.md)
-
-- [JavaScript-DEV/DEP](./JavaScript/05-DEVELOPMENT.md)
-
-- [JavaScript-ARC](./JavaScript/06-ARCHITECTURE.md)
-
-- [JavaScript-Advanced_concepts](./JavaScript/00-JS_Advanced_concepts.md)
+- [JQuery](./JavaScript/07-JQuery.md)
 
 ---
 
@@ -116,20 +125,17 @@ This repository contains notes from my learning Journey to be a reference for an
 ## React
 
 - [React](./React/01-React.md)
-
 - [Hooks](./React/02-Hooks.md)
-
 - [Class-Components](./React/03-Class-Components.md)
-
 - [Redux](./React/04-Redux.md)
-
-- [React-Deployment](./React/05-Deployment.md)
+- [Redux-toolkit](./React/05-Redux-toolkit.md)
+- [performance](./React/06-performance.md)
 
 ---
 
 ## Next js
 
-[Next js](./Nextjs/1-Nextjs.md)
+[Next.js](./Nextjs/1-Nextjs.md)
 
 ---
 
@@ -145,18 +151,27 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Vuex](./Vue/2-Vuex.md)
 - [Composition API](./Vue/3-Composition-API.md)
 - [Testing Vue](./Vue/4-Testing-Vue.md)
+- [Typescript_Vue](./Vue/5-Typescript_Vue.md)
+- [NUXT](./Vue/6-NUXT.md)
 
 ---
 
 ## Git
 
-- [Git](./Git/02-Github.md)
-- [Github](./Git/01-Git.md)
+- [Git](./Git/01-Git.md)
+- [Github](./Git/02-Github.md)
 
 ---
 
 ## Testing
 
 - [Testing](./Testing/1-Testing.md)
+
+### Unit Testing
+
 - [Jasmine](./Testing/2-Jasmine.md)
 - [Jest](./Testing/3-Jest.md)
+
+### Automation (E2E) Testing
+
+- [Jest](./Testing/4-Cypress.md)

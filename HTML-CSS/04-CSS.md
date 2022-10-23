@@ -7,6 +7,7 @@
     - [css selector specificity](#css-selector-specificity)
       - [Calculation](#calculation)
       - [Selectors Notes](#selectors-notes)
+  - [Properties Types](#properties-types)
   - [styling (hyperlinks / buttons)](#styling-hyperlinks--buttons)
   - [Box Model](#box-model)
   - [Display](#display)
@@ -39,8 +40,10 @@
     - [Invalid At Computed Values Time (IACVT)](#invalid-at-computed-values-time-iacvt)
     - [variables token: Number, string, images](#variables-token-number-string-images)
     - [Css variables with Javascript](#css-variables-with-javascript)
-  - [calc()](#calc)
-    - [Advantages](#advantages)
+  - [Calculations Built in Functions](#calculations-built-in-functions)
+    - [calc()](#calc)
+      - [Advantages](#advantages)
+    - [clamp()](#clamp)
   - [icons - SVG](#icons---svg)
   - [Animation](#animation)
     - [What to animate?](#what-to-animate)
@@ -137,6 +140,21 @@ If there are two or more CSS rules that point to the same element, the selector 
 
 ---
 
+## Properties Types
+
+- numbers: `10`, `200px`, `50%`, `14pt`
+- colors: `#FFF`, `rgb(255, 0, 0)`, `red`
+- strings: `img.png`, `url("img.png")`
+- boolens: `true`, `false`
+- lists: like 4 values for all directions in `border`
+- maps: `key-value pairs`
+
+  ```css
+  blue: (base: #6ac0e2, center: #38b5ea, shadow: #316980);
+  ```
+
+---
+
 ## styling (hyperlinks / buttons)
 
 Always use these (pseudo classes) with `<a>`, `<button>` elements:
@@ -160,6 +178,23 @@ Always use these (pseudo classes) with `<a>`, `<button>` elements:
   - this is not the same for **padding** as they get added together
 - **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/border-collapse.png)
 - between sections use padding not margin
+
+- When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
+
+  - it helps if you only want to specify spacing for one direction only instead of making the other direction equals `zero`
+    ![css-margin-block-inline](./img/css-margin-block-inline.png)
+
+  ```css
+  /* OLD */
+  margin: 0 20px;
+  /* NEW */
+  margin-inline: 20px;
+
+  /* OLD */
+  margin: 20px 0;
+  /* NEW */
+  margin-block: 20px;
+  ```
 
 > **THE VISUAL FORMATTING MODEL**: Algorithm that calculates boxes and determines the layout of theses boxes, for each element in the render tree, in order to determine the final layout of the page.
 
@@ -325,7 +360,7 @@ p {
 
 - `white-space: no wrap` => this forces it to automatically go to next line when reaching max-width
 - `text-overflow:ellipsis` => when text passes the max-width, it shows this `...`at the max-width limit as indication of more text available
-- in the `html` element we set the `font-size` to 62.5% and not 10px => because we want to respect the user's font-size settings.
+- in the `html` element-selector we set the `font-size` to **62.5%** and not 10px => because we want to respect the user's font-size settings.
 - `rem` (root element) vs `em` (parent element) : ![rem-em](./img/rem-em.png)
   - **em** ->
     - em are measured relative to their **parent font-size**, if used to specify **font-size**
@@ -336,7 +371,14 @@ p {
 
 ![units](./img/units.PNG)
 
-For font-size scales -> [type-scale.com](https://type-scale.com/)
+> we shouldn't use **Pixels** for font-sizes as if user changed his browser **base font-size** (the default is 16px), then it won't reflect on the page.
+>
+> - so instead we use a relative unit that can scall up/down like: `rem` or `em`
+
+- For font-size scales -> [type-scale.com](https://type-scale.com/)
+- If you're getting your fonts from a service like [https://fonts.google.com](https://fonts.google.com), note that there may be some tracking of **IP-Addresses** of the users when the `HTML` page is downloaded in the browser
+  - to avoid this, you can download the font files locally and refer to it in the `HTML` file
+  - more info [here](https://blog.runcloud.io/google-fonts-gdpr/)
 
 ---
 
@@ -772,40 +814,44 @@ you can make the variable contains :
 
 ### Css variables with Javascript
 
+> One of the main difference between the **old sass variables** and the **new css custom properties** is that in custom-properties, you can use `Javascript` to change the variables values after the compilation and the loading in the browser which will enable more dynamic styling
+
 You can **get / set** css-variable-value of an element in javascript by having the variable declared in the root before, then change it's value locally in the element styles:
 
 ```js
 // Get variable from inline style
-element.style.getPropertyValue('--foo')
+element.style.getPropertyValue('--foo');
 
 // Get variable from wherever
-getComputedStyle(element).getPropertyValue('--foo')
+getComputedStyle(element).getPropertyValue('--foo');
 
 // Set variable on inline style
-element.style.setProperty('--foo', 38 + 4)
+element.style.setProperty('--foo', 38 + 4);
 
 // --------------------------------------------------- //
 
 // or change it in the root element
-let root = document.documentElement
+let root = document.documentElement;
 
 document.addEventListener('pointermove', evt => {
-  let x = evt.clientX / innerWidth
-  let y = evt.clientY / innerHeight
-  root.style.setProperty('--mouse-x', x)
-  root.style.setProperty('--mouse-y', y)
-})
+  let x = evt.clientX / innerWidth;
+  let y = evt.clientY / innerHeight;
+  root.style.setProperty('--mouse-x', x);
+  root.style.setProperty('--mouse-y', y);
+});
 ```
 
 ---
 
-## calc()
+## Calculations Built in Functions
+
+### calc()
 
 it's the ability to do math in css
 
 - compatible with `length`, `frequency`, `angle`, `time`, `number` and `integer`
 
-### Advantages
+#### Advantages
 
 - can mix different units when performing calculations (not possible in `Sass`)
 
@@ -832,6 +878,18 @@ it's the ability to do math in css
 
 ---
 
+### clamp()
+
+The `clamp()` CSS function clamps a middle value within a range of values between a defined minimum bound and a maximum bound. The function takes three parameters: a `minimum value`, a `preferred value`, and a `maximum allowed value`.
+
+![clamp](./img/css-clamp.svg)
+
+```css
+font-size: clamp(1rem, 2.5vw, 2rem);
+```
+
+---
+
 ## icons - SVG
 
 - [Hero Icons](https://heroicons.com/) here we use `stroke` or `fill` properties **not** color
@@ -843,11 +901,18 @@ it's the ability to do math in css
 
 ### What to animate?
 
-note that animation in an expensive process of CPU/GPU and specially on CPU, so these are some guidelines:
+note that animation in an expensive process of CPU/GPU and specially on CPU, so these are some guidelines (CSS triggers):
 
-- ✅ -> `transform`, `opacity`
-- 🤞 -> `color`, `background`
-- ❌ -> `height`, `width`, `left`, `right`, `margin`, `padding` etc (**things that trigger layouts**)
+- **Composite** ✅ -> It's for blending things together like with: `transform`, `opacity`
+  - If you change a property that requires neither layout nor paint, and the browser jumps to just do compositing.
+  - This final version is the cheapest and most desirable for high pressure points in an app's lifecycle, like `animations` or `scrolling`.
+  - > You can find more here: [Stick to Compositor](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/)
+- **Painting** 🤞 -> `color`, `background`
+  - browser skips layout, but it will still do paint.
+  - it's not too expensive for rendering
+- **Layouts** ❌ -> one that changes an element’s geometry, like its `height`, `width`, `left`, `right`, `margin`, `padding` etc (**things that trigger layouts**)
+  - the browser will have to check all the other elements and “reflow” the page. Any affected areas will need to be repainted
+  - it's very costly so try to avoid it
   - instead use `transform: translate()`
 
 ---
@@ -1087,6 +1152,17 @@ You can use `data-state` attribute to define state and make css values establish
   }
   ```
 
+- **TRICK**: instead of using `min-width` in media-query, to specify the width of a container or a grid, we can use the `min()` function
+
+```css
+.el {
+  width: min(1000px, 100%);
+  /* this will choose between the minimum of these 2 values 1000px or the 100% width of the screen */
+
+  /*OR: width: min(1000px, 100% - margin_width-left&right); */
+}
+```
+
 we do breaks when **design breaks**
 ![responsive](./img/responsive.PNG)
 
@@ -1108,38 +1184,37 @@ we do breaks when **design breaks**
 
     - add this library to html file (for safari)
 
-      ````html
+      ```html
       <script
         defer
         src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"
       ></script>
       ```
-      ````
 
     - then in JS file :
 
       ```javascript
-      const allLinks = document.querySelectorAll('a:link')
+      const allLinks = document.querySelectorAll('a:link');
 
       allLinks.forEach(function (link) {
         link.addEventListener('click', function (e) {
-          e.preventDefault()
-          const href = link.getAttribute('href')
+          e.preventDefault();
+          const href = link.getAttribute('href');
 
           // Scroll back to top
           if (href === '#')
             window.scrollTo({
               top: 0,
               behavior: 'smooth'
-            })
+            });
 
           // Scroll to other links
           if (href !== '#' && href.startsWith('#')) {
-            const sectionEl = document.querySelector(href)
-            sectionEl.scrollIntoView({ behavior: 'smooth' })
+            const sectionEl = document.querySelector(href);
+            sectionEl.scrollIntoView({ behavior: 'smooth' });
           }
-        })
-      })
+        });
+      });
       ```
 
 ---
@@ -1201,3 +1276,21 @@ There are two ways to add multiple style sheets to a page:
     margin: 0px auto;
   }
   ```
+
+- when creating base styles (**resets**), you may also want to apply it to `::before` and `::after` pseudo-elements
+
+  ```css
+  html {
+    box-sizing: border-box;
+    font-size: 100%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+  ```
+
+- usually when using compiler and bundling multiple `css`/`sass` files into one `.css` file, you may see file with extension: `.css.map`
+  - this file is for mapping the style rules to their files so that it would show in the devtools to ease the debugging process
