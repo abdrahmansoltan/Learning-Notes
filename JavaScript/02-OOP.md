@@ -6,6 +6,7 @@
     - [Methods](#methods)
   - [prototypal inheritance (delegation)](#prototypal-inheritance-delegation)
     - [Why we do this?](#why-we-do-this)
+      - [The "new Function" syntax](#the-new-function-syntax)
   - [ES6 Classes](#es6-classes)
     - [`getter` & `setter`](#getter--setter)
   - [`object.create()`](#objectcreate)
@@ -87,10 +88,31 @@ why we do this instead of declaring the function with the class properties each 
 - because we don't want to create the same function that have same functionality each time for each object
 - instead we move all these methods (functions) to a parent object so that it won't be created each time (**Bundle all common functions together + Make a Bond to that object by a hidden property -> `__proto__`**)
   - `__proto__` hidden property is added in the background using the **"new"** keyword that points to the **prototype** object-property in the parent class
-- When a function is executed with **new** keyword, it does the following steps:
-  - A new empty object is created and assigned to `this`.
-  - The function body executes. Usually it modifies `this`, adds new properties to it.
-  - The value of `this` is returned.
+
+#### The "new Function" syntax
+
+When a function is executed with **new** keyword, it does the following steps:
+
+- A new empty object is created and assigned to `this`.
+- The function body executes. Usually it modifies `this`, adds new properties to it.
+- The value of `this` is returned.
+
+```js
+// new Function([arg1, arg2, ...argN], functionBody);
+let sum = new Function('a', 'b', 'return a + b');
+```
+
+- The major difference from other ways we’ve seen is that **the function is created literally from a string**; For example, we can receive a new function from a server and then execute it:
+
+  - It is used in very specific cases, like when we receive code from a server, or to dynamically compile a function from a template, in complex web-applications.
+
+  ```js
+  let str = ... receive the code from a server dynamically ...
+
+  let func = new Function(str);
+  func();
+  ```
+
 - all is that is possible because (functions in JS are both **function & objects combo**)
 
 > **NOTE:** other built in objects like arrays have the hidden `__proto__` property

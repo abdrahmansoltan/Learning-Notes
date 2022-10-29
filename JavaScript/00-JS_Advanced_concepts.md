@@ -160,18 +160,28 @@ it's the automatic or implicit conversion of values from one data type to anothe
 - **local variables:** The interpreter creates local variables when the function is run, and removes them as soon as the function has finished its task. This means that:
   - If the function runs twice, the variable can have different values each time.
   - Two different functions can use variables with the same name without any kind of naming conflict
+  - without separate blocks there would be an **error**, if we use `let` with the existing variable name
 - **global variables:**: Global variables are stored **in memory** for as long as the web page is loaded into the web browser. This means they take up more memory than local variables, and it also increases the risk of naming conflicts
-  - For these reasons, you should use local variables wherever possible
+  - For these reasons, **you should use local variables wherever possible**
 
 ---
 
 ### Lexical scope
 
-> **It's where the function was called (Functions are linked to the object they were defined within)**
+> It's where the function was called (Functions are linked to the object they were defined within)
 
 Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope.
 
 > (range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in**.
+
+- The Lexical Environment object consists of two parts:
+
+  1. Environment Record – an object that stores all local variables as its properties (and some other information like the value of this).
+  2. A reference to the outer lexical environment, the one associated with the outer code.
+
+- A **“variable”** is a property of a special internal object, associated with the currently executing block/function/script.
+
+  - “To get or change a variable” means “to get or change a property of that object”.
 
 - it determines our available variables
 - variable defined outside a function can be accessible inside another function defined after the variable declaration.
@@ -181,7 +191,24 @@ Each local scope can also see all the local scopes that contain it, and all scop
 
 ![lexical](./img/fig2.png)
 
-> **Note**: if variable is assign a value but never declared in a scope or block -> it automatically gets declared in the global scope
+> **Note**: (if not in strict mode) -> if variable is assign a value but never declared in a scope or block -> it automatically gets declared in the global scope
+
+- if function is declared in a local scope, it can't be accessed outside:
+
+  ```js
+  let phrase = 'Hello';
+
+  if (true) {
+    let user = 'John';
+
+    function sayHi() {
+      alert(`${phrase}, ${user}`);
+    }
+  }
+
+  sayHi(); // The result is an error.
+  // The function sayHi is declared inside the if, so it only lives inside it. There is no sayHi outside.
+  ```
 
 ---
 
@@ -250,6 +277,15 @@ Each local scope can also see all the local scopes that contain it, and all scop
 
 It's the ability to treat functions (when executed) as values
 
+> **a function remembers where it was born in the special property `[[Environment]]`. It references the Lexical Environment from where it’s created**
+>
+> - But when a function is created using **new Function()** have `[[Environment]]` referencing the global Lexical Environment, not the outer one. Hence,
+> - they cannot use outer variables. But that’s actually good, because it insures us from errors. Passing parameters explicitly is a much better method architecturally and causes no problems with minifiers.
+
+A closure is a function that remembers its outer variables and can access them.
+
+> When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work.
+
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
 one of the biggest examples of closures is **timers**: ![closure](./img/closure2.PNG)
@@ -281,7 +317,7 @@ one of the biggest examples of closures is **timers**: ![closure](./img/closure2
   ```
 
 - when you want to turn **block-scope** into a **functional-scope** -> use **IIFE**
-  - usually used to prevent variable to be in the global scope like here:
+  - usually used to prevent variable to be in the global scope like with (variables declared with `var`) here:
     ![IIFE](./img/iife.PNG)
   - Often used to ensure that the variable names do not conflict with each other (especially if the page uses more than one script).
   - also used for
@@ -297,12 +333,30 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 - most importantly -> `generatedFunc` **doesn't have any connection to** `createFunction`, as:
   - here `generatedFunc` is not equal to `createFunction` function
   - but it's equal to "what `createFunction` function has returned **when it was created(ran)**"
+- Please note that if `f()` is called many times, and resulting functions are saved, then all corresponding Lexical Environment objects will also be retained in memory. In the code below, all 3 of them:.
+
+  ```js
+  function f() {
+    let value = Math.random();
+
+    return function () {
+      alert(value);
+    };
+  }
+
+  // 3 functions in array, every one of them links to Lexical Environment
+  // from the corresponding f() run
+  let arr = [f(), f(), f()];
+  ```
 
 #### Benefits
 
 - It's usually memory-efficient as it caches the values inside its block-scoped (where it was called) **(its local memory (like Backpack) + the returned value from the function)** in case that it was called again, this will be in the hidden property called `__scope__`.
+  - > all functions have the hidden property named `[[Environment]]` > ![closure](./img/function-closure.png)
   - actually the **Backpack** doesn't contain "all" the local memory of the function, but it contains only the values/variables that will be used in the function body and will get rid of other unused things in the local memory using **garbage collection**
     ![closure](./img/closure5.png)
+    - A Lexical Environment object dies (garbage collected) when it becomes **unreachable** (just like any other object). In other words, it exists only while there’s at least one nested function referencing it.
+      - But in practice, JavaScript engines try to optimize that. They analyze variable usage and if it’s obvious from the code that an outer variable is not used – it is removed.
     - this is the main concept behind **iterator function**, where it persists a function called **returnNextElement**, which has:
       1. Our underlying array itself
       2. The position we are currently at in our ‘stream’ of elements
@@ -356,9 +410,10 @@ const element2 = returnNextElement.next(2); // 7 -> when we pass a value to the 
   ```
 
   - Explanation of the code above:
-  ![generator](./img/generator-example.png)
+    ![generator](./img/generator-example.png)
 
 - **Async/await** simplifies all this and finally fixes the inversion of control problem of callbacks
+
   - as it automatically triggers the function on the promise-resolution **(this functionality is still added to the micro-task queue though)**
 
   ```js
@@ -410,6 +465,7 @@ Difference between iteration and recursion:
 recursion sometimes take long time as it calls multiple functions at the same time which occupies the **call stack**
 
 - one solution is to use **memoization (caching)**
+
   - A loop-based algorithm is more memory-saving.
   - The iterative solution uses a single context (place in memory which is the iteration index) changing `i` and result in the process. Its memory requirements are small, fixed and do not depend on `n`.
 
@@ -621,6 +677,7 @@ we can convert functions more easily to make them suit our task Without writing 
     - Please make sure that `"use strict"` is **at the top of your scripts**, otherwise strict mode may not be enabled.
   - Strict mode changes the (previously accepted "bad syntax") into real errors
     - as an example, in normal JavaScript, mistyping a variable name creates a new global variable. In strict mode, this will throw an error, making it impossible to accidentally create a global variable.
+    - If a variable is not found anywhere, that’s an error in strict mode (without `use strict`, an assignment to a non-existing variable creates a new **global** variable, for compatibility with old code).
   - **Should we write it ?**
     - Modern JavaScript supports `“classes”` and `“modules”`, that enable `use strict` automatically. So we don’t need to add the `"use strict"` directive.
 - `Refactoring the code` : means the process of restructuring code without changing or adding to its external behavior and functionality.
@@ -645,33 +702,90 @@ we can convert functions more easily to make them suit our task Without writing 
 
 - **Var** vs **const** & **let**
 
-  - **Var** is function-scoped (not block-scoped) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
+  - **Var**
 
-    ```js
-    function f() {
-      // It can be accessible any where (within) this function
-      //
-      var a = 10;
+    - is function-scoped (`“var”` has no block scope) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
+
+      - Variables, declared with `var`, are either function-scoped or global-scoped. They are visible through blocks.
+
+      ```js
+      function f() {
+        // It can be accessible any where (within) this function
+        //
+        var a = 10;
+        console.log(a); // 10
+      }
+      f();
+
+      // A cannot be accessible
+      // outside of function
+      console.log(a); // ReferenceError: a is not defined
+
+      // ---------------------------------------------------------------
+
+      if (true) {
+        // It can be accessible any where
+        var a = 10;
+        console.log(a); // 10
+      }
       console.log(a); // 10
-    }
-    f();
 
-    // A cannot be accessible
-    // outside of function
-    console.log(a); // ReferenceError: a is not defined
+      // ---------------------------------------------------------------
 
-    // ---------------------------------------------------------------
+      for (var i = 0; i < 10; i++) {
+        var one = 1;
+        // ...
+      }
+      alert(i); // 10, "i" is visible after loop, it's a global variable
+      alert(one); // 1, "one" is visible after loop, it's a global variable
+      ```
 
-    if (true) {
-      // It can be accessible any where
-      var a = 10;
-      console.log(a); // 10
-    }
-    console.log(a); // 10
-    ```
+    - `“var”` tolerates redeclarations
 
-  - **let** is both function-scoped and block-scoped, **means you can't use it outside the function-scope & block-scope**
-  - if you used **const** in a `for loop` -> `for ( i = 0; i < 3; i++) {}` you will get error, as you won't be able to re-assign `i`
+      ```js
+      let user;
+      let user; // SyntaxError: 'user' has already been declared
+
+      var user = 'Pete';
+      var user = 'John'; // this "var" does nothing (already declared)
+      // ...it doesn't trigger an error
+
+      alert(user); // John
+      ```
+
+    - `“var”` variables can be declared below their use
+
+      - `var` declarations are processed when the function starts (or script starts for globals). In other words, `var` variables are defined from the beginning of the function, no matter where the definition is
+
+        ```js
+        function sayHi() {
+          phrase = 'Hello';
+
+          alert(phrase);
+
+          var phrase;
+        }
+        sayHi();
+        ```
+
+      - **Important Note**: Declarations are hoisted, but assignments are not.
+
+        - Because all `var` declarations are processed at the function start, we can reference them at any place. But variables are `undefined` until the assignments.
+
+        ```js
+        function sayHi() {
+          var phrase; // declaration works at the start...
+
+          alert(phrase); // undefined
+
+          phrase = 'Hello'; // ...assignment - when the execution reaches it.
+        }
+
+        sayHi();
+        ```
+
+- **let** is both function-scoped and block-scoped, **means you can't use it outside the function-scope & block-scope**
+- if you used **const** in a `for loop` -> `for ( i = 0; i < 3; i++) {}` you will get error, as you won't be able to re-assign `i`
 
 - There is a widespread practice to use constants (named using capital letters and underscores) as aliases for difficult-to-remember values that are known prior to execution.
 
@@ -726,3 +840,58 @@ we can convert functions more easily to make them suit our task Without writing 
   var elDocument = document.documentElement;
   elDocument.className = elDocument.className.replace(/(^|\s)no-js(\s|$)/, '$1');
   ```
+
+- **polyfills**
+
+  - We use the **global object** to test for support of modern language features.
+
+    - If there’s none (say, we’re in an old browser), we can create “polyfills”: add functions that are not supported by the environment, but exist in the modern standard.
+
+  ```js
+  // For instance, test if a built-in Promise object exists (it doesn’t in really old browsers):
+  if (!window.Promise) {
+    alert('Your browser is really old!');
+    window.Promise = ... // custom implementation of the modern language feature
+  }
+  ```
+
+- In JavaScript, **functions are objects**.
+
+  - Function objects contain some useable properties; For instance, a function’s name is accessible as the `“name”` property:
+
+    ```js
+    function sayHi() {
+      alert('Hi');
+    }
+
+    alert(sayHi.name); // sayHi
+    ```
+
+  - the name-assigning logic is smart. It also assigns the correct name to a function even if it’s created without one, and then immediately assigned:
+
+    ```js
+    let sayHi = function () {
+      alert('Hi');
+    };
+
+    alert(sayHi.name); // sayHi (there's a name!)
+    ```
+
+  - **The “length” property**
+
+    - built-in property `“length”` that returns the number of function parameters, for instance:
+
+    ```js
+    function f1(a) {}
+    function f2(a, b) {}
+    function many(a, b, ...more) {}
+
+    alert(f1.length); // 1
+    alert(f2.length); // 2
+    alert(many.length); // 2
+    ```
+
+    > - The length property is sometimes used for introspection in functions that operate on other functions.
+    > - For instance, in the code below the ask function accepts a question to ask and an arbitrary number of handler functions to call. Once a user provides their answer, the function calls the handlers. We can pass two kinds of handlers:
+    > - A zero-argument function, which is only called when the user gives a positive answer.
+    > - A function with arguments, which is called in either case and returns an answer.

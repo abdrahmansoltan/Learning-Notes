@@ -2,6 +2,10 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
+  - [Scheduling: setTimeout and setInterval](#scheduling-settimeout-and-setinterval)
+    - [setTimeout](#settimeout)
+    - [Canceling with clearTimeout](#canceling-with-cleartimeout)
+    - [setInterval](#setinterval)
   - [Is JavaScript a `synchronous` or `asynchronous` ?](#is-javascript-a-synchronous-or-asynchronous-)
   - [Building a Promise](#building-a-promise)
     - [creating a promise](#creating-a-promise)
@@ -40,10 +44,102 @@
 
 ---
 
+## Scheduling: setTimeout and setInterval
+
+- There are two methods for it:
+
+  - `setTimeout` allows us to run a function once after the interval of time.
+  - `setInterval` allows us to run a function repeatedly, starting after the interval of time, then repeating continuously at that interval.
+
+### setTimeout
+
+```js
+// syntax
+let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...)
+```
+
+**Notes:**
+
+- If the first argument is a **string**, then JavaScript creates a function from it.
+
+  ```js
+  setTimeout("alert('Hello')", 1000); // This will work
+  ```
+
+- But using **strings** is not recommended, use arrow functions instead of them, like this:
+
+  ```js
+  setTimeout(() => alert('Hello'), 1000);
+  ```
+
+- Pass a function, but don’t run it
+
+  ```js
+  // wrong!
+  setTimeout(sayHi(), 1000);
+  ```
+
+  - That doesn’t work, because `setTimeout` expects a **reference to a function**. And here `sayHi()` runs the function, and the result of its execution is passed to setTimeout. In our case the result of `sayHi()` is undefined (the function returns nothing), so nothing is scheduled.
+
+- **Time goes on while `alert` is shown**
+  - In most browsers, the internal timer continues while showing `alert`/`confirm`/`prompt`.
+  - this is as `alert` blocks the Synchronous operations and not the Async ones
+
+---
+
+### Canceling with clearTimeout
+
+A call to `setTimeout` returns a “timer identifier” **timerId** that we can use to cancel the execution.
+
+```js
+let timerId = setTimeout(...);
+clearTimeout(timerId);
+```
+
+---
+
+### setInterval
+
+You can do intervals using `setInterval()` or with **nested setTimeOut()**:
+
+```js
+/** instead of:
+let timerId = setInterval(() => alert('tick'), 2000);
+*/
+
+let timerId = setTimeout(function tick() {
+  alert('tick');
+  timerId = setTimeout(tick, 2000); // (*)
+}, 2000);
+// The setTimeout above schedules the next call right at the end of the current one (*).
+```
+
+- The **nested setTimeout** is a more flexible method than `setInterval`. This way the next call may be scheduled differently, depending on the results of the current one.
+
+  - For instance, we need to write a service that sends a request to the server every 5 seconds asking for data, but in case the server is overloaded, it should increase the interval to 10, 20, 40 seconds…
+
+    ```js
+    let delay = 5000;
+
+    let timerId = setTimeout(function request() {
+      ...send request...
+
+      if (request failed due to server overload) {
+        // increase the interval to the next run
+        delay *= 2;
+      }
+
+      timerId = setTimeout(request, delay);
+
+    }, delay);
+    ```
+
+---
+
 ## Is JavaScript a `synchronous` or `asynchronous` ?
 
 - JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability
-- **but** when `js` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object
+- **but** when `js` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object in the **browser** or in **Node.js**
 - so **Javascript has no timer**, as the timer-function is **Web-browser feature**
 
 > **Async** means that "we don't have it right now"
@@ -119,7 +215,7 @@ Promise.reject(new Error('Problem!')).catch(x => console.error(x)
       - This is done using the `parse()` method of a built-in object called `JSON`. This is a global object, so you can use it without creating an instance of it first.
     - The JSON object also has a method called `stringify()`, which converts objects into a string using `JSON` notation so it can be sent from the browser back to a server. This is also known as serializing an object.
 
->To create an Ajax request, browsers use the `XMLHttpRequest` object.
+> To create an Ajax request, browsers use the `XMLHttpRequest` object.
 > When the server responds to the browser's request, the same `XMLHttpRequest` object will process the result.
 
 ```javascript
@@ -201,7 +297,7 @@ setTimeout(() => {
 - **fetch()**: returns a **promise object** which has 3 properties:
   ![fetch](./img/fetch.png)
   - `value` --> at first it's empty (`undefined`)
-  - `onFulfilled` --> it's an **array** that has the code (functions) that will Javascript run when `value` property   gets filled
+  - `onFulfilled` --> it's an **array** that has the code (functions) that will Javascript run when `value` property gets filled
   - `onRejection` --> it's an **array** that has the code (functions) that will Javascript run when error occurs
 - Benefits of `promises`
   - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
