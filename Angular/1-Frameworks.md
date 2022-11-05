@@ -1,16 +1,16 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Frameworks](#frameworks)
-- [Types of Frameworks](#types-of-frameworks)
-  - [Configuration-over-convention](#configuration-over-convention)
-  - [convention-over-configuration](#convention-over-configuration)
-- [Libraries vs Frameworks](#libraries-vs-frameworks)
-  - [React](#react)
-  - [Angular](#angular)
-  - [Vue](#vue)
-- [Comparison](#comparison)
-  - [Vue vs React](#vue-vs-react)
+  - [Frameworks](#frameworks)
+  - [Types of Frameworks](#types-of-frameworks)
+    - [Configuration-over-convention](#configuration-over-convention)
+    - [convention-over-configuration](#convention-over-configuration)
+  - [Libraries vs Frameworks](#libraries-vs-frameworks)
+    - [React](#react)
+    - [Angular](#angular)
+    - [Vue](#vue)
+  - [Comparison](#comparison)
+    - [Vue vs React](#vue-vs-react)
 
 ---
 

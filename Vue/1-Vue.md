@@ -1,74 +1,80 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Vue](#vue)
-  - [How it works?](#how-it-works)
+  - [Vue](#vue)
+    - [How it works?](#how-it-works)
+    - [Ways of Using Vue](#ways-of-using-vue)
   - [Instance LifeCycle](#instance-lifecycle)
     - [mounted](#mounted)
-- [Data](#data)
-  - [Interpolation](#interpolation)
-  - [Directives](#directives)
-  - [v-model (2 Way Binding)](#v-model-2-way-binding)
-    - [2 way binding for elements in a child-component or custom element component](#2-way-binding-for-elements-in-a-child-component-or-custom-element-component)
-  - [Refs](#refs)
-    - [Accessing the Refs](#accessing-the-refs)
-  - [ref vs v-model](#ref-vs-v-model)
-- [Methods](#methods)
-  - [Listening to Events](#listening-to-events)
-    - [Accessing Event Argument](#accessing-event-argument)
-    - [Event Modifiers](#event-modifiers)
+    - [LifeCycle Notes](#lifecycle-notes)
+  - [Data](#data)
+    - [Interpolation](#interpolation)
+    - [Directives](#directives)
+      - [Binding data (`v-bind`)](#binding-data-v-bind)
+    - [v-model (2 Way Binding)](#v-model-2-way-binding)
+      - [2 way binding for elements in a child-component or custom element component](#2-way-binding-for-elements-in-a-child-component-or-custom-element-component)
+      - [Modifiers](#modifiers)
+    - [Refs](#refs)
+      - [Accessing the Refs](#accessing-the-refs)
+    - [ref vs v-model](#ref-vs-v-model)
+  - [Methods](#methods)
+    - [Listening to Events](#listening-to-events)
+      - [Accessing Event Argument](#accessing-event-argument)
   - [Computed Properties](#computed-properties)
+    - [Computed vs methods](#computed-vs-methods)
+    - [Filters (old and deprecated)](#filters-old-and-deprecated)
   - [Watchers](#watchers)
-- [Styling](#styling)
-  - [Dynamic styling](#dynamic-styling)
-  - [Scoped styling](#scoped-styling)
-  - [Transitions](#transitions)
-    - [Transition vs animation](#transition-vs-animation)
-    - [Transition Classes](#transition-classes)
-    - [Transition mode](#transition-mode)
-    - [Animating with JavaScript Hooks](#animating-with-javascript-hooks)
-- [Rendering Conditional Content & List-items](#rendering-conditional-content--list-items)
-  - [Conditional](#conditional)
-  - [List-items](#list-items)
-- [Components](#components)
-  - [Dynamic Components](#dynamic-components)
-  - [Global Components](#global-components)
-- [Props](#props)
-- [Communicate between Components](#communicate-between-components)
-  - [Event emitter](#event-emitter)
-    - [using v-model with custom components](#using-v-model-with-custom-components)
-    - [model-view](#model-view)
-  - [Provide / Inject](#provide--inject)
-    - [Provide](#provide)
-    - [Inject](#inject)
-- [Slots](#slots)
-  - [named-slots](#named-slots)
-  - [slot-props](#slot-props)
-- [Forms](#forms)
-  - [Form Validation](#form-validation)
-- [Routing](#routing)
-  - [Router configuration](#router-configuration)
-    - [History](#history)
-    - [Nested Routes](#nested-routes)
-    - [Dynamic params](#dynamic-params)
-  - [route vs router](#route-vs-router)
-  - [Navigate from a link: Router-Link](#navigate-from-a-link-router-link)
-  - [Navigate programmatically](#navigate-programmatically)
-  - [Scroll Behavior (Scroll To Top)](#scroll-behavior-scroll-to-top)
-  - [Route Meta Fields](#route-meta-fields)
-    - [Using meta for navigation guards](#using-meta-for-navigation-guards)
-  - [Navigation Guards](#navigation-guards)
-- [Modes and Environment Variables](#modes-and-environment-variables)
-  - [Modes](#modes)
-  - [Environment Variables](#environment-variables)
-- [Performance](#performance)
-  - [Loading data](#loading-data)
-  - [Code Splitting - Lazy Loading](#code-splitting---lazy-loading)
-    - [Webpack Chunks](#webpack-chunks)
-- [PWA](#pwa)
-- [Plugins](#plugins)
-  - [Installing a plugin](#installing-a-plugin)
-- [Notes](#notes)
+  - [Styling](#styling)
+    - [Dynamic styling](#dynamic-styling)
+    - [Scoped styling](#scoped-styling)
+    - [Vue Transitions & Animations](#vue-transitions--animations)
+      - [Transition vs animation](#transition-vs-animation)
+      - [Transition Classes](#transition-classes)
+      - [Transition modes](#transition-modes)
+      - [Animating with JavaScript Hooks](#animating-with-javascript-hooks)
+  - [Rendering Conditional Content & List-items](#rendering-conditional-content--list-items)
+    - [Conditional](#conditional)
+    - [List-items (looping)](#list-items-looping)
+  - [Components](#components)
+    - [Dynamic Components](#dynamic-components)
+      - [Keep-alive](#keep-alive)
+    - [Global Components](#global-components)
+  - [Props](#props)
+  - [Communicate between Components](#communicate-between-components)
+    - [Event emitter](#event-emitter)
+      - [using v-model with custom components](#using-v-model-with-custom-components)
+      - [model-view](#model-view)
+    - [Provide / Inject](#provide--inject)
+      - [Provide](#provide)
+      - [Inject](#inject)
+  - [Slots](#slots)
+    - [named-slots](#named-slots)
+    - [slot-props](#slot-props)
+  - [Forms](#forms)
+    - [Form Validation](#form-validation)
+  - [Routing](#routing)
+    - [Router configuration](#router-configuration)
+      - [History](#history)
+      - [Nested Routes](#nested-routes)
+      - [Dynamic params](#dynamic-params)
+    - [route vs router](#route-vs-router)
+    - [Navigate from a link: Router-Link](#navigate-from-a-link-router-link)
+    - [Navigate programmatically](#navigate-programmatically)
+    - [Scroll Behavior (Scroll To Top)](#scroll-behavior-scroll-to-top)
+    - [Route Meta Fields](#route-meta-fields)
+      - [Using meta for navigation guards](#using-meta-for-navigation-guards)
+    - [Navigation Guards](#navigation-guards)
+  - [Modes and Environment Variables](#modes-and-environment-variables)
+    - [Modes](#modes)
+    - [Environment Variables](#environment-variables)
+  - [Performance](#performance)
+    - [Loading data](#loading-data)
+    - [Code Splitting - Lazy Loading](#code-splitting---lazy-loading)
+      - [Webpack Chunks](#webpack-chunks)
+  - [PWA](#pwa)
+  - [Plugins](#plugins)
+    - [Installing a plugin](#installing-a-plugin)
+  - [Notes](#notes)
 
 ---
 
@@ -76,28 +82,38 @@
 
 It's a JavaScript framework for building user interfaces. It builds on top of standard HTML, CSS and JavaScript, and provides a **declarative and component-based programming model** that helps you efficiently develop user interfaces, be it simple or complex.
 
+> **Framework**: is a third-party library that exposes utility-functionalities and a (set of rules) on how to build your Javascript application
+
+- Comparison with other Frameworks:
+  ![vue-vs-other-frameworks](./img/vue-vs-other-frameworks.png)
+- Advantages of Vue:
+  - **clean** -> (separation of concerns)
+  - **semantic** -> able to write semantic HTML
+  - **declarative**
+  - **easy to maintain**
+  - **reactive** -> responding to changes in a state
 - You should always create an app and specify where the app applies its logic
 
-```html
-<script src="https://unpkg.com/vue@3"></script>
+  ```html
+  <script src="https://unpkg.com/vue@3"></script>
 
-<div id="app">{{ message }}</div>
+  <div id="app">{{ message }}</div>
 
-<script>
-  const { createApp } = Vue;
-  const app = createApp(); // construction function
+  <script>
+    const { createApp } = Vue;
+    const app = createApp(); // construction function
 
-  app({
-    data() {
-      return {
-        message: 'Hello Vue!',
-      };
-    },
-  });
+    app({
+      data() {
+        return {
+          message: 'Hello Vue!'
+        };
+      }
+    });
 
-  app.mount('#app');
-</script>
-```
+    app.mount('#app');
+  </script>
+  ```
 
 ---
 
@@ -112,21 +128,36 @@ It uses **Proxy** which uses `set` method to update properties
   ![proxy](./img/proxy.PNG)
 
   - **How proxy works?** -> it's for reactivity
-    ![proxy](./img/proxy2.PNG)
-    ![proxy](./img/proxy3.PNG)
+    ![proxy](./img/proxy2.png)
+    ![proxy](./img/proxy3.png)
     - It's done using (**track** all properties that are changing) and (**trigger** function that would update new things accordingly)
 
 ---
 
-### Instance LifeCycle
+### Ways of Using Vue
+
+- Standalone Script (`CDN`)
+- Single-Page Application (`SPA`)
+  - Some applications require rich interactivity, deep session depth, and non-trivial stateful logic on the frontend. The best way to build such applications is to use an architecture where Vue not only controls the entire page, but also handles data updates and navigation without having to reload the page. This type of application is typically referred to as a Single-Page Application (SPA).
+- Fullstack / SSR
+  - Pure client-side SPAs are problematic when the app is sensitive to SEO and time-to-content. This is because the browser will receive a largely empty HTML page, and has to wait until the JavaScript is loaded before rendering anything.
+  - This means we can pre-render an entire application into HTML and serve them as static files. This improves site performance and makes deployment a lot simpler since we no longer need to dynamically render pages on each request.
+
+---
+
+## Instance LifeCycle
 
 ![lifecycle](./img/lifecycle2.PNG)
 ![lifecycle](./img/lifecycle.PNG)
-![lifecycle](./img/lifecycle5.PNG)
+![lifecycle](./img/lifecycle5.png)
 
-#### mounted
+### mounted
 
 ![mounted](./img/mounted.PNG)
+
+### LifeCycle Notes
+
+- when you want to use data in the instance within the `before-..` lifecycle hooks --> for that you **replace `this` with `vm`**
 
 ---
 
@@ -136,17 +167,25 @@ It uses **Proxy** which uses `set` method to update properties
 
 > **Data binding**: The task of keeping data synchronized between the two
 
-The most basic form of **data binding** is text interpolation using the "Mustache" syntax (double curly braces):
+- The most basic form of **data binding** is text interpolation using the **"Mustache" syntax** (double curly braces):
 
-```html
-<span>Message: {{ msg }}</span>
-```
+  ```html
+  <span>Message: {{ msg }}</span>
+  ```
+
+- another alternative way is to use `v-text` directive:
+
+  ```html
+  <span v-text="msg"></span>
+  ```
+
+  - it's not usually used, but we may use it if we only have access to change attributes or something and not able to insert something inside the element
 
 ---
 
 ### Directives
 
-A directive is a template token that tells Vue how we want to handle our DOM.P
+A directive is a template-token that tells Vue how we want to handle our DOM.P
 It's used to tell vue to set the value of an html-attribute
 
 ![Directives](./img/directives.jpg)
@@ -161,9 +200,23 @@ It's used to tell vue to set the value of an html-attribute
 
 ---
 
+#### Binding data (`v-bind`)
+
+Dynamically bind one or more attributes, or a component prop to an expression.
+
+- Shorthand: `:` or `.` (when using `.prop` modifier)
+
+```html
+<a v-bind:href="varLink">link</a>
+<!-- OR -->
+<a :href="varLink">link</a>
+```
+
+---
+
 ### v-model (2 Way Binding)
 
-Vue **v-model** is a directive. It tells Vue that we want to create a two-way data binding between a value in our template and a value in our data properties.
+Vue **v-model** is a directive. It tells Vue that we want to create a two-way data binding (relationship) between a value in our template (usually a **form input**) and a value in our `data` properties, so that we can dynamically update values.
 
 - A common use case for using v-model is when designing forms and inputs. We can use it to have our DOM input elements be able to modify the data in our Vue instance.
 
@@ -183,9 +236,9 @@ Vue **v-model** is a directive. It tells Vue that we want to create a two-way da
   export default {
     data() {
       return {
-        value: 'Hello World',
+        value: 'Hello World'
       };
-    },
+    }
   };
 </script>
 ```
@@ -208,6 +261,21 @@ then pass it to an event emitter to the parent component
 
 ---
 
+#### Modifiers
+
+It is a very common need to call event.`preventDefault()` or event.`stopPropagation()` inside event handlers.
+Instead we use **Event Modifiers** or **modifiers** for inputs
+
+![modifiers](./img/modifiers.png)
+![modifiers](./img/modifiers2.png)
+
+```html
+!-- the submit event will no longer reload the page -->
+<form @submit.prevent="onSubmit"></form>
+```
+
+---
+
 ### Refs
 
 While Vue's declarative rendering model abstracts away most of the direct DOM operations for you, there may still be cases where we need **direct access to the underlying DOM elements**. To achieve this, we can use the special `ref` attribute:
@@ -225,7 +293,7 @@ While Vue's declarative rendering model abstracts away most of the direct DOM op
   export default {
     mounted() {
       this.$refs.input.focus();
-    },
+    }
   };
 </script>
 
@@ -260,7 +328,7 @@ Note from **stackoverflow**:
 
 ![methods](./img/methods.PNG)
 
-> Don't use **Arrow-functions** as methods as it will miss-up the binding that vue makes using **this** keyword. Instead use ES6-methods
+> Don't use **Arrow-functions** as methods as it will miss-up the binding that vue makes using **"this"** keyword. Instead use ES6-methods
 
 - **computed properties** can never be **asynchronous** as you expect value to be returned from them, UNLIKE **watchers** which are made for async actions without returning anything
 
@@ -268,9 +336,28 @@ Note from **stackoverflow**:
 
 ### Listening to Events
 
-We can use the **v-on** directive, which we typically shorten to the **@** symbol,
+**`v-on`** directive, which we use its shortcut: **"@"** symbol,
 
-- To listen to DOM events and run some JavaScript when they're triggered. The usage would be `v-on:click="handler"` or with the shortcut, `@click="handler"`.
+- It's used to **bind events**
+- To listen to DOM events and run some JavaScript when they're triggered. The usage would be `v-on:click="handlerFunction"` or with the shortcut, `@click="handlerFunction"`.
+- you can have **multiple bindings**:
+
+  ```html
+  <div
+    v-on="
+      mousedown: func1,
+      mouseup: func2
+    "
+  ></div>
+
+  <!-- OR -->
+  <div
+    @="
+      mousedown: func1,
+      mouseup: func2
+    "
+  ></div>
+  ```
 
 #### Accessing Event Argument
 
@@ -303,22 +390,7 @@ methods: {
 
 ---
 
-#### Event Modifiers
-
-It is a very common need to call event.`preventDefault()` or event.`stopPropagation()` inside event handlers.
-Instead we use **Event Modifiers**
-
-![modifiers](./img/modifiers.png)
-![modifiers](./img/modifiers2.png)
-
-```html
-!-- the submit event will no longer reload the page -->
-<form @submit.prevent="onSubmit"></form>
-```
-
----
-
-### Computed Properties
+## Computed Properties
 
 In-template expressions are very convenient, but they are meant for simple operations. Putting too much logic in your templates can make them bloated and hard to maintain.
 
@@ -363,14 +435,43 @@ export default {
 
 ---
 
-### Watchers
+### Computed vs methods
 
-Computed properties allow us to declaratively compute derived values. However, there are cases where we need to perform **"side effects"** in reaction to state changes - for example, mutating the DOM, or changing another piece of state based on the result of an async operation.
+![computed-vs-methods](./img/computed-vs-methods.png)
+
+---
+
+### Filters (old and deprecated)
+
+Vue allows you to define filters that can be used to apply common text formatting.
+
+- Filters are usable in two places: **mustache interpolations** and `v-bind` expressions. Filters should be appended to the end of the JavaScript expression, denoted by the **“pipe” ( `|` )** symbol:
+
+  ```html
+  <!-- in mustaches -->
+  {{ message | capitalize }}
+
+  <!-- in v-bind -->
+  <div v-bind:id="rawId | formatId"></div>
+  ```
+
+![filters](./img/filters.png)
+
+- It's now replaced with **Computed Properties** in Vue3
+
+---
+
+## Watchers
+
+`Computed properties` allow us to declaratively compute derived values. However, there are cases where we need to perform **"side effects"** (watching something and reacting by changing another thing) in reaction to specific-state changes - for example, mutating the DOM, or changing another piece of state based on the result of an async operation.
 
 - usually when the computed property depends on more than one thing
-- also use it when you want to do something when condition happens or promise fulfilled
+- (Good for Asynchronous updates) as when you want to do something when condition happens or promise fulfilled
+- Note -> the watcher will be names like the watched property
 
 > With Options API, we can use the watch option to trigger a function whenever a **reactive property** changes
+
+![watchers](./img/watcher.png)
 
 ```js
 export default {
@@ -408,8 +509,6 @@ export default {
 <p>{{ answer }}</p>
 ```
 
-![watchers](./img/watcher.png)
-
 ---
 
 ## Styling
@@ -445,11 +544,16 @@ It's to make the styles scoped to its component
 
 ---
 
-### Transitions
+### Vue Transitions & Animations
 
 `<Transition>` is a built-in component: this means it is available in any component's template without having to register it. It can be **used to apply enter and leave animations** on elements or components passed to it via its default slot.
 
 - `<Transition>` must contain only one element inside of it
+- another alternative is to use **binded-classes**:
+
+```html
+<div :class="[isShowing ? blurClass : '', bkClass]"></div>
+```
 
 > You can also use Native CSS animations: (transitions, animation)
 
@@ -523,9 +627,12 @@ Named Transitions
   }
   ```
 
+- or:
+  ![transition-class](./img/transition-class.png)
+
 ---
 
-#### Transition mode
+#### Transition modes
 
 the entering and leaving elements are **animated at the same time**, and we may have to make them `position: absolute` to avoid the layout issue when both elements are present in the DOM.
 
@@ -533,6 +640,8 @@ in some cases this isn't an option, or simply isn't the desired behavior.
 
 - We may want the leaving element to be animated out first, and for the entering element to only be inserted after the leaving animation has finished.
 - we can enable this behavior by passing `<Transition>` a mode prop:
+  - `in-out`-> The current element waits until the new element is done transitioning-in to fire
+  - `out-in`-> The current element transitions-out and then the new element transitions-in
 
 ```HTML
 <Transition mode="out-in">
@@ -548,15 +657,19 @@ in some cases this isn't an option, or simply isn't the desired behavior.
 
 #### Animating with JavaScript Hooks
 
-It makes animation more free unlike in `css`
+It makes animation more free unlike in `css`, as Javascript allows for more handles than CSS
 
-the methods are from [GSAP - GreenSock](https://greensock.com/gsap/)
+![handles](./img/js-animations.png)
+
+- if you will use it, you have to disable **css-binding**:
+
+> The methods are from [GSAP - GreenSock](https://greensock.com/gsap/)
 
 ---
 
 ## Rendering Conditional Content & List-items
 
-![conditional-lists](./img/conditional-lists.png)
+![conditional-lists](./img/conditional-lists.PNG)
 
 ### Conditional
 
@@ -574,12 +687,14 @@ Here we can use
 
 ---
 
-### List-items
+### List-items (looping)
 
 ```html
 <li v-for="goal in goals" :key="goal.id">{{goal.name}}</li>
 <li v-for="(goal,i) in goals" :key="goal.id">{{goal.name}} and index is {{i}}</li>
 ```
+
+- **`Key`**: needs to be unique, It's what Vue uses to **track the VDOM changes**
 
 - You can use the list for numbers
 
@@ -591,15 +706,17 @@ Here we can use
 
 ## Components
 
+**Components**: collection of elements that are encapsulated into a group that can be accessed through one single element
+
 ```html
 <!-- In the child -->
 <script>
   export default {
     data() {
       return {
-        count: 0,
+        count: 0
       };
-    },
+    }
   };
 </script>
 
@@ -616,8 +733,8 @@ Here we can use
   export default {
     // Component Registration
     components: {
-      ButtonCounter,
-    },
+      ButtonCounter // or anyName: ButtonCounter
+    }
   };
 </script>
 
@@ -633,6 +750,8 @@ Here we can use
 
 Sometimes, it's useful to dynamically switch between components, like in a **tabbed interface**(tabs):
 
+- it's used with `<component></component>` tag
+
 - instead of using multiple
 
   ```html
@@ -646,11 +765,19 @@ Sometimes, it's useful to dynamically switch between components, like in a **tab
   ```html
   <!-- Component changes when (currentTab property) changes -->
   <component :is="currentComponent"></component>
+
+  <button @click="selected = 'comp1'"></button>
+  <button @click="selected = 'comp2'"></button>
   ```
+
+#### Keep-alive
 
 When switching between multiple components with `<component :is="...">`, a component will be **unmounted** when it is switched away from. We can force the inactive components to stay "alive" with the built-in `<KeepAlive>` component.
 
-**KeepAlive** is a built-in component that allows us to conditionally **cache** component instances when dynamically switching between multiple components.
+**`KeepAlive` / `keep-alive`** is a built-in component that allows us to conditionally **cache** component instances when dynamically switching between multiple components. which:
+
+1. saves performance of mounting/unmounting
+2. keep whatever change we did in the component like wrote text in `input` but didn't finish
 
 ```html
 <!-- Inactive components will be cached! -->
@@ -684,6 +811,10 @@ app.component('MyComponent', the_imported_component);
 
 ## Props
 
+> Props always always pass data **Down** from parent to child, as we want a single source of truth of "who owns the state" + we want "one way data-flow"
+>
+> - this is called: **"props down .. events up"**
+
 You should write props in **camelCase** but if you wrote it in **kebab case** -> Vue will transfer it to camelCase when you use it in the child component
 
 - Props are defined in the **child component** in **2 ways** as:
@@ -694,39 +825,40 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
     props: ["title"],
     ```
 
-- an object with multiple properties for each prop (`type`, `required`?, `default`, ..)
-
-  ```js
-  props: {
-      price: {
-        type: Number,
-        default: 100,
-        required:true
-        },
-    },
-  ```
-
-  - **default value**:
-    ![props-default](./img/props-default.png)
-  - **Validating props**:
-    - inside it you can't access the component's properties as it hasn't been created yet
+  - an object with multiple properties for each prop (`type`, `required`?, `default`, ..)
 
     ```js
     props: {
-      price: {
-        type: Number,
-        default: 100,
-        required:true,
-        validator: propValue => {
-        return propValue < 1200;
+        price: {
+          type: Number,
+          default: 100,
+          required:true
           },
-          // or
-        validator(propValue) {
-        return propValue < 1200;
-          }
-         }
       },
     ```
+
+    - **default value**: if the `default` value is an `object` or `array`; then we need the default-value to be returned from a function
+      ![props-default](./img/props-default.png)
+    - **Validating props**:
+
+      - inside it you can't access the component's properties as it hasn't been created yet
+
+      ```js
+      props: {
+        price: {
+          type: Number,
+          default: 100,
+          required:true,
+          validator: propValue => {
+          return propValue < 1200;
+            },
+            // or
+          validator(propValue) {
+          return propValue < 1200;
+            }
+           }
+        },
+      ```
 
 - In the **parent component**:
 
@@ -740,7 +872,7 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
     <!-- in the child: BlogPost.vue -->
     <script>
       export default {
-        props: ['title'],
+        props: ['title']
       };
     </script>
 
@@ -819,7 +951,7 @@ For this to actually work though, the `<input>` inside the component must:
   <script>
   export default {
     props: ['modelValue'],
-    emits: ['update:modelValue'],
+    emits: ['update:modelValue']
   };
   </script>
 
@@ -868,8 +1000,8 @@ it's like **context**: it prevents props-drilling
 // in the upper component
 export default {
   provide: {
-    message: 'hello!',
-  },
+    message: 'hello!'
+  }
 };
 ```
 
@@ -879,15 +1011,15 @@ export default {
 export default {
   data() {
     return {
-      message: 'hello!',
+      message: 'hello!'
     };
   },
   provide() {
     // use function syntax so that we can access `this`
     return {
-      message: this.message,
+      message: this.message
     };
-  },
+  }
 };
 ```
 
@@ -912,9 +1044,9 @@ export default {
   data() {
     return {
       // initial data based on injected value
-      fullMessage: this.message,
+      fullMessage: this.message
     };
-  },
+  }
 };
 ```
 
@@ -937,6 +1069,7 @@ The `<slot>` element is a slot outlet that indicates where the parent-provided s
 ```
 
 > what is inside the slot will be the default value
+> ![default-slots](./img/slots2.png)
 
 ---
 
@@ -1141,7 +1274,7 @@ history: createWebHistory(process.env.BASE_URL);
   - also in the link you can set the active class for this link only using `exact-active-class="no-active"`, (usually with the page logo in the navbar):
 
     ```js
-    <router-link to="/" exact-active-class="no-active"></router-link>
+    <router-link to='/' exact-active-class='no-active'></router-link>
     ```
 
 - `<router-link></router-link>` acts like `<a>` in **css**
@@ -1200,16 +1333,16 @@ const routes = [
         path: 'new',
         component: PostsNew,
         // only authenticated users can create posts
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true }
       },
       {
         path: ':id',
         component: PostsDetail,
         // anybody can read a post
-        meta: { requiresAuth: false },
-      },
-    ],
-  },
+        meta: { requiresAuth: false }
+      }
+    ]
+  }
 ];
 ```
 
@@ -1360,6 +1493,8 @@ vue add <name of the plugin>
 
 ## Notes
 
+- only `methods` are written as object, but `data` and `lifecycle hooks` are written as `ES6-functions`
+
 - when you want to change a property that is being rendered you should modify it and not create a new property -> to make vue **rerenders** it
 
   - Ex: array of items: you should use `splice` to remove item instead of using (filter as it will create new array)
@@ -1371,8 +1506,8 @@ vue add <name of the plugin>
   module.exports = {
     rules: {
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
-      'vue/multi-word-component-names': 0,
-    },
+      'vue/multi-word-component-names': 0
+    }
   };
   ```
 
@@ -1422,7 +1557,7 @@ vue add <name of the plugin>
     export default {
       data() {
         return {
-          count: 0,
+          count: 0
         };
       },
       methods: {
@@ -1435,8 +1570,8 @@ vue add <name of the plugin>
           await nextTick();
           // DOM is now updated
           console.log(document.getElementById('counter').textContent); // 1
-        },
-      },
+        }
+      }
     };
   </script>
 
@@ -1444,3 +1579,18 @@ vue add <name of the plugin>
     <button id="counter" @click="increment">{{ count }}</button>
   </template>
   ```
+
+- `v-once` and `v-pre`:
+  ![v-pre](./img/v-pre.png)
+
+  ```js
+  <h1 v-pre>{{ data }}</h1> // outputs -> {{ data }}
+  ```
+
+- if you want to access the `data` object, you can use `$data`
+
+  - this is sometimes useful for debugging
+
+- **Templates**:
+  - Vue uses HTML-based Template syntax to bind the Vue instance to the DOM, it's used for components
+  - Templates are optional, you can write `render functions` with optional **JSX** support

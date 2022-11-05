@@ -6,6 +6,7 @@
     - [setTimeout](#settimeout)
     - [Canceling with clearTimeout](#canceling-with-cleartimeout)
     - [setInterval](#setinterval)
+    - [Garbage collection and setInterval/setTimeout callback](#garbage-collection-and-setintervalsettimeout-callback)
   - [Is JavaScript a `synchronous` or `asynchronous` ?](#is-javascript-a-synchronous-or-asynchronous-)
   - [Building a Promise](#building-a-promise)
     - [creating a promise](#creating-a-promise)
@@ -85,6 +86,10 @@ let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...)
   - In most browsers, the internal timer continues while showing `alert`/`confirm`/`prompt`.
   - this is as `alert` blocks the Synchronous operations and not the Async ones
 
+- The method `setTimeout` in-browser is a little special:
+  - it sets `this = window` for the function call
+    - for `Node.js`, `this` becomes the **timer object**.
+
 ---
 
 ### Canceling with clearTimeout
@@ -103,7 +108,7 @@ clearTimeout(timerId);
 You can do intervals using `setInterval()` or with **nested setTimeOut()**:
 
 ```js
-/** instead of:
+/** instead of "setInterval":
 let timerId = setInterval(() => alert('tick'), 2000);
 */
 
@@ -133,6 +138,54 @@ let timerId = setTimeout(function tick() {
 
     }, delay);
     ```
+
+- Nested `setTimeout` allows to set the delay between the executions more precisely than `setInterval`.
+
+  - `setInterval`
+
+    ```js
+    // setInterval
+    let i = 1;
+    setInterval(function () {
+      func(i++);
+    }, 100);
+    ```
+
+    ![setIntervals](./img/setIntervals.png)
+
+    - The real delay between func calls for setInterval is less than in the code!. because the time taken by func's execution “consumes” a part of the interval.
+    - It is possible that func's execution turns out to be longer than we expected and takes more than `100ms`.
+    - In this case the engine waits for func to complete, then checks the scheduler and if the time is up, runs it again immediately.
+
+  - nested `setTimeout`
+
+  ```js
+  let i = 1;
+  setTimeout(function run() {
+    func(i++);
+    setTimeout(run, 100);
+  }, 100);
+  ```
+
+  ![nested-setTimeOut](./img/nested-setTimeOut.png)
+
+  - The nested `setTimeout` guarantees the fixed delay (here `100ms`).
+    - That’s because a new call is planned at the end of the previous one.
+
+---
+
+### Garbage collection and setInterval/setTimeout callback
+
+When a function is passed in `setInterval`/`setTimeout`, an internal **reference** is created to it and saved in the scheduler. It prevents the function from being garbage collected, even if there are no other references to it.
+
+```js
+// the function stays in memory until the scheduler calls it
+setTimeout(function() {...}, 100);
+```
+
+> For **setInterval** the function stays in memory until **clearInterval** is called.
+
+There’s a side effect. A function references the outer lexical environment, so, while it lives, outer variables live too. They may take much more memory than the function itself. So when we don’t need the scheduled function anymore, it’s better to cancel it, even if it’s very small.
 
 ---
 

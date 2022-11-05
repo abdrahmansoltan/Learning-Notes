@@ -1,57 +1,57 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [installation](#installation)
-- [React fundementals](#react-fundementals)
-  - [Declarative vs imperative](#declarative-vs-imperative)
-  - [multi-page application](#multi-page-application)
-  - [single-page application (SPA)](#single-page-application-spa)
-- [JSX](#jsx)
-  - [Dynamic expressions in JSX](#dynamic-expressions-in-jsx)
-- [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
-  - [How does it work?](#how-does-it-work)
-- [Router](#router)
-  - [Set Up](#set-up)
-  - [Using it](#using-it)
-  - [Dynamic Routes](#dynamic-routes)
-  - [Programmatically navigation](#programmatically-navigation)
-    - [changing the page's url](#changing-the-pages-url)
-    - [Accessing the page's url](#accessing-the-pages-url)
-  - [Prompt](#prompt)
-- [Styling and CSS](#styling-and-css)
-  - [Inline style](#inline-style)
-  - [Styled-components](#styled-components)
-    - [Other casess](#other-casess)
-  - [CSS Modules](#css-modules)
-- [Components](#components)
-  - [why components](#why-components)
-  - [component tree](#component-tree)
-  - [List Components](#list-components)
-    - [update list-items](#update-list-items)
-- [Custom Components (fragment)](#custom-components-fragment)
-  - [fragment](#fragment)
-  - [Portals](#portals)
-  - [Smart vs Dumb components](#smart-vs-dumb-components)
-  - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
-    - [Controlled components](#controlled-components)
-    - [Uncontrolled components](#uncontrolled-components)
-- [Component Props](#component-props)
-  - [single prop](#single-prop)
-  - [Multiple props](#multiple-props)
-- [Communicating Between Components](#communicating-between-components)
-  - [From Parent to Child](#from-parent-to-child)
-  - [From Child to Parent](#from-child-to-parent)
-  - [lifting the state up](#lifting-the-state-up)
-- [React Composition](#react-composition)
-  - [Why Use React Composition?](#why-use-react-composition)
-- [Handling Events](#handling-events)
-  - [Events in HTML vs React](#events-in-html-vs-react)
-  - [Data binding](#data-binding)
-- [Forms](#forms)
-  - [Form-Input](#form-input)
-  - [Validation](#validation)
-- [Environmental Variables](#environmental-variables)
-- [Interview Questions](#interview-questions)
+  - [installation](#installation)
+  - [React fundementals](#react-fundementals)
+    - [Declarative vs imperative](#declarative-vs-imperative)
+    - [multi-page application](#multi-page-application)
+    - [single-page application (SPA)](#single-page-application-spa)
+  - [JSX](#jsx)
+    - [Dynamic expressions in JSX](#dynamic-expressions-in-jsx)
+  - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
+    - [How does it work?](#how-does-it-work)
+  - [Router](#router)
+    - [Set Up](#set-up)
+    - [Using it](#using-it)
+    - [Dynamic Routes](#dynamic-routes)
+    - [Programmatically navigation](#programmatically-navigation)
+      - [changing the page's url](#changing-the-pages-url)
+      - [Accessing the page's url](#accessing-the-pages-url)
+    - [Prompt](#prompt)
+  - [Styling and CSS](#styling-and-css)
+    - [Inline style](#inline-style)
+    - [Styled-components](#styled-components)
+      - [Other casess](#other-casess)
+    - [CSS Modules](#css-modules)
+  - [Components](#components)
+    - [why components](#why-components)
+    - [component tree](#component-tree)
+    - [List Components](#list-components)
+      - [update list-items](#update-list-items)
+  - [Custom Components (fragment)](#custom-components-fragment)
+    - [fragment](#fragment)
+    - [Portals](#portals)
+    - [Smart vs Dumb components](#smart-vs-dumb-components)
+    - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
+      - [Controlled components](#controlled-components)
+      - [Uncontrolled components](#uncontrolled-components)
+  - [Component Props](#component-props)
+    - [single prop](#single-prop)
+    - [Multiple props](#multiple-props)
+  - [Communicating Between Components](#communicating-between-components)
+    - [From Parent to Child](#from-parent-to-child)
+    - [From Child to Parent](#from-child-to-parent)
+    - [lifting the state up](#lifting-the-state-up)
+  - [React Composition](#react-composition)
+    - [Why Use React Composition?](#why-use-react-composition)
+  - [Handling Events](#handling-events)
+    - [Events in HTML vs React](#events-in-html-vs-react)
+    - [Data binding](#data-binding)
+  - [Forms](#forms)
+    - [Form-Input](#form-input)
+    - [Validation](#validation)
+  - [Environmental Variables](#environmental-variables)
+  - [Interview Questions](#interview-questions)
 
 ---
 
@@ -78,7 +78,7 @@ npm start
     <React.StrictMode>
       <App />
     </React.StrictMode>,
-    document.getElementById("root")
+    document.getElementById('root')
   );
   ```
 
@@ -108,6 +108,7 @@ npm start
 
 ![spa](./img/spa%20vs%20mpa.jpg)
 
+- Why? -> it's to make application more **"reactive"** like `mobile-apps` and `desktop-apps` which things happen instantly (you don't wait for new pages or responses to load or actions to start)
 - `Single-page applications` can work in different ways. One way a single-page app loads is by downloading the entire site's contents all at once. This way, when you're navigating around on the site, everything is already available to the browser, and it doesn't need to refresh the page. Another way single-page apps work is by downloading everything that's needed to render the page the user requested. Then when the user navigates to a new page, asynchronous JavaScript requests are made for just the content that was requested.
 
   - Another key factor in a good single-page app is that the URL controls the page content. Single-page applications are highly interactive, and users want to be able to get back to a certain state using just the URL. --> [React Router](#router)
@@ -129,7 +130,7 @@ npm start
 - in older versions of react : to use `JSX` you had to write this in the file :
 
   ```js
-  import React from "react";
+  import React from 'react';
   // we don't have to write it anymore
   ```
 
@@ -137,16 +138,16 @@ npm start
 
 ```js
 // jsx that we write
-<p title="Intro text">React.js is a library for building user interfaces.</p>;
+<p title='Intro text'>React.js is a library for building user interfaces.</p>;
 
 // Babel converts it to this
 React.createElement(
-  "p",
-  { title: "Intro text" },
-  "React.js is a library for building user interfaces."
+  'p',
+  { title: 'Intro text' },
+  'React.js is a library for building user interfaces.'
 );
 ```
->
+
 > - if you don't have attributes you can use `{}` or `null` instead
 > - to have multiple child elements -> use an array
 
@@ -208,7 +209,7 @@ React Router turns React projects into single-page applications. It does this by
 - in `index.js` :
 
   ```js
-  import { BrowserRouter } from "react-router-dom";
+  import { BrowserRouter } from 'react-router-dom';
 
   // then wrap the app in a BrowserRouter fragment
   // You may also use different types of router like "hashRouter"
@@ -227,13 +228,13 @@ React Router turns React projects into single-page applications. It does this by
 - now in `app.js`
 
   ```js
-  import { Route, Routes } from "react-router-dom";
+  import { Route, Routes } from 'react-router-dom';
 
   function App() {
     return (
       // rapping the component in a routes and the route specify the endpoint
       <Routes>
-        <Route path="/home" element={<Home />} />
+        <Route path='/home' element={<Home />} />
         // means that when route matches "/home" -> render the Home component
       </Routes>
     );
@@ -250,8 +251,8 @@ React Router turns React projects into single-page applications. It does this by
     return (
       // now we want to tell the parent compont (Home) where we want the react-router-dom to render the nested-matching-element (Shop) --> using "Outlet componet" from react-router-dom
       <Routes>
-        <Route path="/home" element={<Home />}>
-          <Route path="shop" element={<Shop />} />
+        <Route path='/home' element={<Home />}>
+          <Route path='shop' element={<Shop />} />
         </Route>
       </Routes>
     );
@@ -277,13 +278,13 @@ React Router turns React projects into single-page applications. It does this by
   - to make a "not found page" make: `path="*"`
 
 ```js
-import { Route, Switch } from "react-router";
+import { Route, Switch } from 'react-router';
 
 <Switch>
-  <Route exact path="/">
+  <Route exact path='/'>
     <Home />
   </Route>
-  <Route path="/about">
+  <Route path='/about'>
     <About />
   </Route>
 </Switch>;
@@ -321,27 +322,24 @@ import { Route, Switch } from "react-router";
 - **Note**: `<Link>` can be represented as `<a>` in **css**
 
 ```js
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
-<Link to="/about">About Us</Link>;
+<Link to='/about'>About Us</Link>;
 ```
 
 - To use link with **highlighting the active link** --> use `<NavLink>`
   - it sets a css-class to the clicked link
 
 ```js
-import { NavLink } from "react-router-dom";
+import { NavLink } from 'react-router-dom';
 
 // VERSION 5
-<NavLink aciveClassName="name_of_the_class" to="/about">
+<NavLink aciveClassName='name_of_the_class' to='/about'>
   About Us
 </NavLink>;
 
 // VERSION 6
-<NavLink
-  className={(navData) => (navData.isActive ? "name_of_the_class" : "")}
-  to="/about"
->
+<NavLink className={navData => (navData.isActive ? 'name_of_the_class' : '')} to='/about'>
   About Us
 </NavLink>;
 ```
@@ -354,12 +352,12 @@ import { NavLink } from "react-router-dom";
 - to access this **param** we use `useParams` hook
 
 ```js
-<Route path="/product/:id" component={Product} />
+<Route path='/product/:id' component={Product} />
 ```
 
 ```js
 // in Product.component.jsx
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 const params = useParams();
 // or const {productId} = useParams()
@@ -381,19 +379,19 @@ console.log(params.productId);
   - in case of `replace` it deletes the last record and puts the new one. So if you will not use the go back, Usually when redirecting from an invalid url
 
 ```js
-import { useHistory } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
 
 const history = useHistory();
 
 // ...in a handler-function
-history.push("/home");
+history.push('/home');
 
 //-----------------------------//
 // V6
 const navigate = useNavigate();
 
 // ...in a handler-function
-navigate("/home", { push: true });
+navigate('/home', { push: true });
 ```
 
 #### Accessing the page's url
@@ -403,14 +401,14 @@ It's done using `useLocation()` hook
 - usually used to access query-parameters
 
 ```js
-import { useLocation } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const location = useLocation();
 
 // for parameters
 const queryParams = new URLSearchParameters(location.search);
 
-const something = queryParams.get("wanted_param");
+const something = queryParams.get('wanted_param');
 ```
 
 ---
@@ -433,8 +431,8 @@ The style attribute accepts a JavaScript `object` with `camelCased` properties r
 
 ```js
 const divStyle = {
-  color: "blue",
-  backgroundImage: "url(" + imgUrl + ")",
+  color: 'blue',
+  backgroundImage: 'url(' + imgUrl + ')'
 };
 
 function HelloWorldComponent() {
@@ -446,10 +444,9 @@ function HelloWorldComponent() {
   return (
     <div
       style={{
-        color: "blue",
-        backgroundImage: "url(" + imgUrl + ")",
-      }}
-    >
+        color: 'blue',
+        backgroundImage: 'url(' + imgUrl + ')'
+      }}>
       Hello World!
     </div>
   );
@@ -478,7 +475,7 @@ npm install --save styled-components
 ```js
 // in file.styles.jsx
 
-import styled from "styled-components";
+import styled from 'styled-components';
 
 // Create a Title component that'll render an <h1> tag with some styles
 export const Title = styled.h1`
@@ -512,7 +509,7 @@ render(
 ```js
 // Adapt the colors based on primary prop
 const Button = styled.button`
-  background-color: ${(props) => (props.primary ? "red" : "white")};
+  background-color: ${props => (props.primary ? 'red' : 'white')};
 
   font-size: 1em;
   margin: 1em;
@@ -536,7 +533,7 @@ render(
 - router
 
   ```js
-  import { Link } from "react-router-dom";
+  import { Link } from 'react-router-dom';
 
   const NavLink = styled(Link)`
     /* style for Link Component */
@@ -611,9 +608,7 @@ export   return <button className={styles.errorMessage}>Error Button</button>;
 
 ```js
 const numbers = [1, 2, 3, 4, 5];
-const listItems = numbers.map((number) => (
-  <li key={number.toString()}>{number}</li>
-));
+const listItems = numbers.map(number => <li key={number.toString()}>{number}</li>);
 ```
 
 #### update list-items
@@ -627,7 +622,7 @@ const List = () => {
   return (
     <div>
       <ul>
-        {list.map((item) => (
+        {list.map(item => (
           <li key={item}>{item}</li>
         ))}
       </ul>
@@ -666,7 +661,7 @@ Portals need 2 things:
 - (the container): the DOM location(node) to which the portal should be injected
 
 ```js
-import ReactDOM from "react-dom";
+import ReactDOM from 'react-dom';
 
 ReactDOM.createPortal(child, container);
 ```
@@ -693,30 +688,30 @@ It is the one that takes its current value through props and notifies changes th
 
 ```js
 function App() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
 
   function onSubmit() {
-    console.log("Name value: " + name);
-    console.log("Email value: " + email);
+    console.log('Name value: ' + name);
+    console.log('Email value: ' + email);
   }
   return (
     <form onSubmit={onSubmit}>
       <input
-        type="text"
-        name="name"
+        type='text'
+        name='name'
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={e => setName(e.target.value)}
         required
       />
       <input
-        type="email"
-        name="email"
+        type='email'
+        name='email'
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={e => setEmail(e.target.value)}
         required
       />
-      <input type="submit" value="Submit" />
+      <input type='submit' value='Submit' />
     </form>
   );
 }
@@ -733,14 +728,14 @@ It is the one that stores its own state internally, and you query the DOM using 
 ```js
 function App() {
   function onSubmit() {
-    console.log("Name value: " + window.name.value);
-    console.log("Email value: " + window.email.value);
+    console.log('Name value: ' + window.name.value);
+    console.log('Email value: ' + window.email.value);
   }
   return (
     <form onSubmit={onSubmit}>
-      <input type="text" name="name" id="name" required />
-      <input type="email" name="email" id="email" required />
-      <input type="submit" value="Submit" />
+      <input type='text' name='name' id='name' required />
+      <input type='email' name='email' id='email' required />
+      <input type='submit' value='Submit' />
     </form>
   );
 }
@@ -854,7 +849,7 @@ React Composition is a development pattern based on React's original component m
 
 ```js
 function Card(props) {
-  const classes = "card " + props.className;
+  const classes = 'card ' + props.className;
   // idea is to use {props.children}
   return <div className={classes}>{props.children}</div>;
 }
@@ -864,12 +859,12 @@ export default Card;
 ///////////////////////////////////////////////////////
 
 // then in the file that we will use the card-component
-import Card from "../UI/Card";
+import Card from '../UI/Card';
 
-const Expenses = (props) => {
+const Expenses = props => {
   return (
     <div>
-      <Card className="expenses">
+      <Card className='expenses'>
         <components />
       </Card>
     </div>
@@ -910,11 +905,11 @@ Data binding in React can be achieved by using a `controlled input`. A controlle
 ```js
 // 2 way data-binding because of (value={value})
 const App = () => {
-  const [value, setValue] = useState("Hello World");
-  const handleChange = (e) => setValue(e.target.value);
+  const [value, setValue] = useState('Hello World');
+  const handleChange = e => setValue(e.target.value);
   return (
     <div>
-      <input type="text" value={value} onChange={handleChange} />
+      <input type='text' value={value} onChange={handleChange} />
       <p>{value}</p>
     </div>
   );
@@ -964,9 +959,8 @@ in `.env` file:
   ```js
   <h1
     onClick={() => {
-      this.state.name = "Ahmed";
-    }}
-  >
+      this.state.name = 'Ahmed';
+    }}>
     Hi {this.state.name}
   </h1>
   ```

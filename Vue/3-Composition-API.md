@@ -1,24 +1,27 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Composition API](#composition-api)
-  - [Why use it ?](#why-use-it-)
-  - [Differences](#differences)
-- [Reactivity](#reactivity)
-  - [ref](#ref)
-  - [Computed](#computed)
-- [LifeCycles Hooks](#lifecycles-hooks)
-  - [reactive function](#reactive-function)
-  - [toRef](#toref)
-- [Mixins](#mixins)
-- [props](#props)
-  - [Using destructed props](#using-destructed-props)
-- [Context](#context)
-- [Router](#router)
+  - [Composition API](#composition-api)
+    - [Why use it ?](#why-use-it-)
+    - [Differences](#differences)
+  - [Reactivity](#reactivity)
+    - [Reactive Programming](#reactive-programming)
+    - [ref](#ref)
+    - [Computed](#computed)
+    - [reactive function](#reactive-function)
+    - [toRef](#toref)
+  - [LifeCycles Hooks](#lifecycles-hooks)
+  - [Mixins](#mixins)
+  - [props](#props)
+    - [Using destructed props](#using-destructed-props)
+  - [Context](#context)
+  - [Router](#router)
 
 ---
 
 ## Composition API
+
+Composition API allow you to **encapsulate** one piece of functionality so that you can use it in different components throughout the application
 
 It's an alternative syntax for writing components
 
@@ -51,6 +54,8 @@ It's an alternative syntax for writing components
 - Here, we don't use **this** keyword
 - must return an object with the data/methods to use in the `<template></template>`
 
+> You can use `Composition-API` with `Options-API`
+
 ---
 
 ## Reactivity
@@ -58,6 +63,25 @@ It's an alternative syntax for writing components
 It's the process of **updating the template** whenever a change in the data occurs.
 
 > It's the equivalent of **computed & reactive-data** in options-API
+
+### Reactive Programming
+
+It's the programming with asynchronous **data streams**
+
+- **Stream**: is a sequence of ongoing events ordered in time that offer some hooks with which to observe it
+  - Ex: `hover` state that have transition: we have multiple stages:
+    1. the moment when you start hovering with the **initial** state
+    2. the **transition** changing
+    3. the **end** state
+- when we use **"reactive premises"** for building applications, this means it's very easy to update state in reaction to events
+- How does **Vue 3** do this:
+  1. Detect when there's a change in one of the values
+  2. track the function that changes it
+  3. trigger the function so it can update the final value
+
+> [Amazing video that show reactivity](https://codepen.io/sdras/full/zYYzjBg)
+
+---
 
 ### ref
 
@@ -79,13 +103,13 @@ export default {
 
     // expose to template and other options API hooks
     return {
-      count,
+      count
     };
   },
 
   mounted() {
     console.log(this.count); // 0
-  },
+  }
 };
 </script>
 
@@ -104,27 +128,28 @@ export default {
 
 ---
 
-## LifeCycles Hooks
-
-![lifecycle](./img/lifecycle3.PNG)
-![lifecycle](./img/lifecycle4.PNG)
-
----
-
 ### reactive function
 
 Returns a reactive proxy of the **object** and not **Primitive values** like **ref**.
 
-- here we use it with object-properties to be able to access the object's properties (nested properties)
+![proxy](./img/proxy2.png)
+![proxy](./img/proxy4.png)
+![proxy](./img/proxy5.png)
+
+> **Must Watch this** [video on proxies in Vue](https://media.slid.es/videos/75854/Getg0nRu/reactivity2.mp4)
+
+- here we use it with `object-properties` to be able to access the object's properties (nested properties)
 - now we don't have to use the `value` property as it help us from going so deep into the object to get values from it
 - here we can't use `spread operator {...}` or `destructuring` as **it will make us lose reactivity**
+- if we use the `reactive()` function, we no longer have to use `.value` to use the value elsewhere.
 
 ```js
 const user = reactive({
   name: 'John',
-  age: 20,
+  age: 20
 });
 
+// notice that we dont use them as "user.age.value"
 const title = computed(() => `${user.name} with age of ${user.age}`);
 
 // this won't work!
@@ -141,7 +166,7 @@ Can be used to create a ref for a property on a source reactive object. The crea
 ```js
 const state = reactive({
   foo: 1,
-  bar: 2,
+  bar: 2
 });
 
 const fooRef = toRef(state, 'foo'); // creating connection to  the "foo" property in the "state" object
@@ -159,6 +184,14 @@ console.log(fooRef.value); // 3
 
 ---
 
+## LifeCycles Hooks
+
+![lifecycle](./img/lifecycle6.png)
+![lifecycle](./img/lifecycle3.PNG)
+![lifecycle](./img/lifecycle4.PNG)
+
+--
+
 ## Mixins
 
 Mixins are a flexible **way to distribute reusable functionalities** for Vue components.
@@ -175,20 +208,20 @@ var myMixin = {
   methods: {
     hello: function () {
       console.log('hello from mixin!');
-    },
-  },
+    }
+  }
 };
 
 // ----------------------------------------------------- //
 
 // define a component that uses this mixin
 var Component = Vue.extend({
-  mixins: [myMixin],
+  mixins: [myMixin]
 });
 // Or
 new Vue({
   mixins: [mixin], // must be array
-  data: function () {},
+  data: function () {}
 });
 
 var component = new Component(); // => "hello from mixin!"
@@ -203,11 +236,11 @@ The first argument in the setup function is the **props argument**. Just as you 
 ```js
 export default {
   props: {
-    title: String,
+    title: String
   },
   setup(props) {
     console.log(props.title);
-  },
+  }
 };
 ```
 
@@ -229,7 +262,7 @@ export default {
 
     // OR, turn a single property on `props` into a ref
     const title = toRef(props, 'title');
-  },
+  }
 };
 ```
 
@@ -237,7 +270,9 @@ export default {
 
 ## Context
 
-he second argument passed to the setup function is a Setup **Context object**. The context object exposes other values that may be useful inside setup -> It's like **this**
+he second argument passed to the `setup` function is a Setup **Context object**. The context object exposes other values that may be useful inside setup -> It's like **"this"** or **"$"**
+
+- things like `$emit`, `$attrs` could be accessed here
 
 ```js
 export default {
@@ -249,11 +284,11 @@ export default {
     console.log(context.slots);
 
     // Emit events (Function, equivalent to $emit)
-    console.log(context.emit);
+    context.emit('eventName');
 
     // Expose public properties (Function)
-    console.log(context.expose);
-  },
+    context.expose();
+  }
 };
 ```
 
@@ -285,10 +320,10 @@ export default {
       router.push({
         name: 'search',
         query: {
-          ...route.query,
-        },
+          ...route.query
+        }
       });
     }
-  },
+  }
 };
 ```

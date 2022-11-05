@@ -21,6 +21,9 @@
   - [Stacks and Queues](#stacks-and-queues)
     - [Stacks](#stacks)
     - [Queues](#queues)
+  - [Trees](#trees)
+    - [Binary Tree](#binary-tree)
+      - [Perfect vs Full vs Complete Binary Trees](#perfect-vs-full-vs-complete-binary-trees)
 
 ---
 
@@ -111,7 +114,7 @@ Here we have **Key/value pairs**
 Problem of hash-tables:
 
 - **collision** : with enough data and limited memory, sometimes keys are hashed to the same value so they have the same address in memory (**memory-space**) as there's no concept of ordering keys)indexes), which causes collision, and it becomes **linked list**
-![hash-collision](./img/hash-collision.png)
+  ![hash-collision](./img/hash-collision.png)
   - when we have a collision, the performance becomes **O(n/k) -> O(n)**, which is `k` is the size of the hash-table
 - also here, we may decrease the **time complexity**, but we might also accidentally increase the **space complexity** as a tradeoff by creating an object and storing values inside it in the memory
 
@@ -151,7 +154,10 @@ Problem of hash-tables:
 
 ## Stacks and Queues
 
-they made us limit the operations we can do on other data structures like `lists` and `linked-lists`, this is an advantage as to control whoever uses this data-structure performs only their right operations that are efficient
+They made us limit the operations we can do on other data structures like `lists` and `linked-lists`, this is an advantage as to control whoever uses this data-structure performs only their right operations that are efficient
+
+- They're called: **"linear Data structures"** as they allow us to **traverse** (go through data elements sequentially one by one in which only one data element can be directly reached)
+- here there's no random-access-operations like in `lists`, as we can only reach first or last element
 
 ### Stacks
 
@@ -159,9 +165,14 @@ they made us limit the operations we can do on other data structures like `lists
 
 it's based on **LIFO** (last in - first out)
 
-- used in programming languages when calling functions in the **call stack**
+- used in
+  - programming languages when calling functions in the **call stack**
+  - some commands like: `undo`
+  - go back to previous page
 - `peek` --> is to view the top most plate
-- stacks can be implemented using **Arrays** or **linked-lists**, as arrays allow for **cache locality** which is faster when accessing its items in memory because they're right next to each other versus a `linked-list` that has them scattered all over memory
+- stacks can be implemented using **Arrays** or **linked-lists**, as:
+  - `arrays` allow for **cache locality** which is faster when accessing its items in memory because they're right next to each other
+  - `linked-list`, but note that it has its items scattered all over memory, so it will be slower that `array`
 
 ---
 
@@ -174,4 +185,78 @@ it's based on **FIFO** (first in - first out)
 - `enqueue` --> is to add to the queue (push)
 - `denqueue` --> is to remove first item from queue (pop)
 - creating `Queues` from `arrays` is really bad, as you will shift the other elements (O(n))
-- You would never want to build a queue with an `array`, as `arrays` have indexes associated with them, so if we removed first item then we now need to shift the indexes over --> **O(n)**, **so we should build `queues` with `linked-lists`**, as we just change the `head` --> **O(1)**
+- You would never want to build a queue with an `array`, as `arrays` have indexes associated with them, so if we removed first item then we now need to shift the indexes over --> **O(n)**,
+- **so we should build `queues` with `linked-lists`**, as we just change the `head` --> **O(1)**
+
+---
+
+## Trees
+
+![trees](./img/trees.png)
+
+They have **Hierarchical Data-structures** structure unlike other data-structures which are **Linear Data-structures**
+
+- EX:
+  - the **DOM**
+  - decisions by AI or chess-games
+- `nodes`
+  - can only point to their children
+  - don't have to reference their parent
+
+---
+
+### Binary Tree
+
+![binary-tree](img/binary-tree.webp)
+
+- It's a type of trees that has some rules:
+  - Each `node` can only have either `0`, `1` or `2` child-nodes
+  - Each child can only one parent
+- a `node` represent a certain state which has 3 properties;
+
+  1. **value**
+  2. pointer to the **left** side of the tree
+  3. pointer to the **right** side of the tree
+
+#### Perfect vs Full vs Complete Binary Trees
+
+- **Full Binary Tree**: A Binary Tree is full if every `node` has `0` or `2` children. Following are examples of a full binary tree.
+
+  ```sh
+          18
+        /    \
+      15      20
+      / \
+      40 50
+      / \
+      30 50
+  ```
+
+- **Complete Binary Tree**: A Binary Tree is complete Binary Tree if all levels are completely filled except possibly the last level and the last level has all keys as left as possible.
+
+  ```sh
+              18
+          /      \
+        15         30
+      /  \       /  \
+    40    5    100   40
+  / \   /
+  8  7  9
+  ```
+
+- **Perfect Binary Tree**: A Binary tree is Perfect Binary Tree in which all internal nodes have two children and all leaves are at same level.
+
+  ```sh
+          18
+      /       \
+    15         30
+    /  \        /  \
+  40    50    100   40
+  ```
+
+  - this type is really efficient and desirable as they have 2 interesting properties:
+    1. The number of total `nodes` on each level **doubles** as we move down the tree.
+    2. The number of `nodes` on the last level is equal to (the sum of the number of nodes on all the other levels **plus** `1`), which means that **"half of our nodes are on the last level"**
+       - this is very useful as it can enable us to avoid visiting every `node` if the `node` we're looking for is at the very bottom-level --> this introduces the **"O(log N)"** notation
+
+> **Note**: **`O(log N)`** means that the choice of the next element on which to perform some sort of action is one of several possibilities and only one needs to be chosen --> **"Divide and conquer**

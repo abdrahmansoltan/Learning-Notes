@@ -1,6 +1,9 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Python](#python)
+    - [Running Python](#running-python)
+    - [Data Types](#data-types)
   - [Operators](#operators)
   - [Loops](#loops)
     - [while loop](#while-loop)
@@ -19,6 +22,7 @@
     - [List comprehension](#list-comprehension)
   - [Tuples](#tuples)
   - [String](#string)
+    - [Multi-line strings (Triple Quotes)](#multi-line-strings-triple-quotes)
     - [String methods](#string-methods)
     - [String Formatting](#string-formatting)
     - [String formatting (new way)](#string-formatting-new-way)
@@ -28,11 +32,27 @@
 
 ---
 
+## Python
+
+### Running Python
+
+![running-python](./img/running-python.png)
+
+---
+
+### Data Types
+
+![data-types](./img/python-data-types.png)
+
+---
+
 ## Operators
+
+![operators](./img/operators.png)
 
 - **floor division**: also called integer-division (results in an integer by discarding the fraction part)
 
-  - it round down to a small value ->
+  - it **rounds down** to a small value ->
 
     ```py
     print(14 // 8) # 1`
@@ -46,7 +66,7 @@
     print(12345 // 1000) # 12`
     ```
 
-- **modulus operator** `%` returns the remainder
+- **modulus(remainder) operator** `%` returns the remainder
 
   - module dividing by 10s gets last digits
 
@@ -472,10 +492,35 @@ print(list(zipped))
 
 ## String
 
+### Multi-line strings (Triple Quotes)
+
+you can use single or double quotes
+
+```py
+"""
+dsfs
+'dsfdsf'
+sf
+"fff"
+"""
+# or
+'''
+dsfdsf
+sdfdf
+'''
+```
+
+---
+
 ### String methods
 
 - `.find()`: if doesn't find the text it returns `-1`
+
   - `.rfind()`: same as `find()` but returns `ValueError` if not found
+
+- Slice:
+  ![slice](img/python-slice.png)
+  ![slice](img/python-slice2.png)
 
 ---
 
@@ -640,6 +685,12 @@ print(get_neibghours(3, 6))
 ---
 
 ## Notes
+
+- for variables names, the "Pythonic" way is to use **"snake_case"**, unlike in `Javascript` where we usually use **"camelCase"**:
+
+  ```py
+  first_name = 'Ahmed'
+  ```
 
 - `print()` can have second parameter which is the end after element:
 

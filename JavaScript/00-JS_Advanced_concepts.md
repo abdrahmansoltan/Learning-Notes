@@ -15,11 +15,16 @@
     - [Lexical scope](#lexical-scope)
   - [Functional Programming](#functional-programming)
     - [currying & partial Application](#currying--partial-application)
+    - [Currying](#currying)
+    - [Partial Function Application](#partial-function-application)
+      - [Why do we usually make a partial function?](#why-do-we-usually-make-a-partial-function)
     - [Closure](#closure)
       - [Function returning Functions](#function-returning-functions)
       - [Benefits](#benefits)
     - [Generators](#generators)
     - [Pure Functions](#pure-functions)
+    - [Decorators](#decorators)
+      - [Using “func.call” for the context](#using-funccall-for-the-context)
     - [Iteration vs. Recursion](#iteration-vs-recursion)
     - [Recursion & performance](#recursion--performance)
     - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
@@ -250,11 +255,23 @@ Each local scope can also see all the local scopes that contain it, and all scop
 
 ![currying-vs-partialapplication](./img/currying-vs-partialapplication.jpeg)
 
-- **currying**: one argument at a time
-  - It is translating a function that takes multiple arguments into a sequence of **single-argument-functions**, each accepting one argument.
-- **partial application**: The process of applying a function to some of its arguments. The partially applied function gets returned for later use.
+> These 2 concepts use **Closures**
 
-  - it's creating a new outer-function that calls our multi-argument function with the argument, and the multi-argument function stored conveniently in the **Backpack**
+### Currying
+
+It's -> one argument at a time
+
+- It is translating a function that takes multiple arguments into a sequence of **single-argument-functions**, each accepting one argument.
+
+---
+
+### Partial Function Application
+
+> Creating a new function by fixing some parameters of the existing one.
+
+It's the process of applying a function to some of its arguments. The partially applied function gets returned for later use
+
+- it's creating a new outer-function that calls our multi-argument function with the argument, and the multi-argument function stored conveniently in the **Backpack**
 
   ```js
   const multiply = (a, b) => a * b;
@@ -269,7 +286,62 @@ Each local scope can also see all the local scopes that contain it, and all scop
   const result = multiplyBy2(5);
   ```
 
-- these 2 concepts use **Closures**
+- **we can also use `bind()` for "`this`"**:
+
+  ```js
+  // Syntax
+  let bound = func.bind(context, [arg1], [arg2], ...);
+
+  // EX:
+  function mul(a, b) {
+    return a * b;
+  }
+
+  let double = mul.bind(null, 2);
+
+  alert( double(3) ); // = mul(2, 3) = 6
+  alert( double(4) ); // = mul(2, 4) = 8
+  ```
+
+  - Please note that we actually don’t use `"this"` here. But `bind` requires it, so we must put in something like `null`.
+  - The call to `mul.bind(null, 2)` **creates a new function** `double` that passes calls to `mul`, fixing `mull` as the context and `2` as the first argument. Further arguments are passed “as is”.
+
+- **Going partial without context ("`this`")**
+
+  - What if we’d like to fix some arguments, but not the context `this`? For example, for an object method.
+    - The native `bind()` does not allow that. We can’t just omit the context and jump to arguments.
+  - Fortunately, a function `partial()` for binding only arguments can be easily implemented:
+
+  ```js
+  function partial(func, ...argsBound) {
+    return function (...args) {
+      return func.call(this, ...argsBound, ...args);
+    };
+  }
+
+  // Usage:
+  let user = {
+    firstName: 'John',
+    say(time, phrase) {
+      alert(`[${time}] ${this.firstName}: ${phrase}!`);
+    }
+  };
+
+  // add a partial method with fixed time
+  user.sayNow = partial(user.say, new Date().getHours() + ':' + new Date().getMinutes());
+
+  user.sayNow('Hello'); // [10:00] John: Hello!
+  ```
+
+  - Also there’s a ready [\_.partial](https://lodash.com/docs#partial) implementation from **lodash** library.
+
+---
+
+#### Why do we usually make a partial function?
+
+- The benefit is that we can create an independent function with a readable name (`double`, `triple`). We can use it and not provide the first argument every time as it’s fixed with `bind`.
+- In other cases, **partial application** is useful when we have a very generic function and want a less universal variant of it for convenience.
+  - For instance, we have a function `send(from, to, text)`. Then, inside a user object we may want to use a partial variant of it: `sendTo(to, text)` that sends from the current user.
 
 ---
 
@@ -434,6 +506,59 @@ const element2 = returnNextElement.next(2); // 7 -> when we pass a value to the 
   - pure function **must** return something
 - **side-effects**: are about MODIFICATION and doesn't count if we created new item
   - usually it's anything that the function does other that returning a value
+
+---
+
+### Decorators
+
+**Decorator** is a wrapper around a function that alters its behavior. The main job is still carried out by the function.
+
+- Ex: create a wrapper-function around another function (Pure function) to cache its (behavior or the return-value) for multiple use
+
+  - here: The result of `cachingDecorator(func)` is a “wrapper”: function(x) that “wraps” the call of func(x) into caching logic:
+
+    ```js
+    function slow(x) {
+      // there can be a heavy CPU-intensive job here
+      alert(`Called with ${x}`);
+      return x;
+    }
+
+    function cachingDecorator(func) {
+      let cache = new Map();
+
+      return function (x) {
+        if (cache.has(x)) {
+          // if there's such key in cache
+          return cache.get(x); // read the result from it
+        }
+
+        let result = func(x); // otherwise call func
+
+        cache.set(x, result); // and cache (remember) the result
+        return result;
+      };
+    }
+
+    slow = cachingDecorator(slow);
+
+    alert(slow(1)); // slow(1) is cached and the result returned
+    alert('Again: ' + slow(1)); // slow(1) result returned from cache
+    ```
+
+  - there are several benefits of using a separate `cachingDecorator()` instead of altering the code of `slow()` itself:
+    1. The `cachingDecorator()` is reusable. We can apply it to another function.
+    2. The caching logic is separate, it did not increase the complexity of `slow()` itself (if there was any).
+    3. We can combine multiple decorators if needed.
+
+#### Using “func.call” for the context
+
+The caching decorator mentioned above is not suited to work with **object methods**. The reason is that the **wrapper** calls the original function as `func(x)`. And, when called like that, the function gets `this = undefined`.
+
+- To solve this, we need to do one of the followings
+
+  - using the built-in function method **func.call(context, …args)** that allows to call a function explicitly setting **this** keyword.
+    - It runs func providing the first argument as `this`, and the next as the arguments.
 
 ---
 
@@ -895,3 +1020,12 @@ we can convert functions more easily to make them suit our task Without writing 
     > - For instance, in the code below the ask function accepts a question to ask and an arbitrary number of handler functions to call. Once a user provides their answer, the function calls the handlers. We can pass two kinds of handlers:
     > - A zero-argument function, which is only called when the user gives a positive answer.
     > - A function with arguments, which is called in either case and returns an answer.
+
+- **Arrow functions:**
+  - Do not have `this`
+  - Do not have `arguments` variable
+  - Can’t be called with `new`
+  - They also don’t have `super`
+  - There’s a difference between an `arrow function` => and a regular function called with `.bind(this)`:
+    - `.bind(this)` creates a “bound version” of the function.
+    - The `arrow =>` doesn’t create any binding. The function simply doesn’t have this. The lookup of this is made exactly the same way as a regular variable search: in the outer lexical environment.
