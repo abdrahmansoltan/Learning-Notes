@@ -23,7 +23,7 @@
 ![frameworks](./img/frameworks.PNG)
 ![frameworks](./img/opinionated.PNG)
 
-> **Opinionated**: having strong opinions on how things should be done
+> **Opinionated**: having strong opinions on how things should be done and with what tools
 
 ---
 
@@ -51,13 +51,25 @@
 
 - A `JavaScript library` refers to packaged code, methods, and functions that can be reused and repurposed. On the other hand,
 - A `JavaScript framework` defines the application design, **can call on a library, and use code within it**. It doesn't offer a single solution; instead, it gives you a set of blueprints for building web applications.
+  - It's wrong to say that a framework is a collection of libraries, as some frameworks doesn't contain/use libraries
+- when comparing **framework** and a **library**, remember it's about the **Flow of control** as **"who calls whom"** like in a server/client relationship
 
-![vs](./img/react_vs_Angular.jpeg)
+  - The caller/callee relationship:
+    ![caller-callee-relationship](./img/caller-callee-relationship.png)
+
+- Flow of control difference:
+  ![framework-vs-library](./img/framework-vs-library.png)
+  - **Framework** control the flow of your app
+  - **Library** don't control the flow of your app
+
+---
 
 ### React
 
 - `React` is not technically a framework; it's a library for UI components, but it's seen colloquially as a framework
 - React.js provides fast UIs for interactive apps which use data efficiently by instantly applying changes to elements rather than updating all occurrences at once as other libraries do. It also supports incremental use with the virtual DOM (document object model) to make fast updates to web page content. React also uses JSX, a domain-specific interface created by the same team.
+
+![vs](./img/react_vs_Angular.jpeg)
 
 ### Angular
 

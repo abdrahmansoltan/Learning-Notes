@@ -6,7 +6,7 @@
     - [Interpreted Language](#interpreted-language)
   - [JavaScript Engine](#javascript-engine)
     - [How the engine works ?](#how-the-engine-works-)
-    - [call-stack & Memory-heap](#call-stack--memory-heap)
+    - [call-stack \& Memory-heap](#call-stack--memory-heap)
   - [Types](#types)
     - [`==` vs `===`](#-vs-)
     - [Type Coercion](#type-coercion)
@@ -14,7 +14,7 @@
   - [Scope](#scope)
     - [Lexical scope](#lexical-scope)
   - [Functional Programming](#functional-programming)
-    - [currying & partial Application](#currying--partial-application)
+    - [currying \& partial Application](#currying--partial-application)
     - [Currying](#currying)
     - [Partial Function Application](#partial-function-application)
       - [Why do we usually make a partial function?](#why-do-we-usually-make-a-partial-function)
@@ -22,11 +22,13 @@
       - [Function returning Functions](#function-returning-functions)
       - [Benefits](#benefits)
     - [Generators](#generators)
+      - [Generators are Iterable](#generators-are-iterable)
+      - [Generators in Async Code](#generators-in-async-code)
     - [Pure Functions](#pure-functions)
     - [Decorators](#decorators)
       - [Using “func.call” for the context](#using-funccall-for-the-context)
     - [Iteration vs. Recursion](#iteration-vs-recursion)
-    - [Recursion & performance](#recursion--performance)
+    - [Recursion \& performance](#recursion--performance)
     - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
     - [Referential Transparency](#referential-transparency)
     - [Composition](#composition)
@@ -34,7 +36,7 @@
   - [JS : The weird parts](#js--the-weird-parts)
     - [Advanced Types](#advanced-types)
     - [Numbers](#numbers)
-    - [short circuiting => **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
+    - [short circuiting =\> **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
   - [notes](#notes)
 
 ---
@@ -441,21 +443,101 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
 ### Generators
 
-Once we start thinking of our data as flows (where we can pick of an element one-by-one) we can rethink how we produce those flows - JavaScript now lets us produce the flows using a function
+Regular functions return only one, single value (or nothing). **Generators** can return (`“yield”`) multiple values, one after another, on-demand. They work great with iterables, allowing to create data streams with ease.
 
-the Generator function allows us to exit and renter the execution-context of function manually, unlike iterators which this happens dynamically
+- Once we start thinking of our data as flows (where we can pick of an element one-by-one) we can rethink how we produce those flows - JavaScript now lets us produce the flows using a function
+- the Generator function allows us to exit and renter the execution-context of function manually, unlike iterators which this happens dynamically
+- To create a generator, we need a special syntax construct: `function*`, so-called **“generator function”**.
+  - Generator functions behave differently from regular ones. When such function is called, it doesn’t run its code. Instead it returns a special object, called **“generator object”**, to manage the execution.
 
-```js
-function* createFlow() {
-  const num = 10;
-  const newNum = yield num;
-  yield 5 + newNum;
-  yield 6;
-}
-const returnNextElement = createFlow();
-const element1 = returnNextElement.next(); // 10
-const element2 = returnNextElement.next(2); // 7 -> when we pass a value to the next() method, it will be evaluated as the yielded value and we will continue the function until we find another yield
-```
+    ```js
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+    // "generator function" creates "generator object"
+    let generator = generateSequence(); // The function code execution hasn’t started yet
+    alert(generator); // [object Generator]
+    ```
+
+> **Note:** `function* f(…)` or `function *f(…)`?
+>
+> - Both syntaxes are correct. But usually the first syntax is preferred
+> - we usually use the second syntax in object/class ES6 methods
+
+- The main method of a generator is `next()`. When called, it runs the execution until the nearest `yield <value>` statement (value can be omitted, then it’s `undefined`). Then the function execution pauses, and the yielded value is returned to the outer code.
+  - The result of `next()` is always an object with two properties:
+    - `value`: the yielded value.
+    - `done`: `true` if the function code has finished, otherwise `false`.
+      - When the generator is done. We should see it from `done:true`, and New calls to `generator.next()` don’t make sense any more. If we do them, they return the same object: `{done: true}`.
+
+    ```js
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+    let generator = generateSequence();
+
+    let one = generator.next();
+
+    alert(JSON.stringify(one)); // {value: 1, done: false}
+    ```
+
+  - **"yield" is a two-way street**: That’s because `yield` is a two-way street: it not only returns the result to the outside, but also can pass the value inside the generator.
+
+    - when we pass a value to the `next()` method, it will be evaluated as the yielded value and we will continue the function until we find another yield
+
+    ```js
+    function* createFlow() {
+      const num = 10;
+      const newNum = yield num;
+      yield 5 + newNum;
+      yield 6;
+    }
+    const returnNextElement = createFlow(); // The function code execution hasn’t started yet
+    const element1 = returnNextElement.next(); // 10
+    const element2 = returnNextElement.next(2); // 7
+    ```
+
+#### Generators are Iterable
+
+- We can loop over their values using `for..of`:
+
+  ```js
+  function* generateSequence() {
+    yield 1;
+    yield 2;
+    return 3;
+  }
+
+  let generator = generateSequence();
+
+  for(let value of generator) {
+    alert(value); // 1, then 2
+  }
+  ```
+
+  - **Note**: the example above shows `1`, then `2`, and that’s all. It doesn’t show `3`!
+    - It’s because `for..of` iteration ignores the last value, when `done: true`. So, if we want all results to be shown by `for..of`, we must return them with `yield`
+
+- As generators are iterable, we can call all related functionality, e.g. the **spread syntax `...`**:
+
+  ```js
+  function* generateSequence() {
+    yield 1;
+    yield 2;
+    yield 3;
+  }
+
+  let sequence = [0, ...generateSequence()];
+  alert(sequence); // 0, 1, 2, 3
+  ```
+
+#### Generators in Async Code
 
 - `returnNextElement` is a special object (a **generator object**) that when its `next` method is run starts (or continues) running createFlow **execution-context** until it hits `yield` and returns out the value being yielded **without continuing the function**
 
@@ -515,7 +597,7 @@ const element2 = returnNextElement.next(2); // 7 -> when we pass a value to the 
 
 - Ex: create a wrapper-function around another function (Pure function) to cache its (behavior or the return-value) for multiple use
 
-  - here: The result of `cachingDecorator(func)` is a “wrapper”: function(x) that “wraps” the call of func(x) into caching logic:
+  - here: The result of `cachingDecorator(func)` is a "wrapp"r”: function(x) that “wraps” the call of func(x) into caching logic:
 
     ```js
     function slow(x) {
@@ -807,7 +889,7 @@ we can convert functions more easily to make them suit our task Without writing 
     - Modern JavaScript supports `“classes”` and `“modules”`, that enable `use strict` automatically. So we don’t need to add the `"use strict"` directive.
 - `Refactoring the code` : means the process of restructuring code without changing or adding to its external behavior and functionality.
 - in `DOM` => `:root` element is called `document.documentElement`
-- to make anything `immutable` : `Object.freeze()`
+- to make anything `immutable` : `Object.freeze(obj)`
 
   - it **only** freezes the first level of an object (not a `deep-freeze`)
 

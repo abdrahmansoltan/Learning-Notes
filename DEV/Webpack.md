@@ -9,7 +9,7 @@
       - [How loaders work](#how-loaders-work)
     - [Plugins](#plugins)
   - [Installation and Configuration](#installation-and-configuration)
-  - [Webpack different modes (Splitting Dev & Production)](#webpack-different-modes-splitting-dev--production)
+  - [Webpack different modes (Splitting Dev \& Production)](#webpack-different-modes-splitting-dev--production)
     - [For Development](#for-development)
     - [webpack-dev-server](#webpack-dev-server)
     - [For Production](#for-production)
@@ -192,7 +192,7 @@ webpack by default bundles Javascript files, so when we want to bundle **non-jav
 
 ### Plugins
 
-They're instances of **Objects** with `apply` property, and they allow you to **hook into** the entire compilation lifecycle of events (the build process).
+They're instances of **Objects** with `apply` property (collection of rules), and they allow you to **hook into** the entire compilation lifecycle of events (the build process).
 
 They add additional functionality to Compilations(optimized bundled modules). More powerful w/ more access to CompilerAPI. Does everything else you’d ever want to in webpack.
 

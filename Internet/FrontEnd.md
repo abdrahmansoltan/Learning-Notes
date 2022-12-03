@@ -91,7 +91,7 @@ Example of repeated tasks:
 
 Webpack is a **bundler** whereas Gulp is a **task runner**
 
-- Simply put, Webpack is such a powerful tool that it can already perform the vast majority of the tasks you’d otherwise do through a task runner. For instance, Webpack already provides options for minification and sourcemaps for your bundle. In addition, Webpack can be run as middleware through a custom server called webpack-dev-server, which supports both live reloading and hot reloading
+- Simply put, Webpack is such a powerful tool that it can already perform the vast majority of the tasks you’d otherwise do through a task runner. For instance, Webpack already provides options for minification and sourcemap for your bundle. In addition, Webpack can be run as middleware through a custom server called webpack-dev-server, which supports both live reloading and hot reloading
 
 ![Gulp vs Webpack](./img/Gulp-vs-Webpack-info.jpg.jpg)
 

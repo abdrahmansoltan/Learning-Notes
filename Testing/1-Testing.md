@@ -1,40 +1,42 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Testing](#testing)
-  - [Testing Pyramid](#testing-pyramid)
-  - [Snapshot Testing](#snapshot-testing)
-  - [Sanity Test](#sanity-test)
-  - [(AAA) Pattern](#aaa-pattern)
-  - [BDD vs TDD](#bdd-vs-tdd)
-    - [Behavior Driven Development (BDD)](#behavior-driven-development-bdd)
-    - [Test-Driven Development (TDD)](#test-driven-development-tdd)
-  - [Test Design Best Practices](#test-design-best-practices)
-  - [Testing Setup](#testing-setup)
-- [Suites and Specs](#suites-and-specs)
-  - [Matchers](#matchers)
-    - [Comparisons](#comparisons)
-    - [Truthiness](#truthiness)
-    - [Numerical Matchers](#numerical-matchers)
-    - [Negating](#negating)
-    - [Exceptions (error handling)](#exceptions-error-handling)
-    - [othermatchers](#othermatchers)
-- [Backend: Endpoint Testing (HTTP assertions)](#backend-endpoint-testing-http-assertions)
-  - [Framework for Endpoint Testing](#framework-for-endpoint-testing)
-- [Testing Hooks](#testing-hooks)
-  - [Teardown of Suites](#teardown-of-suites)
-  - [`beforeEach` and `afterEach`](#beforeeach-and-aftereach)
-  - [`beforeAll` and `afterAll`](#beforeall-and-afterall)
-  - [Skipping or Specifying Tests](#skipping-or-specifying-tests)
-- [Spies & Mocks (SideEffects)](#spies--mocks-sideeffects)
-  - [Spies](#spies)
-  - [Mock Testing](#mock-testing)
+  - [Testing](#testing)
+    - [Testing Pyramid](#testing-pyramid)
+    - [Snapshot Testing](#snapshot-testing)
+    - [Sanity Test](#sanity-test)
+    - [(AAA) Pattern](#aaa-pattern)
+    - [BDD vs TDD](#bdd-vs-tdd)
+      - [Behavior Driven Development (BDD)](#behavior-driven-development-bdd)
+      - [Test-Driven Development (TDD)](#test-driven-development-tdd)
+    - [Test Design Best Practices](#test-design-best-practices)
+    - [Testing Setup](#testing-setup)
+  - [Suites and Specs](#suites-and-specs)
+    - [Matchers](#matchers)
+      - [Comparisons](#comparisons)
+      - [Truthiness](#truthiness)
+      - [Numerical Matchers](#numerical-matchers)
+      - [Negating](#negating)
+      - [Exceptions (error handling)](#exceptions-error-handling)
+      - [othermatchers](#othermatchers)
+  - [Backend: Endpoint Testing (HTTP assertions)](#backend-endpoint-testing-http-assertions)
+    - [Framework for Endpoint Testing](#framework-for-endpoint-testing)
+  - [Testing Hooks](#testing-hooks)
+    - [Teardown of Suites](#teardown-of-suites)
+    - [`beforeEach` and `afterEach`](#beforeeach-and-aftereach)
+    - [`beforeAll` and `afterAll`](#beforeall-and-afterall)
+    - [Skipping or Specifying Tests](#skipping-or-specifying-tests)
+  - [Spies & Mocks (SideEffects)](#spies--mocks-sideeffects)
+    - [Spies](#spies)
+    - [Mock Testing](#mock-testing)
 
 ---
 
 ## Testing
 
 **Testing**: is the process of checking that an application is functioning as expected
+
+> Testing is the process of experimentally checking the correctness of a program, while debugging is the process of tracking the execution of a program and discovering the errors in it.
 
 - 2 Types of tests:
 
@@ -201,14 +203,14 @@ npm i --save-dev @types/supertest  #  compile without TypeScript errors.
 - ex
 
 ```ts
-import supertest from "supertest"; // the module
-import app from "../index"; // the file that have the server code
+import supertest from 'supertest'; // the module
+import app from '../index'; // the file that have the server code
 
 const request = supertest(app); // telling supertest where the server is
 
-describe("Test endpoint responses", () => {
-  it("gets the api endpoint", async (doneCallback) => {
-    const response = await request.get("/api");
+describe('Test endpoint responses', () => {
+  it('gets the api endpoint', async doneCallback => {
+    const response = await request.get('/api');
     expect(response.status).toBe(200); // success code
     doneCallback(); // it tells supertest to close the server-calling
   });
@@ -237,18 +239,18 @@ describe("Test endpoint responses", () => {
   ![alt](./img/before-each-and-after-each.jpg)
 
   ```js
-  describe("", () => {
+  describe('', () => {
     beforeEach(function () {
       // callback function
       foo = 1;
     });
 
-    it("", () => {
+    it('', () => {
       expect(foo).toEqual(1);
       foo += 1;
     });
 
-    it("", () => {
+    it('', () => {
       expect(foo).toEqual(2);
     });
   });
@@ -273,14 +275,14 @@ describe("Test endpoint responses", () => {
 Here the idea is to eliminate any **pollution** (any test that affect the result of another test)
 
 ```js
-xdescribe("A spec", function () {
-  it("is just a function, so it can contain any code", () => {
+xdescribe('A spec', function () {
+  it('is just a function, so it can contain any code', () => {
     expect(foo).toEqual(1);
   });
 });
 
-fdescribe("A spec", function () {
-  it("is just a function, so it can contain any code", () => {
+fdescribe('A spec', function () {
+  it('is just a function, so it can contain any code', () => {
     expect(foo).toEqual(1);
   });
 });
@@ -301,7 +303,7 @@ It's when you want to see if the function was called, but aren't interested in w
   - It is automatically in scope within every test file. The methods in the jest object help create mocks and let you control Jest's overall behavior.
 
 ```js
-import { jest } from "jest";
+import { jest } from 'jest';
 const mockFn = jest.fn();
 mockFn();
 expect(mockFn).toHaveBeenCalled();

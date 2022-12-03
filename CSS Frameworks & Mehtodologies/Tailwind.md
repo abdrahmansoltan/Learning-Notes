@@ -1,14 +1,14 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Tailwind](#tailwind)
-  - [TailwindCSS vs. Bootstrap](#tailwindcss-vs-bootstrap)
-- [PurgeCSS](#purgecss)
-  - [Configuring PurgeCSS in the Tailwind configuration file to remove unused CSS](#configuring-purgecss-in-the-tailwind-configuration-file-to-remove-unused-css)
-- [Configuration](#configuration)
-  - [Adding colors/fonts](#adding-colorsfonts)
-- [Functions and Directives](#functions-and-directives)
-  - [@apply](#apply)
+  - [Tailwind](#tailwind)
+    - [TailwindCSS vs. Bootstrap](#tailwindcss-vs-bootstrap)
+  - [PurgeCSS](#purgecss)
+    - [Configuring PurgeCSS in the Tailwind configuration file to remove unused CSS](#configuring-purgecss-in-the-tailwind-configuration-file-to-remove-unused-css)
+  - [Configuration](#configuration)
+    - [Adding colors/fonts](#adding-colorsfonts)
+  - [Functions and Directives](#functions-and-directives)
+    - [@apply](#apply)
 
 ---
 

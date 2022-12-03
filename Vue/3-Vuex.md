@@ -17,22 +17,20 @@
   - [Actions](#actions)
     - [mapActions](#mapactions)
   - [Modules](#modules)
-    ](#mapmutation)
-- [Modules](#modules)
 
 ---
 
 ## Vuex
 
-a library for managing global-state in Vue, with rules that ensure that the state can be only mutated in a predictable way.
+A library for managing global-state in Vue, with rules that ensure that the state can be only mutated in a predictable way.
 
 > Also install plugin for ready and easy configuration
 
 - Vuex is a **state management pattern + library** for Vue.js applications. It serves as a centralized store for (shared data and logic, even shared methods or async) in an application, with rules **ensuring that the state can only be mutated in a predictable fashion**.
-  ![vuex](./img/vuex.png)
+  ![vuex](./img/vuex1.PNG)
 - it ensures a **unidirectional data flow**, to prevent going with state up&down, this ensures that we truly know who owns the state
 - influenced by **Flux Application Architecture**, like with `Redux`
-  ![vuex](./img/vuex1.PNG)
+  ![vuex](./img/vuex.png)
 - **Why** Vuex?
 
   - in a complex `SPA`, passing state between many components and especially deeply nested or sibling components, can get complicated quickly, having one centralized place to access your data can help you stay organized
@@ -220,7 +218,7 @@ Instead of accessing the state's data directly, we use **getters** which help in
 > caching because they use **closures**
 
 - Getters can invoke other getters
-- It's recommended to use **Arrow Functions**
+- It's recommended to use **Arrow Functions** to prevent conflict with the `this` keyword in the component when calling the getter: `this.$store.getters`
 
 ```js
 // It's a replace for this:
@@ -270,7 +268,7 @@ export default {
 
 ## Mutations
 
-**Mutations**: will allow us to update the state, but they will always be synchronous. Mutations are the only way to change data in the state in the store.
+**Mutations**: will allow us to update the state (from one place (single source of truth) and will make sure that the `state` isn't modified from other place ), but they will always be synchronous. Mutations are the only way to change data in the state in the store.
 
 - Must be **synchronous**
 - in the store-options you can use **strict mode** that prevents mutation of the store's state outside of the mutation
@@ -278,7 +276,7 @@ export default {
 - To perform a mutation, use `commit`
 
   ```js
-  this.$store.commit('name of method(mutation) in the mutations');
+  this.$store.commit('name of method(mutation) in the mutations', payload - object);
   ```
 
 ### mapMutation
@@ -304,10 +302,11 @@ export default {
 
 ## Actions
 
-**Actions** will allow us to update the state, **asynchronously**, but will use an existing mutation. This can be very helpful if you need to perform a few different mutations at once in a particular order, or reach out to a server.
+**Actions** will allow us to update the state with mutations ( **asynchronously**), but will use an existing mutation. This can be very helpful if you need to perform a few different mutations at once in a particular order, or reach out to a server.
 
 - They are methods that commits a mutation + they allow for Async operations
-- actions receive `context` object, it's like the `store` object
+- actions receive **`context`** object as an argument, it's like the `$store` object
+  - which can do many things like: `commit mutations`
 - **Async** -> as we can make an API call-in the action, then commit the mutation when we receive the data
 
 ```js
@@ -321,6 +320,7 @@ export const actions = {
 
 // in the component
 // import FETCH_JOBS
+this.$store.dispatch(action-name, payload);
 this.$store.dispatch(FETCH_JOBS);
 ```
 

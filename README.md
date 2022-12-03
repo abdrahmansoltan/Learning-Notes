@@ -5,7 +5,7 @@
   - [Programming Fundamentals](#programming-fundamentals)
   - [Internet-FrontEnd/BackEnd](#internet-frontendbackend)
   - [HTML-CSS](#html-css)
-    - [CSS Methodologies & Frameworks](#css-methodologies--frameworks)
+    - [CSS Methodologies \& Frameworks](#css-methodologies--frameworks)
   - [JavaScript](#javascript)
     - [JQuery](#jquery)
   - [TypeScript](#typescript)
@@ -25,8 +25,7 @@
 
 ## Intro
 
-This repository contains notes from my learning Journey to be a reference for any information that I'd need at any time
-w
+This repository contains notes from my learning Journey to be a reference for any information that I'd need at any time.
 
 ---
 

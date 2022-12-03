@@ -16,6 +16,7 @@
     - [Using destructed props](#using-destructed-props)
   - [Context](#context)
   - [Router](#router)
+  - [Notes](#notes)
 
 ---
 
@@ -25,9 +26,10 @@ Composition API allow you to **encapsulate** one piece of functionality so that 
 
 It's an alternative syntax for writing components
 
-![options api](./img/options%20api.PNG)
+![composition api](./img/options%20api.PNG)
 ![composition api](./img/composition%20api.PNG)
-![options api](./img/composition%20api2.PNG)
+![composition api](./img/composition%20api2.PNG)
+![composition api](./img/composition-api3.png)
 
 - new syntax for the `setup`
   ![composition api](./img/options%20api2.png)
@@ -54,7 +56,7 @@ It's an alternative syntax for writing components
 - Here, we don't use **this** keyword
 - must return an object with the data/methods to use in the `<template></template>`
 
-> You can use `Composition-API` with `Options-API`
+> You can use **`Composition-API`** with **`Options-API`**
 
 ---
 
@@ -93,24 +95,24 @@ It's the programming with asynchronous **data streams**
   - to make the properties become **reactive**
   - you can access the value of the property using `.value`
 
-```vue
+```html
 <script>
-import { ref } from 'vue';
+  import { ref } from 'vue';
 
-export default {
-  setup() {
-    const count = ref(0); // give it the initial value = 0
+  export default {
+    setup() {
+      const count = ref(0); // give it the initial value = 0
 
-    // expose to template and other options API hooks
-    return {
-      count
-    };
-  },
+      // expose to template and other options API hooks
+      return {
+        count
+      };
+    },
 
-  mounted() {
-    console.log(this.count); // 0
-  }
-};
+    mounted() {
+      console.log(this.count); // 0
+    }
+  };
 </script>
 
 <template>
@@ -122,9 +124,29 @@ export default {
 
 ### Computed
 
-- It's reactive-ready function from **Vue**
+- It's reactive-ready function which is imported from **Vue**
+  - it takes a `function` as an argument
   - The function inside it -> returns a **reactive object**
 - it's **read-only** (can't assign values to properties inside of it)
+
+```js
+import { ref, computed, Ref } from '@vue/composition-api';
+
+export default {
+  setup() {
+    const movieName = ref('Relatos Salvajes');
+    const country = ref('Argentina');
+
+    const nameAndCountry = computed(
+      () => `The movie name is ${movieName.value} from ${country.value}`
+    );
+
+    return { movieName, country, nameAndCountry };
+  }
+};
+```
+
+> The same for **Watchers**
 
 ---
 
@@ -149,7 +171,7 @@ const user = reactive({
   age: 20
 });
 
-// notice that we dont use them as "user.age.value"
+// notice that we don't use them as "user.age.value"
 const title = computed(() => `${user.name} with age of ${user.age}`);
 
 // this won't work!
@@ -190,7 +212,7 @@ console.log(fooRef.value); // 3
 ![lifecycle](./img/lifecycle3.PNG)
 ![lifecycle](./img/lifecycle4.PNG)
 
---
+---
 
 ## Mixins
 
@@ -327,3 +349,9 @@ export default {
   }
 };
 ```
+
+---
+
+## Notes
+
+- you can mix between **options-api** and **composition-api** and use them together without problems

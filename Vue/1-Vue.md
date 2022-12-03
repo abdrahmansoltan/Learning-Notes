@@ -3,6 +3,9 @@
 - [INDEX](#index)
   - [Vue](#vue)
     - [How it works?](#how-it-works)
+      - [Reactivity and Proxies](#reactivity-and-proxies)
+        - [Proxies Summary](#proxies-summary)
+      - [Virtual DOM](#virtual-dom)
     - [Ways of Using Vue](#ways-of-using-vue)
   - [Instance LifeCycle](#instance-lifecycle)
     - [mounted](#mounted)
@@ -21,49 +24,41 @@
     - [Listening to Events](#listening-to-events)
       - [Accessing Event Argument](#accessing-event-argument)
   - [Computed Properties](#computed-properties)
-    - [Computed vs methods](#computed-vs-methods)
+    - [Computed properties vs methods](#computed-properties-vs-methods)
     - [Filters (old and deprecated)](#filters-old-and-deprecated)
   - [Watchers](#watchers)
-  - [Styling](#styling)
+  - [Styles](#styles)
     - [Dynamic styling](#dynamic-styling)
     - [Scoped styling](#scoped-styling)
-    - [Vue Transitions & Animations](#vue-transitions--animations)
+    - [Vue Transitions \& Animations](#vue-transitions--animations)
       - [Transition vs animation](#transition-vs-animation)
-      - [Transition Classes](#transition-classes)
+      - [Vue Transition Classes](#vue-transition-classes)
       - [Transition modes](#transition-modes)
       - [Animating with JavaScript Hooks](#animating-with-javascript-hooks)
-  - [Rendering Conditional Content & List-items](#rendering-conditional-content--list-items)
+  - [Rendering Conditional Content \& List-items](#rendering-conditional-content--list-items)
     - [Conditional](#conditional)
+      - [Dynamic Components](#dynamic-components)
+        - [Keep-alive](#keep-alive)
     - [List-items (looping)](#list-items-looping)
+      - [List item key](#list-item-key)
   - [Components](#components)
-    - [Dynamic Components](#dynamic-components)
-      - [Keep-alive](#keep-alive)
-    - [Global Components](#global-components)
-  - [Props](#props)
+    - [Single File Component (SFC)](#single-file-component-sfc)
+    - [Component Registration (Global / Local)](#component-registration-global--local)
+      - [Global Registration](#global-registration)
+      - [Local Registration](#local-registration)
   - [Communicate between Components](#communicate-between-components)
-    - [Event emitter](#event-emitter)
-      - [using v-model with custom components](#using-v-model-with-custom-components)
-      - [model-view](#model-view)
+    - [Props](#props)
+      - [Mutating Object / Array Props](#mutating-object--array-props)
+    - [Component Events (Event emitter)](#component-events-event-emitter)
+      - [`model-value` event: using `v-model` with custom components](#model-value-event-using-v-model-with-custom-components)
     - [Provide / Inject](#provide--inject)
       - [Provide](#provide)
       - [Inject](#inject)
   - [Slots](#slots)
     - [named-slots](#named-slots)
-    - [slot-props](#slot-props)
+    - [slot props (scoped slots)](#slot-props-scoped-slots)
   - [Forms](#forms)
     - [Form Validation](#form-validation)
-  - [Routing](#routing)
-    - [Router configuration](#router-configuration)
-      - [History](#history)
-      - [Nested Routes](#nested-routes)
-      - [Dynamic params](#dynamic-params)
-    - [route vs router](#route-vs-router)
-    - [Navigate from a link: Router-Link](#navigate-from-a-link-router-link)
-    - [Navigate programmatically](#navigate-programmatically)
-    - [Scroll Behavior (Scroll To Top)](#scroll-behavior-scroll-to-top)
-    - [Route Meta Fields](#route-meta-fields)
-      - [Using meta for navigation guards](#using-meta-for-navigation-guards)
-    - [Navigation Guards](#navigation-guards)
   - [Modes and Environment Variables](#modes-and-environment-variables)
     - [Modes](#modes)
     - [Environment Variables](#environment-variables)
@@ -85,7 +80,9 @@ It's a JavaScript framework for building user interfaces. It builds on top of st
 > **Framework**: is a third-party library that exposes utility-functionalities and a (set of rules) on how to build your Javascript application
 
 - Comparison with other Frameworks:
-  ![vue-vs-other-frameworks](./img/vue-vs-other-frameworks.png)
+  - Vue is neutral-Opinionated:
+    - Vue has tools-ecosystem like for `routing`, `testing`, ... that are built by the Vue-team, but unlike `Angular`, Vue doesn't force you to use them even thought they're recommended
+      ![vue-vs-other-frameworks](./img/vue-vs-other-frameworks.png)
 - Advantages of Vue:
   - **clean** -> (separation of concerns)
   - **semantic** -> able to write semantic HTML
@@ -101,7 +98,7 @@ It's a JavaScript framework for building user interfaces. It builds on top of st
 
   <script>
     const { createApp } = Vue;
-    const app = createApp(); // construction function
+    const app = createApp(); // instantiation using (construction function)
 
     app({
       data() {
@@ -111,7 +108,7 @@ It's a JavaScript framework for building user interfaces. It builds on top of st
       }
     });
 
-    app.mount('#app');
+    app.mount('#app'); // we use ID-selector as every Vue app must be connected to one HTML element
   </script>
   ```
 
@@ -119,18 +116,54 @@ It's a JavaScript framework for building user interfaces. It builds on top of st
 
 ### How it works?
 
-![dom](./img/dom.PNG)
+#### Reactivity and Proxies
 
-It uses **Proxy** which uses `set` method to update properties
-
-- **Proxy**: a figure that can be used to represent the value of something in a calculation (usually by creating a **setter**)
+- Javascript in default is not reactive
+- Vue has a built-in mechanism to be aware when a `data-property` or a `variable` is changed, so that parts of the app that rely on that variable can be updated, and for that it uses **"Proxies"**
+- It uses **Proxy** which uses `set` method to update properties
+- > **Proxy**: a figure that can be used to represent the value of something in a calculation (usually by creating a **setter**)
 
   ![proxy](./img/proxy.PNG)
 
-  - **How proxy works?** -> it's for reactivity
-    ![proxy](./img/proxy2.png)
-    ![proxy](./img/proxy3.png)
-    - It's done using (**track** all properties that are changing) and (**trigger** function that would update new things accordingly)
+- **How proxy works?** -> it's for reactivity
+  ![proxy](./img/proxy2.png)
+  ![proxy](./img/proxy3.png)
+  - It's done using (**track** all properties that are changing) and (**trigger** function that would update new things accordingly)
+
+```js
+const data = {
+  message: 'Hello!'
+};
+
+// this object can set-up "traps" which proxies support
+const handler = {
+  set(target, key, value) {
+    console.log(target); // object details before changing its property
+    console.log(key); // object-key that was changed(set)
+    console.log(value); // new object-value for the key that was changed
+  };
+}:
+
+// instantiating the Proxy class with data-object + handler object
+const proxy  = new Proxy(data, handler);
+
+// we can now access/set the message from the proxy which will trigger the "set" method
+proxy.message = 'Hola';
+```
+
+##### Proxies Summary
+
+- what Vue does is: it keeps track of all your data-properties here(the proxy) and whenever such a property changes, it updates the part of your app where that property was used.
+- it does that by wrapping your properties with proxies so that it has a chance of finding out when you're setting a new value
+
+---
+
+#### Virtual DOM
+
+![dom](./img/dom.PNG)
+
+- This step is done after reactivity and changing values
+- It's done in the **memory**
 
 ---
 
@@ -202,7 +235,7 @@ It's used to tell vue to set the value of an html-attribute
 
 #### Binding data (`v-bind`)
 
-Dynamically bind one or more attributes, or a component prop to an expression.
+Dynamically bind one or more attributes, or a component prop to an expression (tells `Vue` to set value from something).
 
 - Shorthand: `:` or `.` (when using `.prop` modifier)
 
@@ -222,7 +255,7 @@ Vue **v-model** is a directive. It tells Vue that we want to create a two-way da
 
   - this is called: **ReActivity**
 
-- **NOTE**: to make adjustment on the binded input -> EX:
+- **NOTE**: to make adjustment on the binded input, use a [modifier](#modifiers) -> EX:
   - `v-model.trim="name`
   - `v-model.number="rate`
 
@@ -263,14 +296,15 @@ then pass it to an event emitter to the parent component
 
 #### Modifiers
 
-It is a very common need to call event.`preventDefault()` or event.`stopPropagation()` inside event handlers.
-Instead we use **Event Modifiers** or **modifiers** for inputs
+- It is a very common need to call event.`preventDefault()` or event.`stopPropagation()` inside event handlers.
+- also it can be used in keyCodes (keyboard) to specify specific key -> `@keyup.enter`
+  Instead we use **Event Modifiers** or **modifiers** for inputs
 
 ![modifiers](./img/modifiers.png)
 ![modifiers](./img/modifiers2.png)
 
 ```html
-!-- the submit event will no longer reload the page -->
+<!-- the submit event will no longer reload the page -->
 <form @submit.prevent="onSubmit"></form>
 ```
 
@@ -336,7 +370,7 @@ Note from **stackoverflow**:
 
 ### Listening to Events
 
-**`v-on`** directive, which we use its shortcut: **"@"** symbol,
+**`v-on:<event-name>`** directive, which we use its shortcut: **"@"** symbol,
 
 - It's used to **bind events**
 - To listen to DOM events and run some JavaScript when they're triggered. The usage would be `v-on:click="handlerFunction"` or with the shortcut, `@click="handlerFunction"`.
@@ -361,6 +395,8 @@ Note from **stackoverflow**:
 
 #### Accessing Event Argument
 
+> When you add event-listener and then point at a function that should be executed (when that event occurs), that function will automatically get one argument, the browser will ensure that this argument is provided, and that will be an **object describing the event that occurred**
+
 To Access event object
 
 - in the element (**inline**) -> `$event`
@@ -368,25 +404,33 @@ To Access event object
 
 > Best Practice: use **$event**
 
-```html
-<!-- using $event special variable -->
-<button @click="warn('Form cannot be submitted yet.', $event)">Submit</button>
+- using `$event` special variable
 
-<!-- using inline arrow function -->
-<button @click="(event) => warn('Form cannot be submitted yet.', event)">Submit</button>
-```
+  ```html
+  <!-- we pass "$event as the first argument" -->
+  <button @click="warn('Form cannot be submitted yet.', $event)">Submit</button>
+  ```
+
+- using inline arrow function
+
+  ```html
+  <button @click="(event) => warn('Form cannot be submitted yet.', event)">Submit</button>
+  ```
 
 ```js
 methods: {
-  warn(message, event) {
+  warn(event, message) {
     // now we have access to the native event
     if (event) {
-      event.preventDefault()
+      event.preventDefault() // handle submitting the form manually instead of reloading
     }
+    console.log(event.target); // access data about the event
     alert(message)
   }
 }
 ```
+
+- **Note**: when dealing with form and want to prevent default when submitting: it's better to use [Modifiers](#modifiers)
 
 ---
 
@@ -395,11 +439,13 @@ methods: {
 In-template expressions are very convenient, but they are meant for simple operations. Putting too much logic in your templates can make them bloated and hard to maintain.
 
 - For complex logic that includes reactive data, it is recommended to use a computed property.
+- > **Note**: Vue re-execute any method that you're using anywhere in your `HTML` code (between `{{}}` or with the `bind` or with the HTML-on-events) whenever anything on the screen changes(re-render), even if the method is not using the changed-value, as Vue doesn't know if this method change the value or not
+  - > That's why **methods** aren't the best solution for computing some dynamically calculated value.
 - Also for expensive logic we use computed-property as it caches the function so that it won't be created each time **UNLESS THE VARIABLES INSIDE IT CHANGED**
 
-- It's used when you have dependent data
-  - It only re calculate tne function if any dependency inside it changed
-- it has to return a value
+- It's used when you have dependent data (Vue is aware of the dependencies in the `computed property/function`)
+  - Use it for outputting data, as it only re calculate tne function if any dependency inside it changed
+- it has to `return` a value
 - It prevents us from writing **Imperative code**
 - in `HTML`, it's used in `{{}}` or in `v-for` like normal properties and not in the place of **methods**
 
@@ -435,7 +481,7 @@ export default {
 
 ---
 
-### Computed vs methods
+### Computed properties vs methods
 
 ![computed-vs-methods](./img/computed-vs-methods.png)
 
@@ -467,11 +513,14 @@ Vue allows you to define filters that can be used to apply common text formattin
 
 - usually when the computed property depends on more than one thing
 - (Good for Asynchronous updates) as when you want to do something when condition happens or promise fulfilled
-- Note -> the watcher will be names like the watched property
+- Note -> the watcher will be named like the watched property (`data-item` or `computed property`)
+- here we don't `return` something as we don't use `watchers` anywhere in our HTML template
+- it can take 2 arguments:
+  ![watchers](./img/watcher.png)
+  1. new value
+  2. old value
 
 > With Options API, we can use the watch option to trigger a function whenever a **reactive property** changes
-
-![watchers](./img/watcher.png)
 
 ```js
 export default {
@@ -511,7 +560,7 @@ export default {
 
 ---
 
-## Styling
+## Styles
 
 ### Dynamic styling
 
@@ -520,19 +569,32 @@ here we use
 - `v-bind:style` or `:style`
 - `v-bind:class` or `:class` --> you can use computed properties with it
 - in the style object,
-  - you can write the css property in a normal way but in a single quotes
-  - or in a **camelCase** without quotes
-  - the value is always in quotes
+  - you can write the css-property-name in 2 ways:
+    1. a normal way but in a single quotes
+    2. or in a **camelCase** without quotes (recommended)
+  - the css-property-value is always in quotes
 
 ```html
-<div :style="{}"></div>
-<div :class="isActive ? 'active' : ''"></div>
+<div :style="{borderColor: isSelected ? 'red' : 'blue'}"></div>
+<!-- OR -->
+<div :style="{'border-color': isSelected ? 'red' : 'blue'}"></div>
 
+<div :class="isActive ? 'active' : ''"></div>
 <!-- Or -->
 <div :class="{ active: isActive }"></div>
 <!-- if you want to use class-name from a variable (Dynamic object property) -->
 <div :class="{ new: item.new, [rowClasses[index]]: true }"></div>
 ```
+
+- To add multiple (`dynamic` + `fixed`) classes together:
+
+  ```html
+  <div :class="['fixed-class', { active: isActive }]"></div>
+  <!-- OR -->
+  <div class="fixed-class" :class="{ active: isActive }"></div>
+  ```
+
+> **Note:** It's a good practice to make the dynamic-style-object as a `computed property` to prevent crowding the HTML template
 
 ---
 
@@ -541,6 +603,9 @@ here we use
 It's to make the styles scoped to its component
 
 `<styles scoped>`
+
+- it's done by giving the elements that has applied styles/selectors you write a (special attributes like: `data-v-9a9f6144`) to ensure that this styling is scoped to that HTML-element markup
+- without it, any style you write in any component will be available for all components in the app and may result in styling conflicts
 
 ---
 
@@ -566,45 +631,51 @@ It's to make the styles scoped to its component
 
 ---
 
-#### Transition Classes
+#### Vue Transition Classes
+
+> They focus on when element is **displayed conditionally**
 
 ![transitions](./img/transitions.png)
+![transitions](./img/transitions2.png)
 
-There are six classes applied for enter / leave transitions:
+- There are six classes applied for enter / leave transitions:
 
-- `v-enter-from`
-- `v-enter-active`
-- `v-enter-to`
-- `v-leave-from`
-- `v-leave-active`
-- `v-leave-to`
+  - `v-enter-from`
+  - `v-enter-active`
+  - `v-enter-to`
+  - `v-leave-from`
+  - `v-leave-active`
+  - `v-leave-to`
 
 - `v-enter-active` and `v-leave-active` give us the ability to specify different easing curves for enter / leave transitions, which we'll see an example of in the following sections.
 
-Named Transitions
+> Vue analyzes the css code for these classes and reads the durations of the animations/transitions and will remove the elements from the DOM once that duration is over, with these special-css-classes and the `transition` component, Vue will be able to tell if an animation is happening and how long the animation takes
 
-```html
-<template>
-  <button @click="show = !show">Toggle</button>
-  <!-- TRansition component -->
-  <Transition>
-    <p v-if="show">hello</p>
-  </Transition>
-</template>
+- EX:
 
-<style>
-  .v-enter-active,
-  .v-leave-active {
-    transition: opacity 0.5s ease;
-  }
+  ```html
+  <template>
+    <button @click="show = !show">Toggle</button>
+    <!-- TRansition component -->
+    <Transition>
+      <p v-if="show">hello</p>
+    </Transition>
+  </template>
 
-  .v-enter-from,
-  .v-leave-to {
-    opacity: 0;
-  }
-</style>
-```
+  <style>
+    .v-enter-active,
+    .v-leave-active {
+      transition: opacity 0.5s ease;
+    }
 
+    .v-enter-from,
+    .v-leave-to {
+      opacity: 0;
+    }
+  </style>
+  ```
+
+- You can use "Named Transitions" when having multiple different `<transition>` components
 - You can mix these classes with **Native CSS animations**:
 
   ```css
@@ -634,18 +705,17 @@ Named Transitions
 
 #### Transition modes
 
-the entering and leaving elements are **animated at the same time**, and we may have to make them `position: absolute` to avoid the layout issue when both elements are present in the DOM.
-
-in some cases this isn't an option, or simply isn't the desired behavior.
+the entering and leaving of **multiple elements** that are **animated at the same time** may conflict, and we may have to make them `position: absolute` to avoid the layout issue when both elements are present in the DOM. in some cases this isn't an option, or simply isn't the desired behavior.
 
 - We may want the leaving element to be animated out first, and for the entering element to only be inserted after the leaving animation has finished.
-- we can enable this behavior by passing `<Transition>` a mode prop:
+- we can enable this behavior by passing `<Transition>` a **"mode"** prop:
   - `in-out`-> The current element waits until the new element is done transitioning-in to fire
   - `out-in`-> The current element transitions-out and then the new element transitions-in
 
 ```HTML
 <Transition mode="out-in">
-  ...
+  <div v-if="condition"></div>
+  <div v-else"></div>
 </Transition>
 ```
 
@@ -684,69 +754,11 @@ Here we can use
 - Which to use?
   - `v-if`: if the element will appear/disappear **occasionally/rarely** from the page
   - `v-show`: if the element will **constantly** appear/disappear from the page
+    - it show/hide elements with **`CSS`**
 
 ---
 
-### List-items (looping)
-
-```html
-<li v-for="goal in goals" :key="goal.id">{{goal.name}}</li>
-<li v-for="(goal,i) in goals" :key="goal.id">{{goal.name}} and index is {{i}}</li>
-```
-
-- **`Key`**: needs to be unique, It's what Vue uses to **track the VDOM changes**
-
-- You can use the list for numbers
-
-  ```html
-  <li v-for="num in 5" :key="num">{{num}}</li>
-  ```
-
----
-
-## Components
-
-**Components**: collection of elements that are encapsulated into a group that can be accessed through one single element
-
-```html
-<!-- In the child -->
-<script>
-  export default {
-    data() {
-      return {
-        count: 0
-      };
-    }
-  };
-</script>
-
-<template>
-  <button @click="count++">You clicked me {{ count }} times.</button>
-</template>
-
-<!-- ----------------------------------------------------------- -->
-
-<!-- In Parent -->
-<script>
-  import ButtonCounter from './ButtonCounter.vue';
-
-  export default {
-    // Component Registration
-    components: {
-      ButtonCounter // or anyName: ButtonCounter
-    }
-  };
-</script>
-
-<template>
-  <h1>Here is a child component!</h1>
-  <ButtonCounter />
-</template>
-```
-
----
-
-### Dynamic Components
+#### Dynamic Components
 
 Sometimes, it's useful to dynamically switch between components, like in a **tabbed interface**(tabs):
 
@@ -770,9 +782,9 @@ Sometimes, it's useful to dynamically switch between components, like in a **tab
   <button @click="selected = 'comp2'"></button>
   ```
 
-#### Keep-alive
+##### Keep-alive
 
-When switching between multiple components with `<component :is="...">`, a component will be **unmounted** when it is switched away from. We can force the inactive components to stay "alive" with the built-in `<KeepAlive>` component.
+When switching between multiple components with `<component :is="...">`, a component will be **unmounted(destroyed)** when it is switched away from. We can force the inactive components to stay "alive" with the built-in `<KeepAlive>` component.
 
 **`KeepAlive` / `keep-alive`** is a built-in component that allows us to conditionally **cache** component instances when dynamically switching between multiple components. which:
 
@@ -791,44 +803,197 @@ When switching between multiple components with `<component :is="...">`, a compo
 
 ---
 
-### Global Components
+---
 
-To be able to use component inside the entire app without importing each time
+### List-items (looping)
 
-```js
-// in main.js
-
-// import the component
-
-import { createApp } from 'vue';
-const app = createApp({ App });
-
-// 2 arguments: (name-registered-that-will-be-used, the-actual-component)
-app.component('MyComponent', the_imported_component);
+```html
+<li v-for="goal in goals" :key="goal.id">{{goal.name}}</li>
+<li v-for="(goal,i) in goals" :key="goal.id">{{goal.name}} and index is {{i}}</li>
 ```
+
+- it can also be used with (`objects` and range of numbers) instead of `arrays`
+
+  ```html
+  <li v-for="num in 5" :key="num">{{num}}</li>
+  ```
+
+#### List item key
+
+- **`Key`**: needs to be unique, It's what Vue uses to **track the VDOM changes**
+- when we delete an item from a list(`<li>`) in vue, Vue doesn't re-render the entire list elements, instead it just moves the content of the lists to the first list-DOM-element and other list items after that
+  - this way Vue re-uses Dom-elements instead of re-render them for performance
+  - so we need to give each list element in a loop a unique **key**
 
 ---
 
-## Props
+## Components
+
+Components allow us to split the UI into independent and reusable pieces, and think about each piece in isolation. It's common for an app to be organized into a tree of nested components
+
+![components](./img/components1.png)
+
+- They're collection of elements that are encapsulated into a group that can be accessed through one single element
+- When using a `build` step, we typically define each Vue component in a dedicated file using the `.vue` extension - known as a Single-File Component (**SFC**)
+
+  ```html
+  <script>
+    export default {
+      data() {
+        return {
+          count: 0
+        };
+      }
+    };
+  </script>
+
+  <template>
+    <button @click="count++">You clicked me {{ count }} times.</button>
+  </template>
+  ```
+
+- When not using a `build` step, a Vue component can be defined as a plain JavaScript **object** containing Vue-specific options
+
+  - > you can use named exports to export multiple components from the same file.
+
+  ```js
+  export default {
+    data() {
+      return {
+        count: 0
+      };
+    },
+    template: `
+      <button @click="count++">
+        You clicked me {{ count }} times.
+      </button>`
+  };
+  ```
+
+- Using a Component:
+  - To use a child component, we need to import it in the parent component, then To expose the imported component to our template, we need to **register** it with the `components` option. The component will then be available as a tag using the key it is registered under.
+  - each one maintains its own, separate **state**. That's because each time you use a component, a new **instance** of it is created.
+  - we use **PascalCase** names when registering components
+    - `<PascalCase />` makes it more obvious that this is a Vue component instead of a native HTML element in templates or a custom web-component
+  - Vue supports resolving **kebab-case** tags to components registered using **PascalCase**. This means a component registered as MyComponent can be referenced in the template via both `<MyComponent>` and `<my-component>`.
+
+---
+
+### Single File Component (SFC)
+
+- **SFC** is a defining feature of Vue as a framework, and is the recommended approach for using Vue in the following scenarios:
+  - `Single-Page Applications (SPA)`
+  - `Static Site Generation (SSG)`
+- How It Works
+  - Vue `SFC` is a framework-specific file format and must be pre-compiled by `@vue/compiler-sfc` into standard JavaScript and CSS. A compiled SFC is a standard JavaScript (ES) module - which means with proper build setup you can import an SFC like a `module`
+  - `<style>` tags inside SFCs are typically injected as native `<style>` tags during development **to support hot updates**. For production they can be extracted and merged into a single CSS file.
+- What About Separation of Concerns? - which `HTML`/`CSS`/`JS` were supposed to separate!
+  - To answer this question, it is important for us to agree that separation of concerns is not equal to the separation of file types. The ultimate goal of engineering principles is to improve the maintainability of codebase.
+  - instead of dividing the codebase into three huge layers that interweave with one another, it makes much more sense to divide them into loosely-coupled components and compose them. Inside a component, its template, logic, and styles are inherently coupled, and collocating them actually makes the component more cohesive and maintainable.
+
+> More info on SFC [here](https://vuejs.org/api/sfc-spec.html)
+
+---
+
+### Component Registration (Global / Local)
+
+A Vue component needs to be "registered" so that Vue knows where to locate its implementation when it is encountered in a template. There are two ways to register components: **global** and **local**.
+
+#### Global Registration
+
+- We can make components available globally in the entire current Vue application without importing each time using the `app.component()` method:
+
+  ```js
+  // in main.js
+  import { createApp } from 'vue';
+  import MyComponent from './App.vue'
+
+  const app = createApp({});
+
+  // arguments: (name-registered-that-will-be-used, the-actual-component)
+  app.component(
+    // the registered name
+    'MyComponent', MyComponent
+  );
+  ```
+
+- The `app.component()` method can be chained:
+
+  ```js
+  app
+    .component('ComponentA', ComponentA)
+    .component('ComponentB', ComponentB)
+    .component('ComponentC', ComponentC)
+
+  ```
+
+- this has some downsides:
+  - Global registration prevents build systems from removing unused components (a.k.a **"tree-shaking"**). If you globally register a component but end up not using it anywhere in your app, it will still be included in the final bundle.
+    - also Vue needs to load them all when the application is loaded initially and the `browser` needs to download the code for all those components initially
+  - also this will crowd the `main.js` file with all the registering components code
+  - Global registration makes dependency relationships less explicit in large applications. It makes it difficult to locate a child component's implementation from a parent component using it.
+  - > To solve this, we register these components locally, where they are used.
+
+#### Local Registration
+
+Local registration scopes the availability of the registered components to the current component only. It makes the dependency relationship more explicit, and is more tree-shaking friendly.
+
+```html
+<script>
+import ComponentA from './ComponentA.vue'
+
+export default {
+  // the key will be the registered name of the component, and the value will contain the implementation of the component.
+  components: {
+    ComponentA
+  }
+}
+</script>
+
+<template>
+  <ComponentA />
+</template>
+```
+
+> **Note** that locally registered components are not also available in descendant components. In this case, ComponentA will be made available to the current component only, not any of its child or descendant components.
+
+---
+
+## Communicate between Components
+
+[Guide](https://dev.to/sanchithasr/how-to-communicate-between-components-in-vue-js-kjc)
+
+1. Using **Props** (Parent to Child Communication)
+2. Using **Events-emitter** (Child to Parent Communication)
+3. Using **Event Bus** (Communication between any components)
+4. Using **provide/inject** (Parent to Child Communication)
+5. Using **this.$refs** (Parent to Child Communication)
+
+---
+
+### Props
 
 > Props always always pass data **Down** from parent to child, as we want a single source of truth of "who owns the state" + we want "one way data-flow"
 >
 > - this is called: **"props down .. events up"**
+> - So this is why we can't modify the prop value in the `child component` as it violate the `"one directional data-flow"` patterns
 
-You should write props in **camelCase** but if you wrote it in **kebab case** -> Vue will transfer it to camelCase when you use it in the child component
+- You should write props in **camelCase** but if you wrote it in **kebab case** -> Vue will transfer it to camelCase when you use it in the child component
+![props-camelCase](./img/props-camelCase.png)
 
-- Props are defined in the **child component** in **2 ways** as:
+- Props are defined in the **child component** using the `props` option in **2 ways** as:
 
-  - an array in the simplest form
+  - an **array** in the simplest form
 
     ```js
     props: ["title"],
     ```
 
-  - an object with multiple properties for each prop (`type`, `required`?, `default`, ..)
+  - an **object** with multiple properties for each prop (`type`, `required`?, `default`, ..)
 
     ```js
     props: {
+        title: String
         price: {
           type: Number,
           default: 100,
@@ -837,8 +1002,34 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
       },
     ```
 
+    - usually for **Prop Validation**
+      - Components can specify requirements for their props, such as the types you've already seen. If a requirement is not met, Vue will warn you in the browser's JavaScript console.
     - **default value**: if the `default` value is an `object` or `array`; then we need the default-value to be returned from a function
-      ![props-default](./img/props-default.png)
+
+      ```js
+      // Object with a default value
+          propE: {
+            type: Object,
+            // Object or array defaults must be returned from
+            // a factory function. The function receives the raw
+            // props received by the component as the argument.
+            default(rawProps) {
+              return { message: 'hello' }
+            }
+          },
+      ```
+
+      - default value for props can also be primitive value
+      - The **Boolean** absent props will be cast to false. You can change this by setting a default for it — i.e.: default: `undefined` to behave as a non-Boolean prop.
+
+        ```html
+        <!-- equivalent of passing :disabled="true" -->
+        <MyComponent disabled />
+
+        <!-- equivalent of passing :disabled="false" -->
+        <MyComponent />
+        ```
+
     - **Validating props**:
 
       - inside it you can't access the component's properties as it hasn't been created yet
@@ -886,26 +1077,24 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
     <BlogPost :title="message" />
     ```
 
-**Note**:
-![props-camelCase](./img/props-camelCase.png)
+---
+
+#### Mutating Object / Array Props
+
+When objects and arrays are passed as props, while the child component cannot mutate the prop binding, it will be able to mutate the object or array's nested properties. This is because in JavaScript **objects and arrays are passed by reference**, and it is unreasonably expensive for Vue to prevent such mutations.
+
+- The main drawback of such mutations is that it allows the child component to affect parent state in a way that isn't obvious to the parent component, potentially making it more difficult to reason about the data flow in the future. As a best practice, you should avoid such mutations unless the parent and child are tightly coupled by design.
+  - In most cases, the child should **emit an event** to let the parent perform the mutation.
+  - > or you can avoid mutating state by duplicating the object/array and returning the new one after mutating it without affecting the original one
 
 ---
 
-## Communicate between Components
+### Component Events (Event emitter)
 
-[Guide](https://dev.to/sanchithasr/how-to-communicate-between-components-in-vue-js-kjc)
-
-1. Using **Props** (Parent to Child Communication)
-2. Using **Events-emitter** (Child to Parent Communication)
-3. Using **Event Bus** (Communication between any components)
-4. Using **provide/inject** (Parent to Child Communication)
-5. Using **this.$refs** (Parent to Child Communication)
-
----
-
-### Event emitter
-
-![emit](./img/emit.PNG)
+- A component can emit custom events directly in template expressions (e.g. in a `v-on` handler) using the built-in `$emit` method
+  - The `$emit()` method is also available on the component instance as `this.$emit()`
+- the first argument to `$emit` is the event-name. The follow-up arguments represent the data that we would like to pass up
+- when declaring events emitted from a component, Similar to prop type validation, an emitted event can be **validated** if it is defined with the **object syntax** instead of the array syntax.
 
 - Inline
 
@@ -916,35 +1105,53 @@ You should write props in **camelCase** but if you wrote it in **kebab case** ->
 - external
 
   ```js
+  // Emitted events can be explicitly declared on the component via the "emits" option
+  emits: ['submit'], // You can also use an object of emits instead of an array, which allows us to perform runtime validation of the payload of the emitted events
+
   methods: {
     submit() {
       this.$emit('methodName_usedIn_parentComponent',emitted_value) //payload
     }
   },
-   emits: ['submit']
   ```
 
 - in parent component:
 
   ```html
-  <child-component @methodName_usedIn_parentComponent="handling_method" />
-
-  <!-- Or handling it (inline) -->
-  <!-- in this case to access the payload we use ($event) -->
-
-  <child-component @methodName_usedIn_parentComponent="role=$event" />
+  <child-component @eventName_usedIn_parentComponent="handling_method" />
   ```
+
+> **Notes**:
+>
+> - we create an **`emits`** array/object for "documentation", so that when other developer enters the component, he knows that this component emits events.
+> - Unlike native DOM events, component emitted events do not **bubble**. You can only listen to the events emitted by a direct child component. If there is a need to communicate between sibling or deeply nested components, use an external event bus
 
 ---
 
-#### using v-model with custom components
+#### `model-value` event: using `v-model` with custom components
+
+it's for using the directive `v-model` on custom input components other than the native `input` elements
+
+> By default, `v-model` on a component uses `modelValue` as the prop and `update:modelValue` as the event. We can modify these names passing an argument to `v-model`
+
+- it works by using `v-model` on the custom-component and then it will be applied as a `prop` + `event-emitter` with the name of `"model-view"` automatically
+
+[guide](https://vuejs.org/guide/components/events.html#usage-with-v-model)
+
+> Video 10 - part 14
+
+![modelValue](./img/modelValue.PNG)
+
+```html
+<CustomInput :modelValue="searchText" @update:modelValue="newValue => searchText = newValue" />
+```
 
 Custom events can also be used to create custom inputs that work with **v-model**.
 
-For this to actually work though, the `<input>` inside the component must:
+- For this to actually work though, the `<input>` inside the component must:
 
-- Bind the value attribute to the **modelValue** prop
-- On input, emit an **update:modelValue** event with the new value
+  - Bind the value attribute to the **modelValue** prop
+  - On input, emit an **update:modelValue** event with the new value
 
   ```vue
   <!-- CustomInput.vue  (child component) -->
@@ -973,28 +1180,16 @@ For this to actually work though, the `<input>` inside the component must:
 
 ---
 
-#### model-view
-
-[guide](https://vuejs.org/guide/components/events.html#usage-with-v-model)
-
-> Video 10 - part 14
-
-![modelValue](./img/modelValue.PNG)
-
-```html
-<CustomInput :modelValue="searchText" @update:modelValue="newValue => searchText = newValue" />
-```
-
----
-
 ### Provide / Inject
+
+They can be used instead of passing props, or emitting events(different implementation)
 
 #### Provide
 
 it's like **context**: it prevents props-drilling
 
-<img src="./img/provide1.png" width=48%>
-<img src="./img/provide2.png" width=48%>
+![provide-inject](./img/provide1.png)
+![provide-inject](./img/provide2.png)
 
 ```js
 // in the upper component
@@ -1005,7 +1200,7 @@ export default {
 };
 ```
 
-**Note**: If we need to provide per-instance state, for example data declared via the `data()`, then provide must use a function value:
+**Note**: If we need to provide per-instance dynamic/state property, for example data declared via the `data()`, then provide must use a function value:
 
 ```js
 export default {
@@ -1014,6 +1209,7 @@ export default {
       message: 'hello!'
     };
   },
+
   provide() {
     // use function syntax so that we can access `this`
     return {
@@ -1030,17 +1226,21 @@ export default {
 
   const app = createApp({});
 
-  app.provide(/* key */ 'message', /* value */ 'hello!');
+  // EX: app.provide(key, value);
+  app.provide(message, 'hello!');
   ```
 
 #### Inject
 
 Injections are resolved **before** the component's own state, so you can access injected properties in data():
 
+- injection must be in a `child-relationship` component to the component that `provide` and can't be between neighbors components
+
 ```js
 // in the lower component
 export default {
   inject: ['message'],
+
   data() {
     return {
       // initial data based on injected value
@@ -1056,7 +1256,7 @@ export default {
 
 It's like `children` in react
 
-> It allow parent-component to inject (dynamic-HTML-content) that can be rendered inside a child component
+> It allow parent-component to inject (dynamic-HTML-content) that can be received and rendered inside a child component
 
 The `<slot>` element is a slot outlet that indicates where the parent-provided slot content should be rendered.
 
@@ -1068,14 +1268,17 @@ The `<slot>` element is a slot outlet that indicates where the parent-provided s
 </div>
 ```
 
-> what is inside the slot will be the default value
-> ![default-slots](./img/slots2.png)
+> **Notes**:
+>
+> - what is inside the slot will be the default value
+>   ![default-slots](./img/slots2.png)
+> - the scoped styles will affect the HTML markup in the child component as what in the slots is passed to the child component as a `HTML markup` and the data/properties/methods are not passed, so they won't be accessible in the child component
 
 ---
 
 ### named-slots
 
-IT HAS TO BE ON A `<template>` TAGS
+> **IT HAS TO BE ON A `<template>` TAGS**
 
 ![named-slots](./img/named-slot.png)
 
@@ -1107,7 +1310,7 @@ IT HAS TO BE ON A `<template>` TAGS
 
 ---
 
-### slot-props
+### slot props (scoped slots)
 
 It's a way for the child to pass data to a slot when rendering it.
 ![vslots](./img/vslots.svg)
@@ -1126,276 +1329,24 @@ It's a way for the child to pass data to a slot when rendering it.
 
 ## Forms
 
-- when creating initial values for input elements
+- when creating initial values for input elements in `data()`
 
   - number -> `null`
   - string -> `""`
-  - select -> `"one value from the options"`
-  - multiple check boxes -> `[]`
-  - single check box -> `true/false`
+  - dropDown-select (only one selection) -> `"one value from the options"`
+  - checkboxes (multiple selections), ex: `radio buttons` -> Array `[]`
+  - single checkbox ex: `confirm to terms` -> `true/false`
 
 - to use **buttons** in a form to select value, Use `type="button"` in the element
 
 ### Form Validation
 
-- manually
+- **manually**
+  - for this you write conditions for the inputs either when finishing typing/selecting or when submitting the form
+  - based on these conditions, you can show/hide different labels/modals and also change styles for input elements (ex: change border & text color to `red`)
   - **Tip**: you can use `.lazy` event modifier with large text area so that you don't annoy user when typing
 - [VeeValidate](https://vee-validate.logaretm.com/v4/)
   - [VeeValidate2](https://www.section.io/engineering-education/form-validation-in-vue.js-using-veevalidate/)
-
----
-
-## Routing
-
-### Router configuration
-
-```js
-const router = createRouter({
-  history: createWebHistory(), // used to enable history-mode in the browser
-  routes: [
-    { path: "/", redirect: "/teams" },
-    {
-      name: "teams",
-      path: "/teams",
-      meta: { needsAuth: true },
-      components: { default: TeamsList, footer: TeamsFooter },
-      children: [
-        {
-          name: "team-members", // without "/"
-          path: ":teamId",
-          component: TeamMembers,
-          props: true, // to tell vue that this component can take the query-parameter as a prop
-        }, // /teams/t1
-      ],
-    }, // our-domain.com/teams => TeamsList
-    {
-      path: "/users",
-      components: {
-        default: UsersList,
-        footer: UsersFooter,
-      },
-      // Navigation Guards
-      beforeEnter(to, from, next) {
-        console.log("users beforeEnter");
-        console.log(to, from);
-        next();
-      },
-    },
-    { path: "/:notFound(.*)", component: NotFound },
-  ],
-  linkActiveClass: "active", // changing default class name from vue for active-link
-  scrollBehavior(_, _2, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    }
-    return { left: 0, top: 0 }; // scroll to top of the page
-  },
-});
-
-router.beforeEach(function(to, from, next) {
-  console.log('Global beforeEach');
-  console.log(to, from);
-  if (to.meta.needsAuth) {
-    console.log('Needs auth!');
-    next();
-  } else {
-    next();
-  }
-
-router.afterEach(function(to, from) {
-  // sending analytics data
-  console.log('Global afterEach');
-  console.log(to, from);
-});
-```
-
-> **Note**: You can use `alias` instead of `redirect`, so that you can have 2 routes that point to the same component
-> `alias : "/teams"`
-
----
-
-#### History
-
-It's used to track the browser history
-
-**history: createWebHistory()**: used to enable history-mode in the browser (instead of hash # mode)
-
-- **history-api**: it lets you interact with the **browseHistory** to change URL without refreshing the page
-
-```js
-history: createWebHistory(process.env.BASE_URL);
-// BASE_URL="/" // can be modified in vue UI
-```
-
----
-
-#### Nested Routes
-
-```sh
-/user/johnny/profile                     /user/johnny/posts
-+------------------+                  +-----------------+
-| User             |                  | User            |
-| +--------------+ |                  | +-------------+ |
-| | Profile      | |  +------------>  | | Posts       | |
-| |              | |                  | |             | |
-| +--------------+ |                  | +-------------+ |
-+------------------+                  +-----------------+
-```
-
-- **Note**: you must use `<router-view />` in the parent route to show the place for the nested(child) route
-  - it's a global component registered in the `main.js` file
-
-#### Dynamic params
-
-- in routing-options for the route you can use this `props: true` to:
-  - tell vue that this component can take the `params/queryParams` as a prop
-
----
-
-### route vs router
-
-**route** -> store information about where you are (`quereyParams`, `URL`)
-
-**router** -> the tool that allows user to navigate anywhere in the app
-
----
-
-### Navigate from a link: Router-Link
-
-- By default, Vue sets an active-class (`router-link-active`) on the clicked link -> so we can style it in **CSS** using this class
-
-  - or you can make an **alias** for this class with different name in the router options
-
-    ```js
-    routes=[],
-    linkExactActiveClass:"text-yellow-500", // replacing the active class with this class
-    ```
-
-  - also in the link you can set the active class for this link only using `exact-active-class="no-active"`, (usually with the page logo in the navbar):
-
-    ```js
-    <router-link to='/' exact-active-class='no-active'></router-link>
-    ```
-
-- `<router-link></router-link>` acts like `<a>` in **css**
-- `<router-link>` takes `to` directive instead of href
-  - `to="/"` -> for string route
-  - `:to="{name : Home}"` for binding route (not string)
-
----
-
-### Navigate programmatically
-
-```js
-// literal string path
-this.$router.push('/users/eduardo');
-
-// object with path
-this.$router.push({ path: '/users/eduardo' });
-
-// named route with params to let the router build the url --> (params="/:username")
-this.$router.push({ name: 'user', params: { username: 'eduardo' } });
-
-// with query, resulting in /register?plan=private
-this.$router.push({ path: '/register', query: { plan: 'private' } });
-
-// with hash, resulting in /about#team
-this.$router.push({ path: '/about', hash: '#team' });
-```
-
----
-
-### Scroll Behavior (Scroll To Top)
-
-When using client-side routing, we may want to **scroll to top when navigating to a new route**, or **preserve the scrolling position of history entries** just like real page reload does.
-
-- Vue Router allows you to achieve these and even better, **allows you to completely customize the scroll behavior on route navigation**.
-
-```js
-scrollBehavior() {
-    return { left: 0, top: 0 }; // scroll to top of the page
-  },
-```
-
----
-
-### Route Meta Fields
-
-Sometimes, you might want to **attach arbitrary information to routes** like transition names, who can access the route, etc. This can be achieved through the meta property which accepts an object of properties and can be accessed on the route location and navigation guards.
-
-```js
-const routes = [
-  {
-    path: '/posts',
-    component: PostsLayout,
-    children: [
-      {
-        path: 'new',
-        component: PostsNew,
-        // only authenticated users can create posts
-        meta: { requiresAuth: true }
-      },
-      {
-        path: ':id',
-        component: PostsDetail,
-        // anybody can read a post
-        meta: { requiresAuth: false }
-      }
-    ]
-  }
-];
-```
-
-#### Using meta for navigation guards
-
-instead of this:
-![alt](./img/routes.PNG)
-
-we use this:
-![alt](./img/meta.PNG)
-
----
-
-### Navigation Guards
-
-Here we have **global-guards** & **local-guards** & **Per-Route Guard**
-
-They are used to guard navigations. either by redirecting it or canceling it. There are a number of ways to hook into the route navigation process: globally, per-route, or in-component (locally).
-
-> it can be in the route-object or in the component's script or the router-file outside the route-object
-
-- Global Guards:
-
-  - `beforeEach()`
-
-- In-Component Guards (local guards):
-
-  - `beforeEnter()`
-
-- Per-Route Guard (in routes array):
-  - `beforeRouteLeave()`
-  - `beforeRouteEnter()`
-  - `beforeRouteUpdate()`
-
-```js
-// to confirm navigation:
-next(); // Or
-next(true);
-
-// ---------------------------------- //
-// to cancel navigation:
-next(false);
-
-// ---------------------------------- //
-// to cancel navigation and redirect to another route:
-next('/teams');
-// Or
-if (to.name === 'teams') {
-  next();
-} else {
-  next({ name: 'teams' });
-}
-```
 
 ---
 
@@ -1511,7 +1462,9 @@ vue add <name of the plugin>
   };
   ```
 
-- when using a **modal** try using
+- when using a **modal** try using [Teleport](https://vuejs.org/guide/built-ins/teleport.html)
+
+  - > `<Teleport>` is a built-in component that allows us to "teleport" a part of a component's template into a DOM node that exists outside the DOM hierarchy of that component.
 
   ```html
   <teleport to="body"></teleport>
