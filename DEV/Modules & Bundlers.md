@@ -3,9 +3,9 @@
 - [INDEX](#index)
   - [Modules](#modules)
     - [Problems with script loading](#problems-with-script-loading)
-  - [History of Modules](#history-of-modules)
-    - [CommonJS](#commonjs)
-    - [EcmaScript Modules (ESM)](#ecmascript-modules-esm)
+    - [History of Modules](#history-of-modules)
+      - [CommonJS](#commonjs)
+      - [EcmaScript Modules (ESM)](#ecmascript-modules-esm)
   - [Module Bundling](#module-bundling)
     - [Stages of a bundler](#stages-of-a-bundler)
       - [Module Representation](#module-representation)
@@ -14,7 +14,7 @@
       - [Packing](#packing)
         - [Packing Process](#packing-process)
   - [Parcel](#parcel)
-  - [Babel (`transpiling` & `Polyfilling`)](#babel-transpiling--polyfilling)
+  - [Babel (`transpiling` \& `Polyfilling`)](#babel-transpiling--polyfilling)
     - [Transpiling code for new language features](#transpiling-code-for-new-language-features)
       - [Configuring Webpack to use Babel](#configuring-webpack-to-use-babel)
     - [Polyfilling](#polyfilling)
@@ -22,6 +22,8 @@
 ---
 
 ## Modules
+
+As our application grows bigger, we want to split it into multiple files, so called “modules”. A module may contain a class or a library of functions for a specific purpose.
 
 ### Problems with script loading
 
@@ -40,9 +42,15 @@
 
 ---
 
-## History of Modules
+### History of Modules
 
-### CommonJS
+When scripts became more and more complex, so the community invented a variety of ways to organize code into modules, special libraries to load modules on demand:
+
+- **AMD** – one of the most ancient module systems, initially implemented by the library `require.js`.
+- **CommonJS** – the module system created for `Node.js` server.
+- **UMD** – one more module system, suggested as a universal one, compatible with `AMD` and `CommonJS`.
+
+#### CommonJS
 
 - With the creation of `Node.js`, we needed a way to run Javascript outside of the browser, this is where `commonJS` was born
 
@@ -58,7 +66,7 @@
 - this is where **bundlers** and **linkers** started to get popular, but they also had problems
 - this led to a solution which is -> **ESM**
 
-### EcmaScript Modules (ESM)
+#### EcmaScript Modules (ESM)
 
 It's a standard pattern for importing JavaScript modules.
 

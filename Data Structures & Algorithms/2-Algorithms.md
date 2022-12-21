@@ -35,7 +35,11 @@
       - [Traversals](#traversals)
       - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
       - [Depth First Search/Traversal DFS](#depth-first-searchtraversal-dfs)
+        - [PreOrder DFS](#preorder-dfs)
+        - [PostOrder DFS](#postorder-dfs)
+        - [InOrder DFS](#inorder-dfs)
       - [Shortest Path](#shortest-path)
+      - [Dijkstra's Algorithm](#dijkstras-algorithm)
 
 ---
 
@@ -138,11 +142,11 @@ Ex: usually nested loops
   - as computers store integers in **binary**, and because a common operation in many algorithms is to repeatedly divide an input in half. In fact, this base is so common that we will typically omit it from the notation when it is `2`. That is, for us,
 
     ```s
-    logn = log2 n
+    log(n) = log2(n)
     ```
 
 ```js
-// x = logb n if and only if bx = n
+// x = log(b) n if and only if bx = n
 //
 level1 = 2^0 = 1;
 level2 = 2^1 = 2;
@@ -489,14 +493,36 @@ It's a method of finding a target value within the list.
 
 it means going through each item in the list, like checking for something on each item in a `tree` --> **(visiting every node O(n))**
 
+- Graph traversal use cases:
+  - peer-to-peer networking
+  - web crawlers
+  - finding `closest` / `matches` / `recommendations`
+  - shortest path problems
+    - GPS navigation
+    - solving mazes
+    - AI
+
+![traversal](./img/traversal.png)
+![traversal](./img/traversal1.png)
+
+- The time-complexity of **BFS** vs **DFS** is the same as we visit each node one time, but the difference here is in the space-complexity as it depends on the structure of the tree:
+  - if we're talking about a breadth-first on a wide tree vs on depth-first, we will not be storing all the nodes across the tree in **BFS** as we only need to keep-track of the nodes in a given branch all the way down to the end
+    ![traversal](./img/traversal2.png)
+
 #### Breadth First Search/Traversal BFS
 
+![BFS](./img/bfs1.png)
+
 - start with the root-node, then go to the left then the right of the second level of the tree, the the same for the next level
+  ![BFS](./img/bfs2.png)
 - it uses additional memory as it tracks the child nodes for a given node on each level (track every node and its children in order)
   - this is done using a **Queue** data structure
+    - we use a `queue` because we need to remember the things that need to come next to be visited
   - if we have a very wide-tree, the `Queue` can get really big, which requires more memory
 - used to find the **shortest path**
-- also used with graphs
+- also used with `Graphs`
+
+---
 
 #### Depth First Search/Traversal DFS
 
@@ -509,7 +535,36 @@ it means going through each item in the list, like checking for something on eac
 - used to determine whether a path exists between two nodes or if a node exists
 - also used with graphs
 
+![BFS](./img/dfs0.png)
+![BFS](./img/dfs.png)
+
+##### PreOrder DFS
+
+![BFS](./img/dfs1.png)
+
+##### PostOrder DFS
+
+![BFS](./img/dfs2.png)
+
+##### InOrder DFS
+
+![BFS](./img/dfs3.png)
+
+---
+
 #### Shortest Path
 
 - Beliman-Ford
 - Dijkstra
+
+---
+
+#### Dijkstra's Algorithm
+
+It's one of the most famous and widely used algorithms around. It finds the **shortest path** between 2 vertices on a **weighted-graph**
+
+- Steps:
+  1. Every time we look to visit a new node, we pick the node with the smallest known distance to visit first
+  2. once we've move to the node we're going to visit, we look at each of its neighbors
+  3. for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
+  4. if the new total distance to a node is less than the previous total, we store the new shorter distance for that node

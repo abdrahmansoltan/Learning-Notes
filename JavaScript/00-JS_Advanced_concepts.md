@@ -21,9 +21,6 @@
     - [Closure](#closure)
       - [Function returning Functions](#function-returning-functions)
       - [Benefits](#benefits)
-    - [Generators](#generators)
-      - [Generators are Iterable](#generators-are-iterable)
-      - [Generators in Async Code](#generators-in-async-code)
     - [Pure Functions](#pure-functions)
     - [Decorators](#decorators)
       - [Using “func.call” for the context](#using-funccall-for-the-context)
@@ -33,11 +30,15 @@
     - [Referential Transparency](#referential-transparency)
     - [Composition](#composition)
     - [Functional Decoration](#functional-decoration)
+  - [Generators](#generators)
+    - [Generator Methods](#generator-methods)
+    - [Generators are Iterable](#generators-are-iterable)
+    - [Generators in Async Code](#generators-in-async-code)
   - [JS : The weird parts](#js--the-weird-parts)
     - [Advanced Types](#advanced-types)
     - [Numbers](#numbers)
     - [short circuiting =\> **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
-  - [notes](#notes)
+  - [Notes](#notes)
 
 ---
 
@@ -261,9 +262,34 @@ Each local scope can also see all the local scopes that contain it, and all scop
 
 ### Currying
 
-It's -> one argument at a time
+Currying is a transformation of functions that translates a function from callable as `f(a, b, c)` into callable as `f(a)(b)(c)`. **Currying doesn’t call a function. It just transforms it.**
 
+- Currying allows us to easily get partials.
 - It is translating a function that takes multiple arguments into a sequence of **single-argument-functions**, each accepting one argument.
+
+```js
+function curry(f) {
+  // curry(f) does the currying transform
+  return function (a) {
+    return function (b) {
+      return f(a, b);
+    };
+  };
+}
+
+// usage
+function sum(a, b) {
+  return a + b;
+}
+
+let curriedSum = curry(sum);
+
+alert(curriedSum(1)(2)); // 3
+```
+
+- **Nores:**
+  - The currying requires the function to have a fixed number of arguments.
+  - A function that uses rest parameters, such as `f(...args)`, can’t be curried this way.
 
 ---
 
@@ -438,147 +464,6 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
   - > So **iterators** turn our data into ‘streams’ of actual values we can access one after another.
   - > JavaScript’s built in iterators are actually objects with a **next()** method that when called returns the next element from the ‘stream’/ flow
 - Encapsulation: prevent unwanted access to inner variables/functions
-
----
-
-### Generators
-
-Regular functions return only one, single value (or nothing). **Generators** can return (`“yield”`) multiple values, one after another, on-demand. They work great with iterables, allowing to create data streams with ease.
-
-- Once we start thinking of our data as flows (where we can pick of an element one-by-one) we can rethink how we produce those flows - JavaScript now lets us produce the flows using a function
-- the Generator function allows us to exit and renter the execution-context of function manually, unlike iterators which this happens dynamically
-- To create a generator, we need a special syntax construct: `function*`, so-called **“generator function”**.
-  - Generator functions behave differently from regular ones. When such function is called, it doesn’t run its code. Instead it returns a special object, called **“generator object”**, to manage the execution.
-
-    ```js
-    function* generateSequence() {
-      yield 1;
-      yield 2;
-      return 3;
-    }
-
-    // "generator function" creates "generator object"
-    let generator = generateSequence(); // The function code execution hasn’t started yet
-    alert(generator); // [object Generator]
-    ```
-
-> **Note:** `function* f(…)` or `function *f(…)`?
->
-> - Both syntaxes are correct. But usually the first syntax is preferred
-> - we usually use the second syntax in object/class ES6 methods
-
-- The main method of a generator is `next()`. When called, it runs the execution until the nearest `yield <value>` statement (value can be omitted, then it’s `undefined`). Then the function execution pauses, and the yielded value is returned to the outer code.
-  - The result of `next()` is always an object with two properties:
-    - `value`: the yielded value.
-    - `done`: `true` if the function code has finished, otherwise `false`.
-      - When the generator is done. We should see it from `done:true`, and New calls to `generator.next()` don’t make sense any more. If we do them, they return the same object: `{done: true}`.
-
-    ```js
-    function* generateSequence() {
-      yield 1;
-      yield 2;
-      return 3;
-    }
-
-    let generator = generateSequence();
-
-    let one = generator.next();
-
-    alert(JSON.stringify(one)); // {value: 1, done: false}
-    ```
-
-  - **"yield" is a two-way street**: That’s because `yield` is a two-way street: it not only returns the result to the outside, but also can pass the value inside the generator.
-
-    - when we pass a value to the `next()` method, it will be evaluated as the yielded value and we will continue the function until we find another yield
-
-    ```js
-    function* createFlow() {
-      const num = 10;
-      const newNum = yield num;
-      yield 5 + newNum;
-      yield 6;
-    }
-    const returnNextElement = createFlow(); // The function code execution hasn’t started yet
-    const element1 = returnNextElement.next(); // 10
-    const element2 = returnNextElement.next(2); // 7
-    ```
-
-#### Generators are Iterable
-
-- We can loop over their values using `for..of`:
-
-  ```js
-  function* generateSequence() {
-    yield 1;
-    yield 2;
-    return 3;
-  }
-
-  let generator = generateSequence();
-
-  for(let value of generator) {
-    alert(value); // 1, then 2
-  }
-  ```
-
-  - **Note**: the example above shows `1`, then `2`, and that’s all. It doesn’t show `3`!
-    - It’s because `for..of` iteration ignores the last value, when `done: true`. So, if we want all results to be shown by `for..of`, we must return them with `yield`
-
-- As generators are iterable, we can call all related functionality, e.g. the **spread syntax `...`**:
-
-  ```js
-  function* generateSequence() {
-    yield 1;
-    yield 2;
-    yield 3;
-  }
-
-  let sequence = [0, ...generateSequence()];
-  alert(sequence); // 0, 1, 2, 3
-  ```
-
-#### Generators in Async Code
-
-- `returnNextElement` is a special object (a **generator object**) that when its `next` method is run starts (or continues) running createFlow **execution-context** until it hits `yield` and returns out the value being yielded **without continuing the function**
-
-  - We end up with a ‘stream’/flow of values that we can get one-by-one by running `returnNextElement.next()`
-  - And most importantly, for the first time we get to pause (‘suspend’) a function being run and then return to it by calling `returnNextElement.next()`
-
-- This is actually what happens behind the scene in **Asynchronous javascript**, as we want to:
-
-  1. Initiate a task that takes a long time (e.g. requesting data from the server)
-  2. Move on to more synchronous regular code in the meantime
-  3. Run some functionality once the requested data has come back
-
-  ```js
-  function doWhenDataReceived(value) {
-    returnNextElement.next(value);
-  }
-  function* createFlow() {
-    const data = yield fetch('http://twitter.com/will/tweets/1');
-    console.log(data);
-  }
-  const returnNextElement = createFlow();
-  const futureData = returnNextElement.next();
-  futureData.value.then(doWhenDataReceived);
-  ```
-
-  - Explanation of the code above:
-    ![generator](./img/generator-example.png)
-
-- **Async/await** simplifies all this and finally fixes the inversion of control problem of callbacks
-
-  - as it automatically triggers the function on the promise-resolution **(this functionality is still added to the micro-task queue though)**
-
-  ```js
-  async function createFlow() {
-    console.log('Me first');
-    const data = await fetch('https://twitter.com/will/tweets/1');
-    console.log(data);
-  }
-  createFlow();
-  console.log('Me second');
-  ```
 
 ---
 
@@ -820,6 +705,172 @@ we can convert functions more easily to make them suit our task Without writing 
 
 ---
 
+## Generators
+
+Regular functions return only one, single value (or nothing). **Generators** can return (`“yield”`) multiple values, one after another, on-demand. They work great with iterables, allowing to create data streams with ease.
+
+- Once we start thinking of our data as flows (where we can pick of an element one-by-one) we can rethink how we produce those flows - JavaScript now lets us produce the flows using a function
+- the Generator function allows us to exit and renter the execution-context of function manually, unlike iterators which this happens dynamically
+- To create a generator, we need a special syntax construct: `function*`, so-called **“generator function”**.
+
+  - Generator functions behave differently from regular ones. When such function is called, it doesn’t run its code. Instead it returns a special object, called **“generator object”**, to manage the execution.
+
+    ```js
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+    // "generator function" creates "generator object"
+    let generator = generateSequence(); // The function code execution hasn’t started yet
+    alert(generator); // [object Generator]
+    ```
+
+> **Note:** `function* f(…)` or `function *f(…)`?
+>
+> - Both syntaxes are correct. But usually the first syntax is preferred
+> - we usually use the second syntax in object/class ES6 methods
+
+### Generator Methods
+
+- The main method of a generator is `next()`. When called, it runs the execution until the nearest `yield <value>` statement (value can be omitted, then it’s `undefined`). Then the function execution pauses, and the yielded value is returned to the outer code.
+
+  - The result of `next()` is always an object with two properties:
+
+    - `value`: the yielded value.
+    - `done`: `true` if the function code has finished, otherwise `false`.
+      - When the generator is done. We should see it from `done:true`, and New calls to `generator.next()` don’t make sense any more. If we do them, they return the same object: `{done: true}`.
+
+    ```js
+    function* generateSequence() {
+      yield 1;
+      yield 2;
+      return 3;
+    }
+
+    let generator = generateSequence();
+
+    let one = generator.next();
+
+    alert(JSON.stringify(one)); // {value: 1, done: false}
+    ```
+
+  - **"yield" is a two-way street**: That’s because `yield` is a two-way street: it not only returns the result to the outside, but also can pass the value inside the generator.
+
+    - when we pass a value to the `next()` method, it will be evaluated as the yielded value and we will continue the function until we find another yield
+
+    ```js
+    function* createFlow() {
+      const num = 10;
+      const newNum = yield num;
+      yield 5 + newNum;
+      yield 6;
+    }
+    const returnNextElement = createFlow(); // The function code execution hasn’t started yet
+    const element1 = returnNextElement.next(); // 10
+    const element2 = returnNextElement.next(2); // 7
+    ```
+
+- `generator.return(value)`
+
+  - it finishes the generator execution and return the given value.
+
+    ```js
+    function* gen() {
+      yield 1;
+      yield 2;
+      yield 3;
+    }
+
+    const g = gen();
+
+    g.next(); // { value: 1, done: false }
+    g.return('foo'); // { value: "foo", done: true }
+    g.next(); // { value: undefined, done: true }
+    ```
+
+  - Often we don’t use it, as most of time we want to get all returning values, but it can be useful when we want to stop generator in a specific condition.
+
+### Generators are Iterable
+
+- We can loop over their values using `for..of`:
+
+  ```js
+  function* generateSequence() {
+    yield 1;
+    yield 2;
+    return 3;
+  }
+
+  let generator = generateSequence();
+
+  for (let value of generator) {
+    alert(value); // 1, then 2
+  }
+  ```
+
+  - **Note**: the example above shows `1`, then `2`, and that’s all. It doesn’t show `3`!
+    - It’s because `for..of` iteration ignores the last value, when `done: true`. So, if we want all results to be shown by `for..of`, we must return them with `yield`
+
+- As generators are iterable, we can call all related functionality, e.g. the **spread syntax `...`**:
+
+  ```js
+  function* generateSequence() {
+    yield 1;
+    yield 2;
+    yield 3;
+  }
+
+  let sequence = [0, ...generateSequence()];
+  alert(sequence); // 0, 1, 2, 3
+  ```
+
+### Generators in Async Code
+
+- `returnNextElement` is a special object (a **generator object**) that when its `next` method is run starts (or continues) running createFlow **execution-context** until it hits `yield` and returns out the value being yielded **without continuing the function**
+
+  - We end up with a ‘stream’/flow of values that we can get one-by-one by running `returnNextElement.next()`
+  - And most importantly, for the first time we get to pause (‘suspend’) a function being run and then return to it by calling `returnNextElement.next()`
+
+- This is actually what happens behind the scene in **Asynchronous javascript**, as we want to:
+
+  1. Initiate a task that takes a long time (e.g. requesting data from the server)
+  2. Move on to more synchronous regular code in the meantime
+  3. Run some functionality once the requested data has come back
+
+  ```js
+  function doWhenDataReceived(value) {
+    returnNextElement.next(value);
+  }
+  function* createFlow() {
+    const data = yield fetch('http://twitter.com/will/tweets/1');
+    console.log(data);
+  }
+  const returnNextElement = createFlow();
+  const futureData = returnNextElement.next();
+  futureData.value.then(doWhenDataReceived);
+  ```
+
+  - Explanation of the code above:
+    ![generator](./img/generator-example.png)
+
+- **Async/await** simplifies all this and finally fixes the inversion of control problem of callbacks
+
+  - as it automatically triggers the function on the promise-resolution **(this functionality is still added to the micro-task queue though)**
+
+  ```js
+  async function createFlow() {
+    console.log('Me first');
+    const data = await fetch('https://twitter.com/will/tweets/1');
+    console.log(data);
+  }
+  createFlow();
+  console.log('Me second');
+  ```
+
+---
+
 ## JS : The weird parts
 
 ### Advanced Types
@@ -843,7 +894,36 @@ we can convert functions more easily to make them suit our task Without writing 
   - `Nan === NaN` --> **false**
   - `alert(isNaN("str"))` --> **true**
 
-- **Negative zero**:
+- **BigInt**:
+
+  - `BigInt` is a special numeric type that provides support for integers of arbitrary length.
+  - BigInt can mostly be used like a regular number,
+
+    - All operations on `bigints` return `bigints`.
+    - for example:
+
+      ```js
+      alert(1n + 2n); // 3
+      alert(5n + 2n); // 2 (not 2.5)
+      ```
+
+    - We can’t mix `bigints` and regular numbers:
+
+      ```js
+      alert(1n + 2); // Error: Cannot mix BigInt and other types
+      ```
+
+      - to do so, we can explicitly convert them if needed: using either `BigInt()` or `Number()` constructors
+
+    - The unary plus is not supported on bigints
+
+      ```js
+      alert(+25n); // error
+      ```
+
+  - **Polyfills**
+    - Polyfilling bigints is tricky. The reason is that many JavaScript operators, such as `+`, `-` and so on behave differently with bigints compared to regular numbers.
+    - we can use the polyfill proposed by the developers of [JSBI library](https://github.com/GoogleChromeLabs/jsbi).
 
 ---
 
@@ -871,7 +951,7 @@ we can convert functions more easily to make them suit our task Without writing 
 
 ---
 
-## notes
+## Notes
 
 - `console` is not built in js, but it's from the `webApi`
 - ( \` ) is called a backticks
@@ -1111,3 +1191,11 @@ we can convert functions more easily to make them suit our task Without writing 
   - There’s a difference between an `arrow function` => and a regular function called with `.bind(this)`:
     - `.bind(this)` creates a “bound version” of the function.
     - The `arrow =>` doesn’t create any binding. The function simply doesn’t have this. The lookup of this is made exactly the same way as a regular variable search: in the outer lexical environment.
+- **eval()** built-in function
+
+  - it allows to execute a string of code.
+
+  ```js
+  let code = 'alert("Hello")';
+  eval(code); // Hello
+  ```

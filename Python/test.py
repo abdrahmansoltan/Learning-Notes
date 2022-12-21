@@ -46,8 +46,11 @@
 # print(odds_squares_sum(5))
 
 
-def odds_squares_sum(num):
-    return [num**2 for num in range(num) if (num % 2 != 0 and num > 0)]
+# def odds_squares_sum(num):
+#     return [num**2 for num in range(num) if (num % 2 != 0 and num > 0)]
 
 
-print(odds_squares_sum(5))
+# print(odds_squares_sum(5))
+
+x = -121
+print(str(x))

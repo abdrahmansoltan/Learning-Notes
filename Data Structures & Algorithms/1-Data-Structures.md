@@ -18,7 +18,9 @@
     - [Referential Arrays](#referential-arrays)
     - [Arrays big O](#arrays-big-o)
     - [Array Notes](#array-notes)
-  - [Hash Tables](#hash-tables)
+  - [Hash Tables (Map)](#hash-tables-map)
+    - [Hash function](#hash-function)
+    - [Hash table implementation](#hash-table-implementation)
   - [Linked lists](#linked-lists)
     - [Arrays vs linked lists](#arrays-vs-linked-lists)
     - [Singly linked list](#singly-linked-list)
@@ -31,10 +33,15 @@
     - [Binary Tree](#binary-tree)
       - [Perfect vs Full vs Complete Binary Trees](#perfect-vs-full-vs-complete-binary-trees)
       - [Binary Search Tree (BST)](#binary-search-tree-bst)
+      - [Tree Traversal](#tree-traversal)
     - [Binary Heap](#binary-heap)
+      - [Array implementation](#array-implementation)
+      - [Heap methods](#heap-methods)
       - [Priority Queue](#priority-queue)
     - [Binary Trie](#binary-trie)
   - [Graphs](#graphs)
+    - [How to store graphs](#how-to-store-graphs)
+    - [Graphs implementation](#graphs-implementation)
 
 ---
 
@@ -193,13 +200,22 @@ steps:
 
 ---
 
-## Hash Tables
+## Hash Tables (Map)
 
 Here we have **Key/value pairs**
 
+> In order to look-up values by key, we need a way to convert keys into valid array indices
+
 ![hash-function](./img/hashFunction.png)
 
-**Hash function:**
+- use cases:
+  - create a mapping from one thing to another thing
+  - look-up
+  - prevent duplicate entries
+  - DNS resolution
+    - `Google.com` -> `74.125.239.133`
+
+### Hash function
 
 - it's a function that generates a value of fixed length for each input that it gets.
 - it's one way
@@ -209,12 +225,33 @@ Here we have **Key/value pairs**
 
 ![hash-function](./img/hashFunction2.png)
 
-Problem of hash-tables:
+Problem of hash-functions in hash-tables:
 
 - **collision** : with enough data and limited memory, sometimes keys are hashed to the same value so they have the same address in memory (**memory-space**) as there's no concept of ordering keys)indexes), which causes collision, and it becomes **linked list**
   ![hash-collision](./img/hash-collision.png)
   - when we have a collision, the performance becomes **O(n/k) -> O(n)**, which is `k` is the size of the hash-table
+  - There're many strategies for dealing with collisions:
+    1. **separate chaining**:
+       ![separate chaining](./img/hash-collision2.png)
+       - at each index in our array we store values using more sophisticated data-structure like (array or linked-list)
+       - this allows us to store multiple key-value pairs at the same index
+    2. **linear probing**:
+       ![linear probing](./img/hash-collision3.png)
+       - when we find a collision, we search through the array to find the next empty slot
 - also here, we may decrease the **time complexity**, but we might also accidentally increase the **space complexity** as a tradeoff by creating an object and storing values inside it in the memory
+
+---
+
+### Hash table implementation
+
+![hash table class](./img/hash-table-class.png)
+
+- `set`:
+  - accepts a key and a value + hashes the key
+  - stores the key-value pair in the hash table array via **separate chaining**
+- `get`:
+  - accepts a key + hashes the key + retrieves the key-value pair in the hash table
+  - if the key isn't found, returns `undefined`
 
 ---
 
@@ -291,7 +328,7 @@ It's almost identical to `singly-linked-list`, except every node has another poi
         counter++;
       }
       return current;
-    } 
+    }
     else {
       let count = this.length - 1;
       let current  = this.tail;
@@ -355,6 +392,7 @@ stacks can be implemented using **Arrays(lists)** or **linked-lists**, as:
 it's based on **FIFO** (first in - first out)
 
 - used in:
+
   - Background tasks
   - uploading resources
   - printing / task processing
@@ -454,32 +492,100 @@ They have **Hierarchical Data-structures** structure unlike other data-structure
   - Every node to the right of a parent node is always greater than the parent
     - this means if I keep going to the right, the number or the value of the node constantly increases
 - Advantages:
-  - searching and look-ups which here is much faster as we won't loop like in arrays (better than `O(n)`)
+
+  - searching, look-ups and inserting which here is `O(log(n))` **(not guaranteed! as we may have unbalanced-search-tree)** which is much faster as we won't loop like in arrays (better than `O(n)`)
+    - > this is also facilitated by that (even if the number of nodes doubled, then we'll find that we only increase the number of steps to `insert`/`find` by **1** step) ![BST O(n)](./img/bst-2.png)
   - ordered
   - flexible size
 
 - Problems:
+
   - **unbalanced search tree** - it's when we have a side that is more occupied than the other side, which make us move from **`O(log n)`** to **`O(n)`** as it turns more into a long **linked list**
     ![unbalanced-search-tree](./img/unbalanced-search-tree.png)
-    - this is solved by Algorithms which balance an unbalanced-trees, like : `AVL Tree`, `Red Black Tree`
+    - this is solved by:
+      - selecting another **root** node and reorder the tree
+      - Algorithms which balance an unbalanced-trees, like : `AVL Tree`, `Red Black Tree`
   - no `O(1)` operations like in `hash-tables`
   - removing elements is a bit tricky, as we need keep track to a reference to the **parentNode**, so that we know whet the deleted node is replaced with
 
 - Class Construction
-![BST class](./img/bst1.png)
+  ![BST class](./img/bst1.png)
+- Inserting a node:
+  ![BST insertion](./img/bst-insertion.png)
+- Finding a node (lookup):
+  ![BST insertion](./img/bst-finding.png)
+
+---
+
+#### Tree Traversal
+
+It's covered in [Traversals section in Algorithms.md](./2-Algorithms.md#traversals)
 
 ---
 
 ### Binary Heap
 
-- Here every node on the top-level has higher value than the lower level
-  - left and right child nodes can be any value as long as they're less than the upper node
+- It's very similar to Binary-search-tree, but with some different rules:
+
+  ![binary-heap](./img/binary-heap.png)
+
+  - There's no order to nodes in left and right nodes
+    - left and right child nodes can be any value as long as they're less than the upper node
+  - in a **MaxBinaryHeap**, parent nodes are always larger than child nodes
+  - in a **MinBinaryHeap**, parent nodes are always smaller than child nodes
+  - Every parent node has **at most** 2 children
+
   - so it can be used in any algorithm where ordering is important
-  - but it has a **`O(n)`** for lookup as it's less ordered than Binary-trees; so it turns to looping in a linked list or array to find a value
+  - **O(n)**:
+    - it has a **`O(n)`** for lookup as it's less ordered than Binary-trees; so it turns to looping in a linked list or array to find a value
+    - it has a **`O(log(n))`** for inserting/removing
+
+- A binary-heap is as compact as possible. All the children of each node are as full as they can be and **left children are filled out first**
+- It's used in:
+  - Implementing [Priority Queues](#priority-queue)
+  - used with **Graph-traversal** Algorithms
+
+#### Array implementation
+
+![Array Implementation](./img/binary-heap2.png)
+![Array Implementation](./img/binary-heap1.png)
+
+- For any parent node of an Array at index `n`:
+  - the left child is stored at `2n + 1`
+  - the right child is stored at `2n + 2`
+- For any child node at index `n`:
+  - its parent is at index `(n - 1) / 2` **floored**
+
+#### Heap methods
+
+- Inserting:
+  - when inserting, we first add item to the end of the `values` array, then we bubble-up (swap it up until it finds its correct spot)
+    ![binary-heap-insertion](./img/binary-heap-insertion1.png)
+    ![binary-heap-insertion](./img/binary-heap-insertion.png)
+- Removing (Extract max)
+
+  1. remove the root
+  2. replace with the most recently added (last element in values array)
+  3. adjust (sink/bubble-down) until we have correct spots
+
+  ![binary-heap-removing](./img/binary-heap-removing.png)
 
 ---
 
 #### Priority Queue
+
+It's a data structure where each element has a priority. Elements with higher priorities are served before elements with lower priorities.
+
+- we can implement it using `Array`, but it's not efficient, as we will need to iterate over the entire thing to find the highest priority element, so instead we use a **Heap**
+- ex with `binary-heap`:
+  ![priority-queue](./img/priority-queue.png)
+
+- Implementation
+
+  - here we use the same steps like in [Binary Heap](#binary-heap) -> `values` array property, but we also have `priority` property
+    ![priority-queue](./img/priority-queue1.png)
+
+  ![priority-queue](./img/priority-queue2.png)
 
 ---
 
@@ -500,9 +606,34 @@ It's a specialized tree used in **searching** most often with text, in most case
 They're nodes (vertices) connected via "Edges"
 ![graphs](./img/graphs.png)
 
+> **Vertex**: node
+> **Edge**: connection between nodes
+
 - There're many ways to categorize graphs:
-  - **Directed** and **undirected** graphs, examples:
+
+  - **Directed** and **undirected** graphs:
+    - directions assigned to distances between nodes
     - Undirected -> If you made a facebook friend-request to someone; you become his friend and he becomes your friend
     - directed -> (graph that goes in one direction): If you made a twitter follow to someone; you follow him, but he doesn't automatically follow you
   - **weighted** and **unweighted**
+    - values assigned to distances between nodes
   - **cyclic** and **Acyclic**
+
+### How to store graphs
+
+![graphs-matrix-vs-list](./img/graphs-matrix-vs-list.png)
+
+- **Adjacency Matrix**
+  ![graphs-adjacency-matrix](./img/graphs-adjacency-matrix.png)
+- **Adjacency List**
+  ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
+  - here, we use array to store the edges
+  - it's the most used, as most data in real-world tends to lend itself to sparser and/or larger graphs
+
+### Graphs implementation
+
+- Adding a Vertex:
+  ![adding a vertex](./img/graphs-vertex.png)
+- Adding an Edge:
+  ![adding an edge](./img/graphs-edge1.png)
+  ![adding an edge](./img/graphs-edge2.png)

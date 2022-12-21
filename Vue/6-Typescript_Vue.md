@@ -1,20 +1,20 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Vue](#vue)
-  - [Props](#props)
-- [Mock functions in Tests](#mock-functions-in-tests)
-- [Testing Vuex](#testing-vuex)
-  - [Mutations](#mutations)
-- [Vuex](#vuex)
-  - [Getters](#getters)
-  - [Actions](#actions)
-- [Composition API](#composition-api)
-  - [Ref](#ref)
-  - [Vuex Composables (composition API)](#vuex-composables-composition-api)
-  - [Vuex Composables Testing](#vuex-composables-testing)
-  - [Typing useStore Composition Function](#typing-usestore-composition-function)
-- [Notes](#notes)
+  - [Vue](#vue)
+    - [Props](#props)
+  - [Mock functions in Tests](#mock-functions-in-tests)
+  - [Testing Vuex](#testing-vuex)
+    - [Mutations](#mutations)
+  - [Vuex](#vuex)
+    - [Getters](#getters)
+    - [Actions](#actions)
+  - [Composition API](#composition-api)
+    - [Ref](#ref)
+    - [Vuex Composables (composition API)](#vuex-composables-composition-api)
+    - [Vuex Composables Testing](#vuex-composables-testing)
+    - [Typing useStore Composition Function](#typing-usestore-composition-function)
+  - [Notes](#notes)
 
 ---
 
