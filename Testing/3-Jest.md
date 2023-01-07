@@ -52,8 +52,8 @@ EsLint will throw errors when using **test** global-object in the node environme
 - A best practice is to start a sentence with `“it”` and then complete the sentence with the description of what the suite is testing.
 
   ```js
-  describe("suite description", () => {
-    it("describes the spec", () => {
+  describe('suite description', () => {
+    it('describes the spec', () => {
       const myVar = true;
       expect(myVar).toBe(true);
     });
@@ -71,9 +71,9 @@ Jest needs to know **when** the code it is testing has completed, before it can 
 - Return a promise from your test, and Jest will wait for that promise to resolve. If the promise is rejected, the test will fail.
 
 ```js
-test("the data is peanut butter", () => {
-  return fetchData().then((data) => {
-    expect(data).toBe("peanut butter");
+test('the data is peanut butter', () => {
+  return fetchData().then(data => {
+    expect(data).toBe('peanut butter');
   });
 });
 ```
@@ -83,9 +83,9 @@ test("the data is peanut butter", () => {
 - To write an async test, use the async keyword in front of the function passed to test.
 
 ```js
-test("the data is peanut butter", async () => {
+test('the data is peanut butter', async () => {
   const data = await fetchData();
-  expect(data).toBe("peanut butter");
+  expect(data).toBe('peanut butter');
 });
 ```
 
@@ -101,26 +101,26 @@ test("the data is peanut butter", async () => {
 
 ```js
 // ---------------------------Don't do this!--------------------------- //
-test("the data is peanut butter", () => {
+test('the data is peanut butter', () => {
   function callback(error, data) {
     if (error) {
       throw error;
     }
-    expect(data).toBe("peanut butter");
+    expect(data).toBe('peanut butter');
   }
 
   fetchData(callback);
 });
 
 // ------------------------------Do this!------------------------------ //
-test("the data is peanut butter", (done) => {
+test('the data is peanut butter', done => {
   function callback(error, data) {
     if (error) {
       done(error);
       return;
     }
     try {
-      expect(data).toBe("peanut butter");
+      expect(data).toBe('peanut butter');
       done();
     } catch (error) {
       done(error);
@@ -140,7 +140,7 @@ test("the data is peanut butter", (done) => {
 - It verifies that a certain number of assertions are called during a test. This is **often useful when testing asynchronous code**, in order to make sure that assertions in a callback actually got called.
 
 ```js
-test("doAsync calls both callbacks", () => {
+test('doAsync calls both callbacks', () => {
   expect.assertions(2); // ensures that both callbacks actually get called
   function callback1(data) {
     expect(data).toBeTruthy();
@@ -187,23 +187,41 @@ It's an useful tool whenever you want to make sure your UI does not change unexp
 
 > Tests must not depend on external services. Use mocking tools such as jest.mock to avoid it.
 
-![fn](./img/jest-fn.PNG)
+- Jest mock function `jest.fn()`
+  - it plays the role of a real function.
+  - we use it as a replacement for a real/complex function that we don't want to involve in our tests to keep it lightweight and simple
 
 ### Timer Mocks
 
 [Timer Mocks](https://jestjs.io/docs/timer-mocks)
-![timers](./img/jest-timers.PNG)
+
+They are mock functions like `jest.fn()` but with focus on javascript timer functions
+
+- `jest.useFakeTimers`
+  - method that auto-mocks all the javascript timer functions, ex: `setTimeout`, `setInterval`
+  - this help us to not have to mock every timer function we use as it will automatically do that
+- `jest.useRealTimers`
+
+  - method that returns the mocked functions to their original native javascript implementations
+  - to undo using the fake timers from jest and returning to the native js-timers
+
+- **Note:**
+  - if `jest.useFakeTimers` doesn't work, you can use `jest.spyOn(global, "setInterval")`
+  - comment from issue in Github:
+    > they are mocked, but they are not mock functions. This is on purpose. See [#5171](https://github.com/facebook/jest/pull/5171) (although that's not the PR that landed, it contains notes of all the differences between "modern" and "legacy" fake timers)
+
+---
 
 ### HTTP Requests (axios)
 
 ```js
 // import axios
 
-jest.mock("axios");
+jest.mock('axios');
 
 // telling it to make it use this function when it's called
-jest.mock("axios", () => ({
-  get: () => Promise.resolve({ data: [{ val: 1 }] }),
+jest.mock('axios', () => ({
+  get: () => Promise.resolve({ data: [{ val: 1 }] })
 }));
 
 // or

@@ -7,8 +7,9 @@
     - [Configuring PurgeCSS in the Tailwind configuration file to remove unused CSS](#configuring-purgecss-in-the-tailwind-configuration-file-to-remove-unused-css)
   - [Configuration](#configuration)
     - [Adding colors/fonts](#adding-colorsfonts)
+    - [Configuring Variants](#configuring-variants)
   - [Functions and Directives](#functions-and-directives)
-    - [@apply](#apply)
+    - [`@apply`](#apply)
 
 ---
 
@@ -21,7 +22,7 @@ Tailwind CSS is a **utility-first CSS framework** for rapidly building custom us
 
 ### TailwindCSS vs. Bootstrap
 
-- Tailwind CSS is not a UI kit. Unlike UI kits such as Bootstrap, Bulma, and Foundation, Tailwind CSS doesn’t have a default theme or built-in UI components. Instead, it comes with pre-designed widgets you can use to build your site from scratch.
+- TailwindCSS is not a UI kit. Unlike **UI kits such as Bootstrap**, Bulma, and Foundation, Tailwind CSS doesn’t have a default theme or built-in UI components. Instead, it comes with pre-designed widgets you can use to build your site from scratch.
 - Bootstrap is known for its **responsiveness**, whereas proponents of Tailwind CSS typically value the framework’s **customizability**.
 - Another problem with Bootstrap, sites is that they almost always look alike, so this inhibits our ability to incorporate creativity into the dev environment. This is one of the advantages of Tailwind CSS: its ability to easily build complex user interfaces without encouraging any two sites to look the same.
 
@@ -56,6 +57,8 @@ purge: {
 
 [Guide](https://tailwindcss.com/docs/configuration)
 
+> when installing tailwind, you will find that a `tailwind.css` file is added to the `assets` directory, and then imported into the `main.js` file to register all the tailwind classes in the app
+
 Or: using **plugins**
 
 ### Adding colors/fonts
@@ -64,16 +67,38 @@ you can do that inside the `tailwind.config.js` file
 
 ![config](./img/tailwind-config.PNG)
 
+### Configuring Variants
+
+The `variants` section of your `tailwind.config.js` file is where you control which variants should be enabled for each core plugin:
+
+- Each property is a core plugin name pointing to an array of variants to generate for that plugin.
+- it's only used if it's not supported by default, So check first as it may work out of the box
+
+```js
+// tailwind.config.js
+module.exports = {
+  variants: {
+    extend: {
+      margin: ['first'], // enables us to apply a different margin class to the first elements in a group (element with first pseudo class),
+      backgroundColor: ['active'], // enables us to apply a different background class to the element with active pseudo class,
+      borderColor: ['focus-visible', 'first'],
+      textColor: ['visited']
+    }
+  }
+};
+```
+
 ---
 
 ## Functions and Directives
 
-### @apply
+### `@apply`
 
 It's used to inline any existing utility classes into your own custom CSS.
 
 ```css
 .select2-search {
+  /* here we use @apply to apply the tailwind-classes to be mapped here as css code */
   @apply border border-gray-300 rounded;
 }
 ```

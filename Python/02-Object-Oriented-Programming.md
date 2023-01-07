@@ -16,7 +16,6 @@
   - [Inheritance](#inheritance)
     - [Abstract Base Classes](#abstract-base-classes)
   - [Encapsulation](#encapsulation)
-  - [Shallow and Deep Copying](#shallow-and-deep-copying)
 
 ---
 

@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Python](#python)
     - [Running Python](#running-python)
+    - [The Style Guide](#the-style-guide)
   - [Data Types](#data-types)
   - [Operators](#operators)
   - [Conditional Flow](#conditional-flow)
@@ -32,7 +33,7 @@
         - [Deep Copy Using "copy" module](#deep-copy-using-copy-module)
     - [Comparing Lists](#comparing-lists)
     - [List Unpacking](#list-unpacking)
-    - [List comprehension](#list-comprehension)
+    - [List Comprehension](#list-comprehension)
   - [Tuples](#tuples)
     - [Packing / Unpacking](#packing--unpacking)
     - [tuple zip function](#tuple-zip-function)
@@ -43,6 +44,7 @@
     - [Multi-line strings (Triple Quotes)](#multi-line-strings-triple-quotes)
     - [String methods](#string-methods)
     - [String Formatting](#string-formatting)
+      - [f-strings](#f-strings)
     - [String formatting (new way)](#string-formatting-new-way)
   - [List of lists (2D Array) Matrix](#list-of-lists-2d-array-matrix)
     - [Position Neighbors](#position-neighbors)
@@ -76,6 +78,18 @@ Python is an **interpreted language**. Commands are executed through a piece of 
 
 ![running-python](./img/running-python.png)
 
+### The Style Guide
+
+One of the oldest PEPs is **PEP 8**, which instructs Python programmers on how to style their code. The Python style guide was written with the understanding that code is read more often than it is written
+
+> The PEP 8 guidelines are not set in stone, and some teams prefer a different values. Don’t worry too much about them in your code as you’re working alone, but be aware that people who are working collaboratively almost always follow the PEP 8 guidelines
+
+- Indentation
+  - PEP 8 recommends that you use four spaces per indentation level. Using four spaces improves readability while leaving room for multiple levels of indentation on each line.
+- Line Length
+  - each line should be less than 80 characters (**79 Character limit**)
+  - PEP 8 also recommends that you limit all of your comments to 72 characters per line, because some of the tools that generate automatic documentation for larger projects add formatting characters at the beginning of each commented line.
+
 ---
 
 ## Data Types
@@ -87,6 +101,12 @@ Python is an **interpreted language**. Commands are executed through a piece of 
 ## Operators
 
 ![operators](./img/operators.png)
+
+- if you have a constant-number: (variable whose value stays the same throughout the life of a program), then Python doesn’t have built-in constant types, but Python programmers use **all capital letters to indicate a variable should be treated as a constant** and never be changed:
+
+  ```py
+  MAX_CONNECTIONS = 5000
+  ```
 
 > - **`/`** this is called "True Division"
 
@@ -188,6 +208,7 @@ Python is an **interpreted language**. Commands are executed through a piece of 
 
   - **Prefix**: any string starts from the first character (n prefixes)
     - `ex`: "ahmed omar" -> "ahme"
+    - `ex`: URL with the common prefix `https://`
   - **Suffix**: any string ends from the last character (n Suffix)
     - `ex`: "ahmed omar" -> "d omar"
   - **Substring**: starts and ends wherever, but consecutive
@@ -290,6 +311,14 @@ An **iterable** is an object, obj, that produces an iterator via the syntax `ite
     - Also, if such a loop were to be interrupted in some fashion, no time will have been spent computing unused values of the `range`.
 
 - > We see **"lazy evaluation"** used in many of Python’s libraries. For example, the dictionary class supports methods `keys()`, `values()`, and `items()`, which respectively produce a “view” of all keys, values, or `(key,value)` pairs within a dictionary. None of these methods produces an explicit list of results. Instead, the views that are produced are iterable objects based upon the actual contents of the dictionary.
+
+- Using `range()` to Make a List of Numbers instead of iterables
+
+  - If you want to make a list of numbers, you can convert the results of `range()` directly into a list using the `list()` function
+
+    ```py
+    numbers = list(range(1, 6))
+    ```
 
 - An explicit list of values from such an iteration can be immediately constructed by calling the list class constructor with the iteration as a parameter
 
@@ -592,6 +621,7 @@ It's an **"ordered"** collection of data
   my_list = [1, 5, 10, 17, 2, 'Hii']
 
   # pop removes the item at a specific index and returns it.
+  # it's useful if you want to use the value of an item after removing it from a list
   print(my_list.pop())    # Hii  - default last item
   # Now list is : 1 5 10 17 2
 
@@ -602,7 +632,8 @@ It's an **"ordered"** collection of data
   # del removes the item at a specific index:
   del my_list[0]  # 5 10 2
 
-  # remove removes ONLY the first matching value, not a specific index:
+  # "remove()" lets us remove by value and not index -> removes ONLY the first matching value, not a specific index:
+  # If there’s a possibility the value appears more than once in the list, you’ll need to use a loop to make sure all occurrences of the value are removed
   my_list.remove(10)  # 5 2
 
   # ValueError: list.remove(x): x not in list
@@ -633,7 +664,7 @@ It's an **"ordered"** collection of data
 
 - Sorting
 
-  - `sort` method -> **in-place**
+  - `sort` method -> **Permanently & in-place**
 
     ```py
     my_list = [5, 7, 2]
@@ -645,7 +676,7 @@ It's an **"ordered"** collection of data
     my_list = my_list,sort() # NONE
     ```
 
-  - `sorted` function -> **new (better)**
+  - `sorted` function -> **Temporarily**
 
     - returns a sorted list of a specified **iterable** object
 
@@ -664,6 +695,7 @@ It's an **"ordered"** collection of data
 
   - same for `reverse()` method and `reversed()` function
     - which reverses a list **in-place (reverse the main list and not returning a new list)**
+    - > **Notice** that `reverse()` doesn’t sort backward alphabetically; it simply reverses the order of the list
 
 - `all` & `any` functions
   - return `true/false` if all/some elements of the iterable are `true/false`
@@ -721,7 +753,7 @@ It's like **destructuring**
 
 ---
 
-### List comprehension
+### List Comprehension
 
 List comprehension offers a shorter syntax when you want to create a new list based on the values of an existing list.
 
@@ -765,9 +797,11 @@ print(lst2)     # [5, 10, 17, 2]
 
 ## Tuples
 
+> Lists work well for storing collections of items that can change throughout the life of a program. However, sometimes you’ll want to create a list of items that **cannot change**. Tuples allow you to do just that. Python refers to values that cannot change as immutable, and an immutable list is called a tuple.
+
 They're **immutable**, **ordered**, **indexed** collections/sequences
 
-- if you have a tuple with a single item, you need to use comma at the end
+- If you want to define a tuple with one element, you need to include a trailing comma at the end
   ![1item-tuple](./img/1item-tuple.png)
 
   ```py
@@ -924,6 +958,12 @@ sdfdf
   ![slice](img/python-slice.png)
   ![slice](img/python-slice2.png)
 
+- `removePrefix()` :
+  - **Prefix**: any string starts from the first character (n prefixes)
+    - `ex`: "ahmed omar" -> "ahme"
+    - `ex`: URL with the common prefix `https://`
+      - When you see a URL in an address bar and the `https://` part isn’t shown, the browser is probably using a method like `removeprefix()` behind the scenes.
+
 ---
 
 ### String Formatting
@@ -936,10 +976,19 @@ print(name + ' is ' + str(age) + ' years old')  # 2 old way
 # The first {} is replaced with mostafa
 # the 2nd is replaced with 33
 print('{} is {} years old'.format(name, age))   # mostafa is 33 years old
+```
 
+#### f-strings
+
+The `f` is for format, because Python formats the string by replacing the name of any variable in braces with its value. The output from the previous code is:
+
+```py
+# new way:
+name, age = 'mostafa', 33
+print(f'{name} is {age} years old')     # mostafa is 33 years old
+
+# old way:
 # we call this string with curly braces {} as template
-
-
 #IndexError: tuple index out of range   - u need to provide 3 arguments
 #print('{}{}{}'.format('Hey'))
 
@@ -1106,10 +1155,17 @@ They return something that iterable (NOT a list)
 
 ### Dictionary methods
 
-- Getting values from Dictionary
+- Getting values from **`.get()`**
 
   - when you want to check if a key exists in the dictionary, we use `in` first then get the value
   - instead, you can use the `.get()` method, which will look for a given key in a dictionary. if the key exists, it will return the corresponding value. otherwise it **returns `None`**
+    - unlike using the bracket-syntax which raises a **KeyError**
+  - The `get()` method requires a key as a first argument. As a second optional argument, you can pass the value to be returned if the key doesn’t exist:
+
+    ```py
+    alien_0 = {'color': 'green', 'speed': 'slow'}
+    alien_0.get('points', 'No point value assigned.')
+    ```
 
 - Join (concatenate) 2 dictionaries
   - using`.update()` method
@@ -1125,6 +1181,8 @@ They return something that iterable (NOT a list)
 
 **Exceptions** are unexpected events that occur during the execution of a program. An exception might result from a logical error or an unanticipated situation. In Python, exceptions (also known as **errors**) are objects that are **raised** (or **thrown**) by code that encounters an unexpected circumstance.
 
+- When an error occurs in your program, the Python interpreter does its best to help you figure out where the problem is. The interpreter provides a **traceback** when a program cannot run successfully.
+  - > A **traceback** is a record of where the interpreter ran into trouble when trying to execute your code.
 - Python includes a rich hierarchy of exception classes that designate various categories of errors
   ![errors](./img/errors.png)
 
@@ -1371,6 +1429,10 @@ Beyond the built-in definitions, the standard Python distribution includes perha
   ```
 
 - `del` -> removes the bind from name of variable to the value in memory, so the variable will equal `undefine` (**unboundLocalError**)
+
+  ```py
+  del alien_0['points']
+  ```
 
 - **object memory location** -> to get identifier (location in memory) -> use built-in method `id()`
 

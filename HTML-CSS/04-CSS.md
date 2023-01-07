@@ -573,7 +573,7 @@ It defines whether the flex items are forced in a single line or can be flowed i
 
 > The **cross axis** is the axis perpendicular to the main axis.
 
-- **nowrap** (default): single-line which may cause the container to overflow
+- **nowrap** (default): single-line(doesn't make flex go(wrap) into a new line) which may cause the container to overflow
   ![wrap](./img/nowrap.PNG)
   - It means that when the end of line is reached, make the items smaller to fit the line together
 - **wrap**: multi-lines, direction is defined by flex-direction

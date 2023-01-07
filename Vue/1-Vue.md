@@ -857,7 +857,7 @@ here we use
 
 ### Scoped styling
 
-It's to make the styles scoped to its component
+It's to make the styles **scoped(limited)** to its component
 
 `<style scoped>`
 
@@ -1401,6 +1401,7 @@ A Vue component needs to be "registered" so that Vue knows where to locate its i
 
 - this has some downsides:
   - Global registration prevents build systems from removing unused components (a.k.a **"tree-shaking"**). If you globally register a component but end up not using it anywhere in your app, it will still be included in the final bundle.
+    - > this may increase your bundle size, so be careful with global components
     - also Vue needs to load them all when the application is loaded initially and the `browser` needs to download the code for all those components initially
   - also this will crowd the `main.js` file with all the registering components code
   - Global registration makes dependency relationships less explicit in large applications. It makes it difficult to locate a child component's implementation from a parent component using it.
@@ -2063,6 +2064,24 @@ common scenarios where plugins are useful include:
 ---
 
 ## Notes
+
+- In Vue apps: Webpack is configured to replace **"@/path"** with **"src/path"**
+
+  - This is done with Webpack `resolve.alias` configuration option and isn't specific to Vue.
+
+    ```js
+    // in webpack file
+    resolve: {
+        extensions: ['.js', '.vue', '.json'],
+        alias: {
+          ...
+          '@': path.resolve('src'),
+        }
+      },
+
+    // The alias is used as:
+    import '@/<path inside src folder>';
+    ```
 
 - only `methods` are written as object, but `data` and `lifecycle hooks` are written as `ES6-functions`
 

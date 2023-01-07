@@ -12,7 +12,9 @@
     - [Rules to improve Big o](#rules-to-improve-big-o)
     - [Notes](#notes)
   - [Recursion](#recursion)
-    - [Helper Method Recursion](#helper-method-recursion)
+    - [Recursion Types](#recursion-types)
+    - [Recursion Steps](#recursion-steps)
+      - [Helper Method Recursion](#helper-method-recursion)
     - [Big-O Runtime for Recursive Functions](#big-o-runtime-for-recursive-functions)
     - [Maximum Recursive Depth](#maximum-recursive-depth)
       - [When recursion goes wrong](#when-recursion-goes-wrong)
@@ -235,12 +237,6 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
   - Readability
 - When the execution of a function leads to a nested function call, the execution of the former call is suspended and its activation record stores the place in the source code at which the flow of control should continue upon return of the nested call. This process is used both in the standard case of one function calling a different function, or in the recursive case in which a function invokes itself. The key point is that there is a different activation record for each active call.
 
-- Steps:
-  1. identify and test for the **Base case** (the condition when the recursion ends)
-     - We begin by testing for a set of base cases (there should be at least one). These base cases should be defined so that every possible chain of recursive calls will eventually reach a base case, and the handling of each base case should not use recursion.
-  2. identify the **recursive case**
-     - If not a base case, we perform one or more recursive calls. This recursive step may involve a test that decides which of several possible recursive calls to make. We should define each possible recursive call so that it makes progress towards a base case.
-  3. get closer and closer and return when needed. usually have 2 returns
 - Rules:
   - Every time you're using a `tree` or converting something into a `tree`, consider **recursion**
 - Divide and conquer using recursion:
@@ -250,7 +246,25 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
 
 ---
 
-### Helper Method Recursion
+### Recursion Types
+
+- Functional Recursion:
+  - function returns result, then computer uses the result for recursive call(s)
+- Procedural Recursion:
+  - no return value, and the task is accomplished during recursive calls
+
+---
+
+### Recursion Steps
+
+- Steps:
+  1. identify and test for the **Base case** (the condition when the recursion ends)
+     - We begin by testing for a set of base cases (there should be at least one). These base cases should be defined so that every possible chain of recursive calls will eventually reach a base case, and the handling of each base case should not use recursion.
+  2. identify the **recursive case**
+     - If not a base case, we perform one or more recursive calls. This recursive step may involve a test that decides which of several possible recursive calls to make. We should define each possible recursive call so that it makes progress towards a base case.
+  3. get closer and closer and return when needed. usually have 2 returns
+
+#### Helper Method Recursion
 
 It's a pattern when using recursion, it consists of `outer function` that contains the `helper(recursion)` function which calls itself
 

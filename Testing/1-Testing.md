@@ -26,7 +26,7 @@
     - [`beforeEach` and `afterEach`](#beforeeach-and-aftereach)
     - [`beforeAll` and `afterAll`](#beforeall-and-afterall)
     - [Skipping or Specifying Tests](#skipping-or-specifying-tests)
-  - [Spies & Mocks (SideEffects)](#spies--mocks-sideeffects)
+  - [Spies \& Mocks (SideEffects)](#spies--mocks-sideeffects)
     - [Spies](#spies)
     - [Mock Testing](#mock-testing)
 
@@ -47,10 +47,15 @@
 
   ![unit-test](./img/unit-test.PNG)
 
+  - if there're dependencies, the unit test should [mock or stub](#mock-testing) them out
+    - > it means to replace a dependency with something that pretends to be that dependency (ex: fake-API)
+
 ### Testing Pyramid
 
 ![Testing Pyramid](./img/Testing%20Pyramid.PNG)
 
+- `UI testing` at the top is also known as **Manual Testing**
+- As we go up in the pyramid, the testing time is increased. as `unit-tests` take short time, and `manual-tests & E2E` take the longest time
 - Jasmine works well with `Unit Testing` and `Integration Testing`.
 
   - the difference between Unit Testing and Integration Testing is the use of third-party integration.
@@ -97,9 +102,17 @@ expect(true).toBe(true);
 - It focuses on writing unit and integration tests that produce expected results.
 - Test Driven Development Cycle
 
-  ![alt](./img/tdd2.png)
+  ![alt](./img/tdd2.PNG)
+  ![alt](./img/TDD3.png)
   ![alt](./img/tdd.png)
-  ![alt](./img/TDD3.PNG)
+
+- Benefits:
+
+  - Ensure you're testing the right thing and avoid duplicate and unnecessary tests
+    - think of it as you only write tests when you have failing test(red stage)
+  - describe the "why" rather than the implementation
+  - Higher test coverage
+  - makes code easy to refactor & leads to higher quality tests and implementation code
 
   > Refactor here is for the code-implementation to find more optimized solution, and **not refactor the test**
 
@@ -304,9 +317,9 @@ It's when you want to see if the function was called, but aren't interested in w
 
 ```js
 import { jest } from 'jest';
-const mockFn = jest.fn();
-mockFn();
-expect(mockFn).toHaveBeenCalled();
+const mockFunction = jest.fn();
+mockFunction();
+expect(mockFunction).toHaveBeenCalled();
 ```
 
 ---
