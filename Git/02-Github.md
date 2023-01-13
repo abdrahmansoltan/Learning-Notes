@@ -15,7 +15,7 @@
   - [Git Collaboration Workflows](#git-collaboration-workflows)
     - [Centralized workflow](#centralized-workflow)
     - [Feature Branches workflow](#feature-branches-workflow)
-    - [Fork & Clone workflow](#fork--clone-workflow)
+    - [Fork \& Clone workflow](#fork--clone-workflow)
       - [Include Upstream Changes to Stay In Sync](#include-upstream-changes-to-stay-in-sync)
         - [Triangular workflow](#triangular-workflow)
   - [Pull Request](#pull-request)
@@ -145,7 +145,7 @@ git push origin master
 git fetch origin master
 
 # then if you want to see what is fetched go to the origin/branch
-git checkout origin/branchName 
+git checkout origin/branchName
 ```
 
 - You can think of `git fetch` as half of a `git pull`. The other half of `git pull` is the merging aspect.
@@ -221,6 +221,9 @@ When working with a project that you've forked. The original project's maintaine
 #### Include Upstream Changes to Stay In Sync
 
 > This is called -> **Fork & Clone** workflow
+>
+> - upstream -> push
+> - downstream -> pull
 
 - The **upstream** repository is the base repository you created a fork from
   - this isn't set up by default, you need to set it up manually

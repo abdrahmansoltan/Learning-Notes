@@ -2,6 +2,8 @@
 
 - [INDEX](#index)
   - [Algorithm Analysis (Big-Oh)](#algorithm-analysis-big-oh)
+    - [Average case vs Worst case](#average-case-vs-worst-case)
+    - [Asymptotic Analysis](#asymptotic-analysis)
     - [O(n)](#on)
       - [Polynomials](#polynomials)
     - [O(1)](#o1)
@@ -18,6 +20,7 @@
     - [Big-O Runtime for Recursive Functions](#big-o-runtime-for-recursive-functions)
     - [Maximum Recursive Depth](#maximum-recursive-depth)
       - [When recursion goes wrong](#when-recursion-goes-wrong)
+    - [Eliminating Tail Recursion](#eliminating-tail-recursion)
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
   - [Sorting](#sorting)
@@ -86,6 +89,26 @@ It tells us **How well a problem is solved**, it's the language we use to tellin
 
 ---
 
+### Average case vs Worst case
+
+- **Average-case analysis** usually requires that we calculate expected running times based on a given input distribution, which usually involves sophisticated probability theory.
+  - Therefore, we usually characterize running times in terms of the worst case, as a function of the input size, `n`, of the algorithm.
+- **Worst-case analysis** is much easier than average-case analysis, as it requires only the ability to identify the worst-case input, which is often simple.
+  - Also, this approach typically leads to better algorithms. Making the standard of success for an algorithm to perform well in the worst case necessarily requires that it will do well on every input. That is, designing for the worst case leads to stronger algorithmic “muscles,”.
+
+> get more info about **Big Omega & Big Theta**
+
+---
+
+### Asymptotic Analysis
+
+- In **algorithm analysis**, we focus on the growth rate of the running time as a function of the input size `n`, taking a “big-picture” approach. For example, it is often enough just to know that the running time of an algorithm grows proportionally to n.
+  - we characterize the running times of algorithms by using functions that map the size of the input, `n`, to values that correspond to the main factor that determines the growth rate in terms of `n`.
+  - This approach reflects that each basic step in a pseudo-code description or a high-level language implementation may correspond to a small number of primitive operations.
+- Thus, we can perform an analysis of an algorithm by estimating the number of primitive operations executed up to a constant factor, rather than getting bogged down in language-specific or hardware-specific analysis of the exact number of operations that execute on the computer.
+
+---
+
 ### O(n)
 
 This is called **linear Time** Algorithm.
@@ -99,6 +122,8 @@ Ex: looping on array using `for-loop`
 
 #### Polynomials
 
+where `a0`,`a1`,...,`ad` are constants, called the **coefficients** of the polynomial, and `ad` != 0. Integer `d`, which indicates the highest power in the polynomial, is called the **degree** of the polynomial.
+
 ![counting operations](./img/counting-operations3.png)
 
 ---
@@ -107,7 +132,8 @@ Ex: looping on array using `for-loop`
 
 These are called **"Constant-Time Operations"**, we say that this function runs in `O(1)` time; that is, the running time of this function is independent of the length, `n` of the list.
 
-- computer hardware supports constant-time access to an element based on its memory address. Therefore, we say that the expression `data[j]` is evaluated in `O(1)` time for a Python list.
+- Computer hardware supports constant-time access to an element based on its memory address. Therefore, we say that the expression `data[j]` is evaluated in `O(1)` time for a Python list.
+- The constant function is useful in algorithm analysis, because it characterizes the number of steps needed to do a basic operation on a computer, like adding two numbers, assigning a value to some variable, or comparing two numbers.
 
 Ex:
 
@@ -218,6 +244,8 @@ this is called **Factorial Time** or **oh no!**
   - answer is: it depends on how the method (`.length) works here in this language
     - for example, here we use javascript which has `length` property (not method) to each string, so it's a simple lookup --> `O(1)`
 
+- slicing `arr[0:j+1]`, also uses `O(j + 1)` time, as it constructs a new list instance for storage.
+
 ---
 
 ## Recursion
@@ -252,6 +280,18 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
   - function returns result, then computer uses the result for recursive call(s)
 - Procedural Recursion:
   - no return value, and the task is accomplished during recursive calls
+- Linear Recursion:
+  - each invocation of the body makes at most one new recursive call
+- Binary Recursion:
+
+  - When a function makes two recursive calls
+
+    ```py
+    return binary sum(S, start, mid) + binary sum(S, mid, stop)
+    ```
+
+- Multiple Recursion
+  - function may make more than two recursive calls
 
 ---
 
@@ -259,7 +299,7 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
 
 - Steps:
   1. identify and test for the **Base case** (the condition when the recursion ends)
-     - We begin by testing for a set of base cases (there should be at least one). These base cases should be defined so that every possible chain of recursive calls will eventually reach a base case, and the handling of each base case should not use recursion.
+     - We begin by testing for a set of base cases (there should be at least one). These base cases should be defined so that every possible chain of recursive calls will eventually reach a base case (should ensure that each recursive call is in some way progressing toward a base case), and the handling of each base case should not use recursion.
   2. identify the **recursive case**
      - If not a base case, we perform one or more recursive calls. This recursive step may involve a test that decides which of several possible recursive calls to make. We should define each possible recursive call so that it makes progress towards a base case.
   3. get closer and closer and return when needed. usually have 2 returns
@@ -280,6 +320,8 @@ The Big-O runtime for a recursive function is equivalent to the number of recurs
 - On the other hand, a recursive function of input `N` that calls itself twice per function may have a runtime of `O(2^N)`.
 
 > **Note**: a bad use of recursion can lead to `Big-O` of `O(2^n)` which is extremely inefficient
+
+---
 
 ### Maximum Recursive Depth
 
@@ -310,6 +352,25 @@ def fib(n):
 > old = sys.getrecursionlimit() # perhaps 1000 is typical
 > sys.setrecursionlimit(1000000) # change to allow 1 million nested calls
 > ```
+
+---
+
+### Eliminating Tail Recursion
+
+> By making our algorithm description exploit the repetitive structure in a recursive way, we can often avoid complex case analyses and nested loops. This approach can lead to more readable algorithm descriptions, while still being quite efficient.
+
+**Tail recursion** is when any recursive call that is made from one context is the very last operation in that context, with the return value of the recursive call (if any) immediately returned by the enclosing recursion.
+
+- a tail recursion must be a linear recursion (since there is no way to make a second recursive call if you must immediately return the result of the first).
+- Example:
+
+  ```py
+  return n factorial(n−1)
+  ```
+
+  - This is not a tail recursion because an additional multiplication is performed after the recursive call is completed.
+
+- Any tail recursion can be reimplemented non-recursively by enclosing the body in a loop for repetition, and replacing a recursive call with new parameters by a reassignment of the existing parameters to those values.
 
 ---
 

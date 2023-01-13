@@ -97,7 +97,7 @@
       - `minimum-scale`
       - `maximum-scale`
       - `user-scalable`: Controls whether zoom in and zoom out actions are allowed on the page. Valid values: 0, 1, yes, or no. Default: 1
-    ![meta-viewport](./img/meta-viewport.png)
+        ![meta-viewport](./img/meta-viewport.png)
 
 - **Attribute** is a piece of data used to describe elements
 - **href** : HyperText Reference
@@ -369,20 +369,24 @@ A keyboard user typically uses the Tab key to navigate through interactive eleme
 Elements that are affected by `tab` are the one which the user interacts with like: `<input>`, `<a>`, `<iframe>`, ..
 
 - elements which are non-interactive are not affected by `tab`
+- Any element becomes focusable if it has `tabindex`. The value of the attribute is the order number of the element when Tab (or something like that) is used to switch between them.
+  - That is: if we have two elements, the first has `tabindex="1"`, and the second has `tabindex="2"`, then pressing Tab while in the first element – moves the focus into the second one.
 - the order of focusing on element using `tab` is called **tab-order**
+
   - this order is by how elements are presented in the **DOM** and not the order by css-style
 
-`tabindex` attribute:
+- `tabindex` attribute:
 
-- it makes the element tabbable
+  - it makes the element tabbable
 
-  ```html
-  <div tabindex="0">W3Schools</div>
-  ```
+    ```html
+    <div tabindex="0">W3Schools</div>
+    ```
 
-  ![tabIndex](./img/tabIndex.png)
+    ![tabIndex](./img/tabIndex.png)
 
   - usually the negative-value is when you want to manage focus by javascript
+  - `tabindex="0"` puts an element among those without tabindex.
 
 > `Document.activeElement` -> read-only property of the Document interface returns the Element within the DOM that currently has focus.
 

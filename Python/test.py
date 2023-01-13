@@ -52,5 +52,7 @@
 
 # print(odds_squares_sum(5))
 
-x = -121
-print(str(x))
+a=10
+b=20
+srting='a+b'
+print(eval(srting))

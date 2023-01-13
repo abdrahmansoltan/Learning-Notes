@@ -10,11 +10,14 @@
   - [mount](#mount)
     - [Second parameter (vue configuration object)](#second-parameter-vue-configuration-object)
     - [find() vs get()](#find-vs-get)
+    - [Mounting Notes](#mounting-notes)
+      - [Mounting factory function](#mounting-factory-function)
   - [Events](#events)
+    - [Emitted Events](#emitted-events)
   - [Stubs and Shallow-Mount](#stubs-and-shallow-mount)
     - [Stub](#stub)
     - [Shallow-Mount (most used)](#shallow-mount-most-used)
-    - [Router Mocking](#router-mocking)
+    - [Router Stubbing](#router-stubbing)
       - [RouterLinkStub](#routerlinkstub)
       - [Mocking `$route` and `$router`](#mocking-route-and-router)
   - [Testing Asynchronous Behavior](#testing-asynchronous-behavior)
@@ -23,6 +26,9 @@
     - [Async outside vue](#async-outside-vue)
   - [Composable helper functions](#composable-helper-functions)
   - [Testing Vuex](#testing-vuex)
+    - [Store testing ways](#store-testing-ways)
+      - [using the real Vuex store](#using-the-real-vuex-store)
+      - [Using a Mock Store](#using-a-mock-store)
     - [Testing getters](#testing-getters)
   - [Testing with Composition-API](#testing-with-composition-api)
   - [Test Coverage](#test-coverage)
@@ -132,15 +138,114 @@ const wrapper = mount(MainNav, {
 
 ---
 
+### Mounting Notes
+
+- reducing the duplication of mounting in `beforeEach` hook:
+
+  - note that the hooks are function-scoped, so if you want to declare a wrapper each time, it will be locally scoped and we won't be able to access it in the test-specs
+  - solution is to declare it first and then assign the value in the hook function body
+
+    ```js
+    let wrapper;
+    beforeEach(() => {
+      wrapper = shallowMount(MainNav);
+    });
+    ```
+
+  - another option is to just define the config object outside and just reference it when mounting
+
+    - this approach is called: **Factory Function**
+
+    ```js
+    const createConfig = {
+      global: {
+        stubs: {
+          'router-link': RouterLinkStub
+        }
+      }
+    };
+    it('displays company name', () => {
+      const wrapper = shallowMount(MainNav, createConfig);
+    });
+    ```
+
+#### Mounting factory function
+
+```js
+// --------------Factory Functions-------------- //
+
+// for props
+const createJobProps = (jobProps = {}) => ({
+  title: 'Vue Developer',
+  organization: 'AirBnB',
+  ...jobProps
+});
+
+// for route
+const createRoute = (queryParams = {}) => ({
+  query: {
+    page: '5',
+    ...queryParams
+  }
+});
+
+// for mount config object
+const createConfig = (jobProps, $route) => ({
+  props: {
+    job: {
+      ...jobProps
+    }
+  },
+  global: {
+    stubs: {
+      'router-link': RouterLinkStub
+    },
+    mocks: {
+      $route
+    }
+  }
+});
+
+// ex: using it
+it('renders job title', () => {
+  const jobProps = createJobProps({ title: 'Vue Programmer' });
+  const $route = createRoute();
+  const wrapper = mount(JobListing, createConfig(jobProps, $route));
+  expect(wrapper.text()).toMatch('Vue Programmer');
+});
+```
+
+---
+
 ## Events
 
 - `trigger()` method can trigger or simulate a user event
 - `trigger("click")` -> simulate a click event
 - The `trigger()` method is asynchronous so we have to use (`async .. await`) to wait until it's complete. otherwise, our test assertions will run before the re-render is complete
 
+### Emitted Events
+
+in testing, the `.emitted()` method returns an **object** that keeps track of a component's emitted events
+
+- the properties will be the event names
+- the values will be arrays of arrays, each nested array stores the data/arguments that the event included
+
+Ex:
+
+```js
+const input = wrapper.find('input');
+input.setValue('Engi');
+input.setValue('eer');
+const message = wrapper.emitted()['update:modelValue']; // array of arrays with all emitted values from the key: "update:modelValue"
+expect(message).toEqual([['Engi'], ['eer']]);
+```
+
 ---
 
 ## Stubs and Shallow-Mount
+
+- **Stubs:** are focus on child components
+- **Mocks:** are focus on global injections (properties that the component is going to have access to, and that are going to be defined on it from some kind of global implementation (e.g. vue, vue-router))
 
 ### Stub
 
@@ -219,9 +324,14 @@ shallow are focused on a specific component. shallow can be useful for testing a
 
 ---
 
-### Router Mocking
+### Router Stubbing
 
 #### RouterLinkStub
+
+- the problem with using `shallowMount()` to automatically stub `<router-link>` component:
+  - it stubs it with another thing that doesn't render the properties like `to` and the name shown so we won't be able to get data we want and will show warning
+  - it's like stubbing it with a `<div>` element
+- Solution is to use the `RouterLinkStub` from `@vue/test-utils`
 
 A component to stub the Vue Router router-link component.
 
@@ -229,16 +339,19 @@ A component to stub the Vue Router router-link component.
 > - As the router is in the upper level of the app and in testing each component is tested isolated, so we use stub to replace the router
 
 - You can use this component to find a router-link component in the render tree.
+  - to have access to the `RouterLinkStub` component as an object which we can assert on its properties(like `props`), we use `findComponent` method instead of the "find" method which gets the RAW HTML DOM Element
 
 ```js
-import { mount, RouterLinkStub } from '@vue/test-utils';
+import { shallowMount, RouterLinkStub } from '@vue/test-utils';
 
-const wrapper = mount(Component, {
-  stubs: {
-    RouterLink: RouterLinkStub
+const wrapper = shallowMount(MainNav, {
+  global: {
+    stubs: {
+      'router-link': RouterLinkStub
+    }
   }
 });
-expect(wrapper.findComponent(RouterLinkStub).props().to).toBe('/some/path');
+expect(wrapper.findComponent(RouterLinkStub).props('to')).toBe('/some/path');
 ```
 
 > **Note**: You can use a beforeEach for if you are testing router-link multiple times or you can create a helper-function (factory-function):
@@ -261,7 +374,12 @@ const wrapper = mount(Component, createConfig());
 
 #### Mocking `$route` and `$router`
 
+> **Mocks:** are focus on global injections (properties that the component is going to have access to, and that are going to be defined on it from some kind of global implementation (e.g. vue, vue-router))
+
 Sometimes you want to test that a component does something with parameters from the `$route` and `$router` objects. To do that, you can pass custom mocks to the Vue instance.
+
+- We can use the `mocks` property in our test configuration object (in `global` object) to mock/replace global properties with our own custom objects
+  - it replaces `$router` and `$route` properties with simpler javascript objects. This decouples the tests from real vue-router implementation
 
 ```js
 import { shallowMount } from '@vue/test-utils';
@@ -272,6 +390,7 @@ const $route = {
 
 const wrapper = shallowMount(Component, {
   mocks: {
+    // mocks "this.$route object"
     $route // ES6-object-property
   }
 });
@@ -330,21 +449,22 @@ it('swaps action verb after first interval', async () => {
 
 #### flushPromises
 
-It flushes all pending resolved promise handlers.
+It resolves any pending promises. This is helpful for async events within our component (such as API requests)
 
 > makes all promises resolve then go to next line
 
 ```js
-import { shallowMount } from '@vue/test-utils';
-import flushPromises from 'flush-promises';
-import Foo from './Foo';
-jest.mock('axios');
+import JobListings from '@/components/JobResults/JobListings.vue';
+import { flushPromises, shallowMount } from '@vue/test-utils';
+import axios from 'axios';
+jest.mock('axios'); // Must be on the same scope as your `import`
 
 it('fetches async when a button is clicked', async () => {
-  const wrapper = shallowMount(Foo);
-  wrapper.find('button').trigger('click');
-  await flushPromises();
-  expect(wrapper.text()).toBe('value');
+  axios.get.mockResolvedValue({ data: Array(15).fill({}) });
+  const wrapper = shallowMount(JobListings);
+  await flushPromises(); // axios promise is resolved immediately like using "nextTick()"
+  const jobListings = wrapper.findAll("[data-test='job-listing']");
+  expect(jobListings).toHaveLength(15);
 });
 ```
 
@@ -401,10 +521,74 @@ export default useConfirmRoute;
 
 ## Testing Vuex
 
+### Store testing ways
+
+A Vuex store's state method and mutations object use plain Javascript constructs. we can test them in isolation without worrying about how the Vuex store uses them. in other words, invoke the appropriate function/method and test its return value
+
 There's 2 methods:
 
-- Testing with a Real Vuex Store
-- Testing with a Mock Store
+1. component-tests can use a real Vuex-store or to use a mock object(a simple javascript object) that can play the role of a Vuex-store
+
+#### using the real Vuex store
+
+Testing with a Real Vuex Store and not a mock, so we want to register it with our component
+
+- here we add it to plugins property in the mount-configuration object
+
+  ```js
+  import { createStore } from 'vuex';
+
+  describe('MainNav', () => {
+    const createConfig = store => ({
+      global: {
+        // plugins are any extensions from a library that we want to provide to our component
+        plugins: [store] // here we will use the real vuex store and not a mock, so we want to register it with our component
+      }
+    });
+
+    it('displays company name', () => {
+      const store = createStore({
+        state() {
+          return {
+            isLoggedIn: true
+          };
+        }
+      });
+      const wrapper = shallowMount(MainNav, createConfig(store));
+      const subnav = wrapper.find("[data-test='subnav']");
+      expect(subnav.exists()).toBe(true);
+    });
+  });
+  ```
+
+#### Using a Mock Store
+
+Here, we pass in the mock object using the `global.mocks` property in the configuration object that we pass as the second argument to `mount/shallowMount`
+
+```js
+describe('MainNav', () => {
+  const createConfig = $store => ({
+    global: {
+      mocks: {
+        $store
+      }
+    }
+  });
+
+  it('displays company name', () => {
+    const $store = {
+      state: {
+        isLoggedIn: true
+      }
+    };
+    const wrapper = shallowMount(MainNav, createConfig($store));
+    const subnav = wrapper.find("[data-test='subnav']");
+    expect(subnav.exists()).toBe(true);
+  });
+});
+```
+
+---
 
 ### Testing getters
 

@@ -38,6 +38,9 @@
     - [Advanced Types](#advanced-types)
     - [Numbers](#numbers)
     - [short circuiting =\> **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
+  - [Miscellaneous](#miscellaneous)
+    - [Mutation observer](#mutation-observer)
+    - [Selection and Range](#selection-and-range)
   - [Notes](#notes)
 
 ---
@@ -948,6 +951,61 @@ Regular functions return only one, single value (or nothing). **Generators** can
 
 - without `strict mode`, `this` will point to the global object => `window`
   - **this is important to note before start thinking**
+
+---
+
+## Miscellaneous
+
+### Mutation observer
+
+**MutationObserver** is a built-in object that observes a DOM element and fires a callback when it detects a change.
+
+```js
+// First, we create an observer with a callback-function:
+let observer = new MutationObserver(callback);
+// And then attach it to a DOM node:
+observer.observe(node, config);
+```
+
+- `config` is an object with boolean options “what kind of changes to react on”:
+  - `childList` – changes in the direct children of node
+  - `subtree` – in all descendants of node
+  - `attributes` – attributes of node
+  - `attributeOldValue` – if `true`, pass both the old and the new value of attribute to callback (see below), otherwise only the new one (needs attributes option),
+  - `attributeFilter` – an array of attribute names, to observe only selected ones.
+  - `characterData` – whether to observe node.data (text content),
+  - `characterDataOldValue` – if true, pass both the old and the new value of node.data to callback (see below), otherwise only the new one (needs characterData option).
+
+```html
+<div contenteditable id="elem">
+  Click and
+  <b>edit</b>
+  , please
+</div>
+
+<script>
+  let observer = new MutationObserver(mutationRecords => {
+    console.log(mutationRecords); // console.log(the changes)
+  });
+
+  // observe everything except attributes
+  observer.observe(elem, {
+    childList: true, // observe direct children
+    subtree: true, // and lower descendants too
+    characterDataOldValue: true // pass old data to callback
+  });
+</script>
+```
+
+- UseCases"
+  - Using `MutationObserver`, we can detect when the unwanted element appears in our DOM and remove it. ex: third-party script that contains useful functionality, but also does something unwanted, e.g. shows ads `<div class="ads">Unwanted ads</div>`.
+  - There are other situations when a third-party script adds something into our document, and we’d like to detect, when it happens, to adapt our page, dynamically resize something etc.
+
+---
+
+### Selection and Range
+
+It's an advance topic and you can find it here [Selection and Range](https://javascript.info/selection-range) if needed
 
 ---
 

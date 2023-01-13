@@ -17,6 +17,7 @@
       - [Nested Named Views](#nested-named-views)
     - [Navigate programmatically](#navigate-programmatically)
   - [Params](#params)
+    - [add params to route](#add-params-to-route)
     - [Dynamic params](#dynamic-params)
       - [Reacting to Params Changes](#reacting-to-params-changes)
     - [Routes Matching Syntax](#routes-matching-syntax)
@@ -135,7 +136,7 @@ app.mount('#app')
 
 The history option when creating the router instance allows us to choose among different history modes.
 
-- It's used to track the browser history
+- It's used to determine how the browser is going to track the user history (what routes the user has been on)
 - **history-api**: it lets you interact with the **browseHistory** to change URL without refreshing the page
 
 ##### History Modes
@@ -368,7 +369,8 @@ Instead of using regular `<a>` tags, we use a custom component `router-link` to 
   ```
 
 - **Note**: you must use `<router-view />` in the parent route to show the place for the nested(child) route
-  - it's a global component registered in the `main.js` file
+  - it's a global component registered in the `main.js` file and used in the top-parent component e.g. `App.vue`
+  - > it's responsible for watching the URL and swapping the dynamic content on the screen based on what is in the route file
 
 #### Nested Named Views
 
@@ -477,6 +479,22 @@ Aside from using `<router-link>` to create anchor tags for declarative navigatio
 ---
 
 ## Params
+
+### add params to route
+
+- this is done by the `query` params
+
+  ```js
+  this.$router.push({
+    name: 'JobResults',
+    query: {
+      role: this.role,
+      location: this.location
+    }
+  });
+  ```
+
+---
 
 ### Dynamic params
 

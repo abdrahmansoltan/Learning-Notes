@@ -17,7 +17,6 @@
     - [Security](#security)
       - [Content Security Policy (CSP)](#content-security-policy-csp)
   - [HTTPS](#https)
-  - [> a lot of websites are now using HTTPS by default, regardless if sensitive data is going to be exchanged or not. This is because Google is flagging websites as **not secure** if they're not SSL protected.](#-a-lot-of-websites-are-now-using-https-by-default-regardless-if-sensitive-data-is-going-to-be-exchanged-or-not-this-is-because-google-is-flagging-websites-as-not-secure-if-theyre-not-ssl-protected)
     - [Handshake](#handshake)
     - [Enabling HTTPS on Your Servers](#enabling-https-on-your-servers)
 
@@ -175,6 +174,7 @@ if a client, or the server, or both, need information about the state of the oth
   - For example, a page that uploads and displays images could allow images from anywhere, but restrict a form action to a specific endpoint. A properly designed Content Security Policy helps protect a page against a cross-site scripting attack.
 
 - **Writing a policy**
+
   - A policy is described using a series of policy directives, each of which describes the policy for a certain resource type or policy area.
   - A policy needs to include a **default-src** or **script-src** directive to prevent inline scripts from running, as well as blocking the use of `eval()`.
   - A policy needs to include a **default-src** or **style-src** directive to restrict inline styles from being applied from a `<style>` element or a `style attribute`.
@@ -211,6 +211,7 @@ We need HTTPS for **Privacy, integrity, and identification.**
 HTTPS also gives us **PWA capabilities**
 
 > a lot of websites are now using HTTPS by default, regardless if sensitive data is going to be exchanged or not. This is because Google is flagging websites as **not secure** if they're not SSL protected.
+
 ---
 
 ### Handshake

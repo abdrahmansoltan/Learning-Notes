@@ -1,36 +1,35 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [What is Internet](#what-is-internet)
-  - [IP address](#ip-address)
-    - [IPv6](#ipv6)
-  - [Packet](#packet)
-  - [SSL](#ssl)
-- [How internet works](#how-internet-works)
-  - [TCP vs UDP](#tcp-vs-udp)
-  - [Domain and DNS](#domain-and-dns)
-    - [DNS Records](#dns-records)
-  - [Hosting](#hosting)
-  - [Server](#server)
-- [The Cloud](#the-cloud)
-  - [Elastic computing](#elastic-computing)
-- [SSH](#ssh)
-  - [How It Works](#how-it-works)
-  - [Different Encryption Techniques](#different-encryption-techniques)
-    - [Symmetric Encryption](#symmetric-encryption)
-    - [Asymmetric Encryption](#asymmetric-encryption)
-    - [Hashing](#hashing)
-  - [Connecting using SSH](#connecting-using-ssh)
-- [Nginx](#nginx)
-  - [Configuration](#configuration)
-  - [Web server vs Application server](#web-server-vs-application-server)
-- [Security](#security)
-- [> You can see security overview for any site from the **devtools**](#-you-can-see-security-overview-for-any-site-from-the-devtools)
-  - [OWASP](#owasp)
-- [Web Browsers](#web-browsers)
-  - [Architecture of web browser](#architecture-of-web-browser)
-  - [Roles of Rendering Engine](#roles-of-rendering-engine)
-  - [Performance](#performance)
+  - [What is Internet](#what-is-internet)
+    - [IP address](#ip-address)
+      - [IPv6](#ipv6)
+    - [Packet](#packet)
+    - [SSL](#ssl)
+  - [How internet works](#how-internet-works)
+    - [TCP vs UDP](#tcp-vs-udp)
+    - [Domain and DNS](#domain-and-dns)
+      - [DNS Records](#dns-records)
+    - [Hosting](#hosting)
+    - [Server](#server)
+  - [The Cloud](#the-cloud)
+    - [Elastic computing](#elastic-computing)
+  - [SSH](#ssh)
+    - [How It Works](#how-it-works)
+    - [Different Encryption Techniques](#different-encryption-techniques)
+      - [Symmetric Encryption](#symmetric-encryption)
+      - [Asymmetric Encryption](#asymmetric-encryption)
+      - [Hashing](#hashing)
+    - [Connecting using SSH](#connecting-using-ssh)
+  - [Nginx](#nginx)
+    - [Configuration](#configuration)
+    - [Web server vs Application server](#web-server-vs-application-server)
+  - [Security](#security)
+    - [OWASP](#owasp)
+  - [Web Browsers](#web-browsers)
+    - [Architecture of web browser](#architecture-of-web-browser)
+    - [Roles of Rendering Engine](#roles-of-rendering-engine)
+    - [Performance](#performance)
 
 ---
 
@@ -102,8 +101,9 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
 ### TCP vs UDP
 
 - TCP is a **connection**-oriented protocol (it's like saying hi and wait to see if the other side heard it)
+
   - TCP do this by checking the packets in the receiver part and see if they're complete and all is there
-   ![TCP](./img/tcp.png)
+    ![TCP](./img/tcp.png)
   - TCP is the main protocol that provides crucial services such as reliability and in-order delivery to other protocols such as HTTP. It’s also one of the reasons we can keep using the Internet with many concurrent users, because it smartly limits each user’s bandwidth usage to their fair share.
 
 - UDP is a **connection-less** protocol. (it's like yelling HI! and assume that the other side heard it and keep sending data like that anyway)
@@ -119,7 +119,7 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
   - Is a server that translates the domain to the corresponding ip address to supply the specified webpage
   - It is the phone-book of the Internet
 - **Domain**: Is a piece of string that helps to spot a specific web site
-![DNS](./img/dns.png)
+  ![DNS](./img/dns.png)
 
 - `TLD`: top level domain
 - The unique number that the DNS server returns to your computer allows your browser to contact the web server that hosts the website you requested.
@@ -134,7 +134,7 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
 
 **Categories**:
 
-- **NS-records (Name Servers)**:  point to your `control center` where all of your other DNS-records will live
+- **NS-records (Name Servers)**: point to your `control center` where all of your other DNS-records will live
   - ex: `GoDaddy`
   - `ns11.domaincontrol.com` or `jeff.ns.cloudflare.com`
 - **A-record**: maps name(**the Domain name that you bought**) to IP address -> `www.jemyoung.com` maps to `23.23.185.61`
@@ -286,6 +286,7 @@ NGINX is open source software for **web serving**, **reverse proxying**, **cachi
 - **Firewall**: a network security device that monitors incoming and outgoing network traffic and decides whether to allow or block specific traffic based on a defined set of security rules
 
 > You can see security overview for any site from the **devtools**
+
 ---
 
 ### OWASP
@@ -300,7 +301,7 @@ NGINX is open source software for **web serving**, **reverse proxying**, **cachi
   - `Broken authentication`
     - A broken authentication vulnerability can allow an attacker to use manual and/or automatic methods to try to gain control over any account they want in a system – or even worse – to gain complete control over the system.
     - Broken authentication usually refers to logic issues that occur on the application authentication’s mechanism, like bad session management prone to username enumeration – when a malicious actor uses brute-force techniques to either guess or confirm valid users in a system.
-    - To minimize broken authentication risks ->  **avoid leaving the login page for admins publicly accessible to all visitors of the website**
+    - To minimize broken authentication risks -> **avoid leaving the login page for admins publicly accessible to all visitors of the website**
       - ex:
         - `/administrator on Joomla!`
         - `/wp-admin/ on WordPress`

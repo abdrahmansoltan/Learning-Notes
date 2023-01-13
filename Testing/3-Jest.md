@@ -214,18 +214,34 @@ They are mock functions like `jest.fn()` but with focus on javascript timer func
 
 ### HTTP Requests (axios)
 
+We don't want out unit-test component to make an actual API-request. It's slow, complex and prone to error. Rather, we can instruct Jest to mock out a dependency (like `axios`) and Jest will replace all of the `axios` object methods with **mock functions**.
+
+> if you had importing problems, add axios to the transformIgnorePatterns in configurations
+
 ```js
 // import axios
 
-jest.mock('axios');
+// Must be on the same scope as your `import` to be hoisted to the top of the file not the scope
+jest.mock('axios'); // mock the axios object and all its methods as jest functions
 
-// telling it to make it use this function when it's called
+// (implicit): telling it to make it use this function when it's called
 jest.mock('axios', () => ({
   get: () => Promise.resolve({ data: [{ val: 1 }] })
 }));
 
 // or
 
-// to simulate what axios return from GET-REQUEST
-axios.get.mockResolvedValue({ data: [{ val: 1 }] });
+// (explicit): to simulate what axios return from GET-REQUEST
+axios.get.mockResolvedValue({ data: [{ val: 1 }] }); // control the resolved value from the mocked method (get())
 ```
+
+- `mockReset()` method:
+
+  - it's a clean-up method that clear any custom mock-implementation set-up in any spec
+  - it's suitable inside a `afterEach` block
+
+    ```js
+    afterEach(() => {
+      axios.get.mockReset(); // clearing any custom mock-implementation set-up in any spec
+    });
+    ```

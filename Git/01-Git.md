@@ -69,6 +69,7 @@ Git is software that keeps track of changes that you make to files and directori
   - value -> Data
 - Git does not use **small** tracking files throughout a repository -- everything is contained within the .git directory in the top-level directory of the repository.
 - Git does not use small tracking files throughout a repository -- everything is contained within the .git directory in the top-level directory of the repository.
+  - it does so by taking snapshot of the entire file at each step/stage
 
 ### advantages of distributed version control
 
@@ -124,7 +125,7 @@ The results showing the difference between the different versions of the file ar
 - it's an ID number for each commit to reach each commit
 - Each hash value is not only unique, it's directly tied to the **contents** that are inside of it.
   - that's why it's called **content addressable source system** (as we use the content to generate the key)
-  ![SHA-1](./img/SHA-1.png)
+    ![SHA-1](./img/SHA-1.png)
 - The algorithm (hashing function) that Git uses is the **SHA-1 hash** algorithm.
   - it generates **40 digits hexadecimal numbers**
   - the value should always be the same if the given input is the same
@@ -468,6 +469,7 @@ git push -f
   - In the working directory, the user can create new files or change existing files that do not yet exist in either the staging index(area) or the repository, and **no Git command is required to do so**.
 
 - **staging index(area)**, which contains changes that we're about to commit into the repository
+
   - > **NOTE:** a clean staging area isn't actually empty, as it actually contains the exact copy of the latest commit
 
   - `git add` : move from working to staging index
@@ -493,10 +495,10 @@ git push -f
 
 - `git show` => display info(content of commit) about a **one** given commit(most recent one)
 
-    ```sh
-    git show <commit> # show commit and contents
-    git show <commit>:<file> # look at file from another commit
-    ```
+  ```sh
+  git show <commit> # show commit and contents
+  git show <commit>:<file> # look at file from another commit
+  ```
 
 - Undo working directory changes
 
@@ -699,6 +701,7 @@ git log --oneline --decorate
 ```
 
 - **Pushing Tags**:
+
   - by default, `git push` command doesn't transfer tags to remote servers. if you have a lot of tags that you want to push up, you can use the `--tags` option to the command
 
   ```sh
@@ -742,7 +745,7 @@ Git keeps a record of when the tips of branches and other references were update
 
 ```sh
 # show the log of a specific reference (it defaults to HEAD)
-git reflog show <branch name> 
+git reflog show <branch name>
 ```
 
 - things that you can't find with `git log` may be found with `git reflog`
@@ -779,6 +782,7 @@ This is inside `.git` directory
 It's a text file that keeps track of where **HEAD** points.
 
 - if it contains `ref/heads/master` this means that **HEAD** is pointing to the master branch
+
   - to know which branch the head is pointing at:
 
     ```sh
@@ -813,7 +817,7 @@ It's how Git stores Data
   - blobs
   - other trees
   - and metadata (type of pointer (blob/tree)), filename, mode
-![trees](./img/trees2.png)
+    ![trees](./img/trees2.png)
 
 ---
 
@@ -836,7 +840,7 @@ It's how Git stores Data
 ![recover](./img/recover1.png)
 
 - undo a merge:
-![recover](./img/recover2.png)
+  ![recover](./img/recover2.png)
 
 - finding commits that aren't referenced anymore:
-![recover](./img/recover3.png)
+  ![recover](./img/recover3.png)

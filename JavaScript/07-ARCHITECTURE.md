@@ -1,13 +1,13 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Notes](#notes)
-- [JavaScript Design (Architecture) Patterns](#javascript-design-architecture-patterns)
-  - [MVC](#mvc)
-    - [Models](#models)
-    - [Views](#views)
-    - [Controllers](#controllers)
-    - [event handling using **Publish Subscribe Pattern**](#event-handling-using-publish-subscribe-pattern)
+  - [Notes](#notes)
+  - [JavaScript Design (Architecture) Patterns](#javascript-design-architecture-patterns)
+    - [MVC](#mvc)
+      - [Models](#models)
+      - [Views](#views)
+      - [Controllers](#controllers)
+      - [event handling using **Publish Subscribe Pattern**](#event-handling-using-publish-subscribe-pattern)
 
 ---
 

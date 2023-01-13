@@ -9,7 +9,7 @@
   - [Getting data from the State](#getting-data-from-the-state)
     - [Getting data from the State Directly](#getting-data-from-the-state-directly)
     - [Getters vs mapping](#getters-vs-mapping)
-      - [mapping the State](#mapping-the-state)
+      - [mapping the Store (mapState)](#mapping-the-store-mapstate)
     - [Getters](#getters)
       - [mapGetters](#mapgetters)
   - [Mutations](#mutations)
@@ -160,26 +160,37 @@ const Counter = {
 
 ---
 
-#### mapping the State
+#### mapping the Store (mapState)
 
 When a component needs to make use of multiple store state properties or getters, declaring all these computed properties can get repetitive. To deal with this we can make use of the `mapState` helper which **generates computed getter functions for us**, saving us some keystrokes
 
 - mapState
+  - it creates component properties that map to Vuex state properties. it's a shortcut to manually define multiple computed properties
+  - it's a method that we invoke here and it returns an object of computed properties of each state-property it has (e.g. `a(){}`) so we need to **destructure** that object properties in our `computed` object
 - mapGetters
 - mapMutation
 - mapActions
 
 ```js
 // in a component
-import { mapState } from "vuex";
+import { mapState } from 'vuex';
 
 export default {
   // ...
   computed: {
-    mapState({
-    // arrow functions can make the code very succinct!
-    count: (state) => state.count,
+    isLoggedIn() {
+      return this.$store.state.isLoggedIn;
+    },
+    // or
+    ...mapState({
+      isLoggedIn: state => state.isLoggedIn
     }),
+    // or
+    ...mapState({
+      isLoggedIn: 'isLoggedIn'
+    }),
+    // or
+    ...mapState(['isLoggedIn'])
   }
 };
 ```
@@ -270,9 +281,21 @@ export default {
 
 **Mutations**: will allow us to update the state (from one place (single source of truth) and will make sure that the `state` isn't modified from other place ), but they will always be synchronous. Mutations are the only way to change data in the state in the store.
 
-- Must be **synchronous**
+- Must be **synchronous** when updating the store's state
 - in the store-options you can use **strict mode** that prevents mutation of the store's state outside of the mutation
-  - Only use it in `development mode` as it reduces performance
+
+  - it makes vue a lot more strict to make sure that we don't have any place where we are accidentally modifying the store-state outside a mutation
+  - **Note:** we should enable it in `development` mode only as strict-mode takes a lot of memory and can slow down the app
+
+  ```js
+  const store = createStore({
+    state,
+    mutations,
+    strict: process.env.NODE_ENV !== 'production'
+  });
+  ```
+
+- Only use it in `development mode` as it reduces performance
 - To perform a mutation, use `commit`
 
   ```js
@@ -281,7 +304,7 @@ export default {
 
 ### mapMutation
 
-It creates component methods that map/connect to Vuex-store-mutations, as Vuex invokes the `commit` method on the store with the mutation-name.
+It creates component `methods` that map/connect to Vuex-store-mutations, as Vuex invokes the `commit` method on the store with the mutation-name.
 
 You can commit mutations in components with `this.$store.commit('xxx')`, or use the **mapMutations** helper which maps component methods to store.commit calls:
 
@@ -304,7 +327,7 @@ export default {
 
 **Actions** will allow us to update the state with mutations ( **asynchronously**), but will use an existing mutation. This can be very helpful if you need to perform a few different mutations at once in a particular order, or reach out to a server.
 
-- They are methods that commits a mutation + they allow for Async operations
+- **Actions** are methods that commits a mutation + they allow for Async operations
 - actions receive **`context`** object as an argument, it's like the `$store` object
   - which can do many things like: `commit mutations`
 - **Async** -> as we can make an API call-in the action, then commit the mutation when we receive the data
@@ -320,7 +343,7 @@ export const actions = {
 
 // in the component
 // import FETCH_JOBS
-this.$store.dispatch(action-name, payload);
+this.$store.dispatch(action - name, payload);
 this.$store.dispatch(FETCH_JOBS);
 ```
 
@@ -338,10 +361,15 @@ import { mapActions } from 'vuex';
 export default {
   methods: {
     ...mapActions([
-      'increment', // map `this.increment()` to `this.$store.dispatch('increment')`
+      'INCREMENT', // map `this.INCREMENT()` to `this.$store.dispatch('INCREMENT')`
       // `mapActions` also supports payloads:
-      'incrementBy' // map `this.incrementBy(amount)` to `this.$store.dispatch('incrementBy', amount)`
-    ])
+      'INCREMENT_BY' // map `this.INCREMENT_BY(amount)` to `this.$store.dispatch('INCREMENT_BY', amount)`
+    ]),
+
+    // or
+    ...mapActions({
+      increment: 'INCREMENT' // this.increment()
+    })
   }
 };
 ```

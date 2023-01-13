@@ -436,10 +436,10 @@ def factors(n): # generator that computes factors
 
 #### arguments
 
-- **`*args`** -> we can use the wildcard (`*`) notation to write functions that accept any number of arguments
+- **`*args`** -> we can use the wildcard (`*`) notation to write functions that accept an Arbitrary number of arguments
 
   - it gathers all remaining arguments into a `tuple` with name "**args**"
-  - it doesn't have to be called `args`, you can use any name
+  - it doesn't have to be called `*args`, you can use any name, e.g. `*jobs` / `*scores`
 
   ```py
   def average(*args):
@@ -449,7 +449,16 @@ def factors(n): # generator that computes factors
     return total/len(args)
   ```
 
-- **`**kwargs`** -> we can use the wildcard (`\*\*`) notation to write functions that accept any number of keyword arguments (key-value pairs)
+  - Mixing Positional and Arbitrary Arguments
+
+    - If you want a function to accept several different kinds of arguments, the parameter that accepts an arbitrary number of arguments must be placed **last** in the function definition
+
+      ```py
+      def make_pizza(size, *toppings):
+      ```
+
+- **`**kwargs`** -> we can use the wildcards notation to write functions that accept an Arbitrary number of keyword arguments (key-value pairs)
+  - The double asterisks before the parameter cause Python to create a dictionary containing all the extra name-value pairs the function receives.
 
 ```py
 def print_ages(**kwargs):

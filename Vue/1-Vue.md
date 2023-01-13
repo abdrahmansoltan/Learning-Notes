@@ -72,7 +72,7 @@
   - [Slots](#slots)
     - [named-slots](#named-slots)
       - [Dynamic Slot Names](#dynamic-slot-names)
-    - [slot props (scoped slots)](#slot-props-scoped-slots)
+    - [Scoped Slots (slots with props)](#scoped-slots-slots-with-props)
   - [Teleport Components](#teleport-components)
   - [Forms](#forms)
     - [Binding input values](#binding-input-values)
@@ -1621,16 +1621,44 @@ it's for using the directive `v-model` on custom input components other than the
 
 ![modelValue](./img/modelValue.PNG)
 
-```html
-<CustomInput :modelValue="searchText" @update:modelValue="newValue => searchText = newValue" />
-```
+- **EX:**
+
+  - in child custom component:
+
+    ```html
+    <input type="text" :value="modelValue" :placeholder="placeholder" @input="handleInput" />
+
+    <script>
+      export default {
+        name: 'TextInput',
+        props: {
+          modelValue: {
+            type: String,
+            required: true
+          }
+        },
+        emits: ['update:modelValue'],
+        methods: {
+          handleInput($event) {
+            this.$emit('update:modelValue', $event.target.value);
+          }
+        }
+      };
+    </script>
+    ```
+
+  - in parent component:
+
+    ```html
+    <text-input v-model="role" />
+    ```
 
 Custom events can also be used to create custom inputs that work with **v-model**.
 
 - For this to actually work though, the `<input>` inside the component must:
 
   - Bind the value attribute to the **modelValue** prop
-  - On input, emit an **update:modelValue** event with the new value
+  - On input, emit an event with a specific name: **update:modelValue** with the new value
 
   ```vue
   <!-- CustomInput.vue  (child component) -->
@@ -1820,23 +1848,24 @@ When a component accepts both a default slot and named slots, all top-level non-
 
 ---
 
-### slot props (scoped slots)
+### Scoped Slots (slots with props)
 
-It's a way for the child to pass data to a slot when rendering it.
-![vslots](./img/vslots.svg)
+It's a way for the child to pass data to a slot when rendering it from the parent component that uses this slot.
+![v-slots](./img/vslots.svg)
 
-```js
+- they alow a child component with a `<slot>` to pass data **up** to the parent that renders it
+
+```html
 <!-- In Child: MyComponent.vue -->
 <div>
   <slot :text="greetingMessage" :count="1"></slot>
 </div>
 
 <!-- In parent -->
-<MyComponent v-slot="slotProps">
-  {{ slotProps.text }} {{ slotProps.count }}
-</MyComponent>
+<MyComponent v-slot="slotProps">{{ slotProps.text }} {{ slotProps.count }}</MyComponent>
 ```
 
+- we can use any name for the prop object, not just `slotProps`
 - we can use destructuring in v-slot:
 
   ```js
@@ -1899,7 +1928,18 @@ When dealing with forms on the frontend, we often need to sync the state of form
   - string -> `""`
   - dropDown-select (only one selection) -> `"one value from the options"`
   - checkboxes (multiple selections), ex: `radio buttons` -> Array `[]`
-  - single checkbox ex: `confirm to terms` -> `true/false`
+    - **Note:** we must also provide a `:value` binding so that we Vue can deal with multiple selections in the array and know what to select/selected
+
+      ```html
+      <input
+        :id="organization"
+        v-model="selectedOrganizations"
+        :value="organization"
+        type="checkbox"
+      />
+      ```
+
+- single checkbox ex: `confirm to terms` -> `true/false`
 
 - to use **buttons** in a form to select value, Use `type="button"` in the element
 
@@ -1920,23 +1960,47 @@ When dealing with forms on the frontend, we often need to sync the state of form
 
 > There are three modes:
 >
-> - **development** is used by vue-cli-service serve
-> - **test** is used by vue-cli-service test:unit
-> - **production** is used by vue-cli-service build and vue-cli-service test:e2e
+> - **development** is used by `vue-cli-service serve`
+>   - for the developer writing additional code and enable some development features like: `hot-module-reloading(HMR)`
+> - **test** is used by `vue-cli-service test:unit`
+> - **production** is used by `vue-cli-service build` and `vue-cli-service test:e2e`
+>   - for bundling the app into a single `.js` file and deploy the code on a server
+>   - here also we can have other optimizations enabled like `speed`, `cache`
 
 ### Environment Variables
 
-```sh
-.env                # loaded in all cases
-.env.local          # loaded in all cases, ignored by git
-.env.[mode]         # only loaded in specified mode
-.env.[mode].local   # only loaded in specified mode & ignored by git
-```
+They help us whenever there's variation in our app that is due to the environment(Mode) that we're running, ex: main url
+
+- we bundle up these kinds of configuration settings in a plain text files, and these files are just a collection of key-value pairs `KEY: VALUE`
+
+  - we can have bunch of text-files in our code-base (one for development and other for production , .. test ).
+  - then the `vue-cli` or the task-runner look for the corresponding file or key-value pairs based on the environment(Mode) we're on and load this file and allow that configuration file to store custom information pertaining to that environment, such as a `custom URL`
+
+- `env` file names:
+
+  - `.env` : loaded in all cases (apply to every environment)
+  - `.env.local` : loaded in all cases, **ignored by git**
+  - `.env.[mode]` : only loaded in specified mode --> ".env.development"
+  - `.env.[mode].local` : only loaded in specified mode & **ignored by git**
 
 - **Notes**:
 
+- by default, node provide these properties that indicate the current Mode: `NODE_ENV`
+
+  ```js
+  process.env.NODE_ENV !== 'production';
+  ```
+
+  - only `NODE_ENV`, `BASE_URL`, and variables that start with **`VUE_APP`** will be statically embedded into the client bundle with `webpack.DefinePlugin`.
+
+    - It is to avoid accidentally exposing a private key on the machine that could have the same name.
+    - so don't forget to make the variable name start with `VUE_APP`
+
+    ```sh
+    VUE_APP_API_URL=http://localhost:3000
+    ```
+
   - Don't forget to restart serve if it is currently running.
-  - only `NODE_ENV`, `BASE_URL`, and variables that start with **VUE*APP*** will be statically embedded into the client bundle with `webpack.DefinePlugin`. It is to avoid accidentally exposing a private key on the machine that could have the same name.
 
 ---
 

@@ -48,7 +48,7 @@
       - [Preventing browser actions](#preventing-browser-actions)
     - [Dispatching custom events](#dispatching-custom-events)
       - [Event constructor](#event-constructor)
-      - [UI Events](#ui-events)
+    - [UI Events](#ui-events)
     - [Events Notes](#events-notes)
   - [Storage](#storage)
 
@@ -1340,7 +1340,9 @@ let event = new Event(type[, options]);
   - We should use `addEventListener` for our custom events, because `on<event>` only exists for built-in events, `document.onhello` doesn’t work.
   - Must set `bubbles:true`, otherwise the event won’t bubble up.
 
-#### UI Events
+---
+
+### UI Events
 
 - Here’s a short list of classes for UI Events:
   - **`UIEvent`**
@@ -1350,6 +1352,9 @@ let event = new Event(type[, options]);
   - **`KeyboardEvent`**
   - **`CustomEvent`**
 - We should use them instead of `new Event` if we want to create such events. For instance, `new MouseEvent("click")`
+- they cover most important user interface events and how to work with them.
+
+More reference and info about (mouse events, drag & drop, pointer events, keyboard, scrolling event) here [javascript.info/event-details](https://javascript.info/event-details)
 
 ---
 
