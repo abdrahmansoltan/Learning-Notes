@@ -1,46 +1,46 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Installation](#installation)
-  - [Angular CLI](#angular-cli)
-  - [ng-commands](#ng-commands)
-- [Angular](#angular)
-  - [Compilation](#compilation)
-  - [Modules](#modules)
-    - [Shared Modules](#shared-modules)
-  - [Files](#files)
-- [Components](#components)
-  - [Component as html element](#component-as-html-element)
-  - [Component as html attribute](#component-as-html-attribute)
-  - [Presentational vs Smart components](#presentational-vs-smart-components)
-- [Data-Binding](#data-binding)
-- [Data flow between components](#data-flow-between-components)
-  - [Local Reference (Template variable)](#local-reference-template-variable)
-  - [Content projection](#content-projection)
-- [LifeCycle Hooks](#lifecycle-hooks)
-  - [ngOnInit()](#ngoninit)
-    - [Difference between `Constructor` and `ngOnInit`](#difference-between-constructor-and-ngoninit)
-- [Pipes](#pipes)
-- [Directives](#directives)
-  - [Attribute Directives](#attribute-directives)
-  - [Structural Directives](#structural-directives)
-- [Services](#services)
-  - [Dependency injection](#dependency-injection)
-    - [`Highrarical injection`](#highrarical-injection)
-    - [`@injectable`](#injectable)
-- [Forms](#forms)
-  - [TEMPLATE-DRIVEN Forms](#template-driven-forms)
-- [RxJS](#rxjs)
-  - [Observables](#observables)
-  - [`imperative approch`](#imperative-approch)
-  - [`Declarative approch`](#declarative-approch)
-    - [Flattening Operators](#flattening-operators)
-- [Notes](#notes)
-  - [`Expressions` vs `String Interpolation`](#expressions-vs-string-interpolation)
-- [Router](#router)
-  - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
-  - [Generating Router Module](#generating-router-module)
-  - [navigating to route programatically](#navigating-to-route-programatically)
+  - [Installation](#installation)
+    - [Angular CLI](#angular-cli)
+    - [ng-commands](#ng-commands)
+  - [Angular](#angular)
+    - [Compilation](#compilation)
+    - [Modules](#modules)
+      - [Shared Modules](#shared-modules)
+    - [Files](#files)
+  - [Components](#components)
+    - [Component as html element](#component-as-html-element)
+    - [Component as html attribute](#component-as-html-attribute)
+    - [Presentational vs Smart components](#presentational-vs-smart-components)
+  - [Data-Binding](#data-binding)
+  - [Data flow between components](#data-flow-between-components)
+    - [Local Reference (Template variable)](#local-reference-template-variable)
+    - [Content projection](#content-projection)
+  - [LifeCycle Hooks](#lifecycle-hooks)
+    - [ngOnInit()](#ngoninit)
+      - [Difference between `Constructor` and `ngOnInit`](#difference-between-constructor-and-ngoninit)
+  - [Pipes](#pipes)
+  - [Directives](#directives)
+    - [Attribute Directives](#attribute-directives)
+    - [Structural Directives](#structural-directives)
+  - [Services](#services)
+    - [Dependency injection](#dependency-injection)
+      - [`Highrarical injection`](#highrarical-injection)
+      - [`@injectable`](#injectable)
+  - [Forms](#forms)
+    - [TEMPLATE-DRIVEN Forms](#template-driven-forms)
+  - [RxJS](#rxjs)
+    - [Observables](#observables)
+    - [`imperative approch`](#imperative-approch)
+    - [`Declarative approch`](#declarative-approch)
+      - [Flattening Operators](#flattening-operators)
+  - [Notes](#notes)
+    - [`Expressions` vs `String Interpolation`](#expressions-vs-string-interpolation)
+  - [Router](#router)
+    - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
+    - [Generating Router Module](#generating-router-module)
+    - [navigating to route programatically](#navigating-to-route-programatically)
 
 ---
 
@@ -145,12 +145,12 @@ components are just exported `classes`
 ### Component as html element
 
 ```ts
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
 @Component({
-  selector: "app-nav", // the html selector that will be represent this component
-  templateUrl: "./nav.component.html", // the html file
-  styleUrls: ["./nav.component.css"],
+  selector: 'app-nav', // the html selector that will be represent this component
+  templateUrl: './nav.component.html', // the html file
+  styleUrls: ['./nav.component.css']
   // or
   // styles: [
   //   `
@@ -166,6 +166,7 @@ export class NavComponent {
 ```
 
 - now in "nav.component.html" you can use this component like an html element
+
   ```html
   <app-nav></app-nav>
   ```
@@ -175,7 +176,7 @@ export class NavComponent {
 ### Component as html attribute
 
 ```ts
-selector: "[app-nav]";
+selector: '[app-nav]';
 ```
 
 ```html
@@ -247,41 +248,40 @@ selector: "[app-nav]";
 
 ```ts
 // in hero-child.component.ts
-import { Component, Input } from "@angular/core";
+import { Component, Input } from '@angular/core';
 
-import { Hero } from "./hero";
+import { Hero } from './hero';
 
 @Component({
-  selector: "app-hero-child",
+  selector: 'app-hero-child',
   template: `
     <h3>{{ hero.name }} says:</h3>
     <p>I, {{ hero.name }}, am at your service, {{ masterName }}.</p>
-  `,
+  `
 })
 export class HeroChildComponent {
   @Input() hero!: Hero;
-  @Input("master") masterName = ""; // here we use an "alias" so that in the parent component we use the alias not the othername(masterName)
+  @Input('master') masterName = ''; // here we use an "alias" so that in the parent component we use the alias not the othername(masterName)
 }
 ```
 
 ```ts
 // in hero-parent.component.ts
-import { Component } from "@angular/core";
+import { Component } from '@angular/core';
 
-import { HEROES } from "./hero";
+import { HEROES } from './hero';
 
 @Component({
-  selector: "app-hero-parent",
+  selector: 'app-hero-parent',
   template: `
     <h2>{{ master }} controls {{ heroes.length }} heroes</h2>
 
-    <app-hero-child *ngFor="let hero of heroes" [hero]="hero" [master]="master">
-    </app-hero-child>
-  `,
+    <app-hero-child *ngFor="let hero of heroes" [hero]="hero" [master]="master"></app-hero-child>
+  `
 })
 export class HeroParentComponent {
   heroes = HEROES;
-  master = "Master";
+  master = 'Master';
 }
 ```
 
@@ -340,7 +340,7 @@ Content projection is a pattern in which you `insert, or project`, the content y
 
   ```ts
   @Component({
-    selector: "app-zippy-multislot",
+    selector: 'app-zippy-multislot',
     template: `
       <h2>Multi-slot content projection</h2>
 
@@ -349,7 +349,7 @@ Content projection is a pattern in which you `insert, or project`, the content y
 
       Question:
       <ng-content select="[question]"></ng-content>
-    `,
+    `
   })
   export class ZippyMultislotComponent {}
   ```
@@ -385,7 +385,7 @@ A component instance has a lifecycle that
 - it can be called normally or using an `interface`
 
 ```ts
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
 
 class MyComponent implements OnInit {
   ngOnInit() {
@@ -445,14 +445,14 @@ ng generate directive highlight
 
 ```ts
 // in src/app/highlight.directive.ts
-import { Directive, ElementRef } from "@angular/core";
+import { Directive, ElementRef } from '@angular/core';
 
 @Directive({
-  selector: "[appHighlight]",
+  selector: '[appHighlight]'
 })
 export class HighlightDirective {
   constructor(private el: ElementRef) {
-    this.el.nativeElement.style.backgroundColor = "yellow";
+    this.el.nativeElement.style.backgroundColor = 'yellow';
   }
 }
 
@@ -644,7 +644,7 @@ export class AppModule {
 ```ts
 // in app-routing.module.ts
 
-const routes: Routes = [{ path: "first-component", component: FirstComponent }]; // sets up routes constant where you define your routes
+const routes: Routes = [{ path: 'first-component', component: FirstComponent }]; // sets up routes constant where you define your routes
 ```
 
 - Html Template with
@@ -660,9 +660,7 @@ const routes: Routes = [{ path: "first-component", component: FirstComponent }];
   <nav>
     <ul>
       <li>
-        <a routerLink="/first-component" routerLinkActive="blue-text"
-          >First Component</a
-        >
+        <a routerLink="/first-component" routerLinkActive="blue-text">First Component</a>
       </li>
     </ul>
   </nav>
@@ -695,5 +693,5 @@ ng g module <Module_name> --routing
 
 ```ts
 // inside a function
-router.navigateByUrl("/");
+router.navigateByUrl('/');
 ```

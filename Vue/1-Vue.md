@@ -135,7 +135,7 @@ It's a JavaScript framework for building user interfaces. It builds on top of st
       }
     });
 
-    // Mounts the application instance in a container element.
+    // Mounts (inserts) the application instance in a container element (the document).
     app.mount('#app'); // we use ID-selector as every Vue app must be connected to one HTML element
 
     // we can also mount it to an actual DOM element
@@ -156,7 +156,17 @@ More on the App configuration and methods, like `app.use()`, `app.config()`, `ap
 - It uses **Proxy** which uses `set` method to update properties
 - > **Proxy**: a figure that can be used to represent the value of something in a calculation (usually by creating a **setter**)
 
-  ![proxy](./img/proxy.PNG)
+  ```js
+  const vm = vue.createApp({
+    data() {
+      return {
+        firstName: 'John'
+      };
+    }
+  });
+  ```
+
+  ![proxy](./img/proxy.png)
 
 - **How proxy works?** -> it's for reactivity
   ![proxy](./img/proxy2.png)
@@ -196,11 +206,17 @@ proxy.message = 'Hola';
 - Vue uses an HTML-based template syntax that allows you to declaratively bind the rendered DOM to the underlying Vue component instance's data.
 - All Vue templates are syntactically valid HTML that can be parsed by spec-compliant browsers and HTML parsers.
 - Under the hood, Vue compiles the templates into highly-optimized JavaScript code. Combined with the reactivity system, Vue can intelligently figure out the minimal number of components to re-render and apply the minimal amount of DOM manipulations when the app state changes.
+  ![vue-compiling](./img/vue-compiling.png)
+
 - Templates are optional, you can write `render functions` with optional **JSX** support
 
 ---
 
 #### Virtual DOM
+
+It's a javascript object. It's a lightweight copy of the actual DOM, without most of its methods and functionalities, it observes all the changes in the data linked to the DOM and **patch** all these changes and reflect on them one time in the real DOM
+
+- It's faster to perform comparisons and updates on the virtual DOM than it is to perform them on the actual DOM
 
 ![dom](./img/dom.PNG)
 
@@ -211,7 +227,8 @@ proxy.message = 'Hola';
 
 ### Ways of Using Vue
 
-- Standalone Script (`CDN`)
+- Standalone Script (Content Delivery Network (CDN))
+  - CDN deliver content from a server closest to the user, this decreases the time it takes for a page to load
 - Single-Page Application (`SPA`)
   - Some applications require rich interactivity, deep session depth, and non-trivial stateful logic on the frontend. The best way to build such applications is to use an architecture where Vue not only controls the entire page, but also handles data updates and navigation without having to reload the page. This type of application is typically referred to as a Single-Page Application (SPA).
 - Fullstack / SSR
@@ -283,7 +300,8 @@ proxy.message = 'Hola';
 
 ### Interpolation
 
-> **Data binding**: The task of keeping data synchronized between the two
+> - **Data binding**: The task of keeping data synchronized between the two
+> - **String interpolation**: is the process of replacing placeholders into string values
 
 - The most basic form of **data binding** is text interpolation using the **"Mustache" syntax** (double curly braces):
 
@@ -353,8 +371,8 @@ Vue **v-model** is a directive. It tells Vue that we want to create a two-way da
 > **Note:** `v-model` will ignore the initial **`value`**, **`checked`** or **`selected`** attributes found on any form elements. It will always treat the current bound JavaScript state as the source of truth. You should declare the initial value on the JavaScript side, using the data option.
 
 - **NOTE**: to make adjustment on the binded input, use a [modifier](#modifiers) -> EX:
-  - `v-model.trim="name`
-  - `v-model.number="rate`
+  - `v-model.trim="name"`
+  - `v-model.number="rate"` --> now the value will be type `number` and not `string`
 
 ```html
 <div>
@@ -1335,6 +1353,7 @@ Components allow us to split the UI into independent and reusable pieces, and th
         count: 0
       };
     },
+    // not recommended; as it's not supported by code-editors and will be hard to use multi-line template code
     template: `
       <button @click="count++">
         You clicked me {{ count }} times.
@@ -1928,6 +1947,7 @@ When dealing with forms on the frontend, we often need to sync the state of form
   - string -> `""`
   - dropDown-select (only one selection) -> `"one value from the options"`
   - checkboxes (multiple selections), ex: `radio buttons` -> Array `[]`
+
     - **Note:** we must also provide a `:value` binding so that we Vue can deal with multiple selections in the array and know what to select/selected
 
       ```html
@@ -2241,4 +2261,4 @@ common scenarios where plugins are useful include:
 
 - Security Warning
 
-  - Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS vulnerabilities. Only use `v-html` on trusted content and never on user-provided content.
+  - Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS(cross site scripting) vulnerabilities. Only use `v-html` on trusted content and never on user-provided content.

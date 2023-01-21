@@ -457,7 +457,7 @@ def factors(n): # generator that computes factors
       def make_pizza(size, *toppings):
       ```
 
-- **`**kwargs`** -> we can use the wildcards notation to write functions that accept an Arbitrary number of keyword arguments (key-value pairs)
+- **`**kwargs`\*\* -> we can use the wildcards notation to write functions that accept an Arbitrary number of keyword arguments (key-value pairs)
   - The double asterisks before the parameter cause Python to create a dictionary containing all the extra name-value pairs the function receives.
 
 ```py
@@ -1174,6 +1174,18 @@ They return something that iterable (NOT a list)
     ```py
     alien_0 = {'color': 'green', 'speed': 'slow'}
     alien_0.get('points', 'No point value assigned.')
+    ```
+
+    - > **Note**: this is a good trick to use when looping on a dictionary keys count each key value
+
+    ```py
+    word = "ssdfdfsdsf"
+    count = {}
+    for char in word):
+      count[char] = 1 + count.get(char,0)
+      # this is instead of this:
+      # if not count[char]: count[char] = 0
+      # count[char] += 1
     ```
 
 - Join (concatenate) 2 dictionaries

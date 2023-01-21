@@ -11,9 +11,11 @@
     - [Getters vs mapping](#getters-vs-mapping)
       - [mapping the Store (mapState)](#mapping-the-store-mapstate)
     - [Getters](#getters)
+      - [Getters Functions](#getters-functions)
       - [mapGetters](#mapgetters)
   - [Mutations](#mutations)
     - [mapMutation](#mapmutation)
+    - [`subscribe` method](#subscribe-method)
   - [Actions](#actions)
     - [mapActions](#mapactions)
   - [Modules](#modules)
@@ -261,6 +263,34 @@ computed: {
 
 ---
 
+#### Getters Functions
+
+we can provide additional arguments to a getter by having the getter method return a function. The function can accept whatever arguments we'd like
+
+- **Arguments to a getter method**
+  - the first argument is the `state` like normal getters
+  - the second argument is an object of all getter methods
+- getters can invoke other getters. We can delegate smaller bits of logic to lightweight getter functions. We don't have to use a getter in a component for it to be useful
+- when invoking the getter in a component, We pass arguments to it as if we're passing them to the returned function (no need to pass `state` argument)
+- Ex:
+
+  ```js
+  [FILTERED_JOBS](state, getters) {
+      // using helper-getters functions
+      return state.jobs
+        .filter((job) => getters.INCLUDE_JOB_BY_ORGANIZATION(job));
+    },
+
+    // --------- HELPER GETTERS ------------ //
+    // a getter that is a function that return value, so that we can use it in other getters
+    [INCLUDE_JOB_BY_ORGANIZATION]: (state) => (job) => {
+      if (state.selectedOrganizations.length === 0) return true;
+      return state.selectedOrganizations.includes(job.organization);
+    },
+  ```
+
+---
+
 #### mapGetters
 
 ```js
@@ -319,6 +349,24 @@ export default {
     ])
   }
 };
+```
+
+---
+
+### `subscribe` method
+
+it make us Subscribe to store mutations. The handler is called after every mutation and receives the mutation descriptor and post-mutation state as arguments.
+
+```js
+// subscribe(handler: Function, options?: Object): Function
+
+// this will run on every store-mutation execution
+store.subscribe(mutation => {
+  // specify which mutation to react to
+  if (mutation.type === CLEAR_USER_JOB_FILTER_SELECTIONS) {
+    selectedValues.value = []; // reset selected checkboxes on clear-mutation
+  }
+});
 ```
 
 ---

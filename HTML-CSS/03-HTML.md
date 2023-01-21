@@ -3,6 +3,8 @@
 - [INDEX](#index)
   - [Static vs Dynamic websites](#static-vs-dynamic-websites)
   - [HTML](#html)
+    - [Head Element](#head-element)
+    - [Other HTML Elements](#other-html-elements)
   - [Semantic HTML](#semantic-html)
     - [Why Semantic?](#why-semantic)
     - [Semantic tags](#semantic-tags)
@@ -13,6 +15,7 @@
     - [Autofill Forms](#autofill-forms)
     - [Form validation](#form-validation)
     - [How is the Form data is transferred?](#how-is-the-form-data-is-transferred)
+    - [Form submission](#form-submission)
   - [Accessibility](#accessibility)
     - [`tab` keyboard-key](#tab-keyboard-key)
     - [Keyboard Events](#keyboard-events)
@@ -24,6 +27,7 @@
   - [images](#images)
     - [Image Formats](#image-formats)
     - [`fav-icon`](#fav-icon)
+      - [Using manifest](#using-manifest)
     - [background img in css](#background-img-in-css)
     - [image size optimization (responsive images)](#image-size-optimization-responsive-images)
       - [HTML `<picture>` Element](#html-picture-element)
@@ -52,9 +56,13 @@
 - **HyperText** is a form of text in which documents can refer(link) to other documents and resources
 - **markup language** allows you to annotate text, and these annotations provide additional meaning to the contents of a document
 - **void(empty) element** is html element with no contents and no closing tag
-- **Head element** is for things that are not visible in the browser window or things that describe the document
-  - This contains information about the page
-- **Body element** is for things that are visible in the browser window
+
+### Head Element
+
+**`<head>` element**: It's a container for **metadata**(data about data) is for things that are not visible in the browser window or things that describe the document
+
+- **metadata** define the document `title`, `character set`, `styles`, `scripts`, and other meta information
+- This contains information about the page
 - **DOCTYPE** tells the browser which version of HTML the page is using (although browsers usually display the page even if it is not included). without it the browser will go to `Quirks mode`
 
   ```html
@@ -99,6 +107,9 @@
       - `user-scalable`: Controls whether zoom in and zoom out actions are allowed on the page. Valid values: 0, 1, yes, or no. Default: 1
         ![meta-viewport](./img/meta-viewport.png)
 
+### Other HTML Elements
+
+- **Body element** is for things that are visible in the browser window
 - **Attribute** is a piece of data used to describe elements
 - **href** : HyperText Reference
 - **HTML Entity** is symbols that start with `&` ex: _copyright_[&copy;], _non-breaking space_[&nbsp;]
@@ -147,7 +158,7 @@ Why do we need to tell the browser what our HTML elements represent?
 **HTML5** brought with it a new set of semantic tags some of them especially thought to avoid unnecessary use of `<div>` and `<span>`
 
 ![tags](./img/semantic.png)
-![tags](./img/symantic2.jpeg)
+![tags](./img/semantic2.jpeg)
 
 - `<section>` element ->
   - usually starts with heading element `h2`
@@ -156,6 +167,7 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<section>` and `<article>` are workmates, not relatives.
   - These elements were not conceived to be part of a hierarchy (parent & child elements), in fact, they are made for working together.
   - you can use them one inside another without any problem.
+  - usually they're used in a **cards/skills section**
 - `<nav>` element usually contains **unordered list** element `ul`
 - `<footer>` -> `Credits`, `copyrights`, `sitemaps`, `secondary navbars`, etc. All these types of elements can be grouped inside a `<footer>` tag.
 - `<main>` -> There can be **only one**, one document, one `<main>` element. This semantic element is especially useful for search engine optimization.
@@ -208,8 +220,11 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<mark>`
 - `<br>`
 - `<a>`
+- `<button>`
 - `<img>`
+- `<i>`
 - `<span>`
+- `<input>`
 
 > `<li>` is a **block element**, so if you want them to be next to each other, you could make them inline
 >
@@ -221,12 +236,33 @@ Why do we need to tell the browser what our HTML elements represent?
 
 - to make link go to other tab and not the current one, use the **target** attribute : `target="_blank"`
 - to check if your HTML syntax is right => [HTML validation](https://validator.w3.org/)
-- `&nbsp;` will add more whiteSpace to a line but won't break it.
+- `&nbsp;` will add more whiteSpace to a line but won't break it. (as HTML is space-collapsing)
 - use `<span>` to isolate part of a paragraph
+- **Lorem ipsum**
+  - using `emmet`, you can type `lorem` and it will continue the paragraph
+  - you can specify how many characters you want by typing the number after the `lorem` word: ex: `lorem50`
 - to link label to input form => use `id='nameofID'` in the `<input>` element,`for='nameofID'` in the `<label>` element
 - in `<input>`
+
   - **radio** => for only one option
+
+    - so we need to make the multiple radio inputs have the same `name` attribute
+
+    ```html
+    <input type="radio" name="language" value="javascript" />
+    javascript
+    </input>
+    <input type="radio" name="language" value="python" />
+    python
+    </input>
+    <input type="radio" name="language" value="c++" />
+    c++
+    </input>
+
+    ```
+
   - **checkbox** => for one/more options
+
 - in FORM when choosing option or inserting input field => what is sent is what in the **value** attribute
 - for progress-bars -> use `<progress>` element with `max` attribute
 
@@ -243,7 +279,9 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<label>` makes the form control accessible to screen readers, and provides a bigger target, since you can tap or click the label to set focus on the control.
 
 - `<textarea>` element is used to enter multiple lines of text
-- `name` attribute to identify the data the user enters with the control. If you submit the form, this name is included in the request.
+  - it takes attributes for columns `cols` and rows `rows`
+- `name` attribute to identify the data the user enters with the control.
+  - If you submit the form, this `name` is included in the request with the value.
 - `<select>` element gives users a list of options to select from
   - The browser by default uses the first option in the list if user didn't select an option,
   - With the `selected` attribute you can pre-select one option.
@@ -348,6 +386,12 @@ Autofill can help with re-entering data. You enter your address once. From now o
     ```
 
   - The data will be encrypted (if you use HTTPS) and only accessible by the backend script that processes the request. The data is not visible in the URL. A common example is a sign-in form.
+
+---
+
+### Form submission
+
+- You can use service like [formspree.io](https://formspree.io/)
 
 - you can use [netlify](https://docs.netlify.com/forms/setup/?_ga=2.17094910.693790722.1649686633-761975974.1648039605) to manage your forms without `Js` => by inserting `name` attribute to each `input` element and writing this at at the `form` element:
 
@@ -533,16 +577,30 @@ Live Region roles are used to define elements with **content that will be dynami
 
 ### `fav-icon`
 
-[website for doing all this](https://www.favicon-generator.org/)
+- Websites that generate favicon icons:
+
+  - [favicon.io](https://favicon.io/)
+  - [favicon-generator.org](https://www.favicon-generator.org/)
 
 - use `fav-icon` for **Browsers** and make sure to resize it to **64px**
+- Basic:
+
+  ```html
+  <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+  <!-- or -->
+  <link rel="icon" type="image/png" href="/images/favicon.png" />
+  ```
+
+#### Using manifest
+
 - for `apple` --> use resized favicon
 
 - for `android` :
 
   - create `manifest.webmanifest` file which contains this code :
 
-  ```webmanifest
+  ```json
+  // in webmanifest.json
   {
     "icons": [
       { "src": "img/favicon-192.png", "type": "image/png", "sizes": "192x192" },
@@ -593,6 +651,7 @@ Live Region roles are used to define elements with **content that will be dynami
   <img src="images/fm.jpg" alt="family" width="600" height="450" />
   ```
 
+- if you use the only `width` attribute, then the HTML will automatically calculate the `height` to maintain the original image ratio
 - image size matter, as You should save the image at the same width and height it will appear on the website:
   - If the image is smaller than the width or height that you have specified, the image can be distorted and stretched.
   - If the image is larger than the width and height if you have specified, **the image will take longer to display on the page**.
@@ -603,7 +662,7 @@ Live Region roles are used to define elements with **content that will be dynami
 #### HTML `<picture>` Element
 
 - The HTML `<picture>` element gives web developers more flexibility in specifying image resources.
-  - The `<picture>` element contains one or more `<source>` elements, each referring to different images through the srcset attribute. This way the browser can choose the image that best fits the current view and/or device.
+  - The `<picture>` element contains one or more `<source>` elements, each referring to different images through the `srcset` attribute. This way the browser can choose the image that best fits the current view and/or device.
 - Each `<source>` element has a **media** attribute that defines when the image is the most suitable.
 
 - It's used to Render images conditionally (show one and hide the other)
@@ -723,8 +782,8 @@ Here the **Tree structure** is the operation that make html code looks the way i
 
 ## Notes
 
-- `<div>` element allows you to group a set of elements together in one **block-level box**.
-- `<span>` element acts like an inline equivalent of the `<div>` element. It is used to either:
+- `<div>` element allows you to group multiple elements together in one **block-level box**.
+- `<span>` element acts like an inline equivalent of the `<div>` element (group inline content). It is used to either:
   - Contain a section of text where there is no other suitable element to differentiate it from its surrounding text
   - Contain a number of inline elements
   - You will usually see that a **class** or **id** attribute is used with `<span>` elements:

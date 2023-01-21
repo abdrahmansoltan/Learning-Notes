@@ -1,58 +1,59 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Installing](#installing)
-  - [Compiling](#compiling)
-    - [Compiling one TS file](#compiling-one-ts-file)
-    - [Compiling entire project with all its files](#compiling-entire-project-with-all-its-files)
-- [Typing](#typing)
-  - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
-  - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
-  - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
-- [TypeScript](#typescript)
-  - [why use Typescript](#why-use-typescript)
-- [TypeScript Types](#typescript-types)
-  - [`Array`](#array)
-  - [`Tuple`](#tuple)
-  - [`enum`](#enum)
-  - [`Objects and Interfaces`](#objects-and-interfaces)
-    - [`Objects`](#objects)
-    - [`Interfaces`](#interfaces)
-    - [Partial Type](#partial-type)
-  - [`unknown`](#unknown)
-  - [`Union & Intersection Types`](#union--intersection-types)
-    - [Union types](#union-types)
-    - [Intersection types](#intersection-types)
-- [Type Guard](#type-guard)
-  - [`Literal Types`](#literal-types)
-    - [String Literal Types](#string-literal-types)
-  - [Type Aliases -- (custom type)](#type-aliases----custom-type)
-  - [function](#function)
-    - [`function type`](#function-type)
-    - [`void`](#void)
-    - [`never`](#never)
-    - [this keyword types](#this-keyword-types)
-- [Type Assertions / Type Casting](#type-assertions--type-casting)
-- [Classes](#classes)
-  - [Using Interfaces with classes](#using-interfaces-with-classes)
-  - [Access Modifiers](#access-modifiers)
-- [Generics](#generics)
-- [Promises](#promises)
-- [Decorators](#decorators)
-  - [Decorator configuration](#decorator-configuration)
-  - [Decorator Composition](#decorator-composition)
-  - [Class Decorator](#class-decorator)
-- [Namespace](#namespace)
-- [Bundling Typescript with Webpack](#bundling-typescript-with-webpack)
-  - [For Development](#for-development)
-  - [For Production](#for-production)
-- [3rd Party JS-Libraries for TypeScript](#3rd-party-js-libraries-for-typescript)
+  - [Installing](#installing)
+    - [Compiling](#compiling)
+      - [Compiling one TS file](#compiling-one-ts-file)
+      - [Compiling entire project with all its files](#compiling-entire-project-with-all-its-files)
+  - [Typing](#typing)
+    - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
+    - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
+    - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
+  - [TypeScript](#typescript)
+    - [why use Typescript](#why-use-typescript)
+  - [TypeScript Types](#typescript-types)
+    - [`Array`](#array)
+    - [`Tuple`](#tuple)
+    - [`enum`](#enum)
+    - [`Objects and Interfaces`](#objects-and-interfaces)
+      - [`Objects`](#objects)
+      - [`Interfaces`](#interfaces)
+      - [Partial Type](#partial-type)
+    - [`unknown` -- (type guard)](#unknown----type-guard)
+    - [`Union & Intersection Types`](#union--intersection-types)
+      - [Union types](#union-types)
+      - [Intersection types](#intersection-types)
+  - [Type Guard](#type-guard)
+    - [`Literal Types`](#literal-types)
+      - [String Literal Types](#string-literal-types)
+    - [Type Aliases -- (custom type)](#type-aliases----custom-type)
+    - [function](#function)
+      - [function type](#function-type)
+      - [function interface](#function-interface)
+      - [`void`](#void)
+      - [`never`](#never)
+      - [`this` keyword types](#this-keyword-types)
+  - [Type Assertions / Type Casting](#type-assertions--type-casting)
+  - [Classes](#classes)
+    - [Using Interfaces with classes](#using-interfaces-with-classes)
+    - [Access Modifiers](#access-modifiers)
+  - [Generics](#generics)
+  - [Promises](#promises)
+  - [Decorators](#decorators)
+    - [Decorator configuration](#decorator-configuration)
+    - [Decorator Composition](#decorator-composition)
+    - [Class Decorator](#class-decorator)
+  - [Namespace](#namespace)
+  - [Bundling Typescript with Webpack](#bundling-typescript-with-webpack)
+    - [For Development](#for-development)
+    - [For Production](#for-production)
+  - [3rd Party JS-Libraries for TypeScript](#3rd-party-js-libraries-for-typescript)
 
 ---
 
 ## Installing
 
-- [refrence](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
+- [reference](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
 
 ```bash
 npm i typescript --save-dev    # save to devDependencies
@@ -66,6 +67,10 @@ npm i --save-dev @types/node  # type definitions
 ---
 
 ### Compiling
+
+Typescript doesn't run in the browser. We only use the language in our code-editor for development. Typescript only exists for the benefit of the developer.
+
+- **Compiler:** is a piece of software that converts Typescript to Javascript so that it runs in the browser
 
 #### Compiling one TS file
 
@@ -270,12 +275,14 @@ let student: { name: string; age: number; enrolled: boolean } = {
 };
 ```
 
+- you can also use [type-aliases----custom-type](#type-aliases----custom-type)
+
 #### `Interfaces`
 
 - it's a blueprint for `object's items`
 - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something. Interfaces can be used to create functions but are most commonly seen to create objects.
 - types & interfaces are similar but:
-  - interfaces are **extendable** from other interfaces like classes unlike `types` which are not
+  - interfaces are **extendable** from other interfaces like classes unlike `type-aliases` which are not
     - you can extend interfaces/classes using the word -> `implements`
 - Use `PascalCase` for naming `interfaces`.
 
@@ -293,12 +300,16 @@ let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
 
 #### Partial Type
 
+The Partial Type accepts a generic argument (type argument). it creates a new type where all the properties of the original type are **optional**.
+
 The partial type is simple to use as it only requires to pass a type **T** where **T** can be any object type regardless of whether it is a defined type.
 
 > It generates a new type based on the input type/object/interface **with all the property-keys being optional**
 
 ```ts
-Partial < MyType > Partial < MyInterface > Partial<{}>;
+Partial<MyType>;
+Partial<MyInterface>;
+Partial<{}>;
 ```
 
 ```ts
@@ -322,11 +333,12 @@ const draft: Partial<Blog> = {
 
 ---
 
-### `unknown`
+### `unknown` -- (type guard)
 
 - Requires a `type check` (**type guard**)
+  - > **type guard**: technique for guarding against certain operations unless we validate that we have the correct type for it.
 - used when the type of the thing being typed is `unknown`. Used heavily for `type assertion`
-- `unknown` is recommended over `any` because it provides **safer typing** — you have to use type assertion or narrow to a specific type if you want to perform operations on unknown.
+- `unknown` is recommended over `any` because it provides **safer typing** — you have to use type assertion or narrowing to a specific type if you want to perform operations on unknown.
   - `any` -> can be used for `console.log()` content
 
 ```ts
@@ -338,7 +350,7 @@ userInput = 'Max';
 
 // type assertion or (Type Guard)
 if (typeof userInput === 'string') {
-  userName = userInput;
+  userName = userInput; // 'Max'
 }
 ```
 
@@ -395,7 +407,7 @@ thisWeek.end.toISOString(); // ---> (property) end: Date
 - it control the flow of code using the type of something
 - this process is called **Narrowing**
   - as it narrows our choice with the type-guard condition
-- usually used with [unknown type](#unknown) or [Union & Intersection Types](#union--intersection-types)
+- usually used with [unknown type](#unknown----type-guard) or [Union & Intersection Types](#union--intersection-types)
 
 ---
 
@@ -443,6 +455,12 @@ let hiWorld = 'Hi World';
   button.animate(0, 0, 'uneasy');
   ```
 
+- it can also be for any other type like `number` or `boolean`
+
+  ```ts
+  animate(dx: 10, dy: number, easing: Easing)
+  ```
+
 ---
 
 ### Type Aliases -- (custom type)
@@ -474,19 +492,33 @@ function greet(user: User) {
 
 ### function
 
-#### `function type`
+#### function type
 
 - it's when you want a variable to be a function with specific conditions
 
 ```ts
-let combineValues: (a: number, b: number) => number;
+let combineValues: (a: number, b: number):number => a * b;
 // here the condition is to have 2 number-parameters & return a number
 
-function add(n1: number, n2: number) {
+function add(n1: number, n2: number): number {
   return n1 + n2;
 }
 
 combineValues = add; // this works as (add) is a function that matches the condition
+```
+
+#### function interface
+
+```ts
+interface TwoNumberMathFunc {
+  (a: number, b: number): number;
+}
+
+const upperCaseFormatter: TwoNumberMathFunc = function (a, b) {
+  return a * b;
+};
+// or with arrow function
+const upperCaseFormatter: TwoNumberMathFunc = (a, b) => a * b;
 ```
 
 #### `void`
@@ -515,7 +547,7 @@ function generateError(message: string, code: number): never {
 }
 ```
 
-#### this keyword types
+#### `this` keyword types
 
 - Sometimes we have a free-standing function that has a strong opinion around what `this` will end up being, at the time it is invoked.
 - For example, if we had a DOM event listener for a button:
@@ -674,15 +706,19 @@ class Department {
 
 A generic is a way to write a function that is reusable across different types, by using **type parameters**
 
+- "generic" means **not specific** (we don't know this type but we will know it as soon as we invoke the function)
+
 > **type parameters**: can be thought of as **function arguments, but for types**
 >
 > - Functions may return different values, depending on the arguments you pass them.
 
-- why not just use `any`?
+- why not just use `any` type?
+  - It's an anti-pattern(not recommended) in typescript
   - `any` allows for any type to go in, and any type to come out.
   - Using a `generic` means a number goes in and a number comes out or a string goes in and a string comes out.
   - `Generics` introduce the `Type Variable`
     - Rather than being a variable that accepts values, it's a variable that accepts types and is denoted with angle brackets myFunc`<T>`
+    - it help us write more reusable and generic :) functions
 
 ```ts
 // Typed Function

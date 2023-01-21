@@ -188,8 +188,30 @@ It's an useful tool whenever you want to make sure your UI does not change unexp
 > Tests must not depend on external services. Use mocking tools such as jest.mock to avoid it.
 
 - Jest mock function `jest.fn()`
+
   - it plays the role of a real function.
   - we use it as a replacement for a real/complex function that we don't want to involve in our tests to keep it lightweight and simple
+
+- **Note:** when using typescript it will raise a warning that the mocked function doesn't have methods of the jest mocked function like `mockReturnValue()`, so we will have to use **type-casting**:
+
+  ```ts
+  import { useStore } from 'vuex';
+  // mock out libraries to mock functions from them
+  jest.mock('vuex');
+  const useStoreMock = useStore as jest.Mock; // type casting so that we can access the "mockResolvedValue" method
+
+  it('retrieves filtered jobs from store', () => {
+    useStoreMock.mockReturnValue({
+      getters: {
+        FILTERED_JOBS: [{ id: 1 }]
+      }
+    });
+    const result = useFilteredJobs();
+    expect(result.value).toEqual([{ id: 1 }]);
+  });
+  ```
+
+---
 
 ### Timer Mocks
 

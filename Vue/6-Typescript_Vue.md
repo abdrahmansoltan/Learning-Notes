@@ -7,10 +7,12 @@
   - [Testing Vuex](#testing-vuex)
     - [Mutations](#mutations)
   - [Vuex](#vuex)
+    - [State](#state)
     - [Getters](#getters)
     - [Actions](#actions)
   - [Composition API](#composition-api)
     - [Ref](#ref)
+    - [`useStore` with Typescript](#usestore-with-typescript)
     - [Vuex Composables (composition API)](#vuex-composables-composition-api)
     - [Vuex Composables Testing](#vuex-composables-testing)
     - [Typing useStore Composition Function](#typing-usestore-composition-function)
@@ -25,7 +27,7 @@
 use `PropType<T>` -> Used to annotate a prop with more **advanced types** when using runtime props declarations.
 
 ```ts
-import { PropType } from "vue";
+import { PropType } from 'vue';
 
 interface Book {
   title: string;
@@ -38,9 +40,13 @@ export default {
     book: {
       // provide more specific type to `Object`
       type: Object as PropType<Book>,
-      required: true,
+      required: true
     },
-  },
+    uniqueValues: {
+      type: Set as PropType<Set<string>>,
+      required: true
+    }
+  }
 };
 ```
 
@@ -53,16 +59,16 @@ Typescript may not recognize `jest.mock` method, in this case:
 - When using mock-function we use **type-casting** to tell for its type which is `jest.Mock`
 
 ```ts
-import getJobs from "@/api/getJobs";
-jest.mock("@/api/getJobs");
+import getJobs from '@/api/getJobs';
+jest.mock('@/api/getJobs');
 const getJobsMock = getJobs as jest.Mock;
 //....
 beforeEach(() => {
   getJobsMock.mockResolvedValue([
     {
       id: 1,
-      title: "Dev",
-    },
+      title: 'Dev'
+    }
   ]);
 });
 ```
@@ -80,8 +86,8 @@ In mutations, we have to access the store's state when invoking a mutation-funct
 
 ```ts
 // Utils.ts
-import state from "@/store/state"; // the actual state
-import { GlobalState } from "@/store/types"; // state-type/interface
+import state from '@/store/state'; // the actual state
+import { GlobalState } from '@/store/types'; // state-type/interface
 
 export const createState = (config: Partial<GlobalState> = {}): GlobalState => {
   const initialState = state();
@@ -89,13 +95,13 @@ export const createState = (config: Partial<GlobalState> = {}): GlobalState => {
 };
 
 // to use it: -> in test file
-import mutations from "@/store/mutations";
-import { GlobalState } from "@/store/types";
-import { createState } from "./utils";
+import mutations from '@/store/mutations';
+import { GlobalState } from '@/store/types';
+import { createState } from './utils';
 
-describe("mutations", () => {
-  describe("LOGIN_USER", () => {
-    it("logs the user in", () => {
+describe('mutations', () => {
+  describe('LOGIN_USER', () => {
+    it('logs the user in', () => {
       //const state = { isLoggedIn: false } as GlobalState; // -> wrong
       //const startingState = state();
       const startingState = createState({ isLoggedIn: false });
@@ -109,6 +115,19 @@ describe("mutations", () => {
 ---
 
 ## Vuex
+
+### State
+
+We can use an interface to define complex object types such as (Vuex store state) -> **`GlobalState`**
+
+```ts
+interface GlobalState {
+  isLoggedIn: boolean;
+  jobs: Job[];
+  selectedOrganizations: string[];
+  selectedJobTypes: string[];
+}
+```
 
 ### Getters
 
@@ -125,17 +144,17 @@ interface IncludeJobGetters {
 const getters = {
   [UNIQUE_ORGANIZATIONS](state: GlobalState) {
     const uniqueOrganizations = new Set<string>();
-    state.jobs.forEach((job) => uniqueOrganizations.add(job.organization));
+    state.jobs.forEach(job => uniqueOrganizations.add(job.organization));
     return uniqueOrganizations;
   },
   // here we use getters inside another getter
   [FILTERED_JOBS](state: GlobalState, getters: IncludeJobGetters) {
     return state.jobs
-      .filter((job) => getters.INCLUDE_JOB_BY_ORGANIZATION(job))
-      .filter((job) => getters.INCLUDE_JOB_BY_JOB_TYPE(job))
-      .filter((job) => getters.INCLUDE_JOB_BY_DEGREE(job))
-      .filter((job) => getters.INCLUDE_JOB_BY_SKILL(job));
-  },
+      .filter(job => getters.INCLUDE_JOB_BY_ORGANIZATION(job))
+      .filter(job => getters.INCLUDE_JOB_BY_JOB_TYPE(job))
+      .filter(job => getters.INCLUDE_JOB_BY_DEGREE(job))
+      .filter(job => getters.INCLUDE_JOB_BY_SKILL(job));
+  }
 };
 ```
 
@@ -146,7 +165,7 @@ const getters = {
 we can create an interface for the **context** that has a method: **commit** which its type is imported from `Vuex`
 
 ```js
-import { Commit } from "vuex";
+import { Commit } from 'vuex';
 
 interface Context {
   commit: Commit;
@@ -162,13 +181,21 @@ interface Context {
 when using refs, use **generic type**
 
 ```ts
-import { ref } from "vue";
-import type { Ref } from "vue";
+import { ref } from 'vue';
+import type { Ref } from 'vue';
 
-const year: Ref<string | number> = ref("2020");
+const year: Ref<string | number> = ref('2020');
 
 year.value = 2020; // ok!
 ```
+
+---
+
+### `useStore` with Typescript
+
+To enable type checking for the Vuex store, create a **key**. we must configure it in the file where we connect the vue app to Vuex. We must pass it to every invocation of the `useStore` composable function
+
+- find instructions here [typing-usestore-composition-function](https://vuex.vuejs.org/guide/typescript-support.html#typing-usestore-composition-function)
 
 ---
 
@@ -191,8 +218,8 @@ export const useFilteredJobs = () => {
 here we use type-casting with the function-mocked
 
 ```ts
-import { useStore } from "vuex";
-jest.mock("vuex");
+import { useStore } from 'vuex';
+jest.mock('vuex');
 
 const useStoreMock = useStore as jest.Mock;
 ```
@@ -208,13 +235,21 @@ const useStoreMock = useStore as jest.Mock;
 ## Notes
 
 - To utilize Typescript in a vue-component:
-  - add a `lang = "ts"` attribute to the `<script>` tag.
-  - import the `defineComponent` function from Vue and pass the component configuration object into it.
+  1. add a `lang = "ts"` attribute to the `<script>` tag.
+  2. import the `defineComponent` function from `vue` and pass the component configuration object into it.
 - When importing files, you may encounter an error because when compiling ts file it may think the file-imported in **.ts-extension** but it's **.vue**
   - So you may have to write `.vue` manually
 - if you have an object-property that uses union-type `(unified | otherType)`, instead you can use optional property: `?`
 - `this.$event` has a built-in type: `Event`
+
   - also the target is unknown for TS, but we know it's from the `input` element, so we use type-casting
+
+    ```ts
+    (event.target as HTMLInputElement).value;
+    ```
+
+- There're types for functions from external libraries like **axios**, and Typescript requires that their methods accept a generic type-argument that represent the response type
+
   ```ts
-  (event.target as HTMLInputElement).value;
+  const response = await axios.get<Job[]>(`${baseUrl}/jobs`);
   ```

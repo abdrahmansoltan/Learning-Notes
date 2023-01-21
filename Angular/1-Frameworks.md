@@ -9,7 +9,7 @@
     - [React](#react)
     - [Angular](#angular)
     - [Vue](#vue)
-  - [Comparison](#comparison)
+  - [Frameworks Comparison](#frameworks-comparison)
     - [Vue vs React](#vue-vs-react)
 
 ---
@@ -67,6 +67,8 @@
 ### React
 
 - `React` is not technically a framework; it's a library for UI components, but it's seen colloquially as a framework
+  - React provides developers with just the **View-section (UI) of a framework**, so it's a library
+  - this comes with a price which is less features, but **less features mean more options** which means more community-built projects and tools
 - React.js provides fast UIs for interactive apps which use data efficiently by instantly applying changes to elements rather than updating all occurrences at once as other libraries do. It also supports incremental use with the virtual DOM (document object model) to make fast updates to web page content. React also uses JSX, a domain-specific interface created by the same team.
 
 ![vs](./img/react_vs_Angular.jpeg)
@@ -76,16 +78,24 @@
 - Angular is a `component-based framework`.
   - It offers developers a collection of integrated libraries and tools to develop, test, and update their code. This makes it a robust option for building and deploying web applications.
 - Angular combines declarative templates, dependency injection, solid end-to-end tooling, and an integrated set of best practices to solve development challenges.
+- Angular has everything built-in, and you as a developer can use these tools together
 
 ---
 
 ### Vue
 
 - It's a JavaScript framework for building user interfaces. It builds on top of standard HTML, CSS and JavaScript, and provides a **declarative and component-based programming model** that helps you efficiently develop user interfaces, be it simple or complex.
+- It gives you best of both worlds of (React & Angular) as it gives you the UI, routing, state-management built-in, but some other tools aren't, that you still get to decide how you want to build your app (like forms)
 
 ---
 
-## Comparison
+## Frameworks Comparison
+
+When someone asks which framework to choose, a great answer is **"What does the team look like?"**, as it depends on that you should pick the framework/library that the team is most familiar with.
+
+- the bigger the team, the better is to unify tools (AKA use opinionated framework/library like `Angular`), so that all of them do the same thing the same way
+- something like `React` is great for Startups, where you trust the development team to make the right decisions and to combine different libraries and tools together to build something great
+  - > sometimes `React` can lead to poorly built applications, where developers end up picking the latest libraries and tools and mix everything together that creates complexity and mess
 
 ### Vue vs React
 

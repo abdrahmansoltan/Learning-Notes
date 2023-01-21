@@ -36,7 +36,9 @@ git config --global user.email "user@example.com"
 
 ## Github workflow
 
-Github is a service that hosts Git-repositories in the cloud and makes it easier to collaborate with other people.
+Github is a **Hosting Service** that hosts Git-repositories in the cloud and makes it easier to collaborate with other people.
+
+- It's not correct to say that "Github is Git but on the web" as Git can do things that Github can't do and vice versa
 
 ![github_workflow](./img/github_workflow.PNG)
 
@@ -92,7 +94,9 @@ Github is a service that hosts Git-repositories in the cloud and makes it easier
 - The `git push` command takes:
 
   - the shortname of the remote repository you want to send commits to
-  - the name of the branch that has the commits you want to send
+    - recommended as if you have more than 1 remote branch connected to the local repo, then you need to specify the remote branch to push to
+  - The name of the branch that has the commits you want to send
+    - usually the name of the remote branch is `origin`
 
 ```bash
 # send commits from a local repository to a remote repository.

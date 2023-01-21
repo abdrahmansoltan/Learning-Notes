@@ -13,6 +13,7 @@
     - [Array Types](#array-types)
       - [Static Array](#static-array)
       - [Dynamic Array](#dynamic-array)
+        - [How it works with capacity ?](#how-it-works-with-capacity-)
         - [Implementing a Dynamic Array](#implementing-a-dynamic-array)
         - [Geometric Increase in Capacity and Arithmetic Progression](#geometric-increase-in-capacity-and-arithmetic-progression)
     - [Referential Arrays](#referential-arrays)
@@ -107,10 +108,17 @@ sort data-items in the data-structure to be ordered (next to each other in memor
 
 - When creating a low-level array in a computer system, the precise size of that array must be explicitly declared in order for the system to properly allocate a consecutive piece of memory for its storage
 - Because the system might dedicate neighboring memory locations to store other data, the capacity of an array cannot trivially be increased by expanding into subsequent cells. In the context of representing a Python `tuple` or `str` instance, this constraint is no problem. Instances of those classes are immutable, so the correct size for an underlying array can be fixed when the object is instantiated.
+- Each cell of an array must use the same number of bytes. This requirement is what allows an arbitrary cell of the array to be accessed in constant time based on its index. In particular, if one knows the memory address at which an array starts, the number of bytes per element (e.g., `2` for a Unicode character), and a desired index within the array, the appropriate memory address can be computed using the calculation
+  - Formula = **`start + cellsize * index`**
+  - By this formula, the cell at index 0 begins precisely at the start of the array, the cell at index 1 begins precisely cellsize bytes beyond the start of the array, and so on. As an example, cell 4 of Figure 5.2 begins at memory location `2146+2 * 4 = 2146+8 = 2154`
 
 #### Dynamic Array
 
 **dynamic** -> can change size after initiation based on the need
+
+> **Dynamic array** is that a list instance maintains an underlying array that often has greater capacity than the current length of the list.
+>
+> - This extra capacity makes it easy to append a new element to the list by using the next available cell of the array.
 
 - this is where languages differ in allocating (managing) memory, as language like `c++` requires to have static array and to change it you need to redeclare another array with the new size which will be in **different memory location**
 - language like **python** are dynamic and it automatically manages memory for us
@@ -118,7 +126,12 @@ sort data-items in the data-structure to be ordered (next to each other in memor
 - If a user continues to append elements to a list, any reserved capacity will eventually be exhausted. In that case, the class requests a new, larger array from the system, and initializes the new array so that its prefix matches that of the existing smaller array.
   - > At that point in time, the old array is no longer needed, so it is reclaimed by the system.
   - We rely on a function named `getsizeof()` that is available from the sys module. This function reports the number of bytes that are being used to store an object in Python. For a list, it reports the number of bytes devoted to the array and other instance variables of the list, but not any space devoted to elements referenced by the list.
-  - Because a list is a referential structure, the result of getsizeof for a list instance only includes the size for representing its primary structure; it does not account for memory used by the objects that are elements of the list.
+  - Because a list is a referential structure, the result of `getsizeof` for a list instance only includes the size for representing its primary structure; it does not account for memory used by the objects that are elements of the list.
+
+##### How it works with capacity ?
+
+- As soon as the first element is inserted into the list, we detect a change in the underlying size of the structure. In particular, we see the number of bytes jump from 72 to 104, an increase of exactly `32 bytes`. Usually, we run on a `64-bit` machine architecture, meaning that each memory address is a `64-bit` number (i.e., `8 bytes`). We speculate that the increase of `32 bytes` reflects the allocation of an underlying array capable of storing four object references. This hypothesis is consistent with the fact that we do not see any underlying change in the memory usage after inserting the second, third, or fourth element into the list.
+  - `32 bytes = 4 \* 8 bytes(64bits)` --> 4 objects references
 
 ##### Implementing a Dynamic Array
 
@@ -130,6 +143,7 @@ steps:
 2. Set `B[i] = A[i]`, for `i = 0,...,n−1`, where `n` denotes current number of items.
 3. Set `A = B`, that is, we henceforth use B as the array supporting the list.
 4. Insert the new element in the new array.
+5. > Not shown is the future garbage collection of the old array
 
 > We may notice that the total running time of n append operations is **`O(n)`**, as an (append operation) causes an overflow and a doubling of capacity. which means -> Copying the old elements (n) to the new array
 
@@ -141,18 +155,25 @@ steps:
 - To avoid reserving too much space at once, it might be tempting to implement a dynamic array with a strategy in which a constant number of additional cells are reserved each time an array is resized. Unfortunately, the overall performance of such a strategy is significantly worse. At an extreme, an increase of only one cell causes each append operation to resize the array, leading to a familiar `1+ 2+ 3+ ··· + n` summation and `Ω(n2)` overall cost. Using increases of `2 or 3` at a time is slightly better, as portrayed in Figure 5.13, but the overall cost remains **quadratic**.
   ![dynamic-array](./img/dynamic-array1.png)
 
+> look more into the **Amortized Analysis of Dynamic Arrays** in page 197 (D&A in python book)
+
 ---
 
 ### Referential Arrays
 
 - Arrays and tuples use another way to keep a byte-reference for each item to randomly access it quickly as each item naturally has different lengths
+
   - Python represents a list or tuple instance using an internal storage mechanism of an array of **object references**. At the lowest level, what is stored is a consecutive sequence of memory addresses at which the elements of the sequence reside. A high-level diagram of such a list
     ![referential-arrays](./img/refrential-arrays.png)
-  - Although the relative size of the individual elements may vary, the number of bits used to store the memory address of each element is fixed (e.g., 64-bits per address). In this way, Python can support constant-time access to a list or tuple element based on its index.
+  - Although the relative size of the individual elements may vary, the number of bits used to store the memory address of each element is fixed (e.g., **64-bits per address**). In this way, Python can support constant-time access to a list or tuple element based on its index
+  - > The list will simply keep a sequence of references to those objects. Note as well that a reference to the **`None`** object can be used as an element of the list to represent an empty bed in the hospital.
+
 - The fact that lists and tuples are referential structures is significant to the semantics of these classes. A single list instance may include multiple references to the same object as elements of the list, and it is possible for a single object to be an element of two or more lists, as those lists simply store references back to that object.
+  - ex: when you compute a slice of a list, the result is a new list instance, but that new list has references to the same elements that are in the original list
+    ![referential-arrays](./img/refrential-arrays3.png)
 - it is a common practice in Python to initialize an array of integers using a syntax such as `counters = [0] * 8`. This syntax produces a list of length eight, with all eight elements being the value zero. Technically, all eight cells of the list reference the same object
   ![referential-arrays](./img/refrential-arrays1.png)
-- the `extend` command is used to add all elements from one list to the end of another list. The extended list does not receive copies of those elements, it receives references to those elements
+- the `extend` command is used to add all elements from one list to the end of another list. **The extended list does not receive copies of those elements, it receives references to those elements (shallow copy)**
   ![referential-arrays](./img/refrential-arrays2.png)
 
 ---
@@ -165,11 +186,20 @@ steps:
 > always remember if we iterated over items in array -> **O(n)**
 
 - `lookup` & `push/append`(inserting from the end) are **O(1)**, as they doesn't iterate over other items in the array
-  - there's a small possibility in **dynamic arrays**, that appending(pushing) element will create a new array which iterate over the array items to make them in the new memory location
+  - there's a small possibility in **dynamic arrays**, that appending(pushing) element will create a new array which iterate over the array items to make them in the new memory location (exhibits **amortized** constant-time behavior)
     - we can further improve the practical execution time by using a **list comprehension** syntax to build up the temporary list, rather than by repeated calls to append.
 - `inserting` (in the beginning / any location other that the end) or `deleting` (`unshift`) are **O(n)**, as they change the locations(indices) of other array items and we then have to **iterate** over all/some of them to change their address in memory and their new index
-- Extending a List: Python provides a method named extend that is used to add all elements of one list to the end of a second list.
+- **Extending a List**: Python provides a method named `extend` that is used to add all elements of one list to the end of a second list.
+  - In practice, the `extend` method is preferable to repeated calls to `append` because the constant factors hidden in the asymptotic analysis are significantly smaller.
+    - **Advantages of `extend` instead of `append`:**
+      1. there is always some advantage to using an appropriate Python method, because those methods are often implemented natively in a compiled language (rather than as interpreted Python code).
+      2. Second, there is less overhead to a single function call that accomplishes all the work, versus many individual function calls.
+      3. Finally, increased efficiency of `extend` comes from the fact that the resulting size of the updated list can be calculated in advance. If the second data set is quite large, there is some risk that the underlying dynamic array might be resized multiple times when using repeated calls to `append`. With a single call to `extend`, at most one resize operation will be performed.
   - the running time is proportional to the **length of the other list**, and amortized because the underlying array for the first list may be resized to accommodate the additional elements.
+- **Best practices for constructing new lists**:
+  - Experiments should show that the list comprehension syntax is significantly faster than building the list by repeatedly appending
+  - it is a common Python idiom to initialize a list of constant values using the multiplication operator, as in `[0] * n` to produce a list of length `n` with all values equal to zero.
+    - Not only is this succinct for the programmer; it is more efficient than building such a list incrementally.
 
 ---
 

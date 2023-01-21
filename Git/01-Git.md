@@ -2,7 +2,8 @@
 
 - [INDEX](#index)
   - [Git](#git)
-    - [advantages of distributed version control](#advantages-of-distributed-version-control)
+    - [Advantages of distributed version control](#advantages-of-distributed-version-control)
+  - [Git Architecture: Three Trees (Git workflow)](#git-architecture-three-trees-git-workflow)
   - [Diff](#diff)
     - [Compare changes across branches](#compare-changes-across-branches)
     - [Compare changes across commits](#compare-changes-across-commits)
@@ -21,12 +22,11 @@
       - [Fast Forward Merge](#fast-forward-merge)
       - [Types](#types)
     - [Useful notes](#useful-notes)
-  - [Rebasing](#rebasing)
+  - [Rebase](#rebase)
     - [Rebasing with backup for extra safety](#rebasing-with-backup-for-extra-safety)
     - [Merge vs Rebase](#merge-vs-rebase)
     - [Interactive Rebase](#interactive-rebase)
     - [Force Pushing](#force-pushing)
-  - [Git Three Trees (Git workflow)](#git-three-trees-git-workflow)
   - [Git commands Notes](#git-commands-notes)
   - [Modifying commits](#modifying-commits)
     - [Amend: Changing The Last Commit](#amend-changing-the-last-commit)
@@ -46,7 +46,7 @@
   - [Git behind the scenes](#git-behind-the-scenes)
     - [Refs Folder](#refs-folder)
     - [heads folder](#heads-folder)
-    - [Objects Folder](#objects-folder)
+    - [Objects Folder (Git Object)](#objects-folder-git-object)
       - [Blobs](#blobs)
       - [Trees](#trees)
   - [Useful Notes](#useful-notes-1)
@@ -67,11 +67,11 @@ Git is software that keeps track of changes that you make to files and directori
 - At its core, Git is like a **key-value store**
   - key -> Hash of the data (SHA-1)
   - value -> Data
-- Git does not use **small** tracking files throughout a repository -- everything is contained within the .git directory in the top-level directory of the repository.
+- Git does not use **small** tracking files throughout a repository -- everything is contained within the `.git` directory in the top-level directory of the repository.
 - Git does not use small tracking files throughout a repository -- everything is contained within the .git directory in the top-level directory of the repository.
   - it does so by taking snapshot of the entire file at each step/stage
 
-### advantages of distributed version control
+### Advantages of distributed version control
 
 - no need to communicate with a central server
 - faster
@@ -80,11 +80,40 @@ Git is software that keeps track of changes that you make to files and directori
 
 ---
 
+## Git Architecture: Three Trees (Git workflow)
+
+- Requirements for the Architecture:
+  - Track everything (title, content, metadata, ....)
+    - & must not change the content of tracked files
+  - OS independent
+  - Unique ID (each git-object has unique id)
+  - Track History
+
+![alt](./img/3_trees.png)
+![alt](./img/trees.gif)
+
+- **working directory**, which contains changes that may not be tracked by Git yet
+
+  - In the working directory, the user can create new files or change existing files that do not yet exist in either the staging index(area) or the repository, and **no Git command is required to do so**.
+
+- **staging index(area)**, which contains changes that we're about to commit into the repository
+
+  - > **NOTE:** a clean staging area isn't actually empty, as it actually contains the exact copy of the latest commit
+
+  - `git add` : move from working to staging index
+  - `git rm --cached` : remove from staging index
+
+- **repository**, and that's what's actually being tracked by Git. The changes that Git has, and that it's going to hold onto and keep track of.
+
+---
+
+---
+
 ## Diff
 
-- `git diff` lists all the changes in the working directory **that are not staged for the next commit** (shows only **unstaged changes**).
+- `git diff` lists all the changes in the working directory **that are not staged for the next commit** (shows only different between the working-tree and the index(staging)-tree --> **unstaged changes**).
 - `git diff HEAD` compares the changes in the (working directory & staged area) to the last commit
-- `git diff --staged` compares the changes in the staged files to the committed versions.
+- `git diff --staged` compares the changes in the **staged index** to the **committed versions (the repo)**.
 
 The results showing the difference between the different versions of the file are called --> **Chunks**
 ![Chunk](./img/chunk.png)
@@ -126,7 +155,7 @@ The results showing the difference between the different versions of the file ar
 - Each hash value is not only unique, it's directly tied to the **contents** that are inside of it.
   - that's why it's called **content addressable source system** (as we use the content to generate the key)
     ![SHA-1](./img/SHA-1.png)
-- The algorithm (hashing function) that Git uses is the **SHA-1 hash** algorithm.
+- The algorithm (hashing function) that Git uses is the **Secure Hash Algorithm (SHA-1)**.
   - it generates **40 digits hexadecimal numbers**
   - the value should always be the same if the given input is the same
 - why can't we change commits?
@@ -358,7 +387,7 @@ git merge "nathan"
 
 ---
 
-## Rebasing
+## Rebase
 
 > **Rebasing**: it's used in 2 ways:
 >
@@ -404,6 +433,9 @@ sometimes you want to rebase, but you're afraid that you will miss something up,
 ---
 
 ### Merge vs Rebase
+
+- Merge takes all the changes in one branch and merges them into another branch in one commit.
+- Rebase says I want the point at which I branched to move to a new starting point
 
 ![merge-vs-rebase](./img/merge-vs-rebase.jpg)
 ![merge-vs-rebase](./img/merge-vs-rebase2.png)
@@ -459,27 +491,9 @@ git push -f
 
 ---
 
-## Git Three Trees (Git workflow)
-
-![alt](./img/3_trees.png)
-![alt](./img/trees.gif)
-
-- **working directory**, which contains changes that may not be tracked by Git yet
-
-  - In the working directory, the user can create new files or change existing files that do not yet exist in either the staging index(area) or the repository, and **no Git command is required to do so**.
-
-- **staging index(area)**, which contains changes that we're about to commit into the repository
-
-  - > **NOTE:** a clean staging area isn't actually empty, as it actually contains the exact copy of the latest commit
-
-  - `git add` : move from working to staging index
-  - `git rm --cached` : remove from staging index
-
-- **repository**, and that's what's actually being tracked by Git. The changes that Git has, and that it's going to hold onto and keep track of.
-
----
-
 ## Git commands Notes
+
+- when command has `--staged`, it do something between (staging-area and the repo) or between the (staging-area and the working tree)
 
 - moving a file and **renaming** a file are the same thing. Because moving a file to a new file path, is a way of renaming it So we're actually going to use "move" as the way to rename it. So "`git mv"` for short, that's "git + move" and we move the "second_file.txt" to be "secondary_file.txt".
 
@@ -565,7 +579,7 @@ git checkout <SHA-of-commit-to-go-to>
   git checkout HEAD <file or -A>
   # or
   git checkout <-- file or -A>
-  # Or using the new command (restore)
+  # or using the new command (restore)
   git restore <file or -A>
   ```
 
@@ -608,7 +622,7 @@ git reset --hard HEAD^      # (removing the commit before HEAD)
 
 git reset --hard HEAD~1     # (equivalent to "^")
 
-git reset --hard HEAD~2     # (removing two commits before HEAD)
+git reset --hard HEAD~2     # (removing two commits before HEAD) (going backward 2 steps)
 
 ###################################################################
 
@@ -759,6 +773,8 @@ git reflog show <branch name>
 
 - **IMPORTANT NOTE** -> one of the advantages is that we can use **reflog entries** to access commits (**removed commits**) that seem lost (reset) and are not appearing in `git log`
 
+  - > it's useful when you go back to a commit in the past using `reset` or any command and you want to see all commits so that you can do a fast-forward as now `git log` won't show the commit that we reset from
+
   ```sh
   git reflog show master # look for that commit and copy its SHA-1
   git reset --hard <SHA of the commit> # will make the tip of your branch (the HEAD of the branch) to that commit
@@ -791,7 +807,7 @@ It's a text file that keeps track of where **HEAD** points.
 
 - in detached HEAD, the HEAD file contains a commit hash instead of a branch-reference
 
-### Objects Folder
+### Objects Folder (Git Object)
 
 it contains all the repo files, this is where Git stores the backups of (files, commits) in repo
 
@@ -799,13 +815,12 @@ it contains all the repo files, this is where Git stores the backups of (files, 
 
 #### Blobs
 
-It's how Git stores Data
-
 ![blob](./img/blob.png)
 
 - Where are blobs stored?
   ![blob](./img/blobs2.png)
 
+- They're objects for tracked files where Git stores Data
 - They're **binary large objects**, they're the object type that Git uses to store the contents of files in a given repository,
   - they just store the contents of a file
 
@@ -813,6 +828,7 @@ It's how Git stores Data
 
 ![trees](./img/trees.png)
 
+- It's an object for tracked folders
 - a tree contains pointers (using SHA-1) to
   - blobs
   - other trees
@@ -822,6 +838,8 @@ It's how Git stores Data
 ---
 
 ## Useful Notes
+
+> Git knows the history, by reading the parent in the tree/blob file and traversing backwards (linked list)
 
 ### Danger Zone
 

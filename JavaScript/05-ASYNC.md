@@ -36,6 +36,8 @@
       - [`Promise.race()`](#promiserace)
       - [`Promise.any()`](#promiseany)
       - [Promise.resolve/reject](#promiseresolvereject)
+  - [Network Requests](#network-requests)
+    - [Fetch](#fetch)
   - [Microtasks](#microtasks)
     - [Microtasks queue](#microtasks-queue)
   - [Working with data from other servers (Proxy)](#working-with-data-from-other-servers-proxy)
@@ -328,6 +330,7 @@ setTimeout(() => {
 - `Promise` : An object that is used as a placeholder for the future result of an asynchronous operation.
 - or: it's an object that may produce a single value some time in the future, either a resolved-value or a (reason that it's rejected)
 - The function passed to new Promise is called the **"executor"**.
+
   - When new Promise is created, the executor runs automatically. It contains the producing code which should eventually produce the result.
   - Its arguments `resolve` and `reject` are callbacks provided by JavaScript itself. Our code is only inside the executor.
   - When the `executor` obtains the result, be it soon or late, doesn’t matter, it should call one of these callbacks:
@@ -335,14 +338,16 @@ setTimeout(() => {
     - `resolve(value)` — if the job is finished successfully, with result value.
     - `reject(error)` — if an error has occurred, error is the error object.
       - it's internally the same as `throw new Error()`
+
   - The promise object returned by the new Promise constructor has these internal properties:
 
     - `state` — initially "`pending`", then changes to either "`fulfilled`" when resolve is called or "`rejected`" when reject is called.
     - `result` — initially `undefined`, then changes to `value` when `resolve(value)` is called or `error` when `reject(error)` is called.
+
 - The constructor syntax for a promise object is:
 
   ```js
-  let promise = new Promise(function(resolve, reject) {
+  let promise = new Promise(function (resolve, reject) {
     // executor (the producing code, "singer")
   });
   ```
@@ -351,33 +356,6 @@ setTimeout(() => {
   ![promise](./img/promise_state_inspect.png)
 
 - In frontend programming, promises are often used for network requests. and we use the `fetch` method to load the information from the server.
-- **fetch()**: doesn't has Execution context like other functions as it's a "facade" function (not from JavaScript)
-- **fetch()**: returns a **promise object** which has 3 properties:
-  ![fetch](./img/fetch.png)
-  - `value` --> at first it's empty (`undefined`)
-  - `onFulfilled` --> it's an **array** that has the code (functions) that will Javascript run when `value` property gets filled
-  - `onRejection` --> it's an **array** that has the code (functions) that will Javascript run when error occurs
-- Benefits of `promises`
-  - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
-  - Instead of nesting callbacks, we can chain promises for a
-    sequence of asynchronous operations: escaping `callback-hell`
-- _note_ : whatever we `return` from a `promise` will be the `fulfilled` value of that promise (which will be used in the `.then()` method), that's why `arrow-functions` are usually used with promises.
-- explanation code :
-
-  ```javascript
-  fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
-    .then(response => {
-      console.log(response); // promise object
-      if (!response.ok) throw new Error(`Country not found (${response.status})`);
-      return response.json();
-      // (.json()) is a method available on all response objects that are coming from (fetch()) function, It reads the remote data and parses it as JSON
-      // also (.json()) returns a new promise => so we have to return it like we did
-    })
-    .then(data => {
-      // the data we want
-      //  do what you want with data object in this function
-    });
-  ```
 
 - clean code :
 
@@ -393,11 +371,11 @@ setTimeout(() => {
 
   ```js
   // The executor should call only one resolve or one reject. Any state change is final.
-  let promise = new Promise(function(resolve, reject) {
-    resolve("done");
+  let promise = new Promise(function (resolve, reject) {
+    resolve('done');
 
-    reject(new Error("…")); // ignored
-    setTimeout(() => resolve("…")); // ignored
+    reject(new Error('…')); // ignored
+    setTimeout(() => resolve('…')); // ignored
   });
   ```
 
@@ -409,13 +387,17 @@ A Promise object serves as a link between the executor (the “producing code”
 
   ```js
   promise.then(
-    function(result) { /* handle a successful result */ },
-    function(error) { /* handle an error */ }
+    function (result) {
+      /* handle a successful result */
+    },
+    function (error) {
+      /* handle an error */
+    }
   );
 
   // -----------------------------------------------
-  let promise = new Promise(function(resolve, reject) {
-    setTimeout(() => resolve("done!"), 1000);
+  let promise = new Promise(function (resolve, reject) {
+    setTimeout(() => resolve('done!'), 1000);
   });
 
   // resolve runs the first function in .then
@@ -426,11 +408,12 @@ A Promise object serves as a link between the executor (the “producing code”
   ```
 
 - `.catch`
+
   - If we’re interested only in errors, then we can use `null` as the first argument: `.then(null, errorHandlingFunction)`. Or we can use `.catch(errorHandlingFunction)`, which is exactly the same:
 
   ```js
   let promise = new Promise((resolve, reject) => {
-    setTimeout(() => reject(new Error("Whoops!")), 1000);
+    setTimeout(() => reject(new Error('Whoops!')), 1000);
   });
 
   // .catch(f) is the same as promise.then(null, f)
@@ -439,19 +422,21 @@ A Promise object serves as a link between the executor (the “producing code”
 
 - **Note:** Are these code fragments equal? In other words, do they behave the same way in any circumstances, for any handler functions?
 
-    ```js
-    promise.then(f1).catch(f2); // 1
-    promise.then(f1, f2); // 2
-    ```
+  ```js
+  promise.then(f1).catch(f2); // 1
+  promise.then(f1, f2); // 2
+  ```
 
   - answer is **NO**, The difference is that:
+
     - in `1`: if an error happens in `f1`, then it is handled by `.catch`
     - in `2`: .then passes results/errors to the next `.then`/`catch`. So in the first example, there’s a `catch` below, and in the second one there isn’t, so the error is unhandled.
+
       - so it should be:
 
-          ```js
-          promise.then(f1).then(null, f2)
-          ```
+        ```js
+        promise.then(f1).then(null, f2);
+        ```
 
 #### Cleanup: `finally` method
 
@@ -468,14 +453,15 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 ```
 
 - **Notes:**
+
   - A `finally` handler doesn’t get the outcome of the previous handler (it has no arguments). This outcome is passed through instead, to the next suitable handler.
   - A `finally` handler “passes through” the result or error to the next suitable handler. For instance, here the result is passed through `finally` to `then`:
 
     ```js
     new Promise((resolve, reject) => {
-      setTimeout(() => resolve("value"), 2000);
+      setTimeout(() => resolve('value'), 2000);
     })
-      .finally(() => alert("Promise ready")) // triggers first
+      .finally(() => alert('Promise ready')) // triggers first
       .then(result => alert(result)); // <-- .then shows "value"
     ```
 
@@ -541,6 +527,7 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 ![await](./img/async_await.PNG)
 
 - by using the word `async` before a function, you convert it to an `asyncronous function`
+
   - which will keep running in the background while performing the code inside of it, than when it's done => it returns a `promise`
   - Other values are wrapped in a resolved promise automatically.
   - We could explicitly return a promise, which would be the same.
@@ -670,12 +657,13 @@ fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
   ```
 
 - there’s an "implicit(hidden) `try..catch`" around the executer-function code. So all **synchronous** errors are handled.
+
   - But if the error is generated not while the executor is running, but later (e.g. Asynchronously). then the promise can’t handle it.
 
     ```js
-    new Promise(function(resolve, reject) {
+    new Promise(function (resolve, reject) {
       setTimeout(() => {
-        throw new Error("Whoops!");
+        throw new Error('Whoops!');
       }, 1000);
     }).catch(alert); // this won't trigger
     ```
@@ -830,11 +818,11 @@ window.onerror = function (message, url, line, col, error) {
 >
 > ```js
 > // EX:
-> let promise = Promise.reject(new Error("Promise Failed!"));
+> let promise = Promise.reject(new Error('Promise Failed!'));
 > setTimeout(() => promise.catch(err => alert('caught')), 1000);
-> 
+>
 > // Error: Promise Failed!
-> window.addEventListener('unhandledrejection', event => alert> (event.reason));
+> window.addEventListener('unhandledrejection', event => alert > event.reason);
 > ```
 
 ---
@@ -875,13 +863,13 @@ There are 6 static methods in the `Promise` class:
 
 - It takes an **iterable** (usually, an array of `promises`) and returns a new `promise`. The new promise resolves when all listed promises are resolved, and the array of their results becomes its result.
 
-    ```js
-    Promise.all([
-      new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
-      new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
-      new Promise(resolve => setTimeout(() => resolve(3), 1000))  // 3
-    ]).then(alert); // 1,2,3 when promises are ready: each promise contributes an array member
-    ```
+  ```js
+  Promise.all([
+    new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
+    new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
+    new Promise(resolve => setTimeout(() => resolve(3), 1000)) // 3
+  ]).then(alert); // 1,2,3 when promises are ready: each promise contributes an array member
+  ```
 
   - > Note that the order of the resulting array members is the same as in its source promises. Even though the first promise takes the longest time to resolve, it’s still first in the array of results.
 
@@ -898,23 +886,24 @@ There are 6 static methods in the `Promise` class:
   let requests = urls.map(url => fetch(url));
 
   // Promise.all waits until all jobs are resolved
-  Promise.all(requests)
-    .then(responses => responses.forEach(
-      response => alert(`${response.url}: ${response.status}`)
-    ));
+  Promise.all(requests).then(responses =>
+    responses.forEach(response => alert(`${response.url}: ${response.status}`))
+  );
   ```
 
 - If any of the promises is rejected, the promise returned by `Promise.all` immediately rejects with that error.
+
   - > if one promise fails, the others will still continue to execute, but `Promise.all` won’t watch them anymore. They will probably settle, but their results will be ignored.
   - > `Promise.all` does nothing to cancel them, as there’s no concept of “cancellation” in promises.
 
 - `Promise.all(iterable)` allows non-promise “regular” values in iterable
+
   - Normally, Promise.all(...) accepts an iterable (in most cases an array) of promises. But if any of those objects is not a promise, it’s passed to the resulting array “as is”.
 
     ```js
     Promise.all([
       new Promise((resolve, reject) => {
-        setTimeout(() => resolve(1), 1000)
+        setTimeout(() => resolve(1), 1000);
       }),
       2,
       3
@@ -938,6 +927,7 @@ There are 6 static methods in the `Promise` class:
 
   - `{status:"fulfilled", value:result}` for successful responses,
   - `{status:"rejected", reason:error}` for errors.
+
 - returns a promise that resolves after all of the given promises have either fulfilled or rejected, with an array of objects that each describes the outcome of each promise.
 - It is typically used when you have multiple asynchronous tasks that are not dependent on one another to complete successfully, or you'd always like to know the result of each promise.
 
@@ -948,25 +938,25 @@ let urls = [
   'https://no-such-url'
 ];
 
-Promise.allSettled(urls.map(url => fetch(url)))
-  .then(results => { // (*)
-    alert(results); 
-    /*
+Promise.allSettled(urls.map(url => fetch(url))).then(results => {
+  // (*)
+  alert(results);
+  /*
     [
       {status: 'fulfilled', value: ...response...},
       {status: 'fulfilled', value: ...response...},
       {status: 'rejected', reason: ...error object...}
     ]
     */
-    results.forEach((result, num) => {
-      if (result.status == "fulfilled") {
-        alert(`${urls[num]}: ${result.value.status}`);
-      }
-      if (result.status == "rejected") {
-        alert(`${urls[num]}: ${result.reason}`);
-      }
-    });
+  results.forEach((result, num) => {
+    if (result.status == 'fulfilled') {
+      alert(`${urls[num]}: ${result.value.status}`);
+    }
+    if (result.status == 'rejected') {
+      alert(`${urls[num]}: ${result.reason}`);
+    }
   });
+});
 ```
 
 #### `Promise.race()`
@@ -1019,6 +1009,7 @@ Methods `Promise.resolve` and `Promise.reject` are rarely needed in modern code,
   ```
 
   - The method is used for compatibility, when a function is expected to return a promise.
+
 - `Promise.reject(error)` creates a rejected promise with error.
 
   ```js
@@ -1034,15 +1025,83 @@ Promise.reject(new Error('Problem!')).catch(x => console.error(x)
 
 ---
 
+## Network Requests
+
+### Fetch
+
+JavaScript can send network requests to the server and load new information whenever it’s needed, and all of that without reloading the page!
+
+The `fetch()` method is modern and versatile, It’s not supported by old browsers (can be polyfilled), but very well supported among the modern ones.
+
+```js
+// Syntax
+let promise = fetch(url, [options]);
+// - options – optional parameters: method, headers etc.
+```
+
+- Without `options`, this is a simple `GET` request, downloading the contents of the url.
+
+- **fetch()**: doesn't has Execution context like other functions as it's a "facade" function (not from JavaScript)
+- The browser starts the request right away and returns a promise that the calling code should use to get the result.
+
+  - **fetch()**: returns a **promise object** which has 3 properties:
+    ![fetch](./img/fetch.png)
+    - `value` --> at first it's empty (`undefined`)
+    - `onFulfilled` --> it's an **array** that has the code (functions) that will Javascript run when `value` property gets filled
+    - `onRejection` --> it's an **array** that has the code (functions) that will Javascript run when error occurs
+  - At this stage we can check **HTTP** `status`, to see whether it is successful or not, check headers. We can see HTTP-status in response properties:
+
+    - `status` – HTTP status code, e.g. `200`
+    - `ok` – boolean, true if the HTTP status code is `200-299`.
+
+    ```js
+    let response = await fetch(url);
+
+    if (response.ok) {
+      // if HTTP-status is 200-299
+      // get the response body (the method explained below)
+      let json = await response.json(); // parse the response as JSON
+    } else {
+      alert('HTTP-Error: ' + response.status);
+    }
+    ```
+
+- Benefits of `promises`
+  - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
+  - Instead of nesting callbacks, we can chain promises for a
+    sequence of asynchronous operations: escaping `callback-hell`
+- _note_ : whatever we `return` from a `promise` will be the `fulfilled` value of that promise (which will be used in the `.then()` method), that's why `arrow-functions` are usually used with promises.
+- explanation code :
+
+  ```javascript
+  fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+    .then(response => {
+      console.log(response); // promise object
+      if (!response.ok) throw new Error(`Country not found (${response.status})`);
+      return response.json();
+      // (.json()) is a method available on all response objects that are coming from (fetch()) function, It reads the remote data and parses it as JSON
+      // also (.json()) returns a new promise => so we have to return it like we did
+    })
+    .then(data => {
+      // the data we want
+      //  do what you want with data object in this function
+    });
+  ```
+
+---
+
 ## Microtasks
 
+> Don't mix this with the Macrotasks, find more here [Macrotasks and Microtasks](./00-JS_Advanced_concepts.md#macrotasks-and-microtasks)
+
 - Promise handlers `.then`/`.catch`/`.finally` are always **Asynchronous**.
+
   - Even when a Promise is immediately resolved
 
   ```js
   let promise = Promise.resolve();
-  promise.then(() => alert("promise done!"));
-  alert("code finished"); // this alert shows first
+  promise.then(() => alert('promise done!'));
+  alert('code finished'); // this alert shows first
   ```
 
 ### Microtasks queue

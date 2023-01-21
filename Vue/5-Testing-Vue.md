@@ -517,6 +517,9 @@ const useConfirmRoute = (routeName: any) => {
 export default useConfirmRoute;
 ```
 
+- Test composables like plain javascript functions (input-output). if it returns a reactive object, access the value to get the data it stores
+- with composables, our tests no longer mock-out properties via `mocks` object-property in the `config` object. Rather, they mock-out the helper functions that the component utilizes (`useStore`, `useRouter`, etc)
+
 ---
 
 ## Testing Vuex

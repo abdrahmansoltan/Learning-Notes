@@ -80,7 +80,7 @@
 
   ![alt](./img/phases-Eventloop.PNG)
   ![Event Loop](./img/eventLoop.PNG)
-  ![Event Loop](./img/eventLoop2.PNG)
+  ![Event Loop](./img/eventLoop2.png)
 
 ---
 

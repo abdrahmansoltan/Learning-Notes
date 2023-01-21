@@ -1,8 +1,8 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Containers](#containers)
-  - [Virtual Machines vs Containers](#virtual-machines-vs-containers)
+  - [Containers](#containers)
+    - [Virtual Machines vs Containers](#virtual-machines-vs-containers)
 
 ---
 

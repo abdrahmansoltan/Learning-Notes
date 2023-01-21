@@ -41,6 +41,9 @@
   - [Miscellaneous](#miscellaneous)
     - [Mutation observer](#mutation-observer)
     - [Selection and Range](#selection-and-range)
+    - [Event loop: microtasks and macrotasks](#event-loop-microtasks-and-macrotasks)
+      - [Event Loop](#event-loop)
+      - [Macrotasks and Microtasks](#macrotasks-and-microtasks)
   - [Notes](#notes)
 
 ---
@@ -1009,6 +1012,64 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 
 ---
 
+### Event loop: microtasks and macrotasks
+
+#### Event Loop
+
+There’s an endless loop, where the JavaScript engine waits for tasks, executes them and then sleeps, waiting for more tasks.
+
+- The general algorithm of the engine:
+
+  1. While there are tasks: execute them, starting with the oldest task.
+  2. Sleep until a task appears, then go to **1**.
+
+- The tasks form a queue, so-called **macrotask queue** (v8 term)
+  - Tasks from the queue are processed on “first come – first served” basis.
+- Notes for the DOM:
+  - Rendering never happens while the engine executes a task. It doesn’t matter if the task takes a long time. Changes to the DOM are painted only after the task is complete.
+  - If a task takes too long, the browser can’t do other tasks, such as processing user events. So after a time, it raises an alert like “Page Unresponsive”, suggesting killing the task with the whole page. That happens when there are a lot of complex calculations or a programming error leading to an infinite loop.
+
+#### Macrotasks and Microtasks
+
+- **Microtasks** come solely from our code. They are usually created by promises: an execution of `.then`/`catch`/`finally` handler becomes a microtask (more [here](./05-ASYNC.md#microtasks)). Microtasks are used “under the cover” of `await` as well, as it’s another form of promise handling.
+
+- **Immediately after every macrotask, the engine executes all tasks from microtask queue, prior to running any other macrotasks or rendering or anything else.**
+
+  - All microtasks are completed before any other event handling or rendering or any other macrotask takes place.
+
+  ```js
+  setTimeout(() => alert('timeout')); // 3 -> because it’s a macrotask.
+
+  Promise.resolve().then(() => alert('promise')); // 2 ->  because .then passes through the microtask queue, and runs after the current code.
+
+  alert('code'); // 1 -> it’s a regular synchronous call.
+  ```
+
+- If we’d like to execute a function asynchronously (after the current code), but before changes are rendered or new events handled, we can schedule it with `queueMicrotask` function.
+
+  ```js
+  let i = 0;
+  function count() {
+    // do a piece of the heavy job (*)
+    do {
+      i++;
+      progress.innerHTML = i;
+    } while (i % 1e3 != 0);
+
+    if (i < 1e6) {
+      queueMicrotask(count);
+    }
+  }
+  ```
+
+- **Web Workers**
+  - For long heavy calculations that shouldn’t block the event loop, we can use Web Workers.
+  - That’s a way to run code in another, parallel thread.
+  - Web Workers can exchange messages with the main process, but they have their own variables, and their own event loop.
+  - Web Workers do not have access to DOM, so they are useful, mainly, for calculations, to use multiple CPU cores simultaneously.
+
+---
+
 ## Notes
 
 - `console` is not built in js, but it's from the `webApi`
@@ -1044,6 +1105,8 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 
   // or anything because everything is an "object"
   ```
+
+````
 
 - **Var** vs **const** & **let**
 
@@ -1257,3 +1320,4 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   let code = 'alert("Hello")';
   eval(code); // Hello
   ```
+````

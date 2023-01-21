@@ -6,16 +6,19 @@
     - [Differences](#differences)
   - [Reactivity](#reactivity)
     - [Reactive Programming](#reactive-programming)
-    - [ref](#ref)
-    - [Computed](#computed)
-    - [reactive function](#reactive-function)
-    - [toRef](#toref)
+    - [`ref` function](#ref-function)
+    - [`Computed` function](#computed-function)
+    - [`reactive` function](#reactive-function)
+    - [`toRef` function](#toref-function)
+    - [`toRefs` function](#torefs-function)
+  - [Composables](#composables)
   - [LifeCycles Hooks](#lifecycles-hooks)
   - [Mixins](#mixins)
   - [props](#props)
     - [Using destructed props](#using-destructed-props)
   - [Context](#context)
   - [Router](#router)
+  - [Store](#store)
   - [Notes](#notes)
 
 ---
@@ -24,7 +27,8 @@
 
 Composition API allow you to **encapsulate** one piece of functionality so that you can use it in different components throughout the application
 
-It's an alternative syntax for writing components
+- It's an alternative syntax for writing components
+- it bundles together all the component-logic in a single `setup` method that is part of the Vue configuration object
 
 ![composition api](./img/options%20api.PNG)
 ![composition api](./img/composition%20api.PNG)
@@ -38,23 +42,39 @@ It's an alternative syntax for writing components
 
 ### Why use it ?
 
-- Better **Typescript** support
-  - as it's made and written in **Typescript**
-- Better Organization
+- **Problems of Options-API**:
+  - Code that belongs together logically is split across multiple parts of the Vue config object (`data`, `methods`, `computed`)
+  - difficult to reuse logic across components. (Vue2 offered mixins but they're considered an **anti-pattern**)
+- **Why Composition?**
 
-  - related code(data+methods) are close to each other
+  - we write functions (composables) that use Vue's **reactive features** and we can write these functions outside of a component and reuse them across multiple components
+    ![mixins](./img/mixins.PNG)
 
-  ![oragnization](./img/organization.PNG)
+  - Better **Typescript** support
+    - as it's made and written in **Typescript**
+  - Better Organization
 
-- Better Re-Usability
-  ![mixins](./img/mixins.PNG)
+    - related code(data+methods) are close to each other
+
+    ![oragnization](./img/organization.PNG)
 
 ---
 
 ### Differences
 
-- Here, we don't use **this** keyword
+- Here in composition api, we don't use **this** keyword
 - must return an object with the data/methods to use in the `<template></template>`
+- we use the `ref` function to define a piece of reactive state (data that will change over time).
+  - it analogous to `data` in the Options API
+- we use `computed` function to re-run logic whenever a reactive piece of state changes.
+  - we pass a function to it and Vue will re-invoke the function whenever a piece of state referenced inside it updates
+  - this is analogous to `computed` properties in Options API
+- we use javascript functions to operate on and change the reactive data
+  - remember to read/write the `value` property
+  - they are analogous to `methods` in the Options API
+- the `setup` method receives a reactive object of `props` as its first argument. the `props` object is reactive but its individual properties are not.
+  - you can pass the `props` object to the `toRefs` function to return an object with all reactive properties
+- When we use reactive objects in HTML, Vue knows to extract their underlying `value`, so no need to add `.value`
 
 > You can use **`Composition-API`** with **`Options-API`**
 
@@ -85,7 +105,9 @@ It's the programming with asynchronous **data streams**
 
 ---
 
-### ref
+### `ref` function
+
+It wraps its argument in a reactive object. The original value can be accessed/overwritten via the `value` property
 
 - **Reactive References**: are variables Vue should keep track of.
 
@@ -93,6 +115,7 @@ It's the programming with asynchronous **data streams**
 
 - why use **ref**?
   - to make the properties become **reactive**
+  - it creates a reactive object
   - you can access the value of the property using `.value`
 
 ```html
@@ -122,11 +145,25 @@ It's the programming with asynchronous **data streams**
 
 ---
 
-### Computed
+### `Computed` function
 
-- It's reactive-ready function which is imported from **Vue**
-  - it takes a `function` as an argument
-  - The function inside it -> returns a **reactive object**
+It's reactive-ready function which is imported from **Vue**
+
+- it accepts a **function** as an argument, Vue will re-invoke the function whenever its referenced values change
+  - it depends on values inside the function body as whenever any value changes in the body, the computed-function will react to that change and rerun the function and get the new value
+- The function inside it -> returns a **reactive object**
+
+  ```js
+  const { ref, computed } = require('vue');
+
+  let a = ref(1);
+  let b = ref(2);
+  let c = computed(() => a.value + b.value); // c.value = 3
+
+  a.value = 10;
+  // c.value = 12
+  ```
+
 - it's **read-only** (can't assign values to properties inside of it)
 
 ```js
@@ -150,7 +187,9 @@ export default {
 
 ---
 
-### reactive function
+### `reactive` function
+
+> We can pass an object to the `ref` function. However, it's cleaner to pass the object to the `reactive` function because it removes the need for a `value` property
 
 Returns a reactive proxy of the **object** and not **Primitive values** like **ref**.
 
@@ -166,24 +205,34 @@ Returns a reactive proxy of the **object** and not **Primitive values** like **r
 - if we use the `reactive()` function, we no longer have to use `.value` to use the value elsewhere.
 
 ```js
+// OLD (using ref)
+const user = ref({
+  name: 'John',
+  age: 20
+});
+const title = computed(() => `${user.value.name} with age of ${user.value.age}`);
+
+// NEW (using reactive)
 const user = reactive({
   name: 'John',
   age: 20
 });
-
 // notice that we don't use them as "user.age.value"
 const title = computed(() => `${user.name} with age of ${user.age}`);
 
-// this won't work!
-const { name, age } = user;
+// NOTE: this won't work!
+const { name, age } = user; // this will be values at only this specific time
 const title = computed(() => `${name} with age of ${age}`);
+// instead, We can use toRef()
 ```
 
 ---
 
-### toRef
+### `toRef` function
 
-Can be used to create a ref for a property on a source reactive object. The created ref is synced with its source property: mutating the source property will update the ref, and vice-versa.
+Creates a reactive object around a single reactive-object-properties
+
+- creates a `ref`(reference) for a property on a source reactive object. The created `ref` is synced with its source property: mutating the source property will update the ref, and vice-versa.
 
 ```js
 const state = reactive({
@@ -203,6 +252,40 @@ console.log(fooRef.value); // 3
 ```
 
 > if the object has a lot of properties that you want them to be reactive -> use [toRefs()](https://vuejs.org/api/reactivity-utilities.html#torefs)
+
+---
+
+### `toRefs` function
+
+Accepts a reactive Object, and makes every object property reactive. This approach allows us to **destructure** properties. However, **Note that** the properties will now be reactive-objects with `value` properties.
+
+- It's going to return an object where every individual property is going to be reactive, and this enable us to destructure properties from this object without problems
+- it gives us an object where every key is going to return another reactive object, unlike in `reactive` where it just return a single reactive object with properties nested inside it
+- it only accepts a reactive object and not normal javascript object
+
+```js
+const state = reactive({
+  foo: 1,
+  bar: 2
+});
+
+const { foo, bar } = toRefs(state);
+// foo = {value: 1}
+// bar = {value: 2}
+
+console.log(foo.value); // Correct
+console.log(foo); // Wrong
+```
+
+---
+
+## Composables
+
+The composition API replaces lots of functionality with helper functions (**composables**)
+
+> **Composable**: is a helper function that utilizes Vue's reactive features. The intent is that a component is composed of lots of smaller, reusable functions that provide reactive objects
+
+- we can use Vue functions like `ref`, `computed`, `reactive` and more in a composable function body
 
 ---
 
@@ -328,7 +411,7 @@ export default {
 
 ## Router
 
-Because we don't have access to **this** inside of setup, we cannot directly access `this.$router or this.$route` anymore. Instead we use the **useRouter** function:
+Because we don't have access to **this** inside of setup, we cannot directly access `this.$router or this.$route` anymore. Instead we use the **`useRouter`** function:
 
 ```js
 import { useRouter, useRoute } from 'vue-router';
@@ -349,6 +432,12 @@ export default {
   }
 };
 ```
+
+---
+
+## Store
+
+To use store functionalities, we use the `useStore` function
 
 ---
 
