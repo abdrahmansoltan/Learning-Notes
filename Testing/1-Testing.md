@@ -71,7 +71,7 @@
 
 is just a casual term to mean that you're testing/confirming/validating something that should follow very clear and simple logic. It's asking someone else to confirm that you are not **insane** and that what seems to make sense to you also makes sense to them
 
-- Usually at the beginning of the testing process
+- Usually at the beginning of the testing process to make sure that our testing environment and configuration works correctly
 
 ```js
 expect(true).toBe(true);
@@ -148,9 +148,13 @@ expect(true).toBe(true);
 
 #### Comparisons
 
-- `.toEqual(expected value)` -> checks if the tested object is the same object
+- **`.toEqual()`**
+  - checks if the tested object is the same object
+  - used with reference-types like `objects`, `arrays`, `sets`
   - it's like `==`
-- `toBe()(expected value)` -> checks if the tested object is the same object (same location in memory)
+- **`toBe()`**
+  - checks if the tested object is the same object (same location in memory)
+  - used with primitive-types like `string`, `number`
   - it's like `===`
 
 #### Truthiness

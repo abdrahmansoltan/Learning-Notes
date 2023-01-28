@@ -21,7 +21,7 @@
 
 > Fun fact: It's a french word meaning **"Fast / Quick"**
 
-It's a build tool that aims to provide a faster and leaner development experience for modern web projects. It consists of two major parts:
+It's a build tool (module bundler) that aims to provide a faster and leaner development experience for modern web projects. It consists of two major parts:
 
 1. A **dev server** that provides rich feature enhancements over `native ES modules`, for example extremely fast `Hot Module Replacement (HMR)`.
 2. A **build command** that bundles your code with `Rollup`, pre-configured to output highly optimized static assets for production.
@@ -29,6 +29,8 @@ It's a build tool that aims to provide a faster and leaner development experienc
 in summary, Vite tries to let the browser do more work for us
 
 ### Why Vite
+
+![why vite](./img/why-vite.png)
 
 #### The Problems
 

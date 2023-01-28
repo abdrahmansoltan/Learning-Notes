@@ -126,7 +126,9 @@ So it’s easy to use JSON for data exchange when the client uses JavaScript and
   - this method has other parameters other than the object value
     - `JSON.stringify(value, replacer, spaceIndents)`
 - `JSON.parse` to convert JSON back into an object (decode a JSON-string).
+
   - `JSON.parse(str, [reviver])`
+
     - `reviver`: is an Optional function(key,value) that will be called for each (key, value) pair and can transform the value.
 
     ```js
@@ -143,7 +145,8 @@ So it’s easy to use JSON for data exchange when the client uses JavaScript and
 ## Local Storage
 
 - The `localStorage` read-only property of the `window` interface allows you to access a `Storage` object for the Document's origin; the stored data is saved across browser sessions. ![local storage](./img/localStorage.png)
-- The keys and the values stored with localStorage are always in the `UTF-16 DOMString format`, which uses two bytes per character. As with objects, integer keys are automatically converted to `strings`.
+- The keys and the values stored with localStorage are always in the `UTF-16 DOMString format`, which uses two bytes per character. As with objects, integer keys are automatically converted to strings.
+  - So to store the data structure correctly in localStorage, store it as a **JSON-strings** with `JSON.stringify()`
 - localStorage is `Blocking`, so it can slow down the app
 - _note_ : when you `get` items from `localStorage`, they lose the `prototype Chain` they had
 - **1oca1Storage** is best suited to information that:

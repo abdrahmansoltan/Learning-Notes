@@ -101,7 +101,12 @@ is a group of objects, each of which represent related things from the real worl
 - **BOM (Browser Object Model)**: contains objects that represent the current `browser window` or `tab`. It contains objects that model things like `browser history` and the `device's screen`.
   ![object-model](./img/object-model.png)
 
-  - `window object` is treated as the default object if none is specified. ex: `alert()` is used instead of `window.alert()`
+  - `window object` is treated as the default object if nothing is specified. ex: `alert()` is used instead of `window.alert()`
+
+    - this is as if a property or a method is not found, javascript looks it up in the `window` object:
+      - ex:
+        - `document` property in `document.getElementBy...` instead of `window.document.getElementBy...`
+        - `console.log()` method instead of `window.console.log()`
 
     ```js
     let gLet = 5;
@@ -261,7 +266,7 @@ elem.insertAdjacentHTML(where, html);
 
     - Don’t use `for..in` to loop over collections, as it iterates over all enumerable properties. And collections have some “extra” rarely used properties that we usually do not want to get
 
-  - Array methods won’t work, because it’s not an array
+  - For **NodeLists**, some Array methods won’t work, because it’s not an array
 
     - We can use `Array.from` to create a “real” array from the collection, if we want array methods:
 
@@ -625,7 +630,7 @@ So nowadays getComputedStyle actually returns the resolved value of the property
     </body>
     ```
 
-- If we assign something to `elem.className`, it replaces the whole string of classes. Sometimes that’s what we need, but often we want to add/remove a single class.
+- If we assign something to `elem.className`, **it replaces the whole string of classes**. Sometimes that’s what we need, but often we want to add/remove a single class.
   - that is when we use the other property: `classList`
 
 #### `classList`
@@ -1091,15 +1096,17 @@ When an event occurs, the event object tells you information about the event, an
     ![event-object](./img/event-object.png)
 - **`event.currentTarget`**: Element that handled the event. That’s exactly the same as `this` keyword in the handler-function, unless the handler is an arrow function, or its `this` is bound to something else, then we can get the element from `event.currentTarget`
 
-- **`event.target` vs `this`**:
+- **`event.target` vs (`this` | `event.currentTarget`)**:
 
   - `event.target`: is the “target” element that **initiated** the event, it doesn’t change through the bubbling process.
-  - `this`: is the **“current”** element, the one that has a currently running handler on it.
+    - identifies the element on which the event occurred
+  - `this` or `event.currentTarget`: is the **“current”** element, the one that has a currently running handler on it.
+    - always refers to the element to which the event handler has been attached to
   - ex:
 
     ```js
     form.onclick;
-    // this (=event.currentTarget) is the <form> element, because the handler runs on it.
+    // this-keyword (=event.currentTarget) is the <form> element, because the handler runs on it.
     // event.target is the actual element inside the form that was clicked.
     ```
 

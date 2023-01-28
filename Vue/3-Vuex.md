@@ -228,7 +228,9 @@ export default {
 
 Instead of accessing the state's data directly, we use **getters** which help in **memory-caching**
 
-> caching because they use **closures**
+> - think of them as computed properties for your state
+> - They will only update if the state changes, this will help with the performance of an application
+> - caching because they use **closures**
 
 - Getters can invoke other getters
 - It's recommended to use **Arrow Functions** to prevent conflict with the `this` keyword in the component when calling the getter: `this.$store.getters`

@@ -8,10 +8,11 @@
     - [Reactive Programming](#reactive-programming)
     - [`ref` function](#ref-function)
     - [`Computed` function](#computed-function)
+      - [Two-way Computed Property (Form Handling)](#two-way-computed-property-form-handling)
     - [`reactive` function](#reactive-function)
     - [`toRef` function](#toref-function)
     - [`toRefs` function](#torefs-function)
-  - [Composables](#composables)
+  - [Composables (Hooks)](#composables-hooks)
   - [LifeCycles Hooks](#lifecycles-hooks)
   - [Mixins](#mixins)
   - [props](#props)
@@ -37,6 +38,8 @@ Composition API allow you to **encapsulate** one piece of functionality so that 
 
 - new syntax for the `setup`
   ![composition api](./img/options%20api2.png)
+  - no `setup()` function and export default
+  - no need for returning an object with the reactive items
 
 ---
 
@@ -109,7 +112,7 @@ It's the programming with asynchronous **data streams**
 
 It wraps its argument in a reactive object. The original value can be accessed/overwritten via the `value` property
 
-- **Reactive References**: are variables Vue should keep track of.
+- **Reactive References**: are variables **Vue** should keep track of.
 
   - they are created by **ref()**
 
@@ -184,6 +187,46 @@ export default {
 ```
 
 > The same for **Watchers**
+
+---
+
+#### Two-way Computed Property (Form Handling)
+
+Admittedly, It's a bit more verbose to use `v-model` in local state and connect it to **the store** using a `subscribe()` method, as we lose some of the useful features from `v-model`. An alternative approach is using a two-way computed property with a `setter` and `getter`:
+
+```html
+<template>
+  <input
+    v-model="skillsSearchTerm"
+    type="text"
+    placeholder="Computer programming, Finance degree"
+  />
+</template>
+
+<script>
+  import { computed } from 'vue';
+
+  export default {
+    name: 'JobFiltersSidebarSkills',
+    setup() {
+      const store = useStore(key);
+      const skillsSearchTerm = computed({
+        get() {
+          // declare the logic for determining the current (reactive value)
+          return store.state.skillsSearchTerm;
+        },
+        set(value) {
+          // declare the logic for setting the next value
+          // value here will be the value from v-model
+          store.commit(UPDATE_SKILLS_SEARCH_TERM, value);
+        }
+      });
+
+      return { skillsSearchTerm };
+    }
+  };
+</script>
+```
 
 ---
 
@@ -279,13 +322,15 @@ console.log(foo); // Wrong
 
 ---
 
-## Composables
+## Composables (Hooks)
 
 The composition API replaces lots of functionality with helper functions (**composables**)
 
 > **Composable**: is a helper function that utilizes Vue's reactive features. The intent is that a component is composed of lots of smaller, reusable functions that provide reactive objects
 
+- any reactive logic can become composable
 - we can use Vue functions like `ref`, `computed`, `reactive` and more in a composable function body
+- They are like mixins as they can be shared across components
 
 ---
 
@@ -299,9 +344,9 @@ The composition API replaces lots of functionality with helper functions (**comp
 
 ## Mixins
 
-Mixins are a flexible **way to distribute reusable functionalities** for Vue components.
+Mixins are a flexible **way to distribute reusable functionalities** for Vue components (create generic functions that can be shared across components).
 
-- If there's a clash of names between data in mixins or data in the component -> **the data in component has the priority**
+- If there's a conflict of names between data in mixins or data in the component -> **the data in component has the priority**
   - that's why mixins work better with composition-api
 
 ```js

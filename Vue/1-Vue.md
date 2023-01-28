@@ -84,7 +84,7 @@
     - [Loading data](#loading-data)
     - [Code Splitting - Lazy Loading](#code-splitting---lazy-loading)
       - [Webpack Chunks](#webpack-chunks)
-  - [PWA](#pwa)
+  - [Progressive Web App PWA](#progressive-web-app-pwa)
   - [Plugins](#plugins)
     - [Installing a plugin](#installing-a-plugin)
     - [Plugins use cases](#plugins-use-cases)
@@ -880,6 +880,23 @@ It's to make the styles **scoped(limited)** to its component
 `<style scoped>`
 
 - it's done by giving the elements that has applied styles/selectors you write a (special attributes like: `data-v-9a9f6144`) to ensure that this styling is scoped to that HTML-element markup
+
+  - it append the element with a custom attribute selector (hash), so it's like the selector is this:
+
+    ```css
+    /* Normal selector */
+    .todo-list {
+      /* styles */
+    }
+
+    /* Scoped selector */
+    .todo-list[data-v-9a9f6144] {
+      /* styles */
+    }
+    ```
+
+  - same for binded-classes
+
 - without it, any style you write in any component will be available for all components in the app and may result in styling conflicts
 
 ---
@@ -1031,7 +1048,7 @@ Although the transition classes are only applied to the direct child element in 
 
 ### TransitionGroup
 
-`<TransitionGroup>` is a built-in component designed for animating the insertion, removal, and order change of elements or components that are rendered in a **list**.
+`<Transition-group>` is a built-in component designed for animating the insertion, removal, and order change of elements or components that are rendered in a **list**.
 
 - Difference from `<Transition>`:
   - By default, it doesn't render a wrapper element. But you can specify an element to be rendered with the `tag` prop.
@@ -1134,6 +1151,9 @@ the entering and leaving of **multiple elements** that are **animated at the sam
 ### Animating with JavaScript Hooks
 
 - It makes animation more free unlike in `css`, as Javascript allows for more handles than CSS
+- It's done using element-life-cycle events-hooks:
+  ![animation-life-cycles](./img/animation-life-cycles.png)
+  - by default the event-handler method takes the element (`el`) as the first argument
 - When using JavaScript-only transitions, it is usually a good idea to add the `:css="false"`
 
 ```html
@@ -2070,7 +2090,7 @@ const a2 = () => import(/* webpackChunkName: "file1" */ '@/components/a2');
 
 ---
 
-## PWA
+## Progressive Web App PWA
 
 [plugin-pwa](https://cli.vuejs.org/core-plugins/pwa.html)
 

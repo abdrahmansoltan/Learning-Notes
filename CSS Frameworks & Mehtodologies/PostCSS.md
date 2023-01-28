@@ -9,14 +9,19 @@
     - [Enabling and Disabling Source Maps](#enabling-and-disabling-source-maps)
     - [Automatically Build when Source Files Change](#automatically-build-when-source-files-change)
   - [PostCSS Configuration File](#postcss-configuration-file)
+  - [PostCSS plugins](#postcss-plugins)
 
 ---
 
 ## PostCss
 
+It's a **tool for transforming CSS with JavaScript** (tool that you can configure with plugins to transform the output of your CSS)
+
+![postcss](./img/postcss.png)
+
 ### The Value and Limitations of Preprocessors
 
-Most CSS developers are familiar with preprocessors. Tools including Sass, Less, and Stylus introduced concepts such as file partials, nesting, variables, and mixins. Some features are gradually appearing in native CSS, but a preprocessor is still useful for managing large codebases and maintaining style and coding consistency.
+Most CSS developers are familiar with preprocessors. Tools including `Sass`, `Less`, and `Stylus` introduced concepts such as file partials, nesting, variables, and mixins. Some features are gradually appearing in native CSS, but a preprocessor is still useful for managing large codebases and maintaining style and coding consistency.
 
 - It may be difficult to imagine life without a CSS preprocessor, but there are downsides:
   - **Preprocessors are not extendable or limitable**.
@@ -168,3 +173,9 @@ The `postcss` command will become long and cumbersome as you add further plugins
   "postcss:watch": "postcss src/style.css --dir public"
 }
 ```
+
+---
+
+## PostCSS plugins
+
+you can find plugins here [postcss.parts](https://www.postcss.parts/)

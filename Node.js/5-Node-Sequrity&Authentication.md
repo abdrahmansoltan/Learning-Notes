@@ -1,23 +1,23 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [SSL, TLS and HTTPS](#ssl-tls-and-https)
-  - [TLS Certificates](#tls-certificates)
-  - [HTTPS with Node](#https-with-node)
-- [CORS with `node.js`](#cors-with-nodejs)
-- [Database Security](#database-security)
-  - [Protecting Passwords (AUTHENTICATE)](#protecting-passwords-authenticate)
-  - [`Hashing`](#hashing)
-    - [`salt`](#salt)
-- [Authorization](#authorization)
-  - [API Key](#api-key)
-  - [Cookie-vs-Token](#cookie-vs-token)
-  - [Sessions](#sessions)
-  - [JSON Web Tokens (JWTs)](#json-web-tokens-jwts)
-    - [Parts of a JSON Web Token](#parts-of-a-json-web-token)
-- [Oath2](#oath2)
-  - [OAuth 2.0 With Google](#oauth-20-with-google)
-    - [passport_js](#passport_js)
+  - [SSL, TLS and HTTPS](#ssl-tls-and-https)
+    - [TLS Certificates](#tls-certificates)
+    - [HTTPS with Node](#https-with-node)
+  - [CORS with `node.js`](#cors-with-nodejs)
+  - [Database Security](#database-security)
+    - [Protecting Passwords (AUTHENTICATE)](#protecting-passwords-authenticate)
+    - [`Hashing`](#hashing)
+      - [`salt`](#salt)
+  - [Authorization](#authorization)
+    - [API Key](#api-key)
+    - [Cookie-vs-Token](#cookie-vs-token)
+    - [Sessions](#sessions)
+    - [JSON Web Tokens (JWTs)](#json-web-tokens-jwts)
+      - [Parts of a JSON Web Token](#parts-of-a-json-web-token)
+  - [Oath2](#oath2)
+    - [OAuth 2.0 With Google](#oauth-20-with-google)
+      - [passport_js](#passport_js)
 
 ---
 
@@ -56,7 +56,7 @@ const cors = require('cors');
 // CORS
 const corsOptions = {
   origin: 'http://localhost:3001',
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
 // ---------------Middlewares--------------- //
@@ -193,6 +193,14 @@ HTTP is stateless. All the requests are stateless. However, there are situations
 ![cookie-vs-token](./img/cookie-vs-token.png)
 
 There're pros and cons for each, and based on situation we choose what suits us, more on that [here](https://developer.okta.com/blog/2022/02/08/cookies-vs-tokens)
+
+- **Web Token**:
+  - It's an encoded string for storing data, used to transport data between the client and the server
+  - digitally signed (can't modify the token or it will be invalid)
+- **Stateless Authentication**:
+  - the server doesn't actively keep track of who's logged in
+  - a **token** is used to verify the user instead
+    - the token is saved in the LocalStorage in the first auth request(login), and then it's sent in every request to the server when we request data related to the authenticated user (with the unique token)
 
 ---
 

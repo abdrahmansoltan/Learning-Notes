@@ -578,10 +578,15 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 ### first-class functions and higher order functions
 
-- **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values \***\*(can be assigned to variables**/**can be passed as arguments**/**can be returned as values from function)\*\***.),It's just a concept.
-  ![first class objects](./img/first%20class%20objects.png)
-- There are however **higher order functions** in practice, which are possible because the language supports `first class functions`.
-  ![higher order functions](./img/higher%20order%20functions.png)
+- **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values:
+  - can be assigned to variables
+  - can be passed as arguments to another function
+  - can be returned as values from another function --> **closure**
+    ![first class objects](./img/first%20class%20objects.png)
+- There are however **higher order functions** in practice, which are possible because the language supports "first class functions".
+
+  - it's a function that accepts another function as an argument or returns another function as a result.
+    ![higher order functions](./img/higher%20order%20functions.png)
 
   - Easier to add features, more readable, easier to debug
   - we can **chain** these higher order functions (pass the output of one as the input of the next)
@@ -881,10 +886,18 @@ Regular functions return only one, single value (or nothing). **Generators** can
 
 ### Advanced Types
 
-- `null` vs `undefined`
+- **`null` vs `undefined`**
   ![null-undefined](./img/null-undefined.png)
-- `null` is you set it to **empty**, (a variable with no value - it may have had one at some point, but no longer has a value)
-- `undefined` it's empty because it **has not been set** / **Doesn't currently have a value**.
+  - `null` is you set it to **empty**, (a variable with no value - it may have had one at some point, but no longer has a value)
+    - developer sets the value
+  - `undefined`
+    - javascript can't find value for it
+    - it's empty because it:
+      - variable without value:
+        - **has not been set**
+        - **Doesn't currently have a value**.
+      - missing function arguments
+      - missing object properties
 - or `null` is empty on purpose, while `undefined` is still empty.
 - `undefined` means a variable has been declared but **has not yet been assigned a value**
 - `null` is an assignment value. It can be assigned to a variable as a representation of **no value**.
@@ -1106,8 +1119,6 @@ There’s an endless loop, where the JavaScript engine waits for tasks, executes
   // or anything because everything is an "object"
   ```
 
-````
-
 - **Var** vs **const** & **let**
 
   - **Var**
@@ -1320,4 +1331,7 @@ There’s an endless loop, where the JavaScript engine waits for tasks, executes
   let code = 'alert("Hello")';
   eval(code); // Hello
   ```
-````
+
+```
+
+```

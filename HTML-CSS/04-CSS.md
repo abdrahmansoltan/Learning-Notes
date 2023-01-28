@@ -731,7 +731,7 @@ body {
 
 ### clip-path
 
-- `clip-path` => [clippy](https://bennettfeely.com/clippy/)
+- `clip-path` tool => [clippy](https://bennettfeely.com/clippy/)
   ![clip-path](./img/clip-path.webp)
 
 ---
@@ -1013,6 +1013,19 @@ Instead we use the new feature `gap`
 - **overlapping grid items**:
   - Grid allows cells to overlap with each other
     ![overlapping grid items](./img/overlapping%20grid%20items.png)
+- to center a container, you can use these 2 options:
+
+  ```css
+  .grid-container {
+    display: grid;
+    /* option 1 */
+    align-items: center;
+    justify-content: center;
+
+    /* option 2 */
+    place-items: center;
+  }
+  ```
 
 ---
 
@@ -1908,4 +1921,16 @@ There are two ways to add multiple style sheets to a page:
   ```
 
 - usually when using compiler and bundling multiple `css`/`sass` files into one `.css` file, you may see file with extension: `.css.map`
+
   - this file is for mapping the style rules to their files so that it would show in the devtools to ease the debugging process
+
+- when rotating cards **180 degrees** and you want not the back of the card to be visible, we use the `backface-visibility` property:
+
+  ```css
+  .card {
+    backface-visibility: hidden;
+  }
+  ```
+
+  ![backface-visibility](./img/backface-visibility.webp)
+  ![backface-visibility](./img/backface-visibility2.png)

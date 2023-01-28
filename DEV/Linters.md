@@ -447,23 +447,28 @@ A typical package.json will look something like what is below. Here, we target t
   }
   ```
 
-- To use with **VS code**, install the extensions: `ESLint`, `Prettier`, and `Format Code Action`, and update your user settings (`settings.json`), as shown below:
+- To use with **VS code**, install the extensions:
 
-  - If we install the `Format Code Action` extension, we can make formatting available as a code action.
+  - `ESLint` (shows the errors inline within its place without needing to look in the terminal)
+  - `Prettier`
+  - `Format Code Action`
+  - and update your user settings (`settings.json`), as shown below:
 
-  ```json
-  {
-    //...
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "eslint.probe": ["javascript", "javascriptreact", "vue"],
-    // you need to disable the editor formatting on save (editor.formatOnSave); we want to handle everything through code actions.
-    "editor.formatOnSave": false,
-    // Runs Prettier, then ESLint
-    "editor.codeActionsOnSave": ["source.formatDocument", "source.fixAll.eslint"],
-    "vetur.validation.template": false
-    // ...
-  }
-  ```
+    - If we install the `Format Code Action` extension, we can make formatting available as a code action.
+
+    ```json
+    {
+      //...
+      "editor.defaultFormatter": "esbenp.prettier-vscode",
+      "eslint.probe": ["javascript", "javascriptreact", "vue"],
+      // you need to disable the editor formatting on save (editor.formatOnSave); we want to handle everything through code actions.
+      "editor.formatOnSave": false,
+      // Runs Prettier, then ESLint
+      "editor.codeActionsOnSave": ["source.formatDocument", "source.fixAll.eslint"],
+      "vetur.validation.template": false
+      // ...
+    }
+    ```
 
 ---
 

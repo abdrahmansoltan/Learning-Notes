@@ -38,6 +38,9 @@
       - [Promise.resolve/reject](#promiseresolvereject)
   - [Network Requests](#network-requests)
     - [Fetch](#fetch)
+      - [Fetch: Abort](#fetch-abort)
+      - [Fetch: Cross-Origin Requests](#fetch-cross-origin-requests)
+      - [Fetch API in depth](#fetch-api-in-depth)
   - [Microtasks](#microtasks)
     - [Microtasks queue](#microtasks-queue)
   - [Working with data from other servers (Proxy)](#working-with-data-from-other-servers-proxy)
@@ -270,6 +273,10 @@ const getCountryData = function (country) {
   });
 };
 ```
+
+> More info [here](https://javascript.info/xmlhttprequest)
+
+---
 
 ### Callback Hell (Callback in callback)
 
@@ -1087,6 +1094,100 @@ let promise = fetch(url, [options]);
       //  do what you want with data object in this function
     });
   ```
+
+---
+
+#### Fetch: Abort
+
+As we know, `fetch` returns a promise. And JavaScript generally has no concept of “aborting” a promise. So how can we cancel an ongoing `fetch`? E.g. if the user actions on our site indicate that the `fetch` isn’t needed any more.
+
+There’s a special built-in object for such purposes: **`AbortController`**. It can be used to abort not only `fetch`, but other asynchronous tasks as well.
+
+- The **AbortController** object
+
+  - It has a single method `abort()`, And a single property `signal` that allows to set event listeners on it.
+
+    ```js
+    let controller = new AbortController();
+    let signal = controller.signal;
+
+    // The party that performs a cancelable operation
+    // gets the "signal" object
+    // and sets the listener to trigger when controller.abort() is called
+    signal.addEventListener('abort', () => alert('abort!'));
+
+    // The other party, that cancels (at any point later):
+    controller.abort(); // abort!
+
+    // The event triggers and signal.aborted becomes true
+    alert(signal.aborted); // true
+    ```
+
+- Using with `fetch`
+
+  - To be able to cancel `fetch`, pass the `signal` property of an AbortController as a `fetch` option
+  - When a `fetch` is aborted, its promise rejects with an error `AbortError`, so we should handle it, e.g. in `try..catch`.
+
+  ```js
+  // abort in 1 second
+  let controller = new AbortController();
+  setTimeout(() => controller.abort(), 1000);
+
+  try {
+    let response = await fetch('/article/fetch-abort/demo/hang', {
+      signal: controller.signal
+    });
+  } catch (err) {
+    if (err.name == 'AbortError') {
+      // handle abort()
+      alert('Aborted!');
+    } else {
+      throw err;
+    }
+  }
+  ```
+
+- `AbortController` is scalable. It allows to cancel multiple fetches at once.
+
+---
+
+#### Fetch: Cross-Origin Requests
+
+Cross-origin requests – those sent to another domain (even a subdomain) or protocol or port – require special headers from the remote side. That policy is called **"CORS": Cross-Origin Resource Sharing**.
+
+> when networking methods appeared in browser javascript, At first, cross-origin requests were forbidden. But as a result of long discussions, cross-origin requests were allowed, but with any new capabilities requiring an explicit allowance by the server, expressed in special headers.
+
+- If a request is cross-origin, the browser always adds the `Origin` header to it.
+
+  - For instance, if we request `https://anywhere.com/request` from `https://javascript.info/page`, the headers will look like:
+
+    ```js
+    GET /request
+    Host: anywhere.com
+    Origin: https://javascript.info
+    ...
+    ```
+
+  - the Origin header contains exactly the origin (domain/protocol/port), without a path.
+
+- The browser plays the role of a trusted mediator here:
+  1. It ensures that the correct Origin is sent with a cross-origin request.
+  2. It checks for permitting `Access-Control-Allow-Origin` in the response, if it exists, then JavaScript is allowed to access the response, otherwise it fails with an error.
+     ![CORS](./img/cors1.png)
+- If the server agrees to serve the requests, then it should respond with empty body, status `200` and headers:
+
+  - `Access-Control-Allow-Origin` must be either `*` or the requesting origin, such as `https://javascript.info`, to allow it.
+  - `Access-Control-Allow-Methods` must have the allowed method.
+  - `Access-Control-Allow-Headers` must have a list of allowed headers.
+  - Additionally, the header **`Access-Control-Max-Age`** may specify a number of seconds to cache the permissions. So the browser won’t have to send a preflight for subsequent requests that satisfy given permissions.
+
+  ![CORS](./img/cors2.png)
+
+---
+
+#### Fetch API in depth
+
+For more details on it, here: [javascript.info/fetch-api](https://javascript.info/fetch-api)
 
 ---
 

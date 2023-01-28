@@ -9,6 +9,7 @@
   - [Performance](#performance)
     - [Minimize images](#minimize-images)
     - [Critical Render PATCH](#critical-render-patch)
+    - [Rollup Visualizer](#rollup-visualizer)
   - [Gulp.js](#gulpjs)
     - [Gulp vs Webpack](#gulp-vs-webpack)
   - [Pugjs](#pugjs)
@@ -24,11 +25,15 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 
 ![pwa](./img/pwa.png)
 
+- It's a term used to describe a set of features and APIs in the browser
 - Progressive Web Apps are user experiences that have the reach of the web, and are:
 
   - reliable
   - fast
   - engaging
+
+- Guide to install a PWA:
+  - [What does it take to be installable?](https://web.dev/install-criteria/)
 
 ### PWA Components
 
@@ -42,10 +47,16 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 
 #### Service Workers
 
-- It's a Javascript file that runs in the background Asynchronously
-- Service workers **enable offline work mode**, background syncs and push notifications. Caching and storage APIs available to service works allow pre-caching of content. As defined on Google developer, a service worker is a script that your browser runs in the background, separate from a web page, opening the door to features that don’t need a web page or user interaction.
+- It's a Javascript file that runs in the background Asynchronously (separate from our code and can run in a separate thread in the background)
+- Service workers **enable offline work mode**, background syncs and **push notifications**. **Caching** and **storage APIs** available to service works allow pre-caching of content. As defined on Google developer, a service worker is a script that your browser runs in the background, separate from a web page, opening the door to features that don’t need a web page or user interaction.
   ![service worker](./img/serviceworker.PNG)
+- Limitations:
+  - unable to access the DOM
+  - limited browser supports
 - caching ![caching](./img/caching.PNG)
+- How to create service worker:
+  - option 1: manually
+  - option 2: using [Workbox](https://developer.chrome.com/docs/workbox/) which is usually added to PWA plugins
 
 #### HTTPS
 
@@ -66,6 +77,12 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 It's how the files are handled after being downloaded from the source
 
 ![Critical Render PATCH](./img/critical%20render%20path.PNG)
+
+### Rollup Visualizer
+
+Tool to Visualize and analyze your Rollup bundle to see which modules are taking up space.
+
+![rollup](./img/rollup.png)
 
 ---
 

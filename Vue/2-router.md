@@ -36,6 +36,8 @@
 
 ## Routing
 
+![FE-Routing](./img/fe-routing.png)
+
 ### Router configuration and setup
 
 - in `main.js`, we setup the `vue-router` and configure it to our app using these methods imported from `vue-router`:
@@ -144,6 +146,8 @@ The history option when creating the router instance allows us to choose among d
 - Hash Mode:
   - It uses a hash character (`#`) before the actual URL that is internally passed.
   - Because this section of the URL is never sent to the server, it doesn't require any special treatment on the server level.
+    - it's like a trick to the browsers, as browsers know that anything after a hash `#` is supposed to be in the same page (lke navigating to headers tags)
+    - > **So, it doesn't reload or request sources on route change**
   - It does however have a bad impact in **SEO**. If that's a concern for you, use the HTML5 history mode.
 - HTML5 Mode:
 
@@ -289,9 +293,21 @@ Instead of using regular `<a>` tags, we use a custom component `router-link` to 
       - applied automatically when its target route is matched (contains part of the route).
     - `.router-link-exact-active`
       - applied automatically when its target route is an exact-match
+  - you can use these classes to give styling to router-links with these classes
+
+  ```html
+  <style scoped>
+    .router-link-active {
+      background-color: blue;
+      font-weight: bold;
+    }
+  </style>
+  ```
+
   - or you can make an **alias** for this class with different name in the router options (change the default classes for the active state)
 
     ```js
+    // router config file (index.js)
     routes=[],
     linkExactActiveClass:"text-yellow-500", // replacing the active class with this class instead of the: `.router-link-active`
     ```
@@ -481,6 +497,8 @@ Aside from using `<router-link>` to create anchor tags for declarative navigatio
 ## Params
 
 ### add params to route
+
+![query--vs-path-params](./img/query-vs-path-params.png)
 
 - this is done by the `query` params
 
