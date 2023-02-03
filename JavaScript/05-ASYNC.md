@@ -41,6 +41,9 @@
       - [Fetch: Abort](#fetch-abort)
       - [Fetch: Cross-Origin Requests](#fetch-cross-origin-requests)
       - [Fetch API in depth](#fetch-api-in-depth)
+    - [Long Polling vs WebSockets](#long-polling-vs-websockets)
+      - [Long Polling](#long-polling)
+      - [WebSocket](#websocket)
   - [Microtasks](#microtasks)
     - [Microtasks queue](#microtasks-queue)
   - [Working with data from other servers (Proxy)](#working-with-data-from-other-servers-proxy)
@@ -243,6 +246,8 @@ lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 
 **Ajax** is a technique for loading data into part of a page without having to refresh the entire page. The data is often sent in a format called JavaScript Object Notation `JSON`.
 
+> It's for **HTTP** requests (communicating between client and server)
+
 - The ability to load new content into part of a page improves the user experience because the user does not have to wait for an entire page to load if only part of it is being updated. This has led to a rise in so-called **single page web applications** (web-based tools that feel more like software applications, even though they run in the browser).
 - Historically, **AJAX** was an acronym for the technologies used in asynchronous requests like this. It stood for **Asynchronous JavaScript And XML**. Since then, technologies have moved on and the term **Ajax** is now used to refer to a group of technologies that offer asynchronous functionality in the browser.
 - **Data formats:** Servers typically send back `HTML`, `XML`(which the browser turns into `HTML`), or `JSON`
@@ -313,7 +318,7 @@ request.addEventListener('load', function () {
   });
 });
 
-// another example
+// another example ( we do this to maintain order of execution  ... then ... then ...)
 setTimeout(() => {
   console.log('1 second passed');
   setTimeout(() => {
@@ -334,7 +339,7 @@ setTimeout(() => {
 
 ### Promises / Fetch API
 
-- `Promise` : An object that is used as a placeholder for the future result of an asynchronous operation.
+- **Promise** : An object that is used as a placeholder for the future result of an asynchronous operation.
 - or: it's an object that may produce a single value some time in the future, either a resolved-value or a (reason that it's rejected)
 - The function passed to new Promise is called the **"executor"**.
 
@@ -1077,7 +1082,11 @@ let promise = fetch(url, [options]);
   - We no longer need to rely on events and callbacks passed into asynchronous functions to handle asynchronous results
   - Instead of nesting callbacks, we can chain promises for a
     sequence of asynchronous operations: escaping `callback-hell`
-- _note_ : whatever we `return` from a `promise` will be the `fulfilled` value of that promise (which will be used in the `.then()` method), that's why `arrow-functions` are usually used with promises.
+- **Notes:**
+  - whatever we `return` from a `promise` will be the `fulfilled` value of that promise (which will be used in the `.then()` method), that's why `arrow-functions` are usually used with promises.
+  - **json()** is a method available on all response objects that are coming from `fetch()` function (in `__proto__` of the response object), It reads the remote data and parses it as JSON
+    - also `.json()` returns a new promise => so we have to return it
+  - in XHR, we use the `JSON.parse()` method with the response, but in `fetch()`, we use `.json()` method on the returned `data`
 - explanation code :
 
   ```javascript
@@ -1086,8 +1095,6 @@ let promise = fetch(url, [options]);
       console.log(response); // promise object
       if (!response.ok) throw new Error(`Country not found (${response.status})`);
       return response.json();
-      // (.json()) is a method available on all response objects that are coming from (fetch()) function, It reads the remote data and parses it as JSON
-      // also (.json()) returns a new promise => so we have to return it like we did
     })
     .then(data => {
       // the data we want
@@ -1188,6 +1195,91 @@ Cross-origin requests – those sent to another domain (even a subdomain) or pro
 #### Fetch API in depth
 
 For more details on it, here: [javascript.info/fetch-api](https://javascript.info/fetch-api)
+
+---
+
+### Long Polling vs WebSockets
+
+#### Long Polling
+
+Long polling is the simplest way of having persistent connection with server, that doesn’t use any specific protocol like WebSocket or Server Sent Events.
+
+- **Regular Polling**:
+
+  - It's the simplest way to get new information from the server is periodic polling. That is, regular requests to the server:
+    - “Hello, I’m here, do you have any information for me?”. For example, once every 10 seconds.
+    - In response, the server first takes a notice to itself that the client is online, and second – sends a packet of messages it got till that moment.
+  - Downsides:
+    1. Messages are passed with a delay up to 10 seconds (between requests)
+    2. Even if there are no messages, the server is bombed with requests every 10 seconds, even if the user switched somewhere else or is asleep. That’s quite a load to handle, speaking performance-wise.
+
+- **Long polling**:
+
+  - much better way to poll the server, also very easy to implement, and delivers messages without delays.
+  - The flow:
+    ![long-pooling](./img/long-polling-1.svg)
+    1. A request is sent to the server.
+    2. The server doesn’t close the connection until it has a message to send.
+    3. When a message appears – the server responds to the request with it.
+    4. The browser makes a new request immediately.
+  - If the connection is lost, because of, say, a network error, the browser immediately sends a new request.
+    ![long-pooling](./img/long-polling-2.jpg)
+  - A sketch of client-side subscribe function that makes long requests:
+
+    ```js
+    async function subscribe() {
+      let response = await fetch('/subscribe');
+
+      if (response.status == 502) {
+        // Status 502 is a connection timeout error,
+        // may happen when the connection was pending for too long,
+        // and the remote server or a proxy closed it
+        // let's reconnect
+        await subscribe();
+      } else if (response.status != 200) {
+        // An error - let's show it
+        showMessage(response.statusText);
+        // Reconnect in one second
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await subscribe();
+      } else {
+        // Get and show the message
+        let message = await response.text();
+        showMessage(message);
+        // Call subscribe() again to get the next message
+        await subscribe();
+      }
+    }
+
+    subscribe();
+    ```
+
+  - Long polling works great in situations when messages are rare.
+    - If messages come very often, another method is preferred, such as **Websocket** or Server Sent Events.
+
+---
+
+#### WebSocket
+
+The WebSocket protocol, provides a way to exchange data between browser and server via a **persistent connection**. The data can be passed in both directions as "packets", without breaking the connection and the need of additional HTTP-requests.
+
+- WebSocket is especially great for services that require continuous data exchange, e.g. online games, real-time trading systems and so on.
+- To open a websocket connection, we need to create new WebSocket using the special protocol **`ws`** in the url:
+
+  ```js
+  let socket = new WebSocket('ws://javascript.info');
+  ```
+
+  - There’s also encrypted `wss://` protocol. It’s like `HTTPS` for websockets.
+
+- Once the socket is created, we should listen to events on it. There are totally 4 events:
+
+  - `open` – connection established
+  - `message` – data received
+  - `error` – websocket error
+  - `close` – connection closed
+
+> More detailed info here [javascript.info/websocket](https://javascript.info/websocket)
 
 ---
 

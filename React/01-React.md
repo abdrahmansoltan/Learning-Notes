@@ -2,7 +2,7 @@
 
 - [INDEX](#index)
   - [installation](#installation)
-  - [React fundementals](#react-fundementals)
+  - [React Fundamentals](#react-fundamentals)
     - [Declarative vs imperative](#declarative-vs-imperative)
     - [multi-page application](#multi-page-application)
     - [single-page application (SPA)](#single-page-application-spa)
@@ -12,8 +12,13 @@
     - [How does it work?](#how-does-it-work)
   - [Router](#router)
     - [Set Up](#set-up)
-    - [Using it](#using-it)
-    - [Dynamic Routes](#dynamic-routes)
+    - [Router Components](#router-components)
+      - [`Route` Component](#route-component)
+      - [`Switch` Component](#switch-component)
+      - [`Redirect` component](#redirect-component)
+      - [`Link` component](#link-component)
+      - [`NavLink` Component](#navlink-component)
+    - [Dynamic Routes (Params)](#dynamic-routes-params)
     - [Programmatically navigation](#programmatically-navigation)
       - [changing the page's url](#changing-the-pages-url)
       - [Accessing the page's url](#accessing-the-pages-url)
@@ -26,7 +31,7 @@
   - [Components](#components)
     - [why components](#why-components)
     - [component tree](#component-tree)
-    - [List Components](#list-components)
+    - [List Components (Looping)](#list-components-looping)
       - [update list-items](#update-list-items)
   - [Custom Components (fragment)](#custom-components-fragment)
     - [fragment](#fragment)
@@ -48,8 +53,9 @@
     - [Events in HTML vs React](#events-in-html-vs-react)
     - [Data binding](#data-binding)
   - [Forms](#forms)
-    - [Form-Input](#form-input)
-    - [Validation](#validation)
+    - [Controlled Forms](#controlled-forms)
+      - [Form-Input](#form-input)
+    - [Form Validation](#form-validation)
   - [Environmental Variables](#environmental-variables)
   - [Interview Questions](#interview-questions)
 
@@ -57,7 +63,7 @@
 
 ## installation
 
-- `npx` is used to execute commands without installing dependencies (**install something and running it immediately**)
+- **`npx`** is used to execute commands without installing dependencies (**install something and running it immediately**)
 
 ```bash
 npx create-react-app my-app # equivalent to installing react globally first then >> creating react app
@@ -68,6 +74,12 @@ npm install
 npm start
 ```
 
+- **create-react-app** is built on top of **Webpack**, which:
+  - Enables module importing/exporting
+    - packages/bundles up all css/images/js into a single file for the browser
+    - reduce number of HTTP requests for performance
+  - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
+  - Enables easy testing & deployment
 - one `HTML` file is delivered => `index.html`
 
 - in `index.js` you render the app to `index.html`
@@ -84,7 +96,11 @@ npm start
 
 ---
 
-## React fundementals
+## React Fundamentals
+
+It's a library not a framework. However, few people use react on its own, but when combined with things/tools like `react-router`, `webpack`, `redux` -> ("React Ecosystem"), then it become more like a framework
+
+> there's an actual framework built around React -> **Next.js**
 
 ### Declarative vs imperative
 
@@ -124,8 +140,8 @@ npm start
 ![jsx](./img/jsx.jpg)
 
 - **JSX** = "HTML in JavaScript"
-- it's a "Syntactic sugar", does not run in the
-  browser like this!
+- it's a "Syntactic sugar", does not run in the browser like this!
+- It's not legal Javascript; It has to be transpiled to Javascript using **Babel**
 - It's like functions as when react sees them it **invokes them**
 - in older versions of react : to use `JSX` you had to write this in the file :
 
@@ -198,6 +214,25 @@ React.createElement(
 
 React Router turns React projects into single-page applications. It does this by providing a number of specialized components that manage the creation of links, manage the app's URL, provide transitions when navigating between different URL locations, and so much more.
 
+- **Server-Side Routing**: (Traditional Routing)
+  - clicking a `<a>` link causes browser to request a new page & replace the entire DOM
+  - Server decides what HTML to return based on URL request, and the entire page refreshes
+- **Client Side Routing**
+
+  - **Fake CSR**:
+    ![fake-client-side-routing](./img/fake-client-side-routing.png)
+    - We can actually create something closer to a client-side-routing using conditions and preventing-default-behavior on `<a>` links, and render components based on state condition, But this will not actually be routing, as we won't be able to track **history** (go back and forward...) and other more features
+      ![fake-client-side-routing](./img/fake-client-side-routing-1.png)
+  - **Real CSR**
+    - It handles mapping between URL bar and the content which the user sees via browser rather than via server
+    - sites that exclusively use client-side routing are **single-page-applications SPA**
+    - here, we use Javascript to manipulate the URL bar with a web-api called **History**
+
+- **SSR** vs **CSR**
+  ![SSR-vs-CSR](./img/SSR-vs-CSR.png)
+
+---
+
 ### Set Up
 
 - first install it
@@ -225,7 +260,7 @@ React Router turns React projects into single-page applications. It does this by
 
   > **StrictMode**: provides additional warnings when using legacy or soon to be deprecated code.
 
-- now in `app.js`
+- now in `App.js`
 
   ```js
   import { Route, Routes } from 'react-router-dom';
@@ -249,7 +284,7 @@ React Router turns React projects into single-page applications. It does this by
   // in `app.js`
   function App() {
     return (
-      // now we want to tell the parent compont (Home) where we want the react-router-dom to render the nested-matching-element (Shop) --> using "Outlet componet" from react-router-dom
+      // now we want to tell the parent component (Home) where we want the react-router-dom to render the nested-matching-element (Shop) --> using "Outlet component" from react-router-dom
       <Routes>
         <Route path='/home' element={<Home />}>
           <Route path='shop' element={<Shop />} />
@@ -271,11 +306,60 @@ React Router turns React projects into single-page applications. It does this by
   }
   ```
 
-- `<switch>` **ONLY IN VERSION 5** -> `<Routes>` in version 6:
-  - It Renders the first child `<Route>` or `<Redirect>` that matches the location.
-  - makes sure that only one component from components with matching routes are displayed
-  - it displays the first match it finds, so the order is important or you can use `exact`
-  - to make a "not found page" make: `path="*"`
+---
+
+### Router Components
+
+#### `Route` Component
+
+![route](./img/route-1.png)
+
+- **`exact`** matches the exact-full-path **ONLY IN VERSION 5**
+
+  - not needed in v6
+
+- one of its props is the prop responsible for referencing the component for the specified route, and this prop is `render=""` or `component=""`, and there's a difference between them:
+
+  - `component`: When you use `component` prop, the component is **instantiated** per every call of Route#render. It means that, for your component that you pass to `component` prop of `Route`, `constructor`, `componentWillMount`, and `componentDidMount` will be executed every time the route is rendered.
+
+    ```js
+    // So when you have it like:
+    <Route path="/:locale/store" component={Store} />
+    // you can think of it as:
+    <Route path="/:locale/store">
+      <Store />
+    </Route>
+    ```
+
+  - `render`: if you use `render` prop, the component is **evaluated** on every Route#render. Remember that every component is a function? This function will be executed as is, without any lifecycle methods.
+
+    ```js
+    // So when you have it like:
+    <Route path="/:locale/store" render={Store} />
+    // you can think of it as:
+    <Route path="/:locale/store">
+      {Store()}
+    </Route>
+    ```
+
+  - Also, the source code explains it very good:
+
+    ```js
+    if (component) return match ? React.createElement(component, props) : null;
+
+    if (render) return match ? render(props) : null;
+    ```
+
+  - Also, when you want to pass props to the component use `render` as it accepts a function unlike `component`
+
+#### `Switch` Component
+
+- `<Switch>` **ONLY IN OLD VERSION 5** -> It's **`<Routes>`** in version 6
+
+- It Renders the first child `<Route>` or `<Redirect>` that matches the location.
+- It makes sure that only one component from components with matching routes are displayed (limit only one match from a group of routes)
+  - > as routes match partially as well as total match, **`/`** & **`/home`** will be fired when requesting `/home`
+- It stops searching once it finds a match -> it displays the first match it finds, so the order is important or you can use **`exact`**
 
 ```js
 import { Route, Switch } from 'react-router';
@@ -290,9 +374,23 @@ import { Route, Switch } from 'react-router';
 </Switch>;
 ```
 
-- `exact` matches the full-path **ONLY IN VERSION 5**
+- **Including a 404 route**:
 
-  - not needed in v6
+  - You can make use of the order of routes in a `<Switch>` and put the 404 route last
+
+    ```js
+    return (
+      <Switch>
+        <Route exact path='/blog' render={() => <BlogHome />} />
+        <Route exact path='/' render={() => <Home />} />
+        <Route render={() => <NotFound />} />
+      </Switch>
+    );
+    ```
+
+  - OR: to make a "not found page (404)" make: `path="*"`
+
+#### `Redirect` component
 
 - `<Redirect>` **ONLY IN VERSION 5**: navigate to a new location. The new location will override the current location
   - for **V6**: we use `<Navigate>`
@@ -313,13 +411,13 @@ import { Route, Switch } from 'react-router';
 
 ```
 
----
-
-### Using it
+#### `Link` component
 
 - when you want to change the page's URL, we don't use `<a>` as it will make the page **reload**(make a new request)
-- Instead we use `<Link>` from `react-router-dom`
-- **Note**: `<Link>` can be represented as `<a>` in **css**
+- Instead we use `<Link>` component from `react-router-dom`
+- **Notes**:
+  - `<Link>` can be represented as `<a>` in **css**
+  - clicking on `<link>` doesn't issue a GET request, as javascript intercepts click and does client-side-routing
 
 ```js
 import { Link } from 'react-router-dom';
@@ -327,16 +425,47 @@ import { Link } from 'react-router-dom';
 <Link to='/about'>About Us</Link>;
 ```
 
-- To use link with **highlighting the active link** --> use `<NavLink>`
-  - it sets a css-class to the clicked link
+#### `NavLink` Component
+
+- `<NavLink>` is just like `link`, with one additional feature:
+
+  - If at page that link would go to, the `<a>` gets a CSS class of `active`
+  - This lets you stylize links to "page you are already at" using the `activeStyle` (in-line) or `activeClassName` props
+
+- You should include an `exact` prop here as well
+- It's Very helpful for navigation menus
 
 ```js
+import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
+import './NavBar.css';
 
-// VERSION 5
-<NavLink aciveClassName='name_of_the_class' to='/about'>
-  About Us
-</NavLink>;
+class NavBar extends Component {
+  render() {
+    const activeStyle = {
+      fontWeight: 'bold',
+      color: 'mediumorchid'
+    };
+    return (
+      <nav>
+        {/* VERSION 5 */}
+        <NavLink exact to='/' activeStyle={activeStyle}>
+          Home
+        </NavLink>
+        <NavLink exact to='/eat' activeStyle={activeStyle}>
+          Eat
+        </NavLink>
+        <NavLink exact to='/drink' activeStyle={activeStyle}>
+          Drink
+        </NavLink>
+        {/* OR */}
+        <NavLink exact to='/drink' activeClassName='name_of_the_class'>
+          Drink
+        </NavLink>
+      </nav>
+    );
+  }
+}
 
 // VERSION 6
 <NavLink className={navData => (navData.isActive ? 'name_of_the_class' : '')} to='/about'>
@@ -346,24 +475,35 @@ import { NavLink } from 'react-router-dom';
 
 ---
 
-### Dynamic Routes
+### Dynamic Routes (Params)
 
-- here we use query-parameters `/:`
-- to access this **param** we use `useParams` hook
+- here we use query-parameters `/:param`
 
-```js
-<Route path='/product/:id' component={Product} />
-```
+- **OLD WAY**: Here we use the `routeProps` and pass it as a prop to the component if you are using `render={()=> <Component/>}`, or just use `component={Component}` without passing anything
 
-```js
-// in Product.component.jsx
-import { useParams } from 'react-router-dom';
+  ```js
+  <Route path='/food/:name' render={routeProps => <Food {...routeProps} />} />
+  ```
 
-const params = useParams();
-// or const {productId} = useParams()
+  ![routeParams](./img/routeParams.png)
 
-console.log(params.productId);
-```
+- **New Way**
+
+  - to access this **param** we use `useParams` hook
+
+  ```jsx
+  <Route path='/product/:id' component={Product} />
+  ```
+
+  ```js
+  // in Product.component.jsx
+  import { useParams } from 'react-router-dom';
+
+  const params = useParams();
+  // or const {productId} = useParams()
+
+  console.log(params.productId);
+  ```
 
 ---
 
@@ -376,7 +516,8 @@ console.log(params.productId);
 
 - `history.replace` vs `history.push`:
   - in case of `push` - a new record is added in the history, and user can go back
-  - in case of `replace` it deletes the last record and puts the new one. So if you will not use the go back, Usually when redirecting from an invalid url
+  - in case of `replace` it deletes the last record and puts the new one. So if you will not use the go back
+    - > Usually when redirecting from an invalid url
 
 ```js
 import { useHistory } from 'react-router-dom';
@@ -536,6 +677,10 @@ There are two different ways of using CSS Modules in a React application.
 
 ## Components
 
+They are the building blocks of React
+
+- They are classes / functions that know how to render themselves into HTML
+
 ### why components
 
 ![comp](./img/components.PNG)
@@ -544,14 +689,22 @@ There are two different ways of using CSS Modules in a React application.
 
 ![tree](./img/components_tree.PNG)
 
-### List Components
+---
+
+### List Components (Looping)
 
 - we can use the array `map` method to iterate over our list items to map them from JavaScript primitive to HTML elements.
 
-  - Each element must receive a **mandatory** `key` prop
+  - Each element must receive a **mandatory** `key` attribute
 
 - `Keys` : Keys help React identify which items have changed, been added, or been removed. so that react only updates this item and not the whole list of items.
+
   - Keys should be given to the elements inside the array to give the elements a stable identity.
+  - If you don't have unique `Id` for rendered items, You may use the iteration **index** as a `key` as a last resort:
+
+  ```js
+  const listItems = numbers.map((number, index) => <li key={index}>{number}</li>);
+  ```
 
 ```js
 const numbers = [1, 2, 3, 4, 5];
@@ -696,6 +849,8 @@ function App() {
 
 [reference](https://dmitripavlutin.com/react-props/)
 
+- They are used for configuring your component
+- they are **immutable** (can't change component's props)
 - they make components more `flexible`
 
 ### single prop
@@ -867,18 +1022,30 @@ const App = () => {
 
 ## Forms
 
-[Here](https://formik.org/)
+Great library for forms in React -> [formik.org](https://formik.org/)
 
-### Form-Input
+### Controlled Forms
 
-to access input-value:
+![controlled-forms](./img/controlled-forms.png)
 
-- use **state**
-  - this is preferred if you will do something on the input-value (like resetting the input-value after submitting)
-- use **refs**
-  - if you want to just access the value without modifying it
+#### Form-Input
 
-### Validation
+- To access input-value:
+
+  - use **state**
+    - this is preferred if you will do something on the input-value (like resetting the input-value after submitting)
+  - use **refs**
+    - if you want to just access the value without modifying it
+
+- Handling multiple inputs
+
+  ![controlled-forms](./img/controlled-forms-1.png)
+
+- for `label` element, use the `htmlFor` attribute instead of `for`
+
+---
+
+### Form Validation
 
 ![validation](./img/forms.PNG)
 
@@ -896,6 +1063,10 @@ in `.env` file:
 ## Interview Questions
 
 [React Interview Questions & Answers](https://github.com/sudheerj/reactjs-interview-questions)
+
+- What will happen if you used a state in a JSX block without defining initial state and just setting state in a `componentDidMount()` lifeCycle?
+
+  - it will result an error, as on the first invocation of the `render()` function, the `componentDidMount()` isn't yet invoked and there's no initial state defined
 
 - Why React Hook useState uses const and not let?
 
@@ -923,4 +1094,9 @@ in `.env` file:
   ```
 
 - Why (fetching with setting the state to the resolved value) without `componentDidMount()` or `useEffect()` results **infinit render**
+
   - because the resolved object/array is different from the one in the memory so the state gets reseted over and over
+
+- why we must open the app (in development/production modes) through a server
+  - it's because libraries like **Babel**
+  - and as it's a SPA, so the HTML will be empty and need to get the requested data (mounted react app) and this request is made through a server that serves these files and data

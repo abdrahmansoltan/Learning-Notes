@@ -186,7 +186,7 @@ it's the automatic or implicit conversion of values from one data type to anothe
 
 Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope.
 
-> (range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in**.
+> (range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in (its current surrounding scope)**.
 
 - The Lexical Environment object consists of two parts:
 
@@ -388,7 +388,8 @@ It's the ability to treat functions (when executed) as values
 > - But when a function is created using **new Function()** have `[[Environment]]` referencing the global Lexical Environment, not the outer one. Hence,
 > - they cannot use outer variables. But that’s actually good, because it insures us from errors. Passing parameters explicitly is a much better method architecturally and causes no problems with minifiers.
 
-A closure is a function that remembers its outer variables and can access them.
+- A closure gives you an access to an outer function's scope from an inner function
+  - It is a function that remembers its outer variables and can access them.
 
 > When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work.
 
@@ -602,7 +603,7 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     sayName.call(human, 'Hi!'); // Outputs Hi! Ahmed
     ```
 
-  - `apply` => is just like `call()` except that it accepts arguments in array
+  - `apply` => is just like `call()`, **the difference is how we pass the arguments to the method** -> it accepts arguments in array
 
     - it's not used in modern javascript because we can instead use `spread operator ...` with `call()`
 
@@ -615,6 +616,9 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     ```
 
   - `bind` => is somewhat special. It is a higher-order function which means when you invoke it => **it returns a new function where `this` keyword is bound**. The function returned is curried, meaning you can call it multiple times to provide different arguments in each call.
+
+    - > it's used for later-use and not immediate invocation
+    - It takes a list of arguments like `call`
 
     - _note_ => `bind` doesn't call the function that's why it's used in `eventListeners`
     - it's also used to set arguments so that we won't have to write them each time
@@ -1203,7 +1207,16 @@ There’s an endless loop, where the JavaScript engine waits for tasks, executes
         sayHi();
         ```
 
-- **let** is both function-scoped and block-scoped, **means you can't use it outside the function-scope & block-scope**
+    - `var` variable can be **re-declared (re-defined)** without errors:
+
+      ```js
+      var num = 20;
+      num = 15; // Ok
+      var num = 50; // Ok
+      ```
+
+  - **let & const** are both function-scoped and block-scoped (anything within `{}`), **means you can't use it outside the function-scope & block-scope**
+
 - if you used **const** in a `for loop` -> `for ( i = 0; i < 3; i++) {}` you will get error, as you won't be able to re-assign `i`
 
 - There is a widespread practice to use constants (named using capital letters and underscores) as aliases for difficult-to-remember values that are known prior to execution.
@@ -1331,7 +1344,3 @@ There’s an endless loop, where the JavaScript engine waits for tasks, executes
   let code = 'alert("Hello")';
   eval(code); // Hello
   ```
-
-```
-
-```

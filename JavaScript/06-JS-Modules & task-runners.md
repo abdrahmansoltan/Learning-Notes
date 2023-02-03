@@ -46,7 +46,7 @@ A **module** is just a file. One script is one module. As simple as that.
   - `export` keyword labels variables and functions that should be accessible from outside the current module.
   - `import` allows the import of functionality from other modules.
 
-- As modules support special keywords and features, we must tell the browser that a script should be treated as a module, by using the attribute `<script type="module">`.
+- As modules support special keywords and features, we **must** tell the browser that a script should be treated as a module, by using the attribute `<script type="module">`.
 
   - The browser automatically fetches and evaluates the imported module (and its imports if needed), and then runs the script.
 
@@ -54,8 +54,8 @@ A **module** is just a file. One script is one module. As simple as that.
   <script type="module" defer src="script.js"></script>
   ```
 
-- Modules work only via **HTTP(s)**, not locally
-  - That's why we use a local web-server, such as “live server”
+- Modules work only via **HTTP(s)**, not locally as it requires CORS access and other protocols
+  - That's why we use a local web-server, such as “live server” and can't open it locally without a server
 
 ---
 
@@ -541,7 +541,7 @@ You can find more in depth here -> [Modules & Bundlers](../DEV/Modules%20%26%20B
 
 ### npm scripts
 
-It is a tool that automates different parts of the build process. For frontend development, tasks include `minifying code`, `optimizing images`, `running tests`, etc.
+It is a tool that automates different parts of the build process (Triggering Build Workflow). For frontend development, tasks include `minifying code`, `optimizing images`, `running tests`, etc.
 
 - The `"scripts"` property of your `package.json` file supports a number of built-in scripts and their preset life cycle events as well as arbitrary scripts. These all can be executed by running `npm run-script <stage>` or `npm run <stage>` for short.
 - Pre and post commands with matching names will be run for those as well (e.g. `premyscript`, `myscript`, `postmyscript`). Scripts from dependencies can be run with `npm explore <pkg> -- npm run <stage>`.
@@ -630,7 +630,8 @@ To create "**pre**" or "**post**" scripts for any scripts defined in the "script
 ### Package manager Notes
 
 - **devDependency**: this saves it as a development dependency, which means it’s a package that you need in your development environment but not on your production server
-  - it's done with the `--save-dev` argument
+  - it's done with the `--save-dev` argument or `-D`
+- When a package has a version starts with **`^`**, this means that we tell tha package manager to install **the latest version**
 - `Bundling` with `parcel` creates a `script` not a `module`, so in html we shouldn't write `type="module"` in `<script>`
 - if you're using `windows`, don't write scripts with **single quotation** as it won't work, so you'll have to use **double quotation**
 

@@ -1052,12 +1052,12 @@ An event is a signal that something has happened. All DOM nodes generate such si
   - **To remove a handler we should pass exactly the same function as was assigned.**
 
     ```js
-    // This won't work
+    // ------ This won't work ------ //
     elem.addEventListener('click', () => alert('Thanks!'));
     // ....
     elem.removeEventListener('click', () => alert('Thanks!'));
 
-    // This will
+    // ------ This will ------ //
     function handler() {
       alert('Thanks!');
     }

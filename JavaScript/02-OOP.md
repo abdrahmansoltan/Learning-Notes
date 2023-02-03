@@ -160,13 +160,24 @@ That's the main purpose of constructors – to implement reusable object creatio
   alert(new BigUser().name); // Godzilla, got that object
   ```
 
-- we can omit **parentheses** after new, if it has no arguments:
+- we can omit **parentheses** after new, if it has no parameters:
 
   ```js
   let user = new User(); // <-- no parentheses
   // same as
   let user = new User();
   ```
+
+- Reusing Constructor function:
+
+  - it's done using the `constructor` property
+
+    ```js
+    const john = new Person('John', 'Cena');
+    const susy = new john.constructor('Ausy', 'Micheal'); // same as new Person(...)
+    ```
+
+---
 
 ### Methods
 
@@ -189,11 +200,11 @@ That's the main purpose of constructors – to implement reusable object creatio
 
 ## prototypal inheritance (delegation)
 
-> In JavaScript, objects have a special hidden property **`[[Prototype]]`**, that is either **`null`** or references another object. That object is called “a prototype”:
+> In JavaScript, each (constructor-function/class) has a special hidden property **`[[Prototype]]`** that is shared by every instance of the constructor/class, that is either **`null`** or references another object. That object is called “a prototype”:
 >
 > - The property `[[Prototype]]` is internal and hidden, but there are many ways to set it:
 >
->   - One of them is to use the special name **`__proto__`**, which is a "setter"
+>   - One of them is to use the special name **`__proto__`**, which is a "setter" for the `[[prototype]]` object
 >
 >     ```js
 >     rabbit.__proto__ = animal; // sets rabbit.[[Prototype]] = animal
@@ -304,7 +315,7 @@ let sum = new Function('a', 'b', 'return a + b');
 
 - all is that is possible because (functions in JS are both **function & objects combo**)
 
-> **NOTE:** other built in objects like arrays have the hidden `__proto__` property
+> **NOTE**: other built in objects like arrays have the hidden `__proto__` property
 
 ---
 
