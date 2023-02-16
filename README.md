@@ -20,6 +20,9 @@
   - [Testing](#testing)
     - [Unit Testing](#unit-testing)
     - [Automation (E2E) Testing](#automation-e2e-testing)
+  - [Development Tools](#development-tools)
+  - [Python](#python)
+  - [Data Structures \& Algorithms](#data-structures--algorithms)
 
 ---
 
@@ -66,6 +69,8 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Sass](./CSS%20Frameworks%20%26%20Mehtodologies/Sass.md)
 - [Bootstrap](./CSS%20Frameworks%20%26%20Mehtodologies/Bootstrap.md)
 - [Tailwind](./CSS%20Frameworks%20%26%20Mehtodologies/Tailwind.md)
+- [PostCSS](./CSS%20Frameworks%20%26%20Mehtodologies/PostCSS.md)
+- [Styled Components](./CSS%20Frameworks%20%26%20Mehtodologies/StyledComponents.md)
 
 ---
 
@@ -74,14 +79,16 @@ This repository contains notes from my learning Journey to be a reference for an
 - [JavaScript](./JavaScript/01-JS.md)
 - [JavaScript Advanced concepts](./JavaScript/00-JS_Advanced_concepts.md)
 - [OOP](./JavaScript/02-OOP.md)
-- [APIs](./JavaScript/03-API.md)
-- [ASYNC](./JavaScript/04-ASYNC.md)
-- [DEVELOPMENT](./JavaScript/05-DEVELOPMENT.md)
-- [ARCHITECTURE](./JavaScript/06-ARCHITECTURE.md)
+- [DOM](./JavaScript/03-DOM.md)
+- [APIs](./JavaScript/04-API.md)
+- [ASYNC](./JavaScript/05-ASYNC.md)
+- [JS-Modules & task-runners](./JavaScript/06-JS-Modules%20%26%20task-runners.md)
+- [ARCHITECTURE](./JavaScript/07-ARCHITECTURE.md)
+- [JS-interviews-tricks](./JavaScript/09-JS-interviews-tricks.md)
 
 ### JQuery
 
-- [JQuery](./JavaScript/07-JQuery.md)
+- [JQuery](./JavaScript/08-JQuery.md)
 
 ---
 
@@ -93,13 +100,10 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Node.js
 
-- [Node.js](./Node.js/2-Node.md)
-
-- [Node-FileSystem](./Node.js/4-Node-FileSystem.md)
-
-- [Express](./Node.js/3-Express.md)
-
-- [Node-Security](./Node.js/5-Node-Sequrity%26Authentication.md)
+- [Node.js](./Node.js/1-Node.md)
+- [Express](./Node.js/2-Express.md)
+- [Node-FileSystem](./Node.js/3-Node-FileSystem.md)
+- [Node-Security](./Node.js/4-Node-Sequrity%26Authentication.md)
 
 ---
 
@@ -147,11 +151,13 @@ This repository contains notes from my learning Journey to be a reference for an
 ## Vue
 
 - [Vue](./Vue/1-Vue.md)
-- [Vuex](./Vue/2-Vuex.md)
-- [Composition API](./Vue/3-Composition-API.md)
-- [Testing Vue](./Vue/4-Testing-Vue.md)
-- [Typescript_Vue](./Vue/5-Typescript_Vue.md)
-- [NUXT](./Vue/6-NUXT.md)
+- [Vue-CLI / Vite](./Vue/0-Vue-CLI-Vite.md)
+- [Vue Router](./Vue/2-router.md)
+- [Vuex](./Vue/3-Vuex.md)
+- [Composition API](./Vue/4-Composition-API.md)
+- [Testing Vue](./Vue/5-Testing-Vue.md)
+- [Typescript_Vue](./Vue/6-Typescript_Vue.md)
+- [NUXT](./Vue/7-NUXT.md)
 
 ---
 
@@ -173,4 +179,28 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ### Automation (E2E) Testing
 
-- [Jest](./Testing/4-Cypress.md)
+- [Cypress](./Testing/4-Cypress.md)
+
+---
+
+## Development Tools
+
+- [Linters](./DEV/Linters.md)
+- [Modules & Bundlers](./DEV/Modules%20%26%20Bundlers.md)
+- [Vite](./DEV/Vite-%26-esbuild.md)
+- [Webpack](./DEV/Webpack.md)
+
+---
+
+## Python
+
+- [Python](./Python/01-Python.md)
+- [OOP](./Python/02-Object-Oriented-Programming.md)
+
+---
+
+## Data Structures & Algorithms
+
+- [Data-Structures](./Data%20Structures%20%26%20Algorithms/1-Data-Structures.md)
+- [Algorithms](./Data%20Structures%20%26%20Algorithms/2-Algorithms.md)
+- [Problem-solving](./Data%20Structures%20%26%20Algorithms/3-Problem-solving.md)
