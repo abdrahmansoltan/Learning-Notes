@@ -25,6 +25,7 @@
     - [Prompt](#prompt)
   - [Styling and CSS](#styling-and-css)
     - [Inline style](#inline-style)
+    - [Dynamic classes](#dynamic-classes)
     - [Styled-components](#styled-components)
     - [CSS Modules](#css-modules)
       - [CSS Modules In React Application](#css-modules-in-react-application)
@@ -40,9 +41,11 @@
     - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
       - [Controlled components](#controlled-components)
       - [Uncontrolled components](#uncontrolled-components)
-  - [Component Props](#component-props)
+  - [Props](#props)
     - [single prop](#single-prop)
     - [Multiple props](#multiple-props)
+    - [passing default props through components (implicitly)](#passing-default-props-through-components-implicitly)
+    - [Validating Props](#validating-props)
   - [Communicating Between Components](#communicating-between-components)
     - [From Parent to Child](#from-parent-to-child)
     - [From Child to Parent](#from-child-to-parent)
@@ -81,6 +84,8 @@ npm start
   - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
   - Enables easy testing & deployment
 - one `HTML` file is delivered => `index.html`
+
+![folder-structure](./img/react-folder-structure.png)
 
 - in `index.js` you render the app to `index.html`
 
@@ -123,6 +128,7 @@ It's a library not a framework. However, few people use react on its own, but wh
 ### single-page application (SPA)
 
 ![spa](./img/spa%20vs%20mpa.jpg)
+![How react works](./img/how-react-works.png)
 
 - Why? -> it's to make application more **"reactive"** like `mobile-apps` and `desktop-apps` which things happen instantly (you don't wait for new pages or responses to load or actions to start)
 - `Single-page applications` can work in different ways. One way a single-page app loads is by downloading the entire site's contents all at once. This way, when you're navigating around on the site, everything is already available to the browser, and it doesn't need to refresh the page. Another way single-page apps work is by downloading everything that's needed to render the page the user requested. Then when the user navigates to a new page, asynchronous JavaScript requests are made for just the content that was requested.
@@ -137,6 +143,7 @@ It's a library not a framework. However, few people use react on its own, but wh
 
 ## JSX
 
+![jsx](./img/jsx-1.png)
 ![jsx](./img/jsx.jpg)
 
 - **JSX** = "HTML in JavaScript"
@@ -164,8 +171,12 @@ React.createElement(
 );
 ```
 
-> - if you don't have attributes you can use `{}` or `null` instead
-> - to have multiple child elements -> use an array
+- **Notes:**
+  - if you don't have attributes you can use `{}` or `null` instead
+  - to have multiple child elements -> use an array
+  - Don't use objects as react can't show an object as text content (string interpolation)
+  - JSX attributes rules:
+    ![jsx-attributes](./img/jsx-attributes.png)
 
 ### Dynamic expressions in JSX
 
@@ -194,6 +205,8 @@ React.createElement(
 - `Virtual DOM (VDOM)`: is a concept where a virtual representation of a UI is kept in `memory` and synced with the real DOM by a library (such as ReactDOM).
 
   - You can simply think of it as a lightweight copy of the Real DOM.
+
+![react-dom](./img/react-dom.png)
 
 - `ReactDOM`: React takes a look at what specific transformations need to be made to the initial DOM and updates them very quickly.
   - React re-renders only the parts that need to be updated compared to the initial DOM.
@@ -259,6 +272,8 @@ React Router turns React projects into single-page applications. It does this by
   ```
 
   > **StrictMode**: provides additional warnings when using legacy or soon to be deprecated code.
+  >
+  > - also it may result **rendering twice**
 
 - now in `App.js`
 
@@ -596,6 +611,14 @@ function HelloWorldComponent() {
 
 ---
 
+### Dynamic classes
+
+To add classes based on certain values, we can use normal conditions `if..else` or short-circuiting `&&` or we can use [classnames](https://www.npmjs.com/package/classnames) package
+
+![classnames](./img/classnames.png)
+
+---
+
 ### Styled-components
 
 [Here](../CSS%20Frameworks%20%26%20Mehtodologies/StyledComponents.md)
@@ -680,6 +703,7 @@ There are two different ways of using CSS Modules in a React application.
 They are the building blocks of React
 
 - They are classes / functions that know how to render themselves into HTML
+- They start with a capital letter `<ContactList/>` to let react differentiate it with HTML elements which start with lower-case letter `<div>`
 
 ### why components
 
@@ -695,9 +719,11 @@ They are the building blocks of React
 
 - we can use the array `map` method to iterate over our list items to map them from JavaScript primitive to HTML elements.
 
-  - Each element must receive a **mandatory** `key` attribute
+- Each element must receive a **mandatory** `key` attribute
 
 - `Keys` : Keys help React identify which items have changed, been added, or been removed. so that react only updates this item and not the whole list of items.
+
+  - this makes us do the minimum update possible to the HTML from the rendering as React compares the keys on each list item to the keys from the previous render
 
   - Keys should be given to the elements inside the array to give the elements a stable identity.
   - If you don't have unique `Id` for rendered items, You may use the iteration **index** as a `key` as a last resort:
@@ -784,6 +810,8 @@ In React, there are two ways to handle **Form data** in our components.
 
 Controlled components are those in which form data is handled by the component’s state.
 
+> **Controlled Inputs:** are input elements where we provide both the `value` and `onChange` props
+
 It is the one that takes its current value through props and notifies changes through callbacks like onChange. A parent component "controls" it by handling the callback and managing its own state and passing the new values as props to the controlled component. You could also call this a "dumb component".
 
 ```js
@@ -843,7 +871,7 @@ function App() {
 
 ---
 
-## Component Props
+## Props
 
 ![props](./img/props.PNG)
 
@@ -891,13 +919,43 @@ function Message({ greet, who }) {
 
 ---
 
+### passing default props through components (implicitly)
+
+Instead of passing default props explicitly like passing `onClick` prop from a custom `<Button/>` element to a `<button>` element inside it, we can use the `rest` parameter:
+
+![rest props](./img/rest-props-1.png)
+![rest props](./img/rest-props-2.png)
+
+```js
+<Button primary onClick={handleClick} />
+
+// inside:
+const {children, ...rest} = props
+<button {...rest} >{children}</button>
+// instead of: <button onClick={rest.onClick} >{children}</button>
+```
+
+---
+
+### Validating Props
+
+This is done using the library [prop-types](https://www.npmjs.com/package/prop-types)
+
+- it used to be very popular. Now **Typescript** does almost the same thing (and more)
+- if someone passes down the incorrect kind of value (number instead of boolean), a warning will appear in console
+  ![prop-types](./img/prop-types.png)
+
+- It can also be used to create custom validations other than checking the type of props, by creating a method in the `component.protoTypes` and return a `new Error()` for the custom condition
+
+---
+
 ## Communicating Between Components
 
 [reference](https://www.pluralsight.com/guides/react-communicating-between-components)
 
 ### From Parent to Child
 
-- use [props](#component-props)
+- use [props](#props)
 
 ### From Child to Parent
 
@@ -945,6 +1003,8 @@ function BookEditForm(props) {
 
 React Composition is a development pattern based on React's original component model where we build components from other components using explicit defined props or the implicit `children` prop.
 
+![children](./img/children.png)
+
 ### Why Use React Composition?
 
 - This technique prevents us from building too many `similar` components containing duplicate code and allows us to build fewer components that can be reused anywhere within our application, making them easier to understand and maintain for your team.
@@ -978,8 +1038,10 @@ const Expenses = props => {
 
 ## Handling Events
 
-- React events are named using `camelCase`, rather than lowercase.
+- React events are named using **camelCase**, rather than lowercase.
 - With JSX you pass a function as the event handler, rather than a string.
+- You should pass the event handler callback-function without invoking it
+  - > **reason:** when invoking it, we won't have a reference to it anymore which is the main reason why we pass it as a reference, as it will be called by someone else in the future
 
 ---
 
@@ -993,7 +1055,7 @@ const Expenses = props => {
 ```js
 // in React
 <button onClick={activateLasers}>Activate Lasers</button>
-// always try to use the callbackfunction like this instead of defining it in the {} as this improves performance as you won't create it each time you do a (click)
+// always try to use the callback function like this instead of defining it in the {} as this improves performance as you won't create it each time you do a (click)
 ```
 
 - Another difference is that you cannot `return false` to prevent default behavior in React. You must call `preventDefault` explicitly. For example, with plain HTML, to prevent the default form behavior of submitting, you can write:
@@ -1027,6 +1089,8 @@ Great library for forms in React -> [formik.org](https://formik.org/)
 ### Controlled Forms
 
 ![controlled-forms](./img/controlled-forms.png)
+
+- What we do by this is **stealing control (of the input value) from the browser and putting the (input value) under the control of a state system**
 
 #### Form-Input
 
@@ -1068,6 +1132,10 @@ in `.env` file:
 
   - it will result an error, as on the first invocation of the `render()` function, the `componentDidMount()` isn't yet invoked and there's no initial state defined
 
+- Why we use `useEffect()` or `componentDidMount()` to change state after mounting, why don't we just invoke the function we want directly in the component body?
+
+  - it's because like that we would be calling this function each time we render which changes the state and cause re-render again, and this will lead to **render infinite loop**
+
 - Why React Hook useState uses const and not let?
 
   --> because When the component is rerendered, the function is executed again, creating a new scope, creating a new `color` variable, which has nothing to do with the previous variable.
@@ -1093,10 +1161,18 @@ in `.env` file:
   });
   ```
 
-- Why (fetching with setting the state to the resolved value) without `componentDidMount()` or `useEffect()` results **infinit render**
+- Why (fetching with setting the state to the resolved value) without `componentDidMount()` or `useEffect()` results **infinite render**
 
-  - because the resolved object/array is different from the one in the memory so the state gets reseted over and over
+  - because the resolved object/array is different from the one in the memory so the state gets reset over and over
 
 - why we must open the app (in development/production modes) through a server
+
   - it's because libraries like **Babel**
   - and as it's a SPA, so the HTML will be empty and need to get the requested data (mounted react app) and this request is made through a server that serves these files and data
+
+- why when updating state item or doing a modification to object or array, we don't mutate this item directly and instead we return a copy of this item with our modification. isn't creating new object/array costly?
+  - Answer: This is done specially with reference-type data-structures like `object` and `array`, as if the (reference to current state and reference to new state) are pointing to the same object/array, React assumes no render is required!
+    ![mutating the state](./img/mutating-state.png)
+    ![mutating the state](./img/mutating-state-0.png)
+    ![mutating the state](./img/mutating-state-1.png)
+    ![mutating the state](./img/mutating-state-2.png)

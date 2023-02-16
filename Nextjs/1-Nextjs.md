@@ -1,31 +1,31 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Next.js](#nextjs)
-  - [React Drawbacks](#react-drawbacks)
-  - [Next.js Features](#nextjs-features)
-- [Install](#install)
-- [Prerender](#prerender)
-  - [Solution](#solution)
-- [Static Site Generation (SSG)](#static-site-generation-ssg)
-  - [getStaticProps()](#getstaticprops)
-    - [getStaticPaths()](#getstaticpaths)
-  - [Incremental Static Regeneration](#incremental-static-regeneration)
-- [Server Side Rendering (SSR)](#server-side-rendering-ssr)
-  - [getServerSideProps()](#getserversideprops)
-- [Data Fetching](#data-fetching)
-- [File-based routing](#file-based-routing)
-  - [Dynamic routes](#dynamic-routes)
-    - [Catch-All Routes](#catch-all-routes)
-  - [Navigation through routes](#navigation-through-routes)
-  - [Custom 404 Page](#custom-404-page)
-- [Optimization](#optimization)
-  - [Head (meta data)](#head-meta-data)
-  - [Optimizing Images](#optimizing-images)
-- [API Routes](#api-routes)
-- [Deployment](#deployment)
-  - [Deployment Options](#deployment-options)
-  - [configuration](#configuration)
+  - [Next.js](#nextjs)
+    - [React Drawbacks](#react-drawbacks)
+    - [Next.js Features](#nextjs-features)
+  - [Install](#install)
+  - [Prerender](#prerender)
+    - [Solution](#solution)
+  - [Static Site Generation (SSG)](#static-site-generation-ssg)
+    - [`getStaticProps()`](#getstaticprops)
+      - [getStaticPaths()](#getstaticpaths)
+    - [Incremental Static Regeneration](#incremental-static-regeneration)
+  - [Server Side Rendering (SSR)](#server-side-rendering-ssr)
+    - [getServerSideProps()](#getserversideprops)
+  - [Data Fetching](#data-fetching)
+  - [File-based Routing](#file-based-routing)
+    - [Dynamic routes](#dynamic-routes)
+      - [Catch-All Routes](#catch-all-routes)
+    - [Navigation through routes](#navigation-through-routes)
+    - [Custom 404 Page](#custom-404-page)
+  - [Optimization](#optimization)
+    - [Head (meta data)](#head-meta-data)
+    - [Optimizing Images](#optimizing-images)
+  - [API Routes](#api-routes)
+  - [Deployment](#deployment)
+    - [Deployment Options](#deployment-options)
+    - [configuration](#configuration)
 
 ---
 
@@ -38,6 +38,16 @@ It's a React framework for production
 ![alt](img/nextjs.PNG)
 
 [NEXT.JS VS REACT](https://pagepro.co/blog/nextjs-vs-react/)
+
+- Is it like `create react app`?
+  - Yes and NO
+  - Yes, in that both make your life easier
+  - No, in that it enforces a structure so that we can do more advanced things like:
+    - server side rendering
+    - automatic code splitting
+  - In addition, Next.js provides 2 built-in features that are critical for every single website:
+    - routing with lazy component loading
+    - a way for components to alter `<head>`: `<Head>`
 
 ### React Drawbacks
 
@@ -79,7 +89,7 @@ Next.js by default doesn't wait for the data to be fetched even if it's in `useE
 
 ### Solution
 
-![prerender](./img/prerender.png)
+![prerender](./img/prerender.PNG)
 
 ---
 
@@ -106,7 +116,7 @@ Next.js provides a few different APIs to fetch data including `getStaticProps` a
 
 ---
 
-### getStaticProps()
+### `getStaticProps()`
 
 [Docs](https://nextjs.org/docs/api-reference/data-fetching/get-static-props)
 
@@ -122,7 +132,7 @@ The code in this function won't happen on Client-Side as it will be in the serve
 ```js
 export async function getStaticProps(context) {
   return {
-    props: {}, // will be passed to the page component as props
+    props: {} // will be passed to the page component as props
   };
 }
 ```
@@ -146,7 +156,7 @@ If a page has **Dynamic Routes** and uses `getStaticProps`, it needs to define a
 export async function getStaticPaths() {
   return {
     paths: pathsArr,
-    fallback: true, // false or 'blocking'
+    fallback: true // false or 'blocking'
   };
 }
 ```
@@ -168,17 +178,17 @@ Next.js allows you to create or update static pages **after** you’ve built you
 // It may be called again, on a serverless function, if
 // revalidation is enabled and a new request comes in
 export async function getStaticProps() {
-  const res = await fetch("https://.../posts");
+  const res = await fetch('https://.../posts');
   const posts = await res.json();
 
   return {
     props: {
-      posts,
+      posts
     },
     // Next.js will attempt to re-generate the page:
     // - When a request comes in
     // - At most once every 10 seconds
-    revalidate: 10, // In seconds
+    revalidate: 10 // In seconds
   };
 }
 ```
@@ -193,9 +203,11 @@ Here, when a user accesses a website, this request’s information is sent direc
 
 Server-side rendering refers to an application’s ability to display the web-page on the server rather than rendering it in the browser. When a website’s JavaScript is rendered on the website’s server, a fully rendered page is sent to the client and the client’s JavaScript bundle engages and enables the Single Page Application framework to operate.
 
+> if you did a `console.log()` in a SSR file, you will find that the log is in (the Node server terminal +  the browser)
+
 ### getServerSideProps()
 
-It's similar to [getStaticProps()](#getstaticprops) but the difference is in the parameter **contex**, as here we can access all the data from the **request and response**
+It's similar to [getStaticProps()](#getstaticprops) but the difference is in the parameter **context**, as here we can access all the data from the **request and response**
 
 ---
 
@@ -205,7 +217,7 @@ It's similar to [getStaticProps()](#getstaticprops) but the difference is in the
 
 ---
 
-## File-based routing
+## File-based Routing
 
 here we used file-based instead of code-based as we don't use react-router
 
@@ -215,7 +227,7 @@ here we used file-based instead of code-based as we don't use react-router
 
 ```js
 // in pages/post/[id].js
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
 const Post = () => {
   const router = useRouter();
@@ -229,7 +241,7 @@ const Post = () => {
 
 ```js
 // in pages/listing/[...slug].js
-import { useRouter } from "next/router";
+import { useRouter } from 'next/router';
 
 const Post = () => {
   const router = useRouter();
@@ -248,16 +260,16 @@ const Post = () => {
 - **Clickable**:
 
   ```js
-  import Link from "next/link";
+  import Link from 'next/link';
 
-  <Link href="/products">products</Link>;
+  <Link href='/products'>products</Link>;
   ```
 
 - **Programmatically**:
 
   ```js
   // like in react
-  router.push("/clients/max");
+  router.push('/clients/max');
   ```
 
 ---
@@ -275,17 +287,17 @@ const Post = () => {
 To inject `head`, `meta` content in the real html page
 
 ```js
-import Head from "next/head";
+import Head from 'next/head';
 
 function IndexPage() {
   return (
     <div>
       <Head>
         <title>My page title</title>
-        <meta property="og:title" content="My page title" key="title" />
+        <meta property='og:title' content='My page title' key='title' />
       </Head>
       <Head>
-        <meta property="og:title" content="My new title" key="title" />
+        <meta property='og:title' content='My new title' key='title' />
       </Head>
       <p>Hello world!</p>
     </div>
@@ -311,11 +323,11 @@ export default IndexPage;
   - **Lazy Loading**: images are loaded when needed
 
 ```js
-import Image from "next/image";
+import Image from 'next/image';
 
 <Image
   src={profilePic}
-  alt="Picture of the author"
+  alt='Picture of the author'
   // width={500} automatically provided
   // height={500} automatically provided
   // blurDataURL="data:..." automatically provided

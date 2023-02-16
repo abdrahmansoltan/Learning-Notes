@@ -49,7 +49,7 @@
 
 - `runtime` is the environment that `javascript` runs on. for example:
 
-  - **V8 engine** on browsers is used to run`javascript`on the **client-side** --> so `web-browser is a javascript runtime`
+  - **V8 engine** on browsers(chrome) is used to run`javascript`on the **client-side** --> so **web-browser is a javascript runtime**
     ![engine](./img/how%20js%20works.jpg)
 
 - Benefits (features we get) of running Javascript in **Browser**:
@@ -68,7 +68,14 @@
 
 - it uses `libuv` so that if `V8 engine` didn't find a `js` syntax like `process module` --> it goes to `libuv`
 
+  - > **libuv** is a multi-platform C library that provides support for Asynchronous I/O based on event loops
+
 - `libuv` abstracts away all specific way do deal with `files` in different `Operation-Systems`, so that `node.js` can work on any system/platform, it does so by `binding` these ways to `node`
+  - this means that there's a binding(communication) between `V8 engine` and `libuv`, so **whenever they encounter something that may need Asynchronous I/O, then we hand it over to `libuv`**
+  - these bindings (Node.js bindings) lets our javascript code call functionality that is implemented in `C` & `C++`
+  - `libuv` has the code for Node.js core functionalities, `v8 engine` **delegates** responsibility of handling the code related to Node.js core functionalities to `libuv`
+
+> **Asynchronous I/O :** it's delegating tasks to the operating-system, so that our Node.js program (javascript) doesn't have to wait for the response
 
 ![alt](./img/runtime.PNG)
 ![alt](./img/noderuntime.PNG)
@@ -89,7 +96,8 @@
 
 ![nodevsjs](./img//nodevsjs.PNG)
 
-- `window` in `js` is ----> `global` in `node`
+- In Javascript, we have the **`window`** object
+- In Node.js, we have the **`global`** object
 
 ---
 
@@ -265,8 +273,10 @@ import notFoundMiddleware from './middlewares/not-found.js';
 
 ### Core-modules : Process Module
 
-Not found in the browser APIs, Process relates to the global node execution process which occurs when you run a js file through Node.js.
+It's not found in the browser APIs, `Process` relates to the global node execution process which occurs when you run a `.js` file through Node.js.
 
+- The `process` object is a **global** that provides information about (and control) the current Node.js process.
+  - As it's a `global`, it's always available to Node.js applications without using `require()`. It can also be explicitly accessed using `require()`
 - The Process module contains the ability to perform tasks immediately before the process exits, and when it exits.
 
   - `beforeExit` allows for asynchronous calls which can make the process continue.
@@ -399,6 +409,8 @@ npm i --save-dev module-name@1.19 # install a specific version (1.19 here) of mo
 ---
 
 ## HTTP server
+
+`http` / `https` are languages used to communicate between server & client
 
 ### Create Node.js Web Server
 

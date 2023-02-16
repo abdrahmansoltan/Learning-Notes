@@ -192,7 +192,7 @@ In the browser, there is no such thing as modules (kind of). But this means that
   // or
   npm i parcel -D
 
-  npx parcel index.html  // this will run parcel in development mode
+  npx parcel index.html  # this will run parcel in development mode
   ```
 
   - we specify an entry point => `index.html`

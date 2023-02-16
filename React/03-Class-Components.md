@@ -129,6 +129,8 @@ Mutable vs Immutable State Updates
 ![Mutable Data Structures](./img/mutable-state-2.png)
 ![Mutable Data Structures](./img/mutable-state-3.png)
 
+> reason for not mutating state [here](./01-React.md#interview-questions)
+
 - The safest way to update state is to make a copy of it, and then call `this.setState()` with the new copy
   - This pattern is a good habit to get-into for React apps and required for using **Redux**
 

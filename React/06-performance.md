@@ -1,12 +1,14 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [React.memo()](#reactmemo)
-- [useCallback()](#usecallback)
-- [useMemo()](#usememo)
-- [Code Splitting & Dynamic Imports](#code-splitting--dynamic-imports)
-  - [`React.lazy()`](#reactlazy)
-  - [Suspense](#suspense)
+  - [React.memo()](#reactmemo)
+  - [useCallback()](#usecallback)
+    - [Using `useCallback` to fix `useEffect()` infinite-loop-rendering problem](#using-usecallback-to-fix-useeffect-infinite-loop-rendering-problem)
+  - [useMemo()](#usememo)
+  - [PureComponent](#purecomponent)
+  - [Code Splitting \& Dynamic Imports](#code-splitting--dynamic-imports)
+    - [`React.lazy()`](#reactlazy)
+    - [Suspense](#suspense)
 
 ---
 
@@ -30,13 +32,15 @@
 
 [read more here..](https://dmitripavlutin.com/dont-overuse-react-usecallback/)
 
+![useCallback](./img/useCallback.png)
+
 - `useCallback` Hook returns a memoized callback function.
 - It only runs when one of its dependencies update.
 
 > "Every callback function should be memoized to prevent useless re-rendering of child components that use the callback function"
 
 ```js
-import { useCallback } from "react";
+import { useCallback } from 'react';
 
 function MyComponent() {
   const handleClick = useCallback(() => {
@@ -48,6 +52,15 @@ function MyComponent() {
 ```
 
 - The `useMemo` and `useCallback` Hooks are similar. The main difference is that useMemo returns a memoized value`(reference-values like objects & Arrays)` and useCallback returns a memoized function.
+
+---
+
+### Using `useCallback` to fix `useEffect()` infinite-loop-rendering problem
+
+![useCallback](./img/useCallback-1.png)
+![useCallback](./img/useCallback-2.png)
+![useCallback](./img/useCallback-3.png)
+![useCallback](./img/useCallback-4.png)
 
 ---
 
@@ -81,6 +94,18 @@ const App = () => {
 
 ---
 
+## PureComponent
+
+Functional components cannot leverage the performance improvements and render optimizations that come with `React.PureComponent` since by definition, they are not classes.
+
+- If you want React to treat a functional component as a pure component, you’ll have to convert the functional component to a class component that extends `React.PureComponent`.
+
+  ```js
+  class PercentageStat extends React.PureComponent {}
+  ```
+
+---
+
 ## Code Splitting & Dynamic Imports
 
 bundling involves aligning our code components in progression and putting them in one javascript chunk that it passes to the browser; but as our application grows, we notice that bundle gets very cumbersome in size. This can quickly make using your application very hard and especially slow.
@@ -99,9 +124,9 @@ It is a new function in react that lets you load react components lazily through
 Suspense is a component required by the lazy function basically used to wrap lazy components. Multiple lazy components can be wrapped with the suspense component. It takes a fallback property that accepts the react elements you want to render as the lazy component is being loaded.
 
 ```js
-import { lazy, Suspense } from "react";
-const Artists = lazy(() => import("./Artists"));
-const Performers = lazy(() => import("./Performers"));
+import { lazy, Suspense } from 'react';
+const Artists = lazy(() => import('./Artists'));
+const Performers = lazy(() => import('./Performers'));
 
 //...
 return (

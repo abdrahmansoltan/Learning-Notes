@@ -10,7 +10,7 @@
   - [Request / Response](#request--response)
     - [HTTP Request Methods](#http-request-methods)
       - [Content methods](#content-methods)
-      - [Information-getter mtheods](#information-getter-mtheods)
+      - [Information-getter methods](#information-getter-methods)
     - [HTTP status messages](#http-status-messages)
   - [HTTP headers](#http-headers)
     - [Cookies](#cookies)
@@ -110,7 +110,7 @@ is for. A URL is a human-readable address, describing exactly where on the web a
 <img src='./img/patch.PNG' width=48%>
 <img src='./img/del.PNG' width=48%>
 
-#### Information-getter mtheods
+#### Information-getter methods
 
 - methods that get information from the server without really touching the content
 - The `HEAD` request method is useful in recovering meta-data that is written according to the headers, without transferring the entire content. The technique is commonly used when testing hypertext links for accessibility, validity, and recent modification.
@@ -126,6 +126,7 @@ is for. A URL is a human-readable address, describing exactly where on the web a
 HTTP status codes are **3-digit codes** most often used to indicate whether an HTTP request has been successfully completed. Status codes are broken into the following 5 blocks:
 
 ![status codes](./img/status%20messages.jpeg)
+![status codes](./img/http-status.png)
 
 > **304** means that you made **200OK** request then requested it again and it got you the same message (not modified), and in the server if you modified the response message and requested again it will be **200OK** again
 

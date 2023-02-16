@@ -196,10 +196,10 @@ There are two types of exports
 
 #### Named Exports (Zero or more exports per module)
 
-- No semicolons after export class/function
-
-  - note that `export` before a class or a function does not make it a function expression. It’s still a function declaration, albeit exported.
-  - Most JavaScript style guides don’t recommend semicolons after function and class declarations.
+- Single import statement can get both `default` + `named` exports
+- Named exports can't be renamed when imported
+- note that `export` before a class or a function does not make it a function expression. It’s still a function declaration, albeit exported.
+- Most JavaScript style guides don’t recommend semicolons after function and class declarations.
 
 ```js
 // Exporting individual features
@@ -253,6 +253,9 @@ They're used with Modules that declare a single entity, e.g. a module `user.js` 
 
 [reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports)
 
+![import-export](./img/import-export.png)
+![import-export](./img/import-export-1.png)
+
 - At first sight, “import everything” `import * as say from ./say.js` seems such a cool thing, short to write, why should we ever explicitly list what we need to import?
   - Explicitly listing what to import gives shorter names: `sayHi()` instead of `say.sayHi()`.
   - Explicit list of imports gives better overview of the code structure: what is used and where. It makes code support and refactoring easier.
@@ -261,14 +264,13 @@ They're used with Modules that declare a single entity, e.g. a module `user.js` 
 
 1. for Named Exports
 
-   - It's preferred for large libraries like `lodash` and `reactDom`
-     - so you only import what you need from them
+   - It's preferred for large libraries like `lodash` and `reactDom` to reduce size, So you only import what you need from them.
    - import needs curly braces for named exports
 
    ```javascript
    // creating a `name-space` from importing => to use in the file
    import * as myModule from 'module-name';
-   // now "myModule" will act as an object which has properties & mehtods we can use
+   // now "myModule" will act as an object which has properties & methods we can use
    myModule.moduleFunc();
 
    // Import a single export from a module
@@ -495,7 +497,7 @@ You can find more in depth here -> [Modules & Bundlers](../DEV/Modules%20%26%20B
 - `npm install package-name`
 
   - This command does two things:
-    1. first, it downloads all the code from the package into a folder called `node_modules`.
+    1. first, it downloads all the package-code from the **NPM Registry** into a folder called `node_modules`.
     2. Second, it automatically modifies the `package.json` file to keep track of the package as a project dependency.
 
 > This is useful later when sharing a project with others — instead of sharing the `node_modules` folder (which can get very large), you only need to share the `package.json` file and other developers can install the required packages automatically with the command `npm install`

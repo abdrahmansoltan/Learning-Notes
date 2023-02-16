@@ -17,7 +17,8 @@
   - will help configure the application
   - variables that are responsible for defining important data
 - `helpers.js` : contains all functions that we use over and over in the application
-- ***
+
+---
 
 ## JavaScript Design (Architecture) Patterns
 
@@ -30,6 +31,7 @@
 #### Models
 
 - Models manage the data for an application. They are concerned with neither the user-interface nor presentation layers but instead represent unique forms of data that an application may require.
+- work with data (e.g. save, fetch)
 
 #### Views
 
@@ -38,6 +40,7 @@
 #### Controllers
 
 - Controllers are an intermediary between models and views which are classically responsible for updating the model when the user manipulates the view.
+- it also includes **Routes**
 
 #### event handling using **Publish Subscribe Pattern**
 

@@ -1,22 +1,22 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Express](#express)
-- [App Structure with Express](#app-structure-with-express)
-- [installation](#installation)
-- [Express Basics](#express-basics)
-  - [Endpoints](#endpoints)
-  - [Request](#request)
-  - [Response](#response)
-- [Middleware](#middleware)
-  - [Types of Middleware](#types-of-middleware)
-  - [Using Middleware](#using-middleware)
-- [POST requests](#post-requests)
-- [Routes](#routes)
-- [Serving Files / HTML Pages](#serving-files--html-pages)
-  - [Serving files statically](#serving-files-statically)
-- [Templating Engines](#templating-engines)
-  - [handlebars (hbs)](#handlebars-hbs)
+  - [Express](#express)
+  - [App Structure with Express](#app-structure-with-express)
+  - [installation](#installation)
+  - [Express Basics](#express-basics)
+    - [Middleware](#middleware)
+      - [Types of Middleware](#types-of-middleware)
+      - [Using Middleware](#using-middleware)
+    - [Endpoints](#endpoints)
+    - [Request](#request)
+    - [Response](#response)
+  - [POST requests](#post-requests)
+  - [Routes](#routes)
+  - [Serving Files / HTML Pages](#serving-files--html-pages)
+    - [Serving files statically](#serving-files-statically)
+  - [Templating Engines](#templating-engines)
+    - [handlebars (hbs)](#handlebars-hbs)
 
 ---
 
@@ -25,8 +25,11 @@
 - Express is a framework used to:
 
   - Set up the server
+    - as the server logic is complex, and we want to focus on the business logic and not the nitty-gritty details
   - Work with routes
   - Apply middleware
+
+> **Framework**: helper-functions, tools and rules that help you build your applications
 
 - Express solves problems, because it:
   - Builds on HTTP module
@@ -46,7 +49,7 @@ An Express Project Is Organized Like a **Book**
 ## installation
 
 ```bash
-npm i express
+npm i express # it's important for production, so we use it as dependency
 npm i --save-dev @types/express   # for typescript
 ```
 
@@ -57,10 +60,17 @@ npm i --save-dev @types/express   # for typescript
 - `The Application Object` --> `app` : defines how the server works.
 
   ```js
-  const app = express();
+  const app = express(); // create express app that stores & manage a lot of things for us behind the scenes
   ```
 
-- Core Methods
+- Express.js is all about [middleware](#middleware),
+  ![middleware](./img/middleWare.PNG)
+
+  - As the incoming request is automatically funneled through a bunch of functions by express.js, so instead of just having one request handler, you will actually have possibility of **hooking** in multiple functions which the request will go through **until you send a response**
+  - this allows you to split your code into multiple blocks instead of having one huge function
+  - this is the **pluggable nature of express.js**, where you can easily add other third party packages which give you such middleware functions that you can plug into express.js nd add certain functions
+
+- **Core Methods**
   ![app methods](./img/app%20methods.PNG)
 
   - `.listen()` - listens for connections to a specified host and port
@@ -73,20 +83,83 @@ npm i --save-dev @types/express   # for typescript
 
 ---
 
+### Middleware
+
+Middleware is a `function/s` that is applied between the request and response. Meaning you get the request, do something with it, and then send the response.
+
+![middleware](./img/middleware2.PNG)
+
+- Common uses of middleware include checking the `authentication` status of a user before sending a response or logging the request before sending the response.
+- We have to call `next()` to allow the request to travel to the next middleware in line.
+
+- **`next()`**
+  - It's a method from the `express router`
+  - It calls the next middleware in a chain of middlewares
+  - Without adding `next` to your middleware function, your application will get stuck on the middleware.
+
+#### Types of Middleware
+
+- Built-in Middleware
+
+  - `express.static` - for serving static files
+  - `.json` - for parsing incoming JSON
+  - `.urlencoded` - for parsing incoming urlencoded data
+
+- 3rd Party Middleware
+
+- Custom Middleware
+
+---
+
+#### Using Middleware
+
+two ways of applying middleware:
+
+- Application/route level
+
+  - `.use()` method is a method that can be applied to the application object or to route objects. It is used for applying middleware and can take in a route, and middleware as arguments
+
+    - it uses **partial-matching** of the `route` --> ((start with) '/page1')
+
+    ```js
+    app.use(middleware);
+
+    //--------------------------------------------------//
+
+    // or with handling different routes
+    app.use('/page1', middleWare_function1); // here it means that the route must (start with) '/page1'
+    app.use('/', middleWare_function2); // here it means that the route must (start with) '/'
+
+    // note : we always puth the one with '/' at the end as all routes start with '/'
+    ```
+
+    - in this way, we don't call `next()`
+
+  - `.get()` / `.post()` are like `use()` but only GET or POST requests
+    - it uses **Exact-matching** of the `route` --> ((must be eaual to) '/page1')
+
+- Endpoint level
+
+  ```js
+  students.get('/', middleware, (req, res) => { // do stuff });
+  ```
+
+---
+
 ### Endpoints
 
 - Endpoints are made up of a `method` you wish to perform on your data, and the `route` you would like to use for that data.
 
-  - ex : `GET https://restcountries.eu/rest/v2/name/canada `
+  - ex : `GET https://restcountries.eu/rest/v2/name/canada`
 
 - create an endpoint
 
 ```js
-app.method("/route", middleware, (callback) => {
+app.method('/route', middleware, callback => {
   // what you want to do with the request or response
 });
 
-app.get("/students", (req, res) => {
+app.get('/students', (req, res) => {
   // perform an action with req or res.
 });
 ```
@@ -112,68 +185,17 @@ It is the response from server back to the browser. Like request, it has many pr
 
 - some methods :
   - `end()` ----> for `string`
-  - `send()` ----> for `HTML`-syntax
+  - `send()` ----> by default sends `HTML`-syntax (content type)
   - `status()`, `cookie()`
   - `sendFile()` : to send HTML-files
   - `json()` : to send Json format
+- To override the default response **header**: use `setHeader()` method
 
----
-
-## Middleware
-
-Middleware is a `function/s` that is applied between the request and response. Meaning you get the request, do something with it, and then send the response.
-
- <img src="./img/middleware2.PNG" width=48%>
-
-- Common uses of middleware include checking the `authentication` status of a user before sending a response or logging the request before sending the response.
-
-- `next()`
-  - It's a method from the `express router`
-  - It calls the next middleware in a chain of middlewares
-  - Without adding `next` to your middleware function, your application will get stuck on the middleware.
-
-### Types of Middleware
-
-- Built-in Middleware
-
-  - `express.static` - for serving static files
-  - `.json` - for parsing incoming JSON
-  - `.urlencoded` - for parsing incoming urlencoded data
-
-- 3rd Party Middleware
-
-- Custom Middleware
-
----
-
-### Using Middleware
-
-two ways of applying middleware:
-
-- Application/route level
-
-  - `.use()` method is a method that can be applied to the application object or to route objects. It is used for applying middleware and can take in a route, and middleware as arguments
-
-    - it uses **partial-matching** of the `route` --> ((start with) '/page1')
-
-    ```js
-    app.use(middleware);
-
-    //--------------------------------------------------//
-
-    // or with handling different routes
-    app.use("/page1", middleWare_function1); // here it means that the route must (start with) '/page1'
-    app.use("/", middleWare_function2); // here it means that the route must (start with) '/'
-
-    // note : we always puth the one with '/' at the end as all routes start with '/'
-    ```
-
-  - `.get()` / `.post()` are like `use()` but only GET or POST requests
-    - it uses **Exact-matching** of the `route` --> ((must be eaual to) '/page1')
-
-- Endpoint level
   ```js
-  students.get('/', middleware, (req, res) => { // do stuff });
+  app.use((req, res, next) => {
+    res.setHeader(''); // optional
+    res.send('<h1>hello world</h1>');
+  });
   ```
 
 ---
@@ -204,36 +226,45 @@ app.post('/friends',(req,res)={
 
 - `Router()` --> The router method is applied to the top-level express object. With this method, you can create a routes object that you can apply your endpoints to rather than the application object.
 
-  - in `Main Route Index`
+![router](./img/router.png)
 
-    ```js
-    import express from 'express';
-    const routes = express.Router(); // creating routes object
+- in `Main Route Index file`
 
-    routes.get('/', (req, res) => { //do something });
+  ```js
+  import express from 'express';
+  const routes = express.Router(); // creating routes object
 
-    export default routes;
-    ```
+  routes.get('/', (req, res) => {
+    //do something
+  }); // instead of app.get(...)
 
-  - in `Main Application Entrypoint`
+  export default routes;
+  ```
 
-    ```js
-    import routes from "./routes/index";
+- in `Main Application Entrypoint file`
 
-    app.use("filter-path, example : '/' ", routes);
-    ```
+  ```js
+  import routes from './routes/index';
+
+  app.use(routes);
+  // or with providing base-url to the router
+  app.use("filter-path, example : '/' ", routes);
+  ```
 
 ---
 
 ## Serving Files / HTML Pages
 
-- we have to use `absolute path`, so use `Path` package
+- we have to use **absolute path**, so use `Path` package
+- we use `path.join()` because this will automatically build the file-system-path in a way that works on both Linux systems and Windows systems which have different paths "`/`" or "`\`"
 
 ```js
-const path = require("path");
+const path = require('path');
 
-router.get("/add-product", (req, res, next) => {
-  res.sendFile(path.join(__dirname, "../", "views", "add-product.html"));
+// __dirname -> is a global variable from Node.js that holds the absolute path in the current OS
+
+router.get('/add-product', (req, res, next) => {
+  res.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
 });
 ```
 
@@ -241,25 +272,35 @@ router.get("/add-product", (req, res, next) => {
 
 ### Serving files statically
 
-- like when you have `css` files you want to use in the `html` file
+- like when you have external `css` files and images you want to use in the `html` file
 
   - for that we specify a `public` folder which has the static files
 
   ```js
   // in main app --> use this middleware
-  app.use(express.static(path.join(__dirname, "..", "public")));
+  app.use(express.static(path.join(__dirname, 'public')));
+  // now when importing the css file in html, we act as we're inside the "public" folder
   ```
 
 ---
 
 ## Templating Engines
 
+![templating](./img/Templating%20Engines.PNG)
 Template engines are used when you want to rapidly build web applications that are split into different components. Templates also enable fast rendering of the server-side data that needs to be passed to the application.
 
-<img src="./img/Templating%20Engines.PNG">
-<img src="./img/available template engines.PNG">
+![templating](./img/templating-engine.jpg)
 
-- For a server-side application written with NodeJS runtime, you can use a template engine.
+![templating](./img/available%20template%20engines.PNG)
+
+- For a server-side application written with NodeJS runtime, you can use a template engine to produce dynamic input based on variables passed to the templating-engine. (**it's like props passed to a component**)
+
+  ```js
+  render.get('/', (req, res, next) => {
+    const products = ['product1', 'product2'];
+    res.render('shop', { prods: products, docTitle: 'shop' });
+  });
+  ```
 
 ---
 
@@ -278,17 +319,17 @@ Template engines are used when you want to rapidly build web applications that a
 
     ```js
     // Using hbs as the default view engine
-    app.set("view engine", "hbs");
+    app.set('view engine', 'hbs'); // for any dynamic-template we are trying to render, use this engine (hbs)
 
     // selecting where the views could be found
-    app.set("views", path.join(__dirname, "..", "views"));
+    app.set('views', path.join(__dirname, '..', 'views'));
 
     // rendering the hbs file
-    app.get("/", (req, res) => {
+    app.get('/', (req, res) => {
       //Serves the body of the page aka "main handlebars" to the container //aka "index.handlebars"
-      res.render("main", {
-        firstName: "Abdelrahman",
-        lastName: "Soltan",
+      res.render('main', {
+        firstName: 'Abdelrahman',
+        lastName: 'Soltan'
       });
     });
     ```

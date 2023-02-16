@@ -2,11 +2,12 @@
 
 - [INDEX](#index)
   - [Functional Components](#functional-components)
-  - [Component's State](#components-state)
+  - [State](#state)
     - [State is Async](#state-is-async)
     - [Difference between state and props](#difference-between-state-and-props)
-    - [Using the state](#using-the-state)
-  - [UseRef Hook](#useref-hook)
+    - [`useState` Hook](#usestate-hook)
+      - [Functional state updates](#functional-state-updates)
+  - [`useRef` Hook](#useref-hook)
     - [Refs](#refs)
     - [The Reference object](#the-reference-object)
     - [useRef](#useref)
@@ -14,15 +15,19 @@
     - [Example](#example)
   - [Effect Hook](#effect-hook)
     - [useEffect](#useeffect)
-      - [useEffect cleanup function](#useeffect-cleanup-function)
+    - [`useEffect` dependency array](#useeffect-dependency-array)
+    - [`useEffect` cleanup function](#useeffect-cleanup-function)
   - [useReducer()](#usereducer)
-  - [useContext()](#usecontext)
+  - [Context: `useContext()`](#context-usecontext)
     - [Prop drilling](#prop-drilling)
-    - [Soulution](#soulution)
-    - [useContext Hook](#usecontext-hook)
+    - [Solution for Prop drilling: (context)](#solution-for-prop-drilling-context)
+    - [context setup](#context-setup)
+    - [`useContext` Hook](#usecontext-hook)
     - [Context Limitations](#context-limitations)
   - [Hooks Rules](#hooks-rules)
   - [Custom Hooks](#custom-hooks)
+    - [Custom hook for form input (`useInput`)](#custom-hook-for-form-input-useinput)
+    - [Custom hook for context](#custom-hook-for-context)
 
 ---
 
@@ -32,7 +37,13 @@ here each time the state change the entire function get called and rerendered un
 
 ---
 
-## Component's State
+## State
+
+**State** is used to store data that changes over time.
+
+![state](./img/state.png)
+![state](./img/state-1.png)
+![state](./img/state-2.png)
 
 [reference](https://reactjs.org/docs/faq-state.html#gatsby-focus-wrapper)
 
@@ -56,7 +67,9 @@ props (short for “properties”) and state are both plain JavaScript objects. 
 
 ---
 
-### Using the state
+### `useState` Hook
+
+![useState](./img/useState.png)
 
 - In React, both this.props and this.state represent the rendered values, i.e. what’s currently on the screen.
 - Calls to setState are asynchronous - don’t rely on this.state to reflect the new value immediately after calling setState. Pass an updater function instead of an object if you need to compute values based on the current state
@@ -64,14 +77,15 @@ props (short for “properties”) and state are both plain JavaScript objects. 
 - `useState`
 
   - The React `useState` Hook allows us to track state in a (function component).
+    - calling `useState` defines a new piece of state
   - it `must` be written inside the `component` function
 
 ```js
 // in the top of the file
-import { useState } from "react";
+import { useState } from 'react';
 
 function FavoriteColor() {
-  const [color, setColor] = useState("red");
+  const [color, setColor] = useState('red');
   // color is our current state
   // setColor is the function that is used to update our state
 
@@ -80,12 +94,12 @@ function FavoriteColor() {
 
 // or with Updating the State
 function FavoriteColor() {
-  const [color, setColor] = useState("red");
+  const [color, setColor] = useState('red');
 
   return (
     <>
       <h1>My favorite color is {color}!</h1>
-      <button type="button" onClick={() => setColor("blue")}>
+      <button type='button' onClick={() => setColor('blue')}>
         Change Color
       </button>
     </>
@@ -93,20 +107,31 @@ function FavoriteColor() {
 }
 ```
 
+- the current state is assigned to the initial state in the first render
+- calling the setter function causes React to **re-render** the component
 - `useState` accepts an `initial state` and returns an `array` with two elements:
   - The current state.
   - A function that updates the state.
 
 ```js
 // updating state with depending on previous state
-const total = setTotal((state) => {
+const total = setTotal(state => {
   return state + 4;
 });
 ```
 
 ---
 
-## UseRef Hook
+#### Functional state updates
+
+As the state changes **asynchronously**, if we want to set state based on current state values, we can use the functional version of setting the state: (it's like [callbacks in class components](./03-Class-Components.md#callbacks-in-setstate))
+
+![functional-state-update](./img/functional-state-update.png)
+![functional-state-update](./img/functional-state-update-1.png)
+
+---
+
+## `useRef` Hook
 
 ### Refs
 
@@ -122,7 +147,7 @@ const total = setTotal((state) => {
   - This way, at any time in the lifecycle of the component, we can access the actual HTML element at `buttonRef.current`
 
   ```js
-  import React, { useRef } from "react";
+  import React, { useRef } from 'react';
   const ActionButton = ({ label, action }) => {
     const buttonRef = useRef(null);
     return (
@@ -172,7 +197,7 @@ To avoid this, we can use the useRef Hook.
 ```js
 // Using useRef to focus the input
 
-import { useRef } from "react";
+import { useRef } from 'react';
 
 function App() {
   const inputElement = useRef();
@@ -183,7 +208,7 @@ function App() {
 
   return (
     <>
-      <input type="text" ref={inputElement} />
+      <input type='text' ref={inputElement} />
       <button onClick={focusInput}>Focus Input</button>
     </>
   );
@@ -204,45 +229,85 @@ function App() {
 
 ## Effect Hook
 
+> If we are writing functional components, We won't have access to lifecycle methods. We can think of `useEffect` hook as the **react-class-component lifecycle methods** (`componentDidMount`, `componentDidUpdate`, `componentWillUnmount`)
+
 - when changing the state => the **whole function-component** `rerenders`.
 - Data fetching(`HTTP requests`), subscriptions, or manually changing the DOM from React components. We call these operations `side effects` (or `effects` for short) because they can affect other components and **can’t be done during rendering.**
   - so such `sideEffects` shouldn't go directly inside the component-function as it will create bugs
-- The Effect Hook, `useEffect`, adds the ability to perform side effects from a function component. It serves the same purpose as `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount` in React classes, but unified into a single API
+- The Effect Hook, `useEffect()`, adds the ability to perform side effects from a function component. It serves the same purpose as `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount` in React classes, but unified into a single API
 
 > **Side-Effects**: Tasks that must happen outside of the component-evaluation and render-cycle, as they might block rendering (ex: HTTP request)
+>
+> - React has no tools, objects, functions for making HTTP requests
+> - React only cares about showing content and handling user events
 
 ### useEffect
+
+It's a function from React used to run code **(always)** when a component is initially rendered and **(sometimes)** when it's re-rendered
 
 ![useEffect](./img/sideEffects.PNG)
 
 - When you call `useEffect`, you’re telling React to run your `effect` function after flushing changes to the `DOM`. Effects are declared inside the component so they have access to its props and state. By default, React runs the effects after every render — including the first render.
 
 > it happens after all other functions and state
-> <img src="./img/react-useeffect-callback-3.svg" style="background-color: #fff">
+> ![useEffect-callback](./img/react-useeffect-callback-3.svg)
 
-#### useEffect cleanup function
+---
+
+### `useEffect` dependency array
+
+![dependency array](./img/useEffect-dependency.png)
+
+**Notes:**
+
+- when using a piece of state inside `useEffect` body, it will reference the initial state and not use the updated state on each render unless you add this piece of state to the dependency array
+
+  - this is because at each render, a new piece of state is created and added to memory and the `useEffect` won't be called again (unless you add this piece of state to the dependency array), so it will have reference to the old state value
+    ![dependency array](./img/useEffect-dependency-1.png)
+  - This bug/issue is common when using `useEffect` and it's called **"Stale Variable References"**
+    - > usually `create-react-app` includes ESLint rule to help you find this when using empty array as a dependency array
+
+- When using a piece of state in the dependency array, each render will result creation of a new callback function in the `useEffect` body. That's why it will now has an updated reference to the piece of state
+- the (render infinite loop) can happen if you put a function that changes the state (ex: `fetchBooks`) in the dependency array, as this function will be re-created at each render which will cause calling it again which changes the state and so on
+  - to fix this, we use [useCallback](./06-performance.md#usecallback)
+
+---
+
+### `useEffect` cleanup function
 
 - it saves applications from unwanted behaviors like memory leaks by cleaning up effects. In doing so, we can optimize our application’s performance.
 - it allows us to tidy up our code before our component unmounts. When our code runs and reruns for every render, useEffect also cleans up after itself using the cleanup function.
+
 - The `useEffect` Hook is built in a way that we can return a function inside it
+  ![useEffect-cleanup](./img/useEffect-cleanup.png)
+
   - this `return function` is where the cleanup happens.
-  - The cleanup function prevents memory leaks and removes some unnecessary and unwanted behaviors.
 
-```js
-useEffect(() => {
-  effect;
-  return () => {
-    cleanup;
-  };
-}, [dep]);
-```
+    ```js
+    useEffect(() => {
+      effect;
+      return () => {
+        cleanup;
+      };
+    }, [dep]);
+    ```
 
-- the `cleanup` function runs before every new side effect function execution and before the component is removed.
-- it does not run `before` the first side effect function execution. But thereafter, it will run `before` every next side effect function execution.
+- when the `cleanup` function is called?
+  ![useEffect-cleanup](./img/useEffect-cleanup-1.png)
+
+  - the `cleanup` function runs before every new side effect function execution and before the component is removed.
+  - it does not run before the first side effect function execution. But thereafter, it will run before every next side effect function execution.
+  - **Note:** the `cleanup` function will only be called if the useEffect callback function will be called again (when there's something in the dependency array or no array what so ever)
+
+- The cleanup function prevents memory leaks and removes some unnecessary and unwanted behaviors.
+  - ex: event listeners, because we want to stop listening to events when re-rendering or we will have a new event listener created on each render and we would have multiple listeners which is BAD
+    ![useEffect-cleanup](./img/useEffect-cleanup-2.png)
 
 ---
 
 ## useReducer()
+
+It's an alternative to `useState`. Accepts a reducer of type `(state, action) => newState`, and returns the current state paired with a `dispatch` method.
 
 ![useReducer](./img/reducer.PNG)
 
@@ -265,8 +330,21 @@ useEffect(() => {
 
 ![usereducer](./img/useReducer.PNG)
 
-- `reducer function` contains your custom state logic(different senarios).
-  - after executing the senario-code, you should return a new state object
+- `reducer function` contains your custom state logic(different scenarios).
+
+  - after executing the scenario-code, you should return a new state object
+
+  ```js
+  // reducer function: takes 2 values and "reduces" them down to one value
+  (accumulatedValue, nextItem) => nextAccumulatedValue
+
+
+  // in our case (useReducer), the 2 values provided to a reducer are:
+    // - the current state
+    // - an action that (may) update the state
+    (state, action) => newState
+  ```
+
 - `initialState` can be a simple value but generally will contain an **object** as it's for more complex state.
 - `dispatch` : is what we call in order to update the state --> it's like `setState()`
   - it will call the `reducer function` for us with `argument = action-object`
@@ -278,7 +356,7 @@ useEffect(() => {
 ![usereducer](./img/reducer2.svg)
 
 ```js
-import { useReducer } from "react";
+import { useReducer } from 'react';
 
 // reducer function can be here outside the component
 
@@ -287,10 +365,10 @@ const [state, dispatch] = useReducer(reducer, initialState);
 function reducer(state, action) {
   let newState;
   switch (action.type) {
-    case "increase":
+    case 'increase':
       newState = { counter: state.counter + 1 };
       break;
-    case "descrease":
+    case 'descrease':
       newState = { counter: state.counter - 1 };
       break;
     default:
@@ -302,7 +380,15 @@ function reducer(state, action) {
 
 ---
 
-## useContext()
+## Context: `useContext()`
+
+Context provides a way to pass data through the component tree without having to pass props down manually at every level
+
+- `context` is primarily used when some data needs to be accessible by many components at different nesting levels.
+  - > Make sure to apply it sparingly because **it makes component reuse more difficult**
+- **Notes:**
+  - context is not a replacement for Props
+  - context is not a replacement for Redux (Redux is all about organization of data)
 
 ### Prop drilling
 
@@ -312,7 +398,7 @@ function reducer(state, action) {
 
 ---
 
-### Soulution
+### Solution for Prop drilling: (context)
 
 Context provides a way to pass data through the component tree without having to pass `props` down manually at every level.
 
@@ -328,17 +414,59 @@ Context provides a way to pass data through the component tree without having to
   - it stores data in a external object so that it can be accessed globally.
 - Context is designed to share data that can be considered `global` for a tree of React components, such as the current authenticated user, theme, or preferred language.
 - It's sometimes used instead of `Redux` by a lot of users
+
+### context setup
+
+**1. Create the context**
+![context](./img/context-1.png)
+**2. Specify the data that will be shared**
+![context](./img/context-2.png)
+![context](./img/context-3.png)
+**3. Consume the data**
+![context](./img/context-4.png)
+**4. Changing context data**
+
+- for this we need to make the `value` passed to the contextProvider is a piece of state, so that when changing it, it would result a **re-render** in all components that are using(consuming) the context
+  ![context](./img/context-5.png)
+- to be able to pass the state-object in the `value`, we need to create another high-level provider that will wrap our provider
+  ![context](./img/context-6.png)
+
+  - then use the provider wrapper for the `<App/>`
+    ![context](./img/context-7.png)
+
+---
+
+### `useContext` Hook
+
+- In order to use the Context in a child component, we need to access it using the useContext Hook.
+
+```js
+import { useState, createContext, useContext } from 'react';
+
+function Component5() {
+  // inside the component
+  const user = useContext(UserContext);
+
+  return (
+    <>
+      <h1>Component 5</h1>
+      <h2>{`Hello ${user} again!`}</h2>
+    </>
+  );
+}
+```
+
 - we'll use the `Context Provider` to wrap the tree of components that need the state Context.
   - `Context Provider` Wrap child components in the Context Provider and supply the state value.
 - we'll use the `Context Consumer` to get values from the state Context.
 - `without context` (Passing "props" through nested components:)
 
   ```js
-  import { useState } from "react";
-  import ReactDOM from "react-dom";
+  import { useState } from 'react';
+  import ReactDOM from 'react-dom';
 
   function Component1() {
-    const [user, setUser] = useState("Jesse Hall");
+    const [user, setUser] = useState('Jesse Hall');
 
     return (
       <>
@@ -388,45 +516,24 @@ Context provides a way to pass data through the component tree without having to
 - `with context`
 
   ```js
-  import { useState, createContext } from "react";
-  import ReactDOM from "react-dom";
+  import { useState, createContext } from 'react';
+  import ReactDOM from 'react-dom';
 
-  const UserContext = createContext();
+  const UserContext = createContext(); // create context wrapper component
 
   function Component1() {
-    const [user, setUser] = useState("Jesse Hall");
+    const [user, setUser] = useState('Jesse Hall');
 
     return (
-      // in the provider the attribute must be named "value"
+      // in the provider the attribute must be named "value" which is the data passed by the context (shared state)
       <UserContext.Provider value={user}>
         <h1>{`Hello ${user}!`}</h1>
         <Component2 user={user} />
       </UserContext.Provider>
       // Now, all components in this tree will have access to the user Context.
-
-
     );
+  }
   ```
-
-### useContext Hook
-
-- In order to use the Context in a child component, we need to access it using the useContext Hook.
-
-```js
-import { useState, createContext, useContext } from "react";
-
-function Component5() {
-  // inside the component
-  const user = useContext(UserContext);
-
-  return (
-    <>
-      <h1>Component 5</h1>
-      <h2>{`Hello ${user} again!`}</h2>
-    </>
-  );
-}
-```
 
 ---
 
@@ -439,32 +546,37 @@ function Component5() {
   ![alt](./img/contextDisadvantages.PNG)
 - Performance
 - context is not optimized for high-frequency state changes
+  - As The way that context works, is that whenever is value changes (something in that value changes), It's going to pass down new data causing a re-render in whatever components are consuming that context.
+  - This makes us have unnecessary re-renders!
 
 ---
 
 ## Hooks Rules
 
+![rules](./img/hooks.png)
 ![rules](./img/rules.PNG)
 
 ---
 
 ## Custom Hooks
 
+![custom hooks](./img/custom-hooks.png)
+
 - When you have component logic that needs to be used by multiple components, we can extract that logic to a custom Hook
   - they're reusable functions.
-- Custom Hooks start with "`use`". Example: `useFetch`
+- Custom Hooks must start with "`use`" keyword. Example: `useFetch`
 
 - Example:
 
   ```js
   // in useBreedList.js
-  import { useState, useEffect } from "react";
+  import { useState, useEffect } from 'react';
 
   const localCache = {};
 
   export default function useBreedList(animal) {
     const [breedList, setBreedList] = useState([]);
-    const [status, setStatus] = useState("unloaded");
+    const [status, setStatus] = useState('unloaded');
 
     useEffect(() => {
       if (!animal) {
@@ -477,17 +589,91 @@ function Component5() {
 
       async function requestBreedList() {
         setBreedList([]);
-        setStatus("loading");
-        const res = await fetch(
-          `http://pets-v2.dev-apis.com/breeds?animal=${animal}`
-        );
+        setStatus('loading');
+        const res = await fetch(`http://pets-v2.dev-apis.com/breeds?animal=${animal}`);
         const json = await res.json();
         localCache[animal] = json.breeds || [];
         setBreedList(localCache[animal]);
-        setStatus("loaded");
+        setStatus('loaded');
       }
     }, [animal]);
 
     return [breedList, status];
   }
   ```
+
+---
+
+### Custom hook for form input (`useInput`)
+
+Oftentimes, you will create an application with some type of form in it. For example, if you integrate authentication in your application, users will have to fill in the form to sign in. You can get the value that the user inputs in the field with vanilla JavaScript and the `getElementById` method, but a simpler method with hooks can also be used. Let's see how to create a useInput hook to get the value of the inputs in our form!
+
+```js
+// useInput.js
+import { useState } from 'react';
+
+const useInput = initialValue => {
+  const [value, setValue] = useState(initialValue);
+
+  const handleChange = event => {
+    setValue(event.target.value);
+  };
+
+  // returned object-keys must be with these names to match the <input> element attributes "value", "onChange"
+  return {
+    value,
+    onChange: handleChange // onChange event, which will be the handleChange function we just defined
+  };
+
+  // or return array like normal hook:
+  return [value, handleChange];
+};
+
+// ---------------------------------------------------------
+
+// Form.js
+import useInput from './useInput';
+
+const SignInForm = () => {
+  const email = useInput('');
+  const password = useInput('');
+
+  const submitForm = event => {
+    event.preventDefault();
+    console.log('email', email.value);
+    console.log('password', password.value);
+  };
+
+  return (
+    <FormWrapper onSubmit={submitForm}>
+      <Title>Sign in</Title>
+      <Input placeholder='Email' {...email} />
+      <Input placeholder='Password' type='password' {...password} />
+      <Button type='submit'>Sign in</Button>
+    </FormWrapper>
+  );
+};
+export default Form;
+```
+
+---
+
+### Custom hook for context
+
+When consuming context in a component, Instead of importing both `useContext` and the context and pass it to `useContext`, we can just create a custom hook for a specific context:
+
+```js
+import { useContext } from 'react';
+import BooksContext from '../context/books';
+
+function useBooksContext() {
+  return useContext(BooksContext);
+}
+
+export default useBooksContext;
+
+// -------------------------------------------------------------
+// using it in a component:
+// import useBooksContext
+const { books } = useBooksContext();
+```

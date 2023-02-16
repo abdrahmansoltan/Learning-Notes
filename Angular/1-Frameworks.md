@@ -101,7 +101,7 @@ When someone asks which framework to choose, a great answer is **"What does the 
 
 1- **Optimization Efforts**
 
-- In React, when a component’s state changes, it triggers the re-render of the entire component sub-tree, starting at that component as root. To avoid unnecessary re-renders of child components, you need to either use `PureComponent` or implement `shouldComponentUpdate`
+- In React, when a component’s state changes, it triggers the **re-render** of the entire component sub-tree (destroying the changed UI and re-render it **instead of data-binding like in Vue.js**), starting at that component as root. To avoid unnecessary re-renders of child components, you need to either use **`PureComponent`** or implement **`shouldComponentUpdate`**
 - In Vue, a component’s dependencies are **automatically** tracked during its render, so the system knows precisely which components actually need to re-render when state changes. Each component can be considered to have shouldComponentUpdate automatically implemented for you, without the nested component caveats.
 
 2- **HTML & CSS**

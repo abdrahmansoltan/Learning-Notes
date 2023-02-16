@@ -1194,6 +1194,8 @@ Cross-origin requests – those sent to another domain (even a subdomain) or pro
 
 #### Fetch API in depth
 
+- It's an API from the browser and not javascript language
+
 For more details on it, here: [javascript.info/fetch-api](https://javascript.info/fetch-api)
 
 ---
