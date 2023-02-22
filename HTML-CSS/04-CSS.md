@@ -266,7 +266,7 @@ If there are two or more CSS rules that point to the same element, the selector 
 - `visibility:hidden` => hide the element but reserves it's place (leaves a space where the element would have been)
 - `display: none` => remove element from the flow, hide element and collapse its space
 
-  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use:
+  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
 
     ```css
     /* ALL THESE FOR mimicking [display:none;] */
@@ -768,6 +768,10 @@ body {
     top: 0; /* once it reaches the top=0 with the viewport, then it will stick  */
   }
   ```
+
+- when using `absolute` position with `inset: 0`, it makes the element expand to fill the height and width of the closest parent with a **non-static position**
+
+  - **inset**: The inset property in CSS is a shorthand for the four inset properties, `top`, `right`, `bottom` and `left` in one declaration. Just like the four individual properties themselves, inset has no effect on non-positioned (static) elements. In other words, an element must declare an explicit position value before inset properties can take effect.
 
 - **stacking context** --> `z-index` : as if the blocks have been stacked on top of each other on a z axis
 
@@ -1934,3 +1938,33 @@ There are two ways to add multiple style sheets to a page:
 
   ![backface-visibility](./img/backface-visibility.webp)
   ![backface-visibility](./img/backface-visibility2.png)
+
+- inline elements ( `<span>` ) are sensitive to spaces (before & after it) unlike other elements, To avoid this you can:
+
+  1. remove spacing between elements manually by making it very close to its siblings/ancestors
+
+     ```jsx
+     <p>
+       <span> Foo </span><span> Bar </span>
+     </p>
+
+     <ul>
+        <li><a href="#">Home</a></li><li><a href="#">About</a></li><li><a href="#">Contact</a></li>
+     </ul>
+     ```
+
+  2. Set Zero Font Size on Parent Element
+
+     ```css
+     ul {
+       padding: 0;
+       list-style: none;
+       font-size: 0;
+     }
+     ul li {
+       font-size: 16px;
+       display: inline-block;
+       background: orange;
+       padding: 5px 20px;
+     }
+     ```

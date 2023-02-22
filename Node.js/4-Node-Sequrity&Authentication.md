@@ -201,6 +201,7 @@ There're pros and cons for each, and based on situation we choose what suits us,
   - the server doesn't actively keep track of who's logged in
   - a **token** is used to verify the user instead
     - the token is saved in the LocalStorage in the first auth request(login), and then it's sent in every request to the server when we request data related to the authenticated user (with the unique token)
+      - > **Note:** when you have something in the local storage, you have to be aware that any script that runs on the browser will have access to the token in the local storage (search for this more)
 
 ---
 

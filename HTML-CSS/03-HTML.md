@@ -739,23 +739,8 @@ Sometimes you may need the entries in a table to stretch across more than one co
 
 The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element and indicates how many columns / rows that cell should run across.
 
-```html
-<table>
-  <tr>
-    <th></th>
-    <th>9am</th>
-    <th>10am</th>
-    <th>11am</th>
-    <th>12am</th>
-  </tr>
-  <tr>
-    <th>Monday</th>
-    <td colspan="2">Geography</td>
-    <td>Math</td>
-    <td>Art</td>
-  </tr>
-</table>
-```
+![table](./img/table-1.png)
+![table](./img/table-2.png)
 
 ### Table Notes
 
@@ -776,7 +761,7 @@ Here the **Tree structure** is the operation that make html code looks the way i
 
 ![Escape Characters](./img/escape_characters.png)
 
-> **NOTE:** it is important to check the page in your browser to ensure that the correct symbol shows up. This is because some fonts do not support all of these characters and you might therefore need to specify a different font for these characters in your CSS code.
+> **NOTE**: it is important to check the page in your browser to ensure that the correct symbol shows up. This is because some fonts do not support all of these characters and you might therefore need to specify a different font for these characters in your CSS code.
 
 ---
 

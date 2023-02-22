@@ -17,10 +17,10 @@
       - [`Switch` Component](#switch-component)
       - [`Redirect` component](#redirect-component)
       - [`Link` component](#link-component)
+        - [How does `Link` work](#how-does-link-work)
       - [`NavLink` Component](#navlink-component)
     - [Dynamic Routes (Params)](#dynamic-routes-params)
     - [Programmatically navigation](#programmatically-navigation)
-      - [changing the page's url](#changing-the-pages-url)
       - [Accessing the page's url](#accessing-the-pages-url)
     - [Prompt](#prompt)
   - [Styling and CSS](#styling-and-css)
@@ -37,6 +37,7 @@
   - [Custom Components (fragment)](#custom-components-fragment)
     - [fragment](#fragment)
     - [Portals](#portals)
+      - [Modal notes](#modal-notes)
     - [Smart vs Dumb components](#smart-vs-dumb-components)
     - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
       - [Controlled components](#controlled-components)
@@ -54,6 +55,7 @@
     - [Why Use React Composition?](#why-use-react-composition)
   - [Handling Events](#handling-events)
     - [Events in HTML vs React](#events-in-html-vs-react)
+    - [DocumentWide event handlers (Refs)](#documentwide-event-handlers-refs)
     - [Data binding](#data-binding)
   - [Forms](#forms)
     - [Controlled Forms](#controlled-forms)
@@ -66,7 +68,7 @@
 
 ## installation
 
-- **`npx`** is used to execute commands without installing dependencies (**install something and running it immediately**)
+- **`npx`** is a command that lets you run code built with Node.js and published through the NPM registry (It's a Node.js package runner). It's used to execute commands without installing dependencies (**install something and running it immediately**)
 
 ```bash
 npx create-react-app my-app # equivalent to installing react globally first then >> creating react app
@@ -85,7 +87,8 @@ npm start
   - Enables easy testing & deployment
 - one `HTML` file is delivered => `index.html`
 
-![folder-structure](./img/react-folder-structure.png)
+- **Folder structure**
+  ![folder-structure](./img/react-folder-structure.png)
 
 - in `index.js` you render the app to `index.html`
 
@@ -154,7 +157,7 @@ It's a library not a framework. However, few people use react on its own, but wh
 
   ```js
   import React from 'react';
-  // we don't have to write it anymore
+  // we don't have to write it anymore after V17
   ```
 
 - what [Babel](https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=Q&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.17.9&externalPlugins=&assumptions=%7B%7D) do to jsx :
@@ -228,18 +231,32 @@ React.createElement(
 React Router turns React projects into single-page applications. It does this by providing a number of specialized components that manage the creation of links, manage the app's URL, provide transitions when navigating between different URL locations, and so much more.
 
 - **Server-Side Routing**: (Traditional Routing)
-  - clicking a `<a>` link causes browser to request a new page & replace the entire DOM
+
   - Server decides what HTML to return based on URL request, and the entire page refreshes
+    ![traditional routing](./img/traditional-routing-1.png)
+  - clicking a `<a>` link causes browser to request a new page & replace the entire DOM
+    ![traditional routing](./img/traditional-routing-2.png)
+    - The standard browser behavior when the browser loads a new HTML document is that "all existing javascript code **is dumped** and we will lose access to it"
+
 - **Client Side Routing**
 
   - **Fake CSR**:
     ![fake-client-side-routing](./img/fake-client-side-routing.png)
     - We can actually create something closer to a client-side-routing using conditions and preventing-default-behavior on `<a>` links, and render components based on state condition, But this will not actually be routing, as we won't be able to track **history** (go back and forward...) and other more features
       ![fake-client-side-routing](./img/fake-client-side-routing-1.png)
-  - **Real CSR**
-    - It handles mapping between URL bar and the content which the user sees via browser rather than via server
-    - sites that exclusively use client-side routing are **single-page-applications SPA**
-    - here, we use Javascript to manipulate the URL bar with a web-api called **History**
+
+- **Real CSR** -> **React Router**
+  ![react router](./img/react-router-1.png)
+
+  - sites that exclusively use client-side routing are **single-page-applications SPA**
+    ![react router](./img/react-router-2.png)
+  - It handles mapping between URL bar and the content which the user sees via browser rather than via server
+    ![react router](./img/react-router-3.png)
+  - here, we use Javascript to manipulate the URL bar with a web-api called **History**
+    ![react router](./img/react-router-4.png)
+    - also `pushState` method handles **backward button** in the browser (with maintaining the state and prevent refreshing) using the `popstate` event in `window.history`
+  - The best thing is that the javascript environment is no longer being reset with navigation!
+  -
 
 - **SSR** vs **CSR**
   ![SSR-vs-CSR](./img/SSR-vs-CSR.png)
@@ -327,7 +344,8 @@ React Router turns React projects into single-page applications. It does this by
 
 #### `Route` Component
 
-![route](./img/route-1.png)
+![route](./img/react-router-route.png)
+![route](./img/react-router-route-1.png)
 
 - **`exact`** matches the exact-full-path **ONLY IN VERSION 5**
 
@@ -440,6 +458,12 @@ import { Link } from 'react-router-dom';
 <Link to='/about'>About Us</Link>;
 ```
 
+##### How does `Link` work
+
+![Link](./img/react-router-link.png)
+
+---
+
 #### `NavLink` Component
 
 - `<NavLink>` is just like `link`, with one additional feature:
@@ -524,10 +548,9 @@ class NavBar extends Component {
 
 ### Programmatically navigation
 
-#### changing the page's url
-
 - **V5** it's done using `useHistory()` hook
 - **V6** it's done using `useNavigate()` hook
+- in the background, these hooks are used to get the return value of `useContext(NavigationContext)` which has the data for navigation, and we use the hooks to simplify our code from a lot of importing
 
 - `history.replace` vs `history.push`:
   - in case of `push` - a new record is added in the history, and user can go back
@@ -776,12 +799,18 @@ const List = () => {
 Portals provide a first-class way to render children into a DOM node that exists **outside the DOM hierarchy** of the parent component.
 
 - it helps for more `semantic HTML`
-  -usually with **modals**
-  - The word “**modal**” means that the visitor can’t interact with the rest of the page, press other buttons, etc, until they have dealt with the window. In this case – until they press “OK”.
+- usually with **modals**
+- we use it with **modals** as a modal will only work correctly when it doesn't have a CSS-Positioned parent element, so that the parent will be `<body>` element, but Real projects use CSS-positioned-parents and this is solved with **Portals**
+  ![portal](./img/portals-1.png)
+  - the modal `div` will never have a CSS-Positioned-Parent. so the modal will be positioned relative to the HTML document, and will always fill the entire screen
+
+Implementation:
+
 - without portals ![portal](./img/portals.PNG)
 - with portals ![portal](./img/portals2.PNG)
 
 Portals need 2 things:
+![portal](./img/portals-2.png)
 
 - the child is a React element
 - (the container): the DOM location(node) to which the portal should be injected
@@ -791,6 +820,28 @@ import ReactDOM from 'react-dom';
 
 ReactDOM.createPortal(child, container);
 ```
+
+#### Modal notes
+
+- when showing the modal, We should prevent scrolling in the page, and this can be done with `useEffect` hook:
+
+  ```js
+  function Modal({...}){
+    useEffect(() => {
+      // using tailwind class
+      document.body.classList.add('overflow-hidden');
+
+      // cleanup function when closing the modal
+      return () => {
+        document.body.classList.remove('overflow-hidden');
+
+      }
+    }, [])
+    return ReactDom.createPortal(...)
+  }
+  ```
+
+- when you want to make the modal appear where you are currently and not in the beginning of the page, use `position: fixed` instead of `absolute`
 
 ---
 
@@ -1062,6 +1113,18 @@ const Expenses = props => {
 
 ---
 
+### DocumentWide event handlers (Refs)
+
+React have a way to handle events on DOM elements by accessing DOM properties directly instead of the plain javascript way
+![refs](./img/refs-1.png)
+
+- **Plain Javascript way:**
+  ![refs](./img/refs-2.png)
+
+`useRef` hook is explained in the [Refs section in Hooks file](./02-Hooks.md#refs)
+
+---
+
 ### Data binding
 
 Data binding in React can be achieved by using a `controlled input`. A controlled input is achieved by binding the `value` to a `state variable` and an `onChange` event to change the state as the `input value` changes.
@@ -1171,8 +1234,28 @@ in `.env` file:
   - and as it's a SPA, so the HTML will be empty and need to get the requested data (mounted react app) and this request is made through a server that serves these files and data
 
 - why when updating state item or doing a modification to object or array, we don't mutate this item directly and instead we return a copy of this item with our modification. isn't creating new object/array costly?
+
   - Answer: This is done specially with reference-type data-structures like `object` and `array`, as if the (reference to current state and reference to new state) are pointing to the same object/array, React assumes no render is required!
     ![mutating the state](./img/mutating-state.png)
     ![mutating the state](./img/mutating-state-0.png)
     ![mutating the state](./img/mutating-state-1.png)
     ![mutating the state](./img/mutating-state-2.png)
+
+- why in reducer function that we always return the current state and override it even if we're overriding all items in the state like here:
+
+  ```js
+  currentState: {
+    count: 10,
+    valueToAdd: 20
+  }
+
+  // .. in reducer function
+  case ADD_VALUE_TO_COUNT:
+    return {
+      ...state, // why this??
+      count: state.count + state.valueToAdd,
+      valueToAdd: 0
+    }
+  ```
+
+  - Answer: the reason is that in any time if the `state` object has some additional features been added, so that the updated state will be handled

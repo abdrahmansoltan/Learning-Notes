@@ -7,17 +7,18 @@
     - [Difference between state and props](#difference-between-state-and-props)
     - [`useState` Hook](#usestate-hook)
       - [Functional state updates](#functional-state-updates)
-  - [`useRef` Hook](#useref-hook)
-    - [Refs](#refs)
+  - [Refs](#refs)
     - [The Reference object](#the-reference-object)
-    - [useRef](#useref)
+    - [`useRef`](#useref)
       - [Why use it ?](#why-use-it-)
-    - [Example](#example)
+    - [`useRef` Implementation](#useref-implementation)
   - [Effect Hook](#effect-hook)
     - [useEffect](#useeffect)
     - [`useEffect` dependency array](#useeffect-dependency-array)
     - [`useEffect` cleanup function](#useeffect-cleanup-function)
   - [useReducer()](#usereducer)
+    - [Not recommended ways of using reducer function](#not-recommended-ways-of-using-reducer-function)
+    - [reducer function with Immer](#reducer-function-with-immer)
   - [Context: `useContext()`](#context-usecontext)
     - [Prop drilling](#prop-drilling)
     - [Solution for Prop drilling: (context)](#solution-for-prop-drilling-context)
@@ -126,14 +127,14 @@ const total = setTotal(state => {
 
 As the state changes **asynchronously**, if we want to set state based on current state values, we can use the functional version of setting the state: (it's like [callbacks in class components](./03-Class-Components.md#callbacks-in-setstate))
 
+This way of dealing with state is called: **"Derived State"**, which is that values that we can calculate using existing state
+
 ![functional-state-update](./img/functional-state-update.png)
 ![functional-state-update](./img/functional-state-update-1.png)
 
 ---
 
-## `useRef` Hook
-
-### Refs
+## Refs
 
 [reference](https://blog.logrocket.com/complete-guide-react-refs/)
 
@@ -167,13 +168,15 @@ the variable you use `useRef` with will become a frozen object with a **current*
 
 ---
 
-### useRef
+### `useRef`
 
-- It allows you to persist values between renders.
-
-- It can be used to store a mutable value that does not cause a re-render when updated.
+It allows a component to get a reference to a DOM element that it creates
 
 - It can be used to access a DOM element directly.
+- most of the time it's used with DOM elements, but it can hold a reference to any value
+
+  - It can be used to store a mutable value that does not cause a re-render when updated.
+  - It allows you to persist values between renders.
 
 - usually used For:
   - **form-input**
@@ -188,11 +191,24 @@ If we tried to count how many times our application renders using the `useState`
 >
 > **useRef** make sure we get same thing each render
 
-To avoid this, we can use the useRef Hook.
+To avoid this, we can use the `useRef` Hook.
 
 ---
 
-### Example
+### `useRef` Implementation
+
+1. create a `ref` at the top of your component by calling `useRef`
+2. Assign the `ref` to a JSX element as a prop called `ref`
+3. Access that DOM element with `ref.current`
+
+   - **Note:** before accessing the DOM element properties inside `ref.current`, Always check if the element is visible:
+
+     ```js
+     if (!inputElement.current) {
+       return;
+     }
+     // ... continue handler
+     ```
 
 ```js
 // Using useRef to focus the input
@@ -215,7 +231,7 @@ function App() {
 }
 ```
 
-**Note**: You can also access form-inputs with useState ->
+**Note**: You can also access form-inputs with `useState` ->
 
 ```js
  handleChange(e) {
@@ -318,19 +334,26 @@ It's an alternative to `useState`. Accepts a reducer of type `(state, action) =>
 - `useReducer()` does so by extracting the state management out of the component.
 
 - Use-Cases :
+  ![useReducer](./img/useReducer-1.png)
 
   - When you have states that belongs together
-  - if you have a state updates (is setted) that depend on other state.
+  - if you have a state updates (is set) that depend on other state.
   - If you find yourself keeping track of multiple pieces of state that rely on complex logic
+    ![useReducer](./img/useReducer-3.png)
 
 - It's similar to `useState()` as the hook returns an `array of 2 items`: the `current state` and the `dispatch function`.
+  ![useReducer](./img/useReducer-2.png)
 - `reducer function` can be outside the component as it doesn't use any items from the component, it only uses **items rendered by react**
 
 ---
 
-![usereducer](./img/useReducer.PNG)
+![useReducer](./img/useReducer.PNG)
+![useReducer](./img/useReducer-4.png)
+![useReducer](./img/useReducer-5.png)
 
-- `reducer function` contains your custom state logic(different scenarios).
+- **Reducer function** contains your custom state logic(different scenarios).
+  ![useReducer](./img/useReducer-6.png)
+  ![useReducer](./img/useReducer-7.png)
 
   - after executing the scenario-code, you should return a new state object
 
@@ -345,15 +368,21 @@ It's an alternative to `useState`. Accepts a reducer of type `(state, action) =>
     (state, action) => newState
   ```
 
-- `initialState` can be a simple value but generally will contain an **object** as it's for more complex state.
-- `dispatch` : is what we call in order to update the state --> it's like `setState()`
+- **`initialState`** can be a simple value but generally will contain an **object** as it's for more complex state.
+- **`dispatch`** : is what we call in order to update the state --> it's like `setState()`
   - it will call the `reducer function` for us with `argument = action-object`
-- `action` is an **object** that tells the reducer how to change the state.
+- **`action`** is an **object** that tells the reducer how to change the state.
+  ![action](./img/action-1.png)
   - It must contain a **type** property
-  - It can contain an optional **payload** object which has properties you want to add to the state(parameters to be used)
+    ![action](./img/action-2.png)
+    - It's to tell the reducer function how the state should be updated
+    - The React community has come up with this convention on how to tell the reducer what it needs to do (React doesn't treat these action objects any differently)
+  - It can contain an optional **payload** property which has the data you want to add to the state(parameters to be used)
+  - for action types, we should follow this:
+    ![action](./img/action-3.png)
 - Finally: when state is updated the component gets rerendered just like in `useState()`
 
-![usereducer](./img/reducer2.svg)
+![useReducer](./img/reducer2.svg)
 
 ```js
 import { useReducer } from 'react';
@@ -374,9 +403,29 @@ function reducer(state, action) {
     default:
       throw new Error();
   }
-  return newState;
+  return newState; // by default if no action matched
 }
 ```
+
+---
+
+### Not recommended ways of using reducer function
+
+![reducer function](./img/reducer-1.png)
+![reducer function](./img/reducer-2.png)
+
+- usually, it makes more sense to stuff logic into the reducer and to keep the dispatches simple, this will lead to less duplicated code if you need to dispatch the same action in multiple places and avoid typos
+- also part of the goal of reducers is to have a very specific set of ways that state can be changed
+
+---
+
+### reducer function with Immer
+
+**Immer:** (German for: always) is a tiny package that allows you to work with immutable state in a more convenient way.
+
+![immer](./img/immer.png)
+
+- It's not always used in real life
 
 ---
 
@@ -564,6 +613,7 @@ function Component5() {
 
 - When you have component logic that needs to be used by multiple components, we can extract that logic to a custom Hook
   - they're reusable functions.
+    ![custom hooks](./img/custom-hooks-1.png)
 - Custom Hooks must start with "`use`" keyword. Example: `useFetch`
 
 - Example:
