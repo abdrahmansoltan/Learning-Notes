@@ -538,11 +538,11 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 
 ![await](./img/async_await.PNG)
 
-- by using the word `async` before a function, you convert it to an `asyncronous function`
+- by using the word `async` before a function, you convert it to an `asynchronous function`
 
   - which will keep running in the background while performing the code inside of it, than when it's done => it returns a `promise`
   - Other values are wrapped in a resolved promise automatically.
-  - We could explicitly return a promise, which would be the same.
+  - It returns a promise, and we could explicitly return a promise, which would be the same.
 
   ```js
   async function f() {
@@ -588,7 +588,7 @@ async function asyncCall() {
   resolveAfter2Seconds().then(res => console.log(result));
 }
 
-asyncCall();
+asyncCall(); // this returns a promise
 ```
 
 - If we try to use `await` **in / without** a `non-async` function, there would be a `syntax error`,so => use `IIFE`

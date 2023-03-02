@@ -1,28 +1,17 @@
 # INDEX
 
 - [INDEX](#index)
-  - [installation](#installation)
   - [React Fundamentals](#react-fundamentals)
+    - [React Concepts](#react-concepts)
     - [Declarative vs imperative](#declarative-vs-imperative)
     - [multi-page application](#multi-page-application)
     - [single-page application (SPA)](#single-page-application-spa)
+  - [installation](#installation)
+    - [`react` and `react-dom` modules(libraries)](#react-and-react-dom-moduleslibraries)
   - [JSX](#jsx)
     - [Dynamic expressions in JSX](#dynamic-expressions-in-jsx)
   - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
     - [How does it work?](#how-does-it-work)
-  - [Router](#router)
-    - [Set Up](#set-up)
-    - [Router Components](#router-components)
-      - [`Route` Component](#route-component)
-      - [`Switch` Component](#switch-component)
-      - [`Redirect` component](#redirect-component)
-      - [`Link` component](#link-component)
-        - [How does `Link` work](#how-does-link-work)
-      - [`NavLink` Component](#navlink-component)
-    - [Dynamic Routes (Params)](#dynamic-routes-params)
-    - [Programmatically navigation](#programmatically-navigation)
-      - [Accessing the page's url](#accessing-the-pages-url)
-    - [Prompt](#prompt)
   - [Styling and CSS](#styling-and-css)
     - [Inline style](#inline-style)
     - [Dynamic classes](#dynamic-classes)
@@ -66,9 +55,69 @@
 
 ---
 
+## React Fundamentals
+
+It's a library not a framework. However, few people use react on its own, but when combined with things/tools like `react-router`, `webpack`, `redux` -> ("React Ecosystem"), then it become more like a framework
+
+> there's an actual framework built around React -> **Next.js**
+
+---
+
+### React Concepts
+
+React is based on these concepts:
+
+1. Don't touch the DOM, I'll do it --> **Declarative**
+   - This idea of declarative style, means that we don't have to directly say "do this and if this happens then do that and so on...", Instead we tell React that this is the state of our app and React will automatically just does the rest for us.
+2. Build websites like lego blocks --> **Components**
+   - React is designed on the concept of reusable-components that are grouped together to form bigger components
+3. Unidirectional(One way) data-flow --> **State(data) can never move up**
+   - Anytime we want something to change on our page, the state has to change, so that React "reacts" to this change and use the new state to update the DOM (the data flows only in one way)
+4. React handles the UI (View) and the rest in on you --> **library and not framework**
+   - React only handles the View using the virtual-dom, Everything else that you need, You can use other modules and libraries and mix and match whatever you want customized to your need.
+   - React is not like a kitchen, It's like a stove
+
+---
+
+### Declarative vs imperative
+
+- Functional Programming is a declarative programming paradigm, in contrast to imperative programming paradigms.
+
+  - `Declarative programming` is a paradigm describing `WHAT` the program does, without explicitly specifying its control flow.
+    - allows you to control flow and state in your application by saying `"the state should look like this" and React will handle the rest`
+  - `Imperative programming` is a paradigm describing `HOW` the program should do something by explicitly specifying each instruction (or statement) step by step, which mutate the program's state.
+    - allows you to control your application by saying `"This is what you should do"`
+
+- React's declarative approach
+  - Define the desired target state(s) and let React figure out the actual JavaScript DOM instructions ![declarative](./img/imperative_declarative.PNG)
+
+---
+
+### multi-page application
+
+- As the name suggests, a multi-page application (MPA) is an app that has more than one page. It works in a traditional way, requiring the app to reload entirely every time a user interacts with it.
+
+---
+
+### single-page application (SPA)
+
+![spa](./img/spa%20vs%20mpa.jpg)
+![How react works](./img/how-react-works.png)
+
+- Why? -> it's to make application more **"reactive"** like `mobile-apps` and `desktop-apps` which things happen instantly (you don't wait for new pages or responses to load or actions to start)
+- `Single-page applications` can work in different ways. One way a single-page app loads is by downloading the entire site's contents all at once. This way, when you're navigating around on the site, everything is already available to the browser, and it doesn't need to refresh the page. Another way single-page apps work is by downloading everything that's needed to render the page the user requested. Then when the user navigates to a new page, asynchronous JavaScript requests are made for just the content that was requested.
+
+  - Another key factor in a good single-page app is that the URL controls the page content. Single-page applications are highly interactive, and users want to be able to get back to a certain state using just the URL. --> [React Router](./4-React-router.md)
+
+- The browser downloads the entire app data when you visit SPA web applications. Thus, you can browse through different parts of the app seamlessly and the page won’t reload every time you click on something.
+
+- This is because a single page application executes the logic in the browser, instead of a server. It does so with JavaScript frameworks that can lift this heavy data on the client-side. JavaScript also enables an SPA to reload only those parts of the app that a user requests for, not the entire app. As a result, SPAs are known to deliver fast and efficient performance.
+
+---
+
 ## installation
 
-- **`npx`** is a command that lets you run code built with Node.js and published through the NPM registry (It's a Node.js package runner). It's used to execute commands without installing dependencies (**install something and running it immediately**)
+- **`npx`** is a command that lets you run code built with Node.js and published through the NPM registry (It's a Node.js package runner). It's used to execute commands without installing dependencies (**install latest version of something and run it immediately**)
 
 ```bash
 npx create-react-app my-app # equivalent to installing react globally first then >> creating react app
@@ -86,6 +135,9 @@ npm start
   - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
   - Enables easy testing & deployment
 - one `HTML` file is delivered => `index.html`
+- When using the `Create-React-App` tool you are provided with a handy script(command) `eject` that allows you to configure Webpack among other features at your heart content.
+
+  - > if you use the script `npm run eject`, it will get you `config` folder which is everything that `create-react-app` does, and it's not recommended to change it or even to `eject` as the configuration is made by people who figured out the best configuration
 
 - **Folder structure**
   ![folder-structure](./img/react-folder-structure.png)
@@ -102,45 +154,15 @@ npm start
   );
   ```
 
----
+### `react` and `react-dom` modules(libraries)
 
-## React Fundamentals
+These 2 libraries from React are critical for React to work, these 2 combined is what actually allows us to build web application in React
 
-It's a library not a framework. However, few people use react on its own, but when combined with things/tools like `react-router`, `webpack`, `redux` -> ("React Ecosystem"), then it become more like a framework
-
-> there's an actual framework built around React -> **Next.js**
-
-### Declarative vs imperative
-
-- Functional Programming is a declarative programming paradigm, in contrast to imperative programming paradigms.
-
-  - `Declarative programming` is a paradigm describing `WHAT` the program does, without explicitly specifying its control flow.
-    - allows you to control flow and state in your application by saying `"It should look like this"`
-  - `Imperative programming` is a paradigm describing `HOW` the program should do something by explicitly specifying each instruction (or statement) step by step, which mutate the program's state.
-    - allows you to control your application by saying `"This is what you should do"`
-
-- React's declarative approach
-  - Define the desired target state(s) and let React figure out the actual JavaScript DOM instructions ![declarative](./img/imperative_declarative.PNG)
-
----
-
-### multi-page application
-
-- As the name suggests, a multi-page application (MPA) is an app that has more than one page. It works in a traditional way, requiring the app to reload entirely every time a user interacts with it.
-
-### single-page application (SPA)
-
-![spa](./img/spa%20vs%20mpa.jpg)
-![How react works](./img/how-react-works.png)
-
-- Why? -> it's to make application more **"reactive"** like `mobile-apps` and `desktop-apps` which things happen instantly (you don't wait for new pages or responses to load or actions to start)
-- `Single-page applications` can work in different ways. One way a single-page app loads is by downloading the entire site's contents all at once. This way, when you're navigating around on the site, everything is already available to the browser, and it doesn't need to refresh the page. Another way single-page apps work is by downloading everything that's needed to render the page the user requested. Then when the user navigates to a new page, asynchronous JavaScript requests are made for just the content that was requested.
-
-  - Another key factor in a good single-page app is that the URL controls the page content. Single-page applications are highly interactive, and users want to be able to get back to a certain state using just the URL. --> [React Router](#router)
-
-- The browser downloads the entire app data when you visit SPA web applications. Thus, you can browse through different parts of the app seamlessly and the page won’t reload every time you click on something.
-
-- This is because a single page application executes the logic in the browser, instead of a server. It does so with JavaScript frameworks that can lift this heavy data on the client-side. JavaScript also enables an SPA to reload only those parts of the app that a user requests for, not the entire app. As a result, SPAs are known to deliver fast and efficient performance.
+- `react`: is the engine which does all of the work of how React functions works and be built -> **Application Builder**
+  - > How react works
+- `react-dom`: is related to the Web-DOM being the document-object-model, which is the different tools that help us actually build web-applications
+  - > what react renders
+  - It specifies that the engine should be directed towards web related applications
 
 ---
 
@@ -150,7 +172,7 @@ It's a library not a framework. However, few people use react on its own, but wh
 ![jsx](./img/jsx.jpg)
 
 - **JSX** = "HTML in JavaScript"
-- it's a "Syntactic sugar", does not run in the browser like this!
+- it's a Syntactic sugar (syntax extension of javascript which extends the functionality of javascript), does not run in the browser like this!
 - It's not legal Javascript; It has to be transpiled to Javascript using **Babel**
 - It's like functions as when react sees them it **invokes them**
 - in older versions of react : to use `JSX` you had to write this in the file :
@@ -188,7 +210,7 @@ React.createElement(
 - **NOTE** : when you write a `array` in JSX, the JSX automatically `joins` the `array`, that's why you can't use `forEach`
 
   ```js
-  const names - ["ahmed", "esraa", "mona"];
+  const names = ["ahmed", "esraa", "mona"];
   return (
       <Fragnent>
           <p>
@@ -205,9 +227,10 @@ React.createElement(
 
 **Dom Manipulation** can be very slow and heavy. For example, if you have several image tags inside a div and you replace one of the images inside with a different image source, the DOM re-renders the entire div. What would happen if you frequently update and make a lot of transformations? To address this problem, the React developers came up with an idea to manipulate the VDOM instead which is faster since nothing gets drawn on your browser.
 
-- `Virtual DOM (VDOM)`: is a concept where a virtual representation of a UI is kept in `memory` and synced with the real DOM by a library (such as ReactDOM).
+- **Virtual DOM (VDOM)**: is a concept where a virtual representation of a UI is kept in `memory` as an object **(snapshot of what the real DOM looks like)**, and synced with the real DOM by a library (such as ReactDOM). which makes changes to the virtual DOM and not the Real DOM
 
   - You can simply think of it as a lightweight copy of the Real DOM.
+  - It's a tree-like object that gives react a blueprint of how it should update the actual DOM
 
 ![react-dom](./img/react-dom.png)
 
@@ -221,382 +244,12 @@ React.createElement(
 1. React generates a new Virtual DOM for our application.
 2. React compares the initial Virtual DOM (representing the current html DOM) to the new Virtual DOM.
 3. Based on the comparison above, React runs its **Diffing Algorithm** to calculate the minimum number of operations to update the initial Virtual DOM to the new Virtual DOM.
+4. it update the new DOM by **unmounting**(removing from the DOM tree) the changed things that differ and re-render them with the new data
+   ![react-dom](./img/vdom-1.png)
+5. then React compares the difference between the DOM-snapshot and the real-DOM and update the real-DOM accordingly
+   ![react-dom](./img/vdom-2.png)
 
 > **Re-Evaluating Components !== Re-Rendering the DOM** > ![rerender](./img/rerender.PNG)
-
----
-
-## Router
-
-React Router turns React projects into single-page applications. It does this by providing a number of specialized components that manage the creation of links, manage the app's URL, provide transitions when navigating between different URL locations, and so much more.
-
-- **Server-Side Routing**: (Traditional Routing)
-
-  - Server decides what HTML to return based on URL request, and the entire page refreshes
-    ![traditional routing](./img/traditional-routing-1.png)
-  - clicking a `<a>` link causes browser to request a new page & replace the entire DOM
-    ![traditional routing](./img/traditional-routing-2.png)
-    - The standard browser behavior when the browser loads a new HTML document is that "all existing javascript code **is dumped** and we will lose access to it"
-
-- **Client Side Routing**
-
-  - **Fake CSR**:
-    ![fake-client-side-routing](./img/fake-client-side-routing.png)
-    - We can actually create something closer to a client-side-routing using conditions and preventing-default-behavior on `<a>` links, and render components based on state condition, But this will not actually be routing, as we won't be able to track **history** (go back and forward...) and other more features
-      ![fake-client-side-routing](./img/fake-client-side-routing-1.png)
-
-- **Real CSR** -> **React Router**
-  ![react router](./img/react-router-1.png)
-
-  - sites that exclusively use client-side routing are **single-page-applications SPA**
-    ![react router](./img/react-router-2.png)
-  - It handles mapping between URL bar and the content which the user sees via browser rather than via server
-    ![react router](./img/react-router-3.png)
-  - here, we use Javascript to manipulate the URL bar with a web-api called **History**
-    ![react router](./img/react-router-4.png)
-    - also `pushState` method handles **backward button** in the browser (with maintaining the state and prevent refreshing) using the `popstate` event in `window.history`
-  - The best thing is that the javascript environment is no longer being reset with navigation!
-  -
-
-- **SSR** vs **CSR**
-  ![SSR-vs-CSR](./img/SSR-vs-CSR.png)
-
----
-
-### Set Up
-
-- first install it
-
-  ```bash
-  npm install react-router-dom@6
-  ```
-
-- in `index.js` :
-
-  ```js
-  import { BrowserRouter } from 'react-router-dom';
-
-  // then wrap the app in a BrowserRouter fragment
-  // You may also use different types of router like "hashRouter"
-
-  root.render(
-    <React.StrictMode>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </React.StrictMode>
-  );
-  ```
-
-  > **StrictMode**: provides additional warnings when using legacy or soon to be deprecated code.
-  >
-  > - also it may result **rendering twice**
-
-- now in `App.js`
-
-  ```js
-  import { Route, Routes } from 'react-router-dom';
-
-  function App() {
-    return (
-      // rapping the component in a routes and the route specify the endpoint
-      <Routes>
-        <Route path='/home' element={<Home />} />
-        // means that when route matches "/home" -> render the Home component
-      </Routes>
-    );
-  }
-  ```
-
-- or if you want nested Routes:
-
-  ![outlet](./img/outlet.png)
-
-  ```js
-  // in `app.js`
-  function App() {
-    return (
-      // now we want to tell the parent component (Home) where we want the react-router-dom to render the nested-matching-element (Shop) --> using "Outlet component" from react-router-dom
-      <Routes>
-        <Route path='/home' element={<Home />}>
-          <Route path='shop' element={<Shop />} />
-        </Route>
-      </Routes>
-    );
-  }
-  ```
-
-  ```js
-  function Home() {
-    // in `Home.jsx`
-    return (
-      <div>
-        <Outlet />
-        <h1>this is home page</h1>
-      </div>
-    );
-  }
-  ```
-
----
-
-### Router Components
-
-#### `Route` Component
-
-![route](./img/react-router-route.png)
-![route](./img/react-router-route-1.png)
-
-- **`exact`** matches the exact-full-path **ONLY IN VERSION 5**
-
-  - not needed in v6
-
-- one of its props is the prop responsible for referencing the component for the specified route, and this prop is `render=""` or `component=""`, and there's a difference between them:
-
-  - `component`: When you use `component` prop, the component is **instantiated** per every call of Route#render. It means that, for your component that you pass to `component` prop of `Route`, `constructor`, `componentWillMount`, and `componentDidMount` will be executed every time the route is rendered.
-
-    ```js
-    // So when you have it like:
-    <Route path="/:locale/store" component={Store} />
-    // you can think of it as:
-    <Route path="/:locale/store">
-      <Store />
-    </Route>
-    ```
-
-  - `render`: if you use `render` prop, the component is **evaluated** on every Route#render. Remember that every component is a function? This function will be executed as is, without any lifecycle methods.
-
-    ```js
-    // So when you have it like:
-    <Route path="/:locale/store" render={Store} />
-    // you can think of it as:
-    <Route path="/:locale/store">
-      {Store()}
-    </Route>
-    ```
-
-  - Also, the source code explains it very good:
-
-    ```js
-    if (component) return match ? React.createElement(component, props) : null;
-
-    if (render) return match ? render(props) : null;
-    ```
-
-  - Also, when you want to pass props to the component use `render` as it accepts a function unlike `component`
-
-#### `Switch` Component
-
-- `<Switch>` **ONLY IN OLD VERSION 5** -> It's **`<Routes>`** in version 6
-
-- It Renders the first child `<Route>` or `<Redirect>` that matches the location.
-- It makes sure that only one component from components with matching routes are displayed (limit only one match from a group of routes)
-  - > as routes match partially as well as total match, **`/`** & **`/home`** will be fired when requesting `/home`
-- It stops searching once it finds a match -> it displays the first match it finds, so the order is important or you can use **`exact`**
-
-```js
-import { Route, Switch } from 'react-router';
-
-<Switch>
-  <Route exact path='/'>
-    <Home />
-  </Route>
-  <Route path='/about'>
-    <About />
-  </Route>
-</Switch>;
-```
-
-- **Including a 404 route**:
-
-  - You can make use of the order of routes in a `<Switch>` and put the 404 route last
-
-    ```js
-    return (
-      <Switch>
-        <Route exact path='/blog' render={() => <BlogHome />} />
-        <Route exact path='/' render={() => <Home />} />
-        <Route render={() => <NotFound />} />
-      </Switch>
-    );
-    ```
-
-  - OR: to make a "not found page (404)" make: `path="*"`
-
-#### `Redirect` component
-
-- `<Redirect>` **ONLY IN VERSION 5**: navigate to a new location. The new location will override the current location
-  - for **V6**: we use `<Navigate>`
-
-```js
-<Redirect to="/somewhere/else" />
-
-<Navigate to="/somewhere/else" />
-
-// Or
-<Redirect
-  to={{
-    pathname: "/login",
-    search: "?utm=your+face",
-    state: { referrer: currentLocation }
-  }}
-/>
-
-```
-
-#### `Link` component
-
-- when you want to change the page's URL, we don't use `<a>` as it will make the page **reload**(make a new request)
-- Instead we use `<Link>` component from `react-router-dom`
-- **Notes**:
-  - `<Link>` can be represented as `<a>` in **css**
-  - clicking on `<link>` doesn't issue a GET request, as javascript intercepts click and does client-side-routing
-
-```js
-import { Link } from 'react-router-dom';
-
-<Link to='/about'>About Us</Link>;
-```
-
-##### How does `Link` work
-
-![Link](./img/react-router-link.png)
-
----
-
-#### `NavLink` Component
-
-- `<NavLink>` is just like `link`, with one additional feature:
-
-  - If at page that link would go to, the `<a>` gets a CSS class of `active`
-  - This lets you stylize links to "page you are already at" using the `activeStyle` (in-line) or `activeClassName` props
-
-- You should include an `exact` prop here as well
-- It's Very helpful for navigation menus
-
-```js
-import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
-import './NavBar.css';
-
-class NavBar extends Component {
-  render() {
-    const activeStyle = {
-      fontWeight: 'bold',
-      color: 'mediumorchid'
-    };
-    return (
-      <nav>
-        {/* VERSION 5 */}
-        <NavLink exact to='/' activeStyle={activeStyle}>
-          Home
-        </NavLink>
-        <NavLink exact to='/eat' activeStyle={activeStyle}>
-          Eat
-        </NavLink>
-        <NavLink exact to='/drink' activeStyle={activeStyle}>
-          Drink
-        </NavLink>
-        {/* OR */}
-        <NavLink exact to='/drink' activeClassName='name_of_the_class'>
-          Drink
-        </NavLink>
-      </nav>
-    );
-  }
-}
-
-// VERSION 6
-<NavLink className={navData => (navData.isActive ? 'name_of_the_class' : '')} to='/about'>
-  About Us
-</NavLink>;
-```
-
----
-
-### Dynamic Routes (Params)
-
-- here we use query-parameters `/:param`
-
-- **OLD WAY**: Here we use the `routeProps` and pass it as a prop to the component if you are using `render={()=> <Component/>}`, or just use `component={Component}` without passing anything
-
-  ```js
-  <Route path='/food/:name' render={routeProps => <Food {...routeProps} />} />
-  ```
-
-  ![routeParams](./img/routeParams.png)
-
-- **New Way**
-
-  - to access this **param** we use `useParams` hook
-
-  ```jsx
-  <Route path='/product/:id' component={Product} />
-  ```
-
-  ```js
-  // in Product.component.jsx
-  import { useParams } from 'react-router-dom';
-
-  const params = useParams();
-  // or const {productId} = useParams()
-
-  console.log(params.productId);
-  ```
-
----
-
-### Programmatically navigation
-
-- **V5** it's done using `useHistory()` hook
-- **V6** it's done using `useNavigate()` hook
-- in the background, these hooks are used to get the return value of `useContext(NavigationContext)` which has the data for navigation, and we use the hooks to simplify our code from a lot of importing
-
-- `history.replace` vs `history.push`:
-  - in case of `push` - a new record is added in the history, and user can go back
-  - in case of `replace` it deletes the last record and puts the new one. So if you will not use the go back
-    - > Usually when redirecting from an invalid url
-
-```js
-import { useHistory } from 'react-router-dom';
-
-const history = useHistory();
-
-// ...in a handler-function
-history.push('/home');
-
-//-----------------------------//
-// V6
-const navigate = useNavigate();
-
-// ...in a handler-function
-navigate('/home', { push: true });
-```
-
-#### Accessing the page's url
-
-It's done using `useLocation()` hook
-
-- usually used to access query-parameters
-
-```js
-import { useLocation } from 'react-router-dom';
-
-const location = useLocation();
-
-// for parameters
-const queryParams = new URLSearchParameters(location.search);
-
-const something = queryParams.get('wanted_param');
-```
-
----
-
-### Prompt
-
-Used to prompt the user before navigating away from a page. When your application enters a state that should prevent the user from navigating away (like a form is half-filled out), render a `<Prompt>`.
-
-- [Guide](https://v5.reactrouter.com/core/api/Prompt)
 
 ---
 
@@ -671,7 +324,7 @@ CSS Modules are “CSS files in which all class names and animation names are sc
 
 There are two different ways of using CSS Modules in a React application.
 
-1. When using the `Create-React-App` tool you are provided with a handy command `eject` that allows you to configure Webpack among other features at your heart content.
+1. When using the `Create-React-App` tool you are provided with a handy script(command) `eject` that allows you to configure Webpack among other features at your heart content.
 
    - more info [here](https://medium.com/nulogy/how-to-use-css-modules-with-create-react-app-9e44bec2b5c2)
 
@@ -1197,7 +850,7 @@ in `.env` file:
 
 - Why we use `useEffect()` or `componentDidMount()` to change state after mounting, why don't we just invoke the function we want directly in the component body?
 
-  - it's because like that we would be calling this function each time we render which changes the state and cause re-render again, and this will lead to **render infinite loop**
+  - it's because like that we would be calling this function each time we render which changes the state (with different state object than the current one in memory) and cause re-render again, and this will lead to **render infinite loop**
 
 - Why React Hook useState uses const and not let?
 
@@ -1214,9 +867,12 @@ in `.env` file:
   </h1>
   ```
 
-  it doesn't change the name in the page but if console.log it I see that the name is equal to 'Ahmed'
+  it doesn't change the name in the page but if `console.log` it I see that the name is equal to 'Ahmed'
 
-  --> because the state is changed but the component needs to be rerendered as what is shown on the page is what we call `object's reference by memory`, so when we rerender we create a new object(state), so we should use
+  - because the state is changed but the component needs to be rerendered as what is shown on the page is what we call **`object's reference by memory`**
+  - **Note:** The state must be changed in a way that React recognized in order to trigger "re-rendering", and this is done using `setState()`
+    - `setState` performs a **shallow merge** with the current `state` object which is to update the current object-keys with the keys given
+  - so when we rerender we create a new object(state), so we should use
 
   ```js
   this.setState(() => {
@@ -1225,6 +881,8 @@ in `.env` file:
   ```
 
 - Why (fetching with setting the state to the resolved value) without `componentDidMount()` or `useEffect()` results **infinite render**
+
+  - because when fetching and changing the state (with different state object than the current one in memory) which cause re-render again and again.
 
   - because the resolved object/array is different from the one in the memory so the state gets reset over and over
 

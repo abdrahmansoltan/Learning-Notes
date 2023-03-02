@@ -3,38 +3,47 @@
 - [INDEX](#index)
   - [Node.js and the V8 Engine](#nodejs-and-the-v8-engine)
     - [Node.js Runtime](#nodejs-runtime)
+    - [Node.js Architecture (How it works)](#nodejs-architecture-how-it-works)
+      - [More about Node.js and libuv](#more-about-nodejs-and-libuv)
+    - [Node Process and Threads](#node-process-and-threads)
     - [Phases of Event-Loop](#phases-of-event-loop)
     - [Node vs Javascript](#node-vs-javascript)
+    - [Node.js vs python / PHP](#nodejs-vs-python--php)
   - [Thread Pool (Asynchronous I/O)](#thread-pool-asynchronous-io)
-  - [Node.js vs python / PHP](#nodejs-vs-python--php)
   - [Events](#events)
     - [EventEmitter](#eventemitter)
   - [REPL](#repl)
   - [Modules](#modules)
     - ["Common-JS" Module System](#common-js-module-system)
-    - ["ECMAScript (ES)" Module System](#ecmascript-es-module-system)
+      - [What happens when we `require()` a module](#what-happens-when-we-require-a-module)
+    - [ECMAScript (ES) Module System](#ecmascript-es-module-system)
     - [Module vs Package](#module-vs-package)
     - [Core-modules : Process Module](#core-modules--process-module)
     - [Core-modules : Path Module](#core-modules--path-module)
     - [Core-modules : File System Module](#core-modules--file-system-module)
     - [Core-modules : HTTP/HTTPS - URL](#core-modules--httphttps---url)
-  - [Installation](#installation)
+  - [NPM Packages Installation](#npm-packages-installation)
     - [semantic versioning](#semantic-versioning)
     - [globally vs locally installation](#globally-vs-locally-installation)
       - [globally (-g)](#globally--g)
       - [locally (--save-dev)](#locally---save-dev)
     - [--save and --save-dev](#--save-and---save-dev)
+  - [Application Programming Interface (API)](#application-programming-interface-api)
+    - [REST Architecture](#rest-architecture)
   - [HTTP server](#http-server)
+    - [What happens when we access a webpage? (How server Works)](#what-happens-when-we-access-a-webpage-how-server-works)
     - [Create Node.js Web Server](#create-nodejs-web-server)
     - [HTTP Header](#http-header)
     - [Routing](#routing)
     - [Parsing Request Body (Streams \& Buffer)](#parsing-request-body-streams--buffer)
+      - [Streams](#streams)
+      - [Buffer](#buffer)
   - [Import / Export Async Data (Streams-Promises)](#import--export-async-data-streams-promises)
     - [Streams Promises API](#streams-promises-api)
     - [stream-promise package](#stream-promise-package)
   - [Logs](#logs)
     - [morgan](#morgan)
-      - [installation](#installation-1)
+      - [installation](#installation)
   - [Improving Performance](#improving-performance)
     - [Running multiple node-processes](#running-multiple-node-processes)
       - [Node Cluster Module](#node-cluster-module)
@@ -59,14 +68,39 @@
   - network requests -> `fetch / xhr`
   - HTML DOM -> `document`
   - Timer -> `setTimeOut`, `setInterval`
+- Benefits of running Javascript in **Node.js**:
+  - accessing file system
+  - better networking capabilities
+  - These benefits enable us to have perfect conditions for using Node.js as a **web server**
 
 ---
 
 ### Node.js Runtime
 
 - `Node.js` is a `Javascript-Runtime` **not** a language or framework, which allows us to run javascript outside browsers, with additional javascript-features (e.g. accessing file system files)
+  ![runtime](./img/node-runtime-1.png)
 
-- it uses `libuv` so that if `V8 engine` didn't find a `js` syntax like `process module` --> it goes to `libuv`
+---
+
+### Node.js Architecture (How it works)
+
+**Node.js Architecture** can be presented based on dependencies which are libraries that Node depends on them in order to work properly, the most important ones are `V8 engine` and `libuv`
+![architecture](./img/node-architecture.png)
+
+- If it wasn't for `V8`, Node would have no way of understanding the javascript code, as `v8 engine` converts javascript code into machine code that the computer can understand
+- `libuv` is an open source library with a strong focus on **Asynchronous I/O**. This layer is what gives Node access to the underlying operating system (`file-system`, `networking`, ...)
+
+  - Also, `libuv` implements 2 important features of Nodejs which are:
+    1. **Event Loop** --> for handling easy tasks like executing callBacks and network I/O
+    2. **Thread Pool** --> for more heavy work like file accessing or compression
+
+- This architecture provides us with a level of **Abstraction**, as the dependencies are written in `C++` but they make us have access to their functions in pure javascript
+
+---
+
+#### More about Node.js and libuv
+
+- Node uses `libuv` so that if `V8 engine` didn't find a `js` syntax like `process module` --> it goes to `libuv`
 
   - > **libuv** is a multi-platform C library that provides support for Asynchronous I/O based on event loops
 
@@ -82,12 +116,58 @@
 
 ---
 
+### Node Process and Threads
+
+When we use Node on a computer, it means that there's a Node `process` running on that computer (the `process` is just a program in execution).
+
+![node process](./img/node-process.png)
+
+- In that process, Node.js runs in a single thread (sequence of instructions). And this is what happen in a thread when starting a Node application
+
+  1. all the top level code is executed (not inside any callback function)
+  2. all the modules that the app needs are required
+  3. all callbacks are registered
+  4. the event loop starts running
+     - Some tasks are too heavy (expensive to be executed) in the event loop, because they would block the single thread. That's where the **thread pool** comes in
+
+- The thread pool is provided to Node.js by the `libuv` library, and it gives us **4 additional threads** that are separate from the main single-thread (we can configure it up to 128 threads)
+
+  - The event loop can **offload** heavy tasks to the thread pool (behind the scenes)
+  - the more threads we have the faster we get the (tasks offloaded to the thread pool) to be executed
+
+    ```js
+    // change number of threads in the thread pool
+    process.env.UV_THREADPOOL_SIZE = 2; // default is 4
+    ```
+
+---
+
 ### Phases of Event-Loop
 
-- Execution in this order :
+**Event Loop**: is all the application code that is inside callback functions (non top level code)
 
-  ![alt](./img/phases-Eventloop.PNG)
-  ![Event Loop](./img/eventLoop.PNG)
+- Node.js is build around callback functions, as it uses **"Event-driven Architecture"** where:
+  ![events](./img/node-events.png)
+
+  1. events are emitted
+  2. the event-loop picks them up when they're emitted, and the more expensive tasks go to thread-pool
+  3. then, the necessary callbacks are called
+
+> Most Node.js core modules like (HTTP, file-system and others) implement events internally by inheriting from the `EventEmitter` Class -> `server.on('request', (req, res)=> {})`
+
+- The event-loop does the Orchestration in Node.js with specific order of execution
+- Execution Order :
+  ![event loop](./img/event-loop-1.png)
+- The event-loop is what makes Asynchronous programming possible in Node.js, making it the most important feature in Node.js design and this is what makes it different from other BE languages
+  ![event loop](./img/event-loop-2.png)
+
+  - **node.js** -> single thread which is good for resources but can be bad if the thread is slowed or blocked
+  - **php** -> multiple threads which is more resources-intensive but no danger of blocking
+
+  - in addition to the main 4 callback queues, there're also 2 other queues (`nextTick` queue and the **microtasks** queue -> for resolved promises)
+    - if there's any callback to be processed in one of these 2 queues, they will be executed right after the current phase of the event loop finishes instead of waiting for the entire loop to finish
+    - So, callbacks from these 2 queues will be **executed right away**
+
   ![Event Loop](./img/eventLoop2.png)
 
 ---
@@ -101,9 +181,18 @@
 
 ---
 
+### Node.js vs python / PHP
+
+- Node.js works best when you deal with `input/output` or `servers`, `(serving data / streaming)`
+
+- Node.js doesn't work well for heavy server-side processing 7 calculation (CPU-Intensive) like `machine learning`, `video processing`, `3D-games`
+  - in this case other languages are better
+
+---
+
 ## Thread Pool (Asynchronous I/O)
 
-- `node` runs on a `single thread` even if you have millions of users, so make sure you don't **block that thread**, --> here comes the rule of `Libuv` which gives us `4` additional threads **(or more)**
+- `Node` runs on a `single thread` even if you have millions of users, so make sure you don't **block that thread**, --> here comes the rule of `Libuv` which gives us `4` additional threads **(or more)**
 
   ![pool-thread](./img/poolthread.PNG)
   ![multi-thread](./img/multithread.PNG)
@@ -118,14 +207,6 @@
 - Libuv takes advantage of the operating system's asynchronous interfaces before engaging the thread pool
 - The thread pool is engaged for events that require more processing power including compression and encryption tasks
 - The default thread pool includes `4` threads
-
----
-
-## Node.js vs python / PHP
-
-- node works best when you deal with `input/output` or `servers`, `(serving data / streaming)`
-
-- it doesn't work well for heavy calculation like `machine learning`, `video processing`, `3D-games`
 
 ---
 
@@ -238,7 +319,27 @@ The module system creates the ability to `export` and `import` JavaScript from s
 
 ---
 
-### "ECMAScript (ES)" Module System
+#### What happens when we `require()` a module
+
+1. **Resolving path to the required module and loading the file**
+   ![modules](./img/modules-1.png)
+2. **Wrapping the module in a function**
+   ![modules](./img/modules-2.png)
+
+   - The module's code is wrapped into an **IIFE**, which will give us access to a couple of special objects and methods like `require()`
+   - This is why in every module, we automatically have access to stuff like `require` function and global variables that are injected into every module
+   - All the module code is executed inside a function body
+   - This is also used to keep the top-level variables defined in each module private and scoped only to the current module instead of leaking everything into the global object
+
+3. **Executing the module code by the Node.js runtime**
+4. **Returning the module exports**
+   ![modules](./img/modules-3.png)
+5. **Caching the module after first load for future requires**
+   - this will make the code in the module run only one time -> (interview question)
+
+---
+
+### ECMAScript (ES) Module System
 
 Starting from `Node.js 13.2.0` now `node.js` supports ECMAScript modules, known for their `import` and `export` statements
 
@@ -297,9 +398,28 @@ It's not found in the browser APIs, `Process` relates to the global node executi
     });
     ```
 
-- `process.env`
+- `process.env` -> **(ENVIRONMENT VARIABLES)**
 
-  - Process.env gives you access to the environment information of your Node.js application. It also allows you to add environment variables that can be used if your code is dependent on the environment it is run in.
+  - `Process.env` gives you access to the environment information of your Node.js application. It also allows you to add environment variables that can be used if your code is dependent on the environment it is run in.
+  - To add new environment-variables in our Node process, we have 2 ways:
+
+    1. manually in terminal before the start script:
+
+       ```sh
+       NODE_ENV=production nodemon server.js
+       ```
+
+    2. by using a `.env` configuration file that contains all our environment-variables and access it using [dotenv package](https://www.npmjs.com/package/dotenv)
+
+       ```js
+       const dotenv = require('dotenv');
+
+       // specify the path of configuration file
+       dotenv.config({ path: './config.env' }); // MUST BE BEFORE requiring app file
+
+       // now we can access the variables in the config file like this:
+       console.log(process.env.PORT);
+       ```
 
 - `process.stdout` it's like `console.log` but it does not force a new line break. This allows you to create helpful tools like progress bars.
 
@@ -350,7 +470,7 @@ console.log(path.join('/app', 'src', 'util', '..', '/index.js'));
 
 ---
 
-## Installation
+## NPM Packages Installation
 
 ```bash
 npm i module-name # install module to dependencies
@@ -374,6 +494,8 @@ npm i --save-dev module-name@1.19 # install a specific version (1.19 here) of mo
 ### semantic versioning
 
 [npm semver calculator](https://semver.npmjs.com/)
+
+![semantic-versioning](./img/semantic-versioning.png)
 
 - `*` means that you'll accept all updates
 - `^` means that you'll only accept minor releases
@@ -408,9 +530,76 @@ npm i --save-dev module-name@1.19 # install a specific version (1.19 here) of mo
 
 ---
 
+## Application Programming Interface (API)
+
+It's a piece of software that can be used by another piece of software, in order to allow application to talk to each other
+
+- API has a broader meaning than building Web APIs, It can be a "web api" or other things like Node-APIs:
+  ![api](./img/api-1.png)
+
+- Web API is usually what's important in the context of Node.js, which is build using the **REST Architecture**
+  - **REST APIs**: are APIs following the REST Architecture
+
+### REST Architecture
+
+It stands for "Representational States Transfer", It's a way of building web APIs in a logical way making them easy to consume. This requires some principles:
+
+1. **Separate API into logical resources**
+   - all data to be shared by the API should be divided into logical resources
+     ![api](./img/api-2.png)
+2. **Expose these resources using URLs**
+   ![api](./img/api-3.png)
+3. **Use HTTP methods to perform different actions on data**
+   - we should only use endpoints with HTTP methods in order to perform actions on data
+     ![api](./img/api-4.png)
+   - we only send response to client if the cline uses a HTTP method to access the endpoint
+     ![api](./img/api-5.png)
+4. **Send data back to client (usually JSON format**
+   - `JSON` is a lightweight data interchange format used by web APIs coded in any programming language (not just related to javascript)
+   - It's used a lot because it's easy for both humans and computers to understand and write JSON (key-value pairs)
+     ![api](./img/api-6.png)
+5. **The API must be stateless**
+   - The server shouldn't have to remember the previous request in order to process the current request
+     ![api](./img/api-7.png)
+
+---
+
 ## HTTP server
 
-`http` / `https` are languages used to communicate between server & client
+`http` / `https` are languages used to communicate between server & client in a way called **"Request-Response Model"** or **"Client-Server Architecture"**
+
+### What happens when we access a webpage? (How server Works)
+
+This is what happens when we access a webpage or accessing a wep API:
+
+![how server works](./img/how-server-works-1.png)
+
+1. client type the URL(domain) to access, ex `https://www.google.com/maps`, (`https` is for the protocol of the connection)
+   - the domain name is not the address written by the user (which is for us to memorize the domain easily), instead it's converted to the real address of the server and that happens through a **DNS Lookup** in a special server -> `https://216.58.211.206:443`
+     - > this actually happens through your internet service provider **(ISP)**
+   - the **port** number is just really to identify a specific service running on a server (sub-address)
+2. After having the web address, a **TCP/IP** Socket Connection is established between the browser and the server, and this connection is kept alive for the entire time it takes to transfer all the files of the website from the server to the client
+   - `TCP`: is "Transmission Control Protocol" and `IP` is "Internet Protocol", and together they are communication protocols that define how data travels across the web
+     - The job of **TCP protocol** is:
+       ![tcp/ip](./img/tcp-ip.png)
+       - to break out the requests and responses into thousands of small chunks called **"packets"** before they're sent
+       - and once they get to their destination, It will reassemble all the packets into (the original request or response) so that the message arrives at the destination as quick as possible, which wouldn't be possible if we sent the website as one big chunk
+     - The job of **IP protocol** is:
+       - to send and route all of these packets through the internet
+       - So it endures that all of them arrive at the destination
+   - **Communication Protocols**: are system of rules that allows 2 or more parties to communicate
+     - > They are the ones that set the rules on how data moves on the internet
+3. After establishing the connection, We make a **HTTP Request**, and the request message contains multiple sections (start line, request headers, request body)
+
+   - **HTTP:** is a communication protocol that allows clients and web servers to communicate by sending requests and response messages from client to server and back
+
+4. After the request hits the server and the server has the data ready to be send back, The server will send back a **HTTP Response**, and the response message will look similar to the request message
+5. The request/response cycle doesn't happen just once, As at first request, We get back just the initial HTML file, which then gets scanned for all the assets needed for the website (`js`, `css`, `img`,...) that require additional requests
+   - for each file, the browser will make a new HTTP request to the server
+   - the number of request/response happening at the same time is limited, so that the connection won't slow down
+   - When all files have arrived in the browser and are ready, they are rendered
+
+---
 
 ### Create Node.js Web Server
 
@@ -472,7 +661,10 @@ server.listen(8000, '127.0.0.1', () => {
 
 ### HTTP Header
 
-it's a piece of information about the response that we are sending back
+It's a piece of information about the response that we are sending back
+
+- writing header/statusCode always need to be set before we send out the response
+- headers can be used to send metadata
 
 ```js
 // Calling response.writeHead method
@@ -490,17 +682,26 @@ response.writeHead(404, {
 - `Routing` refers to how an application’s endpoints (`URIs`) respond to client `requests`.
 - There are two ways to implement routing in node.js which are :
 
-  - By Using Framework => `Express.js`
-  - Without using Framework
+  - Without using Framework: based on the request-url, we will send corresponding response
 
     ```js
     if (req.url === '/message') {
       res.end('Here are your messages!');
     } else {
+      // fallback response for not-found route
       res.statusCode = 404;
       res.end();
     }
     ```
+
+  - to access route params, we first need to parse the URL:
+
+    ```js
+    const parsedUrl = url.parse(req.url, true);
+    console.log(parsedUrl.query.id);
+    ```
+
+  - By Using Framework => [Express.js](./2-Express.md)
 
 ---
 
@@ -508,11 +709,56 @@ response.writeHead(404, {
 
 ![streams & buffers](./img/streams-buffers.png)
 
+#### Streams
+
+> **Streams:** Used to process (read/write) data piece by piece (chunks), without completing the whole read or write operation, and therefore without keeping all the data in memory
+
 - **Stream**: is an ongoing process, as the request is read by Node.js **in chunks**
-  - This is done so that we can start working on the individual chunks without having to wait for the full request being read, ex: uploading a file
+
+  - This is done so that we can start working on the individual chunks without having to wait for the full request being read
+    - Ex: uploading a file or streaming-services like netflix, youtube
+  - streams are perfect for handling large volumes of data like videos
+  - streams are more a efficient data processing in terms of memory (no need to keep all data in memory) and time (we don't have to wait u til all data is available)
   - This is how Node handles all requests because it doesn't know in advance how complex and big they request-chunks are.
 
-> The problem is that we can't arbitrarily try to work with these chunks. Instead to organize the incoming chunks, we use **buffer**
+- **Streams Types and events**
+  ![streams](./img/streams-1.png)
+
+- **streams & `pipe()`**
+
+  - sometimes, there's a problem when reading streams, as the readable stream used to read file from the disk is much faster than sending the result with the response writable stream over the network, and this will overwhelm the response-stream which can't handle all the incoming data so fast. This problem is called "Back Pressure"
+    - > **"Back Pressure"**: It's when the response can't send the data nearly as fast as it's receiving it from the file
+  - `pipe` operator is available in all readable streams and allows us to pipe the output of a readable stream into the input of a writable stream
+    - This fixes the problem of "Back Pressure", because it will automatically handle the speed of the data coming `in` and `out`
+
+- Examples:
+
+  ```js
+  // Instead of this:
+  fs.readFile('rest.txt', (err, data) => {
+    res.end(data); // write everything at once into a variable (data) and once that was ready, we then send that entire piece to the client
+  });
+
+  // Solution 1: Streams
+  const readable = fs.createReadStream('rest.txt');
+  // listening to the "data" event
+  readable.on('data', chunk => {
+    res.write(chunk); // streaming the content of the file to the client (reading one piece and send it as soon as it's available and so on until all the file is read (streamed to the client))
+  });
+  readable.on('end', () => {
+    res.end(); // notifying the server that no more streams will be send
+  });
+
+  // Solution 2: Streams with pipe -> BEST SOLUTION
+  const readable = fs.createReadStream('rest.txt');
+  readable.pipe(res); // (res) is the writable destination -> where the data goes to
+  ```
+
+> The problem with streams is that we can't arbitrarily try to work with these chunks. Instead to organize the incoming chunks, we use **buffer**
+
+---
+
+#### Buffer
 
 - **Buffer**
 
@@ -583,19 +829,20 @@ it's a 3rd party library can be used instead of the above
 
 ### [morgan](https://www.npmjs.com/package/morgan)
 
-Morgan is an HTTP request level `Middleware`.
+**Morgan** is an HTTP request level `Middleware`.
 
 - It is a great tool that logs the requests along with some other information depending upon its configuration and the preset used.
 - It's helpful while debugging and also if you want to create `Log files`.
+- It's not only used in development mode, as date from it is used in production mode, so it's a regular dependency and not a dev-dependency
 
 #### installation
 
-- usually it sould be before any sequrity condsederation or after `cors`
+- usually it should be before any security consideration or after `CORS`
 
-```js
-app.use(cors(corsOptions)); // Middleware
-app.use(morgan('combined')); // Middleware
-```
+  ```js
+  app.use(cors(corsOptions)); // Middleware
+  app.use(morgan('combined')); // Middleware
+  ```
 
 ---
 

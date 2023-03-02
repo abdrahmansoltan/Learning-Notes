@@ -5,15 +5,17 @@
   - [App Structure with Express](#app-structure-with-express)
   - [installation](#installation)
   - [Express Basics](#express-basics)
-    - [Middleware](#middleware)
-      - [Types of Middleware](#types-of-middleware)
-      - [Using Middleware](#using-middleware)
     - [Endpoints](#endpoints)
     - [Request](#request)
     - [Response](#response)
+  - [Middleware](#middleware)
+    - [Middleware in express development](#middleware-in-express-development)
+    - [Types of Middleware](#types-of-middleware)
+    - [Using Middleware](#using-middleware)
   - [POST requests](#post-requests)
   - [Routes](#routes)
   - [Serving Files / HTML Pages](#serving-files--html-pages)
+    - [Static vs Dynamic Websites / APIs](#static-vs-dynamic-websites--apis)
     - [Serving files statically](#serving-files-statically)
   - [Templating Engines](#templating-engines)
     - [handlebars (hbs)](#handlebars-hbs)
@@ -22,12 +24,15 @@
 
 ## Express
 
-- Express is a framework used to:
+- Express is a minimal node.js framework (build on top of Node.js) that contains features like:
 
   - Set up the server
+    - easier handling of requests and responses
     - as the server logic is complex, and we want to focus on the business logic and not the nitty-gritty details
-  - Work with routes
+  - complex routing
   - Apply middleware
+  - server-side rendering
+  - makes it easier to organize application into the **MVC** architecture
 
 > **Framework**: helper-functions, tools and rules that help you build your applications
 
@@ -83,69 +88,6 @@ npm i --save-dev @types/express   # for typescript
 
 ---
 
-### Middleware
-
-Middleware is a `function/s` that is applied between the request and response. Meaning you get the request, do something with it, and then send the response.
-
-![middleware](./img/middleware2.PNG)
-
-- Common uses of middleware include checking the `authentication` status of a user before sending a response or logging the request before sending the response.
-- We have to call `next()` to allow the request to travel to the next middleware in line.
-
-- **`next()`**
-  - It's a method from the `express router`
-  - It calls the next middleware in a chain of middlewares
-  - Without adding `next` to your middleware function, your application will get stuck on the middleware.
-
-#### Types of Middleware
-
-- Built-in Middleware
-
-  - `express.static` - for serving static files
-  - `.json` - for parsing incoming JSON
-  - `.urlencoded` - for parsing incoming urlencoded data
-
-- 3rd Party Middleware
-
-- Custom Middleware
-
----
-
-#### Using Middleware
-
-two ways of applying middleware:
-
-- Application/route level
-
-  - `.use()` method is a method that can be applied to the application object or to route objects. It is used for applying middleware and can take in a route, and middleware as arguments
-
-    - it uses **partial-matching** of the `route` --> ((start with) '/page1')
-
-    ```js
-    app.use(middleware);
-
-    //--------------------------------------------------//
-
-    // or with handling different routes
-    app.use('/page1', middleWare_function1); // here it means that the route must (start with) '/page1'
-    app.use('/', middleWare_function2); // here it means that the route must (start with) '/'
-
-    // note : we always puth the one with '/' at the end as all routes start with '/'
-    ```
-
-    - in this way, we don't call `next()`
-
-  - `.get()` / `.post()` are like `use()` but only GET or POST requests
-    - it uses **Exact-matching** of the `route` --> ((must be eaual to) '/page1')
-
-- Endpoint level
-
-  ```js
-  students.get('/', middleware, (req, res) => { // do stuff });
-  ```
-
----
-
 ### Endpoints
 
 - Endpoints are made up of a `method` you wish to perform on your data, and the `route` you would like to use for that data.
@@ -188,7 +130,7 @@ It is the response from server back to the browser. Like request, it has many pr
   - `send()` ----> by default sends `HTML`-syntax (content type)
   - `status()`, `cookie()`
   - `sendFile()` : to send HTML-files
-  - `json()` : to send Json format
+  - `json()` : to send response in a "`application/json`" format
 - To override the default response **header**: use `setHeader()` method
 
   ```js
@@ -196,6 +138,92 @@ It is the response from server back to the browser. Like request, it has many pr
     res.setHeader(''); // optional
     res.send('<h1>hello world</h1>');
   });
+  ```
+
+---
+
+## Middleware
+
+Middleware is a `function/s` that is applied between the request and response. Meaning you get the request, do something with it, and then send the response.
+
+![middleware](./img/middleware2.PNG)
+
+- Common uses of middleware include checking the `authentication` status of a user before sending a response or logging the request before sending the response.
+- We have to call `next()` to allow the request to travel to the next middleware in line.
+
+- **`next()`**
+  - It's a method from the `express router`
+  - It calls the next middleware in a chain of middlewares
+  - Without adding `next` to your middleware function, your application will get stuck on the middleware.
+
+---
+
+### Middleware in express development
+
+![middleware](./img/middleware-3.png)
+
+- In the **request-response-cycle**, when Express app receives a request is when someone hits a server for which it will then create a `request` and `response` objects
+- The `data` then will be used and processed to generate and send back a `response`
+  - in order to process that `data`, Express uses **Middlewares** which can manipulate the `request` or `response` objects, or execute any code that we want (doesn't have to be for the `request` or `response` objects)
+- It's called "Middleware", because it's a function that is executed in the middle of receiving the request and sending the response
+  - > **Note:** In Express, everything is a middleware (even routers as they are middleware functions that are only executed for certain routes)
+- All the middlewares in the app are called: **"Middleware Stack"**
+  - At the end of each middleware function, a `next()` function is called, which executes the next middleware in the stack with the exact same `request` or `response` objects. and this happens in all the middlewares until we reach the last one which is a route handler which send the response data back to the client
+    - without calling the `next()` function, the middleware will be stuck
+  - this process is like a **"Pipeline"**
+
+**Notes:**
+
+- As the routes are middlewares, the order of them matter,and also if a custom-middleware was after one route, It won't apply for this route
+  - That's why we define all middlewares at the top of the app before anything
+
+---
+
+### Types of Middleware
+
+- Built-in Middleware
+
+  - `express.static` - for serving static files
+  - `.json` - for parsing incoming JSON
+  - `.urlencoded` - for parsing incoming urlencoded data
+
+- 3rd Party Middleware
+
+- Custom Middleware
+
+---
+
+### Using Middleware
+
+two ways of applying middleware:
+
+- Application/route level
+
+  - `.use()` method is a method that can be applied to the application object or to route objects. It is used for applying middleware and can take in a route, and middleware as arguments
+
+    - it uses **partial-matching** of the `route` --> ((start with) '/page1')
+
+    ```js
+    app.use(middleware);
+
+    //--------------------------------------------------//
+
+    // or with handling different routes
+    app.use('/page1', middleWare_function1); // here it means that the route must (start with) '/page1'
+    app.use('/', middleWare_function2); // here it means that the route must (start with) '/'
+
+    // note : we always puth the one with '/' at the end as all routes start with '/'
+    ```
+
+    - in this way, we don't call `next()`
+
+  - `.get()` / `.post()` are like `use()` but only GET or POST requests
+    - it uses **Exact-matching** of the `route` --> ((must be eaual to) '/page1')
+
+- Endpoint level
+
+  ```js
+  students.get('/', middleware, (req, res) => { // do stuff });
   ```
 
 ---
@@ -270,16 +298,46 @@ router.get('/add-product', (req, res, next) => {
 
 ---
 
+### Static vs Dynamic Websites / APIs
+
+- **Static vs Dynamic Websites**
+  ![static-vs-dynamic-websites](./img/static-vs-dynamic-websites.png)
+- **Static vs API-Powered Websites**
+  ![static-vs-api-powered-websites](./img/static-vs-api-powered-websites.png)
+
+---
+
 ### Serving files statically
 
-- like when you have external `css` files and images you want to use in the `html` file
+To serve static files such as images, CSS files, and JavaScript files, use the `express.static()` built-in middleware function in Express.
 
-  - for that we specify a `public` folder which has the static files
+```js
+// express.static(root, [options])
+app.use(express.static('public'));
+
+// Now, you can load the files that are in the public directory (without writing "public" as it will be the root):
+http://localhost:3000/images/kitten.jpg
+http://localhost:3000/css/style.css
+http://localhost:3000/js/app.js
+http://localhost:3000/images/bg.png
+http://localhost:3000/hello.html
+```
+
+- for that we specify a `public` folder which has the static files
 
   ```js
   // in main app --> use this middleware
   app.use(express.static(path.join(__dirname, 'public')));
   // now when importing the css file in html, we act as we're inside the "public" folder
+  ```
+
+- To create a virtual path prefix (where the path does not actually exist in the file system) for files that are served by the express.static function, specify a mount path for the static directory, as shown below:
+
+  ```js
+  app.use('/static', express.static('public'))
+
+  http://localhost:3000/static/images/kitten.jpg
+  http://localhost:3000/static/css/style.css
   ```
 
 ---

@@ -12,7 +12,7 @@
   - [Context.Consumer](#contextconsumer)
   - [`this` keyword](#this-keyword)
   - [component LifeCycles](#component-lifecycles)
-    - [Order of executing](#order-of-executing)
+    - [Order of Execution](#order-of-execution)
   - [Error Boundaries](#error-boundaries)
 
 ---
@@ -139,6 +139,8 @@ Mutable vs Immutable State Updates
 ![setState-callback](./img/setState-callback-1.png)
 
 since `setState` works in an **asynchronous** way. That means after calling `setState` the `this.state` variable is not immediately changed. so if you want to perform an action immediately after setting state on a state variable and then return a result, a callback will be useful
+
+> This is done because when updating the state, React batches the different (`setState`) calls so that it can determine what is the most optimal strategy for re-rendering the website
 
 - Consider the example:
 
@@ -341,7 +343,7 @@ Every component comes with methods that allow developers to update app state and
 
 ---
 
-### Order of executing
+### Order of Execution
 
 LifeCycles methods diagram with order execution of component's methods
 ![alt](./img/lifeCycle2.PNG)

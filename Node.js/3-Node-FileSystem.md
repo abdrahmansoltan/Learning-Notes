@@ -3,7 +3,6 @@
 - [INDEX](#index)
   - [Asynchronous node.js and Callbacks](#asynchronous-nodejs-and-callbacks)
     - [callbacks](#callbacks)
-    - [Asynchronous node.js and Callbacks](#asynchronous-nodejs-and-callbacks-1)
   - [File System vs Database](#file-system-vs-database)
   - [Using File System to Open and Write Files](#using-file-system-to-open-and-write-files)
     - [File System Flags](#file-system-flags)
@@ -17,8 +16,7 @@
 ## Asynchronous node.js and Callbacks
 
 - Node.js introduced a `non-blocking I/O` environment to extend this concept to file access, network calls and so on.
-
----
+  ![node async](./img/node-async-1.png)
 
 ### callbacks
 
@@ -28,25 +26,16 @@
 - instead use `__dirname` in `template-literals` which indicate the place where the `js` file exists ->
 
   ```js
-  const tempOverview = fs.readFileSync(
-    `${__dirname}/templates/template-overview.html`,
-    "utf-8"
-  );
+  const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.html`, 'utf-8');
   ```
-
----
-
-### Asynchronous node.js and Callbacks
-
-- Node.js introduced a `non-blocking I/O` environment to extend this concept to file access, network calls and so on.
 
 - To avoid using callbacks, we can use the `File System Promises API` which allows the asynchronous methods to return promises.
 
-```js
-import {promises as fsPromises} from fs;
-// or
-import {promises as fs} from fs;
-```
+  ```js
+  import {promises as fsPromises} from fs;
+  // or
+  import {promises as fs} from fs;
+  ```
 
 ---
 
@@ -118,7 +107,7 @@ File System Flags are used for identifying `read/write` operations available whe
 
   ```js
   const readData = async () => {
-    const myFile = await fsPromises.readFile("myfile.txt", "utf-8");
+    const myFile = await fsPromises.readFile('myfile.txt', 'utf-8');
     console.log(myFile);
   };
   ```
@@ -141,7 +130,7 @@ File System Flags are used for identifying `read/write` operations available whe
 - to read streams we use the `File System (fs)` : it `emmits` a event called `'data'`
 
 ```js
-fs.createReadStream("kepler_data.csv").on("data", (data) => {
+fs.createReadStream('kepler_data.csv').on('data', data => {
   console.log(data);
 });
 ```
@@ -155,9 +144,9 @@ fs.createReadStream("kepler_data.csv").on("data", (data) => {
 ![streams](./img/streams.PNG)
 
 ```js
-fs.createReadStream("kepler_data.csv")
+fs.createReadStream('kepler_data.csv')
   .pipe(parser) // do parsing on incoming data
-  .on("data", (data) => {
+  .on('data', data => {
     console.log(data);
   });
 ```

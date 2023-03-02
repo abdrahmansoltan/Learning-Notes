@@ -36,6 +36,10 @@
 
 here each time the state change the entire function get called and rerendered unlike in `class components` where only the `render()` method was called
 
+React functional components are **Pure Functions** which depend on the component's props
+
+- We use hooks to create impure functions as they generate side-effects
+
 ---
 
 ## State
@@ -69,6 +73,8 @@ props (short for “properties”) and state are both plain JavaScript objects. 
 ---
 
 ### `useState` Hook
+
+It's used to encapsulate a single value from the state of the component
 
 ![useState](./img/useState.png)
 
@@ -245,7 +251,9 @@ function App() {
 
 ## Effect Hook
 
-> If we are writing functional components, We won't have access to lifecycle methods. We can think of `useEffect` hook as the **react-class-component lifecycle methods** (`componentDidMount`, `componentDidUpdate`, `componentWillUnmount`)
+> If we are writing **functional components, We won't have lifecycle methods**. We can think of `useEffect` hook as the **react-class-component lifecycle methods** (`componentDidMount`, `componentDidUpdate`, `componentWillUnmount`)
+>
+> - Instead we have **"pure functions"** and **"side effects"**
 
 - when changing the state => the **whole function-component** `rerenders`.
 - Data fetching(`HTTP requests`), subscriptions, or manually changing the DOM from React components. We call these operations `side effects` (or `effects` for short) because they can affect other components and **can’t be done during rendering.**
@@ -449,7 +457,7 @@ Context provides a way to pass data through the component tree without having to
 
 ### Solution for Prop drilling: (context)
 
-Context provides a way to pass data through the component tree without having to pass `props` down manually at every level.
+Context provides a way to pass data through the component tree without having to pass `props` down manually at every level. and most of the component passing the props don't need the props-data and they just act as **"Traffic Components"**
 
 - without context
 
@@ -464,24 +472,27 @@ Context provides a way to pass data through the component tree without having to
 - Context is designed to share data that can be considered `global` for a tree of React components, such as the current authenticated user, theme, or preferred language.
 - It's sometimes used instead of `Redux` by a lot of users
 
+---
+
 ### context setup
 
-**1. Create the context**
-![context](./img/context-1.png)
-**2. Specify the data that will be shared**
-![context](./img/context-2.png)
-![context](./img/context-3.png)
-**3. Consume the data**
-![context](./img/context-4.png)
-**4. Changing context data**
+1. **Create the context**
+   ![context](./img/context-1.png)
+2. **Specify the data that will be shared**
+   ![context](./img/context-2.png)
+   ![context](./img/context-3.png)
+3. **Consume the data**
+   ![context](./img/context-4.png)
+4. **Changing context data**
 
-- for this we need to make the `value` passed to the contextProvider is a piece of state, so that when changing it, it would result a **re-render** in all components that are using(consuming) the context
-  ![context](./img/context-5.png)
-- to be able to pass the state-object in the `value`, we need to create another high-level provider that will wrap our provider
-  ![context](./img/context-6.png)
+   - for this we need to make the `value` passed to the contextProvider is a piece of state, so that when changing it, it would result a **re-render** in all components that are using(consuming) the context
+     ![context](./img/context-5.png)
+   - to be able to pass the state-object in the `value`, we need to create another high-level provider that will wrap our provider
+     ![context](./img/context-6.png)
 
-  - then use the provider wrapper for the `<App/>`
-    ![context](./img/context-7.png)
+     - then use the **provider** wrapper for the `<App/>`
+       - The provider is used to tell which component can access the context
+         ![context](./img/context-7.png)
 
 ---
 
