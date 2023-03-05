@@ -54,7 +54,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [HTTP](./Internet/HTTP.md)
 - [FrontEnd](./Internet/FrontEnd.md)
 - [BackEnd](./internet/../Internet/BackEnd.md)
-- [Docker](./Internet/Doc)
+- [Docker](./Internet/Docker.md)
 
 ---
 
@@ -94,7 +94,9 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## TypeScript
 
-- [TypeScript](./TypeScript/TypeScript.md)
+- [TypeScript](./TypeScript/1-TypeScript.md)
+- [TypeScript Types](./TypeScript/2-TS-Types.md)
+- [TypeScript with the DOM](./TypeScript/3-TS-DOM.md)
 
 ---
 
@@ -127,12 +129,15 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## React
 
-- [React](./React/01-React.md)
-- [Hooks](./React/02-Hooks.md)
-- [Class-Components](./React/03-Class-Components.md)
-- [Redux](./React/04-Redux.md)
-- [Redux-toolkit](./React/05-Redux-toolkit.md)
-- [performance](./React/06-performance.md)
+- [React](./React/1-React.md)
+- [Hooks](./React/2-Hooks.md)
+- [Class-Components](./React/3-Class-Components.md)
+- [React Router](./React/4-React-router.md)
+- [Redux](./React/5-Redux.md)
+- [Redux-toolkit](./React/6-Redux-toolkit.md)
+- [performance](./React/7-performance.md)
+- [React-Typescript](./React/8-React-Typescript.md)
+- [React Interview Questions](./React/9-React-Interview.md)
 
 ---
 
