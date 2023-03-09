@@ -666,7 +666,7 @@ new User('Dude').sayHi(); // Hello Dude!
 
 - `static methods` are not available for instances
   - Usually, static methods are used to implement functions that belong to the class as a whole, but not to any particular object of it.
-- It can be used as a "factory method" (a factory is an object for creating other objects; formally, it is a function or method that returns objects of a varying prototype or class from some method call, which is assumed to be "new" ):
+- It can be used as a "factory method" (a factory is an object for creating other objects (instantiate instance of the class); formally, it is a function or method that returns objects of a varying prototype or class from some method call, which is assumed to be "new" ):
 
   ```js
   class Article {

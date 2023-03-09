@@ -4,7 +4,7 @@
   - [Typescript with the DOM](#typescript-with-the-dom)
   - [HTMLElement](#htmlelement)
     - [Dealing with `null` (Non-Null Assertion Operator)](#dealing-with-null-non-null-assertion-operator)
-    - [Type Assertion with HTML elements types](#type-assertion-with-html-elements-types)
+    - [Type-Assertion or Generics for HTML elements types](#type-assertion-or-generics-for-html-elements-types)
   - [Events](#events)
 
 ---
@@ -71,7 +71,7 @@ btn.addEventListener('click', () => {}); // ✅
 
 ---
 
-### Type Assertion with HTML elements types
+### Type-Assertion or Generics for HTML elements types
 
 - Image element
 
@@ -86,11 +86,17 @@ btn.addEventListener('click', () => {}); // ✅
 - Input element
 
   ```ts
-  // Typescript infers a type of HTML Element
+  // Typescript infers a type of HTMLElement
   const input = document.querySelector('todo-input');
   btn.addEventListener('click', () => {
     console.log(input.value); // ❌
     console.log((input as HTMLInputElement).value); // ✅
+  });
+
+  // or with generics
+  const input = document.querySelector<HTMLInputElement>('todo-input')!;
+  btn.addEventListener('click', () => {
+    console.log(input.value); // ✅
   });
   ```
 

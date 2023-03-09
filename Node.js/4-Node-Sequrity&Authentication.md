@@ -9,15 +9,18 @@
     - [Protecting Passwords (AUTHENTICATE)](#protecting-passwords-authenticate)
     - [`Hashing`](#hashing)
       - [`salt`](#salt)
+  - [Authentication using JWT](#authentication-using-jwt)
+    - [How JWT Works](#how-jwt-works)
+    - [JSON Web Tokens (JWT) in depth](#json-web-tokens-jwt-in-depth)
+    - [How Verifying JWT Works (Signing the JWT)](#how-verifying-jwt-works-signing-the-jwt)
+    - [Implementing JWT](#implementing-jwt)
   - [Authorization](#authorization)
     - [API Key](#api-key)
     - [Cookie-vs-Token](#cookie-vs-token)
     - [Sessions](#sessions)
-    - [JSON Web Tokens (JWTs)](#json-web-tokens-jwts)
-      - [Parts of a JSON Web Token](#parts-of-a-json-web-token)
   - [Oath2](#oath2)
     - [OAuth 2.0 With Google](#oauth-20-with-google)
-      - [passport_js](#passport_js)
+      - [passport\_js](#passport_js)
 
 ---
 
@@ -85,6 +88,7 @@ app.use(cors(corsOptions)); // global Middleware to all routes
   - you can't put a `hash` input and get a `string` output
   - you can only put a `string` and get out a `hash`
 - `Bcrypt` is a very common library for password hashing in web apps
+  - when hashing, it usually has an argument for the `cost` of hashing (how cpu-intensive is the hashing process)
 
 ---
 
@@ -165,6 +169,164 @@ app.use(cors(corsOptions)); // global Middleware to all routes
 
 ---
 
+## Authentication using JWT
+
+> see Authentication section in the [database-notes file](../Databases/Database-SQL.md#jwt)
+
+![jwt](./img/jwt.PNG)
+
+**JWT:** is a stateless solution for authentication
+
+> The most widely used alternative to authentication with JWT, is to store the user's log-in state on the server using [Sessions](#sessions)
+
+- It's `Stateless`, so there's no need to store any session-state on the server which is perfect for Restful-APIs
+- It's very useful when you have 2 or more separate servers or `load-balancers` that share the same `secret-key` and you can access them without having to `log in` each time
+
+### How JWT Works
+
+The server creates `JWT` with a secret and sends the JWT to the client. The client stores the JWT (usually in local storage) and includes JWT in the header with every request. The server would then validate the JWT with every request from the client and sends response.
+
+![jwt](./img/jwt-1.png)
+
+Steps:
+
+1. user logs into the app. So the user's client starts by making a **post** request with the username or email and the password.
+2. The application then checks if the user exists and if the password is correct.
+3. And if so, a unique Json Web Token for only that user is created using a secret string that is stored on a server.
+4. The server then sends that JWT back to the client which will store it either in a cookie or in local storage.
+5. And just like this the user is authenticated and basically logged into our application **(without leaving any state on the server)**
+   - So the server does in fact not know which users are actually logged in. But, the user knows that he's logged in because he has a valid Json Web Token
+
+> **Note:** All this communication must happen over `HTTPS` in order to prevent that anyone can get access to passwords or JWT
+
+---
+
+### JSON Web Tokens (JWT) in depth
+
+It's an encoded string made of 3 parts
+
+![jwt](./img/parts%20of%20jwt.png)
+![jwt](./img/jwt-2.png)
+
+- `Header`:
+
+  - It's a meta-data about the token
+  - consists of two parts: the type of the token, which is JWT, and the signing algorithm being used, such as `HMAC` `SHA256` or `RSA`.
+
+- `Payload`:
+
+  - It's the data encoded into the token
+  - responsible for containing information specific to the currently authenticated user --> (who is making the request?) **NOT SECRET**
+
+- `Signature` :
+  - If the signature strings match, we can trust that the data within the JWT is **authentic**.
+  - To create the signature part you have to take the encoded header, the encoded payload, a secret, the algorithm specified in the header, and sign that.
+    ![secret](./img/secret.PNG)
+  - it's **SECRET**
+
+The output is three Base64-URL strings separated by dots that can be easily passed in HTML and HTTP environments
+
+- **Notes:**
+
+  - the `header` and `payload` will be encoded but not encrypted, so anyone will be able to decode them and read them, so we can't store sensitive data here
+  - the `signature` is created using the `header` and the `payload` and the (`secret` that is saved on the server)
+
+- [JWT playground](https://jwt.io/)
+
+---
+
+### How Verifying JWT Works (Signing the JWT)
+
+![jwt](./img/jwt-3.png)
+
+1. The signing algorithm takes the `header`, the `payload` and the `secret` to create a unique signature. Then together with the `header` and the `payload`, these signature forms the **JWT**, which then gets sent to the client.
+2. once the server receives a JWT to grant access to a protected route, it needs to verify it in order to determine if the user really is who he claims to be
+   - In other words, it will verify if no one changed the `header` and the `payload` data of the token.
+   - this verification step will check if no third party actually altered either the `header` or the `payload` of the Json Web Token.
+3. once the JWT is received, the verification will take it's `header` and `payload` and together with the secret that is still saved on the server, basically create a test `signature`. But the original signature that was generated
+4. when the JWT was first created is still in the token, And that's the key for this verification.
+5. Now all we have to do is to compare the test-signature with the original-signature.
+
+   - If the test signature is the same as the original signature, then it means that the `payload` and the `header` have not been modified
+   - And of course, if the two signatures are actually different, well, then it means that someone tampered with the data.
+     - Usually by trying to change the `payload`.
+     - But that third party manipulating the `payload` does of course not have access to the `secret`, so they cannot sign the JWT. And therefore, the verification will always fail
+
+> **Note:** the TOKEN_SECRET should be kept as environment-variable and it **should be at least 32 characters**. You can use this command to generate a secret with a specified character-length:
+>
+> ```js
+> node -e "console.log(require('crypto').randomBytes(256).toString('base64'));"
+> ```
+
+---
+
+### Implementing JWT
+
+Using NPM library [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
+
+- creating user
+
+  ```js
+  exports.signup = catchAsync(async (req, res, next) => {
+    // prevent anyone from logging-in as admin + allow only data we need
+    const newUser = await User.create({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm
+    });
+
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN
+    });
+
+    res.status(201).json({
+      status: 'success',
+      token,
+      data: {
+        user: newUser
+      }
+    });
+  });
+  ```
+
+- verifying the user
+  - use the `jwt.verify` method
+- in real life, the token will not be part of the request body. Instead, tokens live as part of the `request header`.
+
+  - When we use JWTs, we pass them as a special header called the Authorization header using this format:
+
+    ```js
+    Authorization: Bearer <token>;
+    ```
+
+  - In Node, we can locate the authorization header sent with a request like this:
+
+    ```ts
+    const authorizationHeader = req.headers.authorization;
+    const token = authorizationHeader.split(' ')[1]; // Parsing the header
+    ```
+
+- putting it all together
+
+  ```ts
+  const create = async (req: Request, res: Response) => {
+      try {
+          const authorizationHeader = req.headers.authorization
+          const token = authorizationHeader.split(' ')[1]
+          jwt.verify(token, process.env.TOKEN_SECRET)
+      } catch(err) {
+          res.status(401)
+          res.json('Access denied, invalid token')
+          return
+      }
+
+      ....rest of method is unchanged
+  }
+  ```
+
+---
+
 ## Authorization
 
 ### API Key
@@ -210,34 +372,6 @@ There're pros and cons for each, and based on situation we choose what suits us,
 ![sessions](./img/sessions.PNG)
 
 Here, the server will create a session for the user after the user logs in. The session id is then **stored on a cookie on the user’s browser**. While the user stays logged in, the cookie would be sent along with every subsequent request. The server can then compare the session id stored on the cookie against the session information stored in the memory to verify user’s identity and sends response with the corresponding state!
-
----
-
-### JSON Web Tokens (JWTs)
-
-![jwt](./img/jwt.PNG)
-
-Here, the server creates JWT with a secret and sends the JWT to the client. The client stores the JWT (usually in local storage) and includes JWT in the header with every request. The server would then validate the JWT with every request from the client and sends response.
-
-- It's `Stateless`
-- It's very usefull when you have 2 or more seperate servers or `load-balancers` that share the same `secret-key` and you can access them without having to `log in` each time
-
-#### Parts of a JSON Web Token
-
-![jwt](./img/parts%20of%20jwt.png)
-
-- `Header` : consists of two parts: the type of the token, which is JWT, and the signing algorithm being used, such as `HMAC` `SHA256` or `RSA`.
-
-- `Payload` : responsible for containing information specific to the currently authenticated user --> (who is making the request?) **NOT SECRET**
-
-- `Signature` : If the signature strings match, we can trust that the data within the JWT is **authentic**.
-  - To create the signature part you have to take the encoded header, the encoded payload, a secret, the algorithm specified in the header, and sign that.
-    ![secret](./img/secret.PNG)
-  - it's **SECRET**
-
-The output is three Base64-URL strings separated by dots that can be easily passed in HTML and HTTP environments
-
-- [JWT playground](https://jwt.io/)
 
 ---
 

@@ -104,20 +104,24 @@ is for. A URL is a human-readable address, describing exactly where on the web a
 
 #### Content methods
 
-<img src='./img/get.PNG' width=48%>
-<img src='./img/post.PNG' width=48%>
-<img src='./img/put.PNG' width=48%>
-<img src='./img/patch.PNG' width=48%>
-<img src='./img/del.PNG' width=48%>
+![HTTP method](./img/get.PNG)
+![HTTP method](./img/post.PNG)
+![HTTP method](./img/put.PNG)
+![HTTP method](./img/patch.PNG)
+![HTTP method](./img/del.PNG)
+
+- PUT vs PATCH
+  - `put`: **replace** a source in collection
+  - `patch`: **modify** a source in collection
 
 #### Information-getter methods
 
 - methods that get information from the server without really touching the content
 - The `HEAD` request method is useful in recovering meta-data that is written according to the headers, without transferring the entire content. The technique is commonly used when testing hypertext links for accessibility, validity, and recent modification.
 
-<img src='./img/head.PNG' width=33%>
-<img src='./img/options.PNG' width=30%>
-<img src='./img/trace.PNG' width=33%>
+![HTTP head](./img/head.PNG)
+![HTTP options](./img/options.PNG)
+![HTTP trace](./img/trace.PNG)
 
 ---
 

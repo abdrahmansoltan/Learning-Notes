@@ -8,17 +8,25 @@
     - [Endpoints](#endpoints)
     - [Request](#request)
     - [Response](#response)
+  - [MVC Architecture in Express App](#mvc-architecture-in-express-app)
+    - [MVC Steps (lifecycle)](#mvc-steps-lifecycle)
+    - [MVC Application vs Business Logic](#mvc-application-vs-business-logic)
   - [Middleware](#middleware)
-    - [Middleware in express development](#middleware-in-express-development)
+    - [Middleware in Express Development](#middleware-in-express-development)
     - [Types of Middleware](#types-of-middleware)
     - [Using Middleware](#using-middleware)
   - [POST requests](#post-requests)
   - [Routes](#routes)
+    - [Handling unhandled routes](#handling-unhandled-routes)
   - [Serving Files / HTML Pages](#serving-files--html-pages)
     - [Static vs Dynamic Websites / APIs](#static-vs-dynamic-websites--apis)
     - [Serving files statically](#serving-files-statically)
-  - [Templating Engines](#templating-engines)
+  - [Template Engines](#template-engines)
     - [handlebars (hbs)](#handlebars-hbs)
+  - [Error Handling](#error-handling)
+    - [Unhandled Rejections and Exceptions](#unhandled-rejections-and-exceptions)
+      - [Handling Asynchronous promise rejections](#handling-asynchronous-promise-rejections)
+      - [Handling Synchronous Exceptions](#handling-synchronous-exceptions)
 
 ---
 
@@ -75,7 +83,7 @@ npm i --save-dev @types/express   # for typescript
   - this allows you to split your code into multiple blocks instead of having one huge function
   - this is the **pluggable nature of express.js**, where you can easily add other third party packages which give you such middleware functions that you can plug into express.js nd add certain functions
 
-- **Core Methods**
+- Express is really good at routing, and it provides methods to respond to different HTTP-requests with **Core Methods**:
   ![app methods](./img/app%20methods.PNG)
 
   - `.listen()` - listens for connections to a specified host and port
@@ -127,7 +135,7 @@ It is the response from server back to the browser. Like request, it has many pr
 
 - some methods :
   - `end()` ----> for `string`
-  - `send()` ----> by default sends `HTML`-syntax (content type)
+  - `send()` ----> by default sends the appropriate (content-type) based on the response body
   - `status()`, `cookie()`
   - `sendFile()` : to send HTML-files
   - `json()` : to send response in a "`application/json`" format
@@ -139,6 +147,50 @@ It is the response from server back to the browser. Like request, it has many pr
     res.send('<h1>hello world</h1>');
   });
   ```
+
+---
+
+## MVC Architecture in Express App
+
+We use this architecture/pattern as it allows us to write a more modular applications which is easier to maintain in scale as necessary
+
+- **The model layer** is concerned with everything about the application data and the business logic
+- **The controller layer** is concerned with the Application-logic and is responsible for:
+  - handling the application's requests
+  - interacting with the models and
+  - sending responses back to the client
+- **The view layer** is concerned with the Presentation-logic is necessary if we have a graphical interface in our app or when building a **server-side-rendered SSR** websites
+  - It consists of the templates used to generate the view (website we send back to the client)
+
+---
+
+### MVC Steps (lifecycle)
+
+![MVC](./img/mvc-1.png)
+
+- Steps
+
+  1. A request will hit one of our routers(one for each resource), and the router delegate the request to the correct handler function which will be on the corresponding controller
+  2. Depending on the incoming request, The controller might need to interact with one of the models (ex: to retrieve a certain document from the database or to create a new one)
+     - There's one model for each resource
+  3. After getting the dta from the model, The controller might then be ready to send back a response (containing that data) to the client
+  4. In case we want to render a website, there's one step involved, which is after getting the data from the model, the controller will go to the view layer and select the corresponding template and inject the data into it
+
+     - That rendered website will then be send back to the client with the data
+     - in the View-layer, there's usually 1 view template for each page
+
+> In Java, the MVC is implemented using Classes, but in Node.js, it's implemented using modules(files)
+
+---
+
+### MVC Application vs Business Logic
+
+- Application logic is the logic that makes the app actually works (technical stuff like managing requests/responses)
+- Business Logic is about the stuff related to business operations
+
+> They sometimes are hard to separate and may overlap
+
+![MVC](./img/mvc-2.png)
 
 ---
 
@@ -158,7 +210,7 @@ Middleware is a `function/s` that is applied between the request and response. M
 
 ---
 
-### Middleware in express development
+### Middleware in Express Development
 
 ![middleware](./img/middleware-3.png)
 
@@ -183,9 +235,16 @@ Middleware is a `function/s` that is applied between the request and response. M
 
 - Built-in Middleware
 
-  - `express.static` - for serving static files
-  - `.json` - for parsing incoming JSON
-  - `.urlencoded` - for parsing incoming urlencoded data
+  - `.static()` - for serving static files
+  - `.json()` - for automatic-parsing of incoming JSON-request-body
+
+    ```js
+    app.use(express.json());
+    ```
+
+    - > This is different from `res.json()`
+
+  - `.urlencoded()` - for parsing incoming urlencoded data
 
 - 3rd Party Middleware
 
@@ -279,11 +338,28 @@ app.post('/friends',(req,res)={
   app.use("filter-path, example : '/' ", routes);
   ```
 
+- Whenever we have a condition when handling request, so that it will send error response to client, It's better to return this response, so that we don't continue with the remaining request-handling-logic
+
+---
+
+### Handling unhandled routes
+
+- This must be after all routes
+
+  ```js
+  app.all('*', (req, res, next) => {
+    res.status(404).json({
+      status: 'fail',
+      message: `Can't find ${req.originalUrl} on this server`
+    });
+  });
+  ```
+
 ---
 
 ## Serving Files / HTML Pages
 
-- we have to use **absolute path**, so use `Path` package
+- we have to use **Absolute Path**, so use `Path` package
 - we use `path.join()` because this will automatically build the file-system-path in a way that works on both Linux systems and Windows systems which have different paths "`/`" or "`\`"
 
 ```js
@@ -292,7 +368,7 @@ const path = require('path');
 // __dirname -> is a global variable from Node.js that holds the absolute path in the current OS
 
 router.get('/add-product', (req, res, next) => {
-  res.sendFile(path.join(__dirname, '../', 'views', 'add-product.html'));
+  res.sendFile(path.join(__dirname, '..', 'views', 'add-product.html'));
 });
 ```
 
@@ -320,7 +396,7 @@ http://localhost:3000/images/kitten.jpg
 http://localhost:3000/css/style.css
 http://localhost:3000/js/app.js
 http://localhost:3000/images/bg.png
-http://localhost:3000/hello.html
+http://localhost:3000/index.html
 ```
 
 - for that we specify a `public` folder which has the static files
@@ -342,7 +418,7 @@ http://localhost:3000/hello.html
 
 ---
 
-## Templating Engines
+## Template Engines
 
 ![templating](./img/Templating%20Engines.PNG)
 Template engines are used when you want to rapidly build web applications that are split into different components. Templates also enable fast rendering of the server-side data that needs to be passed to the application.
@@ -376,11 +452,8 @@ Template engines are used when you want to rapidly build web applications that a
   - you also should put `.hbs` files in `views` folder
 
     ```js
-    // Using hbs as the default view engine
-    app.set('view engine', 'hbs'); // for any dynamic-template we are trying to render, use this engine (hbs)
-
-    // selecting where the views could be found
-    app.set('views', path.join(__dirname, '..', 'views'));
+    app.set('view engine', 'hbs'); // Using hbs as the default view engine
+    app.set('views', path.join(__dirname, '..', 'views')); // selecting where the views could be found
 
     // rendering the hbs file
     app.get('/', (req, res) => {
@@ -393,3 +466,69 @@ Template engines are used when you want to rapidly build web applications that a
     ```
 
 ---
+
+## Error Handling
+
+In Express, there's 2 types of errors that can happen: **Operation errors** and **Programming errors**
+
+- **Operation Errors:** are problems that we can predict will inevitably happen at some point in the future, So we need to handle them in advance.
+  - They have nothing to do with bugs in our code. instead, they depend on the user or the system or the network
+  - ex:
+    - user accessing an invalid route
+    - inputting invalid data
+    - application failing to connect to the database
+- **Programming Errors:** They are bugs that developers introduce into our code
+  - ex:
+    - trying to read properties from `undefined` variable using `await` without `async`
+    - accidentally using `request.query` instead of `request.body`
+
+So when handling errors in express, we mean to handle **Operation errors** using one central error handling middleware
+
+---
+
+### Unhandled Rejections and Exceptions
+
+After handling operation/programming errors, some errors may be still unhandled like (connecting to DB) or synchronous errors or else, we should handle each of these errors individually on its location, but it's also better to create global handling as a **safety net**
+
+#### Handling Asynchronous promise rejections
+
+For this, we use event-listener:
+
+- Each time an unhandled rejection occurs somewhere in the app, the `process` object will **emit** an object called `"unhandledRejection"`
+- we can subscribe to that event -> `process.on('unhandledRejection')`
+- > can be after the server initialization
+
+  ```js
+  // server.js
+  process.on('unhandledRejection', error => {
+    console.log('UNHANDLED REJECTION! Shutting 💥 down...');
+    console.log(err.name, err.message);
+
+    // Shut down gracefully
+    server.close(() => {
+      process.exit(1);
+    });
+  });
+  ```
+
+#### Handling Synchronous Exceptions
+
+**Uncaught Exceptions:** Any errors/bugs that occur in our synchronous code but are not handled anywhere
+
+For this, we use event-listener:
+
+- Each time an uncaught exceptions occurs somewhere in the app, the `process` object will **emit** an object called `"uncaughtException"`
+- we can subscribe to that event -> `process.on('uncaughtException')`
+- > **Note:** It must be on the very top of the code so that it's executed first to catch all sync-errors after that
+
+  ```js
+  // server.js
+  // MUST BE ON TOP OF THE FILE
+  process.on('uncaughtException', error => {
+    console.log('Uncaught Exception! Shutting 💥 down...');
+    console.log(err.name, err.message);
+
+    // Here we must Shut down immediately
+    process.exit(1);
+  });
+  ```

@@ -23,6 +23,13 @@ It's a **module bundler** that lets you write any module format (mixed bunch of 
 
 ![webpack](./img/webpack.png)
 
+> When we want to bundle files, we have to balance 2 concerns
+>
+> - Each script requires new HTTP request. this can lead to bottleneck (very slow website) if number of requests is a lot
+> - Writing code in one single massive Javascript file is a nightmare!
+>
+> So, We want as few files as possible in the browser that have to load, but we also want as many files as we want when we're actually developing apps. And what is where **webpack** comes in
+
 There're 2 main things webpack does:
 
 1. it bundles our code/assets together
@@ -461,5 +468,3 @@ npm i --save-dev clean-webpack-plugin
   - > note that it's normal to use the `"style-loader"` in development mede, so we add it to the `webpack.dev.js` file and remove it from `webpack.prod.js`
 
 - We don't minify in development mode, we do it only in production
-
----

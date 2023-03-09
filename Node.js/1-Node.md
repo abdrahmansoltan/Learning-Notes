@@ -5,19 +5,20 @@
     - [Node.js Runtime](#nodejs-runtime)
     - [Node.js Architecture (How it works)](#nodejs-architecture-how-it-works)
       - [More about Node.js and libuv](#more-about-nodejs-and-libuv)
-    - [Node Process and Threads](#node-process-and-threads)
+    - [Node Process and Threads (thread pool)](#node-process-and-threads-thread-pool)
     - [Phases of Event-Loop](#phases-of-event-loop)
     - [Node vs Javascript](#node-vs-javascript)
     - [Node.js vs python / PHP](#nodejs-vs-python--php)
   - [Thread Pool (Asynchronous I/O)](#thread-pool-asynchronous-io)
+    - [Thread pool process (How Node runs Asynchronously)](#thread-pool-process-how-node-runs-asynchronously)
   - [Events](#events)
     - [EventEmitter](#eventemitter)
   - [REPL](#repl)
   - [Modules](#modules)
-    - ["Common-JS" Module System](#common-js-module-system)
+    - [Common-JS Module System](#common-js-module-system)
       - [What happens when we `require()` a module](#what-happens-when-we-require-a-module)
     - [ECMAScript (ES) Module System](#ecmascript-es-module-system)
-    - [Module vs Package](#module-vs-package)
+    - [Module vs NPM Package](#module-vs-npm-package)
     - [Core-modules : Process Module](#core-modules--process-module)
     - [Core-modules : Path Module](#core-modules--path-module)
     - [Core-modules : File System Module](#core-modules--file-system-module)
@@ -29,10 +30,11 @@
       - [locally (--save-dev)](#locally---save-dev)
     - [--save and --save-dev](#--save-and---save-dev)
   - [Application Programming Interface (API)](#application-programming-interface-api)
-    - [REST Architecture](#rest-architecture)
+    - [REST Architecture (RESTFUL APIs)](#rest-architecture-restful-apis)
   - [HTTP server](#http-server)
     - [What happens when we access a webpage? (How server Works)](#what-happens-when-we-access-a-webpage-how-server-works)
     - [Create Node.js Web Server](#create-nodejs-web-server)
+      - [Shutting Down Node/Express Server](#shutting-down-nodeexpress-server)
     - [HTTP Header](#http-header)
     - [Routing](#routing)
     - [Parsing Request Body (Streams \& Buffer)](#parsing-request-body-streams--buffer)
@@ -49,8 +51,6 @@
       - [Node Cluster Module](#node-cluster-module)
       - [Process Manager 2 (PM2)](#process-manager-2-pm2)
   - [Work Threads](#work-threads)
-  - [Authentication using JWT](#authentication-using-jwt)
-    - [NPM library jsonwebtoken](#npm-library-jsonwebtoken)
 
 ---
 
@@ -93,6 +93,7 @@
   - Also, `libuv` implements 2 important features of Nodejs which are:
     1. **Event Loop** --> for handling easy tasks like executing callBacks and network I/O
     2. **Thread Pool** --> for more heavy work like file accessing or compression
+  - > `libuv` has binding to other languages like `ruby`, `python`
 
 - This architecture provides us with a level of **Abstraction**, as the dependencies are written in `C++` but they make us have access to their functions in pure javascript
 
@@ -116,7 +117,7 @@
 
 ---
 
-### Node Process and Threads
+### Node Process and Threads (thread pool)
 
 When we use Node on a computer, it means that there's a Node `process` running on that computer (the `process` is just a program in execution).
 
@@ -133,6 +134,7 @@ When we use Node on a computer, it means that there's a Node `process` running o
 - The thread pool is provided to Node.js by the `libuv` library, and it gives us **4 additional threads** that are separate from the main single-thread (we can configure it up to 128 threads)
 
   - The event loop can **offload** heavy tasks to the thread pool (behind the scenes)
+    - > More [here](#thread-pool-asynchronous-io)
   - the more threads we have the faster we get the (tasks offloaded to the thread pool) to be executed
 
     ```js
@@ -146,27 +148,34 @@ When we use Node on a computer, it means that there's a Node `process` running o
 
 **Event Loop**: is all the application code that is inside callback functions (non top level code)
 
-- Node.js is build around callback functions, as it uses **"Event-driven Architecture"** where:
+- Node.js is build around callback functions, as it uses **"Event-driven Architecture"** with "Observer Pattern" where:
   ![events](./img/node-events.png)
 
   1. events are emitted
   2. the event-loop picks them up when they're emitted, and the more expensive tasks go to thread-pool
-  3. then, the necessary callbacks are called
+  3. then, the necessary callbacks are called.
 
 > Most Node.js core modules like (HTTP, file-system and others) implement events internally by inheriting from the `EventEmitter` Class -> `server.on('request', (req, res)=> {})`
 
 - The event-loop does the Orchestration in Node.js with specific order of execution
 - Execution Order :
   ![event loop](./img/event-loop-1.png)
+
+  > **Notes:**
+  >
+  > - `setImmediate` is called "immediate", because it runs immediately after any I/O operations have finished executing
+  > - `close callbacks`: it's the last phase because this is for when you close a (file or a network connection) and you have a callback that executes when that connection is closed
+
 - The event-loop is what makes Asynchronous programming possible in Node.js, making it the most important feature in Node.js design and this is what makes it different from other BE languages
   ![event loop](./img/event-loop-2.png)
 
   - **node.js** -> single thread which is good for resources but can be bad if the thread is slowed or blocked
   - **php** -> multiple threads which is more resources-intensive but no danger of blocking
 
-  - in addition to the main 4 callback queues, there're also 2 other queues (`nextTick` queue and the **microtasks** queue -> for resolved promises)
-    - if there's any callback to be processed in one of these 2 queues, they will be executed right after the current phase of the event loop finishes instead of waiting for the entire loop to finish
-    - So, callbacks from these 2 queues will be **executed right away**
+- In addition to the main 4 callback queues, there're also 2 other queues (`nextTick` queue and the **microtasks** queue -> for resolved promises)
+
+  - if there's any callback to be processed in one of these 2 queues, they will be executed right after the current phase of the event loop finishes instead of waiting for the entire loop to finish
+  - So, callbacks from these 2 queues will be **executed right away**
 
   ![Event Loop](./img/eventLoop2.png)
 
@@ -185,28 +194,43 @@ When we use Node on a computer, it means that there's a Node `process` running o
 
 - Node.js works best when you deal with `input/output` or `servers`, `(serving data / streaming)`
 
-- Node.js doesn't work well for heavy server-side processing 7 calculation (CPU-Intensive) like `machine learning`, `video processing`, `3D-games`
+- Node.js doesn't work well for heavy server-side processing 7 calculation (CPU/GPU-Intensive) like `machine learning`, `video processing`, `3D-games`
   - in this case other languages are better
+
+> With libuv and the thread-pool, we won't need for additional web-server like **Apache** or **Nginx** to create thousands of threads
 
 ---
 
 ## Thread Pool (Asynchronous I/O)
 
-- `Node` runs on a `single thread` even if you have millions of users, so make sure you don't **block that thread**, --> here comes the rule of `Libuv` which gives us `4` additional threads **(or more)**
+- `Node` runs on a `single thread` even if you have millions of users, so make sure you don't **block that thread**, --> here comes the rule of `Libuv` which gives us **4** additional threads **(or more)**
 
   ![pool-thread](./img/poolthread.PNG)
-  ![multi-thread](./img/multithread.PNG)
 
   - so `node` takes care of heavy things by `offloading` them to the `thread pool`
   - it simulates `asynchronous` task by doing each task in a single `call-stack (thread)`
 
 - `Libuv Library` : A library written in `C` that provides **multithreading** to Node.js and allows for heavy processing.
+  ![libuv](./img/libuv.jpg)
+- The thread-pool(collection of threads) in `libuv` are se-up ahead of time and are ready to take on work as it comes in
 
-![libuv](./img/libuv.jpg)
+  - libuv is written in C++, that's why it have threads
+    ![multi-thread](./img/multithread.PNG)
 
+- The default thread pool includes `4` threads
+
+### Thread pool process (How Node runs Asynchronously)
+
+- There's a common misconception that "all Asynchronous functions are executed in the thread-pool". Instead Node try to save the thread-pool for only the heavy tasks, and for normal tasks, libuv uses the operation-system (**kernel**) directly
+  ![os kernel](./img/os-kernel.png)
+  - `kernel`: is the core-part of the OS that talks to the computer's hardware and has multiple threads of its own
+    - the kernel is really good at doing basic operations, So whenever the functionality exists in the OS, libuv will make the appropriate call saving us from using the valuable resources of the thread-pool
 - Libuv takes advantage of the operating system's asynchronous interfaces before engaging the thread pool
 - The thread pool is engaged for events that require more processing power including compression and encryption tasks
-- The default thread pool includes `4` threads
+
+> So, for most of the Async operations, we skip over the thread-pool and instead the event-loop uses the OS-kernel
+>
+> - by using javascript with node with is single-threaded, we won't have to manage multiple threads manually because Node handles it and simplify our code
 
 ---
 
@@ -218,7 +242,7 @@ When we use Node on a computer, it means that there's a Node `process` running o
 - EventEmitter provides multiple properties like `on` and `emit`. on property is used to bind a function with the event and emit is used to fire an event.
   - `emit` is used to trigger an event
   - `on` is used to add a callback function that's going to be executed when the event is triggered
-- it works on the idea of `observer pattern` where
+- it works on the idea of **Observer Pattern** where
 
   - `emit` triggers an event
   - `on` observes an event and wait until it occurs
@@ -266,7 +290,12 @@ eventEmitter.emit('new song released');
 
 The module system creates the ability to `export` and `import` JavaScript from separate files.
 
-### "Common-JS" Module System
+- Node Modules are used to:
+  1. Reuse existing code
+  2. Organize code
+  3. Expose only what will be used
+
+### Common-JS Module System
 
 - Node.js uses the `Common JS module` system to break code into smaller chunks.
 
@@ -297,6 +326,10 @@ The module system creates the ability to `export` and `import` JavaScript from s
 - **`require()`**
 
   - When using `require`, a preceding `slash (/)` must come before a locally created module name; otherwise, Node.js will search the `core modules` and then `node_modules`.
+  - also by default, `require()` doesn't need `.js` extension for javascript file as it's set to look for these extensions in this order:
+    1. `.js`
+    2. `.json`
+    3. `.node`
 
   ```js
   const logger = require('./util/logger.js');
@@ -341,7 +374,7 @@ The module system creates the ability to `export` and `import` JavaScript from s
 
 ### ECMAScript (ES) Module System
 
-Starting from `Node.js 13.2.0` now `node.js` supports ECMAScript modules, known for their `import` and `export` statements
+Starting from `Node.js 13.2.0`, `Node.js` supports ECMAScript modules, known for their `import` and `export` statements
 
 - The default format of modules in Node.js is the `CommonJS`. To make Node.js understand `ES` modules format, you have to explicitly make so.
 
@@ -349,22 +382,23 @@ Starting from `Node.js 13.2.0` now `node.js` supports ECMAScript modules, known 
 
 - Additional Steps in order to use `ECMAScript-modules` :
 
-  - The module's file extension is .mjs
+  - The module's file extension is `.mjs`, if not using a special compiler that handles this
   - Or the module's nearest parent folder has `{ "type": "module" }` in `package.json`
 
 - **NOTE**: You must specify the file extension when importing
 
-```js
-// won't work
-import notFoundMiddleware from './middlewares/not-found';
+  ```js
+  // won't work
+  import notFoundMiddleware from './middlewares/not-found';
 
-// will work
-import notFoundMiddleware from './middlewares/not-found.js';
-```
+  // will work
+  import notFoundMiddleware from './middlewares/not-found.js';
+  import notFoundMiddleware from './middlewares/not-found.mjs';
+  ```
 
 ---
 
-### Module vs Package
+### Module vs NPM Package
 
 - `module` : a file containing some code that could be exported from this module
 
@@ -385,7 +419,7 @@ It's not found in the browser APIs, `Process` relates to the global node executi
 
     ```js
     // create conditions for exit code options
-    // example: 0 typically implies without errors, 1 with.
+    // example: 0 typically implies no errors, 1 does.
 
     process.exitCode = 1;
 
@@ -532,7 +566,7 @@ npm i --save-dev module-name@1.19 # install a specific version (1.19 here) of mo
 
 ## Application Programming Interface (API)
 
-It's a piece of software that can be used by another piece of software, in order to allow application to talk to each other
+It's a piece of software that can be used by another piece of software, in order to **allow application to talk to each other**
 
 - API has a broader meaning than building Web APIs, It can be a "web api" or other things like Node-APIs:
   ![api](./img/api-1.png)
@@ -540,7 +574,7 @@ It's a piece of software that can be used by another piece of software, in order
 - Web API is usually what's important in the context of Node.js, which is build using the **REST Architecture**
   - **REST APIs**: are APIs following the REST Architecture
 
-### REST Architecture
+### REST Architecture (RESTFUL APIs)
 
 It stands for "Representational States Transfer", It's a way of building web APIs in a logical way making them easy to consume. This requires some principles:
 
@@ -554,13 +588,17 @@ It stands for "Representational States Transfer", It's a way of building web API
      ![api](./img/api-4.png)
    - we only send response to client if the cline uses a HTTP method to access the endpoint
      ![api](./img/api-5.png)
-4. **Send data back to client (usually JSON format**
+4. **Send data back to client with existing format-standards (usually JSON format)**
    - `JSON` is a lightweight data interchange format used by web APIs coded in any programming language (not just related to javascript)
    - It's used a lot because it's easy for both humans and computers to understand and write JSON (key-value pairs)
      ![api](./img/api-6.png)
-5. **The API must be stateless**
-   - The server shouldn't have to remember the previous request in order to process the current request
-     ![api](./img/api-7.png)
+5. **The API must be stateless and cacheable**
+   - Stateless:
+     - each request is separate and not connected to any state on the client in the request
+     - The server shouldn't have to remember the previous request in order to process the current request
+       ![api](./img/api-7.png)
+   - Cacheable:
+     - by caching the request, we save the result of it for future use, this reduce the work from the server and improve performance
 
 ---
 
@@ -605,9 +643,12 @@ This is what happens when we access a webpage or accessing a wep API:
 
 Node.js makes it easy to create a simple web server that processes incoming requests `asynchronously`.
 
+- `req`is a readable stream, which we can be listened to by using the `.on()` function
+- `res`is a writable stream, which we can be listened to by using the `write` functions to write data to it like (headers, body, etc)
+
 - explanation of code below :
 
-  - `requestListener function` is the callback function that takes a request `object` and a response `object` as parameters.
+  - `requestListener` function is the callback function that takes a request `object` and a response `object` as parameters.
 
   - The `request` object contains things such as the `requested URL`, but in this example we ignore it and always return "Hello World".
 
@@ -658,6 +699,21 @@ server.listen(8000, '127.0.0.1', () => {
   console.log('listening.......');
 });
 ```
+
+---
+
+#### Shutting Down Node/Express Server
+
+To shut down server we use `process.exit(1)` which ends the program (**immediately** abort all the requests that are currently still running or pending which may not be good), So usually it's better to shut down the server **gracefully**(we first close the server and only then we shut down the application)
+
+```js
+// Shut down gracefully
+server.close(() => {
+  process.exit(1);
+});
+```
+
+---
 
 ### HTTP Header
 
@@ -727,17 +783,19 @@ response.writeHead(404, {
 - **streams & `pipe()`**
 
   - sometimes, there's a problem when reading streams, as the readable stream used to read file from the disk is much faster than sending the result with the response writable stream over the network, and this will overwhelm the response-stream which can't handle all the incoming data so fast. This problem is called "Back Pressure"
-    - > **"Back Pressure"**: It's when the response can't send the data nearly as fast as it's receiving it from the file
+    - **"Back Pressure"**: It's when the response can't send the data nearly as fast as it's receiving it from the file
   - `pipe` operator is available in all readable streams and allows us to pipe the output of a readable stream into the input of a writable stream
     - This fixes the problem of "Back Pressure", because it will automatically handle the speed of the data coming `in` and `out`
 
-- Examples:
+- Streams Examples:
 
   ```js
   // Instead of this:
   fs.readFile('rest.txt', (err, data) => {
     res.end(data); // write everything at once into a variable (data) and once that was ready, we then send that entire piece to the client
   });
+
+  // --------------------------------------------------------- //
 
   // Solution 1: Streams
   const readable = fs.createReadStream('rest.txt');
@@ -751,7 +809,9 @@ response.writeHead(404, {
 
   // Solution 2: Streams with pipe -> BEST SOLUTION
   const readable = fs.createReadStream('rest.txt');
-  readable.pipe(res); // (res) is the writable destination -> where the data goes to
+  readable.pipe(res);
+  // - (readable) is the source
+  // - (res) is the writable destination -> where the data goes to
   ```
 
 > The problem with streams is that we can't arbitrarily try to work with these chunks. Instead to organize the incoming chunks, we use **buffer**
@@ -932,66 +992,3 @@ pm2 start server.js -l logs.txt -i max
 - `work threads` make us work on one process with multiple threads
 
 ---
-
-## Authentication using JWT
-
-> see Authentication section in the database-notes file
-
-![jwt](./img/jwt.PNG)
-
-### NPM library [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
-
-- creating user
-
-  ```ts
-  const create = async (req: Request, res: Response){
-    const user: User {
-      username: req.body.username,
-      password: req.body.password,
-      }
-    try {
-      const newUser = await store.create(user)
-      var token = jwt.sign({ user: newUser }, process.env.TOKEN_SECRET); // store TOKEN_SECRET in .env file
-
-      res.json(token) // send the token so that the client can use it for future HTTP-requests
-    } catch(err) {
-    res.status(400)
-    res.json(err + user)
-    }
-  }
-  ```
-
-- verifing the user
-  - use the `jwt.verify` method
-- in real life, the token will not be part of the request body. Instead, tokens live as part of the `request header`.
-
-  - When we use JWTs, we pass them as a special header called the Authorization header using this format:
-
-    - ```ts
-      Authorization: Bearer<token>;
-      ```
-
-  - In Node, we can locate the authorization header sent with a request like this:
-
-    ```ts
-    const authorizationHeader = req.headers.authorization;
-    const token = authorizationHeader.split(' ')[1]; // Parsing the header
-    ```
-
-- putting it all together
-
-  ```ts
-  const create = async (req: Request, res: Response) => {
-      try {
-          const authorizationHeader = req.headers.authorization
-          const token = authorizationHeader.split(' ')[1]
-          jwt.verify(token, process.env.TOKEN_SECRET)
-      } catch(err) {
-          res.status(401)
-          res.json('Access denied, invalid token')
-          return
-      }
-
-      ....rest of method is unchanged
-  }
-  ```

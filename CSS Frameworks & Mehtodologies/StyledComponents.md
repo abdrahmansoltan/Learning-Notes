@@ -97,7 +97,7 @@ const StyledContainer = styled.section`
   margin: 0 auto;
 `;
 
-// Inherit StyledContainer in StyledSmallConatiner
+// Inherit StyledContainer in StyledSmallContainer
 const StyledSmallContainer = styled(StyledContainer)`
   padding: 0 10px;
 `;
@@ -125,13 +125,12 @@ function Contact() {
 
 > Styled components are **functional**, so we can easily style elements dynamically.
 
-- Using props to determine the css property value
+- Using props to determine the css property value instead of (using inline styles to use the props)
 
-  ```js
+  ```jsx
   // Adapting the colors based on primary prop
   const Button = styled.button`
     background-color: ${props => (props.primary ? 'red' : 'white')};
-
     font-size: 1em;
     margin: 1em;
     padding: 0.25em 1em;
@@ -149,7 +148,7 @@ function Contact() {
 
 - Using props to declare css code block
 
-  ```js
+  ```jsx
   // we must import the "css" module to let it know that we're inserting a css-code-block
   import styled, { css } from 'styled-components';
 
@@ -184,7 +183,7 @@ function Contact() {
 
 - With the `as` polymorphic prop, you can swap the end element that gets rendered. One use case is (when you inherit styles), for example, you’d prefer a `div` to a `section` for a reusable styled-component, you can pass the as prop to your styled component with the value of your preferred element, like so:
 
-  ```js
+  ```jsx
   function Home() {
     return (
       <StyledContainer>
@@ -204,8 +203,8 @@ function Contact() {
 
 - You could even have a custom component as your value
 
-  ```html
-  <StyledSmallContainer as="{StyledContainer}">
+  ```jsx
+  <StyledSmallContainer as='{StyledContainer}'>
     <h1>Never dribble when you can pass</h1>
   </StyledSmallContainer>
   ```

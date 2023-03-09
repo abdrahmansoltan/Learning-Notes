@@ -7,7 +7,7 @@
     - [Canceling with clearTimeout](#canceling-with-cleartimeout)
     - [setInterval](#setinterval)
     - [Garbage collection and setInterval/setTimeout callback](#garbage-collection-and-setintervalsettimeout-callback)
-  - [Is JavaScript a `synchronous` or `asynchronous` ?](#is-javascript-a-synchronous-or-asynchronous-)
+  - [Is JavaScript `synchronous` or `asynchronous` ?](#is-javascript-synchronous-or-asynchronous-)
   - [Building a Promise](#building-a-promise)
     - [creating a promise](#creating-a-promise)
   - [consume promise : (Old Way)](#consume-promise--old-way)
@@ -17,6 +17,7 @@
     - [Promises / Fetch API](#promises--fetch-api)
       - [Consumers: `then`, `catch`](#consumers-then-catch)
       - [Cleanup: `finally` method](#cleanup-finally-method)
+      - [Handling errors when fetching](#handling-errors-when-fetching)
   - [consume promise (ES7)](#consume-promise-es7)
     - [Promisification (promisify)](#promisification-promisify)
     - [Consuming Promises with Async/Await](#consuming-promises-with-asyncawait)
@@ -204,13 +205,14 @@ There’s a side effect. A function references the outer lexical environment, so
 
 ---
 
-## Is JavaScript a `synchronous` or `asynchronous` ?
+## Is JavaScript `synchronous` or `asynchronous` ?
 
-- JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability
-- **but** when `js` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object in the **browser** or in **Node.js**
+JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability
+
+- **But** when `javascript` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object in the **browser** or in **Node.js**
 - so **Javascript has no timer**, as the timer-function is **Web-browser feature**
 
-> **Async** means that "we don't have it right now"
+> So, Javascript can behave in asynchronous way, but it doesn't do this out of the box as we have to manipulate it to be this way
 
 ---
 
@@ -479,6 +481,29 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 
   - A `finally` handler also shouldn’t `return` anything. If it does, the returned value is silently ignored.
     - The only exception to this rule is when a `finally` handler throws an error. Then this error goes to the next handler, instead of any previous outcome.
+
+---
+
+#### Handling errors when fetching
+
+- if you're using normal `fetch`, then you will have to check (the request status for many cases and various status-codes), depending on them you will throw an error to go to the catch block other wise it won't know that there's an error
+
+  ```js
+  fetch(url)
+    .then(res => {
+      if (res.status >= 200 && res.status <= 299) {
+        return res.json();
+      } else {
+        // response error
+        throw new Error('404 error');
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+  ```
+
+- Or if you are using **Axios**, then this is handled automatically for different status-codes and situations
 
 ---
 

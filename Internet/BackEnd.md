@@ -11,9 +11,9 @@
     - [HTTP Response](#http-response)
       - [HTTP Response Status Codes](#http-response-status-codes)
   - [same origin policy ( SOP ) \& CORS](#same-origin-policy--sop---cors)
-    - [`Origin`](#origin)
-    - [`SOP`](#sop)
-    - [`Cross-Origin Resource Sharing (CORS)`](#cross-origin-resource-sharing-cors)
+    - [Origin](#origin)
+    - [SOP](#sop)
+    - [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
     - [Idempotency](#idempotency)
       - [Idempotency and Security](#idempotency-and-security)
   - [REST / RESTFULL API](#rest--restfull-api)
@@ -95,7 +95,7 @@ An API is the interface or gateway through which we interact with an external pr
 
 ## same origin policy ( SOP ) & CORS
 
-The Same Origin Policy (SOP) allows a browser to restrict access to resources relating to one origin to being permitted only via other resources from that same origin. (by default that is the behavior configured in browsers)
+**The Same Origin Policy (SOP)** allows a browser to restrict access to resources relating to one origin to being permitted only via other resources from that same origin. (by default that is the behavior configured in browsers)
 
 - both pages must agree for data exchange and must contain special JavaScript code that handles it.
 
@@ -103,13 +103,15 @@ The Same Origin Policy (SOP) allows a browser to restrict access to resources re
   - `React` : port3000
   - `node` : port8000
 
-### `Origin`
+### Origin
 
 - it's combination of (domain, scheme, or port)
-- whenever something in the img below changes, we get a different `origin`
+- whenever one of these 3 changes, we get a different `origin`
   ![origin](./img/origin.PNG)
 
-### `SOP`
+---
+
+### SOP
 
 - when you browse `google`, the request for `facebook` will be denied unless `google` allows it with the use of `CORS`
 - this is used for protecting data
@@ -117,10 +119,10 @@ The Same Origin Policy (SOP) allows a browser to restrict access to resources re
 
 ---
 
-### `Cross-Origin Resource Sharing (CORS)`
+### Cross-Origin Resource Sharing (CORS)
 
 - It's an important factor in making and handling API requests
-- It's an **HTTP-header** based mechanism that allows a server to indicate any `origins` other than its own from which a browser should permit loading resources.
+- It's an **HTTP-header** based mechanism that allows a server to indicate any `origins` other than its (own origin (in the URL)) from which a browser should permit loading resources.
   ![cors](./img/cors.PNG)
 
   - in the image we have 2 options :
@@ -128,6 +130,7 @@ The Same Origin Policy (SOP) allows a browser to restrict access to resources re
     - to make access to specific websites only `list of sites`
 
 - it uses `whitelisting` instead of `blacklisting`
+  - `whitelisting`: is the practice of explicitly allowing access to a particular privilege or service.
 - We can use CORS as a `middleware` on a route by route basis in `EXPRESS` --> [cors](https://www.npmjs.com/package/cors)
 - **You don't need it if your `frontend` & `backend` have the same domain**
 

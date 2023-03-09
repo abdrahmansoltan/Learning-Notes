@@ -28,14 +28,15 @@
     - [Portals](#portals)
       - [Modal notes](#modal-notes)
     - [Smart vs Dumb components](#smart-vs-dumb-components)
-    - [Controlled vs. uncontrolled components](#controlled-vs-uncontrolled-components)
+    - [Forms: Controlled vs uncontrolled components](#forms-controlled-vs-uncontrolled-components)
       - [Controlled components](#controlled-components)
       - [Uncontrolled components](#uncontrolled-components)
   - [Props](#props)
     - [single prop](#single-prop)
     - [Multiple props](#multiple-props)
     - [passing default props through components (implicitly)](#passing-default-props-through-components-implicitly)
-    - [Validating Props](#validating-props)
+    - [Validating Props (propTypes)](#validating-props-proptypes)
+    - [Default Prop Values](#default-prop-values)
   - [Communicating Between Components](#communicating-between-components)
     - [From Parent to Child](#from-parent-to-child)
     - [From Child to Parent](#from-child-to-parent)
@@ -51,7 +52,6 @@
       - [Form-Input](#form-input)
     - [Form Validation](#form-validation)
   - [Environmental Variables](#environmental-variables)
-  - [Interview Questions](#interview-questions)
 
 ---
 
@@ -297,7 +297,7 @@ To add classes based on certain values, we can use normal conditions `if..else` 
 
 ### Styled-components
 
-[Here](../CSS%20Frameworks%20%26%20Mehtodologies/StyledComponents.md)
+[StyledComponents File](../CSS%20Frameworks%20%26%20Mehtodologies/StyledComponents.md)
 
 ---
 
@@ -506,7 +506,7 @@ ReactDOM.createPortal(child, container);
 
 ---
 
-### Controlled vs. uncontrolled components
+### Forms: Controlled vs uncontrolled components
 
 In React, there are two ways to handle **Form data** in our components.
 
@@ -518,7 +518,7 @@ Controlled components are those in which form data is handled by the component�
 
 It is the one that takes its current value through props and notifies changes through callbacks like onChange. A parent component "controls" it by handling the callback and managing its own state and passing the new values as props to the controlled component. You could also call this a "dumb component".
 
-```js
+```jsx
 function App() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -551,9 +551,9 @@ function App() {
 
 #### Uncontrolled components
 
-Uncontrolled components are those for which the form data is handled by the DOM itself. “Uncontrolled” refers to the fact that these components are not controlled by React state.
+Uncontrolled components are those for which the form data is handled by the DOM itself. **"Uncontrolled"** refers to the fact that these components are not controlled by React state.
 
-It is the one that stores its own state internally, and you query the DOM using a ref to find its current value when you need it. This is a bit more like traditional HTML.
+It is the one that stores its own state internally, and you query the DOM using a [ref](./2-Hooks.md#refs) to find its current value when you need it. This is a bit more like traditional HTML.
 
 > components that use **ref** are uncontrolled, as they aren't controlled by React
 
@@ -641,7 +641,7 @@ const {children, ...rest} = props
 
 ---
 
-### Validating Props
+### Validating Props (propTypes)
 
 This is done using the library [prop-types](https://www.npmjs.com/package/prop-types)
 
@@ -650,6 +650,30 @@ This is done using the library [prop-types](https://www.npmjs.com/package/prop-t
   ![prop-types](./img/prop-types.png)
 
 - It can also be used to create custom validations other than checking the type of props, by creating a method in the `component.protoTypes` and return a `new Error()` for the custom condition
+
+---
+
+### Default Prop Values
+
+You can define default values for your props by assigning to the special `defaultProps` property
+
+- The `defaultProps` will be used to ensure that the prop-item will have a value if it was not specified by the parent component. - The `propTypes` typechecking happens after `defaultProps` are resolved, so typechecking will also apply to the `defaultProps`.
+
+```jsx
+import PropTypes from 'prop-types';
+
+function HelloWorldComponent({ name }) {
+  return <div>Hello, {name}</div>;
+}
+
+HelloWorldComponent.propTypes = {
+  name: PropTypes.string
+};
+
+HelloWorldComponent.defaultProps = {
+  name: 'World'
+};
+```
 
 ---
 
@@ -839,81 +863,3 @@ in `.env` file:
 - [Docs](https://create-react-app.dev/docs/adding-custom-environment-variables/#adding-development-environment-variables-in-env)
 
 ---
-
-## Interview Questions
-
-[React Interview Questions & Answers](https://github.com/sudheerj/reactjs-interview-questions)
-
-- What will happen if you used a state in a JSX block without defining initial state and just setting state in a `componentDidMount()` lifeCycle?
-
-  - it will result an error, as on the first invocation of the `render()` function, the `componentDidMount()` isn't yet invoked and there's no initial state defined
-
-- Why we use `useEffect()` or `componentDidMount()` to change state after mounting, why don't we just invoke the function we want directly in the component body?
-
-  - it's because like that we would be calling this function each time we render which changes the state (with different state object than the current one in memory) and cause re-render again, and this will lead to **render infinite loop**
-
-- Why React Hook useState uses const and not let?
-
-  --> because When the component is rerendered, the function is executed again, creating a new scope, creating a new `color` variable, which has nothing to do with the previous variable.
-
-- why if I write
-
-  ```js
-  <h1
-    onClick={() => {
-      this.state.name = 'Ahmed';
-    }}>
-    Hi {this.state.name}
-  </h1>
-  ```
-
-  it doesn't change the name in the page but if `console.log` it I see that the name is equal to 'Ahmed'
-
-  - because the state is changed but the component needs to be rerendered as what is shown on the page is what we call **`object's reference by memory`**
-  - **Note:** The state must be changed in a way that React recognized in order to trigger "re-rendering", and this is done using `setState()`
-    - `setState` performs a **shallow merge** with the current `state` object which is to update the current object-keys with the keys given
-  - so when we rerender we create a new object(state), so we should use
-
-  ```js
-  this.setState(() => {
-    name: "Ahmed",
-  });
-  ```
-
-- Why (fetching with setting the state to the resolved value) without `componentDidMount()` or `useEffect()` results **infinite render**
-
-  - because when fetching and changing the state (with different state object than the current one in memory) which cause re-render again and again.
-
-  - because the resolved object/array is different from the one in the memory so the state gets reset over and over
-
-- why we must open the app (in development/production modes) through a server
-
-  - it's because libraries like **Babel**
-  - and as it's a SPA, so the HTML will be empty and need to get the requested data (mounted react app) and this request is made through a server that serves these files and data
-
-- why when updating state item or doing a modification to object or array, we don't mutate this item directly and instead we return a copy of this item with our modification. isn't creating new object/array costly?
-
-  - Answer: This is done specially with reference-type data-structures like `object` and `array`, as if the (reference to current state and reference to new state) are pointing to the same object/array, React assumes no render is required!
-    ![mutating the state](./img/mutating-state.png)
-    ![mutating the state](./img/mutating-state-0.png)
-    ![mutating the state](./img/mutating-state-1.png)
-    ![mutating the state](./img/mutating-state-2.png)
-
-- why in reducer function that we always return the current state and override it even if we're overriding all items in the state like here:
-
-  ```js
-  currentState: {
-    count: 10,
-    valueToAdd: 20
-  }
-
-  // .. in reducer function
-  case ADD_VALUE_TO_COUNT:
-    return {
-      ...state, // why this??
-      count: state.count + state.valueToAdd,
-      valueToAdd: 0
-    }
-  ```
-
-  - Answer: the reason is that in any time if the `state` object has some additional features been added, so that the updated state will be handled

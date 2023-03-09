@@ -6,17 +6,19 @@
     - [State is Async](#state-is-async)
     - [Difference between state and props](#difference-between-state-and-props)
     - [`useState` Hook](#usestate-hook)
+      - [changing state of type object](#changing-state-of-type-object)
       - [Functional state updates](#functional-state-updates)
   - [Refs](#refs)
     - [The Reference object](#the-reference-object)
     - [`useRef`](#useref)
       - [Why use it ?](#why-use-it-)
-    - [`useRef` Implementation](#useref-implementation)
+    - [`useRef` Implementation (How to use it)](#useref-implementation-how-to-use-it)
   - [Effect Hook](#effect-hook)
-    - [useEffect](#useeffect)
+    - [`useEffect`](#useeffect)
     - [`useEffect` dependency array](#useeffect-dependency-array)
     - [`useEffect` cleanup function](#useeffect-cleanup-function)
   - [useReducer()](#usereducer)
+    - [ACtion generator functions](#action-generator-functions)
     - [Not recommended ways of using reducer function](#not-recommended-ways-of-using-reducer-function)
     - [reducer function with Immer](#reducer-function-with-immer)
   - [Context: `useContext()`](#context-usecontext)
@@ -87,7 +89,7 @@ It's used to encapsulate a single value from the state of the component
     - calling `useState` defines a new piece of state
   - it `must` be written inside the `component` function
 
-```js
+```jsx
 // in the top of the file
 import { useState } from 'react';
 
@@ -127,6 +129,39 @@ const total = setTotal(state => {
 });
 ```
 
+#### changing state of type object
+
+when we have a state with type object, when we update any of the state-object properties, make sure to use the previous state using the spread operator:
+
+```js
+setPerson(curState => {
+  return { ...curState, age: 40 };
+});
+```
+
+- this way is commonly used with form inputs, to collect all input values in a state-object and use the name-attribute as the object-key
+
+  ```js
+  const [person, setPerson] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
+
+  const handleChange = e => {
+    setPerson(currentPerson => {
+      return {
+        ...currentPerson,
+        [e.target.name]: e.target.value
+      };
+    });
+  };
+
+  // in JSX, add the attribute: 'name' in input elements
+  ```
+
+> We can also create useState hook for each of the state object properties instead of one useState for the entire object
+
 ---
 
 #### Functional state updates
@@ -144,7 +179,7 @@ This way of dealing with state is called: **"Derived State"**, which is that val
 
 [reference](https://blog.logrocket.com/complete-guide-react-refs/)
 
-- **Allow us to access DOM properties directly**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
+- **Allow us to access DOM properties directly, which makes us have "uncontrolled inputs"**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
 - can be very useful when dealing with different frameworks like `react + JQuery` or `react + Angular`
 
 > Note: refs are escape hatches for React developers, and we should try to avoid using them if possible.
@@ -170,18 +205,19 @@ This way of dealing with state is called: **"Derived State"**, which is that val
 
 ### The Reference object
 
-the variable you use `useRef` with will become a frozen object with a **current** property which contains the referenced element
+the variable you use `useRef` with will become a frozen object with a **`current`** property which contains the referenced element
 
 ---
 
 ### `useRef`
 
-It allows a component to get a reference to a DOM element that it creates
+It allows a component to get a reference to a DOM nodes/elements that it creates.
 
-- It can be used to access a DOM element directly.
+- It can be used to access a DOM nodes/elements directly **with a preserved value**
 - most of the time it's used with DOM elements, but it can hold a reference to any value
 
   - It can be used to store a mutable value that does not cause a re-render when updated.
+    - It doesn't trigger re-render
   - It allows you to persist values between renders.
 
 - usually used For:
@@ -201,7 +237,7 @@ To avoid this, we can use the `useRef` Hook.
 
 ---
 
-### `useRef` Implementation
+### `useRef` Implementation (How to use it)
 
 1. create a `ref` at the top of your component by calling `useRef`
 2. Assign the `ref` to a JSX element as a prop called `ref`
@@ -265,16 +301,32 @@ function App() {
 > - React has no tools, objects, functions for making HTTP requests
 > - React only cares about showing content and handling user events
 
-### useEffect
+### `useEffect`
 
-It's a function from React used to run code **(always)** when a component is initially rendered and **(sometimes)** when it's re-rendered
+It's a function from React used to run code **(always)** when a component is initially **rendered** and **(sometimes)** when it's re-rendered
 
 ![useEffect](./img/sideEffects.PNG)
 
+- by default it runs after re-render unless dependency-array is utilized
 - When you call `useEffect`, you’re telling React to run your `effect` function after flushing changes to the `DOM`. Effects are declared inside the component so they have access to its props and state. By default, React runs the effects after every render — including the first render.
 
-> it happens after all other functions and state
-> ![useEffect-callback](./img/react-useeffect-callback-3.svg)
+- it happens after all other functions and state
+  ![useEffect-callback](./img/react-useeffect-callback-3.svg)
+
+- use cases:
+
+  - making a request on page load
+  - adding event listener on page load
+
+    - make sure not to forget the dependency array here to prevent infinite-rendering and to add a cleanup function
+
+    ```js
+    useEffect(() => {
+      window.addEventListener('resize', () => {
+        setSize(window.innerWidth);
+      });
+    }, []);
+    ```
 
 ---
 
@@ -319,35 +371,47 @@ It's a function from React used to run code **(always)** when a component is ini
 - when the `cleanup` function is called?
   ![useEffect-cleanup](./img/useEffect-cleanup-1.png)
 
-  - the `cleanup` function runs before every new side effect function execution and before the component is removed.
+  - the `cleanup` function runs **before** every new side effect function execution and before the component is removed.
   - it does not run before the first side effect function execution. But thereafter, it will run before every next side effect function execution.
   - **Note:** the `cleanup` function will only be called if the useEffect callback function will be called again (when there's something in the dependency array or no array what so ever)
 
 - The cleanup function prevents memory leaks and removes some unnecessary and unwanted behaviors.
+
   - ex: event listeners, because we want to stop listening to events when re-rendering or we will have a new event listener created on each render and we would have multiple listeners which is BAD
     ![useEffect-cleanup](./img/useEffect-cleanup-2.png)
+
+- **Note:** `useEffect` function can't be `async` because it shouldn't return a promise, as it only returns the cleanup function
+
+  ```js
+  useEffect(async () => {}, []); // ❌
+  // ---------------------------------------- //
+  getUsers = async () => {};
+  useEffect(async () => {
+    getUsers(); // ✅
+  }, []);
+  ```
 
 ---
 
 ## useReducer()
 
-It's an alternative to `useState`. Accepts a reducer of type `(state, action) => newState`, and returns the current state paired with a `dispatch` method.
+It's an alternative to `useState`. Accepts a reducer of type `(state, action) => newState`, and **returns** the current state paired with a `dispatch` method.
 
 ![useReducer](./img/reducer.PNG)
 
 - in `useState()` the state management logic takes a good part of the component body.
 
-  - That's a problem because the React component in nature should contain the logic that calculates the output. But the state management logic is a different concern that should be managed in a separate place. Otherwise, you get a mix of state management and rendering logic in one place, and that's difficult to read, maintain, and test! as the order of depending states may differ and cause wrong action!
+- That's a problem because the React component in nature should contain the logic that calculates the output. But the state management logic is a different concern that should be managed in a separate place. Otherwise, you get a mix of state management and rendering logic in one place, and that's difficult to read, maintain, and test! as the order of depending states may differ and cause wrong action!
 
 - `useReducer()` does so by extracting the state management out of the component.
 
 - Use-Cases :
   ![useReducer](./img/useReducer-1.png)
 
-  - When you have states that belongs together
-  - if you have a state updates (is set) that depend on other state.
-  - If you find yourself keeping track of multiple pieces of state that rely on complex logic
-    ![useReducer](./img/useReducer-3.png)
+- When you have states that belongs together
+- if you have a state updates (is set) that depend on other state.
+- If you find yourself keeping track of multiple pieces of state that rely on complex logic
+  ![useReducer](./img/useReducer-3.png)
 
 - It's similar to `useState()` as the hook returns an `array of 2 items`: the `current state` and the `dispatch function`.
   ![useReducer](./img/useReducer-2.png)
@@ -359,22 +423,23 @@ It's an alternative to `useState`. Accepts a reducer of type `(state, action) =>
 ![useReducer](./img/useReducer-4.png)
 ![useReducer](./img/useReducer-5.png)
 
-- **Reducer function** contains your custom state logic(different scenarios).
+- **Reducer function** It's just a function that **returns** the shape of the data we want to store. It contains your custom state logic(different scenarios).
   ![useReducer](./img/useReducer-6.png)
   ![useReducer](./img/useReducer-7.png)
 
-  - after executing the scenario-code, you should return a new state object
+- after executing the scenario-code, you must return a new state object
+  - if nothing returned from the reducer function, the state will be `undefined`
 
-  ```js
-  // reducer function: takes 2 values and "reduces" them down to one value
-  (accumulatedValue, nextItem) => nextAccumulatedValue
+```js
+// reducer function: takes 2 values and "reduces" them down to one value
+(accumulatedValue, nextItem) => nextAccumulatedValue
 
 
-  // in our case (useReducer), the 2 values provided to a reducer are:
-    // - the current state
-    // - an action that (may) update the state
-    (state, action) => newState
-  ```
+// in our case (useReducer), the 2 values provided to a reducer are:
+  // - the current state
+  // - an action that (may) update the state
+  (state, action) => newState
+```
 
 - **`initialState`** can be a simple value but generally will contain an **object** as it's for more complex state.
 - **`dispatch`** : is what we call in order to update the state --> it's like `setState()`
@@ -405,11 +470,11 @@ function reducer(state, action) {
     case 'increase':
       newState = { counter: state.counter + 1 };
       break;
-    case 'descrease':
+    case 'decrease':
       newState = { counter: state.counter - 1 };
       break;
     default:
-      throw new Error();
+      throw new Error(`unhandled type of ${action.type} in Reducer`);
   }
   return newState; // by default if no action matched
 }
@@ -417,13 +482,31 @@ function reducer(state, action) {
 
 ---
 
+### ACtion generator functions
+
+instead of dispatching with the action each time we want to use that action, we can just create an action-generation-function that takes a payload as an argument and dispatches the wanted action
+
+```js
+const increaseState = payload => {
+  dispatch({ type: 'increase', payload });
+};
+```
+
+---
+
 ### Not recommended ways of using reducer function
 
-![reducer function](./img/reducer-1.png)
-![reducer function](./img/reducer-2.png)
+The reducer function should only care about updating the state, It shouldn't worry about how to update the state
 
 - usually, it makes more sense to stuff logic into the reducer and to keep the dispatches simple, this will lead to less duplicated code if you need to dispatch the same action in multiple places and avoid typos
-- also part of the goal of reducers is to have a very specific set of ways that state can be changed
+- also part of the goal of reducers is to have a very specific set of ways that state can be changed like we can pass the final part of the state wa want to update as the **payload**, instead of just passing a value in the payload:
+
+  - passing just a value (not the best approach):
+
+    ![reducer function](./img/reducer-1.png)
+
+  - passing the final part of the state wa want to update as the **payload** (recommended):
+    ![reducer function](./img/reducer-2.png)
 
 ---
 
@@ -477,8 +560,9 @@ Context provides a way to pass data through the component tree without having to
 ### context setup
 
 1. **Create the context**
-   ![context](./img/context-1.png)
-2. **Specify the data that will be shared**
+   - when creating a `context`, we will have access to 2 components: `context.provider` & `context.consumer` functions
+     ![context](./img/context-1.png)
+2. **Specify (Provide) the data that will be shared**
    ![context](./img/context-2.png)
    ![context](./img/context-3.png)
 3. **Consume the data**
@@ -615,6 +699,23 @@ function Component5() {
 
 ![rules](./img/hooks.png)
 ![rules](./img/rules.PNG)
+
+- ✅ Call Hooks from React function components.
+- ✅ Call Hooks from custom Hooks
+- ✅ Call Hooks in a component that its name is uppercase
+
+```js
+❌ not calling hook directly in the component
+if (condition) {
+  useEffect(() => {});
+}
+
+✅ calling hook directly in the component
+useEffect(() => {
+  if (condition) {
+  }
+});
+```
 
 ---
 

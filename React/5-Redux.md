@@ -23,7 +23,7 @@
     - [user.action.js](#useractionjs)
   - [Redux Hooks](#redux-hooks)
     - [useDispatch()](#usedispatch)
-  - [Reselect](#reselect)
+  - [Reselect Library](#reselect-library)
   - [Redux-persist](#redux-persist)
   - [Redux Async Data Flow (Side Effects)](#redux-async-data-flow-side-effects)
     - [Redux Middleware and Side Effects](#redux-middleware-and-side-effects)
@@ -72,26 +72,34 @@ Redux is really:
 
 ### (`useContext` + `useReducer`) vs Redux
 
-Redux is very similar to `useReducer`, but there's some differences:
-
-- `useReducer`
-  ![alt](./img/redux-vs-reducers.png)
-  ![alt](./img/redux-vs-reducers-3.png)
-- Redux:
-  - here, we create a **separate object** called the redux-store which is separate from our React Application and outside of the hierarchy of our components
-    ![alt](./img/redux-vs-reducers-1.png)
-    ![alt](./img/redux-vs-reducers-2.png)
-    ![alt](./img/redux-vs-reducers-4.png)
-    ![alt](./img/redux-vs-reducers-5.png)
-
 ![alt](./img/reduxworkflow.png)
-![alt](./img/redux3.PNG)
-![alt](./img/redux2.PNG)
 
-- usually, you don't use `useContext` with `Redux` at the same time as data can be stored in redux
+- Redux is very similar to `useReducer`, but there's some differences:
+
+  - `useReducer`
+    ![alt](./img/redux-vs-reducers.png)
+    ![alt](./img/redux-vs-reducers-3.png)
+  - Redux:
+    - here, we create a **separate object** called the redux-store which is separate from our React Application and outside of the hierarchy of our components
+      ![alt](./img/redux-vs-reducers-1.png)
+      ![alt](./img/redux-vs-reducers-2.png)
+      ![alt](./img/redux-vs-reducers-4.png)
+      ![alt](./img/redux-vs-reducers-5.png)
+
+- `useContext` vs `Redux`
+
+  - **context**
+    ![Context](./img/redux3.PNG)
+  - **Redux**
+    ![Redux](./img/redux2.PNG)
+    - Here, the Redux structure depends on **singularity (single store and singular `dispatch`)** (reducer function for each state item), they are still functions that return objects that carry the state of the reducer
+    - these reducers are combined into one reducer (root reducer) and from this root-reducer we will pass the state into all the components (passing the entire state object and not just the state for each reducer)
+    - similarly the components can dispatch actions to any reducer that matches the type **as we have only one `dispatch` function**, and even the same action can update all reducers
+
+- usually, you don't use `useContext` with `Redux` at the same time because data can be stored in redux and gets confusing
 - some people try to replace redux with `useReducer`, but they will need a lot of plugins to get similar result of redux
 
-> **Note**: `Redux` & `useReducer` both use **context api** to give different components access to the store within the application
+> **Note**: `Redux` & `useReducer` both use **Context API** to give different components access to the store within the application
 
 ---
 
@@ -319,6 +327,9 @@ When using Redux, we have 2 options: **organize by function** or **organize by f
 
 ### store.js
 
+- in order to use middlewares, we need to generate a compose using `compose` function from redux
+  - Middleware is passed as a third argument to the `createStore` function
+
 ```js
 import { compose, createStore, applyMiddleware } from 'redux';
 import logger from 'redux-logger';
@@ -326,7 +337,7 @@ import logger from 'redux-logger';
 import { rootReducer } from './root-reducer';
 
 // they run before actions hit the reducers
-const middleWares = [process.env.NODE_ENV === 'development' && logger].filter(Boolean);
+const middleWares = [process.env.NODE_ENV === 'development' && logger].filter(Boolean); // run the logger-middleware only in dev-mode
 
 // Generate composed enhancers that apply middlewares
 const composedEnhancers = compose(applyMiddleware(...middleWares));
@@ -364,7 +375,9 @@ export const USER_ACTION_TYPES = {
 
 ### user.selector.js
 
-it takes a `function` that selects the part that we want from the state-object
+- `useSelector()`: it takes a `function` that selects the part that we want from the state-object
+  - it runs every time that the state object has updated in the root reducer, but it only re-renders the (component it's in) if the return-value of the selector-function is different
+  - **Note:** in order to prevent this re-run of `useSelector`, we can use [Reselect library](#reselect-library)
 
 ```js
 export const selectCurrentUser = state => state.user.curr;
@@ -435,11 +448,15 @@ const dispatch = useDispatch();
 dispatch({ type: something, payload: {} });
 ```
 
+> **Note:** when calling the `dispatch` function inside of `useEffect`, we know that the `dispatch` function won't change, so we can put in in the useEffect's dependency array
+
 ---
 
-## Reselect
+## Reselect Library
 
-A library for creating **memoized** "selector" functions. Commonly used with Redux
+It's library for creating **memorized** selector-functions. Commonly used with Redux
+
+> **Memorization:** is the process in which you cache the previous value of something so that if the input has not changed, then you just return back the same output (This works when you have a pure-function)
 
 - Reselect exports a `createSelector API`, which generates memoized selector functions. createSelector accepts one or more "input" selectors, which extract values from arguments, and an "output" selector that receives the extracted values and should return a derived value.
 - If the generated selector is called multiple times, the output will only be recalculated when the extracted values have changed.
@@ -464,7 +481,7 @@ export const selectCategories = createSelector(
   categoriesSlice => categoriesSlice.categories
 );
 
-// as long as "selectCategories" doesn't change, Don't run this function
+// By this, we tell Redux: "As long as "selectCategories" doesn't change, Don't re-run this function"
 export const selectCategoriesMap = createSelector([selectCategories], categories =>
   categories.reduce((acc, category) => {
     // acc is for 'accumulator'
@@ -478,6 +495,8 @@ export const selectCategoriesMap = createSelector([selectCategories], categories
 ---
 
 ## Redux-persist
+
+It allows us to persist the reducer function value
 
 [Guide](https://dev.to/dawnind/persist-redux-state-with-redux-persist-3k0d)
 
@@ -601,6 +620,13 @@ const asyncFunctionMiddleware = storeAPI => next => action => {
 
 ### Redux Thunk Middleware
 
+It's a middleware that allows us to receive actions that are function
+
+- Instead of dispatching an action in the typical format of an object with a `type` and a `payload`, We pass a function that goes to the thunk and Redux takes this function and return a `dispatch` from it, so that we can dispatch new actions from the `thunk`
+- The dispatched action from the thunk might hit another thunk or continue on into the Redux store (reducers)
+
+> The key benefit here, is that now in Redux, we can abstract out some of our logic into the thunk, like **Async operations**
+
 ![Redux Async Data Flow](./img/Redux%20Async%20Data%20Flow.gif)
 
 Redux already has "**async function** middleware", called the Redux "Thunk" middleware.
@@ -669,10 +695,12 @@ export const fetchCategoriesFailure = error =>
 // it's a function that returns a function that gets a dispatch as an argument
 export const fetchCategoriesStartAsync = () => {
   return async dispatch => {
-    dispatch(fetchCategoriesStart());
+    dispatch(fetchCategoriesStart()); // change loading state
+
+    // The Async logic
     try {
       const categoriesArray = await getCategoriesAndDocuments('categories'); // doing the logic here instead of in the component
-      dispatch(fetchCategoriesSuccess(categoriesArray));
+      dispatch(fetchCategoriesSuccess(categoriesArray)); // after finishing the fetching logic
     } catch (error) {
       dispatch(fetchCategoriesFailure(error));
     }
@@ -715,25 +743,31 @@ const [doFetchUsers, isLoadingUsers, loadingUsersError] = useThunk(fetchUsers);
 
 It's an intuitive Redux **side-effect manager**.
 
+- like when a dispatch with type `startFetching`, we do a side-effect of fetching-logic
+  - It's like event listener and callback function
+
 In most middlewares, actions hit `middleware` before they hit the `reducer`, **But** Saga is different -> the actions will hit the reducer first before moving to the saga **(after the reducers have updated**)
 
-- when actions hit the saga, it will respond to these actions and perform (buisness-logic, async-requests,..)
+- when actions hit the saga, it will respond to these actions and perform (business-logic, async-requests,..)
+  ![saga](./img/saga.PNG)
 
 - **NOTE**: Actions fired by sagas can trigger another sagas:
-  - Actions triggered by sagas can also flow through the saga again
 
-![saga](./img/saga.PNG)
+  - Actions triggered by sagas can also flow through the saga again
 
 - Saga uses [Generator Functions](https://javascript.info/generators)
   ![generators](./img/generators.png)
+  - instead of `await`, use `yield`
+  - instead of `dispatch`, use `put`
 
-Look at the **Example Usage** [here](https://redux-saga.js.org/)
+Look at the **Example Usage** [here](https://redux-saga.js.org/docs/introduction/GettingStarted)
 
 ---
 
 ### Saga vs Thunk
 
-![thunk_vs_saga](./img/thunk_vs_saga2.png)
+![thunk_vs_saga](./img/thunk_vs_saga2.PNG)
+![thunk_vs_saga](./img/thunk_vs_saga.png)
 
 ---
 
