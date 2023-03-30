@@ -37,6 +37,9 @@
       - [`Promise.race()`](#promiserace)
       - [`Promise.any()`](#promiseany)
       - [Promise.resolve/reject](#promiseresolvereject)
+  - [Axios](#axios)
+    - [Global Axios Defaults](#global-axios-defaults)
+    - [Custom Axios Instance](#custom-axios-instance)
   - [Network Requests](#network-requests)
     - [Fetch](#fetch)
       - [Fetch: Abort](#fetch-abort)
@@ -486,7 +489,11 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 
 #### Handling errors when fetching
 
+By default, the `fetch()` API doesn't consider HTTP status codes in the 4xx or 5xx range to be errors. Instead it considers these status codes to be indicative of a successful request
+
 - if you're using normal `fetch`, then you will have to check (the request status for many cases and various status-codes), depending on them you will throw an error to go to the catch block other wise it won't know that there's an error
+
+  - or we can check for the `res.ok` value
 
   ```js
   fetch(url)
@@ -1058,6 +1065,50 @@ Methods `Promise.resolve` and `Promise.reject` are rarely needed in modern code,
 // immediately resolve /reject a promise using thees methods from (promise) object
 Promise.resolve('abc').then(x => console.log(x));
 Promise.reject(new Error('Problem!')).catch(x => console.error(x)
+```
+
+---
+
+## Axios
+
+- Axios is a promise-based HTTP client for the browser and node.js. It is a very popular library for making HTTP requests in JavaScript.
+  - On the server-side, it uses the native node.js `http` module.
+  - On the client-side (browser), it uses the `XMLHttpRequest` object.
+- **Features:**
+  - Supports the Promise API
+  - Intercept request and response
+  - Transform request and response data
+  - Cancel requests
+  - Automatic transforms for **JSON** data
+  - Client-side support for protecting against `XSRF`
+
+### Global Axios Defaults
+
+You can set default values for the Axios instance using the `axios.defaults` object.
+
+```js
+axios.defaults.baseURL = 'https://api.example.com';
+axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+```
+
+---
+
+### Custom Axios Instance
+
+You can create a custom instance of axios with a custom config. This is useful for creating different instances for different environment configurations, such as an instance for communicating with an API while another for communicating with a static file server.
+
+```js
+const authFetch = axios.create({
+  baseURL: 'https://api.example.com',
+  headers: {
+    Authorization: AUTH_TOKEN
+  }
+});
+
+// using it:
+const response = await authFetch.get('/users');
 ```
 
 ---

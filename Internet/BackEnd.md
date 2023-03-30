@@ -14,6 +14,7 @@
     - [Origin](#origin)
     - [SOP](#sop)
     - [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors)
+      - [The Problem with CORS](#the-problem-with-cors)
     - [Idempotency](#idempotency)
       - [Idempotency and Security](#idempotency-and-security)
   - [REST / RESTFULL API](#rest--restfull-api)
@@ -108,6 +109,7 @@ An API is the interface or gateway through which we interact with an external pr
 - it's combination of (domain, scheme, or port)
 - whenever one of these 3 changes, we get a different `origin`
   ![origin](./img/origin.PNG)
+  - even if the backend & the frontend are from the same `host`, like `localhost`, but they have different ports (`3000` & `8000`), this will result CORS error
 
 ---
 
@@ -133,6 +135,12 @@ An API is the interface or gateway through which we interact with an external pr
   - `whitelisting`: is the practice of explicitly allowing access to a particular privilege or service.
 - We can use CORS as a `middleware` on a route by route basis in `EXPRESS` --> [cors](https://www.npmjs.com/package/cors)
 - **You don't need it if your `frontend` & `backend` have the same domain**
+
+#### The Problem with CORS
+
+The most visible problem with **CORS**, besides security, is the impact on the performance in web apps. When your frontend sends an HTTP request to a different domain or subdomain, the browser will send an additional HTTP called preflight request, to see whether the server accepts messages from the sender’s domain.
+
+So for each HTTP request triggered by the frontend, the browser needs to send two HTTP requests, increasing the overall response time. In most cases, the added delay is visible in web apps and adversely affects user experience.
 
 ---
 

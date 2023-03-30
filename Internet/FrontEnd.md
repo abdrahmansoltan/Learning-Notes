@@ -12,7 +12,7 @@
     - [Rollup Visualizer](#rollup-visualizer)
   - [Gulp.js](#gulpjs)
     - [Gulp vs Webpack](#gulp-vs-webpack)
-  - [Pugjs](#pugjs)
+  - [Pug.js](#pugjs)
   - [SEO](#seo)
 
 ---
@@ -114,9 +114,9 @@ Webpack is a **bundler** whereas Gulp is a **task runner**
 
 ---
 
-## Pugjs
+## Pug.js
 
-It's a **templating engine** designed to render HTML in server-side technologies such as Node.js. Like any JavaScript templating engine, Pug.js supports writing **reusable** HTML code and rendering dynamic data.
+It's a **template engine** designed to render HTML in server-side technologies such as Node.js. Like any JavaScript template engine, `Pug.js` supports writing **reusable** HTML code and rendering dynamic data.
 
 > A template engine is a program which is responsible for compiling a template (that can be written using any one of a number of languages) into HTML. The template engine will normally receive data from an external source, which it will inject into the template it’s compiling.
 

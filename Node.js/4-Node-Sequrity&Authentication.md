@@ -20,7 +20,15 @@
     - [Sessions](#sessions)
   - [Oath2](#oath2)
     - [OAuth 2.0 With Google](#oauth-20-with-google)
-      - [passport\_js](#passport_js)
+      - [Passport.js](#passportjs)
+  - [Security Best Practices](#security-best-practices)
+    - [Compromised Database](#compromised-database)
+    - [Brute Force Attacks](#brute-force-attacks)
+    - [Cross-Site Scripting (XSS) Attacks](#cross-site-scripting-xss-attacks)
+      - [Helmet](#helmet)
+    - [Denial of Service (DOS) Attacks](#denial-of-service-dos-attacks)
+    - [NOSQL Query Injection](#nosql-query-injection)
+    - [Other Best Practices](#other-best-practices)
 
 ---
 
@@ -34,6 +42,7 @@
 
 ### TLS Certificates
 
+![Certificates](./img/certificates-1.png)
 ![Certificates](./img/certificates.PNG)
 
 ---
@@ -42,9 +51,7 @@
 
 ![https](./img/drown-attack-openssl-vulnerability.png)
 
-- video 184
-
-- [npm helmet](https://www.npmjs.com/package/helmet?activeTab=versions)
+- video 184 for creating ssl-certificate using `openssl`, to use **HTTPS** with node
 
 ---
 
@@ -173,6 +180,8 @@ app.use(cors(corsOptions)); // global Middleware to all routes
 
 > see Authentication section in the [database-notes file](../Databases/Database-SQL.md#jwt)
 
+It's an **access token** which is like `api key` as it uniquely identify a specific user in an application, and then act as set of credentials for that user
+
 ![jwt](./img/jwt.PNG)
 
 **JWT:** is a stateless solution for authentication
@@ -181,6 +190,10 @@ app.use(cors(corsOptions)); // global Middleware to all routes
 
 - It's `Stateless`, so there's no need to store any session-state on the server which is perfect for Restful-APIs
 - It's very useful when you have 2 or more separate servers or `load-balancers` that share the same `secret-key` and you can access them without having to `log in` each time
+- It's based on **Modern Token Authentication** (Bearer Token)
+  ![token authentication](./img/token-authentication.png)
+
+---
 
 ### How JWT Works
 
@@ -352,6 +365,8 @@ HTTP is stateless. All the requests are stateless. However, there are situations
 
 ### Cookie-vs-Token
 
+> More on cookies [here](../JavaScript/04-API.md#cookies)
+
 ![cookie-vs-token](./img/cookie-vs-token.png)
 
 There're pros and cons for each, and based on situation we choose what suits us, more on that [here](https://developer.okta.com/blog/2022/02/08/cookies-vs-tokens)
@@ -369,6 +384,21 @@ There're pros and cons for each, and based on situation we choose what suits us,
 
 ### Sessions
 
+**Sessions** are a way of storing data about current active user, ex: name of user, last page the user visited
+
+- What we store in a session is data that we wouldn't want the user to modify in the browser directly, ex: user permissions
+- the client can read and access data in sessions but can't modify it
+- sessions have short life, and only kept during the time the user is interacting with it, unlike data in database which is permanent
+
+  - sessions are tied to the specific browser and the temporary state of the application on that browser
+
+- How to store sessions data
+  - **server-side sessions**
+    - lives in the server on a database and the sessions-data will get looked-up for each request that the user makes and potentially deleting it when the user logs-out or close the browser
+    - in most cases we don't need to store the session in the server unless we have a very large session, which is good to be stored in a server-database
+  - **client-side sessions** --> **Cookies**
+    - lives in the browser's cookies
+
 ![sessions](./img/sessions.PNG)
 
 Here, the server will create a session for the user after the user logs in. The session id is then **stored on a cookie on the user’s browser**. While the user stays logged in, the cookie would be sent along with every subsequent request. The server can then compare the session id stored on the cookie against the session information stored in the memory to verify user’s identity and sends response with the corresponding state!
@@ -377,10 +407,16 @@ Here, the server will create a session for the user after the user logs in. The 
 
 ## Oath2
 
-OAuth 2.0, which stands for “Open Authorization”, is a standard designed to allow a website or application to access resources hosted by other web apps(ex: `google sign in`) on behalf of a user.
+OAuth 2.0, which stands for "Open Authorization", is a standard designed to allow a website or application to access resources hosted by other web apps(ex: `google sign in`) on behalf of a user.
 
-![oath](./img/oath.PNG)
-![oath](./img/auth2.PNG)
+- It defines the flow (process) that goes behind the scenes when logging-in to a site like Google
+
+> The problem that `Oath` tries to solve is that we want the users to access application without putting their passwords into untrusted sites
+
+- Flow (Note: replace `okta` with `google` for more understanding)
+  ![oath](./img/oath.PNG)
+- Different roles involved in the `Oath` process
+  ![oath](./img/auth2.PNG)
 
 - `OAuth 2.0` is an **authorization protocol** and NOT an authentication protocol.
 
@@ -396,8 +432,116 @@ OAuth 2.0, which stands for “Open Authorization”, is a standard designed to 
 - [source](https://developers.google.com/identity/protocols/oauth2)
 - Video 193
 
-#### [passport_js](https://www.passportjs.org/)
+To use Oath with Node.js, we use `passport.js`
 
-Passport is authentication middleware for Node.js
+#### Passport.js
 
-- each `strategy` implies a package
+[passport_js](https://www.passportjs.org/) is authentication middleware for Node.js
+
+- It's a NPM package that provide **authentication middleware** for Node.js
+
+- It provides a common way for authentication regarding of the provider or flow you are using, it does so using some plugins (packages) that plug-in to `passport`, these packages are called **"Strategies"**
+- We can make use of the multiple authentication strategies available [here](https://www.passportjs.org/packages/)
+  - each `strategy` implies a package
+
+---
+
+## Security Best Practices
+
+### Compromised Database
+
+Means that attacker gained access to the DB, to avoid this:
+
+- We must always encrypt passwords with salt and hash (bcrypt)
+  - So that the attacker can't steal the users' passwords
+- We must always encrypt passwords reset tokens (SHA 256)
+
+  - So that the attacker can't reset the users' passwords
+
+---
+
+### Brute Force Attacks
+
+It's where the attacker tries to guess a password by trying millions of random passwords until they find the right one. what we can do is (strategies):
+
+- Make the login request really slow using the `bcrypt` package
+- Implement rate limiting (`express-rate-limit`) which limits the number of requests coming from one single **IP**
+- Implement a maximum number of login attempts for each user
+
+---
+
+### Cross-Site Scripting (XSS) Attacks
+
+It's where the attacker tries to inject scripts into our page to run his malicious code from the client-side
+
+- It allows the attacker to read the local storage, **which is the reason that we should never store the JSON web token in local storage**. instead, it should be stored in an HTTP-only cookie so that the browser can only receive and send the cookie, but can't access or modify it in any way.
+
+  - by doing so, that makes it impossible for any attacker to steal the **JWT** that is stored in the cookie
+  - this is done by using `httpOnly`
+    ![cookies-HttpOnly](./img/cookies-HttpOnly.png)
+
+    ```js
+    const cookieOptions = {
+      // ...
+      httpOnly: true // cookie can't be accessed or modified by the browser (To prevent XSS attacks)
+    };
+
+    // Send JWT via cookie
+    res.cookie('jwt', token, cookieOptions);
+    ```
+
+- On the **Backend-side**, in order to prevent XSS attacks, we should sanitize user input data and set some special HTTP headers (`helmet` package) which makes these attacks a bit more difficult to happen
+
+#### Helmet
+
+[helmet](https://www.npmjs.com/package/helmet?activeTab=readme) is a NPM package that contains collection of middlewares that help us secure our servers by plugging all common issues that node.js server might have
+
+- It should be at the top of the middleware-chain, so that every request passes through it
+
+```js
+// Middleware to set security HTTP headers
+app.use(helmet());
+```
+
+---
+
+### Denial of Service (DOS) Attacks
+
+It happens when the attacker sends so many requests to a server that it breaks-down, and the application becomes unavailable
+
+- Implementing **rate-limiting** is a good solution for this -> (`express-rate-limit`)
+- Also, we should limit the amount of data that can be sent in a `body` in a `POST` or `PATCH` requests
+- Also, we should avoid using (so called: **evil regular expressions**) to be in our code, which are regular expressions that takes an exponential time to run for non-matching inputs, and they can be exploited to bring the entire application down
+
+---
+
+### NOSQL Query Injection
+
+It happens when the attacker injects some query (instead of inputting valid data) in order to create query-expressions that are going to be translated to `true`
+
+> EX: logging in without providing a valid username or password
+
+- Using **Mongoose** for **MongoDB** is a good strategy for preventing these kind of attacks, because a good schema forces each value to have a well-defined value using the **SchemaTypes**, which effectively makes this type of attacks very difficult to execute
+- Also, it's still recommended to sanitize input data, just to be sure
+
+---
+
+### Other Best Practices
+
+- ✅ Always use HTTPS
+  - In production applications, all communication between server and client needs to happen over HTTPS, otherwise anyone can listen into the conversation and steal the user's JSON-Web-Token (JWT)
+- ✅ Create random password reset tokens with expiry dates
+  - It should be random and not generated from other things like dates, because they are effectively passwords and they should be treated as such
+- ✅ Deny access to JWT after password change
+  - We must revoke the token as soon as the user changes the password
+- ✅ Don’t commit sensitive config data to Git
+- ✅ Don’t send error details to clients
+- ⚛ Prevent **Cross-Site Request Forgery** (`csurf` package)
+  - It's an attack that forces a users to execute unwanted actions on a web application in which they are currently logged-in
+- ⚛ Require re-authentication before a high-value action (ex: payment)
+- ⚛ Implement a blacklist of untrusted JWT
+- ⚛ Confirm user email address after first creating account
+- ⚛ Keep user logged in with refresh tokens
+- ⚛ Implement two-factor authentication
+- ↘ Prevent parameter pollution causing Uncaught Exceptions
+  - this attack is used to crash applications

@@ -204,6 +204,7 @@ if a client, or the server, or both, need information about the state of the oth
 We need HTTPS for **Privacy, integrity, and identification.**
 
 - **Privacy** means that no one can eavesdrop on your messages.
+  - without `https`, anyone using the same network can access the requests/responses from a `http` connection, and when using `https` the data sent/received is encrypted using **TLS** protocol
 - **Integrity** means that the message is not manipulated on the way to its destination.
   - This is often called a **man-in-the-middle attack**.
   - a manipulation could be done by a malware

@@ -231,7 +231,7 @@ If there are two or more CSS rules that point to the same element, the selector 
     }
     ```
 
-  - `outline` is an animated property
+  - **`outline` is an animated property**
 
 - inline elements respect padding & margin **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they don't respect `width`/`height`
 - to make global reset for margin/padding => use `*` and not `body`
@@ -545,9 +545,17 @@ p {
 - `color`: the color of box-shadow (Optional)
 - `inset` to add border from the inside and not outside (Optional) => ex:
 
-```css
-box-shadow: inset 0 0 0 3px #fff;
-```
+  ```css
+  box-shadow: inset 0 0 0 3px #fff;
+  ```
+
+- sometimes it's used instead of border, as it doesn't affect the size of the element and doesn't cause shifting of other elements
+
+  ```css
+  .btn:hover {
+    box-shadow: 0 2px green;
+  }
+  ```
 
 ---
 

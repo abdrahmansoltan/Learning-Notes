@@ -48,9 +48,11 @@
       - [installation](#installation)
   - [Improving Performance](#improving-performance)
     - [Running multiple node-processes](#running-multiple-node-processes)
-      - [Node Cluster Module](#node-cluster-module)
-      - [Process Manager 2 (PM2)](#process-manager-2-pm2)
-  - [Work Threads](#work-threads)
+      - [Improve performance: Node Cluster Module](#improve-performance-node-cluster-module)
+      - [Improve performance: Load Balancing](#improve-performance-load-balancing)
+      - [Process Manager 2 (PM2 tool)](#process-manager-2-pm2-tool)
+    - [Worker Threads](#worker-threads)
+  - [Node.js Best Practices](#nodejs-best-practices)
 
 ---
 
@@ -454,6 +456,8 @@ It's not found in the browser APIs, `Process` relates to the global node executi
        // now we can access the variables in the config file like this:
        console.log(process.env.PORT);
        ```
+
+       - when calling the `.config()` method on the `dotenv`, it populates the `process.env` object with the values in the `.env` file
 
 - `process.stdout` it's like `console.log` but it does not force a new line break. This allows you to create helpful tools like progress bars.
 
@@ -908,13 +912,21 @@ it's a 3rd party library can be used instead of the above
 
 ## Improving Performance
 
+Node.js makes use of the thread-pool to handle multiple requests coming at the same time and by passing input/output tasks that takes longer time to complete
+
+- This is done so that the (javascript-code and the event-loop) don't get blocked, even though the code is running on a single thread
+- When running on a single processor, each request on the server will wait for the previous request to finish, which is not good for performance
+
 ### Running multiple node-processes
+
+When dealing with servers that are overloaded with so much work, it's best to divide that work and spread the load
 
 ![model](./img/model.PNG)
 
-- node.js runs on a single thread, so to do multithreading:
+- node.js runs on a single thread, So to do multi-threading we can:
 
   - run node on multiple processes side-by-side to share the `work`
+    - spreading the request between multiple node.js processes that response to the same request in the same way, So that they share the load evenly
   - it means that instead of taking each request and handling it in `one node server (process)`, we instead `spread` the requests out between multiple node.js processes
   - they run side-by-side without effecting the performance
 
@@ -922,21 +934,28 @@ it's a 3rd party library can be used instead of the above
 
 ---
 
-#### Node Cluster Module
+#### Improve performance: Node Cluster Module
 
-The Node. js Cluster module enables the creation of child processes (workers) that run simultaneously and share the same server port. Each spawned child has its own event loop, memory, and V8 instance.
+> **Cluster Module** allows us to create copies of the Node-process that each run the server-code side-by-side in parallel
+
+The Node.js Cluster module enables the creation of child processes (workers) that run simultaneously and share the same server port. Each spawned child has its own event loop, memory, and V8 instance.
 
 ![cluster](./img/cluster.PNG)
 
-- each time you use `fork()` method you create new process
+- How it works:
 
-- the number of process should equall number of `cors in the cpu`
+  1. when running node.js application, the main node process is created which is called: **"master process"**
+  2. Inside of the cluster module, we have access to a function called `fork()`, which is used to create copies of the `master` process called **"worker processes**
+  3. the worker-processes are responsible for doing the heavy work of (taking HTTP requests, process them and respond to them)
+
+- each time you use `fork()` method you create new process
+- the number of process should equal number of `cors in the cpu`
 
   ```js
   const NUM_WORKERS = os.cups().length;
   ```
 
-- this is similar to `Load Balancer` or `Horizontal Scalling` or `round robin`
+- this is similar to `Load Balancer` or `Horizontal Scaling` or `round robin` approach
 
   ![roundRobin](./img/round-robin.webp)
 
@@ -944,11 +963,12 @@ The Node. js Cluster module enables the creation of child processes (workers) th
 const cluster = require('cluster');
 const os = require('os');
 
+// check if in the master-process (the first time the server runs)
 if (cluster.isMaster) {
   // any code here will be executed first time whe server is executed
-  console.log('master has started');
+  console.log('master process has been started');
 
-  const NUM_WORKERS = os.cups().length;
+  const NUM_WORKERS = os.cpus().length; // each process requires single core in the computer-processor (CPU)
 
   for (let i = 0; i < NUM_WORKERS; i++) {
     cluster.fork(); // create a worker
@@ -962,11 +982,25 @@ if (cluster.isMaster) {
 
 ---
 
-#### Process Manager 2 (PM2)
+#### Improve performance: Load Balancing
+
+**Load balancing**: is the process of distributing a set of tasks over a set of resources (computing units), with the aim of making their overall processing more efficient
+
+- The **load balancer** is what takes requests and distribute the responsibility of handling these requests and share them between different processes or applications
+- load balancing applies when running multiple (servers or processes in parallel) **each handling the same kind of request**
+  - ex using the same route
+- this is related to **Horizontal Scaling**
+
+> In Node.js, we can use the **cluster-module** to do load balancing of requests as they come-in to the Node-HTTP-server using the **Round-Robin** algorithm to determine which process handles the requests
+
+---
+
+#### Process Manager 2 (PM2 tool)
+
+It's much easier way than `Node Cluster Module` for using Load balancing and to control processes
 
 - [PM2](https://pm2.keymetrics.io/)
 - [NPM PM2](https://www.npmjs.com/package/pm2)
-- It's much easier than `Node Cluster Module`
 
 ```js
 console.log('worker has started');
@@ -983,7 +1017,16 @@ pm2 start server.js -l logs.txt -i max
 
 ---
 
-## Work Threads
+### Worker Threads
+
+The `worker_threads` module enables the use of threads that execute javascript in parallel
+
+- worker-threads are useful for performing CPU-intensive javascript operations
+
+  - They don't help much with I/O operations, as the Node.js built-in asynchronous I/O operations are more efficient than worker-threads can be
+
+- worker-threads is a new feature coming from a new feature in the V8 engine called: **"V8-isolates"**, they're like VMs running js-code together which enables us to mimic having multiple threads in javascript
+  ![workThreads](./img/worker-threads.png)
 
 - `work threads` vs `clusters`
 
@@ -992,3 +1035,7 @@ pm2 start server.js -l logs.txt -i max
 - `work threads` make us work on one process with multiple threads
 
 ---
+
+## Node.js Best Practices
+
+[Node.js Best Practices Repository](https://github.com/goldbergyoni/nodebestpractices)

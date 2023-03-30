@@ -7,6 +7,7 @@
     - [multi-page application](#multi-page-application)
     - [single-page application (SPA)](#single-page-application-spa)
   - [installation](#installation)
+    - [Folder Structure and Assets](#folder-structure-and-assets)
     - [`react` and `react-dom` modules(libraries)](#react-and-react-dom-moduleslibraries)
   - [JSX](#jsx)
     - [Dynamic expressions in JSX](#dynamic-expressions-in-jsx)
@@ -28,9 +29,10 @@
     - [Portals](#portals)
       - [Modal notes](#modal-notes)
     - [Smart vs Dumb components](#smart-vs-dumb-components)
-    - [Forms: Controlled vs uncontrolled components](#forms-controlled-vs-uncontrolled-components)
-      - [Controlled components](#controlled-components)
-      - [Uncontrolled components](#uncontrolled-components)
+  - [Forms: Controlled vs uncontrolled components](#forms-controlled-vs-uncontrolled-components)
+    - [Controlled components](#controlled-components)
+      - [Controlled Form with FormData API](#controlled-form-with-formdata-api)
+    - [Uncontrolled components](#uncontrolled-components)
   - [Props](#props)
     - [single prop](#single-prop)
     - [Multiple props](#multiple-props)
@@ -117,7 +119,7 @@ React is based on these concepts:
 
 ## installation
 
-- **`npx`** is a command that lets you run code built with Node.js and published through the NPM registry (It's a Node.js package runner). It's used to execute commands without installing dependencies (**install latest version of something and run it immediately**)
+- **`npx`** is a command that lets you run **(execute)** code built with Node.js and published through the NPM registry without installing it first locally (It's a Node.js package runner). It's used to execute commands without installing dependencies (**install latest version of something and run it immediately**)
 
 ```bash
 npx create-react-app my-app # equivalent to installing react globally first then >> creating react app
@@ -134,13 +136,12 @@ npm start
     - reduce number of HTTP requests for performance
   - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
   - Enables easy testing & deployment
+- **Vite** can also be used instead of `create-react-app`
+  - with `vite`, the starting file will be `main.jsx` instead of `index.js`
 - one `HTML` file is delivered => `index.html`
 - When using the `Create-React-App` tool you are provided with a handy script(command) `eject` that allows you to configure Webpack among other features at your heart content.
 
   - > if you use the script `npm run eject`, it will get you `config` folder which is everything that `create-react-app` does, and it's not recommended to change it or even to `eject` as the configuration is made by people who figured out the best configuration
-
-- **Folder structure**
-  ![folder-structure](./img/react-folder-structure.png)
 
 - in `index.js` you render the app to `index.html`
 
@@ -153,6 +154,24 @@ npm start
     document.getElementById('root')
   );
   ```
+
+> **StrictMode**: It's a tool for highlighting potential problems in the app. It provides additional checks and warnings for its descendence-components when using legacy or soon to be deprecated code.
+>
+> - It only runs in dev-mode and may result **rendering twice** so that it can catch any weird behaviors that might occur in the side-effects inside the functional component, and **won't run in production mode** so no logs will be shown there
+> - also the re-render happens when the props change, which is the case when providing props
+
+---
+
+### Folder Structure and Assets
+
+- **Folder structure**
+  ![folder-structure](./img/react-folder-structure.png)
+- **Images**
+  - external images (hosted on different server) -> just need url
+  - local images **(public folder)** -> less performant
+  - local images **(src folder)** -> better solution for assets, since under the hood they get optimized
+
+---
 
 ### `react` and `react-dom` modules(libraries)
 
@@ -225,7 +244,12 @@ React.createElement(
 
 ## Virtual DOM vs Real DOM
 
-**Dom Manipulation** can be very slow and heavy. For example, if you have several image tags inside a div and you replace one of the images inside with a different image source, the DOM re-renders the entire div. What would happen if you frequently update and make a lot of transformations? To address this problem, the React developers came up with an idea to manipulate the VDOM instead which is faster since nothing gets drawn on your browser.
+**Dom Manipulation** can be very slow and heavy. For example, if you have several image tags inside a div and you replace one of the **images**
+
+- external images (hosted on different server) -> inside with a just need url
+- external images (hosted on different server) -> inside with a just need url
+- external images (hosted on different server) -> inside with a just need url
+  different image source, the DOM re-renders the entire div. What would happen if you frequently update and make a lot of transformations? To address this problem, the React developers came up with an idea to manipulate the VDOM instead which is faster since nothing gets drawn on your browser.
 
 - **Virtual DOM (VDOM)**: is a concept where a virtual representation of a UI is kept in `memory` as an object **(snapshot of what the real DOM looks like)**, and synced with the real DOM by a library (such as ReactDOM). which makes changes to the virtual DOM and not the Real DOM
 
@@ -404,9 +428,11 @@ They are the building blocks of React
   - Keys should be given to the elements inside the array to give the elements a stable identity.
   - If you don't have unique `Id` for rendered items, You may use the iteration **index** as a `key` as a last resort:
 
-  ```js
-  const listItems = numbers.map((number, index) => <li key={index}>{number}</li>);
-  ```
+    - This is not recommended, only use it if you know that the list won't change
+
+      ```js
+      const listItems = numbers.map((number, index) => <li key={index}>{number}</li>);
+      ```
 
 ```js
 const numbers = [1, 2, 3, 4, 5];
@@ -506,11 +532,11 @@ ReactDOM.createPortal(child, container);
 
 ---
 
-### Forms: Controlled vs uncontrolled components
+## Forms: Controlled vs uncontrolled components
 
 In React, there are two ways to handle **Form data** in our components.
 
-#### Controlled components
+### Controlled components
 
 Controlled components are those in which form data is handled by the component’s state.
 
@@ -549,7 +575,75 @@ function App() {
 }
 ```
 
-#### Uncontrolled components
+---
+
+#### Controlled Form with FormData API
+
+> more onn FormData [here]('../../../JavaScript/01-JS.md#formdata-api')
+
+It can be used to automatically create a object-ready format for a form in the state without
+
+```jsx
+import { useState } from 'react';
+
+const UncontrolledInputs = () => {
+  const [value, setValue] = useState(0);
+
+  const handleSubmit = e => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget); // get values one by one
+
+    const name = formData.get('name');
+    console.log(name); // get all of them
+    const newUser = Object.fromEntries(formData); // do something (post request, add to list, etc)
+
+    // Gotcha - re-render won't clear out the values
+    setValue(value + 1);
+
+    // Reset values
+    e.currentTarget.reset();
+  };
+
+  return (
+    <div>
+      <form className='form' onSubmit={handleSubmit}>
+        <h4>Form Data API</h4>
+        {/* name */}
+        <div className='form-row'>
+          <label htmlFor='name' className='form-label'>
+            name
+          </label>
+          <input type='text' className='form-input' id='name' name='name' />
+        </div>
+        {/* email */}
+        <div className='form-row'>
+          <label htmlFor='email' className='form-label'>
+            Email
+          </label>
+          <input type='email' className='form-input' id='email' name='email' />
+        </div>
+        {/* email */}
+        <div className='form-row'>
+          <label htmlFor='password' className='form-label'>
+            Password
+          </label>
+          <input type='password' className='form-input' id='password' name='password' />
+        </div>
+
+        <button type='submit' className='btn btn-block'>
+          submit
+        </button>
+      </form>
+    </div>
+  );
+};
+export default UncontrolledInputs;
+```
+
+---
+
+### Uncontrolled components
 
 Uncontrolled components are those for which the form data is handled by the DOM itself. **"Uncontrolled"** refers to the fact that these components are not controlled by React state.
 

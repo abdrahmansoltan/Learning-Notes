@@ -2,14 +2,16 @@
 
 - [INDEX](#index)
   - [Performance Optimization in React](#performance-optimization-in-react)
+    - [Reasons for re-renders for react components](#reasons-for-re-renders-for-react-components)
   - [useCallback()](#usecallback)
     - [Using `useCallback` to fix `useEffect()` infinite-loop-rendering problem](#using-usecallback-to-fix-useeffect-infinite-loop-rendering-problem)
   - [useMemo()](#usememo)
-  - [memo()](#memo)
+  - [React.memo()](#reactmemo)
+  - [useTransition](#usetransition)
   - [PureComponent](#purecomponent)
   - [Code Splitting \& Dynamic Imports](#code-splitting--dynamic-imports)
     - [`React.lazy()`](#reactlazy)
-    - [`<Suspense>`](#suspense)
+    - [React Suspense](#react-suspense)
   - [React DevTools Profiler](#react-devtools-profiler)
 
 ---
@@ -28,14 +30,30 @@ A log of people want to write react app that is performant. But You shouldn't ov
 
 ---
 
+### Reasons for re-renders for react components
+
+- Reasons:
+  - passed props changes
+  - component's state changes
+  - parent component re-renders
+    - sometimes, we can fix this by **Lowering the state** moving it to where it's used instead of passing it down
+
+---
+
 ## useCallback()
 
-[read more here..](https://dmitripavlutin.com/dont-overuse-react-usecallback/)
+> [read more here..](https://dmitripavlutin.com/dont-overuse-react-usecallback/)
+
+It allows us to memoize (remember) a function, which is useful if we have an expensive function that we only want to re-compute when its dependencies change
 
 ![useCallback](./img/useCallback.png)
 
-- `useCallback` Hook returns a memoized callback function.
-- It only runs when one of its dependencies-array updates.
+- it takes 2 arguments:
+  - function we want to memoize
+  - array of dependencies
+- `useCallback` Hook returns a memoized version of the callback function.
+- It only runs when one of its dependencies-array changes.
+  - if any state-item is used in the function, we must put it in the dependencies-array to prevent the memoized function from running with **outdated-state-items**
 
 > "Every callback function should be memoized to prevent useless re-rendering of child components that use the callback function"
 
@@ -100,11 +118,11 @@ const App = () => {
 
 ---
 
-## memo()
+## React.memo()
 
 > When deciding to update DOM, React first renders your component, then compares the result with the previous render. **If the render results are different, React updates the DOM**.
 
-- When a component is wrapped in `memo()` method, React renders the component and memoizes the result. Before the next render, if the **new props** are the same, React reuses the memoized result which means -> **skipping the next rendering.**
+When a component is wrapped in `memo()` method, React renders the component and memoizes the result. Before the next render, if the **new props** are the same, React reuses the memoized result which means -> **skipping the next rendering.**
 
 > This comes at a cost of storing the previous component in memory and comparing it each time, so It's best to use it if you have big component that has a lot of child-components.
 
@@ -113,6 +131,39 @@ const App = () => {
 - If you have a component wrapped in `React.memo()` and the props from the parent-component is a **callback-function** for and event or other -> you should put the callback in a `useCallback()` hook as each time the parent element renders it will also render the callback-function unless it's in an `useCallback()` hook.
 - watch out for props that is a **reference type** (e.g functions,objects,arrays,..) as they will be recreated each time the parent component rerenders which will make the prop different each time
   - To solve this we use [useCallback](#usecallback)
+
+---
+
+## useTransition
+
+> In order to use `useTransition()` hook, make sure to [enable the concurrent mode](https://github.com/reactwg/react-18/discussions/5).
+
+It's a React hook that lets you update the state without blocking the UI
+
+> Ex: filtering on each letter-input, which will block the UI (make it not responsive) until the filtering is done
+
+- By default, all updates in React are considered **urgent**. That could create a problem when quick updates are slowed down by heavy updates.
+  ![useTransition](./img/useTransition-1.svg)
+
+- `useTransition()` is the hook that lets you access **concurrent mode** features inside of the React component.
+- Invoking `const [isPending, startTransition] = useTransitionHook()` returns an array of 2 items:
+  - `isPending`: indicates that the transition is pending
+  - `startTransition(callback)`: allows you to mark any UI updates inside callback as transitions.
+
+```jsx
+import { useTransition } from 'react';
+function MyComponent() {
+  const [isPending, startTransition] = useTransition();
+  // ...
+  const someEventHandler = event => {
+    startTransition(() => {
+      // Mark updates as transitions
+      setValue(event.target.value);
+    });
+  };
+  return <HeavyComponent value={value} />;
+}
+```
 
 ---
 
@@ -163,9 +214,12 @@ It is a new function in react that lets you load react components lazily through
   - In order to use `lazy()`, we need to use `<Suspense>` because the `<Suspense>` is essentially saying:
     - "I know that you are currently trying to fetch something in suspended animation (meaning it's asynchronous), So while you're waiting, tell me what to do/show"
 
-### `<Suspense>`
+### React Suspense
 
-Suspense is a component required by the `lazy()` function basically used to wrap lazy components. Multiple lazy components can be wrapped with the suspense component. It takes a fallback property that accepts the react elements you want to render as the lazy component is being loaded, like a **loading spinner**
+The **Suspense API** is a feature in React that allows you to manage the loading state of your components. It provides a way to **"suspend" rendering of a component until some data has been fetched**, and display a fallback UI in the meantime. This makes it easier to handle asynchronous data loading and provide a smooth user experience
+
+- `<Suspense></Suspense>` is a component required by the `lazy()` function basically used to wrap lazy components. Multiple lazy components can be wrapped with the suspense component. It takes a fallback property that accepts the react elements you want to render as the lazy component is being loaded, like a **loading spinner**
+- usually it's for components/pages that are not rendered often
 
 ```jsx
 import { lazy, Suspense } from 'react';
@@ -174,12 +228,10 @@ const Performers = lazy(() => import('./Performers'));
 
 //...
 return (
-  <div>
-    <Suspense fallback={<h1>Still Loading…</h1>}>
-      <Artists />
-      <Performers />
-    </Suspense>
-  </div>
+  <Suspense fallback={<h1>Still Loading…</h1>}>
+    <Artists />
+    <Performers />
+  </Suspense>
 );
 ```
 

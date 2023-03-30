@@ -14,6 +14,7 @@
       - [Why use it ?](#why-use-it-)
     - [`useRef` Implementation (How to use it)](#useref-implementation-how-to-use-it)
   - [Effect Hook](#effect-hook)
+    - [You might not need an Effect](#you-might-not-need-an-effect)
     - [`useEffect`](#useeffect)
     - [`useEffect` dependency array](#useeffect-dependency-array)
     - [`useEffect` cleanup function](#useeffect-cleanup-function)
@@ -21,7 +22,7 @@
     - [ACtion generator functions](#action-generator-functions)
     - [Not recommended ways of using reducer function](#not-recommended-ways-of-using-reducer-function)
     - [reducer function with Immer](#reducer-function-with-immer)
-  - [Context: `useContext()`](#context-usecontext)
+  - [Context API](#context-api)
     - [Prop drilling](#prop-drilling)
     - [Solution for Prop drilling: (context)](#solution-for-prop-drilling-context)
     - [context setup](#context-setup)
@@ -56,6 +57,8 @@ React functional components are **Pure Functions** which depend on the component
 
 - `setState()` schedules an update to a component’s state object. When state changes, the component responds by `re-rendering`.
   - it happens `ASynchronously` as react finds the best strategy to change it, so it's better to use a callback function inside of `setState`
+
+> By default, React 18 uses a technique called **"auto-batching"** to group state updates that occur within the same event-loop into a single update. This means that if you call the state-update function multiple times in a short period of time, **React will only perform a single re-render for all of the updates**
 
 ### State is Async
 
@@ -216,14 +219,58 @@ It allows a component to get a reference to a DOM nodes/elements that it creates
 - It can be used to access a DOM nodes/elements directly **with a preserved value**
 - most of the time it's used with DOM elements, but it can hold a reference to any value
 
-  - It can be used to store a mutable value that does not cause a re-render when updated.
-    - It doesn't trigger re-render
+- It can be used to store a mutable value that does not cause a re-render when updated.
+
+  - **It doesn't trigger re-render**
   - It allows you to persist values between renders.
 
-- usually used For:
+- **usually used For:**
+
   - **form-input**
   - Accessing DOM elements
-    - used when you need to have programmatic access to a DOM node
+
+    - used when you need to have programmatic access to a DOM node like:
+
+      - a form input or an element that you want to focus on
+      - getting the dimensions of an element (`height`, `width`)
+
+        ```jsx
+        const [height, setHeight] = useState(0);
+        const refContainer = useRef(null);
+
+        useEffect(() => {
+          setHeight(refContainer.current.getBoundingClientRect().height); // getBoundingClientRect() returns the size of an element and its position relative to the viewport (window)
+        }, []);
+
+        return (
+          <div ref={refContainer}>
+            <h1>hello world</h1>
+          </div>
+        );
+        ```
+
+      - getting the scroll position of an element (`scrollTop`, `scrollLeft`)
+
+  - Doing a functionality in each render except initial render
+
+    ```js
+    const [value, setValue] = useState(0);
+    const refContainer = useRef(null);
+    const isMounted = useRef(false);
+
+    useEffect(() => {
+      if (!isMounted.current) {
+        // in initial render
+        isMounted.current = true;
+        return;
+      }
+
+      // in other re-renders except initial-render
+      console.log('re-render');
+    }, [value]);
+    ```
+
+---
 
 #### Why use it ?
 
@@ -273,15 +320,15 @@ function App() {
 }
 ```
 
-**Note**: You can also access form-inputs with `useState` ->
+- **Note**: You can also access form-inputs with `useState`:
 
-```js
- handleChange(e) {
-  setState(e.target.value);
-}
+  ```jsx
+  handleChange(e) {
+    setState(e.target.value);
+  }
 
-<input type="text" value={state} onChange={handleChange} />
-```
+  <input type="text" value={state} onChange={handleChange} />
+  ```
 
 ---
 
@@ -301,6 +348,18 @@ function App() {
 > - React has no tools, objects, functions for making HTTP requests
 > - React only cares about showing content and handling user events
 
+---
+
+### You might not need an Effect
+
+> More [Here](https://react.dev/learn/you-might-not-need-an-effect)
+
+`useEffect` is used most of the time for **fetching data**, and this process is now replaced by: (`libraries`, `react query`, `rtk query`, `swr` of `next.js`)
+
+- by using these alternatives, we can use less `useEffect`
+
+---
+
 ### `useEffect`
 
 It's a function from React used to run code **(always)** when a component is initially **rendered** and **(sometimes)** when it's re-rendered
@@ -312,13 +371,14 @@ It's a function from React used to run code **(always)** when a component is ini
 
 - it happens after all other functions and state
   ![useEffect-callback](./img/react-useeffect-callback-3.svg)
+- we can have multiple `useEffect()`(Effects) in the component for different state fields
 
-- use cases:
+**use cases:**
 
-  - making a request on page load
-  - adding event listener on page load
+- making a request on page load
+- adding event listener on page load
 
-    - make sure not to forget the dependency array here to prevent infinite-rendering and to add a cleanup function
+  - make sure not to forget the dependency array here to prevent infinite-rendering and to add a cleanup function
 
     ```js
     useEffect(() => {
@@ -327,6 +387,16 @@ It's a function from React used to run code **(always)** when a component is ini
       });
     }, []);
     ```
+
+- doing something after some time on page load using `useTimeout()`
+
+  ```js
+  useEffect(() => {
+    setTimeout(() => {
+      setSize(window.innerWidth);
+    }, 3000);
+  }, []);
+  ```
 
 ---
 
@@ -380,13 +450,17 @@ It's a function from React used to run code **(always)** when a component is ini
   - ex: event listeners, because we want to stop listening to events when re-rendering or we will have a new event listener created on each render and we would have multiple listeners which is BAD
     ![useEffect-cleanup](./img/useEffect-cleanup-2.png)
 
-- **Note:** `useEffect` function can't be `async` because it shouldn't return a promise, as it only returns the cleanup function
+- **Note:** `useEffect` cb-function can't be `async` because it can't return a promise, as it only returns the cleanup function
+
+  - but the execution code inside the cb-function can contain async-functions
 
   ```js
   useEffect(async () => {}, []); // ❌
+
   // ---------------------------------------- //
+
   getUsers = async () => {};
-  useEffect(async () => {
+  useEffect(() => {
     getUsers(); // ✅
   }, []);
   ```
@@ -520,7 +594,7 @@ The reducer function should only care about updating the state, It shouldn't wor
 
 ---
 
-## Context: `useContext()`
+## Context API
 
 Context provides a way to pass data through the component tree without having to pass props down manually at every level
 
@@ -703,14 +777,15 @@ function Component5() {
 - ✅ Call Hooks from React function components.
 - ✅ Call Hooks from custom Hooks
 - ✅ Call Hooks in a component that its name is uppercase
+- ❌ Don't call hooks conditionally
 
 ```js
-❌ not calling hook directly in the component
+// ❌ not calling hook directly in the component
 if (condition) {
-  useEffect(() => {});
+  useEffect(() => {}); // Don't call hooks conditionally
 }
 
-✅ calling hook directly in the component
+// ✅ calling hook directly in the component
 useEffect(() => {
   if (condition) {
   }

@@ -7,7 +7,7 @@
   - [Set Up](#set-up)
   - [Router Components](#router-components)
     - [`Route` Component](#route-component)
-      - [Nested Routes (`outlet`)](#nested-routes-outlet)
+      - [Nested Routes with `outlet` (Index Pages)](#nested-routes-with-outlet-index-pages)
     - [`Switch` Component](#switch-component)
     - [`Redirect` component](#redirect-component)
     - [`Link` component](#link-component)
@@ -16,6 +16,8 @@
   - [Dynamic Routes (Params)](#dynamic-routes-params)
   - [Programmatically navigation](#programmatically-navigation)
     - [Accessing the page's url](#accessing-the-pages-url)
+  - [Protected Routes (Guarding Routes)](#protected-routes-guarding-routes)
+    - [Steps (Implementation)](#steps-implementation)
   - [Prompt](#prompt)
 
 ---
@@ -45,7 +47,9 @@ React Router turns React projects into single-page applications. It does this by
     ![fake-client-side-routing](./img/fake-client-side-routing-1.png)
 
 - **Real CSR** -> **React Router**
-  ![react router](./img/react-router-1.png)
+
+  - Here, all the HTML, Javascript, and CSS is loaded initially, and then the browser only loads the data that is needed for the page (the functionality is handled by javascript)
+    ![react router](./img/react-router-1.png)
 
   - sites that exclusively use client-side routing are **single-page-applications SPA**
     ![react router](./img/react-router-2.png)
@@ -86,11 +90,6 @@ React Router turns React projects into single-page applications. It does this by
     </React.StrictMode>
   );
   ```
-
-  > **StrictMode**: provides additional warnings when using legacy or soon to be deprecated code.
-  >
-  > - It may result **rendering twice** so that it can catch any weird behaviors that might occur in the side-effects inside the functional component,
-  > - also the re-render happens when the props change, which is the case when providing props
 
 - now in `App.js`
 
@@ -159,7 +158,7 @@ React Router turns React projects into single-page applications. It does this by
 
 ---
 
-#### Nested Routes (`outlet`)
+#### Nested Routes with `outlet` (Index Pages)
 
 if you want nested Routes, we need to identify where the (nested-route corresponding component) will be using the **`<Outlet/>` component**:
 
@@ -195,7 +194,7 @@ function Home() {
 
   - It determines if the route is an index(root) route. Index routes render into their parent's Outlet at their parent's URL (like a default child route).
 
-    ```js
+    ```jsx
     <Route path='/teams' element={<Teams />}>
       <Route index element={<TeamsIndex />} /> // will be automatically in the <Outlet />
       <Route path=':teamId' element={<Team />} />
@@ -291,13 +290,13 @@ import { Link } from 'react-router-dom';
 
 - `<NavLink>` is just like `link`, with one additional feature:
 
-  - If at page that link would go to, the `<a>` gets a CSS class of `active`
+  - If at page that link would go to, the `<a>` gets a CSS class of **`active`**
   - This lets you stylize links to "page you are already at" using the `activeStyle` (in-line) or `activeClassName` props
 
 - You should include an `exact` prop here as well
 - It's Very helpful for navigation menus
 
-```js
+```jsx
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
 import './NavBar.css';
@@ -330,7 +329,9 @@ class NavBar extends Component {
 }
 
 // VERSION 6
-<NavLink className={navData => (navData.isActive ? 'name_of_the_class' : '')} to='/about'>
+<NavLink
+  className={navData => (navData.isActive ? 'name_of_the_custom_active_class' : '')}
+  to='/about'>
   About Us
 </NavLink>;
 ```
@@ -354,7 +355,7 @@ class NavBar extends Component {
   - to access this **param** we use `useParams` hook
 
   ```jsx
-  <Route path='/product/:id' component={Product} />
+  <Route path='/product/:productId' component={Product} />
   ```
 
   ```js
@@ -412,6 +413,80 @@ const queryParams = new URLSearchParameters(location.search);
 
 const something = queryParams.get('wanted_param');
 ```
+
+---
+
+## Protected Routes (Guarding Routes)
+
+Protected routes are a way to restrict access to certain parts of your web application based on user authentication or permissions. In this context, a protected route is a route that is only accessible by authenticated users or users with specific permissions.
+
+### Steps (Implementation)
+
+1. Create an `AuthContext`
+
+   ```jsx
+   import { createContext, useContext, useState } from 'react';
+
+   const AuthContext = createContext();
+
+   export const useAuth = () => useContext(AuthContext);
+
+   export const AuthProvider = ({ children }) => {
+     const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+     const login = () => setIsAuthenticated(true);
+     const logout = () => setIsAuthenticated(false);
+
+     const value = { isAuthenticated, login, logout };
+
+     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+   };
+   ```
+
+2. Create a `ProtectedRoute` component
+
+   ```jsx
+   import { Route, Redirect } from 'react-router-dom';
+   import { useAuth } from './AuthContext';
+
+   const ProtectedRoute = ({ component: Component, ...rest }) => {
+     const { isAuthenticated } = useAuth();
+
+     return (
+       <Route
+         {...rest}
+         render={props => {
+           return isAuthenticated ? <Component {...props} /> : <Redirect to='/login' />;
+         }}
+       />
+     );
+   };
+
+   export default ProtectedRoute;
+   ```
+
+3. Use `ProtectedRoute` in your routing
+
+   ```jsx
+   import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+   import ProtectedRoute from './ProtectedRoute';
+   import { AuthProvider } from './AuthContext';
+
+   const App = () => {
+     return (
+       <Router>
+         <AuthProvider>
+           <Switch>
+             <Route path='/login' component={Login} />
+             <ProtectedRoute path='/dashboard' component={Dashboard} />
+           </Switch>
+         </AuthProvider>
+       </Router>
+     );
+   };
+
+   export default App;
+   ```
 
 ---
 

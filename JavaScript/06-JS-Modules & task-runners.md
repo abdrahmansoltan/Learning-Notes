@@ -19,6 +19,7 @@
   - [Task runners](#task-runners)
     - [NPM](#npm)
     - [npm scripts](#npm-scripts)
+      - [Chaining commands](#chaining-commands)
       - [Pre \& Post Scripts](#pre--post-scripts)
     - [Yarn](#yarn)
     - [Package manager Notes](#package-manager-notes)
@@ -604,6 +605,22 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
   # run this after finishing development and removed (dist, modules) folders and you are ready for deployment
   npm run build
   ```
+
+#### Chaining commands
+
+- when you want to chain commands for a script like "go to folder then run `npm start`", you can use the `&&` or the `--prefix` option:
+
+  ```sh
+  cd client && npm start
+  # or
+  npm start --prefix client
+  ```
+
+- **`&` vs `&&`**
+
+  - `&`: do the second command in the background and don't wait for the first one to finish
+    - this is useful for commands with servers as servers stay working and don't finish
+  - `&&`: do the second command after the first one finishes
 
 #### Pre & Post Scripts
 

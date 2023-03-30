@@ -19,7 +19,7 @@
       - [Negating](#negating)
       - [Exceptions (error handling)](#exceptions-error-handling)
       - [othermatchers](#othermatchers)
-  - [Backend: Endpoint Testing (HTTP assertions)](#backend-endpoint-testing-http-assertions)
+  - [Backend: Endpoint / API Testing (HTTP assertions)](#backend-endpoint--api-testing-http-assertions)
     - [Framework for Endpoint Testing](#framework-for-endpoint-testing)
   - [Testing Hooks](#testing-hooks)
     - [Teardown of Suites](#teardown-of-suites)
@@ -56,7 +56,7 @@
 
 - `UI testing` at the top is also known as **Manual Testing**
 - As we go up in the pyramid, the testing time is increased. as `unit-tests` take short time, and `manual-tests & E2E` take the longest time
-- Jasmine works well with `Unit Testing` and `Integration Testing`.
+- Jasmine works well with `Unit Testing` and `Integration Testing (API Testing)`.
 
   - the difference between Unit Testing and Integration Testing is the use of third-party integration.
 
@@ -193,11 +193,18 @@ expect(true).toBe(true);
 
 ---
 
-## Backend: Endpoint Testing (HTTP assertions)
+## Backend: Endpoint / API Testing (HTTP assertions)
 
-- `endpoint`
+`endpoint`: is the `URL` of the REST API with the method that (gets, adds to, or modifies) the data of an API in some way.
 
-  - is the `URL` of the REST API with the method that (gets, adds to, or modifies) the data of an API in some way.
+- Testing APIs use tools together:
+
+  - test runner -> jest
+  - test fixtures -> a `fixture` is how your tests are setup and organized by modules
+    - each test-fixture can run in its own **environment**
+  - assertions
+  - mocking
+    - like when working with database-api, So we prevent the test from affecting the real database, so we mock the database
 
 - Benefits of Endpoint Testing
 
@@ -207,6 +214,7 @@ expect(true).toBe(true);
 
 ### Framework for Endpoint Testing
 
+- Jest
 - [Supertest](https://www.npmjs.com/package/supertest)
   - tests the status of responses from servers.
 
@@ -219,20 +227,24 @@ npm i --save-dev @types/supertest  #  compile without TypeScript errors.
 
 - ex
 
-```ts
-import supertest from 'supertest'; // the module
-import app from '../index'; // the file that have the server code
+  ```js
+  import supertest from 'supertest'; // the module
+  import app from '../index'; // the file that have the server code
 
-const request = supertest(app); // telling supertest where the server is
+  const request = supertest(app); // telling supertest where the server is
 
-describe('Test endpoint responses', () => {
-  it('gets the api endpoint', async doneCallback => {
-    const response = await request.get('/api');
-    expect(response.status).toBe(200); // success code
-    doneCallback(); // it tells supertest to close the server-calling
+  describe('Test endpoint responses', () => {
+    it('gets the api endpoint', async doneCallback => {
+      const response = await request.get('/api');
+      expect(response.status).toBe(200); // success code
+
+      // or
+      const response = await request.get('/api').expect(status).toBe(200);
+
+      doneCallback(); // it tells supertest to close the server-calling
+    });
   });
-});
-```
+  ```
 
 ---
 

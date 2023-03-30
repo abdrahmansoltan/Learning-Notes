@@ -63,6 +63,8 @@ Internet Protocol addresses are numbers that computers use to identify each othe
 - internet engineers have developed a new standard called **IPv6**.
   - IPv6 allows for a big number of unique addresses — the exact figure is `39`digits long — ensuring that the world will never again run out.
 
+---
+
 ### Packet
 
 **packet** is the basic unit of information transmitted over the internet. Splitting information up into small, digestible pieces allows the network’s capacity to be used more efficiently.
@@ -83,6 +85,8 @@ Internet Protocol addresses are numbers that computers use to identify each othe
     - amount of data the hosting company will send to your site's visitors.
 - in order to send the `0 / 1` data we want a way which has low data-loss and can transfer for long distances, thats why we use light and not electricity
   - light is transmitted in **fiber / copper** cables
+
+---
 
 ### SSL
 

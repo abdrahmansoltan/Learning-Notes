@@ -21,6 +21,7 @@
   - [Serving Files / HTML Pages](#serving-files--html-pages)
     - [Static vs Dynamic Websites / APIs](#static-vs-dynamic-websites--apis)
     - [Serving files statically](#serving-files-statically)
+    - [Serving Apps with Client-Side Routing](#serving-apps-with-client-side-routing)
   - [Template Engines](#template-engines)
     - [handlebars (hbs)](#handlebars-hbs)
   - [Error Handling](#error-handling)
@@ -401,6 +402,8 @@ http://localhost:3000/index.html
 
 - for that we specify a `public` folder which has the static files
 
+  - By using `express.static('public')`, we define that all the static assets will always automatically be served from a folder called **"public"**
+
   ```js
   // in main app --> use this middleware
   app.use(express.static(path.join(__dirname, 'public')));
@@ -415,6 +418,25 @@ http://localhost:3000/index.html
   http://localhost:3000/static/images/kitten.jpg
   http://localhost:3000/static/css/style.css
   ```
+
+---
+
+### Serving Apps with Client-Side Routing
+
+- when dealing with FE-SPA apps like `React`, we may use router like `react-router` and to do this, we need to tell express that if the endpoint-requested is not handled in the backend, we delegate the routing to the client-side-router using `/*`
+
+```js
+app.use(express.static(path.join(__dirname, 'build')));
+
+// app.get('/', function (req, res) {}) // won't work
+
+// will work
+app.get('/*', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+```
+
+> More info [here](https://create-react-app.dev/docs/deployment/#serving-apps-with-client-side-routing)
 
 ---
 

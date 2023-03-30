@@ -151,9 +151,9 @@ So it’s easy to use JSON for data exchange when the client uses JavaScript and
 
 ### Cookies
 
-Cookies are small strings of data that are stored directly in the browser. They are a part of the HTTP protocol,
+Cookies are strings of data that are stored in the browser. They are a part of the HTTP protocol,
 
-- Cookies are usually set by a web-server using the response `Set-Cookie` HTTP-header. Then, the browser automatically adds them to (almost) every request to the same domain using the Cookie HTTP-header.
+- Cookies are usually set by a web-server using the response `Set-Cookie` HTTP-header. Then, the browser automatically **adds them to (almost) every request to the same domain** using the Cookie HTTP-header.
 - One of the most widespread use cases is **authentication**:
 
   1. Upon sign in, the server uses the Set-Cookie HTTP-header in the response to set a cookie with a unique “session identifier”.
