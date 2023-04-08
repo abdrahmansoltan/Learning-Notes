@@ -4,6 +4,7 @@
   - [Algorithm Analysis (Big-Oh)](#algorithm-analysis-big-oh)
     - [Average case vs Worst case](#average-case-vs-worst-case)
     - [Asymptotic Analysis](#asymptotic-analysis)
+    - [Runtime Analysis](#runtime-analysis)
     - [O(n)](#on)
       - [Polynomials](#polynomials)
     - [O(1)](#o1)
@@ -106,6 +107,16 @@ It tells us **How well a problem is solved**, it's the language we use to tellin
   - we characterize the running times of algorithms by using functions that map the size of the input, `n`, to values that correspond to the main factor that determines the growth rate in terms of `n`.
   - This approach reflects that each basic step in a pseudo-code description or a high-level language implementation may correspond to a small number of primitive operations.
 - Thus, we can perform an analysis of an algorithm by estimating the number of primitive operations executed up to a constant factor, rather than getting bogged down in language-specific or hardware-specific analysis of the exact number of operations that execute on the computer.
+
+---
+
+### Runtime Analysis
+
+![Determining Complexity](./img/determine-complexity.png)
+
+- **Determining Complexity**
+  - Time complexity
+    ![Determining Complexity](./img/determining-complexity-1.png)
 
 ---
 

@@ -25,12 +25,14 @@
   - [Linked lists](#linked-lists)
     - [Arrays vs linked lists](#arrays-vs-linked-lists)
     - [Singly linked list](#singly-linked-list)
+    - [Linked List Traversal](#linked-list-traversal)
     - [Doubly linked list](#doubly-linked-list)
   - [Stacks and Queues](#stacks-and-queues)
     - [Stacks](#stacks)
       - [Array-Based Stack Implementation](#array-based-stack-implementation)
     - [Queues](#queues)
   - [Trees](#trees)
+    - [Tree Implementation](#tree-implementation)
     - [Binary Tree](#binary-tree)
       - [Perfect vs Full vs Complete Binary Trees](#perfect-vs-full-vs-complete-binary-trees)
       - [Binary Search Tree (BST)](#binary-search-tree-bst)
@@ -49,6 +51,15 @@
 ## Data Structures
 
 it's a collection of values (can have relationships between them) which is being manipulated by steps of processes (**Algorithms**)
+
+They're ways to organize information with **optimal runtime complexity** for different operations
+
+- Most programming languages have built-in data structures, but in interviews, you may still be asked about **"inferior"** data structures like queues and linked lists.
+  - this is done by using the built-in data structures and getting the same result
+    - ex: to add to queue -> use array equivalent: `array.insert()`
+  - also if we want to make a class to the data-structure, we can use the built-in data-structure to make it
+    - ex: to make a queue class -> use array to make it and remove some unwanted array-methods
+      ![ds-class](./img/ds-class.png)
 
 ### storing data in the Memory
 
@@ -317,21 +328,112 @@ It's a data structure that contains a `head`, `tail` and `length` properties and
 - `.Get(index)` here we don't have `index`, so if we want to **get** to a node with a specific index, we will have to **manually count each `.next` operation** until we reach wanted node
 
   ```js
+  // Get the index'th node in the linked list.
   get(index) {
+    // If the index is less than zero or greater than or equal to the length of the list, return null.
     if(index < 0 || index >= this.length) return null;
+
+    // Initialize a counter variable at 0.
     let counter = 0;
+    // Initialize a variable that will be used to traverse the linked list. Set it to the head of the list.
     let current  = this.head;
+
+    // While the counter is not equal to the index...
     while(counter !== index) {
+      // Set the current variable to be the next node in the linked list.
       current = current.next;
+      // Increment the counter by 1.
       counter++;
     }
+    // Return the current variable.
     return current;
   }
   ```
 
-- when **inserting**, we can make use of the already existed methods: `push` and `unshift`:
-  - if the index is the same as the length, **push** a new node to the end of the list
-  - if the index is `0`, **unshift** a new node to the start of the list
+- `removeAt(index)`:
+
+  - we need to keep track of the previous node, so we can update the `.next` pointer of the previous node to point to the next node
+  - we need to keep track of the current node, so we can return the value of the node that was removed
+  - we need to keep track of the next node, so we can update the `.next` pointer of the current node to point to the next node
+
+  ```py
+  def removeAt(self, index):
+    counter = 0
+    current = self.head
+    previous = None # to keep track of the previous node so we can update the .next pointer of the previous node to point to the next node
+
+    # if list is empty
+    if !current:
+      return None
+    # if index is out of range
+    if index < 0 or index >= self.length:
+      return None
+    # if index is the head
+    if index == 0:
+      self.head = self.head.next
+      return self.head
+
+    while counter != index:
+      previous = current
+      current = current.next
+      counter += 1
+    previous.next = current.next
+    self.length -= 1
+    return current
+  ```
+
+- `insertAt(index)`: we need to keep track of the previous node, so we can update the `.next` pointer of the previous node to point to the new node
+
+  - we need to keep track of the current node, so we can update the `.next` pointer of the new node to point to the current node
+  - we need to keep track of the next node, so we can update the `.next` pointer of the current node to point to the next node
+
+  ```py
+  def insertAt(self, index, value):
+    newNode = Node(value)  # create a new node with the value passed to the function and next pointer set to None
+    counter = 0
+    current = self.head
+    previous = None
+
+    # if list is empty
+    if !current:
+      self.head = newNode
+      return self.head
+    # if index is out of range
+    if index < 0 or index >= self.length:
+      return None
+    # if index is the head
+    if index == 0:
+      newNode.next = self.head
+      self.head = newNode
+      return self.head
+
+    while counter != index:
+      previous = current
+      current = current.next
+      counter += 1
+    previous.next = newNode
+    newNode.next = current
+    self.length += 1
+    return self.head
+  ```
+
+  > - when **inserting**, we can make use of the already existed methods: `push` and `unshift`:
+  > - if the index is the same as the length, **push** a new node to the end of the list
+  > - if the index is `0`, **unshift** a new node to the start of the list
+
+---
+
+### Linked List Traversal
+
+To be able to loop through a linked list using `for` loop, we need to have a way to traverse through the linked list, using generator function:
+
+```py
+def traverse(self):
+  current = self.head
+  while current:
+    yield current.value
+    current = current.next
+```
 
 ---
 
@@ -453,6 +555,69 @@ They have **Hierarchical Data-structures** structure unlike other data-structure
   - can only point to their children (child node can't point to it;s parent or it's siblings)
   - each node must have only one parent node
   - don't have to reference their parent
+
+---
+
+### Tree Implementation
+
+- `nodes` can be implemented using `classes` or `objects`
+- `edges` can be implemented using `arrays` or `lists`
+- `trees` can be implemented using `arrays` or `lists` or `objects`
+- Traverse a tree using `BFS` or `DFS`
+  - **`BFS` Steps:**
+    - create a queue (this can be an array) and a variable to store the values of nodes visited
+    - place the root node in the queue
+    - loop as long as there is anything in the queue
+      - dequeue a node from the queue and push the value of the node into the variable that stores the nodes
+      - if there are children on the node dequeued - add them to the queue
+    - return the variable that stores the values
+  - **`DFS` Steps:**
+    - create a stack (this can be an array) and a variable to store the values of nodes visited
+    - create a variable to store the values of nodes visited
+    - store the root of the BST in a variable called current
+    - write a helper function which accepts a node
+      - push the value of the node to the variable that stores the values
+      - if there are children on the node dequeued - add them to the queue
+    - return the array of values
+
+```py
+class Node:
+  def __init__(self, value):
+    self.value = value
+    self.children = []
+
+  def add_child(self, child_node):
+    self.children.append(child_node)
+
+  def remove_child(self, child_node):
+    self.children = [child for child in self.children if child is not child_node]
+
+# -------------------------------------------------------------
+
+class Tree:
+  def __init__(self, root_node=None):
+    self.root = root_node
+
+  def bfs_traverse(self):
+    if self.root is None:
+      return
+    # create a list to store the nodes that we need to visit
+    queue = [self.root]
+    while queue:
+      current_node = queue.pop(0) # "pop(0)" is to remove the first item in the list
+      print(current_node.value)
+      queue += current_node.children # "queue += current_node.children" is to add the children of the current node to the queue
+
+  def dfs_traverse(self):
+    if self.root is None:
+      return
+    # create a list to store the nodes that we need to visit
+    stack = [self.root]
+    while stack:
+      current_node = stack.pop() # "pop()" is to remove the last item in the list
+      print(current_node.value)
+      stack += current_node.children
+```
 
 ---
 

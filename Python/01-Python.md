@@ -84,7 +84,7 @@ One of the oldest PEPs is **PEP 8**, which instructs Python programmers on how t
 
 > The PEP 8 guidelines are not set in stone, and some teams prefer a different values. Don’t worry too much about them in your code as you’re working alone, but be aware that people who are working collaboratively almost always follow the PEP 8 guidelines
 
-- Indentation
+- Indentation (Whitespace)
   - PEP 8 recommends that you use four spaces per indentation level. Using four spaces improves readability while leaving room for multiple levels of indentation on each line.
 - Line Length
   - each line should be less than 80 characters (**79 Character limit**)
@@ -108,7 +108,7 @@ One of the oldest PEPs is **PEP 8**, which instructs Python programmers on how t
   MAX_CONNECTIONS = 5000
   ```
 
-> - **`/`** this is called "True Division"
+> - **`/`** this is called **"True Division"** returning a floating-point result
 
 - **floor division**: also called integer-division (results in an integer by discarding the fraction part)
 
@@ -204,7 +204,23 @@ One of the oldest PEPs is **PEP 8**, which instructs Python programmers on how t
   print(x == y)   # True: y is approximated to 5
   ```
 
-- **Membership operators** -> `in`, `not in` operators
+- **Extended Assignment Operators**
+
+  - For immutable types, we shouldn't assume that this syntax changes the value of the existing variable. Instead, it creates a new variable and assigns it to the existing variable name
+
+    ```py
+    x = 5
+    x += 1 # x = x + 1
+    ```
+
+  - For mutable types, we can assume that the syntax changes the value of the existing variable
+
+    ```py
+    x = [1, 2, 3]
+    x += [4, 5] # x = x + [4, 5]
+    ```
+
+- **Membership (Containment check) operators** -> `in`, `not in` operators
 
   - **Prefix**: any string starts from the first character (n prefixes)
     - `ex`: "ahmed omar" -> "ahme"
@@ -239,6 +255,11 @@ param = n if n >= 0 else −n
 ---
 
 ## Loops
+
+Python supports two types of loops: `while` and `for` loops.
+
+- **while loop** : allows for repeated execution of a block of code as long as a condition is true.
+- **for loop** : provides a more convenient way to iterate over a (sequence of values).
 
 ### while loop
 
@@ -376,7 +397,21 @@ def factors(n): # generator that computes factors
 
   ![casting Types](./img/python-casting-types.png)
 
-- **Get number for a Unicode character**
+  ```py
+  int(3.14) # Output: 3
+  int(3.98) # Output: 3
+  int(-3.98) # Output: -3
+  int("3") # Output: 3
+  int("3.14") # Output: ValueError: invalid literal for int() with base 10: '3.14'
+
+  # ------------------------------------------------------
+
+  float() # Output: 0.0
+  float("3") # Output: 3.0
+  float("3.14") # Output: 3.14
+  ```
+
+- **Get number for a Unicode character (Character Encoding)**
 
   - `ord()` function -> returns an integer representing the Unicode character.
 
@@ -902,7 +937,7 @@ They're **unordered** collections with **no duplicate** elements
     - as in `lists` there's a `hashing` and other operations that may slow operation compare to `sets`
   - sets are an easy way to remove duplicates from a collection
 
-- can contain only immutable elements (no `lists`/`dictionaries` which are **unhashable-types**) --> so that it contains only unique elements
+- can **contain only immutable elements** (no `lists`/`dictionaries`/`sets` which are **mutable-types**) --> so that it contains only unique elements
 - to create an empty set, you must write it like this:
 
   ```py
@@ -913,6 +948,8 @@ They're **unordered** collections with **no duplicate** elements
 ### Set methods
 
 ```py
+set('hello') # {'e', 'h', 'l', 'o'}
+
 # add item
 even = {2, 4, 6}
 even.add(8)
@@ -930,6 +967,15 @@ even.discard(3) # no error
 ![set-intersection](img/set-intersection.png)
 ![set-union](./img/set-union.png)
 ![set-difference](./img/set-difference.png)
+
+- Subset and Superset
+
+  ```py
+  s1 <= s2 # s1 is a subset of s2
+  s1 < s2 # s1 is a proper subset of s2
+  s1 >= s2 # s1 is a superset of s2
+  s1 > s2 # s1 is a proper superset of s2
+  ```
 
 ---
 
@@ -1207,20 +1253,20 @@ They return something that iterable (NOT a list)
 - Python includes a rich hierarchy of exception classes that designate various categories of errors
   ![errors](./img/errors.png)
 
-| Class               | Description                                               |
-| ------------------- | --------------------------------------------------------- |
-| `Exception`         | A base class for most error types                         |
-| `AttributeError`    | Raised by syntax obj.foo, if obj has no member named foo  |
-| `EOFError`          | Raised if “end of file” reached for console or file input |
-| `IOError`           | Raised upon failure of I/O operation (e.g., opening file) |
-| `IndexError`        | Raised if index to sequence is out of bounds              |
-| `KeyError`          | Raised if nonexistent key requested for set or dictionary |
-| `KeyboardInterrupt` | Raised if user types ctrl-C while program is executing    |
-| `NameError`         | Raised if nonexistent identifier used                     |
-| `StopIteration`     | Raised by next(iterator) if no element                    |
-| `TypeError`         | Raised when wrong type of parameter is sent to a function |
-| `ValueError`        | Raised when parameter has invalid value (e.g., sqrt(−5))  |
-| `ZeroDivisionError` | Raised when any division operator used with 0 as divisor  |
+| Class               | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| `Exception`         | A base class for most error types                              |
+| `AttributeError`    | Raised by syntax `obj.foo`, if `obj` has no member named `foo` |
+| `EOFError`          | Raised if “end of file” reached for console or file input      |
+| `IOError`           | Raised upon failure of I/O operation (e.g., opening file)      |
+| `IndexError`        | Raised if index to sequence is out of bounds                   |
+| `KeyError`          | Raised if nonexistent key requested for set or dictionary      |
+| `KeyboardInterrupt` | Raised if user types `ctrl-C` while program is executing       |
+| `NameError`         | Raised if nonexistent identifier used                          |
+| `StopIteration`     | Raised by `next(iterator)` if no element                       |
+| `TypeError`         | Raised when wrong type of parameter is sent to a function      |
+| `ValueError`        | Raised when parameter has invalid value (e.g., `sqrt(−5)`)     |
+| `ZeroDivisionError` | Raised when any division operator used with `0` as divisor     |
 
 ### Raising exceptions
 
@@ -1235,6 +1281,15 @@ They return something that iterable (NOT a list)
   ```py
   raise ValueError("invalid character")
   ```
+
+```py
+def sqrt(x):
+    if not isinstance(x, (int, float)):
+        raise TypeError("x must be numeric")
+    if x < 0:
+        raise ValueError("x can't be negative")
+    # ... compute the square root of x ...
+```
 
 ---
 
@@ -1285,6 +1340,8 @@ There are several philosophies regarding how to cope with possible exceptional c
   except ValueError:
     print("Oh no, that ins't a number!")
   ```
+
+````
 
 - you can specify the error in the handling:
 
@@ -1442,12 +1499,21 @@ Beyond the built-in definitions, the standard Python distribution includes perha
   # original is called -> "alias"
   ```
 
-- `print()` can have second parameter which is the end after element:
+- `print()` can have other optional parameters like:
 
-  ```py
-  # make separator "," instead of new line "\n"
-  print(x, end=',')
-  ```
+  - `end='end'` Optional. Specify what to print at the end. Default is `'\n'` (line feed)
+
+    ```py
+    # make separator "," instead of new line "\n"
+    print(x, end=',')
+    ```
+
+  - `sep='separator'` Optional. Specify how to separate the objects, if there is more than one. Default is ' ' (space).
+
+    ```py
+    # make separator "," instead of space " "
+    print(x, y, z, sep=',')
+    ```
 
 - `del` -> removes the bind from name of variable to the value in memory, so the variable will equal `undefine` (**unboundLocalError**)
 
@@ -1464,3 +1530,4 @@ Beyond the built-in definitions, the standard Python distribution includes perha
   - Immutable objects
     ![immutable](./img/immutable_objects.png)
   - Python interpreter already maintains what are known as **"reference counts"** for each object; this count is used in part to determine if an object can be garbage collected.
+````

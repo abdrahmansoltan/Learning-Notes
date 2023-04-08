@@ -722,25 +722,31 @@ we can convert functions more easily to make them suit our task Without writing 
 
 ## Generators
 
-Regular functions return only one, single value (or nothing). **Generators** can return (`“yield”`) multiple values, one after another, on-demand. They work great with iterables, allowing to create data streams with ease.
+They differ from Regular functions which return only single value (or nothing). **Generators** can return (`“yield”`) multiple values, one after another, on-demand. They work great with iterables, allowing to create data streams with ease.
+
+> **Generators Summary:**
+>
+> - When we define a generator, when we call `.next()` method on it => it will execute the code until it reaches the first **`yield` statement**, then it will return the value of the `yield` statement and stop the execution of the function. When we call `.next()` again, it will continue the execution of the function until it reaches the next `yield` statement, then it will return the value of the `yield` statement and stop the execution of the function. And so on.
+> - If in the next time we call `.next()` and passing on a value as a parameter to the `.next()` method, this value will be the result of the `yield` statement. So, the value of the `yield` statement will be replaced by the value that we passed to the `.next()` method.
+> - if we kept calling `.next()` method, it will keep executing the code until it reaches the end of the function, then it will return an object with the value of `done` property set to `true` and the value of the `value` property will be the value that we passed to the `.next()` method in the last time. -> **`{ done: true, value: 10 }`**
 
 - Once we start thinking of our data as flows (where we can pick of an element one-by-one) we can rethink how we produce those flows - JavaScript now lets us produce the flows using a function
 - the Generator function allows us to exit and renter the execution-context of function manually, unlike iterators which this happens dynamically
 - To create a generator, we need a special syntax construct: `function*`, so-called **“generator function”**.
 
-  - Generator functions behave differently from regular ones. When such function is called, it doesn’t run its code. Instead it returns a special object, called **“generator object”**, to manage the execution.
+- Generator functions behave differently from regular ones. When such function is called, it doesn’t run its code. Instead it returns a special object, called **“generator object”**, to manage the execution.
 
-    ```js
-    function* generateSequence() {
-      yield 1;
-      yield 2;
-      return 3;
-    }
+  ```js
+  function* generateSequence() {
+    yield 1;
+    yield 2;
+    return 3;
+  }
 
-    // "generator function" creates "generator object"
-    let generator = generateSequence(); // The function code execution hasn’t started yet
-    alert(generator); // [object Generator]
-    ```
+  // "generator function" creates "generator object"
+  let generator = generateSequence(); // The function code execution hasn’t started yet
+  alert(generator); // [object Generator]
+  ```
 
 > **Note:** `function* f(…)` or `function *f(…)`?
 >

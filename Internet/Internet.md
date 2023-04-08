@@ -102,6 +102,8 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
 
 ## How internet works
 
+> watch the first question from [this video](https://www.youtube.com/watch?v=qvyvysDV17w)
+
 ### TCP vs UDP
 
 - TCP is a **connection**-oriented protocol (it's like saying hi and wait to see if the other side heard it)

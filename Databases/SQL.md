@@ -1,70 +1,33 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Database](#database)
-  - [Different Databases](#different-databases)
-  - [Columns / Rows](#columns--rows)
-  - [Keys](#keys)
-- [SQL](#sql)
-  - [psql](#psql)
-  - [Queries](#queries)
-    - [CRUD](#crud)
-    - [Filters](#filters)
-  - [notes](#notes)
-- [Environment Variables](#environment-variables)
-- [Connecting Node to a Postgres Database](#connecting-node-to-a-postgres-database)
-- [Migrations](#migrations)
-  - [Instructions to install db-migrate](#instructions-to-install-db-migrate)
-- [Models](#models)
-  - [Files and Folders](#files-and-folders)
-  - [CRUD methods](#crud-methods)
-  - [Testing Models](#testing-models)
-    - [Steps](#steps)
-- [REST](#rest)
-  - [Routes to Models](#routes-to-models)
-  - [JWT](#jwt)
-- [SQL Relationships](#sql-relationships)
-  - [Many to many](#many-to-many)
-  - [Join Queries](#join-queries)
-  - [Services](#services)
-
----
-
-## Database
-
-- Databases are organized data storage.
-- Types of Databases
-
-  ![typesOfDatabases](./img/typesOfDatabases.PNG)
-
-- `database schema` : The architecture or structure of a relational database, a statement of its tables and their columns.
-
----
-
-### Different Databases
-
-- `SQL/Relational Type Databases` : organize information in tables.
-- `NoSQL` : can take a few different forms and are used for large sets of distributed data (like for use in micro service architectures).
-
-  - `Key-Value store`
-  - `Document store`
-  - `Column-oriented`
-
-- Common NoSQL Database Technologies:
-  - Redis [Key Value store]
-  - MongoDB [Document store]
-  - Elasticsearch [Document store]
-  - Apache Cassandra [Column oriented]
-
----
-
-### Columns / Rows
-
-![alt](./img/columns.PNG)
-
-### Keys
-
-![alt](./img/key.PNG)
+  - [SQL](#sql)
+    - [Queries](#queries)
+      - [SQL Commands](#sql-commands)
+      - [CRUD](#crud)
+    - [notes](#notes)
+  - [Filtering Queries](#filtering-queries)
+  - [Comparison Operators](#comparison-operators)
+  - [SQL Functions](#sql-functions)
+  - [Multiple Tables](#multiple-tables)
+    - [Multi Table Queries](#multi-table-queries)
+  - [PostgreSQL](#postgresql)
+  - [Environment Variables](#environment-variables)
+  - [Connecting Node to a Postgres Database](#connecting-node-to-a-postgres-database)
+  - [Migrations](#migrations)
+    - [Instructions to install db-migrate](#instructions-to-install-db-migrate)
+  - [Models](#models)
+    - [Files and Folders](#files-and-folders)
+    - [CRUD methods](#crud-methods)
+    - [Testing Models](#testing-models)
+      - [Steps](#steps)
+  - [REST](#rest)
+    - [Routes to Models](#routes-to-models)
+    - [JWT](#jwt)
+  - [SQL Relationships](#sql-relationships)
+    - [Many to many](#many-to-many)
+    - [Join Queries](#join-queries)
+    - [Services](#services)
 
 ---
 
@@ -72,13 +35,167 @@
 
 SQL stands for Structured Query Language and it is the syntax that allows us to interact with a SQL type database.
 
+It's a **declarative language**, which means that we tell the database what we want to do, but not how to do it.
+
 - `PRIMARY KEY` : it's used for indexing (to reach row fast instead of going through all rows before)
 
   ![indexing](./img/indexing.png)
 
 ---
 
-### psql
+### Queries
+
+a "Query" is also called "SQL Statement" and it is a command that we send to the database to perform some action.
+
+![query](./img/query.PNG)
+
+- **Order of Operations**
+
+  ![order-of-operations](./img/order-of-operations.png)
+
+  1. `FROM` and `JOIN`
+  2. `WHERE`
+  3. `GROUP BY`
+  4. `HAVING`
+  5. `SELECT`
+  6. `DISTINCT`
+  7. `ORDER BY`
+  8. `LIMIT`
+
+#### SQL Commands
+
+![commands categories](./img/sql-commands.png)
+
+- **DDL:** Data Definition Language - used to define the database structure or schema. It includes the commands: `CREATE`, `ALTER`, `DROP`, `TRUNCATE`, `COMMENT`, `RENAME`.
+- **DQL:** Data Query Language - used to query data from the database. It includes the commands: `SELECT`, `WHERE`, `GROUP BY`, `HAVING`, `UNION`, `INTERSECT`, `EXCEPT`.
+- **DML:** Data Manipulation Language - used to manipulate the data in the database. It includes the commands: `INSERT`, `UPDATE`, `DELETE`.
+- **DCL:** Data Control Language - used to define the database security. It includes the commands: `GRANT`, `REVOKE`.
+
+---
+
+#### CRUD
+
+> table-name : "worlds"
+
+- CREATE --> `INSERT INTO worlds (name) VALUES ('Asgard');`
+- READ --> `SELECT * FROM worlds;`
+- UPDATE --> `UPDATE worlds SET sighting_date = '2021-01-10' WHERE id='1';`
+- DELETE --> `DELETE FROM worlds WHERE id='1';` -> delete `row` where `id=1`
+
+---
+
+### notes
+
+- Double quotes `""` instead of single quotes `''`
+
+  - `double quotes` are always used to denote delimited identifiers ( `table name` - `column name` ).
+  - `single quotes` used to indicate that a token is a string -> for text.
+
+- Missing a semicolon
+  - The semicolon at the end of a query is one of the most common mistakes to make. Thankfully its easy to fix by just adding a semi colon on the next line - but that fix only works if you notice it soon enough.
+  - This is why its a good idea to keep an eye on the beginning of the terminal line, to make sure it ends with this `=#` and not something like this `-#`
+- `AND` and `OR` order
+  - `AND` has a higher precedence than `OR`
+  - `AND` is evaluated first and then `OR`
+  - or use parenthesis `()` to change the order
+
+---
+
+## Filtering Queries
+
+Common filter words are WHERE, BETWEEN, LIKE, IF NULL, IF NOT NULL
+
+![filters](./img/filter.PNG)
+
+- `LIKE 'Dan%'`
+  - `%` : is a wildcard that means anything
+  - here it means 'Dan' and anything that comes after the `n` ---> AKA: any word starts with "Dan"
+- `NOT` : is used to exclude the results that match the condition
+
+  ```sql
+  SELECT * FROM worlds WHERE NOT name = 'Dan';
+  ```
+
+---
+
+## Comparison Operators
+
+---
+
+## SQL Functions
+
+SQL functions are built-in functions that are available to use in SQL statements. They are used to perform specific tasks like formatting the output, performing calculations, and more.
+
+It's a set of steps that creates a **single value**.
+
+- Types of SQL Functions:
+
+  - **Scalar Functions:** returns a single value for each row of data.
+  - **Aggregate Functions:** returns a single value for a set of rows of data.
+    - It produces a summary of the column-data in a table.
+
+- **numbers Functions**
+
+  - `COUNT` : counts the number of rows in a table
+  - `SUM` : adds up all the values in a column
+  - `AVG` : calculates the average of all the values in a column
+  - `MIN` : finds the smallest value in a column
+  - `MAX` : finds the largest value in a column
+
+  ```sql
+  SELECT COUNT(*) FROM <table_name>;
+  SELECT SUM(<column_name>) FROM <table_name>;
+  SELECT AVG(<column_name>) FROM <table_name>;
+  SELECT MIN(<column_name>) FROM <table_name>;
+  SELECT MAX(<column_name>) FROM <table_name>;
+  ```
+
+- **string Functions**
+
+  - `CONCAT` : combines 2 strings from 2 columns
+  - `UPPER` : converts a string to uppercase
+  - `LOWER` : converts a string to lowercase
+  - `LENGTH` : returns the number of characters in a string
+  - `SUBSTRING` : extracts a portion of a string
+
+    ```sql
+    SELECT CONCAT(<column_name>, <column_name>) FROM <table_name>;
+    SELECT CONCAT(<column_name>, <column_name>) as "Custom Concatenation Column" FROM <table_name>;
+
+    SELECT UPPER(<column_name>) FROM <table_name>;
+    SELECT LOWER(<column_name>) FROM <table_name>;
+    SELECT LENGTH(<column_name>) FROM <table_name>;
+    SELECT SUBSTRING(<column_name>, <start_index>, <length>) FROM <table_name>;
+    ```
+
+---
+
+## Multiple Tables
+
+### Multi Table Queries
+
+It's a query that involves more than one table.
+
+- It's done using **aliases**.
+
+  - `AS` is used to give a table an alias.
+
+    ```sql
+    SELECT <column_name>, <column_name>
+    FROM <table_name> AS <alias_name>
+    ```
+
+- Here, we use the `WHERE` clause to filter the 2 tables using primary and foreign keys
+
+```sql
+SELECT a.emp_id, a.emp_name, b.emp_salary
+FROM employees as a, salaries as b
+WHERE a.emp_id = b.emp_id;
+```
+
+---
+
+## PostgreSQL
 
 - If you already know the name of the database you want to connect to, you can write `psql name_of_database`
 
@@ -86,7 +203,6 @@ SQL stands for Structured Query Language and it is the syntax that allows us to 
   psql <name_of_database>
 
   # that would be equivalent to
-
   psql postgres
   \c <name_of_database>
   ```
@@ -132,44 +248,6 @@ SQL stands for Structured Query Language and it is the syntax that allows us to 
 
 ---
 
-### Queries
-
-![query](./img/query.PNG)
-
-#### CRUD
-
-> table-name : "worlds"
-
-- CREATE --> `INSERT INTO worlds (name) VALUES ('Asgard');`
-- READ --> `SELECT * FROM worlds;`
-- UPDATE --> `UPDATE worlds SET sighting_date = '2021-01-10' WHERE id='1';`
-- DELETE --> `DELETE FROM worlds WHERE id='1';` -> delete `row` where `id=1`
-
-#### Filters
-
-Common filter words are WHERE, BETWEEN, LIKE, IF NULL, IF NOT NULL
-
-![filters](./img/filter.PNG)
-
-- `LIKE 'Dan%'`
-  - `%` : is a wildcard that means anything
-  - here it means 'Dan' and anything that comes after the `n` ---> AKA: any word starts with "Dan"
-
----
-
-### notes
-
-- `Double quotes instead of single quotes`
-
-  - `double quotes` are always used to denote delimited identifiers ( `table name` - `column name` ).
-  - `single quotes` used to indicate that a token is a string.
-
-- `Missing a semicolon`
-  - The semicolon at the end of a query is one of the most common mistakes to make. Thankfully its easy to fix by just adding a semi colon on the next line - but that fix only works if you notice it soon enough.
-  - This is why its a good idea to keep an eye on the beginning of the terminal line, to make sure it ends with this `=#` and not something like this `-#`
-
----
-
 ## Environment Variables
 
 Working with sensitive information can be hard, especially when your application relies on keys and passwords in order to connect to and access databases or APIs. so we add a `library for environment variables` in Node so that we can safely store information away from public eyes without moving it out of reach.
@@ -203,21 +281,20 @@ Working with sensitive information can be hard, especially when your application
   - The `dotenv.config()` ->You can't access the env vars unless this line exists in your code, it typically goes as close to the beginning of the program as possible.
 
   ```ts
-  import dotenv from "dotenv";
-  import { Pool } from "pg";
+  import dotenv from 'dotenv';
+  import { Pool } from 'pg';
 
   dotenv.config(); // initialize the environment variables
 
   // getting the information needed to connect to the database
-  const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } =
-    process.env;
+  const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } = process.env;
 
   // connection to database, we'll call it "client"
   const client = new Pool({
     host: POSTGRES_HOST,
     database: POSTGRES_DB,
     user: POSTGRES_USER,
-    password: POSTGRES_PASSWORD,
+    password: POSTGRES_PASSWORD
   });
 
   export default client; // to be used to establish connection to database
@@ -303,7 +380,7 @@ Migrations are a record of a **changes** made to the `schema` of a database.
 - Example
 
 ```ts
-import Client from "../database"; // Responsible for database connection
+import Client from '../database'; // Responsible for database connection
 
 // type for the class
 export type Book = {
@@ -319,7 +396,7 @@ export class BookStore {
     try {
       // @ts-ignore
       const conn = await Client.connect(); // Open connection
-      const sql = "SELECT * FROM books";
+      const sql = 'SELECT * FROM books';
 
       const result = await conn.query(sql);
 
@@ -333,7 +410,7 @@ export class BookStore {
 
   async show(id: string): Promise<Book> {
     try {
-      const sql = "SELECT * FROM books WHERE id=($1)";
+      const sql = 'SELECT * FROM books WHERE id=($1)';
       // @ts-ignore
       const conn = await Client.connect();
 
@@ -350,16 +427,11 @@ export class BookStore {
   async create(b: Book): Promise<Book> {
     try {
       const sql =
-        "INSERT INTO books (title, author, total_pages, summary) VALUES($1, $2, $3, $4) RETURNING *";
+        'INSERT INTO books (title, author, total_pages, summary) VALUES($1, $2, $3, $4) RETURNING *';
       // @ts-ignore
       const conn = await Client.connect();
 
-      const result = await conn.query(sql, [
-        b.title,
-        b.author,
-        b.totalPages,
-        b.summary,
-      ]);
+      const result = await conn.query(sql, [b.title, b.author, b.totalPages, b.summary]);
 
       const book = result.rows[0];
 
@@ -373,7 +445,7 @@ export class BookStore {
 
   async delete(id: string): Promise<Book> {
     try {
-      const sql = "DELETE FROM books WHERE id=($1)";
+      const sql = 'DELETE FROM books WHERE id=($1)';
       // @ts-ignore
       const conn = await Client.connect();
 
@@ -409,38 +481,32 @@ export class BookStore {
 3. Update the database connection file (database.ts)
 
    ```ts
-   import dotenv from "dotenv";
-   import { Pool } from "pg";
+   import dotenv from 'dotenv';
+   import { Pool } from 'pg';
 
    dotenv.config();
 
-   const {
-     POSTGRES_HOST,
-     POSTGRES_DB,
-     POSTGRES_USER,
-     POSTGRES_PASSWORD,
-     POSTGRES_TEST_DB,
-     ENV,
-   } = process.env;
+   const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_TEST_DB, ENV } =
+     process.env;
 
    let client;
    console.log(ENV);
 
-   if (ENV === "test") {
+   if (ENV === 'test') {
      client = new Pool({
        host: POSTGRES_HOST,
        database: POSTGRES_DB,
        user: POSTGRES_USER,
-       password: POSTGRES_PASSWORD,
+       password: POSTGRES_PASSWORD
      });
    }
 
-   if (ENV === "dev") {
+   if (ENV === 'dev') {
      client = new Pool({
        host: POSTGRES_HOST,
        database: POSTGRES_TEST_DB,
        user: POSTGRES_USER,
-       password: POSTGRES_PASSWORD,
+       password: POSTGRES_PASSWORD
      });
    }
 
@@ -450,59 +516,59 @@ export class BookStore {
 4. Write the tests
 
    ```ts
-   import { Book, BookStore } from "../book";
+   import { Book, BookStore } from '../book';
 
    const store = new BookStore();
 
-   describe("Book Model", () => {
+   describe('Book Model', () => {
      // test if the method exists
-     it("should have an index method", () => {
+     it('should have an index method', () => {
        expect(store.index).toBeDefined();
      });
 
-     it("create method should add a book", async () => {
+     it('create method should add a book', async () => {
        const result = await store.create({
-         title: "Bridge to Terabithia",
+         title: 'Bridge to Terabithia',
          total_pages: 250,
-         author: "Katherine Paterson",
-         type: "Childrens",
+         author: 'Katherine Paterson',
+         type: 'Childrens'
        });
        expect(result).toEqual({
-         id: "1",
-         title: "Bridge to Terabithia",
+         id: '1',
+         title: 'Bridge to Terabithia',
          total_pages: 250,
-         author: "Katherine Paterson",
-         type: "Childrens",
+         author: 'Katherine Paterson',
+         type: 'Childrens'
        });
      });
 
      // check for specific array result
-     it("index method should return a list of books", async () => {
+     it('index method should return a list of books', async () => {
        const result = await store.index();
        expect(result).toEqual([
          {
-           id: "1",
-           title: "Bridge to Terabithia",
+           id: '1',
+           title: 'Bridge to Terabithia',
            total_pages: 250,
-           author: "Katherine Paterson",
-           type: "Childrens",
-         },
+           author: 'Katherine Paterson',
+           type: 'Childrens'
+         }
        ]);
      });
 
-     it("show method should return the correct book", async () => {
-       const result = await store.show("1");
+     it('show method should return the correct book', async () => {
+       const result = await store.show('1');
        expect(result).toEqual({
-         id: "1",
-         title: "Bridge to Terabithia",
+         id: '1',
+         title: 'Bridge to Terabithia',
          total_pages: 250,
-         author: "Katherine Paterson",
-         type: "Childrens",
+         author: 'Katherine Paterson',
+         type: 'Childrens'
        });
      });
 
-     it("delete method should remove the book", async () => {
-       store.delete("1");
+     it('delete method should remove the book', async () => {
+       store.delete('1');
        const result = await store.index();
 
        expect(result).toEqual([]);
@@ -526,8 +592,8 @@ in `restfull` architecture each entity or model in the app gets its own set of `
 
 ```ts
 // in helper file
-import express, { Request, Response } from "express"; // for Typescript
-import { Article, ArticleStore } from "../models/article";
+import express, { Request, Response } from 'express'; // for Typescript
+import { Article, ArticleStore } from '../models/article';
 
 const store = new ArticleStore(); // new instance
 
@@ -547,7 +613,7 @@ const create = async (req: Request, res: Response) => {
   try {
     const article: Article = {
       title: req.body.title,
-      content: req.body.content,
+      content: req.body.content
     };
 
     const newArticle = await store.create(article);
@@ -565,10 +631,10 @@ const destroy = async (req: Request, res: Response) => {
 
 // each route use one model
 const articleRoutes = (app: express.Application) => {
-  app.get("/articles", index);
-  app.get("/articles/:id", show);
-  app.post("/articles", create);
-  app.delete("/articles", destroy);
+  app.get('/articles', index);
+  app.get('/articles/:id', show);
+  app.post('/articles', create);
+  app.delete('/articles', destroy);
 };
 
 export default articleRoutes; // to be used in the server file to have clean code
@@ -586,9 +652,9 @@ export default articleRoutes; // to be used in the server file to have clean cod
   // handlers/users.ts
 
   // in helper file
-  import express, { Request, Response } from "express"; // for Typescript
-  import { Article, ArticleStore } from "../models/article";
-  const jwt = require("jsonwebtoken");
+  import express, { Request, Response } from 'express'; // for Typescript
+  import { Article, ArticleStore } from '../models/article';
+  const jwt = require('jsonwebtoken');
 
   const store = new ArticleStore(); // new instance
 
@@ -596,7 +662,7 @@ export default articleRoutes; // to be used in the server file to have clean cod
   const createNewUser = async (req: Request, res: Response) => {
     const user: User = {
       username: _req.body.username,
-      password: _req.body.password,
+      password: _req.body.password
     };
     try {
       const newUser = await store.create(user);
@@ -617,9 +683,9 @@ export default articleRoutes; // to be used in the server file to have clean cod
 
   ```ts
   // handlers/users.ts
-  import express, { Request, Response } from "express"; // for Typescript
-  import { Article, ArticleStore } from "../models/article";
-  const jwt = require("jsonwebtoken");
+  import express, { Request, Response } from 'express'; // for Typescript
+  import { Article, ArticleStore } from '../models/article';
+  const jwt = require('jsonwebtoken');
 
   const store = new WeaponStore(); // new instance
 
@@ -627,7 +693,7 @@ export default articleRoutes; // to be used in the server file to have clean cod
     const weapon: Weapon = {
       name: _req.body.name,
       type: _req.body.type,
-      weight: _req.body.weight,
+      weight: _req.body.weight
     };
 
     // Validating the user's token to Authorize him to the next action
@@ -656,7 +722,7 @@ export default articleRoutes; // to be used in the server file to have clean cod
 
   ```js
   const authorizationHeader = req.headers.authorization;
-  const token = authorizationHeader.split(" ")[1]; // Parsing the header
+  const token = authorizationHeader.split(' ')[1]; // Parsing the header
   ```
 
 - Validating `JWT` (real life)
@@ -668,7 +734,7 @@ export default articleRoutes; // to be used in the server file to have clean cod
   const verifyAuthToken = (req: Request, res: Response, next) => {
     try {
       const authHeader = req.headers.authorization;
-      const token = authHeader.split(" ")[1];
+      const token = authHeader.split(' ')[1];
       const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
 
       next(); // !IMPORTANT
@@ -683,11 +749,11 @@ export default articleRoutes; // to be used in the server file to have clean cod
 
   // using the middleware function
   const mount = (app: express.Application) => {
-    app.get("/users", index);
-    app.get("/users/:id", show);
-    app.post("/users", verifyAuthToken, create);
-    app.put("/users/:id", verifyAuthToken, update);
-    app.delete("/users/:id", verifyAuthToken, destroy);
+    app.get('/users', index);
+    app.get('/users/:id', show);
+    app.post('/users', verifyAuthToken, create);
+    app.put('/users/:id', verifyAuthToken, update);
+    app.delete('/users/:id', verifyAuthToken, destroy);
   };
 
   export default mount;
@@ -732,18 +798,16 @@ SELECT * FROM products INNER JOIN order_products ON product.id = order_products.
 ```ts
 // src/services/dashboard.ts --> orderedProducts
 
-import Client from "../database";
+import Client from '../database';
 
 export class DashboardQueries {
   // Get all products that have been included in orders
-  async productsInOrders(): Promise<
-    { name: string; price: number; order_id: string }[]
-  > {
+  async productsInOrders(): Promise<{ name: string; price: number; order_id: string }[]> {
     try {
       //@ts-ignore
       const conn = await Client.connect();
       const sql =
-        "SELECT name, price, order_id FROM products INNER JOIN order_products ON product.id = order_products.id";
+        'SELECT name, price, order_id FROM products INNER JOIN order_products ON product.id = order_products.id';
 
       const result = await conn.query(sql);
 
@@ -762,9 +826,9 @@ export class DashboardQueries {
   ```ts
   // src/handlers/dashboardHandlers.ts
 
-  import express, { Request, Response } from "express";
+  import express, { Request, Response } from 'express';
 
-  import { DashboardQueries } from "../services/dashboard";
+  import { DashboardQueries } from '../services/dashboard';
 
   const dashboard = new DashboardQueries();
 
@@ -779,9 +843,13 @@ export class DashboardQueries {
   };
 
   const dashboardRoutes = (app: express.Application) => {
-    app.get("/products-in-orders", productsInOrders);
-    app.get("/users-with-orders", usersWithOrders);
+    app.get('/products-in-orders', productsInOrders);
+    app.get('/users-with-orders', usersWithOrders);
   };
 
   export default dashboardRoutes;
   ```
+
+```
+
+```
