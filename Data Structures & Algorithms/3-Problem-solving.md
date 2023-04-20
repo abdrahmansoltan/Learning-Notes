@@ -4,7 +4,7 @@
   - [Problem Solving](#problem-solving)
     - [Problem Solving Patterns](#problem-solving-patterns)
       - [Frequency Counter](#frequency-counter)
-      - [Multiple Pointers](#multiple-pointers)
+      - [Two Pointers (multiple pointers)](#two-pointers-multiple-pointers)
       - [Sliding Window](#sliding-window)
       - [Divide and Conquer](#divide-and-conquer)
       - [Dynamic Programming](#dynamic-programming)
@@ -25,6 +25,10 @@
       - [Anagram](#anagram)
   - [Arrays](#arrays)
     - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
+    - [Container with most water](#container-with-most-water)
+    - [Trapping Rain Water](#trapping-rain-water)
+      - [Solution 1: multiple loops O(n)](#solution-1-multiple-loops-on)
+      - [Solution 2: Two pointers](#solution-2-two-pointers)
     - [Matrix](#matrix)
       - [Create a Spiral Matrix](#create-a-spiral-matrix)
       - [Return elements of Spiral Matrix](#return-elements-of-spiral-matrix)
@@ -41,6 +45,10 @@
     - [General Tree Questions](#general-tree-questions)
       - [Level Width](#level-width)
     - [Binary Search Trees (BST)](#binary-search-trees-bst)
+      - [BST Insertion](#bst-insertion)
+      - [Validate BST](#validate-bst)
+        - [Solution 1: Using min and max values](#solution-1-using-min-and-max-values)
+        - [Solution 2: Using In-Order Traversal](#solution-2-using-in-order-traversal)
   - [Creating Shapes](#creating-shapes)
     - [Steps shape](#steps-shape)
     - [Pyramid](#pyramid)
@@ -56,7 +64,26 @@
 
 ## Problem Solving
 
-![problem solving steps](./img/problem-solving.png)
+- Problem Solving Steps:
+
+  1. Understand the problem
+  2. Explore concrete examples (test cases) and verify the constraints (if any) and edge cases, Ex:
+
+     - When dealing with numbers: we may ask if the number is positive or negative, or if it is an integer or a decimal.
+     - we may ask if there're duplicates in the input
+     - will there always be a result or can there be no result? and what to return in that case?
+
+  3. Break it down
+  4. Solve/Simplify
+
+     - first write a brute force solution
+     - then test it with the test cases
+     - then optimize it
+
+  5. Look back and refactor and double-check for errors
+  6. Analyze the time and space complexity of the solution
+     - Check if the input size in increased, how much will the time and space complexity increase?
+     - If you found that (the time complexity is `O(n^2)` or `O(n^3)` or `O(2^n)` or `O(n!)`, and the space complexity is `O(n)` or `O(1)), then you can try to optimize it by using the`Problem Solving Patterns` below. and use some space to save time.
 
 ### Problem Solving Patterns
 
@@ -69,9 +96,11 @@
 
 ---
 
-#### Multiple Pointers
+#### Two Pointers (multiple pointers)
 
 Creating pointers or values that correspond to an `index` or `position` and move towards the beginning, and/or middle based on certain condition
+
+![two pointers](./img/two-pointers.png)
 
 - very efficient for solving problems with minimal **space-complexity**.
 - `EX`: function that accepts **sorted** array of integers and find the first pair where the sum is `0`.
@@ -327,7 +356,7 @@ def chunk(arr, size):
         # i += size # without the iteration-step
     return chunked
 
-# -------------------------------------------------
+# --------------------------OR-----------------------------------
 
 def chunk(arr, size):
     result = []
@@ -341,6 +370,153 @@ def chunk(arr, size):
     if subarray:
         result.append(subarray)
     return result
+```
+
+---
+
+### Container with most water
+
+Given n non-negative integers `a1`, `a2`, ..., `an` , where each represents a point at coordinate `(i, ai)`. `n` vertical lines are drawn such that the two endpoints of the line `i` is at `(i, ai)` and `(i, 0)`. Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.
+
+- EX: height =`[1, 8, 6, 2, 9, 4]`-->`24`
+  ![water container](./img/water-container.png)
+- Notes:
+
+  - Here, the width has a direct impact on the area, so the distance between indexes matters.
+  - We don't know if we should increase or decrease the width, so we will see which one is shorter and move the pointer in that direction.
+
+- **Steps**:
+
+  1. Verify the constraints:
+
+     - Does the thickness of the lines matter? No.
+     - Do the left and right sides of the container form a wall? No.
+     - Does a higher line inside the container affect the area, breaking it into 2 parts? No.
+       ![water container](./img/water-container-1.png)
+
+  2. Initialize **two pointers**, one at the beginning and one at the end of the array constituting the length of the lines.
+  3. At every step, find out the area formed between them
+     - width = `right index - left index`
+     - height = `min(height[left], height[right])`
+  4. update the result and move the pointer pointing to the shorter line towards the other end by one step. This is because the farther the lines, the more will be the area obtained.
+
+```py
+def max_area(height):
+    max_area = 0
+    # Two pointers at the beginning and the end of the array
+    left, right = 0, len(height) - 1
+
+    while left < right:
+        # The width is the distance between them, and the height is the lower line.
+        area = (right - left) * min(height[left], height[right])
+        # Update max_area if we have a new maximum
+        max_area = max(max_area, area)
+        # Move the left and right pointers, depending on which line is shorter
+        if height[left] < height[right]:
+            left += 1
+        else:
+            right -= 1
+    return max_area
+```
+
+---
+
+### Trapping Rain Water
+
+Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.
+
+- EX: `height = [0,1,0,2,1,0,3,1,0,1,2]` --> `8` units of water
+  ![rain water](./img/trapping-rain-water.png)
+- Notes:
+
+  - Here, we will need to use the entire array to find the maximum area, so the distance between indexes doesn't matter.
+  - We know that the height of water cannot exceed the height of the shorter wall.
+  - Formula for the area of water above any point: `current_water = min(left_max, right_max) - height[i]`
+    - `height[i]` is the height of the current wall.
+    - `left_max` is the height of the tallest wall to the left of the current wall.
+    - `right_max` is the height of the tallest wall to the right of the current wall.
+  - To ge the wanted amount of water, we need to **find the area of water above each point and add them up**.
+    - if the water is above the current wall, the area will be positive, otherwise it will be negative. So we will only add the positive areas to the total.
+
+#### Solution 1: multiple loops O(n)
+
+- **Steps**:
+
+  1. Verify the constraints:
+
+     - Do the left and right sides of the container form a wall? No.
+     - will there be negative numbers? No.
+
+  2. Initialize variables to keep track of the maximum height on both the left and right sides of each bar
+  3. Loop through the list of heights to find the maximum height on the left side of each bar
+  4. Loop through the list of heights in reverse order to find the maximum height on the right side of each bar
+  5. Loop through the list of heights again and calculate the amount of water that can be trapped above each bar using the formula above.
+  6. Add up the amount of water trapped above each bar to get the total amount of water trapped.
+
+```py
+def trap(height):
+    # initialize two lists to store the max height of the left and right
+    # of each position
+    left_max = [0] * len(height)
+    right_max = [0] * len(height)
+    total_water = 0
+
+    # calculate the max height of the left of each position
+    max_height = 0
+    for i in range(len(height)):
+        left_max[i] = max_height
+        max_height = max(max_height, height[i])
+
+    # calculate the max height of the right of each position
+    max_height = 0
+    # loop through the list in reverse order
+    for i in range(len(height)-1, -1, -1):
+        right_max[i] = max_height
+        max_height = max(max_height, height[i])
+
+    # calculate the water in each position
+    for i in range(len(height)):
+        water = min(left_max[i], right_max[i]) - height[i]
+        # add the water to the total if it's positive (above the current wall)
+        if water > 0:
+            total_water += water
+
+    return total_water
+```
+
+#### Solution 2: Two pointers
+
+- In solution-1, we actually used 2 pointers (1 individual pointer with one iteration for each) but we were iterating pointers outwards. Here we will use 2 pointers to iterate inwards.
+- We can't use the 2 pointers in order to single handedly figure out what (the walls are for some container and the water inside), but what we can keep track of is the **maximum height of the left and right walls**.
+  - meaning that we keep track of every value that we have seen and keep track of the maximum value that is's seen and then decide which one to move inwards.
+- Here, **we calculate water per vertical-block for each point and not the area**
+
+```py
+def trap(height):
+    # initialize two lists to store the max height of the left and right
+    # of each position
+    left_max = 0
+    right_max = 0
+    total_water = 0
+
+    # initialize two pointers, one at the beginning and one at the end
+    left = 0
+    right = len(height) - 1
+
+    while left < right:
+        # update the left_max and right_max
+        if height[left] < height[right]:
+            # 1. get current left wall height
+            left_max = max(left_max, height[left]) # Update the left_max if the current wall is taller than the previous one
+            # 2. calculate the water above the current wall
+            total_water += left_max - height[left]
+            left += 1
+        else:
+            right_max = max(right_max, height[right])
+            total_water += right_max - height[right]
+            right -= 1
+
+    return total_water
 ```
 
 ---
@@ -692,6 +868,111 @@ def level_width(root):
   - When you're asked to find the **closest value** in a BST, you can use a **Depth First Search** to traverse the tree
   - When you're asked to find the **closest value** in a BST, you can use a **Breadth First Search** to traverse the tree
   - When you're asked to find the **closest value** in a BST, you can use a **Binary Search** to traverse the tree
+
+#### BST Insertion
+
+Write a function that accepts a root node of a BST and a value to insert into the tree. The function should return the root node of the BST after the insertion.
+
+- EX: `insert(root, 5) --> root`
+  ![bst insertion](./img/bst-insertion-1.png)
+
+```py
+def insert(root, value):
+    # if the root is None, create a new node with the value and return it
+    if root is None:
+        return Node(value)
+
+    # if the value is less than the root's value, insert it to the left
+    if value < root.value:
+        root.left = insert(root.left, value)
+    # if the value is greater than the root's value, insert it to the right
+    else:
+        root.right = insert(root.right, value)
+
+    return root
+```
+
+---
+
+#### Validate BST
+
+Write a function that accepts a root node of a BST and returns `True` if the tree is a valid BST and `False` if it is not.
+
+- EX: `validate(root) --> True`
+
+##### Solution 1: Using min and max values
+
+- **Steps:**
+  1. create a function that accepts a `root` node, a `min value`, and a `max value`
+  2. if the `root` is `None`, return `True`
+  3. if the `root`'s value is less than the `min_value` or greater than the `max_value`, return `False`
+  4. if the `left` subtree is not a valid BST, return `False`
+     - > the `max_value` of the left subtree should be the `root`'s value (since the left subtree should be less than the root)
+  5. if the `right` subtree is not a valid BST, return `False`
+     - > the `min_value` of the right subtree should be the `root`'s value (since the right subtree should be greater than the root)
+  6. if the `root` is a valid BST, return `True`
+
+```py
+def validate(root, min_value=float('-inf'), max_value=float('inf')):
+    # if the root is None, return True
+    if root is None:
+        return True
+    # if the root's value is less than the min_value or greater than the max_value, return False
+    if root.value < min_value or root.value > max_value:
+        return False # So that the validate function returns False and the parent function returns False
+
+    # if the left subtree is not a valid BST, return False
+    if not validate(root.left, min_value, root.value):
+        return False
+
+    # if the right subtree is not a valid BST, return False
+    if not validate(root.right, root.value, max_value):
+        return False
+
+    # if the root is a valid BST, return True
+    return True
+```
+
+##### Solution 2: Using In-Order Traversal
+
+- **Steps:**
+  1. create a function that accepts a `root` node
+  2. create an array to store the `values` of the nodes in the tree
+  3. create a function that accepts a `root` node and adds the `values` of the nodes in the tree to the array, then call the function with the `root`'s `right` node
+  4. call the function with the `root` node
+  5. loop through the array and check if the values are in ascending order
+  6. if the values are in ascending order, return `True`
+
+```py
+def validate(root):
+    # create an array to store the values of the nodes in the tree
+    values = []
+
+    # create a function that accepts a root node
+    def traverse(root):
+        # if the root is None, return
+        if root is None:
+            return
+
+        # call the function with the root's left node
+        traverse(root.left)
+        # add the root's value to the array
+        values.append(root.value)
+        # call the function with the root's right node
+        traverse(root.right)
+
+    # call the function with the root node
+    traverse(root)
+
+    # loop through the array and check if the values are in ascending order
+    for i in range(len(values) - 1):
+        # if the values are not in ascending order, return False
+        if values[i] > values[i + 1]:
+            return False
+
+    # if the values are in ascending order, return True
+    return True
+```
 
 ---
 

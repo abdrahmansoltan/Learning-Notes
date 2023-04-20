@@ -6,28 +6,33 @@
       - [SQL Commands](#sql-commands)
       - [CRUD](#crud)
     - [notes](#notes)
+  - [Date](#date)
+    - [date Operators](#date-operators)
   - [Filtering Queries](#filtering-queries)
-  - [Comparison Operators](#comparison-operators)
+    - [NULL values](#null-values)
+      - [Null Coalescing](#null-coalescing)
+      - [`NULLIF` function](#nullif-function)
+    - [BETWEEN...AND](#betweenand)
+    - [`IN` Keyword](#in-keyword)
+    - [`LIKE` Keyword](#like-keyword)
+    - [`Distinct` Keyword](#distinct-keyword)
+    - [`HAVING` Keyword](#having-keyword)
+    - [`CASE` Keyword (if-then-else)](#case-keyword-if-then-else)
+  - [Sorting](#sorting)
+  - [Grouping](#grouping)
+    - [Unions](#unions)
+    - [GROUPING SETS](#grouping-sets)
   - [SQL Functions](#sql-functions)
+    - [Window Function](#window-function)
+      - [Frame Clause](#frame-clause)
+  - [Views](#views)
   - [Multiple Tables](#multiple-tables)
     - [Multi Table Queries](#multi-table-queries)
-  - [PostgreSQL](#postgresql)
-  - [Environment Variables](#environment-variables)
-  - [Connecting Node to a Postgres Database](#connecting-node-to-a-postgres-database)
-  - [Migrations](#migrations)
-    - [Instructions to install db-migrate](#instructions-to-install-db-migrate)
-  - [Models](#models)
-    - [Files and Folders](#files-and-folders)
-    - [CRUD methods](#crud-methods)
-    - [Testing Models](#testing-models)
-      - [Steps](#steps)
-  - [REST](#rest)
-    - [Routes to Models](#routes-to-models)
-    - [JWT](#jwt)
-  - [SQL Relationships](#sql-relationships)
-    - [Many to many](#many-to-many)
-    - [Join Queries](#join-queries)
-    - [Services](#services)
+    - [Joining Tables (`JOIN`)](#joining-tables-join)
+      - [`USING` Keyword](#using-keyword)
+  - [Indexes](#indexes)
+    - [Index Types](#index-types)
+  - [SubQueries](#subqueries)
 
 ---
 
@@ -101,6 +106,80 @@ a "Query" is also called "SQL Statement" and it is a command that we send to the
 
 ---
 
+## Date
+
+- Time zones are not stored in the database. They are only used when displaying the date and time. So the date and time stored in the database is always in **UTC**.
+
+  ```sql
+  SHOW TIMEZONE; -- UTC
+
+  SET TIMEZONE = 'Asia/Tehran'; -- change timezone for current session
+
+  -- To change the timezone for all sessions, you need to change the timezone in the postgresql.conf file.
+  ALTER SYSTEM SET TIMEZONE TO 'Asia/Tehran';
+  ```
+
+- `DATE` : is a data type that stores a date (year, month, day) without a time zone.
+
+  ```sql
+  SELECT * FROM worlds WHERE sighting_date = '2021-01-10';
+  ```
+
+- Date format
+
+  - `YYYY-MM-DD` : is the most common format for dates in SQL
+  - `YYYY-MM-DD HH:MM:SS` : is the most common format for dates and times in SQL
+  - `YYYY-MM-DD HH:MM:SS +-HH:MM` : is the most common format for dates and times with time zones in SQL
+
+- When creating a date column, You can specify whether you will use time zones or not using **TIMESTAMP**.
+
+  ```sql
+  CREATE TABLE timezones (
+    TS TIMESTAMP WITHOUT TIME ZONE
+    tZ TIMESTAMP WITH TIME ZONE,
+  );
+  ```
+
+---
+
+### date Operators
+
+- Get current date
+
+  ```sql
+  SELECT CURRENT_DATE; -- 2021-01-10
+  -- or
+  SELECT NOW()::DATE; -- 2021-01-10
+  ```
+
+- Format date
+
+  ```sql
+  SELECT TO_CHAR(NOW(), 'YYYY-MM-DD HH:MM:SS'); -- 2021-01-10 15:00:00
+  ```
+
+- Cast date
+
+  ```sql
+  SELECT CAST('2021/01/10' AS DATE); -- 2021-01-10
+  -- or
+  SELECT date '2021/01/10'; -- 2021-01-10
+  ```
+
+- Extract date
+
+  ```sql
+  SELECT EXTRACT(YEAR FROM NOW()); -- 2021
+  ```
+
+- Interval
+
+  ```sql
+  SELECT date '2021/01/10' + INTERVAL '1 day'; -- 2021-01-11 15:00:00
+  ```
+
+---
+
 ## Filtering Queries
 
 Common filter words are WHERE, BETWEEN, LIKE, IF NULL, IF NOT NULL
@@ -118,7 +197,245 @@ Common filter words are WHERE, BETWEEN, LIKE, IF NULL, IF NOT NULL
 
 ---
 
-## Comparison Operators
+### NULL values
+
+You should always be aware of the possibility of NULL values in your database. So it's a good idea to be defensive and to check for them in your queries.
+
+- `IS NULL` : is used to test for NULL values (empty fields)
+- with comparison/math operators -> **All roads lead to Null**
+  - `null = null` -> false
+  - `null <> null` -> false
+- `IS NOT NULL` : is used to test for NOT NULL values
+
+  ```sql
+  SELECT * FROM worlds WHERE name = NULL; -- WRONG
+  SELECT * FROM worlds WHERE name != NULL; -- WRONG
+
+  SELECT * FROM worlds WHERE name IS NULL; -- CORRECT
+  SELECT * FROM worlds WHERE name IS NOT NULL; -- CORRECT
+  ```
+
+#### Null Coalescing
+
+- `COALESCE` : is a function used to return the first non-NULL value in a list
+
+  ```sql
+  SELECT COALESCE(NULL, 'Dan', 'John'); -- Dan
+  ```
+
+- It's used when you have columns that may contain `NULL` values and you want to replace them with a default value.
+
+  ```sql
+  SELECT COALESCE(name, 'Unknown') FROM worlds;
+  ```
+
+---
+
+#### `NULLIF` function
+
+- `NULLIF` : is a function used to return `NULL` if the two arguments are equal. Otherwise it returns the first argument.
+
+  ```sql
+  SELECT NULLIF('Dan', 'Dan'); -- NULL
+  SELECT NULLIF('Dan', 'John'); -- Dan
+  ```
+
+---
+
+### BETWEEN...AND
+
+- `BETWEEN` : is used to filter the result set within a certain range. The values can be numbers, text, or dates.
+
+  ```sql
+  SELECT * FROM worlds WHERE id BETWEEN 1 AND 3;
+  ```
+
+- It's sensitive to the order of arguments. The first argument must be less than or equal to the second argument.
+
+  ```sql
+  SELECT * FROM worlds WHERE id BETWEEN 3 AND 1; -- WRONG
+  ```
+
+---
+
+### `IN` Keyword
+
+- `IN` : is used to specify multiple values in a `WHERE` clause.
+
+  ```sql
+  SELECT * FROM worlds WHERE name IN ('Dan', 'John');
+  -- It's instead of writing OR
+  SELECT * FROM worlds WHERE name = 'Dan' OR name = 'John';
+  ```
+
+---
+
+### `LIKE` Keyword
+
+- `LIKE` : is used in a `WHERE` clause to search for a **specified pattern** in a column.
+
+  - `%` : is a wildcard that represents zero, one, or multiple characters
+  - `_` : is a wildcard that represents a single character
+  - It's case sensitive by default. To perform case-insensitive comparisons, use `ILIKE` instead.
+
+```sql
+SELECT * FROM worlds WHERE name LIKE 'Dan%'; -- Dan and anything that comes after the n
+
+SELECT * FROM numbers WHERE percentage LIKE '_00%'; -- 100, 200, 300, 400, 500, 600, 700, 800, 900 and 1000
+
+SELECT * FROM numbers WHERE percentage LIKE '2_%_%'; -- values that start with 2 and are at least 3 characters in length
+```
+
+- **Note:** Postgres uses `LIKE` only with text comparison. It doesn't work with numbers. So we must cast the column to text.
+
+  ```sql
+  SELECT * FROM numbers WHERE CAST(percentage AS TEXT) LIKE '2_%_%';
+  -- or
+  SELECT * FROM numbers WHERE percentage::TEXT LIKE '2_%_%';
+  ```
+
+---
+
+### `Distinct` Keyword
+
+- `DISTINCT` : is used to return only distinct (different) values **(Remove Duplicates)**.
+
+  ```sql
+  SELECT DISTINCT name FROM worlds;
+  ```
+
+---
+
+### `HAVING` Keyword
+
+- `HAVING` : is used with aggregate functions to filter the result-set based on the aggregate values.
+
+  ```sql
+  SELECT name, COUNT(*) FROM worlds
+  GROUP BY name
+  HAVING COUNT(*) > 1;
+  ```
+
+- `WHERE` : is used to filter records to individual rows.
+- `HAVING` : is used to filter records to groups of rows as a whole.
+
+---
+
+### `CASE` Keyword (if-then-else)
+
+- `CASE` : is used to create different outputs (usually in the `SELECT` statement). It is SQL's way of handling **`if-then-else`** logic.
+
+  ```sql
+  SELECT name,
+    CASE
+      WHEN name = 'Dan' THEN 'Hello Dan'
+      WHEN name = 'John' THEN 'Hello John'
+      ELSE 'I don't know you'
+    END AS greeting
+  FROM worlds;
+  ```
+
+---
+
+## Sorting
+
+- `ORDER BY` : is used to sort the result-set in ascending or descending order.
+
+  ```sql
+  SELECT * FROM worlds ORDER BY name; -- ASC
+  SELECT * FROM worlds ORDER BY name DESC; -- DESC
+  ```
+
+- `ORDER BY` : can be used with multiple columns. The first column is used to sort the records first, then the second column, and so on.
+
+  ```sql
+  SELECT * FROM worlds ORDER BY name, id; -- order by name ASC and id ASC
+
+  SELECT * FROM worlds ORDER BY name, id DESC; -- order by name ASC and id DESC
+  ```
+
+---
+
+## Grouping
+
+It's used to summarize data into groups. This is done by splitting data into groups and then applying aggregate functions to each group rather than applying them to each row or the entire table.
+
+- `GROUP BY` : is used in conjunction with the aggregate functions to group the result-set by one or more columns.
+
+  ```sql
+  SELECT name, COUNT(*) FROM worlds GROUP BY name;
+  ```
+
+- Example:
+
+  ```sql
+  SELECT genre, AVG(price) AS avg_price
+  FROM books
+  GROUP BY genre;
+  ```
+
+  ![grouping](./img/grouping-1.jpg)
+
+- How it works -> **Split-Apply-Combine**
+  ![grouping](./img/grouping-2.png)
+
+  - **Split:** The data is split into groups based on the column specified in the `GROUP BY` clause.
+  - **Apply:** An aggregate function is applied to each group.
+  - **Combine:** The results from each group are combined into a single result set.
+
+- To filter by the aggregate values, we use ["HAVING" Keyword](#having-keyword) instead of `WHERE`.
+
+- **Notes:**
+
+  - We need to select the columns that we want to group by. If we don't select them, we'll get an error.
+
+    ```sql
+    SELECT COUNT(*) FROM worlds GROUP BY name; -- WRONG
+    ```
+
+  - Also we can't use `GROUP BY` without aggregate functions.
+
+    ```sql
+    SELECT name FROM worlds GROUP BY name; -- WRONG
+    ```
+
+    - That is because `GROUP BY` is used to reduce all records found for the matching group to a **single record**. So we need to use aggregate functions to summarize the data.
+
+---
+
+### Unions
+
+- `UNION` : is used to combine the result-set of two or more `SELECT` statements.
+
+  ```sql
+  SELECT name FROM worlds WHERE name LIKE 'Dan%'
+  UNION
+  SELECT name FROM worlds WHERE name LIKE 'John%';
+  ```
+
+- `UNION` : removes duplicate rows from the result-set.
+- `UNION ALL` : doesn't remove duplicate rows from the result-set.
+
+---
+
+### GROUPING SETS
+
+`GROUPING SETS` : is used to group the result-set by one or more columns.
+
+- It replaces the `UNION` keyword for multiple grouping.
+
+  ```sql
+  SELECT name, COUNT(*) FROM worlds
+  GROUP BY GROUPING SETS (name, (name, id));
+
+  -- this is instead of:
+
+  SELECT name, COUNT(*) FROM worlds
+  GROUP BY name
+  UNION
+  SELECT name, COUNT(*) FROM worlds
+  GROUP BY name, id;
+  ```
 
 ---
 
@@ -170,11 +487,68 @@ It's a set of steps that creates a **single value**.
 
 ---
 
+### Window Function
+
+It creates a new column based on functions performed on a subset **(window)** of the rows in a table.
+
+- `OVER`: is used to define the window.
+
+- `PARTITION BY` : is used to partition the data into groups based on the specified column.
+
+![window function](./img/window-function.png_large)
+
+```sql
+SELECT name, COUNT(*) OVER (PARTITION BY name) FROM worlds;
+-- Here, we're:
+-- partitioning the data into groups based on the `name` column.
+-- Then, we apply the `COUNT` function to each group.
+-- The result is a new column that contains the count of each group.
+```
+
+#### Frame Clause
+
+- `ROWS` : is used to specify the number of rows before and after the current row to be included in the window.
+
+  ```sql
+  SELECT name, COUNT(*) OVER (PARTITION BY name ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM worlds;
+  -- Here, we're:
+  -- partitioning the data into groups based on the `name` column.
+  -- Then, we apply the `COUNT` function to each group.
+  -- The result is a new column that contains the count of each group.
+  -- The `ROWS` clause specifies the number of rows before and after the current row to be included in the window. (1 row before and 1 row after)
+  ```
+
+- `Order By` : is used to sort the rows in the window.
+
+  ```sql
+  SELECT name, COUNT(*) OVER (PARTITION BY name ORDER BY id ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING) FROM worlds;
+  ```
+
+---
+
+## Views
+
+**Views** : is a virtual table based on the result-set of an SQL statement. which allows you to store and query previously executed queries.
+
+- It's a table that doesn't exist physically in the database. used to simplify the process of querying data.
+- It's a way to store the result of a query for later use.
+- Views take little space in the database. we only store the definition of a view and not all the data.
+- Views can be used to restrict access to data.
+
+```sql
+CREATE VIEW <view_name> AS
+SELECT <column_name>, <column_name>
+FROM <table_name>
+WHERE <condition>;
+```
+
+---
+
 ## Multiple Tables
 
 ### Multi Table Queries
 
-It's a query that involves more than one table.
+**Multi table select:** is combining data from multiple tables in order to create a visual representation of the data relationships across the tables.
 
 - It's done using **aliases**.
 
@@ -195,661 +569,142 @@ WHERE a.emp_id = b.emp_id;
 
 ---
 
-## PostgreSQL
+### Joining Tables (`JOIN`)
 
-- If you already know the name of the database you want to connect to, you can write `psql name_of_database`
+`JOIN` : is used to combine rows from two or more tables, based on a related column between them.
 
-  ```bash
-  psql <name_of_database>
+![join](./img/sql-join-1.png)
 
-  # that would be equivalent to
-  psql postgres
-  \c <name_of_database>
-  ```
+- `INNER JOIN` : returns records that have matching values in both tables
 
-- Common psql commands
+  - It's generally considered a best practice, It's more readable than using `WHERE` clause. It shows what's being joined.
 
-  - Create user : `CREATE USER full_stack_user WITH PASSWORD 'password123';`
-  - open psql: `psql postgres`
-  - commands with `\` are called **meta-commands** : they are `system-level commands`
-  - `\l` List databases
-  - connect to a database: `\c <database_name>`
-  - create a new database: `create database <database_name>`
-  - get out of psql: `\q`
-  - display tables in the database : `\dt`
+    ```sql
+    SELECT <column_name>, <column_name>
+    FROM <table_name> AS <alias_name>
+    INNER JOIN <table_name> AS <alias_name>
+    ON <table_name>.<column_name> = <table_name>.<column_name>
 
-- [Create a Superuser in postgres](https://stackoverflow.com/questions/57975093/create-a-superuser-in-postgres)
+    -- EX:
+    SELECT a.emp_id, a.emp_name, b.emp_salary
+    FROM employees as a
+    INNER JOIN salaries as b
+    ON a.emp_id = b.emp_id;
+    ```
 
-  - do this after
+- `OUTER JOIN` : returns all records from one table, and the matched records from the other table
 
-- Command to create a new table:
+  - `LEFT OUTER JOIN` : returns all records from the left table, and the matched records from the right table
+  - `RIGHT OUTER JOIN` : returns all records from the right table, and the matched records from the left table
+  - `FULL OUTER JOIN` : returns all records from both tables whether there is a match or not.
+
+- `CROSS JOIN` : create a combination of every row from the first table with every row from the second table
+
+  - returns the **cartesian product** of the sets of records from the joined tables
+  - It results in a very large number of records
+
+- `SELF JOIN` : is a regular join, but the table is joined with itself, creating a temporary copy of the table to work with in the query
+
+  - This can be done when a table has a foreign key that references its primary key -> (references itself)
+  - not supported in Postgres
 
   ```sql
-  <!-- structure -->
-  CREATE TABLE [IF NOT EXISTS] <table_name> (
-  column1_name column1_datatype,
-  column2_name column2_datatype,
-  column2_name column2_datatype
-  );
-
-  <!-- Example -->
-  CREATE TABLE Plants (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100),
-    description text,
-    indiveduals integer,
-    date date);
+  SELECT a.emp_id, a.emp_name, b.emp_salary
+  FROM employees as a
+  INNER JOIN employees as b -- same table but different alias
+  ON a.emp_id = b.emp_id;
   ```
 
-- `SERIAL PRIMARY KEY` : A table column whose values are an auto incrementing number and are guaranteed to
-  be unique to each row
-- If you already know the name of the database you want to connect to, you can write `psql name_of_database` and that would be equivalent to `psql postgres` `\c name_of_database`
-  - `psql <database name> <username>` --> to connect to database as user ..
+- **Notes**
+  - when we do a `join`, the results always come back **unsorted**
+
+#### `USING` Keyword
+
+- `USING` : is used to join tables on columns that have the same name.
+- It's a shorthand for `ON <table_name>.<column_name> = <table_name>.<column_name>`
+
+  ```sql
+  SELECT <column_name>, <column_name>
+  FROM <table_name> AS <alias_name>
+  INNER JOIN <table_name> AS <alias_name>
+  USING (<column_name>)
+  ```
+
+  - `USING` is a shorthand for `ON <table_name>.<column_name> = <table_name>.<column_name>`
 
 ---
 
-## Environment Variables
+## Indexes
 
-Working with sensitive information can be hard, especially when your application relies on keys and passwords in order to connect to and access databases or APIs. so we add a `library for environment variables` in Node so that we can safely store information away from public eyes without moving it out of reach.
+**Indexes** : is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and storage space to maintain the index data structure.
 
-- The library we will use for environment variables is called `dotenv` ---> [dotenv](https://github.com/motdotla/dotenv)
-- Make a new file called `.env` in the root of the project.
-
-- put the variables names in the `.env` file
-
-  ```js
-  POSTGRES_HOST=127.0.0.1
-  POSTGRES_DB=full_stack_dev
-  POSTGRES_USER=full_stack_user
-  POSTGRES_PASSWORD=password123
-  ```
-
-- The `.env` file hides sensitive information and makes it available to our application via a variable, so it holds a lot of really important, secret information. Information we don't want shared **even in a respository**.
-  - If a `gitignore` file exists in your project add the .env file there.
-  - If you include your `.env` file in a public repository, you have completely negated the purpose of adding environment variables.
-
----
-
-## Connecting Node to a Postgres Database
-
-- create Database connection file --> `database.ts`
-- install `pg`, `dotenv`
-
-  - information to connect to a database
-    - database location, database name
-    - username, password
-  - The `dotenv.config()` ->You can't access the env vars unless this line exists in your code, it typically goes as close to the beginning of the program as possible.
-
-  ```ts
-  import dotenv from 'dotenv';
-  import { Pool } from 'pg';
-
-  dotenv.config(); // initialize the environment variables
-
-  // getting the information needed to connect to the database
-  const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD } = process.env;
-
-  // connection to database, we'll call it "client"
-  const client = new Pool({
-    host: POSTGRES_HOST,
-    database: POSTGRES_DB,
-    user: POSTGRES_USER,
-    password: POSTGRES_PASSWORD
-  });
-
-  export default client; // to be used to establish connection to database
-  ```
-
----
-
-## Migrations
-
-Migrations are a record of a **changes** made to the `schema` of a database.
-
-- Migrations contain instructions for how to enact and rollback a specific change to the database
-
-![migration](./img/Migrations.png)
-![migration](./img/Migrations2.png)
-
-- npm library we will use for database migrations: [DB-migrate](https://github.com/db-migrate/node-db-migrate)
-
-### Instructions to install db-migrate
-
-- ```bash
-  npm install -g db-migrate  # globally to use its terminal comands
-  npm install db-migrate db-migrate-pg  # create dependencies
-  ```
-
-- Add a `database.json` reference file in the root of the project.
-
-  - this will allow us to specify what database we want to run migrations on
-
-  ```json
-  {
-    "dev": {
-      "driver": "pg",
-      "host": "127.0.0.1",
-      "database": "fantasy_worlds",
-      "user": "magical_user",
-      "password": "password123"
-    },
-    "test": {
-      "driver": "pg",
-      "host": "127.0.0.1",
-      "database": "fantasy_worlds_test",
-      "user": "test_user",
-      "password": "password123"
-    }
-  }
-  ```
-
-- Create a migration
-
-  ```bash
-  # run this in terminal
-  db-migrate create <table_name> --sql-file
-  ```
-
-- Add the SQL you need to the `up` and `down` sql files
-  - Bring the migration up `db-migrate up`
-  - Bring the migration down `db-migrate down`
-
----
-
-## Models
-
-- as all rows in a table have the same schema so we can treat :
-  - `table` as a `Class`
-  - `row` as a `instance of the class`
-- performs `CRUD` operations on the database from within a Node program.
-
-### Files and Folders
-
-- `models` folder contains tables as each `js` file in it is for a table (class)
-- The directory structure should look like this:
-  `src --> models --> book.ts`
-
-- Database table will hold many books, but **the model file is defining what a book is for our application**.
-- The model is represented as a `class`
-- Each book `row` in the database will be an `instance` of the book model.
-
----
-
-### CRUD methods
-
-- Example
-
-```ts
-import Client from '../database'; // Responsible for database connection
-
-// type for the class
-export type Book = {
-  id: number;
-  title: string;
-  author: string;
-  totalPages: number;
-  summary: string;
-};
-
-export class BookStore {
-  async index(): Promise<Book[]> {
-    try {
-      // @ts-ignore
-      const conn = await Client.connect(); // Open connection
-      const sql = 'SELECT * FROM books';
-
-      const result = await conn.query(sql);
-
-      conn.release(); // Close connection
-
-      return result.rows;
-    } catch (err) {
-      throw new Error(`Could not get books. Error: ${err}`);
-    }
-  }
-
-  async show(id: string): Promise<Book> {
-    try {
-      const sql = 'SELECT * FROM books WHERE id=($1)';
-      // @ts-ignore
-      const conn = await Client.connect();
-
-      const result = await conn.query(sql, [id]);
-
-      conn.release();
-
-      return result.rows[0];
-    } catch (err) {
-      throw new Error(`Could not find book ${id}. Error: ${err}`);
-    }
-  }
-
-  async create(b: Book): Promise<Book> {
-    try {
-      const sql =
-        'INSERT INTO books (title, author, total_pages, summary) VALUES($1, $2, $3, $4) RETURNING *';
-      // @ts-ignore
-      const conn = await Client.connect();
-
-      const result = await conn.query(sql, [b.title, b.author, b.totalPages, b.summary]);
-
-      const book = result.rows[0];
-
-      conn.release();
-
-      return book;
-    } catch (err) {
-      throw new Error(`Could not add new book ${title}. Error: ${err}`);
-    }
-  }
-
-  async delete(id: string): Promise<Book> {
-    try {
-      const sql = 'DELETE FROM books WHERE id=($1)';
-      // @ts-ignore
-      const conn = await Client.connect();
-
-      const result = await conn.query(sql, [id]);
-
-      const book = result.rows[0];
-
-      conn.release();
-
-      return book;
-    } catch (err) {
-      throw new Error(`Could not delete book ${id}. Error: ${err}`);
-    }
-  }
-}
-```
-
----
-
-### Testing Models
-
-`integration test` checks how the individual pieces of your application logic work together. The span of one integration test will cover multiple chunks of code (that can and should each have their own unit tests) and make sure that working correctly together in a flow or process.
-
-#### Steps
-
-1. Create the database
-
-   - add a new database called `full_stack_test`
-
-2. Add the Environment Variable
-   - We need a new variable called `ENV` to the `.env file`.
-   - Set `ENV=dev` so that the default environment is development.
-3. Update the database connection file (database.ts)
-
-   ```ts
-   import dotenv from 'dotenv';
-   import { Pool } from 'pg';
-
-   dotenv.config();
-
-   const { POSTGRES_HOST, POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_TEST_DB, ENV } =
-     process.env;
-
-   let client;
-   console.log(ENV);
-
-   if (ENV === 'test') {
-     client = new Pool({
-       host: POSTGRES_HOST,
-       database: POSTGRES_DB,
-       user: POSTGRES_USER,
-       password: POSTGRES_PASSWORD
-     });
-   }
-
-   if (ENV === 'dev') {
-     client = new Pool({
-       host: POSTGRES_HOST,
-       database: POSTGRES_TEST_DB,
-       user: POSTGRES_USER,
-       password: POSTGRES_PASSWORD
-     });
-   }
-
-   export default client;
-   ```
-
-4. Write the tests
-
-   ```ts
-   import { Book, BookStore } from '../book';
-
-   const store = new BookStore();
-
-   describe('Book Model', () => {
-     // test if the method exists
-     it('should have an index method', () => {
-       expect(store.index).toBeDefined();
-     });
-
-     it('create method should add a book', async () => {
-       const result = await store.create({
-         title: 'Bridge to Terabithia',
-         total_pages: 250,
-         author: 'Katherine Paterson',
-         type: 'Childrens'
-       });
-       expect(result).toEqual({
-         id: '1',
-         title: 'Bridge to Terabithia',
-         total_pages: 250,
-         author: 'Katherine Paterson',
-         type: 'Childrens'
-       });
-     });
-
-     // check for specific array result
-     it('index method should return a list of books', async () => {
-       const result = await store.index();
-       expect(result).toEqual([
-         {
-           id: '1',
-           title: 'Bridge to Terabithia',
-           total_pages: 250,
-           author: 'Katherine Paterson',
-           type: 'Childrens'
-         }
-       ]);
-     });
-
-     it('show method should return the correct book', async () => {
-       const result = await store.show('1');
-       expect(result).toEqual({
-         id: '1',
-         title: 'Bridge to Terabithia',
-         total_pages: 250,
-         author: 'Katherine Paterson',
-         type: 'Childrens'
-       });
-     });
-
-     it('delete method should remove the book', async () => {
-       store.delete('1');
-       const result = await store.index();
-
-       expect(result).toEqual([]);
-     });
-   });
-   ```
-
-5. Add the tset script
-
-   ```json
-   "test": "ENV=test db-migrate --env test up && jasmine-ts && db-migrate db:drop test",
-   ```
-
----
-
-## REST
-
-### Routes to Models
-
-in `restfull` architecture each entity or model in the app gets its own set of `RestFull routes`
-
-```ts
-// in helper file
-import express, { Request, Response } from 'express'; // for Typescript
-import { Article, ArticleStore } from '../models/article';
-
-const store = new ArticleStore(); // new instance
-
-// now we create CRUD functions
-
-const index = async (_req: Request, res: Response) => {
-  const articles = await store.index(); // get all articles
-  res.json(articles);
-};
-
-const show = async (req: Request, res: Response) => {
-  const article = await store.show(req.body.id);
-  res.json(article);
-};
-
-const create = async (req: Request, res: Response) => {
-  try {
-    const article: Article = {
-      title: req.body.title,
-      content: req.body.content
-    };
-
-    const newArticle = await store.create(article);
-    res.json(newArticle);
-  } catch (err) {
-    res.status(400);
-    res.json(err);
-  }
-};
-
-const destroy = async (req: Request, res: Response) => {
-  const deleted = await store.delete(req.body.id);
-  res.json(deleted);
-};
-
-// each route use one model
-const articleRoutes = (app: express.Application) => {
-  app.get('/articles', index);
-  app.get('/articles/:id', show);
-  app.post('/articles', create);
-  app.delete('/articles', destroy);
-};
-
-export default articleRoutes; // to be used in the server file to have clean code
-```
-
----
-
-### JWT
-
-- [npm jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
-
-- Creating `JWT` (Create JWT at user sign up)
-
-  ```ts
-  // handlers/users.ts
-
-  // in helper file
-  import express, { Request, Response } from 'express'; // for Typescript
-  import { Article, ArticleStore } from '../models/article';
-  const jwt = require('jsonwebtoken');
-
-  const store = new ArticleStore(); // new instance
-
-  // create method with JWT for Authorization
-  const createNewUser = async (req: Request, res: Response) => {
-    const user: User = {
-      username: _req.body.username,
-      password: _req.body.password
-    };
-    try {
-      const newUser = await store.create(user);
-
-      const token = jwt.sign({ user: newUser }, process.env.TOKEN_SECRET); // create a token
-
-      res.json(token); // send the token so that it can be stored in the frontend and used for future-authorization with out API
-    } catch (err) {
-      res.status(400);
-      res.json(err + user);
-    }
-  };
-
-  export default articleRoutes; // to be used in the server file to have clean code
-  ```
-
-- Validating `JWT` (example to understand)
-
-  ```ts
-  // handlers/users.ts
-  import express, { Request, Response } from 'express'; // for Typescript
-  import { Article, ArticleStore } from '../models/article';
-  const jwt = require('jsonwebtoken');
-
-  const store = new WeaponStore(); // new instance
-
-  const createNewWeapon = async (_req: Request, res: Response) => {
-    const weapon: Weapon = {
-      name: _req.body.name,
-      type: _req.body.type,
-      weight: _req.body.weight
-    };
-
-    // Validating the user's token to Authorize him to the next action
-    try {
-      jwt.verify(_req.body.token, process.env.TOKEN_SECRET);
-    } catch (err) {
-      res.status(401);
-      res.json(`Invalid Token ${err}`);
-    }
-
-    try {
-      const newWeapon = await store.create(weapon);
-      res.json(newWeapon);
-    } catch (err) {
-      res.status(400);
-      res.json(err);
-    }
-  };
-
-  export default weaponsRoutes; // to be used in the server file to have clean code
-  ```
-
-- `Authorization: Bearer <token>`
-
-  > Where `Bearer` is a string separated by the token with a space.
-
-  ```js
-  const authorizationHeader = req.headers.authorization;
-  const token = authorizationHeader.split(' ')[1]; // Parsing the header
-  ```
-
-- Validating `JWT` (real life)
-
-  ```ts
-  // handlers/weapons.ts
-
-  // middleware
-  const verifyAuthToken = (req: Request, res: Response, next) => {
-    try {
-      const authHeader = req.headers.authorization;
-      const token = authHeader.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.TOKEN_SECRET);
-
-      next(); // !IMPORTANT
-    } catch (error) {
-      res.status(401);
-    }
-  };
-
-  const create = async (req: Request, res: Response) => {
-    //....rest of method is unchanged
-  };
-
-  // using the middleware function
-  const mount = (app: express.Application) => {
-    app.get('/users', index);
-    app.get('/users/:id', show);
-    app.post('/users', verifyAuthToken, create);
-    app.put('/users/:id', verifyAuthToken, update);
-    app.delete('/users/:id', verifyAuthToken, destroy);
-  };
-
-  export default mount;
-  ```
-
----
-
-## SQL Relationships
-
-![relations](./img/relations.png)
-
-### Many to many
-
-![manytomany](./img/manytomany.png)
-
----
-
-### Join Queries
+- It's a way to speed up queries.
+- It's a pointer to data in a table.
+  - It's like the (table of contents) in a book, as it helps you find the data you're looking for faster.
+- It slows down the process of inserting, updating, and deleting data in the table. **(because we have to update the index as well)**
 
 ```sql
-SELECT * FROM products INNER JOIN order_products ON product.id = order_products.id;
+CREATE INDEX <index_name> ON <table_name> (<column_name>);
 ```
+
+- When to use Indexes?
+
+  - Primary keys, Foreign keys and Unique columns are indexed by default.
+  - When you have a lot of data in a table.
+  - When you have a lot of queries that use the same column.
+  - When you have a lot of queries that use the same column in the `WHERE` clause.
+
+- When not to use Indexes?
+  - When you have a small amount of data in a table.
+  - whey table is updated frequently.
+  - when columns contain a lot of `NULL` values.
+  - when columns have large values
+  - When you have a lot of queries that use the same column but in the `SELECT` clause.
+  - When you have a lot of queries that use the same column in the `WHERE` clause but with different values.
 
 ---
 
-### Services
+### Index Types
 
-- This `JOIN` query is **business logic** that does not belong in any model or handler, so we are going to put it in a new place, called a `service`.
+- Postgres supports different types of indexes:
 
-- `service file` is a place to write extra business logic that does not belong in a handler or a model or orchestrates changes with multiple models.
+  - **B-tree** : is the default index type in Postgres. It's the most common index type. It's the best choice for most situations.
+    ![b-tree](./img/b-tree-algorithm.png)
+  - **Hash** : is a good choice when you have a small number of rows in the table. It's faster than B-tree for small tables.
+    ![b-tree](./img/hash-algorithm.png)
+  - **Gin** : Generalized inverted index -- best used when multiple values are stored in a single field.
+  - **GiST** : Generalized search tree -- useful in indexing geometry data types.
 
-- `services` -> `dashboard.ts`
+- Each index type uses a different **Algorithm** to store the data. Each index type has its own advantages and disadvantages.
 
-  - Here, we can add various methods that get information from the database in the form of specialized select queries or joins.
+---
 
-  - The dashboard will run SQL queries to `READ` information from the database, but any actions on the database should be done through a `model`.
+## SubQueries
 
-  - This dashboard file is simply allowing us to isolate our informational queries together in one place, rather than spread them out across all the models.
+**SubQuery** : is a query within/inside another query.
 
-- We import the database client and create a connection in the method just like a model, because this service is running queries on the database, they will just be READ-ONLY queries, instead of updating tables, so this is ok.
+- It must be enclosed in parentheses `()`.
+- It's most often found in the `WHERE` clause of a query.
 
-```ts
-// src/services/dashboard.ts --> orderedProducts
-
-import Client from '../database';
-
-export class DashboardQueries {
-  // Get all products that have been included in orders
-  async productsInOrders(): Promise<{ name: string; price: number; order_id: string }[]> {
-    try {
-      //@ts-ignore
-      const conn = await Client.connect();
-      const sql =
-        'SELECT name, price, order_id FROM products INNER JOIN order_products ON product.id = order_products.id';
-
-      const result = await conn.query(sql);
-
-      conn.release();
-
-      return result.rows;
-    } catch (err) {
-      throw new Error(`unable get products and orders: ${err}`);
-    }
-  }
-}
-```
-
-- We will create a separate `handler file` for these methods.
-
-  ```ts
-  // src/handlers/dashboardHandlers.ts
-
-  import express, { Request, Response } from 'express';
-
-  import { DashboardQueries } from '../services/dashboard';
-
-  const dashboard = new DashboardQueries();
-
-  const productsInOrders = async (_req: Request, res: Response) => {
-    const products = await dashboard.productsInOrders();
-    res.json(products);
-  };
-
-  const usersWithOrders = async (_req: Request, res: Response) => {
-    const users = await dashboard.usersWithOrders();
-    res.json(users);
-  };
-
-  const dashboardRoutes = (app: express.Application) => {
-    app.get('/products-in-orders', productsInOrders);
-    app.get('/users-with-orders', usersWithOrders);
-  };
-
-  export default dashboardRoutes;
+  ```sql
+  SELECT <column_name>, <column_name>
+  FROM <table_name>
+  WHERE <column_name> = (SELECT <column_name> FROM <table_name> WHERE <condition>);
   ```
 
-```
+- When using `HAVING` with it, It must return a single value.
 
-```
+- SubQueries vs Joins
+
+  - `SubQueries`
+
+    - are used when you need to filter the data based on a condition that is not in the same table.
+    - can be standalone queries.
+    - can return a single result or row set (multiple rows) depending on the query location.
+      - in `WHERE` clause, it must return a single result.
+      - in `HAVING`/`SELECT` clause, it can return a single result or row set (multiple rows).
+      - in `FROM` clause, it can return a single result or row set (multiple rows).
+
+  - `Joins`
+    - are used when you need to filter the data based on a condition that is in the same table.
+    - can only return a row set (multiple rows)

@@ -11,7 +11,7 @@
     - [O(n^2)](#on2)
     - [O(log(n))](#ologn)
     - [O(n log(n))](#on-logn)
-    - [O(n!)](#on-1)
+    - [O(!n)](#on-1)
     - [Rules to improve Big o](#rules-to-improve-big-o)
     - [Notes](#notes)
   - [Recursion](#recursion)
@@ -30,6 +30,8 @@
       - [Selection Sort](#selection-sort)
       - [Insertion Sort](#insertion-sort)
     - [Merge Sort](#merge-sort)
+      - [Merge Function](#merge-function)
+      - [Merge Sort Function](#merge-sort-function)
     - [Quick Sort](#quick-sort)
       - [Quick sort Pseudocode](#quick-sort-pseudocode)
     - [Radix Sort](#radix-sort)
@@ -38,14 +40,6 @@
     - [Linear(sequential) Search](#linearsequential-search)
     - [Binary Search](#binary-search)
       - [How it works](#how-it-works)
-      - [Traversals](#traversals)
-      - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
-      - [Depth First Search/Traversal DFS](#depth-first-searchtraversal-dfs)
-        - [PreOrder DFS](#preorder-dfs)
-        - [PostOrder DFS](#postorder-dfs)
-        - [InOrder DFS](#inorder-dfs)
-      - [Shortest Path](#shortest-path)
-      - [Dijkstra's Algorithm](#dijkstras-algorithm)
 
 ---
 
@@ -205,10 +199,11 @@ This function grows a little more rapidly than the `linear function O(n)` and a 
 
 ---
 
-### O(n!)
+### O(!n)
 
-this is called **Factorial Time** or **oh no!**
+This is called **Factorial Time** or **oh no!**
 
+- It's considered **Exponential** Time even though it's not a polynomial
 - you won't encounter it most likely
 - means that we're adding nested loop for every input that we have
 - Ex: usually nested loops
@@ -406,6 +401,8 @@ It's an optimization technique using `"caching"` (Do you have something you can 
 
 ## Sorting
 
+> **Note:** Usually sorting algorithms are not taught in the interview, but it's good to know them, so don't focus on them too much
+
 **Sorting**: is the process of rearranging the items in a collection (e.g. `array`) so that the items are in some kind of order
 
 > As more and more data is handled by our computers, **sorting** and **searching** are two of the biggest computer science problems in the software world
@@ -432,6 +429,16 @@ It's a sorting algorithm where the largest values **bubble up to the top**
 - it's one of the simplest sorting algorithms, but the has least performance
   - one of its performance drawbacks, is that if the array is **almost-sorted**, it will continue to do all looping and checking steps even if we reached sorted-result after the first few steps
 
+```py
+def bubble_sort(arr):
+  for i in range(len(arr)):
+    for j in range(len(arr) - 1):
+      # if the number in the left is larger than the left one, we swap them
+      if arr[j] > arr[j + 1]:
+        arr[j], arr[j + 1] = arr[j + 1], arr[j]
+  return arr
+```
+
 ---
 
 #### Selection Sort
@@ -440,12 +447,26 @@ It's a sorting algorithm where the largest values **bubble up to the top**
 
 - it works by scanning a list of items for the smallest element and then swapping that element for the one in the first position
 - also one of the simplest but not efficient either
-- steps:
+- **steps:**
   1. store the first element as the smallest value you've seen so far
   2. compare this item to the next item in the array until you find a smaller number
      - if smaller number is found, designate that smaller number to be the new **minimum** and continue to the end of the array
      - if the **minimum** is not the value(index) you initially began with, we swap the two values
   3. repeat this with the next element until the array is sorted
+
+```py
+def selection_sort(arr):
+  for i in range(len(arr)):
+    min_index = i
+    # loop from the next element to the end of the array and find the smallest element
+    for j in range(i + 1, len(arr)):
+      if arr[j] < arr[min_index]:
+        min_index = j
+    # if the minimum is not the value(index) you initially began with, we swap the two values
+    if min_index != i:
+      arr[i], arr[min_index] = arr[min_index], arr[i]
+  return arr
+```
 
 > it's better than **Bubble sort** only in one condition:
 >
@@ -474,8 +495,10 @@ Taking elements one at a time and **inserting** it in the right spot
 
 ![merge-sort](./img/Merge-Sort.png)
 
-- It's a combination of 2 things: (`merging` & `sorting`)
-- it exploits the fact that arrays of `0` or `1` element are always sorted
+- It's a combination of 2 things:
+  - [dividing](#merge-sort-function)
+  - [merging](#merge-function)
+- it exploits the fact that arrays of `0` or `1` elements are always sorted
   - as it works by decomposing an array into smaller arrays of `0` or `1` elements, then building up a newly sorted array
 - it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions which gives us **`O(n log n)`** time complexity which is better than **`O(n^2)`**
   - the number of times we **divide**(split-up/decompose) is equal to `log(n)` and the number of **merging**(comparisons) is `n`
@@ -486,6 +509,86 @@ Taking elements one at a time and **inserting** it in the right spot
 - one downside is that it has a bigger space-complexity : **space-complexity of `O(n)`** unlike most sorting algorithms which has `O(1)`
   - this is due to holding off to the divided lists in memory
   - so we use it if we have enough memory
+
+#### Merge Function
+
+It's a function for joining 2 sorted arrays into one sorted array
+
+- **Steps:**
+  1. create an empty `results` array, take a look at the smallest values in each input array
+  2. while there are still elements in both arrays (`arr1`, `arr2`) we haven't looked at:
+     - if the first value in the first array is smaller than the first value in the second array, push the value in the first array into our `results` and move on to the next value in the first array
+     - if the value in the first array is larger than the value in the second array, push the value in the second array into our results and move on to the next value in the second array
+     - once we exhaust one array, push in all remaining values from the other array
+
+```py
+def merge(arr1, arr2):
+  results = []
+  i = 0
+  j = 0
+
+  # while there are still elements in both arrays (`arr1`, `arr2`) we haven't looked at:
+  while i < len(arr1) and j < len(arr2):
+    # if the first value in the first array is smaller than the first value in the second array
+    if arr1[i] < arr2[j]:
+      results.append(arr1[i])
+      i += 1 # move on to the next value in the first array
+    else:
+      results.append(arr2[j])
+      j += 1 # move on to the next value in the second array
+
+  # once we exhaust one array, push in all remaining values from the other array
+  while i < len(arr1):
+    results.append(arr1[i])
+    i += 1
+  while j < len(arr2):
+    results.append(arr2[j])
+    j += 1
+  return results
+
+# -----------------------------------------------------------------
+
+# Different way to write the same function
+def merge(arr1, arr2):
+  results = []
+  i = 0
+  j = 0
+
+  while arr1 and arr2:
+    if arr1[0] < arr2[0]:
+      results.append(arr1.pop(0))
+    else:
+      results.append(arr2.pop(0))
+
+  # once we exhaust one array, join all remaining values from the other array
+  return results + arr1 + arr2
+```
+
+#### Merge Sort Function
+
+![merge-sort](./img/merge-sort-4.png)
+
+- **Steps:**
+  1. break up the array into halves until you have arrays that are **(empty or have one element)**
+  2. once you have smaller sorted arrays, merge those arrays with other sorted arrays using the [merge-function](#merge-function) until you are back at the full length of the array
+  3. once the array has been merged back together, return the merged (and sorted) array
+
+```py
+def merge_sort(arr):
+  # base case
+  if len(arr) <= 1:
+    return arr
+
+  # divide
+  mid = len(arr) // 2
+  left = merge_sort(arr[:mid])
+  right = merge_sort(arr[mid:])
+
+  # merge the sorted arrays (look at image below)
+  return merge(left, right)
+```
+
+![merge-sort](./img/merge-sort-5.png)
 
 ---
 
@@ -558,6 +661,8 @@ It's a method of finding a target value within the list.
   ```js
   mid = (low + high) / 2;
   ```
+
+```
 
 - We consider three cases:
 
@@ -654,3 +759,4 @@ It's one of the most famous and widely used algorithms around. It finds the **sh
   2. once we've move to the node we're going to visit, we look at each of its neighbors
   3. for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
   4. if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
+```
