@@ -10,12 +10,12 @@
     - [Searching](#searching)
     - [Sorting](#sorting)
   - [Arrays](#arrays)
-    - [Array Types](#array-types)
-      - [Static Array](#static-array)
-      - [Dynamic Array](#dynamic-array)
-        - [How it works with capacity ?](#how-it-works-with-capacity-)
-        - [Implementing a Dynamic Array](#implementing-a-dynamic-array)
-        - [Geometric Increase in Capacity and Arithmetic Progression](#geometric-increase-in-capacity-and-arithmetic-progression)
+    - [Static Array](#static-array)
+      - [Downside of static array](#downside-of-static-array)
+    - [Dynamic Array](#dynamic-array)
+      - [How it works with capacity ?](#how-it-works-with-capacity-)
+      - [Implementing a Dynamic Array](#implementing-a-dynamic-array)
+      - [Geometric Increase in Capacity and Arithmetic Progression](#geometric-increase-in-capacity-and-arithmetic-progression)
     - [Referential Arrays](#referential-arrays)
     - [Arrays big O](#arrays-big-o)
     - [Array Notes](#array-notes)
@@ -29,6 +29,7 @@
     - [Doubly linked list](#doubly-linked-list)
   - [Stacks and Queues](#stacks-and-queues)
     - [Stacks](#stacks)
+      - [Call Stack](#call-stack)
       - [Array-Based Stack Implementation](#array-based-stack-implementation)
     - [Queues](#queues)
   - [Trees](#trees)
@@ -111,9 +112,7 @@ sort data-items in the data-structure to be ordered (next to each other in memor
 
 ![arrays](./img/arrays.png)
 
-### Array Types
-
-#### Static Array
+### Static Array
 
 **static** -> fixed size declared at initiation
 
@@ -123,7 +122,17 @@ sort data-items in the data-structure to be ordered (next to each other in memor
   - Formula = **`start + cellsize * index`**
   - By this formula, the cell at index 0 begins precisely at the start of the array, the cell at index 1 begins precisely cellsize bytes beyond the start of the array, and so on. As an example, cell 4 of Figure 5.2 begins at memory location `2146+2 * 4 = 2146+8 = 2154`
 
-#### Dynamic Array
+#### Downside of static array
+
+- The downside of this approach is that the size of the array must be specified in advance, and it remains fixed for the lifetime of the array.
+  - If the array is too small to hold all the items, it will be necessary to create a new, larger array and then copy the old array into the new one. This operation takes `O(n)` time, where `n` is the current number of items. In addition, if the array becomes overfull, it will be necessary to create a new, smaller array and copy the items again. Once again, this operation takes `O(n)` time.
+- It may not need the extra capacity, and it may be wasteful to reserve memory that is never used. On the other hand, You may also fill the array again and it becomes overfull, it will be necessary to create a new, smaller array and copy the items again. Once again, this operation takes `O(n)` time.
+
+> So specifying the size of the array in advance is a good workaround, but it's not a perfect solution. [Linked lists](#linked-lists) provide a more flexible alternative. As **with linked lists, the items can be anywhere in memory**.
+
+---
+
+### Dynamic Array
 
 **dynamic** -> can change size after initiation based on the need
 
@@ -139,12 +148,12 @@ sort data-items in the data-structure to be ordered (next to each other in memor
   - We rely on a function named `getsizeof()` that is available from the sys module. This function reports the number of bytes that are being used to store an object in Python. For a list, it reports the number of bytes devoted to the array and other instance variables of the list, but not any space devoted to elements referenced by the list.
   - Because a list is a referential structure, the result of `getsizeof` for a list instance only includes the size for representing its primary structure; it does not account for memory used by the objects that are elements of the list.
 
-##### How it works with capacity ?
+#### How it works with capacity ?
 
 - As soon as the first element is inserted into the list, we detect a change in the underlying size of the structure. In particular, we see the number of bytes jump from 72 to 104, an increase of exactly `32 bytes`. Usually, we run on a `64-bit` machine architecture, meaning that each memory address is a `64-bit` number (i.e., `8 bytes`). We speculate that the increase of `32 bytes` reflects the allocation of an underlying array capable of storing four object references. This hypothesis is consistent with the fact that we do not see any underlying change in the memory usage after inserting the second, third, or fourth element into the list.
   - `32 bytes = 4 \* 8 bytes(64bits)` --> 4 objects references
 
-##### Implementing a Dynamic Array
+#### Implementing a Dynamic Array
 
 steps:
 
@@ -158,7 +167,7 @@ steps:
 
 > We may notice that the total running time of n append operations is **`O(n)`**, as an (append operation) causes an overflow and a doubling of capacity. which means -> Copying the old elements (n) to the new array
 
-##### Geometric Increase in Capacity and Arithmetic Progression
+#### Geometric Increase in Capacity and Arithmetic Progression
 
 - When choosing the geometric base, there exists a tradeoff between run-time efficiency and memory usage. With a base of `2` (i.e., doubling the array), if the last insertion causes a resize event, the array essentially ends up twice as large as it needs to be. If we instead increase the array by only `25%` of its current size (i.e., a geometric base of `1.25`), we do not risk wasting as much memory in the end, but there will be more intermediate resize events along the way.
 - > The key to the performance is that the amount of additional
@@ -196,6 +205,7 @@ steps:
 
 > always remember if we iterated over items in array -> **O(n)**
 
+- Arrays are faster at reads because they provide **random access** instead of **sequential access**
 - `lookup` & `push/append`(inserting from the end) are **O(1)**, as they doesn't iterate over other items in the array
   - there's a small possibility in **dynamic arrays**, that appending(pushing) element will create a new array which iterate over the array items to make them in the new memory location (exhibits **amortized** constant-time behavior)
     - we can further improve the practical execution time by using a **list comprehension** syntax to build up the temporary list, rather than by repeated calls to append.
@@ -301,13 +311,24 @@ Problem of hash-functions in hash-tables:
 It's a data structure that contains a `head`, `tail` and `length` properties and consist of **nodes** and each node has a `value` and a `pointer` to another node or `null`
 
 - It's an excellent alterative to arrays when insertion and deletion at the beginning are frequently required
+- It's a bunch of random memory addresses that are **linked together**
 
 ### Arrays vs linked lists
 
 ![linked-list vs Array](./img/linked-list-vs-array.png)
 
+- Arrays are better for **random access (lookups)** as we can access any element in the array in constant time
+
+  - because you can look up any element in your array instantly. With a linked list, the elements aren’t next to each other, so you can't instantly calculate the position of the ith element in memory—you have to go to the first element to get the address to the second element, then go to the second element to get the address of the third element, and so on until you get to the ith element.
+
+- Linked lists are better for **insertion** and **deletion** as we don't have to shift the indexes of the elements in the array
+
+  - because you don't have to shift the elements in memory to make room for a new element or to fill in the gap when you delete an element. With an array, you have to shift all the elements after the deleted element over one space in memory.
+    ![array-vs-linked-list](./img/array-vs-linked-list.png)
+
 - in array, elements are **indexed**, but in linked-list -> you start with the **head** , then you **traverse** the list until you get to item that you want
   - so, instead of using **iteration** between indexes of a list, we are traversing the list until you hit `null`
+  - That's why, in linked-lists, we use **sequential access** which is "reading elements one by one starting from first element" instead of **random access**
 - iterating through a linked-list is a bit slower that iterating through items in array, even though they're technically both `O(n)`
 - inserts that we can do in the **middle** of a linked-list is a lot better that an array, as we don't have to do any shifting the indexes, as nodes are scattered in the memory like in hash-table
 - unlike `hash-table`, here we have ordered (sorted) data as each node points to the next one
@@ -489,10 +510,38 @@ They made us limit the operations we can do on other data structures like `lists
 A stack is a collection of objects that are inserted and removed according to the **last-in, first-out (LIFO)** principle.
 
 - used in
+
   - programming languages when calling functions in the **call stack**
   - some commands like: `undo`
   - Internet Web browsers store the addresses of recently visited sites in a stack. Each time a user visits a new site, that site’s address is “pushed” onto the stack of addresses. The browser then allows the user to “pop” back to previously visited sites using the “back” button
+
 - `peek` --> is to view the top most plate
+
+---
+
+#### Call Stack
+
+```py
+def greet(name):
+  print(f"hello {name}")
+  greet2(name) # calling another function here will add it to the call stack
+  print("getting ready to say bye...")
+  bye() # calling another function here will add it to the call stack
+```
+
+![call-stack](./img/call-stack-1.png)
+![call-stack](./img/call-stack-2.png)
+![call-stack](./img/call-stack-3.png)
+![call-stack](./img/call-stack-4.png)
+![call-stack](./img/call-stack-5.png)
+![call-stack](./img/call-stack-6.png)
+
+> **Note:** Using the stack is convenient, but there's a cost: saving all that info can take up a lot of memory. Each of those function calls takes up some memory, and when your stack is too tall, that means your computer is saving information for many function calls. At that point, you have two options:
+>
+> - You can rewrite your code to use a loop instead.
+> - You can use something called [tail recursion](./2-Algorithms.md#eliminating-tail-recursion). That's an advanced recursion topic. It's also only supported by some languages, not all.
+
+---
 
 #### Array-Based Stack Implementation
 

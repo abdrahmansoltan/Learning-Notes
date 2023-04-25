@@ -1,6 +1,7 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Algorithm](#algorithm)
   - [Algorithm Analysis (Big-Oh)](#algorithm-analysis-big-oh)
     - [Average case vs Worst case](#average-case-vs-worst-case)
     - [Asymptotic Analysis](#asymptotic-analysis)
@@ -16,6 +17,7 @@
     - [Notes](#notes)
   - [Recursion](#recursion)
     - [Recursion Types](#recursion-types)
+    - [How recursion works with the call stack](#how-recursion-works-with-the-call-stack)
     - [Recursion Steps](#recursion-steps)
       - [Helper Method Recursion](#helper-method-recursion)
     - [Big-O Runtime for Recursive Functions](#big-o-runtime-for-recursive-functions)
@@ -33,19 +35,39 @@
       - [Merge Function](#merge-function)
       - [Merge Sort Function](#merge-sort-function)
     - [Quick Sort](#quick-sort)
-      - [Quick sort Pseudocode](#quick-sort-pseudocode)
-    - [Radix Sort](#radix-sort)
+    - [Radi](#radi)
     - [Sorting Notes](#sorting-notes)
   - [Searching](#searching)
     - [Linear(sequential) Search](#linearsequential-search)
     - [Binary Search](#binary-search)
       - [How it works](#how-it-works)
+  - [Traversals](#traversals)
+    - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
+    - [Depth First Search/Traversal DFS](#depth-first-searchtraversal-dfs)
+      - [PreOrder DFS](#preorder-dfs)
+      - [PostOrder DFS](#postorder-dfs)
+      - [InOrder DFS](#inorder-dfs)
+    - [Shortest Path](#shortest-path)
+    - [Dijkstra's Algorithm](#dijkstras-algorithm)
 
 ---
 
+## Algorithm
+
+It's a set of instructions to solve a problem/perform a task
+
+- We use Big O to analyze the performance of an algorithm (how fast it is, how much memory it takes up, etc.)
+- It's not enough to know how long an algorithm takes to run—you need to know how the running time increases as the list size increases. hat’s where Big O notation comes in.
+- Algorithm speed isn’t measured in seconds, but in growth of the number of operations.
+
 ## Algorithm Analysis (Big-Oh)
 
-It tells us **How well a problem is solved**, it's the language we use to telling (how the runtime of an algorithm grows as the inputs grow)
+It tells us **How well/fast a problem is solved**, it's the language we use to telling (how the runtime of an algorithm grows as the inputs grow)
+
+- Big O doesn't tell you the speed in **seconds**. Big O notation lets you compare the number of operations. It tells you how fast the algorithm grows.
+- `O(n)` -> `n` is the number of operations an algorithm will make
+- `O(log(n))` -> `log(n)` is the number of operations an algorithm will make
+- `O(n^2)` -> `n^2` is the number of operations an algorithm will make
 
 > Why?
 >
@@ -76,7 +98,8 @@ It tells us **How well a problem is solved**, it's the language we use to tellin
     - for fast algorithms, speed measurements may not be precise enough
     - Experiments can be done only on a limited set of test inputs; hence, they leave out the running times of inputs not included in the experiment (and these inputs may be important)
   - so instead of time, we count the number of simple operations the computer has to perform
-- When we talk about `big O`, we talk about the "worst case"
+- When we talk about `big O`, we talk about the **"worst c ase scenario"**
+  - It's a reassurance that no matter what happens, the algorithm will never be slower than the `big O` we've calculated
 
 ![big-o](./img/big-o.png)
 
@@ -168,26 +191,20 @@ Ex: usually nested loops
 
 **`O(log N)`** means that the choice of the next element on which to perform some sort of action is one of several possibilities and only one needs to be chosen --> **"Divide and conquer**
 
-![log](./img/log.png)
+- **Logarithms**
+
+  - `log10(100)` is like asking: how many `10s` do we need to multiply together to get `100`? - `10 * 10 = 100` --> `2`
+    ![log](./img/log.png)
 
 - The value `b` is known as the base of the logarithm. The most common base for the logarithm function in computer science is `2`,
 
   - as computers store integers in **binary**, and because a common operation in many algorithms is to repeatedly divide an input in half. In fact, this base is so common that we will typically omit it from the notation when it is `2`. That is, for us,
 
-    ```s
+    ```sh
     log(n) = log2(n)
     ```
 
-```js
-// x = log(b) n if and only if bx = n
-//
-level1 = 2^0 = 1;
-level2 = 2^1 = 2;
-level3 = 2^2 = 4;
-level4 = 2^3 = 8;
-numOfNodes = (2^h - 1) = 15; // h is the height starting from count of 1
-log numOfNodes = stepsOrHeight; // log 15 = 3
-```
+- In big O notation, we use the base `2` for the logarithm function, and we drop the base when it is `2`.
 
 ---
 
@@ -206,7 +223,10 @@ This is called **Factorial Time** or **oh no!**
 - It's considered **Exponential** Time even though it's not a polynomial
 - you won't encounter it most likely
 - means that we're adding nested loop for every input that we have
-- Ex: usually nested loops
+- Ex:
+  - usually nested loops
+  - The traveling salesperson problem
+    ![traveling salesperson](./img/traveling-salesperson.png)
 
 ---
 
@@ -267,11 +287,20 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
     - ex: Object-traversal like ->`JSON.parse()` and `JSON.stringify()`
   - `file systems`
 - Advantages:
+
   - DRY
   - Readability
-- When the execution of a function leads to a nested function call, the execution of the former call is suspended and its activation record stores the place in the source code at which the flow of control should continue upon return of the nested call. This process is used both in the standard case of one function calling a different function, or in the recursive case in which a function invokes itself. The key point is that there is a different activation record for each active call.
 
-- Rules:
+  - Ex: looking for a key in boxes:
+    - looping
+      ![recursion-vs-loops](./img/recursion-vs-loops-1.png)
+    - recursion
+      ![recursion-vs-loops](./img/recursion-vs-loops-2.png)
+  - Both approaches have the same time complexity, but recursion is more readable
+  - There's no performance gain in using recursion over looping. In fact recursion is slower than looping in most cases.
+    - > Quote: "Loops may achieve a performance gain for your program. Recursion may achieve a performance gain for your programmer."
+
+- **Rules**:
   - Every time you're using a `tree` or converting something into a `tree`, consider **recursion**
 - Divide and conquer using recursion:
   1. divided into a number of sub-problems that are smaller instances of the same problem
@@ -301,12 +330,41 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
 
 ---
 
+### How recursion works with the call stack
+
+When the execution of a function leads to a nested function call, the execution of the former call is **suspended** and its activation record stores the place in the source code at which the flow of control should continue upon return of the nested call.
+
+- This process is used both in the standard case of one function calling a different function, or in the recursive case in which a function invokes itself. The key point is that there is a different activation record for each active call.
+- The handling of the suspending and resuming of the execution of functions is done by the **call stack**.
+- It can be a replacement for looping
+
+- When a function is called, the function is pushed to the top of the call stack.
+- When the function returns, the function is popped off the call stack.
+
+- Ex: `factorial` function
+
+  ```py
+  def factorial(n):
+      if n == 1:
+          return 1
+      else:
+          return n * factorial(n-1)
+  ```
+
+  ![factorial call stack](./img/factorial-call-stack-1.png)
+  ![factorial call stack](./img/factorial-call-stack-2.png)
+  ![factorial call stack](./img/factorial-call-stack-3.png)
+  ![factorial call stack](./img/factorial-call-stack-4.png)
+
+---
+
 ### Recursion Steps
 
 - Steps:
-  1. identify and test for the **Base case** (the condition when the recursion ends)
+  1. identify and test for the **Base case** (the condition when the recursion ends | when the function doesn't call itself anymore)
      - We begin by testing for a set of base cases (there should be at least one). These base cases should be defined so that every possible chain of recursive calls will eventually reach a base case (should ensure that each recursive call is in some way progressing toward a base case), and the handling of each base case should not use recursion.
-  2. identify the **recursive case**
+     - > **Note:** When writing a recursive function involving an array, the base case is often an empty array or an array with one element.
+  2. identify the **recursive case** (when the function calls itself)
      - If not a base case, we perform one or more recursive calls. This recursive step may involve a test that decides which of several possible recursive calls to make. We should define each possible recursive call so that it makes progress towards a base case.
   3. get closer and closer and return when needed. usually have 2 returns
 
@@ -466,11 +524,35 @@ def selection_sort(arr):
     if min_index != i:
       arr[i], arr[min_index] = arr[min_index], arr[i]
   return arr
+
+# ----------------------------------------------- or -----------------------------------------------
+
+# helper function to find the index of the smallest element in the array
+def find_smallest(arr):
+  smallest = arr[0]
+  smallest_index = 0
+  for i in range(1, len(arr)):
+    if arr[i] < smallest:
+      smallest = arr[i]
+      smallest_index = i
+  return smallest_index
+
+def selection_sort(arr):
+  new_arr = []
+  for i in range(len(arr)):
+    smallest = find_smallest(arr)
+    # pop the smallest element from the array and append it to the new array
+    new_arr.append(arr.pop(smallest))
+  return new_arr
 ```
 
 > it's better than **Bubble sort** only in one condition:
 >
 > - if you want to minimize the number of **swaps** on each loop
+
+- **Notes**
+  - You will notice that this algorithm is doing a lot of unnecessary work, because after the first iteration, the smallest number is already in the first position
+  - In the sorting algorithm, the number of elements to check decreases as you go through the operations until you only have to check one element. However, the runtime is still `O(n^2)` because of constants in Big O notation. On average, you check a list that has `1/2 * n` elements, but constants like `1/2` are ignored in Big O notation, so the runtime is written as `O(n^2)`.
 
 ---
 
@@ -600,13 +682,37 @@ def merge_sort(arr):
 - it may have a worst-case for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element,
 - it has better **space-complexity of `O(log(n))`**, so it can be sorted in memory if the database is not massive
 
-#### Quick sort Pseudocode
+- Quick sort Pseudocode
+  ![pivot-point](./img/quick-sort-pivot.png)
+- **Quick sort Steps:**
+  ![quick sort](./img/quick-sort-0.png)
+  1. pick a pivot point
+  2. partition the array into 2 sub-arrays: one with all the elements less than the pivot point, and one with all the elements greater than the pivot point
+  3. call `quicksort` recursively on both sub-arrays
 
-![pivot-point](./img/quick-sort-pivot.png)
+```py
+def quicksort(array):
+  # base case
+  if len(array) < 2:
+    return array
+
+  # recursive case
+  else:
+    # choose a pivot point
+    pivot = array[0]
+    # sub-array of all the elements less than the pivot
+    less = [i for i in array[1:] if i <= pivot]
+    # sub-array of all the elements greater than the pivot
+    greater = [i for i in array[1:] if i > pivot]
+
+    return quicksort(less) + [pivot] + quicksort(greater)
+```
+
+![quick sort](./img/quick-sort-1.png)
 
 ---
 
-### Radix Sort
+### Radi
 
 - The previous sorting-algorithms were called: "Comparison Sorts", but the question is: "can we do better for the time-complexity?"
 
@@ -645,6 +751,8 @@ It's a method of finding a target value within the list.
 
 ### Binary Search
 
+Binary search is a search algorithm that finds the position of a target value within a **sorted** array.
+
 - if we know tha list is **sorted**:
   - Rather than eliminating one element at a time, you can eliminate **half** of the remaining elements at a time
   - we can pick a number in the list and discard it's left/right side based on the number we're searching for
@@ -662,8 +770,6 @@ It's a method of finding a target value within the list.
   mid = (low + high) / 2;
   ```
 
-```
-
 - We consider three cases:
 
   1. If the target equals `data[mid]`, then we have found the item we are looking for, and the search terminates successfully
@@ -671,6 +777,42 @@ It's a method of finding a target value within the list.
   3. If `target > data[mid]`, then we recur on the second half of the sequence, that is, on the interval of indices from `mid+1` to high.
 
 - Here worst case is `O(log(n))` with log-base of `2` as we divide each group by `2` each time
+
+```py
+# 1. Recursive Binary Search
+def binary_search(data, target, low, high):
+  if low > high:
+    return False  # interval is empty; no match
+  else:
+    mid = (low + high) // 2
+    if target == data[mid]:  # found a match
+      return True
+    elif target < data[mid]:
+      # recur on the portion left of the middle
+      return binary_search(data, target, low, mid - 1)
+    else:
+      # recur on the portion right of the middle
+      return binary_search(data, target, mid + 1, high)
+
+# -------------------------------------------------------------------------------------------------
+
+# 2. Iterative Binary Search
+def binary_search_iterative(data, target):
+  low = 0
+  high = len(data) - 1
+
+  while low <= high:
+    mid = (low + high) // 2
+    if target == data[mid]:  # found a match
+      return True
+    elif target < data[mid]:
+      # recur on the portion left of the middle
+      high = mid - 1
+    else:
+      # recur on the portion right of the middle
+      low = mid + 1
+  return False  # interval is empty; no match
+```
 
 > **Notes**:
 >
@@ -680,7 +822,9 @@ It's a method of finding a target value within the list.
 >
 > - making a copy of half the list would already take `O(n)` time, negating the whole benefit of the binary search algorithm.
 
-#### Traversals
+---
+
+## Traversals
 
 it means going through each item in the list, like checking for something on each item in a `tree` --> **(visiting every node O(n))**
 
@@ -700,7 +844,7 @@ it means going through each item in the list, like checking for something on eac
   - if we're talking about a breadth-first on a wide tree vs on depth-first, we will not be storing all the nodes across the tree in **BFS** as we only need to keep-track of the nodes in a given branch all the way down to the end
     ![traversal](./img/traversal2.png)
 
-#### Breadth First Search/Traversal BFS
+### Breadth First Search/Traversal BFS
 
 ![BFS](./img/bfs1.png)
 
@@ -715,7 +859,7 @@ it means going through each item in the list, like checking for something on eac
 
 ---
 
-#### Depth First Search/Traversal DFS
+### Depth First Search/Traversal DFS
 
 - the search follows one branch of the tree down as many levels as possible until the target notice is found or the end is reached, then it continues at the next ancestor with an unexplored children
   - the idea is to go as deep as possible from the left side and then start going to the right until the traversal of the tree is done
@@ -729,28 +873,28 @@ it means going through each item in the list, like checking for something on eac
 ![BFS](./img/dfs0.png)
 ![BFS](./img/dfs.png)
 
-##### PreOrder DFS
+#### PreOrder DFS
 
 ![BFS](./img/dfs1.png)
 
-##### PostOrder DFS
+#### PostOrder DFS
 
 ![BFS](./img/dfs2.png)
 
-##### InOrder DFS
+#### InOrder DFS
 
 ![BFS](./img/dfs3.png)
 
 ---
 
-#### Shortest Path
+### Shortest Path
 
 - Beliman-Ford
 - Dijkstra
 
 ---
 
-#### Dijkstra's Algorithm
+### Dijkstra's Algorithm
 
 It's one of the most famous and widely used algorithms around. It finds the **shortest path** between 2 vertices on a **weighted-graph**
 
@@ -759,4 +903,3 @@ It's one of the most famous and widely used algorithms around. It finds the **sh
   2. once we've move to the node we're going to visit, we look at each of its neighbors
   3. for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
   4. if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
-```

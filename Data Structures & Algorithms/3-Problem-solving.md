@@ -7,6 +7,7 @@
       - [Two Pointers (multiple pointers)](#two-pointers-multiple-pointers)
       - [Sliding Window](#sliding-window)
       - [Divide and Conquer](#divide-and-conquer)
+        - [Inductive proofs](#inductive-proofs)
       - [Dynamic Programming](#dynamic-programming)
       - [Greedy Algorithms](#greedy-algorithms)
       - [Backtracking](#backtracking)
@@ -147,8 +148,25 @@ this pattern involves creating a window which can either be an array or number f
 
 This pattern involves dividing a dataset into smaller chunks and then repeating a process with a subset of data
 
+- How it works:
+
+  1. Figure out a simple case as the base case
+  2. Figure out how to reduce your problem and get to the base case
+
+- Divide and conquer algorithms are often recursive algorithms, To solve a problem using `D&C`, we need to:
+
+  1. Divide (decrease) the problem into a number of subproblems that are smaller instances of the same problem until it becomes the base case.
+  2. Conquer the subproblems by solving them recursively. If they are small enough, solve the subproblems as base cases.
+  3. Combine the solutions to the subproblems into the solution for the original problem.
+
 - this pattern can tremendously decrease **time-complexity**
-- EX: **Binary Search**
+- EX: **Binary Search**, **Merge Sort**, **Quick Sort**
+
+##### Inductive proofs
+
+**Inductive proofs** are a way to prove that an algorithm works and involve two steps - the base case and the inductive case. In the case of quicksort, the algorithm's effectiveness is proven for arrays of different sizes through the base case and the inductive case. Inductive proofs are considered fun and complement the Divide and Conquer technique.
+
+- Ex: for `quicksort`. In the base case, The algorithm works for the base case: arrays of size `0` and `1`. In the inductive case, It's shown that if quicksort works for an array of size `1`, it will work for an array of size `2`. And if it works for arrays of size `2`, it will work for arrays of size `3`, and so on. hen I can say that quicksort will work for all arrays of any size.
 
 ---
 
