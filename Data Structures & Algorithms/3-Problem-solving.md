@@ -26,6 +26,9 @@
       - [Anagram](#anagram)
   - [Arrays](#arrays)
     - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
+    - [Array Sums](#array-sums)
+      - [Two Sum II](#two-sum-ii)
+      - [Three Sum](#three-sum)
     - [Container with most water](#container-with-most-water)
     - [Trapping Rain Water](#trapping-rain-water)
       - [Solution 1: multiple loops O(n)](#solution-1-multiple-loops-on)
@@ -84,7 +87,12 @@
   5. Look back and refactor and double-check for errors
   6. Analyze the time and space complexity of the solution
      - Check if the input size in increased, how much will the time and space complexity increase?
-     - If you found that (the time complexity is `O(n^2)` or `O(n^3)` or `O(2^n)` or `O(n!)`, and the space complexity is `O(n)` or `O(1)), then you can try to optimize it by using the`Problem Solving Patterns` below. and use some space to save time.
+     - If you found that:
+       - the time complexity is `O(n^2)` or `O(n^3)` or `O(2^n)` or `O(n!)`
+       - and the space complexity is `O(n)` or `O(1)
+       - then you can try to optimize it by using the`Problem Solving Patterns` below. and use some space to save time.
+
+---
 
 ### Problem Solving Patterns
 
@@ -276,6 +284,39 @@ A palindrome is a word, phrase, number, or other sequence of characters which **
   5. If the pointers meet in the middle of the string, the string is a palindrome.
 
 ```py
+# using two pointers
+# helper
+def isAlphaNum(char):
+            # using ASCII values
+           return (ord('A') <= ord(char) <= ord('Z') or
+                   ord('a') <= ord(char) <= ord('z') or
+                   ord('0') <= ord(char) <= ord('9'))
+
+def is_palindrome(s):
+  # First & last pointers
+  left, right = 0, len(s)-1
+
+  # Loop until we meet
+  while left < right:
+    # Move pointers until we find alphanumeric chars
+    while not isAlphaNum(s[left]) and left < right:
+      left += 1
+    while not isAlphaNum(s[right]) and left < right:
+      right -= 1
+
+    # Case-insensitive comparison
+    if s[left].lower() != s[right].lower():
+      return False
+
+    # Update pointers
+    left += 1
+    right -= 1
+
+  return True
+
+# --------------------------------------------------
+
+# Or: using isalnum() string-method to check if character is alphanumeric
 def is_palindrome(s):
     s = s.lower()
     s = ''.join(c for c in s if c.isalnum())
@@ -387,6 +428,89 @@ def chunk(arr, size):
             subarray = []
     if subarray:
         result.append(subarray)
+    return result
+```
+
+---
+
+### Array Sums
+
+#### Two Sum II
+
+Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be `numbers[index1]` and `numbers[index2]` where `1 <= index1 < index2 <= numbers.length`.
+
+- EX: `nums = [2, 7, 11, 15], target = 9` --> `[0, 1]` because `nums[0] + nums[1] == 9`
+
+```py
+def two_sum(numbers, target):
+    # Set the left and right pointers
+    left = 0
+    right = len(numbers) - 1
+
+    while left < right:
+        # If the sum of the left and right pointers is the target, return the indices adding 1 to each since the problem is 1-indexed
+        if numbers[left] + numbers[right] == target:
+            return [left + 1, right + 1]
+        # If the sum of the left and right pointers is less than the target, move the left pointer forward
+        elif numbers[left] + numbers[right] < target:
+            left += 1
+        # If the sum of the left and right pointers is greater than the target, move the right pointer backward
+        else:
+            right -= 1
+    # If the target was not found, return [-1, -1]
+    return [-1, -1]
+```
+
+---
+
+#### Three Sum
+
+Given an array `nums` of n integers, are there elements a, b, c in `nums` such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
+
+- EX: `nums = [-1, 0, 1, 2, -1, -4]` --> `[[-1, 0, 1], [-1, -1, 2]]`
+- **Steps:**
+  ![3sum](./img/3sum.png)
+  - Sort the array
+  - Loop through the array
+    - If the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+    - Set left and right pointers to find the other two values
+    - If the sum is less than zero, move the left pointer to the right to get a larger value
+    - If the sum is greater than zero, move the right pointer to the left to get a smaller value
+    - If the sum is zero, append the three values to the result
+    - Move the left and right pointers to the next unique values to avoid duplicates
+
+```py
+# Time: O(nlog(n)) + O(n^2) = O(n^2)
+def three_sum(nums):
+    nums.sort()
+    result = []
+
+    for i in range(len(nums)):
+        # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+        if i > 0 and nums[i] == nums[i-1]:
+            continue
+
+        # set left and right pointers to find the other two values
+        left, right = i+1, len(nums)-1
+        while left < right:
+            total = nums[i] + nums[left] + nums[right]
+            # if the sum is less than zero, move the left pointer to the right to get a larger value
+            if total < 0:
+                left += 1
+            # if the sum is greater than zero, move the right pointer to the left to get a smaller value
+            elif total > 0:
+                right -= 1
+            # otherwise, we have found the triplet
+            else:
+                result.append([nums[i], nums[left], nums[right]])
+                # move both pointers to the middle to see if we have more triplets
+                left += 1
+                right -= 1
+                # skip duplicates
+                while left < right and nums[left] == nums[left-1]:
+                    left += 1
+                while left < right and nums[right] == nums[right+1]:
+                    right -= 1
     return result
 ```
 

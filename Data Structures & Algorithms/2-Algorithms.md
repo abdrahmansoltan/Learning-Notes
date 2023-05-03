@@ -3,9 +3,15 @@
 - [INDEX](#index)
   - [Algorithm](#algorithm)
   - [Algorithm Analysis (Big-Oh)](#algorithm-analysis-big-oh)
+    - [Elements of good code](#elements-of-good-code)
     - [Average case vs Worst case](#average-case-vs-worst-case)
     - [Asymptotic Analysis](#asymptotic-analysis)
+      - [Asymptotic notation](#asymptotic-notation)
     - [Runtime Analysis](#runtime-analysis)
+    - [Determining Complexity](#determining-complexity)
+      - [Time complexity](#time-complexity)
+      - [Space complexity](#space-complexity)
+      - [Big O Rules](#big-o-rules)
     - [O(n)](#on)
       - [Polynomials](#polynomials)
     - [O(1)](#o1)
@@ -35,7 +41,8 @@
       - [Merge Function](#merge-function)
       - [Merge Sort Function](#merge-sort-function)
     - [Quick Sort](#quick-sort)
-    - [Radi](#radi)
+      - [Merge sort vs quicksort](#merge-sort-vs-quicksort)
+    - [Radix Sort](#radix-sort)
     - [Sorting Notes](#sorting-notes)
   - [Searching](#searching)
     - [Linear(sequential) Search](#linearsequential-search)
@@ -43,12 +50,14 @@
       - [How it works](#how-it-works)
   - [Traversals](#traversals)
     - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
+      - [BFS Implementation](#bfs-implementation)
     - [Depth First Search/Traversal DFS](#depth-first-searchtraversal-dfs)
       - [PreOrder DFS](#preorder-dfs)
       - [PostOrder DFS](#postorder-dfs)
       - [InOrder DFS](#inorder-dfs)
     - [Shortest Path](#shortest-path)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
+      - [How Dijkstra's Algorithm works](#how-dijkstras-algorithm-works)
 
 ---
 
@@ -56,54 +65,55 @@
 
 It's a set of instructions to solve a problem/perform a task
 
+> or: It's a step-by-step procedure for performing some task in a finite amount of time
+
 - We use Big O to analyze the performance of an algorithm (how fast it is, how much memory it takes up, etc.)
 - It's not enough to know how long an algorithm takes to run—you need to know how the running time increases as the list size increases. hat’s where Big O notation comes in.
 - Algorithm speed isn’t measured in seconds, but in growth of the number of operations.
 
+---
+
 ## Algorithm Analysis (Big-Oh)
 
-It tells us **How well/fast a problem is solved**, it's the language we use to telling (how the runtime of an algorithm grows as the inputs grow)
+**Big O:** It tells us how time scales with respect to some input variables
+
+> It tells us **How well/fast a problem is solved**, it's the language we use to telling (how the runtime of an algorithm grows as the inputs grow)
 
 - Big O doesn't tell you the speed in **seconds**. Big O notation lets you compare the number of operations. It tells you how fast the algorithm grows.
+  - we don't use seconds because:
+    - different machines will record different times for the same algorithm
+    - the same machine will record different times for the same algorithm if it runs at different times of the day
+    - to study the running time of an algorithm, we need to fully implement it (which takes time specially for complex algorithms and large inputs)
 - `O(n)` -> `n` is the number of operations an algorithm will make
 - `O(log(n))` -> `log(n)` is the number of operations an algorithm will make
 - `O(n^2)` -> `n^2` is the number of operations an algorithm will make
+- Many `Big O` times don't use `n` as it's just a variable and any letter will do!, but it's still the number of operations an algorithm will make
+  ![big o](./img/big-o-1.png)
 
-> Why?
+> Why we use it?
 >
 > - to have a benchmark on how our code performs
 > - useful for discussing trade-offs between different approaches
 > - when code slows down or crashes, identifying parts of the code that are inefficient can help us find pain-points in our apps
 
-- Elements of good code:
+---
 
-  - readable
+### Elements of good code
 
-  - scalable:
-    - **speed** --> CPU --> **Time complexity** --> **Big O**
-      - compare algorithms on which one is better in scale
-    - **memory** --> **space complexity**:
-      - heap --> store variable
-        - most primitives(`booleans`, `numbers`, `undefined`, `null`) are constant space
-          ![space-complexity](./img/space-complexity.png)
-        - strings require `O(n)` space (`n` is the string length)
-        - reference-types are generally `O(n)`, where `n` is the length(for arrays) or the number of keys(for objects)
-          ![space-complexity](./img/space-complexity2.png)
-      - stack --> operations
+- **readable**
 
-- This is done by measuring the performance (**number of steps / operations**) which varies between devices so we need something standard, instead of measuring time, but why is that?
-  - problem with time:
-    - different machines will record different times
-    - the same machine will record different times
-    - for fast algorithms, speed measurements may not be precise enough
-    - Experiments can be done only on a limited set of test inputs; hence, they leave out the running times of inputs not included in the experiment (and these inputs may be important)
-  - so instead of time, we count the number of simple operations the computer has to perform
-- When we talk about `big O`, we talk about the **"worst c ase scenario"**
-  - It's a reassurance that no matter what happens, the algorithm will never be slower than the `big O` we've calculated
+- **scalable**
 
-![big-o](./img/big-o.png)
-
-> here we see when elements (input) increases, how much the algorithm slow down (how many operation do we need to do) ?
+  - **speed** --> CPU --> **Time complexity** --> **Big O**
+    - compare algorithms on which one is better in scale
+  - **memory** --> **space complexity**:
+    - heap --> store variable
+      - most primitives(`booleans`, `numbers`, `undefined`, `null`) are constant space
+        ![space-complexity](./img/space-complexity.png)
+      - strings require `O(n)` space (`n` is the string length)
+      - reference-types are generally `O(n)`, where `n` is the length(for arrays) or the number of keys(for objects)
+        ![space-complexity](./img/space-complexity2.png)
+    - stack --> operations
 
 ---
 
@@ -127,13 +137,183 @@ It tells us **How well/fast a problem is solved**, it's the language we use to t
 
 ---
 
+#### Asymptotic notation
+
+We analyze different Algorithms by counting the maximum number of guesses we need to make. But what we really want to know is how long these algorithms take. We're interested in time, not just guesses. The running times of linear search and binary search include the time needed to make and check guesses, but there's more to these algorithms.
+
+- The running time of an algorithm depends on how long it takes a computer to run the lines of code of the algorithm—and that depends on the speed of the computer, the programming language, and the compiler that translates the program from the programming language into code that runs directly on the computer, among other factors.
+- To calculating the running time of an algorithm more carefully. We can use a combination of two ideas: **asymptotic analysis** and **asymptotic notation**.
+
+  1. we think about the running time of the algorithm as a **function of the size of its input**.
+  2. we think about how fast a function grows with the input size. We call this the **"rate of growth"** of the running time.
+     - For example, suppose that an algorithm, running on an input of size `n`, takes `6n^2 + 100n + 300` machine instructions. The `6n^2` becomes larger than the remaining terms, `100n + 300`, once `n` becomes large enough, `20` in this case. Here's a chart showing values of `6n^2` and `100n + 300` for values of `n` from `0` to `100`:
+       ![asymptotic-notation](./img/asymptotic-notation-1.png)
+     - We would say that the running time of this algorithm grows as `n^2` dropping the coefficient `6` and the remaining terms `100n + 300`. It doesn't really matter what coefficients we use; as long as the running time is `an^2 + bn + c`, where `a`, `b`, and `c` are constants: `a > 0`
+       - > There will always be a Value of `n` for which `an^2` is greater than `bn + c`, and this difference increases as `n` increases. We say that `an^2` **dominates** `bn + c` as `n` increases.
+
+- By dropping the less significant terms and the constant coefficients, we can focus on the important part of an algorithm's running time—its rate of growth—without getting mired in details that complicate our understanding. When we drop the constant coefficients and the less significant terms, we use **asymptotic notation**. We'll see three forms of it:
+  - `big-O` notation
+  - `big-Theta` notation
+  - `big-Omega` notation.
+
+---
+
 ### Runtime Analysis
+
+- This is done by measuring the performance (**number of steps / operations**) which varies between devices so we need something standard, instead of measuring time, but why is that?
+  - problem with time:
+    - different machines will record different times
+    - the same machine will record different times
+    - for fast algorithms, speed measurements may not be precise enough
+    - Experiments can be done only on a limited set of test inputs; hence, they leave out the running times of inputs not included in the experiment (and these inputs may be important)
+  - so instead of time, we count the number of simple operations the computer has to perform
+- When we talk about `big O`, we talk about the **"worst c ase scenario"**
+  - It's a reassurance that no matter what happens, the algorithm will never be slower than the `big O` we've calculated
+
+![big-o](./img/big-o.png)
+
+> here we see when elements (input) increases, how much the algorithm slow down (how many operation do we need to do) ?
+
+---
+
+### Determining Complexity
+
+> **Data structures are just saving memory, and Algorithms are just actions taken on that memory**
 
 ![Determining Complexity](./img/determine-complexity.png)
 
-- **Determining Complexity**
-  - Time complexity
-    ![Determining Complexity](./img/determining-complexity-1.png)
+#### Time complexity
+
+![Determining Complexity](./img/determining-complexity-1.png)
+
+- Examples
+
+  ```py
+  # O(a/b) -> O(a)
+  def div(a, b):
+    count = 0
+    sum = b
+    while sum <= a:
+      sum += b
+      count += 1
+    return count
+
+  # Time complexity -> O(sqrt(n))
+  def sqrt(n):
+    i = 1
+    while i * i <= n:
+      i += 1
+    return i - 1
+
+  # Time complexity -> O(log n)
+  def sumDigits(n):
+    sum = 0
+    while n > 0:
+      sum += n % 10
+      n //= 10 # O(log n) because we're dividing n by 10 in each iteration
+    return sum
+  ```
+
+- Hard Examples
+
+  ```py
+  # code prints all strings of length k where the characters are in sorted order O(k*26^k)
+  def printSortedStrings(remaining, prefix=""):
+    if remaining == 0:
+      if isInOrder(prefix):
+        print(prefix)
+    else:
+      for c in range(ord('a'), ord('z') + 1):
+        printSortedStrings(remaining - 1, prefix + chr(c))
+  # helper
+  def isInOrder(s):
+    for i in range(1, len(s)):
+      prev = s[i - 1]
+      curr = s[i]
+      if prev > curr:
+        return False
+    return True
+  ```
+
+---
+
+#### Space complexity
+
+- It's the same as time complexity, but instead of measuring the time to run program, **we measure memory usage of a specific program**
+- What makes space complexity increase?
+  - Assigning variables
+  - Creating new data structures
+  - function calls and allocations
+
+```py
+# memory complexity -> O(1)
+def test1():
+  for i in range(1000):
+    # O(1) because we're not creating new data structure or assigning variables other than i
+    print(i)
+
+# memory complexity -> O(n)
+def test2():
+  arr = []
+  for i in range(1000):
+    # O(n) because we're creating new data structure (arr) and assigning variables (i) in each iteration to the memory
+    arr.append(i)
+
+# memory complexity -> O(log n), Time complexity -> O(log n)
+def sqrt(n):
+  return sqrt_helper(n, 1, n)
+
+def sqrt_helper(n, min, max):
+  if max < min:
+    return -1
+  guess = (min + max) // 2
+  if guess * guess == n:
+    return guess
+  elif guess * guess < n:
+    return sqrt_helper(n, guess + 1, max)
+  else:
+    return sqrt_helper(n, min, guess - 1)
+```
+
+- **Notes**
+  - when needing to create a bigger fixed array to insert new elements to a full fixed array, we use `O(n)` space complexity of the new array and not the sum of the two arrays
+    - This is because we're not creating a new array in each iteration, we're just creating a new array once and then adding elements to it and then **deleting the old array**.
+
+---
+
+#### Big O Rules
+
+1. Different steps get added
+
+   ```py
+   # O(a + b)
+   def something():
+    step1() # O(a)
+    step2() # O(b)
+   ```
+
+2. Drop constants -> [example](#polynomials)
+
+   - because we're looking for how things scale roughly. is it `linear`, `quadratic`, etc.
+
+3. Different inputs -> Different variables
+
+   - 2 different arrays with different lengths (`a`, `b`) can't have same `n`
+
+   ```py
+     # O(a + b) not O(n + n) or O(2n)
+     def something(arr1, arr2):
+       for i in arr1:
+         print(i)
+       for i in arr2:
+         print(i)
+   ```
+
+4. Drop non-dominant terms
+
+   - `O(n + n^2) -> O(n^2)`
+   - `O(2^n + 3^n) -> O(3^n)` -> `O(n)` -> because `3^n` is bigger than `2^n`
+   - `O(n + n/2) -> O(n)` -> because `n/2` is smaller than `n`
 
 ---
 
@@ -145,6 +325,13 @@ Ex: looping on array using `for-loop`
 ![counting operations](./img/counting-operations.png)
 
 - we will simply count how many **primitive operations** are executed, and use this number t as a measure of the running time of the algorithm.
+  - Ex of **primitive operations**: (They correspond to low-level instructions that take constant time to perform.)
+    - assignment
+    - comparison
+    - arithmetic
+    - calling a function
+    - entering and returning from a function
+  - > Instead of trying to determine the specific execution time of an algorithm, we can simply count the number of primitive operations performed.
 - depending on what we count, the number of operations can be as slow as `2n` or as high as `5n+2`. But regardless of the exact number, the number of operations grows roughly proportionally with `n`
   ![counting operations](./img/counting-operations2.png)
 
@@ -154,14 +341,18 @@ where `a0`,`a1`,...,`ad` are constants, called the **coefficients** of the polyn
 
 ![counting operations](./img/counting-operations3.png)
 
+- Constant almost never matters for simple search versus binary search, because O(log n) is so much faster than O(n) when your list gets big.
+
 ---
 
 ### O(1)
 
 These are called **"Constant-Time Operations"**, we say that this function runs in `O(1)` time; that is, the running time of this function is independent of the length, `n` of the list.
 
+> `O(1)` is called constant time. It doesn’t mean **"instant"**. It means the time taken will stay the same, regardless of how big the hash table is.
+
 - Computer hardware supports constant-time access to an element based on its memory address. Therefore, we say that the expression `data[j]` is evaluated in `O(1)` time for a Python list.
-- The constant function is useful in algorithm analysis, because it characterizes the number of steps needed to do a basic operation on a computer, like adding two numbers, assigning a value to some variable, or comparing two numbers.
+- The constant function characterizes the number of steps needed to do a **basic operation** on a computer, like adding two numbers, assigning a value to some variable, or comparing two numbers.
 
 Ex:
 
@@ -196,9 +387,10 @@ Ex: usually nested loops
   - `log10(100)` is like asking: how many `10s` do we need to multiply together to get `100`? - `10 * 10 = 100` --> `2`
     ![log](./img/log.png)
 
-- The value `b` is known as the base of the logarithm. The most common base for the logarithm function in computer science is `2`,
+- The value `b` is known as the base of the logarithm. The most common base for the logarithm function in computer science is `2`
 
-  - as computers store integers in **binary**, and because a common operation in many algorithms is to repeatedly divide an input in half. In fact, this base is so common that we will typically omit it from the notation when it is `2`. That is, for us,
+  - as computers store integers in **binary**, and because a common operation in many algorithms is to repeatedly divide an input in half.
+  - In fact, this base is so common that we will typically omit it from the notation when it is `2`. That is, for us:
 
     ```sh
     log(n) = log2(n)
@@ -212,7 +404,7 @@ Ex: usually nested loops
 
 This function grows a little more rapidly than the `linear function O(n)` and a lot less rapidly than the `quadratic function O(n^2)`; therefore,
 
-- we would greatly prefer an algorithm with a running time that is proportional to `nlogn`, than one with `quadratic` running time.
+- we would greatly prefer an algorithm with a running time that is proportional to `n log(n)`, than one with `quadratic` running time.
 
 ---
 
@@ -235,6 +427,7 @@ This is called **Factorial Time** or **oh no!**
 1. worst case
    - always measure the worst case
    - Worst-case analysis is much easier than average-case analysis, as it requires only the ability to identify the worst-case input, which is often simple
+     - > An average-case analysis usually requires that we calculate expected running times based on a given input distribution, which usually involves sophisticated probability theory **(big-input data distribution)**. Therefore, for the remainder of this book, unless we specify otherwise, we will characterize running times in terms of the worst case, as a function of the input size `n` of the algorithm.
 2. remove constants
    - `O(n/2 + 124)` will be `O(n+1)`
 3. different terms for inputs
@@ -679,8 +872,18 @@ def merge_sort(arr):
 ![Quick-sort](./img/quick-sort.png)
 
 - it also uses the technique: "Divide & Conquer"
-- it may have a worst-case for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element,
 - it has better **space-complexity of `O(log(n))`**, so it can be sorted in memory if the database is not massive
+- Quick sort is unique, because its speed depends on the pivot point you choose
+
+  - best case for time-complexity is `O(n log n)`
+    ![quick-sort-best-case](./img/quick-sort-best-case.png)
+    - In this example, there are `O(log n)` levels (the technical way to say that is, “he height of the call stack is `O(log n)`”). And each level takes `O(n)` time. he entire algorithm will take `O(n) * O(log n) = O(n log n)` time. This is the best-case scenario.
+  - it may have a worst-case for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element.
+    ![quick-sort-worst-case](./img/quick-sort-worst-case.png)
+    - In this example, there're `O(n)` levels, so the entire algorithm will take `O(n) * O(n) = O(n^2)` time
+  - average case for time-complexity is `O(n log n)`
+    ![quick-sort-average-case](./img/quick-sort-average-case.png)
+    - > **Note:** The best case is also the average case. If you always choose a random element in the array as the pivot, quicksort will complete in O(n log n) time on average. **Quicksort is one of the fastest sorting algorithms out there**, and it’s a very good example of D&C.
 
 - Quick sort Pseudocode
   ![pivot-point](./img/quick-sort-pivot.png)
@@ -712,7 +915,15 @@ def quicksort(array):
 
 ---
 
-### Radi
+#### Merge sort vs quicksort
+
+- Quick sort is risky, In worst case, it can be `O(n^2)`, but in average case, it's `O(n log n)`
+  - unlike `merge sort` which is always `O(n log n)`
+- Sometimes the constant can make a difference. `Quicksort` versus `merge sort` is one example. `Quicksort` has a smaller constant than `merge sort`. So if they're both `O(n log n)` time, `quicksort` is faster. And `quicksort` is faster in practice because it hits the average case way more often than the worst case.
+
+---
+
+### Radix Sort
 
 - The previous sorting-algorithms were called: "Comparison Sorts", but the question is: "can we do better for the time-complexity?"
 
@@ -844,7 +1055,13 @@ it means going through each item in the list, like checking for something on eac
   - if we're talking about a breadth-first on a wide tree vs on depth-first, we will not be storing all the nodes across the tree in **BFS** as we only need to keep-track of the nodes in a given branch all the way down to the end
     ![traversal](./img/traversal2.png)
 
+---
+
 ### Breadth First Search/Traversal BFS
+
+- It can answer questions like:
+  - Is there a path from node `A` to node `B`?
+  - What is the shortest path from node `A` to node `B`?
 
 ![BFS](./img/bfs1.png)
 
@@ -853,9 +1070,68 @@ it means going through each item in the list, like checking for something on eac
 - it uses additional memory as it tracks the child nodes for a given node on each level (track every node and its children in order)
   - this is done using a **Queue** data structure
     - we use a `queue` because we need to remember the things that need to come next to be visited
+    - we need to search data in the order that they're added. So we need to use a `queue` as it's a `FIFO` data structure
   - if we have a very wide-tree, the `Queue` can get really big, which requires more memory
-- used to find the **shortest path**
+- used to find the **shortest path** (the fewest segments) between two nodes
+  - > **Note:** It's not necessarily the shortest path in terms of distance (fastest path), but the shortest path in terms of number of segments, To get the fastest path, we need to use [Dijkstra's algorithm](#dijkstras-algorithm)
 - also used with `Graphs`
+- Breadth-first search takes `O(number of people + number of edges)`, and it's more commonly written as `O(V+E)` (`V` for number of vertices, `E` for number of edges).
+- Notes:
+  - To calculate the shortest path in an unweighted graph, use `breadth-first search`. To calculate the shortest path in a weighted graph, use `Dijkstra’s algorithm`
+
+#### BFS Implementation
+
+BFS Implementation for a mango seller example
+![bfs example](./img/bfs-implementation.png)
+![bfs example](./img/bfs-implementation-1.png)
+
+```py
+from collections import deque
+
+# create a graph
+graph = {}
+graph["you"] = ["alice", "bob", "claire"]
+graph["bob"] = ["anuj", "peggy"]
+graph["alice"] = ["peggy"]
+graph["claire"] = ["thom", "jonny"]
+graph["anuj"] = []
+graph["peggy"] = []
+graph["thom"] = []
+graph["jonny"] = []
+
+# helper: check if a person is a mango seller
+def person_is_seller(name):
+  # mango sellers' names end with 'm' letter (e.g. thom)
+  return name[-1] == "m"
+
+
+def search(name):
+  # Create a new queue
+  search_queue = deque()
+  # Add all of your neighbors to the search queue
+  search_queue += graph[name]
+
+  # This array is how you keep track of which people you've searched before.
+  searched = []
+
+  while search_queue:
+    # pop the first person off the queue
+    person = search_queue.popleft()
+    # Only search this person if you haven't already searched them to avoid infinite loops (the search queue will keep going back and forth between neighbors nodes)
+    if not person in searched:
+      if person_is_seller(person):
+        print(person + " is a mango seller!")
+        return True
+      else:
+        # add this person's friends to the search queue
+        search_queue += graph[person]
+        # Marks this person as searched
+        searched.append(person)
+  return False
+
+
+search("you") # thom is a mango seller!
+```
 
 ---
 
@@ -896,10 +1172,27 @@ it means going through each item in the list, like checking for something on eac
 
 ### Dijkstra's Algorithm
 
-It's one of the most famous and widely used algorithms around. It finds the **shortest path** between 2 vertices on a **weighted-graph**
+It's one of the most famous and widely used algorithms around. It finds (the **shortest path** between 2 vertices on a **weighted-graph**)
 
-- Steps:
-  1. Every time we look to visit a new node, we pick the node with the smallest known distance to visit first
-  2. once we've move to the node we're going to visit, we look at each of its neighbors
-  3. for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
-  4. if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
+#### How Dijkstra's Algorithm works
+
+- Each segment has a travel time in minutes. You’ll use Dijkstra’s algorithm to go from start to finish in the shortest possible time.
+  ![Dijkstra-algorithm](./img/dijkstra-algorithm-1.png)
+- If you ran breadth-first search on this graph, you’d get this shortest path.
+  ![Dijkstra-algorithm](./img/dijkstra-algorithm-2.png)
+
+  - But that path takes 7 minutes. Let’s see if you can ind a path that takes less time!
+
+- **Steps:**
+
+  1. Find the **cheapest** node: pick the node with the smallest known distance to visit first
+     - This is the node you can get to in the least amount of time.
+  2. Update the costs of the neighbors of this node.
+     - for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
+  3. Repeat until you've done this for every node in the graph.
+  4. Calculate the final path.
+     - if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
+
+- **Notes:**
+  - Dijkstra’s algorithm only works with **directed acyclic graphs**, called `DAGs` for short.
+    - because undirected graphs can have cycles, which can lead to infinite loops or double-counting
