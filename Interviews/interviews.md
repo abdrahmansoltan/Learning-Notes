@@ -1,11 +1,102 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Communication](#communication)
+    - [Emails](#emails)
+  - [Behavioral skills for job interviews](#behavioral-skills-for-job-interviews)
+    - [Structure your answer using STARR](#structure-your-answer-using-starr)
   - [Non Technical interviews](#non-technical-interviews)
     - [Personality Questions](#personality-questions)
     - [Company Questions](#company-questions)
     - [Interviewer Questions](#interviewer-questions)
+    - [Feedback](#feedback)
+      - [Situation-Behavior-Impact (SBI)](#situation-behavior-impact-sbi)
   - [Negotiation](#negotiation)
+
+---
+
+## Communication
+
+### Emails
+
+- Tips:
+
+  - Don't start with `Dear Sir/Madam` or `To whom it may concern`
+    - try to find the name of the person you're sending the email to
+    - also `sir/madam` is too formal and usually used in spam emails
+  - Try not to use more than one exclamation mark `!`
+    - It's used to express tone and emotion and it's not professional to show a lot of emotions in a professional email like excitement or anger.
+
+- Examples:
+
+  - Intro email to a recruiter:
+
+    - Here we use (`-`) instead of (`,`) for readability and to replace new lines. to be short and clear.
+
+    ```md
+    Hi <name> - I love what I heard about <> from <> and what I read online. Looking forward to meeting! What's the easiest way to schedule a time? If it's helpful, you can use this calendly link.
+    I'm generally available Sunday-Friday between 9am-9pm EST, which would be 4pm-4am your time, but I can be more flexible if needed.
+
+    Best,
+    <name>
+    ```
+
+  - Professional email to a recruiter:
+
+    - Here, we use (`,`) normally
+    - Remind them when your interview will be held.
+
+    ```md
+    Hi <name>,
+
+    I hope you're well! I just wanted to clarify what type of interview I'l be having on the 30th of Sep. Can you give me a little more information on what I should be prepared for?
+
+    You mentioned it is a technical interview. I'm wondering If this will be focused on data structures & algorithms, or a conversation about my past technical projects, or a more practical coding exercise using a relevant technology like React. Any information would be greatly appreciated.
+
+    Thanks so much!
+    <name>
+    ```
+
+  - Showing interest after interview (Thank you email):
+
+    ```md
+    Hi <name>,
+
+    Thanks so much for taking the time to interview me yesterday. I really enjoyed it - it felt more like a teamwork project than an interview!
+
+    I also appreciate you taking the time to answer my questions.It was really encouraging to hear how cool startup gives engineers opportunities to meet customers & come up with product/business ideas.
+
+    I'll be in touch with <name> about next steps.
+
+    Warm Regards,
+    <name>
+    ```
+
+---
+
+## Behavioral skills for job interviews
+
+### Structure your answer using STARR
+
+It's a method to structure your answers to behavioral interview questions. It's a way to answer questions that help you to tell a story about a specific time when you did something. It's a way to help you to structure your answers to behavioral interview questions.
+
+> **STAR** stands for `Situation`, `Task`, `Action`, and `Result`.
+>
+> - The STAR technique is great for any interview questions asking about your experience and how you dealt with different problems. Questions like “What is your greatest weakness?” or “How did you deal with a difficult team member?” will be right at home here.
+
+![STAR](./img/star.jpg)
+
+- **Situation:** Describe the situation that you were in or the task that you needed to accomplish. This is where you are going to set up the story. Give one or two sentences of background so your interviewer knows the context of what you’re going to be talking about. At bare minimum, you should mention where you were and at what point in your career this took place.
+  - `Ex`: “I’m going to tell you about something that happened at my summer internship. I was interning at Facebook after my junior year of college.”
+- **Task:** What goal were you working toward?
+  - `Ex`: “My mentor asked me to stay late at work one night toward the end of my internship to help him with a project.”
+- **Action:** Now we’re getting into the meat of things, where you’re actually going to describe what you did. Since we’re getting to the more relevant stuff, you can take more time to describe what you did.
+  - Keep the focus on YOU. What specific steps did you take and what was your particular contribution? Be careful that you don’t describe what the team or group did when talking about a project, but what you actually did. Use the word “I,” not “we” when describing actions.
+  - > **Caution:** Don’t go into too much technical detail here. Unless your interviewer is familiar with the technology, they’re likely not going to understand all of what you’re talking about if you go too deep. Plus, going too deep can take a lot of time.
+  - `Ex`: “We were working on building out a new message handler for `X` service. I didn’t know too much about `Y` and `Z` technology, but he helped me figure it out, and by 1 AM we had built a working prototype. Over the next two weeks we refined it and pushed it into production.”
+- **Results:** This is the part where you really have to bring it home and make sure that you’re connecting back to the core question.
+  - Describe the outcome, and give any specific metrics that you can. Don’t be shy about taking credit for your behavior. What happened? How did the event end? What did you accomplish? What did you learn? Make sure your answer contains multiple positive results.
+  - `Ex`: “As a result of our all-nighter, we got our code up two weeks ahead of schedule, and I made my mentor look really good. I also learned a lot of new technology, and we managed to speed up job handling by `20` percent. That’s an example of a time when I exceeded expectations.”
 
 ---
 
@@ -50,18 +141,45 @@
     - you want more challenge
     - you want to work with people that are really smart like they have at the company you're applying to
 
+---
+
 ### Interviewer Questions
 
 - Do you have any questions for me?
+
   - focus on the interviewer, not `company` or `yourself`
   - mention something they've mentioned (this shows that you're paying attention to what they're saying in the interview)
     - use the info they tell you about themselves at the beginning of the interview
-  - > EX:
-    >
-    > - what is a big mistake that you did at the beginning of your jeb here? and what did you do?
-    > - where you see the company going in the next 3 years, as I want to work here for a while and you have better knowledge of the company than I do, and I would like to see where the company is headed.
-    > - Have you seen your skills grow here in the past 3 years?
-    > - What you wish somebody told them when they just started the job at this company?
+
+One of the important things to think about here is the fact that even though you’re asking the questions, it is still part of the interview. Your interviewer will be evaluating you based on the sorts of questions you ask. Therefore, make sure you have good questions…and don’t ask about things like vacation days, since it’s not really a good first impression.
+
+Here are some questions to get you started. I love opinion questions because you get interesting answers and can ask everyone the same question. Don’t be afraid to ask about the negatives too:
+
+- EX:
+  - “Can you share more about the day-to-day responsibilities of this position? What’s a typical day like?”
+  - “What are your favorite and least favorite parts of the job?”
+  - “Why did you decide to join Company X?”
+  - “Can you tell me about the opportunities for career advancement at Company X?”
+  - what is a big mistake that you did at the beginning of your jeb here? and what did you do?
+  - where you see the company going in the next 3 years, as I want to work here for a while and you have better knowledge of the company than I do, and I would like to see where the company is headed.
+  - Have you seen your skills grow here in the past 3 years?
+  - What you wish somebody told them when they just started the job at this company?
+
+---
+
+### Feedback
+
+#### Situation-Behavior-Impact (SBI)
+
+- **Situation:**
+  - Start by describing the specific situation or context in which the behavior occurred. This helps to provide a clear and specific context for the feedback.
+- **Behavior:**
+  - Describe the behavior that you observed in the situation. This should be a specific and objective description of what the person did or said.
+- **Impact:**
+
+  - Describe the impact that the behavior had on you or others. This should be a description of the consequences of the behavior, whether positive or negative.
+
+> EX: "I noticed that you were late to the meeting **(Situation)**. I was concerned because we had a lot to cover in the meeting and we had to rush through the agenda **(Behavior)**. As a result, we didn’t have time to discuss the new product launch **(Impact)**."
 
 ---
 

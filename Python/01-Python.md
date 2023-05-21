@@ -94,6 +94,10 @@ One of the oldest PEPs is **PEP 8**, which instructs Python programmers on how t
 
 ## Data Types
 
+A **Type** is a classification of data that tells the computer possible values for that type and the operations that can be performed on it
+
+> In Python, everything is an object, and every object has a type
+
 ![data-types](./img/python-data-types.png)
 
 ---
@@ -309,6 +313,7 @@ def range(start, stop=None, step=1):
 ## Iterators and Generators
 
 - In Python, the mechanism for iteration is based upon the following conventions: `iterator` & `iterable`
+  ![Iterator-Iterable](./img/Iterator-Iterable.jpg)
 
 ### Iterator
 
@@ -323,7 +328,15 @@ An **iterator** is an object that manages an iteration through a series of value
 
 An **iterable** is an object, obj, that produces an iterator via the syntax `iter(obj)`.
 
-- For example, calling `iter(data)` on a list instance produces an instance of the list iterator class
+- For example, calling `iter(data)` on a list instance (`data`) produces an instance of the list iterator class
+
+  ```py
+  data = [1, 2, 3]
+  next(data) # ❌ TypeError: 'list' object is not an iterator
+  i = iter(data) # ✅
+  print(next(i)) # 1
+  ```
+
 - Python also supports functions and classes that produce an implicit iterable series of values, that is, without constructing a data structure to store all of its values at once.
 
   - For example, the call `range(1000000)` does not return a list of numbers; it returns a range object that is iterable. This object generates the million values one at a time, and only as needed.
@@ -600,6 +613,8 @@ def scale(data, factor):
 
 > In the terminology of programming languages, **first-class objects** are instances of a type that can be assigned to an identifier, passed as a parameter, or returned by a function
 
+It's a **"data-type"** that can be: `assigned` / `passed` / `returned`
+
 - In Python, `functions` and `classes` are also treated as first-class objects. For example, we could write the following:
 
   ```py
@@ -748,7 +763,7 @@ It's an **"ordered"** collection of data
 
 ##### Shallow copy
 
-- We want to subsequently be able to add additional colors to palette, or to modify or remove some of the existing colors, without affecting the contents of warmtones. If we were to execute the command
+- We want to subsequently be able to add additional colors to palette, or to modify or remove some of the existing colors, without affecting the contents of `warmtones`. If we were to execute the command
 
   ```py
   palette = warmtones
@@ -1300,6 +1315,7 @@ There are several philosophies regarding how to cope with possible exceptional c
 - One philosophy for managing exceptional cases is to **“look before you leap (LBYL)”**
 
   - The goal is to entirely avoid the possibility of an exception being raised (avoid leaping into the logic) through the use of a proactive conditional test.
+    ![LBYL](./img/lbyl.jpg)
 
     ```py
     if y != 0:
@@ -1332,6 +1348,10 @@ There are several philosophies regarding how to cope with possible exceptional c
 
 ![try / except](./img/try-except.png)
 
+It's best used when there is reason to believe that the exceptional case is relatively unlikely, or when it is prohibitively expensive to proactively evaluate a condition to avoid the exception.
+
+> It is significantly easier to attempt the command and catch the resulting error than it is to accurately predict whether the command will succeed.
+
 - usually it's better to except a specific exception and handle it, rather than handling any possible exception that could occur
 
   ```py
@@ -1340,8 +1360,6 @@ There are several philosophies regarding how to cope with possible exceptional c
   except ValueError:
     print("Oh no, that ins't a number!")
   ```
-
-````
 
 - you can specify the error in the handling:
 
@@ -1366,7 +1384,8 @@ There are several philosophies regarding how to cope with possible exceptional c
       print( Invalid response )
   ```
 
-- a **"finally"** clause, with a body of code that will always be executed in the standard or exceptional cases, even when an uncaught or re-raised exception occurs. That block is typically used for critical cleanup work, such as closing an open file.
+- a **`finally`** clause, with a body of code that will always be executed in the standard or exceptional cases, even when an uncaught or re-raised exception occurs.
+  - That block is typically used for critical cleanup work, such as closing an open file.
 
 ---
 
@@ -1530,4 +1549,7 @@ Beyond the built-in definitions, the standard Python distribution includes perha
   - Immutable objects
     ![immutable](./img/immutable_objects.png)
   - Python interpreter already maintains what are known as **"reference counts"** for each object; this count is used in part to determine if an object can be garbage collected.
-````
+
+```
+
+```

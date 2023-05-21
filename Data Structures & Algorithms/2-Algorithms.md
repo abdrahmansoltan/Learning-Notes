@@ -58,6 +58,7 @@
     - [Shortest Path](#shortest-path)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
       - [How Dijkstra's Algorithm works](#how-dijkstras-algorithm-works)
+      - [Implementing Dijkstra's Algorithm](#implementing-dijkstras-algorithm)
 
 ---
 
@@ -1059,18 +1060,23 @@ it means going through each item in the list, like checking for something on eac
 
 ### Breadth First Search/Traversal BFS
 
+It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores all of the `neighbor` nodes at the present depth before moving on to the nodes at the next depth level.
+
 - It can answer questions like:
   - Is there a path from node `A` to node `B`?
   - What is the shortest path from node `A` to node `B`?
 
 ![BFS](./img/bfs1.png)
+![BFS](./img/bfs3.webp)
 
 - start with the root-node, then go to the left then the right of the second level of the tree, the the same for the next level
   ![BFS](./img/bfs2.png)
 - it uses additional memory as it tracks the child nodes for a given node on each level (track every node and its children in order)
   - this is done using a **Queue** data structure
+    ![BFS](./img/bfs4.png)
     - we use a `queue` because we need to remember the things that need to come next to be visited
     - we need to search data in the order that they're added. So we need to use a `queue` as it's a `FIFO` data structure
+      - Similar to tree's level-order traversal, the nodes closer to the root node will be traversed earlier.
   - if we have a very wide-tree, the `Queue` can get really big, which requires more memory
 - used to find the **shortest path** (the fewest segments) between two nodes
   - > **Note:** It's not necessarily the shortest path in terms of distance (fastest path), but the shortest path in terms of number of segments, To get the fastest path, we need to use [Dijkstra's algorithm](#dijkstras-algorithm)
@@ -1137,6 +1143,8 @@ search("you") # thom is a mango seller!
 
 ### Depth First Search/Traversal DFS
 
+It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores as far as possible along each branch before backtracking.
+
 - the search follows one branch of the tree down as many levels as possible until the target notice is found or the end is reached, then it continues at the next ancestor with an unexplored children
   - the idea is to go as deep as possible from the left side and then start going to the right until the traversal of the tree is done
   - it's like "solving a maze"
@@ -1174,25 +1182,53 @@ search("you") # thom is a mango seller!
 
 It's one of the most famous and widely used algorithms around. It finds (the **shortest path** between 2 vertices on a **weighted-graph**)
 
+> Shortest path doesn't have to be about the physical distance, it can be about minimizing something.
+
 #### How Dijkstra's Algorithm works
 
 - Each segment has a travel time in minutes. You’ll use Dijkstra’s algorithm to go from start to finish in the shortest possible time.
   ![Dijkstra-algorithm](./img/dijkstra-algorithm-1.png)
+- Cost of a node is how long it takes to get to that node from the start.
 - If you ran breadth-first search on this graph, you’d get this shortest path.
   ![Dijkstra-algorithm](./img/dijkstra-algorithm-2.png)
 
   - But that path takes 7 minutes. Let’s see if you can ind a path that takes less time!
 
-- **Steps:**
+- EX: Trading for a piano
 
-  1. Find the **cheapest** node: pick the node with the smallest known distance to visit first
-     - This is the node you can get to in the least amount of time.
-  2. Update the costs of the neighbors of this node.
-     - for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
-  3. Repeat until you've done this for every node in the graph.
-  4. Calculate the final path.
-     - if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
+  - In this graph, the nodes are all the items Rama can trade for. he weights on the edges are the amount of money he would have to pay to make the trade
+    ![piano example](./img/piano-example-1.png)
+    ![piano example](./img/piano-example-2.png)
+    ![piano example](./img/piano-example-3.png)
+  - **Steps:**
+
+    1. Find the **cheapest** node: pick the node with the smallest known distance to visit first
+
+       - This is the node you can get to in the least amount of time.
+
+    2. Update the costs of the neighbors of this node (Figure out how long it takes to get to its neighbors).
+       ![piano example](./img/piano-example-4.png)
+       ![piano example](./img/piano-example-5.png)
+       ![piano example](./img/piano-example-6.png)
+
+       - for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
+       - Mark the node as processed.
+         - we do this to avoid calculating the same node more than once
+
+    3. Repeat until you've done this for every node in the graph.
+       ![piano example](./img/piano-example-7.png)
+    4. Calculate the final path.
+       ![piano example](./img/piano-example-8.png)
+
+       - if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
+       - We can get the piano even cheaper by trading the drum set for the piano instead. So the cheapest set of trades will cost us `$35`.
+       ![piano example](./img/piano-example-9.png)
 
 - **Notes:**
   - Dijkstra’s algorithm only works with **directed acyclic graphs**, called `DAGs` for short.
     - because undirected graphs can have cycles, which can lead to infinite loops or double-counting
+  - We can't use Dijkstra’s algorithm if we have **negative-weighted edges**.
+
+---
+
+#### Implementing Dijkstra's Algorithm

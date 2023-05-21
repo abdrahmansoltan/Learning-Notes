@@ -8,14 +8,14 @@
       - [Encapsulation Principle](#encapsulation-principle)
   - [Classes](#classes)
     - [The `self` Identifier](#the-self-identifier)
-    - [constructor](#constructor)
+    - [Constructor](#constructor)
     - [Python’s Built-In Classes](#pythons-built-in-classes)
     - [Operator and Function Overloading in Custom Python Classes](#operator-and-function-overloading-in-custom-python-classes)
     - [Class Methods](#class-methods)
     - [Attributes (Class Data Members)](#attributes-class-data-members)
+  - [Encapsulation](#encapsulation)
   - [Inheritance](#inheritance)
     - [Abstract Base Classes](#abstract-base-classes)
-  - [Encapsulation](#encapsulation)
 
 ---
 
@@ -75,11 +75,11 @@ Each instance from a class must maintain its own properties & methods. Therefore
 
 > **`self`** identifies the instance upon which a method is invoked
 
-- when using a class-method that is called with one parameter, for example, as my `card.charge(200)`. The interpreter automatically **binds the instance upon which the method is invoked to the `self` parameter**.
+- when using a class-method that is called with one parameter, for example, as my `card.charge(200)`. The `self` parameter is not passed explicitly by the programmer when invoking a method. Instead, the interpreter automatically binds the instance upon which the method is invoked to the `self` parameter.
 
 ---
 
-### constructor
+### Constructor
 
 it initializes the data members of the class when an object of class is created by calling the specially-named `__init__` method that serves as the constructor of the class
 
@@ -168,6 +168,39 @@ A `class-level data member` is often used when there is some value, such as a co
 
 ---
 
+## Encapsulation
+
+It's a way to hide the data and the methods that operate on data from the outside world. It is a concept of bundling data and methods that work on that data within one unit, e.g., a `class` in Python.
+
+- in `c++`, `java`, this concept is more loaded with **hiding** things from outsiders
+
+  - but `python` has another philosophy: **trust other programmers**
+    - Python does not support formal access control, but names beginning with a single underscore (`_`) are conventionally akin to **protected**, while names beginning with a double underscore (`__`) (other than special methods) are akin to **private**.
+
+- Using the underscore `_` symbol
+
+  - **single underscore** `_` is used to **mark a variable as protected** for internal use. It is just a convention and not enforced by the Python interpreter.
+  - **double underscore** `__` is used to **mark a variable as private** for internal use. The interpreter changes the name of the variable to prevent accidental access.
+
+  ```py
+  class Person:
+      def __init__(self, first_name, last_name, age):
+          self._first_name = first_name
+          self._last_name = last_name
+          self._age = age
+
+      def get_full_name(self):
+          return f'Person({self._first_name},{self._last_name},{self._age})'
+
+      john = Person('John', 'Sam', 36)
+      print(john._first_name) # John -> we can access it but it's not recommended
+      print(john.get_full_name()) # Person(John,Sam,36) -> better way to access it
+  ```
+
+> Note: Python doesn't support access control keywords like `private`, `protected`, and `public`, etc. like other languages do. However, it has a naming convention for variables to indicate the access level.
+
+---
+
 ## Inheritance
 
 A natural way to organize various structural components of a software package is in a **hierarchical** fashion, with similar abstract definitions grouped together in a level-by-level manner that goes from specific to more general as one traverses up the hierarchy. An example of such a hierarchy is shown in the Figure. Using mathematical notations, the set of `houses` is a **subset** of the set of buildings, but a **superset** of the set of `ranches`. The correspondence between levels is often referred to as an **“is a” relationship**, as a house is a building, and a `ranch` is a `house`.
@@ -178,11 +211,37 @@ A natural way to organize various structural components of a software package is
 - This allows a new class to be defined based upon an existing class as the starting point.
 - In object-oriented terminology, the existing class is typically described as the **base class**, **parent class**, or **superclass**, while the newly defined class is known as the **subclass** or **child class**.
 - There are two ways in which a subclass can differentiate itself from its superclass. A subclass may specialize an existing behavior by providing a new implementation that overrides an existing method. A subclass may also extend its superclass by providing brand new methods.
+- EX:
+  ![inheritance](./img/oop-inheritance.png)
 - The mechanism for calling the inherited constructor relies on the syntax, `super()`
+  ![inheritance](./img/oop-inheritance2.png)
   - it calls the `__init__` method that was inherited from the superclass
+- To access inherited properties and methods, we use the `super()` function -> `super().method_name()`
 
-![inheritance](./img/oop-inheritance.png)
-![inheritance](./img/oop-inheritance2.png)
+  ```py
+  class Building:
+      def __init__(self, name, address):
+          self.name = name
+          self.address = address
+
+      def get_address(self):
+          return self.address
+
+      def get_name(self):
+          return self.name
+
+  class House(Building):
+      def __init__(self, name, address, num_bedrooms):
+          super().__init__(name, address)
+          self.num_bedrooms = num_bedrooms
+
+      def get_num_bedrooms(self):
+          return self.num_bedrooms
+
+      # override the method with access to the superclass method
+      def get_name(self):
+          return f'House: {super().get_name()}'
+  ```
 
 ---
 
@@ -191,14 +250,5 @@ A natural way to organize various structural components of a software package is
 In classic object-oriented terminology, we say a class is an abstract base class if its only purpose is to serve as a base class through inheritance. More formally, an **"abstract base class"** is one that cannot be directly instantiated, while a **"concrete class"** is one that can be instantiated.
 
 > Python’s collections module provides several abstract base classes that assist when defining custom data structures that share a common interface with some of Python’s built-in data structures. These rely on an object-oriented software design pattern known as the **template method pattern**
-
----
-
-## Encapsulation
-
-- it's grouping of variables and functions of a specific concept in a single component, named **class**
-- in `c++`, `java`, this concept is more loaded with **hiding** things from outsiders
-  - but `python` has another philosophy: **trust other programmers**
-  - Python does not support formal access control, but names beginning with a `single underscore (_)` are conventionally akin to **protected**, while names beginning with a `double underscore (__)` (other than special methods) are akin to **private**.
 
 ---

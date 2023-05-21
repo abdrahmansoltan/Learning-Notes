@@ -41,6 +41,7 @@
       - [Call Stack](#call-stack)
       - [Array-Based Stack Implementation](#array-based-stack-implementation)
     - [Queues](#queues)
+      - [Circular Queue](#circular-queue)
   - [Graphs](#graphs)
     - [How to store graphs](#how-to-store-graphs)
     - [Graphs implementation](#graphs-implementation)
@@ -54,7 +55,10 @@
       - [Array implementation](#array-implementation)
       - [Heap methods](#heap-methods)
       - [Priority Queue](#priority-queue)
-    - [Binary Trie](#binary-trie)
+        - [Implementation of Priority Queue](#implementation-of-priority-queue)
+    - [Tries](#tries)
+      - [Tries Implementation](#tries-implementation)
+      - [Hybrid Tries](#hybrid-tries)
 
 ---
 
@@ -67,11 +71,19 @@ it's a collection of values (can have relationships between them) which is being
 They're ways to organize information with **optimal runtime complexity** for different operations
 
 - Most programming languages have built-in data structures, but in interviews, you may still be asked about **"inferior"** data structures like queues and linked lists.
+
   - this is done by using the built-in data structures and getting the same result
     - ex: to add to queue -> use array equivalent: `array.insert()`
   - also if we want to make a class to the data-structure, we can use the built-in data-structure to make it
     - ex: to make a queue class -> use array to make it and remove some unwanted array-methods
       ![ds-class](./img/ds-class.png)
+
+- There're 2 types of data structures:
+  - **Linear** -> data is organized sequentially, one after the other
+    - are called “linear” data structures because they all have a logical start and a logical end.
+    - ex: `array`, `stack`, `queue`, `linked-list`
+  - **Non-Linear** -> data is not organized sequentially
+    - ex: `tree`, `graph`
 
 ### storing data in the Memory
 
@@ -533,6 +545,7 @@ Here we have **Key/value pairs**
 ![hash-function](./img/hashFunction.png)
 
 - Arrays and lists map straight to memory, but hash tables are smarter. hey use a hash function to intelligently figure out where to store elements.
+  - array like a data structure where keys (integers) can be used directly as an index to store values. However, in cases where the keys are large and cannot be used directly as an index, you should use **hashing**.
 - Hash tables are great for:
   1. creating a mapping from one thing to another
   2. looking something up
@@ -551,7 +564,7 @@ Here we have **Key/value pairs**
 
 ### Hash function
 
-- it's a function that generates a value of fixed length for each input that it gets.
+- it's a function that generates a value of **fixed length** for each input that it gets.
 - it's one way
 - the resulted hash-value is converted to **index-biased** which is pointer to where the value of the key is in the memory
   - this is great for accessing values of a hash-table as we only give it a **key** and it gets the value from the location immediately -> **O(1)**
@@ -559,12 +572,26 @@ Here we have **Key/value pairs**
 
 ![hash-function](./img/hashFunction2.png)
 
+- Hashing is implemented in two steps:
+
+  ```py
+  hash = hashfunc(key)
+  index = hash % array_size
+  ```
+
+  1. An element is converted into an integer by using a hash function. This element can be used as an `index` to store the original element, which falls into the hash table.
+  2. The element is stored in the hash table where it can be quickly retrieved using hashed key.
+
 #### Good Hash functions
 
-A good hash function distributes values in the array evenly.
-![good hash function](./img/good-hash-function.png)
+To achieve a good hashing mechanism, It is important to have a good hash function with the following basic requirements:
 
-> You'll almost never have to implement a hash table yourself. he programming language you use should provide an implementation for you. You can use Python’s hash tables and assume that you’ll get the average case performance: constant time.
+1. **Easy to compute:** It should be easy to compute and must not become an algorithm in itself.
+2. **Uniform distribution:** It should provide a uniform distribution across the hash table and should not result in clustering.
+   ![good hash function](./img/good-hash-function.png)
+3. **Less collisions:** Collisions occur when pairs of elements are mapped to the same hash value. These should be avoided.
+
+> Note: Irrespective of how good a hash function is, collisions are bound to occur. Therefore, to maintain the performance of a hash table, it is important to manage collisions through various collision resolution techniques. Assume that you’ll get the average case performance: constant time.
 
 #### Problem of Hash functions in hash-tables (bad hash functions)
 
@@ -577,17 +604,25 @@ with enough data and limited memory, sometimes keys are hashed to the same value
 
 - There're many ways to deal with this problem, but the most common one is **separate chaining** which is storing the values in a data-structure like (array or **linked-list**) at the same index
   ![hash-collision](./img/hash-collision.png)
-- when we have a collision **(worst case)**, the performance becomes **O(n/k) -> O(n)**, which is `k` is the size of the hash-table
+- when we have a collision **(worst case)**, the performance becomes **O(n/k) -> O(n)**, where `n` is the number of elements(entries) in the hash-table and `k` is the number of slots in the hash-table
+  - > **Note:** `k` is usually a constant, so we can ignore it and say that the time complexity is `O(n)` which is the same as the time complexity of a linked-list
 - There're many strategies for dealing with collisions:
 
-  1. **separate chaining**: (most common)
+  1. **separate chaining (open hashing)**: (most common)
      ![separate chaining](./img/hash-collision2.png)
      - at each index in our array we store values using more sophisticated data-structure like (array or linked-list)
      - this allows us to store multiple key-value pairs at the same index
-  2. **linear probing**:
+  2. **linear probing (open addressing or closed hashing)**:
      ![linear probing](./img/hash-collision3.png)
-     - when we find a collision, we search through the array to find the next empty slot
+     ![linear probing](./img/hash-collision4.jpg)
+     - In `open addressing`, instead of in linked lists, all entry records are stored in the array itself. When a new entry has to be inserted, the hash index of the hashed value is computed and then the array is examined (starting with the hashed index). If the slot at the hashed index is unoccupied, then the entry record is inserted in slot at the hashed index else it proceeds in some probe sequence until it finds an unoccupied slot.
+       - when we find a collision, we search through the array to find the next empty slot
+       - When searching for an entry, the array is scanned in the same sequence until either the target element is found or an unused slot is found. This indicates that there is no such key in the table.
+     - > The name `"open addressing"` refers to the fact that the location or address of the item is not determined by its hash value.
      - also here, we may improve the **time complexity**, but we might also accidentally increase the **space complexity** as a tradeoff by creating an object and storing values inside it in the memory
+     - also this may result in a `O(n)` time complexity in the worst case, as we may have to search through the entire array to find an empty slot
+  3. **double hashing**: Similar to linear probing, but instead of using a constant "skip" value, we use a second hash function to determine the next index to check.
+  4. **quadratic probing**: Similar to linear probing, but instead of using a constant "skip" value, we use a quadratic function to determine the next index to check.
 
 - To avoid collisions, we want to distribute our values evenly throughout, So we need:
   - A low **load factor**
@@ -610,6 +645,7 @@ If the entire hash table is totally empty except for one slot. And that slot has
 
 - Your hash function is really important. If your hash function mapped all the keys to a single slot. Ideally, your hash function would map keys evenly all over the hash.
 - If those linked lists get long, it slows down your hash table a lot. But they won’t get long if you use a good hash function!
+- **Time complexity:** The time complexity of a hash table is `O(1)` for insertions, deletions, and lookups. But that’s only true if you have a good hash function. If you have a bad hash function, you could end up with a hash table that’s as slow as a linked list, and then the time complexity would be `O(n)`.
 
 ---
 
@@ -638,6 +674,8 @@ They made us limit the operations we can do on other data structures like `lists
 ![stacks](./img/stacks.png)
 
 A stack is a collection of objects that are inserted and removed according to the **last-in, first-out (LIFO)** principle.
+
+- In a `LIFO` data structure, the newest element added to the queue will be processed first.
 
 - used in
 
@@ -694,6 +732,31 @@ stacks can be implemented using **Arrays(lists)** or **linked-lists**, as:
 - `linked-list`, but note that it has its items scattered all over memory, so it will be slower that `array`
   - also remember that `.pop()` in `singly-linked-list` is `O(n)` and not `O(1)` like in `doubly-linked-list`, so if you will implement a stack using linked-list, do it with `doubly-linked-list`
 
+```py
+class ArrayStack:
+  def __init__(self):
+    self._data = [] # nonpublic list instance
+
+  def __len__(self):
+    return len(self._data)
+
+  def is_empty(self):
+    return len(self._data) == 0
+
+  def push(self, e):
+    self._data.append(e) # new item stored at end of list
+
+  def top(self):
+    if self.is_empty():
+      raise Empty('Stack is empty')
+    return self._data[-1] # the last item in the list
+
+  def pop(self):
+    if self.is_empty():
+      raise Empty('Stack is empty')
+    return self._data.pop() # remove last item from list
+```
+
 ---
 
 ### Queues
@@ -701,6 +764,8 @@ stacks can be implemented using **Arrays(lists)** or **linked-lists**, as:
 ![queues](./img/queues.png)
 
 it's based on **FIFO** (first in - first out)
+
+- In a `FIFO` data structure, the first element added to the queue will be processed first.
 
 - used in:
 
@@ -713,6 +778,91 @@ it's based on **FIFO** (first in - first out)
 - creating `Queues` from `arrays` is really bad, as you will shift the other elements (O(n))
 - You would never want to build a queue with an `array`, as `arrays` have indexes associated with them, so if we removed first item then we now need to shift the indexes over --> **O(n)**,
 - **so we should build `queues` with `linked-lists`**, as we just change the `head` --> **O(1)**
+
+  ```py
+  class Queue:
+    def __init__(self):
+      self.queue = DoublyLinkedList()
+
+    def enqueue(self, value):
+      self.queue.append(value)
+
+    def dequeue(self):
+      return self.queue.pop(0)
+
+    def peek(self):
+      return self.queue[0]
+
+    def is_empty(self):
+      return len(self.queue) == 0
+
+    def __len__(self):
+      return len(self.queue)
+
+    def __str__(self):
+      return str(self.queue)
+  ```
+
+- Queues Drawbacks:
+
+  - `Queues` are not very efficient for searching for an item
+  - `Queues` are not very efficient for deleting an item
+  - `Queues` are not very efficient for randomly accessing an item
+  - The implementation above is straightforward but is inefficient in some cases. With the movement of the `start (head)` pointer, more and more space is wasted. And it will be unacceptable when we only have a space limitation.
+    - A more efficient way is to use a **circular queue**.
+
+#### Circular Queue
+
+In a circular queue, we use 2 pointers: the `tail` pointer still points to the last element, but the `head` pointer points to the next position of the last element.
+![circular queue](./img/circular-queue-1.jpeg)
+
+- One of the benefits of the circular queue is that we can make use of the spaces in front of the queue. In a normal queue, once the queue becomes full, we cannot insert the next element even if there is a space in front of the queue. But using the circular queue, we can use the space to store new values.
+- When the queue is full (we use to check if a queue is empty or full), the `head` and `tail` pointers point to the same position.
+  ![circular queue](./img/circular-queue-2.jpg)
+
+```py
+class MyCircularQueue:
+  def __init__(self, k: int):
+    self.queue = [None] * k
+    self.head = 0
+    self.tail = 0
+    self.maxSize = k
+
+  def enqueue(self, value: int) -> bool:
+    if self.isFull():
+      return False
+    self.queue[self.tail] = value
+    self.tail = (self.tail + 1) % self.maxSize
+    return True
+
+  def dequeue(self) -> bool:
+    if self.isEmpty():
+      return False
+    self.queue[self.head] = None
+    self.head = (self.head + 1) % self.maxSize
+    return True
+
+  def Front(self) -> int:
+    return -1 if self.isEmpty() else self.queue[self.head]
+
+  def Rear(self) -> int:
+    return -1 if self.isEmpty() else self.queue[self.tail - 1]
+
+  def isEmpty(self) -> bool:
+    return self.head == self.tail and self.queue[self.head] == None
+
+  def isFull(self) -> bool:
+    return self.head == self.tail and self.queue[self.head] != None
+```
+
+- Python provides a `deque` class that is a double-ended queue. It can be used to add or remove elements from both ends.
+
+  ```py
+  from collections import deque
+  queue = deque([1, 2, 3])
+  queue.append(4)
+  queue.popleft()
+  ```
 
 ---
 
@@ -764,7 +914,14 @@ It's a special type of graph, where no edges point back to the root node (no cyc
 ![trees](./img/trees1.png)
 ![trees](./img/trees.png)
 
-They have **Hierarchical Data-structures** structure unlike other data-structures which are **Linear Data-structures**
+- They have **Hierarchical (non-linear) Data-structures** structure unlike other data-structures which are **Linear Data-structures**
+  - `Leaves` are the last nodes on a tree. They are nodes without children. Like real trees, we have the `root`, `branches`, and finally the `leaves`.
+- If a tree has `N` vertices(nodes) than the number of edges is always one less than the number of nodes(vertices) i.e `N-1`.
+  - If it has more than `N-1` edges it is called a `graph` not a `tree`.
+- Other important concepts to understand are `height` and `depth`:
+
+  - `height` of a tree is the number of edges from the `root` to the furthest `leaf`.
+  - `depth` of a node is the number of edges from the `root` to that node.
 
 - used in:
   - the **HTML DOM**
@@ -901,11 +1058,15 @@ class Tree:
 
 ![BST](./img/bst.png)
 
+**Binary Search Tree (BST)** is an extension of Binary tree with some added constraints / rules:
+
 - **Rules:**
+
   - Every parent node has **at most** 2 children
-  - Every node to the left of a parent node is always less than the parent
-  - Every node to the right of a parent node is always greater than the parent
+  - value of the left child is always less than the parent node
+  - value of the right child is always greater than the parent node
     - this means if I keep going to the right, the number or the value of the node constantly increases
+
 - **Advantages:**
 
   - searching, look-ups and inserting which here is `O(log(n))` **(not guaranteed! as we may have unbalanced-search-tree)** which is much faster as we won't loop like in arrays (better than `O(n)`)
@@ -927,6 +1088,8 @@ class Tree:
 
   - If a binary search tree is not balanced, how long might it take (worst case) to find an element in it?
     - Answer: `O(n)`
+  - Binary Search Tree is sometimes called **Ordered** or **Sorted** Binary Tree.
+    - it keeps its values in sorted order, so that lookup and other operations can use the principle of binary search
 
 - Class Construction
   ![BST class](./img/bst1.png)
@@ -939,7 +1102,12 @@ class Tree:
 
 #### Tree Traversal
 
-It's covered in [Traversals section in Algorithms.md](./2-Algorithms.md#traversals)
+- There're 3 types of traversals:
+  1. In-order traversal (`left` -> `root` -> `right`)
+  2. Pre-order traversal (`root` -> `left` -> `right`)
+  3. Post-order traversal (`left` -> `right` -> `root`)
+
+> It's covered in [Traversals section in Algorithms.md](./2-Algorithms.md#traversals)
 
 ---
 
@@ -962,8 +1130,12 @@ It's covered in [Traversals section in Algorithms.md](./2-Algorithms.md#traversa
 
 - A binary-heap is as compact as possible. All the children of each node are as full as they can be and **left children are filled out first**
 - It's used in:
+
   - Implementing [Priority Queues](#priority-queue)
   - used with **Graph-traversal** Algorithms
+
+- When implementing a Binary-heap, we can use an `Array` to store the values, as it's more efficient than using `Nodes` and `Pointers` like in `Binary-trees`
+  - this is because we don't need to store the `left` and `right` pointers, as we can calculate them using the index of the parent node as the elements of the heap will be stored in a specific location in the array
 
 #### Array implementation
 
@@ -971,8 +1143,8 @@ It's covered in [Traversals section in Algorithms.md](./2-Algorithms.md#traversa
 ![Array Implementation](./img/binary-heap1.png)
 
 - For any parent node of an Array at index `n`:
-  - the left child is stored at `2n + 1`
-  - the right child is stored at `2n + 2`
+  - the `left` child is stored at `2n + 1`
+  - the `right` child is stored at `2n + 2`
 - For any child node at index `n`:
   - its parent is at index `(n - 1) / 2` **floored**
 
@@ -999,24 +1171,191 @@ It's a data structure where each element has a priority. Elements with higher pr
 - we can implement it using `Array`, but it's not efficient, as we will need to iterate over the entire thing to find the highest priority element, so instead we use a **Heap**
 - ex with `binary-heap`:
   ![priority-queue](./img/priority-queue.png)
+- Usage:
 
-- Implementation
+  - Priority queues are often used in real-time systems, where the order in which elements are processed can have significant consequences. They are also used in algorithms to improve their efficiencies
+  - such as `Dijkstra’s algorithm` for finding the shortest path in a graph and the A\* search algorithm for path-finding.
 
-  - here we use the same steps like in [Binary Heap](#binary-heap) -> `values` array property, but we also have `priority` property
-    ![priority-queue](./img/priority-queue1.png)
+- a priority Queue is an extension of the queue with the following properties:
+  ![priority-queue](./img/priority-queue-1.png)
+
+  1. Every item has a priority associated with it.
+
+     - In a priority queue, generally, the `value` of an element is considered for assigning the priority.
+
+  2. An element with high priority is dequeued before an element with low priority.
+  3. If two elements have the same priority, they are served according to their order in the queue.
+
+- **Types of Priority Queue:**
+  1. Ascending Order Priority Queue
+     - the element with a lower priority value is given a higher priority in the priority list
+  2. Descending order Priority Queue
+
+##### Implementation of Priority Queue
+
+- **Inserting**: When a new element is inserted in a priority queue, it moves to the empty slot from top to bottom and left to right. However, if the element is not in the correct place then it will be compared with the parent node. If the element is not in the correct order, the elements are swapped. The swapping process continues until all the elements are placed in the correct position.
+- **Deletion**: As you know that in a max heap, the maximum element is the root node. And it will remove the element which has maximum priority first. Thus, you remove the root node from the queue. This removal creates an empty slot, which will be further filled with new insertion. Then, it compares the newly inserted element with all the elements inside the queue to maintain the heap invariant.
+
+- here we use the same steps like in [Binary Heap](#binary-heap) -> `values` array property, but we also have `priority` property
+  ![priority-queue](./img/priority-queue1.png)
 
   ![priority-queue](./img/priority-queue2.png)
 
+```py
+class Node:
+    def __init__(self, value, priority):
+        self.value = value
+        self.priority = priority
+
+class PriorityQueue:
+    def __init__(self):
+        self.values = []
+
+    def enqueue(self, value, priority):
+        newNode = Node(value, priority)
+        self.values.append(newNode)
+        self.bubbleUp()
+
+    def bubbleUp(self):
+        idx = len(self.values) - 1
+        element = self.values[idx]
+        while idx > 0:
+            parentIdx = (idx - 1) // 2
+            parent = self.values[parentIdx]
+            if element.priority <= parent.priority:
+                break
+            self.values[parentIdx] = element
+            self.values[idx] = parent
+            idx = parentIdx
+
+    def dequeue(self):
+        max = self.values[0]
+        end = self.values.pop()
+        if len(self.values) > 0:
+            self.values[0] = end
+            self.sinkDown()
+        return max
+
+    def sinkDown(self):
+        idx = 0
+        length = len(self.values)
+        element = self.values[0]
+        while True:
+            leftChildIdx = 2 * idx + 1
+            rightChildIdx = 2 * idx + 2
+            swap = None
+            if leftChildIdx < length:
+                leftChild = self.values[leftChildIdx]
+                if leftChild.priority > element.priority:
+                    swap = leftChildIdx
+            if rightChildIdx < length:
+                rightChild = self.values[rightChildIdx]
+                if (
+                    (swap is None and rightChild.priority > element.priority)
+                    or (swap is not None and rightChild.priority > leftChild.priority)
+                ):
+                    swap = rightChildIdx
+            if swap is None:
+                break
+            self.values[idx] = self.values[swap]
+            self.values[swap] = element
+            idx = swap
+```
+
 ---
 
-### Binary Trie
+### Tries
+
+It's a special type of tree, where each node is a letter (character), and each node can have multiple children
 
 It's a specialized tree used in **searching** most often with text, in most cases it can outperform `binary search trees`, `hash-tables` and others
 
-![Trie](./img/binary-trie.png)
+> Enabling this sort of suggest-as-you-type feature requires a fast, in-memory index. These indexes can use several different kinds of data structures depending on what kind of queries they need to answer. The data structure we commonly use when we need to find entries that match a prefix string is known as a `trie` (pronounced "tree" or "try"). The name comes from the word **"re`trie`val"**, which indicates that this structure is designed for search and retrieval operations, specifically searching for things that match a prefix string.
+
+- It's often used to store words, as each node is a letter, and each node can have multiple children
+
+  - each sequence of letters from the root to the leaf node represents a word
+    ![Tries](./img/tries-1.png)
+    ![Trie](./img/binary-trie.png)
+
+- used in:
+
+  - autocomplete
+  - spell check
+  - IP routing (Longest prefix matching)
+  - T9 predictive text
+  - Solving word games
 
 - it's used to tell if a (word or a part of a word) exists in a body of text
 - it usually has a start point which is empty and then letters are added below it
 - it has a lookup **`O(length of word)`**
 
+#### Tries Implementation
+
+- when using it for looking up words, Don't look up each prefix from the root, instead build on the previous results (calls) by:
+
+  - keeping track of the current `node`
+
+- **Insertion**
+  - we start from the root node, and we check if the current letter exists in the children of the current node
+  - if it exists, we move to that node and check the next letter
+  - if it doesn't exist, we add it to the children of the current node, and move to that node and check the next letter
+  - we repeat this process until we reach the end of the word
+  - EX:
+    ![Tries](./img/tries-2.png)
+    ![Tries](./img/tries-3.png)
+
+```py
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.endOfWord = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        current = self.root
+        for letter in word:
+            node = current.children.get(letter)
+            if node is None:
+                node = TrieNode()
+                current.children[letter] = node
+            current = node
+        current.endOfWord = True
+
+    def search(self, word):
+        current = self.root
+        for letter in word:
+            node = current.children.get(letter)
+            if node is None:
+                return False
+            current = node
+        return current.endOfWord
+
+    def delete(self, word):
+        self.deleteRecursively(self.root, word, 0)
+
+    def deleteRecursively(self, current, word, index):
+        if index == len(word):
+            if not current.endOfWord:
+                return False
+            current.endOfWord = False
+            return len(current.children) == 0
+        letter = word[index]
+        node = current.children.get(letter)
+        if node is None:
+            return False
+        shouldDeleteCurrentNode = self.deleteRecursively(node, word, index + 1)
+        if shouldDeleteCurrentNode:
+            del current.children[letter]
+            return len(current.children) == 0
+        return False
+```
+
 ---
+
+#### Hybrid Tries
+
+- It's a special type of tries, where each node can have multiple children, but it's not limited to letters, it can be any type of data
