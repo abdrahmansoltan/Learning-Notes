@@ -33,10 +33,9 @@
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
   - [Sorting](#sorting)
-    - [Elementary Sorting Algorithms](#elementary-sorting-algorithms)
-      - [Bubble Sort](#bubble-sort)
-      - [Selection Sort](#selection-sort)
-      - [Insertion Sort](#insertion-sort)
+    - [Bubble Sort](#bubble-sort)
+    - [Selection Sort](#selection-sort)
+    - [Insertion Sort](#insertion-sort)
     - [Merge Sort](#merge-sort)
       - [Merge Function](#merge-function)
       - [Merge Sort Function](#merge-sort-function)
@@ -131,7 +130,7 @@ It's a set of instructions to solve a problem/perform a task
 
 ### Asymptotic Analysis
 
-- In **algorithm analysis**, we focus on the growth rate of the running time as a function of the input size `n`, taking a “big-picture” approach. For example, it is often enough just to know that the running time of an algorithm grows proportionally to n.
+- In **algorithm analysis**, we focus on the growth rate of the running time as a function of the input size `n`, taking a “big-picture” approach. For example, it is often enough just to know that the running time of an algorithm grows proportionally to `n`.
   - we characterize the running times of algorithms by using functions that map the size of the input, `n`, to values that correspond to the main factor that determines the growth rate in terms of `n`.
   - This approach reflects that each basic step in a pseudo-code description or a high-level language implementation may correspond to a small number of primitive operations.
 - Thus, we can perform an analysis of an algorithm by estimating the number of primitive operations executed up to a constant factor, rather than getting bogged down in language-specific or hardware-specific analysis of the exact number of operations that execute on the computer.
@@ -385,8 +384,10 @@ Ex: usually nested loops
 
 - **Logarithms**
 
-  - `log10(100)` is like asking: how many `10s` do we need to multiply together to get `100`? - `10 * 10 = 100` --> `2`
+  - `log10(100)` is like asking:
     ![log](./img/log.png)
+    - how many `10s` do we need to multiply together to get `100`? - `10 * 10 = 100` --> `2`
+    - or how many times we need to divide `100` by `10` to get `1`? - `100 / 10 / 10 = 1` --> `2`
 
 - The value `b` is known as the base of the logarithm. The most common base for the logarithm function in computer science is `2`
 
@@ -493,6 +494,7 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
   - Both approaches have the same time complexity, but recursion is more readable
   - There's no performance gain in using recursion over looping. In fact recursion is slower than looping in most cases.
     - > Quote: "Loops may achieve a performance gain for your program. Recursion may achieve a performance gain for your programmer."
+    - This because **recursion uses more memory than looping**, as each recursive call adds a new stack frame to the call stack, which can lead to stack overflow if the recursion is too deep.
 
 - **Rules**:
   - Every time you're using a `tree` or converting something into a `tree`, consider **recursion**
@@ -664,11 +666,19 @@ It's an optimization technique using `"caching"` (Do you have something you can 
     - `Chrome`, `Mozilla`, ...
 - There're many different ways to sort things, and each technique has its own advantages and disadvantages
 
-### Elementary Sorting Algorithms
+- Elementary Sorting Algorithms
+  ![elementary-sorting-algorithms](./img/elementary-sorting-algorithms.png)
 
-![elementary-sorting-algorithms](./img/elementary-sorting-algorithms.png)
+- **Stable vs Unstable Sorting Algorithms**
+  ![stable-vs-unstable-sorting](./img/stable-vs-unstable-sorting.webp)
+  - **Stable Sorting Algorithms**: maintains the relative order of records with equal keys (if the keys are equal, the order of the records remains unchanged)
+  - **Unstable Sorting Algorithms**: does not maintain the relative order of records with equal keys (if the keys are equal, the order of the records may change)
+    - Ex: `Quick Sort` is unstable, because it swaps elements based on the pivot, so it may swap elements with equal keys
+    - Ex: `Merge Sort` is stable, because it doesn't swap elements, it just merges them
 
-#### Bubble Sort
+---
+
+### Bubble Sort
 
 It's a sorting algorithm where the largest values **bubble up to the top**
 
@@ -693,7 +703,7 @@ def bubble_sort(arr):
 
 ---
 
-#### Selection Sort
+### Selection Sort
 
 ![selection-sort](./img/selection-sort.png)
 
@@ -750,11 +760,11 @@ def selection_sort(arr):
 
 ---
 
-#### Insertion Sort
+### Insertion Sort
 
 ![insertion-sort](./img/insertion-sort.png)
 
-Taking elements one at a time and **inserting** it in the right spot
+It's called `insertion` because we're **inserting** the element in the correct place in the sorted part of the array
 
 - it's used when you know or think that the list is **"almost/already sorted"**
   - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
@@ -762,8 +772,30 @@ Taking elements one at a time and **inserting** it in the right spot
 - steps:
   1. start by picking the second element in the array
   2. now compare the second element with (the one before it) and swap if necessary
+     ![insertion-sort](./img/insertion-sort-1.png)
+     ![insertion-sort](./img/insertion-sort-2.png)
   3. continue to the next element and if it is in the (incorrect order), iterate through the sorted portion (the left side) to place the element in the correct place
   4. repeat until the array is sorted
+
+- Time complexity:
+  - **Best case**: `O(n)` -> when the array is already sorted (because we don't even go inside the `while` loop)
+  - **Worst case**: `O(n^2)` -> when the array is sorted in reverse order
+  - **Average case**: `O(n^2)`
+
+```py
+def insertion_sort(arr):
+  for i in range(1, len(arr)):
+    current_value = arr[i]
+    j = i - 1
+    # loop from the current element to the beginning of the array
+    while j >= 0 and arr[j] > current_value:
+      # if the current element is greater than its adjacent element, swap them
+      arr[j + 1] = arr[j]
+      j -= 1
+    # insert the current element in its correct place
+    arr[j + 1] = current_value
+  return arr
+```
 
 ---
 
@@ -824,7 +856,7 @@ def merge(arr1, arr2):
 
 # -----------------------------------------------------------------
 
-# Different way to write the same function
+# Different way to write the same function ✅
 def merge(arr1, arr2):
   results = []
   i = 0
@@ -839,6 +871,8 @@ def merge(arr1, arr2):
   # once we exhaust one array, join all remaining values from the other array
   return results + arr1 + arr2
 ```
+
+- > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
 
 #### Merge Sort Function
 
@@ -1222,7 +1256,7 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
 
        - if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
        - We can get the piano even cheaper by trading the drum set for the piano instead. So the cheapest set of trades will cost us `$35`.
-       ![piano example](./img/piano-example-9.png)
+         ![piano example](./img/piano-example-9.png)
 
 - **Notes:**
   - Dijkstra’s algorithm only works with **directed acyclic graphs**, called `DAGs` for short.

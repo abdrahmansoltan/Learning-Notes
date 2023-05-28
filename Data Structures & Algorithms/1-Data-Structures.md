@@ -91,7 +91,11 @@ They're ways to organize information with **optimal runtime complexity** for dif
 
 Each data type has a number of bits associated with it and that needs to get stored in the system and **the system allocates data storage and then the CPU reads from that storage**
 
-A computer system will have a huge number of bytes of memory, and to keep track of what information is stored in what byte, the computer uses an abstraction known as a memory address. In effect, each byte of memory is associated with a unique number that serves as its address (more formally, the binary representation of the number serves as the address).
+A computer system will have a huge number of **bytes** of memory (`1 byte` = `8 bits`), and each byte has a unique **memory address**. The memory address is a number that the CPU uses to access a specific `byte` of memory.
+
+> Usually numbers are stored in **32 bits (4 bytes) or 64 bits (8 bytes)**
+
+To keep track of what information is stored in what `byte`, the computer uses an abstraction known as a memory address. In effect, each byte of memory is associated with a unique number that serves as its address (more formally, the binary representation of the number serves as the address).
 
 > computer hardware is designed, in theory, so that any byte of the main memory can be efficiently accessed based upon its memory address. In this sense, we say that a computer’s main memory performs as **random access memory (RAM)**.
 >
@@ -133,7 +137,12 @@ sort data-items in the data-structure to be ordered (next to each other in memor
 
 ## Arrays
 
+Arrays are stored contiguously in memory, which means that all elements of the array are stored next to each other in memory. This is why we can access any element of an array in constant time, as long as we know the index of that element.
 ![arrays](./img/arrays.png)
+
+- Note that the addresses in the picture are not real addresses, they are just used to illustrate the concept of contiguous memory. also they are incremented by `4` as each **number** element is `4 bytes` (32 bits)
+  - This will differ if storing **ASCII** characters as each character is `1 byte` (8 bits)
+    ![arrays](./img/arrays-1.png)
 
 ### Static Array
 
@@ -169,7 +178,7 @@ The downside of this approach is that the size of the array must be specified in
 > - This extra capacity makes it easy to append a new element to the list by using the next available cell of the array.
 
 - this is where languages differ in allocating (managing) memory, as language like `c++` requires to have static array and to change it you need to redeclare another array with the new size which will be in **different memory location**
-- language like **python** are dynamic and it automatically manages memory for us
+- language like `python` and `javascript` are dynamic and it automatically manages memory for us
   - Python’s `list` class presents a more interesting abstraction. Although a list has a particular `length` when constructed, the class allows us to add elements to the list, with no apparent limit on the overall capacity of the list. To provide this abstraction, Python relies on an algorithmic sleight of hand known as a **dynamic array**.
 - If a user continues to append elements to a list, Any reserved capacity will eventually be exhausted. In that case, the Array-class requests a new, larger array from the system, and initializes the new array so that its prefix matches that of the existing smaller array.
   - > At that point in time, the old array is no longer needed, so it is reclaimed by the system.
@@ -180,10 +189,10 @@ The downside of this approach is that the size of the array must be specified in
 
 ##### The capacity problem
 
-- When specifying the capacity of the new array, we don't do so by adding 1 to the capacity as this will result in creating array and copy elements each time we want to insert one more element
+- When specifying the capacity of the new array, we don't do so by adding `1` to the capacity as this will result in creating array and copy elements each time we want to insert one more element
 
   - Ex: We have array of length `3` and we increase it like this:
-    - `insertions = (4+5+6+...+N)` --> `O(N^2)`
+    - `insertions = (4+5+6+...+N)` --> `O(N^2)` -> **Time series**
       ![dynamic-array](./img/dynamic-array-1.png)
   - This is not efficient, so we increase the capacity (by `8` for example) to reduce number of `insertions`
     - `insertions = (11+19+27+...+N)` --> `O(N^2)` as well
@@ -268,6 +277,7 @@ steps:
 
 - `lookup` & `push/append`(inserting from the end) are **O(1)**, as they doesn't iterate over other items in the array
   - there's a small possibility in **dynamic arrays**, that appending(pushing) element will create a new array which iterate over the array items to make them in the new memory location (exhibits **amortized** constant-time behavior)
+    - > **Amortized** -> the average time taken to perform an operation, considering all possible scenarios (we don't frequently double the array)
     - we can further improve the practical execution time by using a **list comprehension** syntax to build up the temporary list, rather than by repeated calls to append.
 - `inserting` (in the beginning / any location other that the end) or `deleting` (`unshift`) are **O(n)**, as they change the locations(indices) of other array items and we then have to **iterate** over all/some of them to change their address in memory and their new index
 - **Extending a List**: Python provides a method named `extend` that is used to add all elements of one list to the end of a second list.
@@ -308,7 +318,7 @@ steps:
 - To properly initialize a two-dimensional list, we must ensure that each cell of the primary list refers to an independent instance of a secondary list. This can be accomplished through the use of Python’s list comprehension syntax.
 
   ```py
-  data = [ [0] c for j in range(r) ]
+  data = [c[0] for c in range(r)]
   ```
 
 ---

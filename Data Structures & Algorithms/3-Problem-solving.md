@@ -28,10 +28,14 @@
       - [Palindrome](#palindrome)
       - [Reverse Integer](#reverse-integer)
   - [Arrays](#arrays)
+    - [Modify array in plave](#modify-array-in-plave)
+      - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
+      - [Remove Element](#remove-element)
     - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
     - [Array Sums](#array-sums)
       - [Two Sum II](#two-sum-ii)
       - [Three Sum](#three-sum)
+      - [4 Sum](#4-sum)
       - [Continuous SubArray Sum](#continuous-subarray-sum)
     - [Product of Array Except Self](#product-of-array-except-self)
     - [Container with most water](#container-with-most-water)
@@ -59,6 +63,7 @@
     - [Top K Frequent Elements](#top-k-frequent-elements)
       - [Solution 1: using Heap](#solution-1-using-heap)
       - [Solution 2: using Bucket Sort](#solution-2-using-bucket-sort)
+    - [Top K Frequent Words](#top-k-frequent-words)
     - [Reorganize String](#reorganize-string)
     - [Find Median from Data Stream](#find-median-from-data-stream)
   - [Linked Lists](#linked-lists)
@@ -70,6 +75,8 @@
       - [Merge Two Sorted Linked Lists](#merge-two-sorted-linked-lists)
       - [Merge k Sorted Lists](#merge-k-sorted-lists)
       - [Reorder List](#reorder-list)
+    - [Doubly Linked List](#doubly-linked-list)
+      - [Design Browser History](#design-browser-history)
   - [Hash Tables](#hash-tables)
     - [Two sum](#two-sum)
     - [Valid Anagram](#valid-anagram)
@@ -81,20 +88,39 @@
     - [Verifying an Alien Dictionary](#verifying-an-alien-dictionary)
     - [Hand of Straights](#hand-of-straights)
     - [Letter combinations of a phone number](#letter-combinations-of-a-phone-number)
+    - [4Sum II](#4sum-ii)
   - [Trees](#trees)
     - [General Tree Questions](#general-tree-questions)
       - [Level Width](#level-width)
       - [Number of islands](#number-of-islands)
+      - [Path Sum](#path-sum)
+      - [Symmetric Tree](#symmetric-tree)
+      - [Lowest Common Ancestor of a Binary Tree](#lowest-common-ancestor-of-a-binary-tree)
+      - [Vertical Order Traversal of a Binary Tree](#vertical-order-traversal-of-a-binary-tree)
+      - [Flatten Binary Tree to Linked List](#flatten-binary-tree-to-linked-list)
     - [Binary Search Trees (BST)](#binary-search-trees-bst)
       - [BST Insertion](#bst-insertion)
       - [Validate BST](#validate-bst)
+      - [Binary Tree Inorder Traversal](#binary-tree-inorder-traversal)
+      - [Binary Tree Postorder Traversal](#binary-tree-postorder-traversal)
       - [Maximum Depth of Binary Tree](#maximum-depth-of-binary-tree)
+      - [Check Completeness of a Binary Tree](#check-completeness-of-a-binary-tree)
+      - [Binary Tree Zigzag Level Order Traversal](#binary-tree-zigzag-level-order-traversal)
+      - [Sum of Left Leaves](#sum-of-left-leaves)
+      - [Diameter of Binary Tree](#diameter-of-binary-tree)
+      - [Minimum Absolute Difference in BST](#minimum-absolute-difference-in-bst)
+      - [Invert Binary Tree](#invert-binary-tree)
+      - [Kth Smallest Element in a BST](#kth-smallest-element-in-a-bst)
+      - [Lowest Common Ancestor of a Binary Search Tree](#lowest-common-ancestor-of-a-binary-search-tree)
+  - [Tries](#tries)
+    - [Implement Trie (Prefix Tree)](#implement-trie-prefix-tree)
   - [Creating Shapes](#creating-shapes)
     - [Steps shape](#steps-shape)
     - [Pyramid](#pyramid)
     - [Solution 1 - using for loops](#solution-1---using-for-loops)
       - [Solution 2 - using recursion](#solution-2---using-recursion)
   - [Numbers](#numbers)
+    - [Climbing Stairs](#climbing-stairs)
     - [Partitioning Into Minimum Number Of Deci-Binary Numbers](#partitioning-into-minimum-number-of-deci-binary-numbers)
     - [Series](#series)
       - [Fibonacci Number](#fibonacci-number)
@@ -617,6 +643,74 @@ def reverse_integer(num):
 
 ## Arrays
 
+### Modify array in plave
+
+#### Remove Duplicates From Sorted Array
+
+Given a sorted array `nums`, remove the duplicates **in-place** such that each element appears only once and returns the new length.
+
+- Ex:
+
+  - `nums = [1,1,2]` -> `2` (nums = [1,2])
+  - `nums = [0,0,1,1,1,2,2,3,3,4]` -> `5` (nums = [0,1,2,3,4])
+
+- Explanation:
+  ![remove duplicates](./img/remove-duplicates-1.png)
+  - we can use a **two pointers** pattern to check for all the elements in the array
+  - we can use the first pointer to keep track of the last unique element in the array
+  - and the second pointer to iterate over the array and check if the current element is equal to the last unique element
+  - if it is, then we skip it, if not, then we increment the last unique index **and then** update the last unique element
+
+```py
+def removeDuplicates(nums):
+    if len(nums) == 0: return 0
+
+    # initialize the index of the last unique element
+    last_unique = 0
+
+    for i in range(1, len(nums)):
+        # if the current element is not equal to the last unique element, increment the last unique index and then update the last unique element
+        if nums[i] != nums[last_unique]:
+            last_unique += 1
+            nums[last_unique] = nums[i]
+
+    # return the length of the array
+    return last_unique + 1
+```
+
+---
+
+#### Remove Element
+
+Given an array `nums` and a value `val`, remove all instances of that value **in-place** and return the new length.
+
+- Ex:
+
+  - `nums = [3,2,2,3], val = 3` -> `2` (`nums = [2,2]`)
+
+- Explanation:
+  - we can use a **two pointers** pattern to check for all the elements in the array
+  - we can use the first pointer to keep track of the last non-val element in the array
+  - and the second pointer to iterate over the array and check if the current element is equal to val
+  - if it is, then we skip it, if not, then we update the last non-val element **and then** update the last non-val index
+
+```py
+def removeElement(nums, val):
+    # initialize the index of the last non-val element
+    last_non_val = 0
+
+    for i in range(len(nums)):
+        # if the current element is not equal to val, update the last non-val element and then increment the last non-val index
+        if nums[i] != val:
+            nums[last_non_val] = nums[i]
+            last_non_val += 1
+
+    # return the length of the array
+    return last_non_val
+```
+
+---
+
 ### Array chunk (split array into smaller chunks)
 
 Given an array and chunk size, divide the array into many subarrays where each subarray is of length size.
@@ -766,6 +860,73 @@ Given an array `nums` of n integers, are there elements a, b, c in `nums` such t
                   right -= 1
       return result
   ```
+
+---
+
+#### 4 Sum
+
+Given an array `nums` of `n` integers, return an array of all the **unique** quadruplets `[nums[a], nums[b], nums[c], nums[d]]` such that:
+
+- `0 <= a, b, c, d < n`
+- `a`, `b`, `c`, and `d` are **distinct**.
+- `nums[a] + nums[b] + nums[c] + nums[d] == target`
+
+You may return the answer in **any order**.
+
+- EX: `nums = [1, 0, -1, 0, -2, 2], target = 0` --> `[[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]`
+
+- **Steps:**
+  ![4sum](./img/4sum.png)
+
+  - Sort the array
+  - Loop through the array
+    - If the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+    - Set left and right pointers to find the other three values
+    - If the sum is less than zero, move the left pointer to the right to get a larger value
+    - If the sum is greater than zero, move the right pointer to the left to get a smaller value
+    - If the sum is zero, append the four values to the result
+    - Move the left and right pointers to the next unique values to avoid duplicates
+
+```py
+# Time: O(n^3)
+
+def four_sum(nums, target):
+    nums.sort()
+    result = []
+
+    for i in range(len(nums)):
+        # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+        if i > 0 and nums[i] == nums[i-1]:
+            continue
+
+        for j in range(i+1, len(nums)):
+            # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+            if j > i+1 and nums[j] == nums[j-1]:
+                continue
+
+            # set left and right pointers to find the other two values
+            left, right = j+1, len(nums)-1
+            while left < right:
+                total = nums[i] + nums[j] + nums[left] + nums[right]
+                # if the sum is less than zero, move the left pointer to the right to get a larger value
+                if total < target:
+                    left += 1
+                # if the sum is greater than zero, move the right pointer to the left to get a smaller value
+                elif total > target:
+                    right -= 1
+                # otherwise, we have found the quadruplet
+                else:
+                    result.append([nums[i], nums[j], nums[left], nums[right]])
+                    # move both pointers to the middle to see if we have more quadruplets
+                    left += 1
+                    right -= 1
+                    # skip duplicates
+                    while left < right and nums[left] == nums[left-1]:
+                        left += 1
+                    while left < right and nums[right] == nums[right+1]:
+                        right -= 1
+    return result
+```
 
 ---
 
@@ -1652,6 +1813,40 @@ def top_k_frequent(nums, k):
 
 ---
 
+### Top K Frequent Words
+
+Given an array of strings `words` and an integer `k`, return the `k` most frequent strings.
+Return the answer **sorted** by the **frequency** from highest to lowest. Sort the words with the same frequency by their **lexicographical order**.
+
+- EX: `words = ["i", "love", "leetcode", "i", "love", "coding"], k = 2` --> `["i", "love"]`
+
+  - Explanation: "i" and "love" are the two most frequent words.
+    Note that "i" comes before "love" due to a lower alphabetical order.
+
+```py
+def top_k_frequent(words, k):
+    res = []
+    freq = {}
+    buckets = [[] for _ in range(len(words)+1)]
+
+    for word in words:
+        freq[word] = freq.get(word, 0) + 1
+
+    for word, count in freq.items():
+        buckets[count].append(word)
+
+    for i in range(len(buckets)-1, -1, -1):
+        if len(res) == k:
+            break
+        if buckets[i]:
+            buckets[i].sort()
+            res.extend(buckets[i])
+
+    return res
+```
+
+---
+
 ### Reorganize String
 
 Given a string `s`, rearrange the characters of `s` so that any two adjacent characters are not the same.
@@ -2116,6 +2311,95 @@ def reorder_list(head):
       head1 = head1_next
       head2 = head2_next
 ```
+
+---
+
+### Doubly Linked List
+
+#### Design Browser History
+
+You have a browser of one tab where you start on the homepage and you can visit another url, get back in the history number of steps or move forward in the history number of steps.
+
+Implement the `BrowserHistory` class:
+
+- `BrowserHistory(string homepage)` Initializes the object with the homepage of the browser.
+- `void visit(string url)` Visits `url` from the current page. It clears up all the forward history.
+- `string back(int steps)` Move `steps` back in history. If you can only return `x` steps in the history and `steps > x`, you will return only `x` steps. Return the current `url` after moving back in history **at most** `steps`.
+- `string forward(int steps)` Move `steps` forward in history. If you can only forward `x` steps in the history and `steps > x`, you will forward only `x` steps. Return the current `url` after forwarding in history **at most** `steps`.
+- **Solution 1: Doubly linked list**
+
+  - we can use a pointer to store the current page
+  - we can use a pointer to store the last page
+  - we can use a pointer to store the next page
+  - we can use a variable to store the number of pages in the history
+  - we can use a variable to store the number of pages in the future
+  - **Time Complexity:**
+    - `visit`: `O(1)`
+    - `back`: `O(n)`
+    - `forward`: `O(n)`
+  - **Space Complexity:** `O(n)`
+
+  ```py
+  class Node:
+      def __init__(self, val, prev=None, next=None):
+          self.val = val
+          self.prev = prev
+          self.next = next
+
+  class BrowserHistory:
+      def __init__(self, homepage: str):
+          self.cur = Node(homepage)
+
+      def visit(self, url: str) -> None:
+          # make current page point to the new page and make the new page point back to the current page
+          self.cur.next = Node(url, self.cur)
+          # update the current page
+          self.cur = self.cur.next
+
+      def back(self, steps: int) -> str:
+          # if the number of steps is greater than the number of pages in the history, we will move back to the first page
+          # use cur.prev to make sure that we don't pass the first page
+          while steps > 0 and self.cur.prev:
+              self.cur = self.cur.prev
+              steps -= 1
+          return self.cur.val
+
+      def forward(self, steps: int) -> str:
+          # if the number of steps is greater than the number of pages in the future, we will move forward to the last page
+          # use cur.next to make sure that we don't pass the last page
+          while steps > 0 and self.cur.next:
+              self.cur = self.cur.next
+              steps -= 1
+          return self.cur.val
+  ```
+
+- **Solution 2: Array (Better ✅)**
+
+  ```py
+  class BrowserHistory:
+      def __init__(self, homepage: str):
+          self.history = [homepage]
+          self.curIdx = 0
+
+      def visit(self, url: str) -> None:
+          # if we are not at the end of the history, we will remove all the pages after the current page
+          if self.curIdx < len(self.history) - 1:
+              self.history = self.history[:self.curIdx+1]
+          # append the new page to the history
+          self.history.append(url)
+          # update the current page
+          self.curIdx += 1
+
+      def back(self, steps: int) -> str:
+          # if the number of steps is greater than the number of pages in the history, we will move back to the first page
+          self.curIdx = max(self.curIdx - steps, 0)
+          return self.history[self.curIdx]
+
+      def forward(self, steps: int) -> str:
+          # if the number of steps is greater than the number of pages in the future, we will move forward to the last page
+          self.curIdx = min(self.curIdx + steps, len(self.history) - 1)
+          return self.history[self.curIdx]
+  ```
 
 ---
 
@@ -2627,6 +2911,66 @@ def letterCombinations(digits):
 
 ---
 
+### 4Sum II
+
+Given four lists `A`, `B`, `C`, `D` of integer values, compute how many tuples `(i, j, k, l)` there are such that `A[i] + B[j] + C[k] + D[l]` is zero.
+
+- Ex: `A = [ 1, 2], B = [-2,-1], C = [-1, 2], D = [ 0, 2]`
+
+  - Output: `2`
+  - Explanation: The two tuples are:
+    1. `(0, 0, 0, 1)` -> `A[0] + B[0] + C[0] + D[1] = 1 + (-2) + (-1) + 2 = 0`
+    2. `(1, 1, 0, 0)` -> `A[1] + B[1] + C[0] + D[0] = 2 + (-1) + (-1) + 0 = 0`
+
+- **Solution 1:** using a dictionary -> `O(n^2)` time and `O(n^2)` space
+
+  ```py
+  def fourSumCount(A, B, C, D):
+      # create a dictionary to store the sum of each pair of numbers in A and B
+      sumAB = {}
+      for a in A:
+          for b in B:
+              sumAB[a+b] = sumAB.get(a+b, 0) + 1
+
+      # create a dictionary to store the sum of each pair of numbers in C and D
+      sumCD = {}
+      for c in C:
+          for d in D:
+              sumCD[c+d] = sumCD.get(c+d, 0) + 1
+
+      # iterate through the keys of the first dictionary
+      count = 0
+      for sum1 in sumAB:
+          # if the complement is in the second dictionary, add the product of the frequencies to the count
+          if -sum1 in sumCD:
+              count += sumAB[sum1] * sumCD[-sum1]
+
+      return count
+  ```
+
+- Solution 2: using a dictionary **(Better ✅)** -> `O(n^2)` time and `O(n)` space
+
+  ```py
+  def fourSumCount(A, B, C, D):
+      # create a dictionary to store the sum of each pair of numbers in A and B
+      sumAB = {}
+      for a in A:
+          for b in B:
+              sumAB[a+b] = sumAB.get(a+b, 0) + 1
+
+      # iterate through the keys of the first dictionary
+      count = 0
+      for c in C:
+          for d in D:
+              # if the complement is in the first dictionary, add the product of the frequencies to the count
+              if -(c+d) in sumAB:
+                  count += sumAB[-(c+d)]
+
+      return count
+  ```
+
+---
+
 ## Trees
 
 - **Trees Tips:**
@@ -2763,6 +3107,261 @@ def numIslands(grid):
 
 ---
 
+#### Path Sum
+
+Given the `root` of a binary tree and an integer `targetSum`, return `true` if the tree has a **root-to-leaf** path such that adding up all the values along the path equals `targetSum`.
+
+- Explanation:
+  ![path-sum](./img/path-sum-1.png)
+
+  - We can use a **Depth-First Search** to traverse the tree and keep track of the current sum of the path from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we return `True`. Otherwise, we return `False`.
+
+- Solution 1: by subtracting the current node's value from the target sum
+
+  ```py
+  def hasPathSum(root, targetSum):
+      if root is None:
+          return False
+
+      # if the root is a leaf node, check if the current sum is equal to the target sum
+      if root.left is None and root.right is None:
+        return root.val == targetSum
+
+      targetSum -= root.val
+      return hasPathSum(root.left, targetSum) or hasPathSum(root.right, targetSum)
+  ```
+
+- Solution 2: by adding the current node's value to the current sum
+
+  ```py
+  def hasPathSum(root, targetSum):
+      def dfs(node, curSum):
+          if node is None:
+              return False
+
+          curSum += node.val
+          # if the root is a leaf node, check if the current sum is equal to the target sum
+          if not node.left and not node.right:
+              return curSum == targetSum
+
+          return dfs(node.left, curSum) or dfs(node.right, curSum)
+
+      return dfs(root, 0)
+  ```
+
+---
+
+#### Symmetric Tree
+
+Given the `root` of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+
+- Explanation:
+  ![symmetric tree](./img/symmetric-tree-1.png)
+
+  - We can use a **Depth-First Search** to traverse the tree and check if the left subtree of the root is a mirror of the right subtree of the root.
+  - because this is a mirror, we need to check:
+    - if the `left` child of the `left` subtree is equal to the `right` child of the `right` subtree
+    - and if the `right` child of the `left` subtree is equal to the `left` child of the `right` subtree
+  - we will know that the tree is symmetric if the above conditions are true for all nodes in the tree and when we reach `null` nodes
+
+- Time complexity: `O(n)` where `n` is the number of nodes in the tree
+- Space complexity: `O(h)` where `h` is the height of the tree (as it's a `BFS` algorithm)
+
+```py
+def isSymmetric(root):
+    def dfs(left, right):
+        # if both nodes are null, return True
+        if not left and not right:
+            return True
+        # if one of the nodes is null, return False
+        if not left or not right:
+            return False
+        # if the values of the nodes are not equal, return False
+        if left.val != right.val:
+            return False
+
+        return dfs(left.left, right.right) and dfs(left.right, right.left)
+
+    return dfs(root.left, root.right)
+```
+
+---
+
+#### Lowest Common Ancestor of a Binary Tree
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+> "The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**)."
+
+- Ex:
+  ![lowest common ancestor](./img/LCA-tree-1.png)
+
+  - The lowest common ancestor of `p = 6` and `q = 7` is `3`.
+
+- Explanation:
+  - We can use a **Depth-First Search** to traverse the tree and check:
+    - if the current node is equal to `p` or `q`
+    - or if the current node is equal to the lowest common ancestor of `p` and `q`.
+  - We can use a **Bottom-Up Approach** to solve this problem.
+    1. We start by checking if the current node is equal to `p` or `q`. If it is, then we return the current node. Otherwise, we recursively call the function on the left and right subtrees.
+    2. If both the left and right subtrees return a non-null value, then we know that the current node is the lowest common ancestor of `p` and `q`.
+    3. Otherwise, we return the non-null value that was returned by either the left or right subtree.
+
+```py
+def lowestCommonAncestor(root, p, q):
+    # base case
+    if not root:
+      return None
+
+    # if the node is equal to p or q, then we know that the current node is the lowest common ancestor of p and q
+    if root == p or root == q:
+        return root
+
+    # recursively call the function on the left and right subtrees
+    left = lowestCommonAncestor(root.left, p, q)
+    right = lowestCommonAncestor(root.right, p, q)
+
+    # if both the left and right subtrees return a non-null value, then we know that the current node is the lowest common ancestor of p and q
+    if left and right:
+        return root
+    # otherwise, we return the non-null value that was returned by either the left or right subtree
+    return left or right
+```
+
+---
+
+#### Vertical Order Traversal of a Binary Tree
+
+Given the `root` of a binary tree, calculate the **vertical order traversal** of the binary tree.
+
+For each node at position `(row, col)`, its left and right children will be at positions `(row + 1, col - 1)` and `(row + 1, col + 1)` respectively. The root of the tree is at `(0, 0)`.
+
+> The **vertical order traversal** of a binary tree is a list of top-to-bottom orderings for each column index starting from the leftmost column and ending on the rightmost column. There may be multiple nodes in the same row and same column. In such a case, sort these nodes by their values.
+
+![vertical order traversal](./img/vertical-order-traversal-1.jpg)
+
+- Solution 1: using `queue`
+
+  ```py
+  def verticalTraversal(root):
+      # dictionary to store the nodes of each column
+      columns = {} # {col: [(row, val), (row, val), ...]}
+
+      # queue to store the nodes that we need to visit
+      queue = [(root, 0, 0)]
+
+      # while the queue is not empty
+      while queue:
+          # pop the first node in the queue
+          node, row, col = queue.pop(0)
+
+          # if the node is not null, add it to the dictionary
+          if node:
+              columns[col] = columns.get(col, []) + [(row, node.val)]
+              # add the left and right children of the node to the queue
+              queue.append((node.left, row + 1, col - 1))
+              queue.append((node.right, row + 1, col + 1))
+
+      # sort the nodes of each column by their row and value
+      result = []
+      for col in sorted(columns):
+          result.append([val for row, val in sorted(columns[col])])
+
+      return result
+  ```
+
+- Solution 2: using `DFS`
+
+  ```py
+  def verticalTraversal(root):
+      # dictionary to store the nodes of each column
+      columns = {} # {col: [(row, val), (row, val), ...]}
+
+      # helper function to do the DFS
+      def dfs(node, row, col):
+          if node:
+              columns[col] = columns.get(col, []) + [(row, node.val)]
+              dfs(node.left, row + 1, col - 1)
+              dfs(node.right, row + 1, col + 1)
+
+      # call the helper function
+      dfs(root, 0, 0)
+
+      # sort the nodes of each column by their row and value
+      result = []
+      for col in sorted(columns):
+          result.append([val for row, val in sorted(columns[col])])
+
+      return result
+  ```
+
+---
+
+#### Flatten Binary Tree to Linked List
+
+Given the `root` of a binary tree, flatten the tree into a "linked list":
+
+- The "linked list" should use the same `TreeNode` class where the `right` child pointer points to the next node in the list and the `left` child pointer is always `null`.
+- The "linked list" should be in the same order as a **pre-order traversal** of the binary tree.
+- Ex: `flatten(root) --> [1, null, 2, null, 3, null, 4, null, 5, null, 6]`
+  ![flatten binary tree](./img/flatten-binary-tree-to-linked-list.png)
+
+- Solution 1:
+
+  - We can use a **Depth-First Search** to traverse the tree and keep track of the previous node in the linked list.
+  - At each node, we set the previous node's `right` child to the current node and set the current node's `left` child to `null`.
+  - We then update the previous node to the current node and recursively call the function on the left and right subtrees.
+
+  ```py
+  # Time complexity: O(n) where n is the number of nodes in the tree
+  # Space complexity: O(h) where h is the height of the tree
+  def flatten(root):
+      prev = None # current tail of the linked list
+
+      def dfs(node):
+          if node:
+              # set the previous node's right child to the current node
+              # and set the current node's left child to null
+              if prev:
+                  prev.right = node
+                  prev.left = None
+              # update the previous node to the current node
+              prev = node
+              # recursively call the function on the left and right subtrees
+              dfs(node.left)
+              dfs(node.right)
+
+      # call the helper function
+      dfs(root)
+  ```
+
+- Another solution:
+
+  ```py
+  def flatten(root):
+    # flatten the root tree and return the list tail
+    def dfs(root):
+      if not root:
+        return
+
+      leftTail = dfs(root.left)
+      rightTail = dfs(root.right)
+
+      if root.left:
+        # connect the leftTail to the current root's right child
+        leftTail.right = root.right
+        # connect the current root's left child to the current root's right child
+        root.right = root.left
+        root.left = None
+
+      last = rightTail or leftTail or root
+      return last
+
+    dfs(root)
+  ```
+
+---
+
 ### Binary Search Trees (BST)
 
 - **Binary Search Trees Tips:**
@@ -2881,6 +3480,124 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
 
 ---
 
+#### Binary Tree Inorder Traversal
+
+Given the `root` of a binary tree, return the inorder traversal of its nodes' values.
+
+![binary-tree-inorder-traversal](./img/binary-tree-inorder-traversal.jpg)
+
+- Explanation:
+
+  - We can use a `DFS` to traverse the tree and add the values of the nodes to an array.
+  - We can use a helper function to do the `DFS` and then return the array.
+
+- Solution 1: using `DFS` **recursively**
+
+  ```py
+  def inorderTraversal(root):
+      values = []
+
+      def traverse(root):
+          if root is None:
+              return
+          # 1. recursively call the function with the root's left node until we reach a leaf node (None)
+          traverse(root.left)
+          # 2. add the root's value to the array
+          values.append(root.value)
+          # 3. recursively call the function with the root's right node until we reach a leaf node (None)
+          traverse(root.right)
+
+      traverse(root)
+      return values
+  ```
+
+- Solution 2: using `DFS` + `stack` **iteratively**
+  ![binary-tree-inorder-traversal](./img/binary-tree-inorder-traversal-1.png)
+
+  ```py
+  def inorderTraversal(root):
+      values = []
+      stack = []
+      cur = root
+
+      # while the stack is not empty or the cur is not None
+      while stack or cur:
+          # 1. loop through the left nodes of the cur and add them to the stack
+          while cur:
+              stack.append(cur)
+              cur = cur.left
+
+          # 2. add the node's value to the array
+          node = stack.pop()
+          values.append(node.value)
+          # 4. set the root to the node's right node
+          cur = node.right
+
+      return values
+  ```
+
+---
+
+#### Binary Tree Postorder Traversal
+
+Given the `root` of a binary tree, return the postorder traversal of its nodes' values.
+
+- Solution 1: **Recursive**
+
+  - the recursive solution uses the `call stack` to store the nodes of the tree
+
+  ```py
+  def postorderTraversal(root):
+      values = []
+
+      def traverse(root):
+          if root is None:
+              return
+          # 1. recursively call the function with the root's left node until we reach a leaf node (None)
+          traverse(root.left)
+          # 2. recursively call the function with the root's right node until we reach a leaf node (None)
+          traverse(root.right)
+          # 3. add the root's value to the array
+          values.append(root.value)
+
+      traverse(root)
+      return values
+  ```
+
+- Solution 2: **Iterative**
+
+  - The iterative solution uses a `stack` to store the nodes of the tree
+    - for each node, before going to the left node, we need to add the node and the right node to the stack **(to come back to them later)**
+    - we only want to add the value of a node to the `result` array when we reach a leaf node (a node that has no children)
+      - which means that when visiting the node for the second time, we need to check if the node has been visited before or not
+        - if the node has been visited before, we can add its value to the `result` array
+        - if the node has not been visited before, we need to add it to the stack and visit its left node
+
+  ```py
+  def postorderTraversal(root):
+      stack = [root]
+      visit = [False]
+      res = []
+
+      while stack:
+        cur, visited = stack.pop(), visit.pop()
+        if cur:
+          if visited:
+            res.append(cur.val)
+          else:
+            # append everything (right first because we want to visit it last)
+            stack.append(cur)
+            visit.append(True)
+            stack.append(cur.right)
+            visit.append(False)
+            stack.append(cur.left)
+            visit.append(False)
+
+      return res
+  ```
+
+---
+
 #### Maximum Depth of Binary Tree
 
 Given the `root` of a binary tree, return its maximum depth.
@@ -2888,7 +3605,7 @@ Given the `root` of a binary tree, return its maximum depth.
 A binary tree's **maximum depth** is the number of nodes along the longest path from the root node down to the farthest leaf node.
 
 - Explanation:
-  - We will use recursive DFS to solve this problem
+  - We will use **recursive DFS** to solve this problem
     ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree.png)
 
 ```py
@@ -2907,7 +3624,7 @@ def maxDepth(root):
 
 - **Other solutions without recursion**
 
-  - **Solution 1:** using `BFS` + `queue`
+  - **Solution 1:** using `BFS` + `queue` -> **level-order traversal**
     ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree-1.png)
 
     ```py
@@ -2920,7 +3637,7 @@ def maxDepth(root):
 
         # while the queue is not empty
         while queue:
-            # loop through the queue
+            # loop through the queue to add the children of each node to the queue (BFS) + update level when finished
             for i in range(len(queue)):
                 # pop the first node in the queue
                 node = q.popleft()
@@ -2955,6 +3672,511 @@ def maxDepth(root):
 
         return level
     ```
+
+---
+
+#### Check Completeness of a Binary Tree
+
+Given the `root` of a binary tree, determine if it is a **complete binary tree**. In a **complete binary tree**, every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between `1` and `2h` nodes inclusive at the last level `h`.
+
+- EX: `isCompleteTree(root) --> True`
+
+- Explanation:
+
+  - in a complete binary tree, if we draw the tree level by level, we can see that the **last level is filled from left to right**
+  - So, when we pop the last node in the queue, we should not see any more nodes in the queue
+    ![check completeness of a binary tree](./img/check-completeness-of-binary-tree-1.png)
+  - To do so, we'll use `BFS` because we want to traverse the tree **level by level**, and then check if the last level is filled from **left-to-right**
+    - We know that the last level will be filled with `None` nodes
+    - So when we reach the first `None` node, we should not see any more nodes in the queue when popping/
+      ![check completeness of a binary tree](./img/check-completeness-of-binary-tree-2.png)
+
+- **Solution:** using `BFS` + `queue`
+
+  ```py
+  # Time complexity: O(n), Space complexity: O(n)
+  def isCompleteTree(root):
+      if root is None:
+          return True
+
+      # create a queue to store the nodes of each level
+      q = deque([root])
+      # create a flag to indicate if we've reached the last level
+      reached_last_level = False
+
+      # while the queue is not empty
+      while q:
+          # pop the first node in the queue
+          node = q.popleft()
+
+          # if we've reached the last level, but the current node is not None, return False
+          if reached_last_level and node is not None:
+              return False
+
+          # if the current node is None, set the flag to True
+          if node is None:
+              reached_last_level = True
+          # else add its children to the queue
+          else:
+              q.append(node.left)
+              q.append(node.right)
+
+      # if we didn't return False, return True
+      return True
+  ```
+
+- **Another solution** without using a boolean state variable:
+
+  ```py
+  def isCompleteTree(root):
+      q = deque([root])
+
+      while q:
+          node = q.popleft()
+
+          if node:
+              q.append(node.left)
+              q.append(node.right)
+          else:
+              while q:
+                  # if we found a non-null node
+                  if q.popleft():
+                      return False
+
+      return True
+  ```
+
+---
+
+#### Binary Tree Zigzag Level Order Traversal
+
+Given the `root` of a binary tree, return the zigzag level order traversal of its nodes' values. (i.e., from `left` to `right`, then `right` to `left` for the next level and alternate between).
+
+- Ex:
+
+  - Input: `root = [3,9,20,null,null,15,7]`
+  - Output: `[[3],[20,9],[15,7]]`
+
+- Explanation:
+
+  - we want to take every level and reverse it if it's an odd level and then add it to the result array
+    ![binary zigzag](./img/binary-zigzag.png)
+  - we can use BFS to traverse the tree level by level and:
+    1. use a flag to indicate if we're going from left to right or from right to left and toggle it on each level
+    2. use a double-ended queue (deque) to store the nodes of each level
+    3. reverse the odd levels after adding them to the result array
+
+- **Solution 1** `DFS` + Iterative + `deque`
+
+  ```py
+  def zigzagLevelOrder(root):
+      if root is None:
+          return []
+
+      result = []
+      # create a queue to store the nodes of each level
+      q = deque([root])
+
+      while q:
+          # create an array to store the nodes of the current level
+          level = []
+          # loop through the queue
+          for i in range(len(q)):
+              # pop the first node in the queue
+              node = q.popleft()
+              # add the node's value to the level array
+              level.append(node.value)
+              # add the node's children to the queue
+              if node.left:
+                  q.append(node.left)
+              if node.right:
+                  q.append(node.right)
+
+          # reverse if it's an odd level
+          level = reversed(level) if len(result) % 2 else level
+          result.append(level)
+
+      return result
+  ```
+
+- **Solution 2**: `DFS` + recursive
+
+  ```py
+  def zigzagLevelOrder(root):
+      if root is None:
+          return []
+
+      result = []
+
+      def dfs(node, level):
+          if node is None:
+              return
+
+          # if the current level is greater than the length of the result array, add a new array to the result array
+          if level >= len(result):
+              result.append([])
+
+          # add the node's value to the array
+          result[level].append(node.value)
+          # recursively call the function with the node's left and right nodes and the next level
+          dfs(node.left, level + 1)
+          dfs(node.right, level + 1)
+
+      dfs(root, 0)
+
+      # reverse the odd levels
+      for i in range(len(result)):
+          if i % 2:
+              result[i] = reversed(result[i])
+
+      return result
+  ```
+
+---
+
+#### Sum of Left Leaves
+
+Given the `root` of a binary tree, return the sum of all left leaves.
+
+![sum of left leaves](./img/sum-of-left-leaves.png)
+
+- **Solution 1:** using `DFS` + `stack`
+
+  ```py
+  def sumOfLeftLeaves(root):
+      if root is None:
+          return 0
+
+      stack = [(root, False)] # (node, is_left)
+      sum = 0
+
+      while stack:
+          node, is_left = stack.pop()
+          # if the node is a left leaf, add its value to the sum
+          if is_left and node.left is None and node.right is None:
+              sum += node.value
+          if node.left:
+              stack.append((node.left, True))
+          if node.right:
+              stack.append((node.right, False))
+
+      return sum
+  ```
+
+- **Solution 2:** using `BFS` + `recursion`
+
+  ```py
+  def sumOfLeftLeaves(root):
+      if root is None:
+          return 0
+
+      # If root has a left child and the left child is a leaf node, add it to the sum
+      if root.left and root.left.left is None and root.left.right is None:
+          return root.left.value + sumOfLeftLeaves(root.right)
+      # Otherwise, recursively call sumOfLeftLeaves on the left and right children
+      else:
+          return sumOfLeftLeaves(root.left) + sumOfLeftLeaves(root.right)
+  ```
+
+---
+
+#### Diameter of Binary Tree
+
+Given the `root` of a binary tree, return the length of the **diameter** of the tree.
+
+The diameter of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the `root`.
+![diameter of binary tree](./img/diameter-of-binary-tree-1.png)
+
+- **Explanation**
+  - To solve this, we can use a **Depth First Search** to traverse the tree and keep track of the **diameter** of the tree
+  - we do so by calculating the diameter for each node recursively and then return the maximum diameter
+  - to calculate the diameter of a node, we need to calculate the **height** of the left subtree and the **height** of the right subtree and then add them together
+    ![diameter of binary tree](./img/diameter-of-binary-tree-2.png)
+    - the **height** of a subtree is the number of edges between the root node and the farthest leaf node
+    - `diameter` = `left_height` + `right_height`
+    - we add them because the diameter of a node is the longest path between any two nodes in a tree and this path may or may not pass through the `root` (see picture)
+      ![diameter of binary tree](./img/diameter-of-binary-tree-3.webp)
+- So, the approach for solving this problem is to calculate the `height` of each node's `left` and `right` subtrees and find the maximum `sum` of heights for any node. This `sum` represents the longest path that passes through that node. We can do this recursively for each node in the tree and keep track of the maximum diameter found so far.
+
+```py
+def diameterOfBinaryTree(root):
+    # create a variable to store the diameter of the tree
+    diameter = 0
+
+    # create a function that accepts a root node and returns the height of the tree
+    def height(root):
+        # if the root is None, return 0
+        if root is None:
+            return 0
+
+        # recursively call the function with the root's left node and the root's right node
+        left = height(root.left)
+        right = height(root.right)
+
+        # update the diameter of the tree
+        diameter = max(diameter, left + right)
+
+        # return the height of the tree (1 for the current node)
+        return max(left, right) + 1
+
+    height(root)
+    return diameter
+```
+
+---
+
+#### Minimum Absolute Difference in BST
+
+Given the `root` of a Binary Search Tree (BST), return the minimum absolute difference between the values of any two different nodes in the tree.
+
+- Ex:
+
+  - Input: `root = [4,2,6,1,3]`
+  - Output: `1`
+
+- **Explanation**
+  - We can use a **inorder DFS** to traverse the tree and keep track of the **minimum absolute difference** between the values of any two different nodes in the tree
+  - we do so by calculating the **absolute difference** between the current node's value and the **previous** node's value and then return the minimum absolute difference
+    - > Here, `prev` is the node below and not above
+  - we create a recursive function `traverse()`:
+    - it takes a node as input and recursively traverses its **left subtree** until it reaches a leaf node
+      - > because the values in the **left** subtree are less than the current node's value
+    - then checks if the `prev` variable is not `None`. If it is not None, it calculates the absolute difference between the current node and the previous node, and updates the `min_diff` variable with the minimum of the current minimum absolute difference and the absolute difference between the current node and the previous node.
+    - It then sets the `prev` variable to the current node and recursively traverses the **right subtree**.
+      - we go to `left` subtree first because the values in the `left` subtree are less than the current node's value
+
+```py
+def getMinimumDifference(root):
+    min_diff = float('inf')
+    prev = None
+
+    def traverse(root):
+        if not root:
+            return
+
+        traverse(root.left)
+
+        # if the previous node's value is not None, update the minimum absolute difference
+        if prev:
+            min_diff = min(min_diff, root.value - prev.val)
+
+        # update the previous node's value
+        prev = root
+
+        # recursively call the function with the root's right node
+        traverse(root.right)
+
+    # call the function with the root node
+    traverse(root)
+    return min_diff
+```
+
+---
+
+#### Invert Binary Tree
+
+Given the `root` of a binary tree, invert the tree, and return its root.
+
+- Ex:
+  ![invert bst](./img/invert-bst-1.jpg)
+
+  - Input: `root = [4,2,7,1,3,6,9]`
+  - Output: `[4,7,2,9,6,3,1]`
+
+- Explanation:
+  - here, we want to visit every node and swap its `left` and `right` children
+  - do this recursively for each node with `DFS`
+
+```py
+def invertTree(root):
+    if not root:
+        return None
+
+    # swap the children
+    root.left, root.right = root.right, root.left
+
+    # recursively call the function with the root's left node and the root's right node
+    invertTree(root.left)
+    invertTree(root.right)
+
+    return root
+
+# -------------------------------------------------------------------
+# Different method (DFS)
+def invertTree(root):
+    if not root:
+      return None
+
+    # recursively call the function with the root's left node and the root's right node
+    left = invertTree(root.left)
+    right = invertTree(root.right)
+
+    # swap the children
+    root.left = right
+    root.right = left
+
+    return root
+```
+
+---
+
+#### Kth Smallest Element in a BST
+
+Given the `root` of a binary search tree, and an integer `k`, return the `kth` smallest value (`1-indexed`) of all the values of the nodes in the tree.
+
+- Ex:
+
+  - Input: `root = [3,1,4,null,2], k = 1`
+  - Output: `1`
+
+- Explanation:
+- **Solution 1:** using `DFS` + sorting **(recursively)**
+
+  - we can use `DFS` to traverse the tree and add the values of the nodes to an array
+  - then we can sort the array and return the `kth` smallest value
+
+  ```py
+  def kthSmallest(root, k):
+      values = []
+
+      def traverse(root):
+          if root is None:
+              return
+
+          # Traverse in-order
+          traverse(root.left)
+          values.append(root.value)
+          traverse(root.right)
+
+      traverse(root)
+      values.sort()
+      return values[k - 1]
+  ```
+
+- **Solution 2:** using `DFS` + `stack` **(iteratively)**
+
+  - we go left as far down as we can with adding the values to the stack and then go up by popping the nodes from the stack and adding their values to the array
+
+    - we can use a `stack` to store the nodes of the tree in descending order
+    - then we can pop the first `k` nodes from the stack and return the last node's value
+
+    ```py
+    def kthSmallest(root, k):
+        stack = []
+        cur = root
+
+        while stack or cur:
+            # loop through the left nodes of the cur and add them to the stack
+            while cur:
+                stack.append(cur)
+                cur = cur.left
+
+            # pop the first node in the stack
+            node = stack.pop()
+            k -= 1
+            if k == 0:
+                return node.value
+
+            # set the root to the node's right node
+            cur = node.right
+    ```
+
+---
+
+#### Lowest Common Ancestor of a Binary Search Tree
+
+Given a binanaary search tree (BST), find the lowest common ancestor (LCA) of two given nodes in the BST.
+
+> "The lowest common ancestor is defined between two nodes `p` and `q` as the lowest node in `T` that has both `p` and `q` as descendants (where we allow **a node to be a descendant of itself**)."
+
+- Explanation:
+  - This is different from the **lowest common ancestor of a binary tree** problem because in a **binary tree**, we can have nodes with only one child, and also the nodes can be in any order.
+  - But in a **binary search tree**, we know that the nodes in the left subtree are less than the root node and the nodes in the right subtree are greater than the root node.
+  - So, we can use this property to find the lowest common ancestor of two nodes in a BST.
+
+```py
+def lowestCommonAncestor(root, p, q):
+    cur = root
+
+    while cur:
+      # if the current node is bigger than both p and q, go left (smaller value)
+      if cur.value > p.value and cur.value > q.value:
+        cur = cur.left
+      # else if the current node is smaller than both p and q, go right (bigger value)
+      elif cur.value < p.value and cur.value < q.value:
+        cur = cur.right
+      # else return the current node -> it's the lowest common ancestor
+      else:
+        return cur
+```
+
+---
+
+## Tries
+
+### Implement Trie (Prefix Tree)
+
+A **trie** (pronounced as "try") or **prefix tree** is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. There are various applications of this data structure, such as autocomplete and spellchecker.
+
+- Steps
+  - when inserting a word, we loop through each character in the word and check if the character is in the trie
+    - if the character is in the trie, we move to the next character until we reach the end of the word
+    - if the character is not in the trie, we add it to the trie by creating a node for that character
+  - when adding all the characters of a word, we need to mark the last character as the end of the word by adding a `*` to the node
+
+```py
+class TrieNode:
+    def __init__(self):
+        """
+        # Ex: children = {'a': TrieNode(), 'b': TrieNode()}
+        # or: children['a'] = TrieNode()
+        """
+        self.children = {}
+        self.end_of_word = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word):
+        cur = self.root
+
+        for char in word:
+            # if the character is not in the trie, add it
+            if char not in cur.children:
+                cur.children[char] = TrieNode()
+            # move to the next character if it's in the trie
+            cur = cur.children[char]
+
+        # mark the last character as the end of the word
+        cur.end_of_word = True
+
+    def search(self, word):
+        cur = self.root
+
+        for char in word:
+            # if the character is not in the trie, return False
+            if char not in cur.children:
+                return False
+            # move to the next character
+            cur = cur.children[char]
+
+        # return True if the last character is the end of the word
+        return cur.end_of_word
+
+    def startsWith(self, prefix):
+        cur = self.root
+
+        for char in prefix:
+            # if the character is not in the trie, return False
+            if char not in cur.children:
+                return False
+            # move to the next character
+            cur = cur.children[char]
+
+        # return True if we reach the end of the prefix
+        return True
+```
 
 ---
 
@@ -3078,6 +4300,49 @@ def pyramid(n, row=0, level=''):
 
 ## Numbers
 
+### Climbing Stairs
+
+You are climbing a staircase. It takes `n` steps to reach the top.
+
+Each time you can either climb `1` or `2` steps. In how many distinct ways can you climb to the top?
+
+- Ex:
+
+  - Input: `n = 2`
+  - Output: `2`
+  - Explanation: There are two ways to climb to the top.
+    1. `1 step + 1 step`
+    2. `2 steps`
+
+- **Explanation**
+  ![climbing stairs](./img/climbing-stairs-1.png)
+  ![climbing stairs](./img/climbing-stairs.png)
+  - We can use **dynamic programming** to solve this problem
+  - We can use a **bottom-up** approach to solve this problem
+  - We can create an array of size `n + 1` to store the number of ways to reach each step
+  - We can then loop through the array and calculate the number of ways to reach each step
+    - The number of ways to reach the current step is equal to the number of ways to reach the previous step + the number of ways to reach the step before the previous step
+    - We can then return the last element in the array
+
+```py
+def climbStairs(n):
+    # create an array of size n + 1 to store the number of ways to reach each step
+    dp = [0] * (n + 1)
+
+    # set the first two elements in the array to 1
+    dp[0] = 1
+    dp[1] = 1
+
+    # loop through the array and calculate the number of ways to reach each step
+    for i in range(2, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2]
+
+    # return the last element in the array
+    return dp[-1]
+```
+
+---
+
 ### Partitioning Into Minimum Number Of Deci-Binary Numbers
 
 A decimal number is called **deci-binary** if each of its digits is either `0` or `1` without any leading zeros. For example, `101` and `1100` are **deci-binary**, while `112` and `3001` are not.
@@ -3165,37 +4430,41 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 
 - The function takes an integer n as input, which represents the position of the number we want to find in the Fibonacci sequence.
 - If n is not 0 or 1, the function returns the sum of the previous two numbers in the sequence, which are found by recursively calling the function with `n-1` and `n-2` as inputs.
+
   - For example, if we call `fib(5)`, the function will return the sum of the previous two numbers in the sequence: `fib(4)` + `fib(3)`. To find `fib(4)`, it will call `fib(3)` and `fib(2)`, and so on, until it reaches the base cases of `fib(0)` and `fib(1)`.
     ![Fibonacci](./img/fibonacci.png)
   - we will neglect `fib(0)` as it returns 0, and will only focus on `fib(1)`, which returns 1. This means that `fib(2)` will return 1, and `fib(3)` will return 2. This means that `fib(4)` will return 3, and `fib(5)` will return 5.
     ![Fibonacci](./img/fibonacci-1.png)
 
-```py
-# Solution 1 - using recursion O(2^n) --> exponential time (BAD)
-def fib(n):
-    if n < 2:
-        return n
-    return fib(n - 1) + fib(n - 2)
-```
+- Solution 1 - using recursion `O(2^n)` --> exponential time (BAD)
+
+  - `O(2^n)` because we're calling the function twice for each number in the sequence and doing this for each level(`n` levels)
+
+  ```py
+  def fib(n):
+      if n < 2:
+          return n
+      return fib(n - 1) + fib(n - 2)
+  ```
 
 **INTERVIEW QUESTION:** How can we improve this `O(2^n)` performance?
 
 - **Memoization:** In the current implementation, the function recalculates the same values multiple times, which can be inefficient. We can use memoization to store the results of previous calculations and avoid redundant calculations.
   ![Fibonacci](./img/fibonacci-2.png)
 
-```py
-cache = {}
+  ```py
+  cache = {}
 
-def fib(n):
-    if n in cache:
-        return cache[n]
-    elif n < 2:
-        return n
-    else:
-        result = fib(n-1) + fib(n-2)
-        cache[n] = result
-        return result
-```
+  def fib(n):
+      if n in cache:
+          return cache[n]
+      elif n < 2:
+          return n
+      else:
+          result = fib(n-1) + fib(n-2)
+          cache[n] = result
+          return result
+  ```
 
 - using generic memoization function (useful for interviews)
 

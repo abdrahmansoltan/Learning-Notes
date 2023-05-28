@@ -7,6 +7,7 @@
     - [Structure your answer using STARR](#structure-your-answer-using-starr)
   - [Non Technical interviews](#non-technical-interviews)
     - [Personality Questions](#personality-questions)
+      - [Strength and weakness Questions](#strength-and-weakness-questions)
     - [Company Questions](#company-questions)
     - [Interviewer Questions](#interviewer-questions)
     - [Feedback](#feedback)
@@ -123,6 +124,40 @@ It's a method to structure your answers to behavioral interview questions. It's 
     >
     > - so lately, I've taken the time to make sure that I write "pseudo code" first and commenting out my steps, inputs and assumptions before I actually jump in coding.
 
+#### Strength and weakness Questions
+
+A hiring manager may ask you to describe your strengths and weaknesses. When you respond to this question, you may speak about yourself positively and explain how you're improving a weakness you have. Understanding how to answer this interview question can improve your chances of receiving a job offer.
+
+- Why they ask it?
+
+  - They want to know if you're familiar with what areas you can improve and what steps you've taken to address them.
+  - what you think your best qualities are so you can apply them in the new role
+  - they can use your response to assess how your attributes may affect the company's operations and existing team members' duties and responsibilities -> to see if you're a good fit for the role
+
+- Strength
+
+  - > Another format of the strengths question is: **"When they're describing you, what is one word your colleagues and managers would use to describe you?"**
+    >
+    > - While these questions don't ask you about your strengths directly, they encourage you to talk about your positive attributes.
+
+- Weakness
+  - > Another format of the weakness question is: **"What is one thing that you can change about yourself?"** or **"What feedback have you received from your manager?"**
+    >
+    > - This question is similar to the weakness question, but it's more specific. It asks you to describe a specific area you're working to improve, rather than a general weakness.
+  
+  - You can use this formula for answering this question:
+    - **Weakness** + **Context** + **Improvement measures**
+  - EX:
+    - "I focus too much on the details"
+      - this can be used to show that you're a perfectionist, and you can say that you're working on it by trying to focus on the big picture and the main goal of the project. Also it shows that you're a hard worker and you're willing to put in the time and effort to get the job done. plus delivering a high quality work.
+      - You can leverage this weakness to show that you're capable of helping the company avoid even minor mistakes.
+      - Don't forget to mention that you're working on it and how you're working on it.
+    - "Sometimes I have a hard time letting go of a project, I'm the biggest critic of my work, and I can always find something that needs to be improved or changed"
+      - this can be used to show that you're a perfectionist, and you can say that you're working on it by trying to focus on the big picture and the main goal of the project. Also it shows that you're a hard worker and you're willing to put in the time and effort to get the job done. plus delivering a high quality work.
+      - For improvement measures, you can say that you're working on it by trying to focus on the big picture and the main goal of the project. Also by giving yourself a deadline to finish the project and not going back to it after that deadline.
+
+---
+
 ### Company Questions
 
 - Why Join Us?
@@ -145,8 +180,9 @@ It's a method to structure your answers to behavioral interview questions. It's 
 
 ### Interviewer Questions
 
-- Do you have any questions for me?
+- **"Do you have any questions for me?"**
 
+  - Prepare 4-5 questions to ask the interviewer
   - focus on the interviewer, not `company` or `yourself`
   - mention something they've mentioned (this shows that you're paying attention to what they're saying in the interview)
     - use the info they tell you about themselves at the beginning of the interview
@@ -155,15 +191,29 @@ One of the important things to think about here is the fact that even though you
 
 Here are some questions to get you started. I love opinion questions because you get interesting answers and can ask everyone the same question. Don’t be afraid to ask about the negatives too:
 
-- EX:
-  - “Can you share more about the day-to-day responsibilities of this position? What’s a typical day like?”
-  - “What are your favorite and least favorite parts of the job?”
-  - “Why did you decide to join Company X?”
-  - “Can you tell me about the opportunities for career advancement at Company X?”
+- **Questions to ask about the job**:
+  - "Can you share more about the day-to-day responsibilities of this position? What's a typical day like?"
+  - "What Are Your Expectations for the Person in This Role?"
+  - "What are the characteristics of someone who would succeed in this role?"
+  - "What does the career path for someone in this role look like?"
+  - "What are some of the challenges you’ve seen people in this role or on this team encounter?"
+  - "Can you tell me about the team I'd be working with?"
   - what is a big mistake that you did at the beginning of your jeb here? and what did you do?
-  - where you see the company going in the next 3 years, as I want to work here for a while and you have better knowledge of the company than I do, and I would like to see where the company is headed.
   - Have you seen your skills grow here in the past 3 years?
   - What you wish somebody told them when they just started the job at this company?
+
+- **Questions to ask about the company**:
+  - "What do you like best about working here?"
+  - career advancement: "I'd love to talk about career advancements. In my next career move, I really want to find a company that is prioritizing upward mobility and career growth. I want to be a senior engineer in the next couple of years, So it's really important that I have clear opportunities for growth in this role. If you'd be able to share, I'd like to understand how many people have been promoted out of this position?"
+
+- **Questions to ask about the culture**:
+  - How would you describe the company culture?
+
+- Questions to avoid:
+  - Avoid asking questions that make it seem like you’ve already been hired, such as questions about the company’s paid-time-off policy or anything with regard to salary or benefits. These are details that will be discussed after you’re offered the job or will be brought up by the interviewer themselves.
+  - Also, avoid asking about who else the company may be interviewing and questions about background checks, how long before your first review or if they’d be contacting past employers. Such questions may come across as you worrying about them learning something about you in the future. You want to make the most of your two to three questions and leave them with the best impression possible.
+  - avoid asking about information that is already available on the company’s website or social media pages. This will make it seem like you didn’t do your research before the interview.
+    - EX: "How are the company's mission and values?"
 
 ---
 
