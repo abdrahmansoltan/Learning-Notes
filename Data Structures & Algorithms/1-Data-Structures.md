@@ -699,6 +699,28 @@ A stack is a collection of objects that are inserted and removed according to th
 
 #### Call Stack
 
+It is what a program uses to keep track of method calls.
+
+- The call stack is made up of **stack frames** (one for each method call).
+
+  - Each method call creates its own stack frame, taking up space on the call stack.
+    - That's important because it can impact the space complexity of an algorithm. Especially when we use **recursion**
+    - The entire call stack takes up `O(n)` space even though our method itself doesn't create any data structures!
+  - A stack frame usually stores:
+    - local variables
+    - method arguments
+    - return address --> what the program should do after the function returns
+
+- **procedure call stack**:
+  - The call stack is a stack data structure maintained inside computers and ran by the operating system. It stores information about when the active procedures and functions call each other, and how they pass parameters to each other.
+  ![procedure call stack](./img/procedure-call-stack-1.png)
+  ![procedure call stack](./img/procedure-call-stack-2.png)
+  - Ex: when `procedure 1` calls `procedure 2`, `procedure 2` is pushed onto the stack. and so on when `3` calls `2`, ..., When `procedure 2` returns, it is popped off the stack and `procedure 1` resumes execution.
+  ![procedure call stack](./img/procedure-call-stack-3.png)
+  ![procedure call stack](./img/procedure-call-stack-4.png)
+
+  - reference: [Procedures, Video 2: Call stack](https://www.youtube.com/watch?v=XbZQ-EonR_I)
+
 ```py
 def greet(name):
   print(f"hello {name}")
@@ -718,6 +740,14 @@ def greet(name):
 >
 > - You can rewrite your code to use a loop instead.
 > - You can use something called [tail recursion](./2-Algorithms.md#eliminating-tail-recursion). That's an advanced recursion topic. It's also only supported by some languages, not all.
+
+- **StackOverFlow**
+  - During the stack-framing  process, if `JVM` encounters a situation where there is no space for a new stack frame to be created, it will throw a `StackOverflowError`.
+  - causes:
+    - unterminated/infinite recursion – too deep recursion in a particular code snippet.
+    - It can also happen in a situation where an application keeps calling methods from within methods until the stack is exhausted. This is a rare case since no developer would intentionally follow bad coding practices.
+    - Another rare cause is having a vast number of `local variables` inside a method.
+    - Another interesting scenario that causes this error is if a class is being instantiated within the same class as an instance variable of that class. This will cause the constructor of the same class to be called again and again (recursively) which eventually results in a `StackOverflowError`.
 
 ---
 

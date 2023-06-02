@@ -33,14 +33,15 @@
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
   - [Sorting](#sorting)
+    - [Stable vs Unstable Sorting](#stable-vs-unstable-sorting)
     - [Bubble Sort](#bubble-sort)
     - [Selection Sort](#selection-sort)
     - [Insertion Sort](#insertion-sort)
-    - [Merge Sort](#merge-sort)
-      - [Merge Function](#merge-function)
-      - [Merge Sort Function](#merge-sort-function)
-    - [Quick Sort](#quick-sort)
-      - [Merge sort vs quicksort](#merge-sort-vs-quicksort)
+    - [Divide \& Conquer](#divide--conquer)
+      - [Merge Sort](#merge-sort)
+        - [Merge Function](#merge-function)
+        - [Merge Sort Function](#merge-sort-function)
+      - [Quick Sort](#quick-sort)
     - [Radix Sort](#radix-sort)
     - [Sorting Notes](#sorting-notes)
   - [Searching](#searching)
@@ -471,7 +472,7 @@ This is called **Factorial Time** or **oh no!**
 
 ## Recursion
 
-> **Recursion** is a technique by which a function makes one or more calls to itself during execution, or by which a data structure relies upon smaller instances of the very same type of structure in its representation.
+> **Recursion** is a technique by which a function makes one or more calls to itself during execution, or by which a data structure relies upon **smaller** instances of the very same type of structure in its representation.
 
 It's not actually an Algorithm, it's more of a concept that we use in our Algorithms
 
@@ -666,15 +667,33 @@ It's an optimization technique using `"caching"` (Do you have something you can 
     - `Chrome`, `Mozilla`, ...
 - There're many different ways to sort things, and each technique has its own advantages and disadvantages
 
-- Elementary Sorting Algorithms
-  ![elementary-sorting-algorithms](./img/elementary-sorting-algorithms.png)
+- Sorting Algorithms
+  ![elementary-sorting-algorithms](./img/sorting-algorithms.png)
 
-- **Stable vs Unstable Sorting Algorithms**
-  ![stable-vs-unstable-sorting](./img/stable-vs-unstable-sorting.webp)
-  - **Stable Sorting Algorithms**: maintains the relative order of records with equal keys (if the keys are equal, the order of the records remains unchanged)
-  - **Unstable Sorting Algorithms**: does not maintain the relative order of records with equal keys (if the keys are equal, the order of the records may change)
-    - Ex: `Quick Sort` is unstable, because it swaps elements based on the pivot, so it may swap elements with equal keys
-    - Ex: `Merge Sort` is stable, because it doesn't swap elements, it just merges them
+### Stable vs Unstable Sorting
+
+A sorting algorithm is said to be **stable** if two objects with equal keys appear in the same order in sorted output as they appear in the input data set
+
+![stable-vs-unstable-sorting](./img/stable-vs-unstable-sorting.webp)
+
+- **Stable Sorting Algorithms**: maintains the relative order of records with equal keys (if the keys are equal, the order of the records remains unchanged)
+  ![stable-vs-unstable-sorting](./img/stable-vs-unstable-sorting-1.png)
+  - Ex: `Merge Sort`, `Insertion Sort`, `Bubble Sort`
+  -
+- **Unstable Sorting Algorithms**: does not maintain the relative order of records with equal keys (if the keys are equal, the order of the records may change)
+  - Ex: `Quick Sort`, `Selection Sort`
+
+> When equal elements are indistinguishable, such as with integers, or more generally, any data where the entire element is the key, stability is not an issue. **Stability is also not an issue if all keys are different.**
+
+- Any given sorting algorithm which is not stable can be modified to be stable. There can be algorithm-specific ways to make it stable, but in general, **any comparison-based sorting algorithm which is not stable by nature can be modified to be stable by changing the key comparison operation** so that the comparison of two keys considers position as a factor for objects with equal keys.
+
+- Where stable sorting algorithms are useful?
+  - When we want to sort objects by multiple attributes
+  - Consider the following dataset of Student Names and their respective class sections: `[(Alice, 2), (Bob, 1), (John, 2), (Mary, 1), (Mike, 2), (Sarah, 1), (Tom, 1)]`
+    - If we sort this dataset by name, we get the following: `[(Alice, 2), (Bob, 1), (John, 2), (Mary, 1), (Mike, 2), (Sarah, 1), (Tom, 1)]`
+    - But if we sort this dataset by class section, we get the following: `[(Bob, 1), (Mary, 1), (Sarah, 1), (Tom, 1), (Alice, 2), (John, 2), (Mike, 2)]`
+      - Notice that the relative order of students with class section `1` and students with class section `2` is maintained in the sorted output
+      - if we used unstable sorting algorithm, the relative order of students with class section `1` and students with class section `2` may change in the sorted output
 
 ---
 
@@ -710,8 +729,10 @@ def bubble_sort(arr):
 - it works by scanning a list of items for the smallest element and then swapping that element for the one in the first position
 - also one of the simplest but not efficient either
 - **steps:**
+  ![selection-sort](./img/selection-sort-1.png)
+
   1. store the first element as the smallest value you've seen so far
-  2. compare this item to the next item in the array until you find a smaller number
+  2. compare this item to the next item in the array until you find a smaller number **(in each iteration, we select the smallest item that hasn't yet been sorted)**
      - if smaller number is found, designate that smaller number to be the new **minimum** and continue to the end of the array
      - if the **minimum** is not the value(index) you initially began with, we swap the two values
   3. repeat this with the next element until the array is sorted
@@ -770,12 +791,14 @@ It's called `insertion` because we're **inserting** the element in the correct p
   - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
 - works well with small datasets
 - steps:
+
   1. start by picking the second element in the array
   2. now compare the second element with (the one before it) and swap if necessary
      ![insertion-sort](./img/insertion-sort-1.png)
      ![insertion-sort](./img/insertion-sort-2.png)
   3. continue to the next element and if it is in the (incorrect order), iterate through the sorted portion (the left side) to place the element in the correct place
   4. repeat until the array is sorted
+     ![insertion-sort](./img/insertion-sort-3.png)
 
 - Time complexity:
   - **Best case**: `O(n)` -> when the array is already sorted (because we don't even go inside the `while` loop)
@@ -799,7 +822,19 @@ def insertion_sort(arr):
 
 ---
 
-### Merge Sort
+### Divide & Conquer
+
+Both merge sort and quicksort employ a common algorithmic paradigm based on **recursion**. This paradigm, **divide-and-conquer**, breaks a problem into subproblems that are similar to the original problem, recursively solves the subproblems, and finally combines the solutions to the subproblems to solve the original problem.
+
+![divide-and-conquer](./img/divide-and-conquer-1.png)
+![divide-and-conquer](./img/divide-and-conquer-2.png)
+
+- Merge Sort vs Quick Sort
+  - Quick sort is risky, In worst case, it can be `O(n^2)`, but in average case, it's `O(n log(n))`
+  - unlike `merge sort` which is always `O(n log n)`
+  - Sometimes the constant can make a difference. `Quicksort` versus `merge sort` is one example. `Quicksort` has a smaller constant than `merge sort`. So if they're both `O(n log n)` time, `quicksort` is faster. And `quicksort` is faster in practice because it hits the average case way more often than the worst case.
+
+#### Merge Sort
 
 ![merge-sort](./img/Merge-Sort.png)
 
@@ -818,7 +853,7 @@ def insertion_sort(arr):
   - this is due to holding off to the divided lists in memory
   - so we use it if we have enough memory
 
-#### Merge Function
+##### Merge Function
 
 It's a function for joining 2 sorted arrays into one sorted array
 
@@ -874,7 +909,7 @@ def merge(arr1, arr2):
 
 - > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
 
-#### Merge Sort Function
+##### Merge Sort Function
 
 ![merge-sort](./img/merge-sort-4.png)
 
@@ -902,7 +937,7 @@ def merge_sort(arr):
 
 ---
 
-### Quick Sort
+#### Quick Sort
 
 ![Quick-sort](./img/quick-sort.png)
 
@@ -947,14 +982,6 @@ def quicksort(array):
 ```
 
 ![quick sort](./img/quick-sort-1.png)
-
----
-
-#### Merge sort vs quicksort
-
-- Quick sort is risky, In worst case, it can be `O(n^2)`, but in average case, it's `O(n log n)`
-  - unlike `merge sort` which is always `O(n log n)`
-- Sometimes the constant can make a difference. `Quicksort` versus `merge sort` is one example. `Quicksort` has a smaller constant than `merge sort`. So if they're both `O(n log n)` time, `quicksort` is faster. And `quicksort` is faster in practice because it hits the average case way more often than the worst case.
 
 ---
 
@@ -1043,21 +1070,19 @@ def binary_search(data, target, low, high):
 # -------------------------------------------------------------------------------------------------
 
 # 2. Iterative Binary Search
-def binary_search_iterative(data, target):
-  low = 0
-  high = len(data) - 1
+def binary_search_iterative(nums, target):
+  l, r = 0, len(nums) - 1
 
-  while low <= high:
-    mid = (low + high) // 2
-    if target == data[mid]:  # found a match
-      return True
-    elif target < data[mid]:
-      # recur on the portion left of the middle
-      high = mid - 1
+  while l <= r:
+    midIdx = (l + r) // 2
+    if nums[midIdx] > target:
+      r = midIdx - 1
+    elif nums[midIdx] < target:
+      l = midIdx + 1
     else:
-      # recur on the portion right of the middle
-      low = mid + 1
-  return False  # interval is empty; no match
+      return midIdx
+
+  return -1
 ```
 
 > **Notes**:

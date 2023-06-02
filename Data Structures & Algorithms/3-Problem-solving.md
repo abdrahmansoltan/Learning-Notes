@@ -25,7 +25,7 @@
       - [Count Vowel Substrings of a String](#count-vowel-substrings-of-a-string)
       - [Minimum Window Substring](#minimum-window-substring)
     - [Reversing Problems](#reversing-problems)
-      - [Palindrome](#palindrome)
+      - [Valid Palindrome](#valid-palindrome)
       - [Reverse Integer](#reverse-integer)
   - [Arrays](#arrays)
     - [Modify array in plave](#modify-array-in-plave)
@@ -87,8 +87,8 @@
     - [Find the Duplicate Number](#find-the-duplicate-number)
     - [Verifying an Alien Dictionary](#verifying-an-alien-dictionary)
     - [Hand of Straights](#hand-of-straights)
-    - [Letter combinations of a phone number](#letter-combinations-of-a-phone-number)
     - [4Sum II](#4sum-ii)
+    - [Repeated DNA Sequences](#repeated-dna-sequences)
   - [Trees](#trees)
     - [General Tree Questions](#general-tree-questions)
       - [Level Width](#level-width)
@@ -114,18 +114,44 @@
       - [Lowest Common Ancestor of a Binary Search Tree](#lowest-common-ancestor-of-a-binary-search-tree)
   - [Tries](#tries)
     - [Implement Trie (Prefix Tree)](#implement-trie-prefix-tree)
+  - [Sorting and searching](#sorting-and-searching)
+    - [Searching](#searching)
+      - [Binary Search](#binary-search)
+      - [Search a 2D Matrix](#search-a-2d-matrix)
+      - [Koko Eating Bananas](#koko-eating-bananas)
+      - [Search in Rotated Sorted Array](#search-in-rotated-sorted-array)
+    - [Time Based Key-Value Store](#time-based-key-value-store)
+    - [Sorting](#sorting)
+      - [Insertion Sort List](#insertion-sort-list)
+      - [Largest Number](#largest-number)
+      - [Merge Intervals](#merge-intervals)
+      - [Non-overlapping Intervals](#non-overlapping-intervals)
   - [Creating Shapes](#creating-shapes)
     - [Steps shape](#steps-shape)
     - [Pyramid](#pyramid)
     - [Solution 1 - using for loops](#solution-1---using-for-loops)
       - [Solution 2 - using recursion](#solution-2---using-recursion)
-  - [Numbers](#numbers)
+  - [Numbers \& Math](#numbers--math)
+    - [Power of Two](#power-of-two)
+    - [Pow(x, n)](#powx-n)
     - [Climbing Stairs](#climbing-stairs)
     - [Partitioning Into Minimum Number Of Deci-Binary Numbers](#partitioning-into-minimum-number-of-deci-binary-numbers)
-    - [Series](#series)
-      - [Fibonacci Number](#fibonacci-number)
-        - [Recursion solution steps](#recursion-solution-steps)
-        - [Fibonacci looping solution](#fibonacci-looping-solution)
+  - [Recursion \& Backtracking](#recursion--backtracking)
+    - [Fibonacci Number](#fibonacci-number)
+      - [Recursion solution steps](#recursion-solution-steps)
+      - [Fibonacci looping solution](#fibonacci-looping-solution)
+    - [Restore IP Addresses](#restore-ip-addresses)
+    - [Permutations](#permutations)
+    - [Permutations II](#permutations-ii)
+    - [Combinations](#combinations)
+    - [Subsets](#subsets)
+    - [Subsets II](#subsets-ii)
+    - [Sum of All Subset XOR Totals](#sum-of-all-subset-xor-totals)
+    - [Count Number of Maximum Bitwise-OR Subsets](#count-number-of-maximum-bitwise-or-subsets)
+    - [Letter combinations of a phone number](#letter-combinations-of-a-phone-number)
+    - [N-Queens](#n-queens)
+    - [Combination Sum](#combination-sum)
+    - [Combination Sum II](#combination-sum-ii)
 
 ---
 
@@ -567,7 +593,7 @@ Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **
 
 ### Reversing Problems
 
-#### Palindrome
+#### Valid Palindrome
 
 A palindrome is a word, phrase, number, or other sequence of characters which **reads the same backward or forward**. Allowances may be made for adjustments to capital letters, punctuation, and word dividers.
 
@@ -598,25 +624,40 @@ def is_palindrome(s):
   left, right = 0, len(s)-1
 
   while left < right:
-    if not isAlphaNum(s[left]):
+    while left < right and not isAlphaNum(s[left]):
       left += 1
-    elif not isAlphaNum(s[right]):
+    while left < right and not isAlphaNum(s[right]):
       right -= 1
-    elif s[left].lower() != s[right].lower():
+
+    if s[left].lower() != s[right].lower():
       return False
-    else:
-      left += 1
-      right -= 1
+
+    left += 1
+    right -= 1
 
   return True
 
 # --------------------------------------------------
 
-# Or: using regex and all() function to check if all elements in an iterable are True
-def is_palindrome(s):
-    s = s.lower().replace(r'[^a-z0-9]', '')
-    return all(s[i] == s[-i-1] for i in range(len(s)//2))
+# Or
+newStr = ''
+for char in s:
+  if char.isalnum():
+    newStr += char.lower()
+
+return newStr == newStr[::-1]
 ```
+
+- recursive solution
+
+  ```py
+  def isPalindrome(s):
+      if len(s) <= 1:
+          return True
+      if s[0] != s[-1]:
+          return False
+      return isPalindrome(s[1:-1])
+  ```
 
 ---
 
@@ -876,7 +917,7 @@ You may return the answer in **any order**.
 - EX: `nums = [1, 0, -1, 0, -2, 2], target = 0` --> `[[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]`
 
 - **Steps:**
-  ![4sum](./img/4sum.png)
+  ![4sum](./img/4sum)
 
   - Sort the array
   - Loop through the array
@@ -1325,10 +1366,10 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
       - This is done by iterating through the matrix and swapping the element at index `[i]` `[j]` with the element at index `[j]` `[i]`.
 
         ```py
-        for i in range(len(matrix)):
-            for j in range(i):
-                matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
+        matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
         ```
+
+    - The nested loop will iterate over the `range(row)`
 
   ```py
   # Time: O(n^2) | Space: O(1) -> (in-place)
@@ -1352,6 +1393,8 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
   - For each element in the current cycle, swap the element with its corresponding element in the cycle, using four pointers to keep track of the top, bottom, left, and right boundaries of the cycle.
     ![rotate matrix](./img/rotate-matrix-3.png)
   - After swapping all elements in the current cycle, move the top pointer down by one row and the bottom pointer up by one row, and move the left pointer to the right by one column and the right pointer to the left by one column. This moves the boundaries of the current cycle inward by one element.
+    - That's where we use the `for` loop to iterate over the current cycle. and the `i` variable to keep track of the current element in the cycle.
+      - top left -> `matrix[top][left + i]` instead of `matrix[top][left]`
 
   ```py
   def rotate(matrix):
@@ -1359,10 +1402,10 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
     l,r = 0, len(matrix) - 1
 
     while l < r:
-        # loop through the current cycle
+        # loop through the entire row except the last element
         for i in range(r - l):
             top, bottom = l, r
-            # save the top-left element
+            # Temporarily save the top-left element for later
             top_left = matrix[top][l + i]
 
             # 1. move the bottom-left element to the top-left
@@ -2851,66 +2894,6 @@ def isNStraightHand(hand, groupSize):
 
 ---
 
-### Letter combinations of a phone number
-
-Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent. Return the answer in **any order**.
-
-- A mapping of digit to letters (just like on the telephone buttons) is given below. Note that `1` does not map to any letters.
-  ![letter combinations of a phone number](./img/letter-combinations-of-phone-num-1.jpeg)
-
-- EX:
-
-  - Input: `digits = "23"`
-
-- Explanation:
-  - We can use a **backtracking** approach to solve this problem.
-    1. We can start with an empty string and then append each letter of the first digit to the string.
-    2. Then we can **recursively** call the function with the next digit and append each letter of the next digit to the string. We can continue this process until we reach the end of the string.
-    3. Once we reach the end of the string, we can add the string to the result array.
-  - Time complexity: `O(n.4^n)` where `n` is the length of the input string; `4` because some digits has 4 letters
-
-```py
-def letterCombinations(digits):
-    # create a dictionary to store the mapping of each digit to its letters
-    digit_letters = {
-        '2': 'abc',
-        '3': 'def',
-        '4': 'ghi',
-        '5': 'jkl',
-        '6': 'mno',
-        '7': 'pqrs',
-        '8': 'tuv',
-        '9': 'wxyz'
-    }
-
-    # create an array to store the result
-    result = []
-
-    # create a helper function to do the backtracking
-    def backtrack(i, curStr):
-        """
-        i: the index of the current digit
-        curStr: the current string that we're building
-        """
-        # if we reached the end of the string, add the string to the result array
-        if i == len(digits):
-            result.append(curStr)
-            return
-
-        # Else: we continue building the string
-        # iterate through the letters of the current digit
-        for letter in digit_letters[digits[i]]:
-            # recursively call the function with the next digit (i+1 because we're moving to the next digit, and add the updated string)
-            backtrack(i+1, curStr+letter)
-
-    # call the helper function
-    if digits:
-        backtrack(0, '')
-    return result
-```
-
----
-
 ### 4Sum II
 
 Given four lists `A`, `B`, `C`, `D` of integer values, compute how many tuples `(i, j, k, l)` there are such that `A[i] + B[j] + C[k] + D[l]` is zero.
@@ -2968,6 +2951,33 @@ Given four lists `A`, `B`, `C`, `D` of integer values, compute how many tuples `
 
       return count
   ```
+
+---
+
+### Repeated DNA Sequences
+
+The **DNA sequence** is composed of series of nucleotides abbreviated as `'A'`, `'C'`, `'G'`, and `'T'`.
+
+- For example, `"ACGAATTCCG"` is a **DNA sequence**.
+
+Given a **DNA sequence** `s`, return all the **10-letter-long** sequences (substrings) that occur more than once in a DNA molecule. You may return the answer in **any order**.
+
+- Ex: `s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT"`
+
+  - Output: `["AAAAACCCCC", "CCCCCAAAAA"]`
+  - Explanation: `"AAAAACCCCC"` appears twice, and `"CCCCCAAAAA"` appears twice.
+
+```py
+def findRepeatedDnaSequences(s):
+    seen = set()
+    repeated = set()
+    for i in range(len(s)-9):
+        # get the current substring
+        cur = s[i:i+10]
+        if cur in seen:
+            repeated.add(cur)
+        seen.add(cur)
+```
 
 ---
 
@@ -4180,6 +4190,379 @@ class Trie:
 
 ---
 
+## Sorting and searching
+
+### Searching
+
+#### Binary Search
+
+```py
+def binary_search(arr, target):
+    l, r = 0, len(arr) - 1
+
+    while l <= r:
+        mid = (l + r) // 2
+
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            l = mid + 1
+        else:
+            r = mid - 1
+
+    return -1
+```
+
+> Interview question: what if `left` and `right` values are in the upper limit of the `32` bit integer? so adding them will result in an **"overflow"**
+>
+> - Answer: we can instead get the `mid` value by using `mid = left + (right - left) // 2`
+
+---
+
+#### Search a 2D Matrix
+
+You are given an `m x n` integer matrix `matrix` sorted in ascending order, and an integer `target`. Return `true` if `target` is in `matrix`, or `false` otherwise.
+
+- Each row of `matrix` is sorted in ascending order.
+- The first integer of each row is greater than the last integer of the previous row
+
+- Ex:
+  ![alt](./img/search-matrix-1.jpg)
+
+  - `matrix = [[1, 3, 5, 7], [10, 11, 16, 20], [23, 30, 34, 60]]`
+  - `target = 3 --> True`
+  - `target = 13 --> False`
+
+- Explanation
+  ![alt](./img/search-matrix-2.png)
+
+  - We can make use of that each row is sorted to perform a binary search on each row
+    - this will be `O(m * log(n))`, where `m` is the number of rows and `n` is the number of columns
+  - We can do even better, by performing a binary search on the entire matrix to make use of that the last element of each row is smaller than the first element of the next row
+    - this will be `O(log(m) + log(n))`, where `m` is the number of rows and `n` is the number of columns
+
+- Solution 1 -> `O(log(m) + log(n))` -> double binary-search
+
+  ```py
+  def searchMatrix(matrix, target):
+      ROWS, COLS = len(matrix), len(matrix[0])
+      top, bottom = 0, ROWS - 1
+
+      # Perform binary search
+      while top <= bottom:
+        row = (top + bottom) // 2
+        # if the target is smaller than the first element of the row, go up
+        if target < matrix[row][0]:
+          bottom = row - 1
+        # if the target is bigger than the last element of the row, go down
+        elif target > matrix[row][COLS - 1]:
+          top = row + 1
+        else:
+          # Perform binary search on the row
+          left, right = 0, COLS - 1
+          while left <= right:
+            mid = (left + right) // 2
+            if target < matrix[row][mid]:
+              right = mid - 1
+            elif target > matrix[row][mid]:
+              left = mid + 1
+            else:
+              return True
+          return False
+  ```
+
+- Solution 2 -> `O(m + n)`
+
+  ```py
+  def searchMatrix(matrix, target):
+      if not matrix or not matrix[0]:
+          return False
+
+      row = 0
+      col = len(matrix[0]) - 1
+
+      # Perform binary search
+      while row < len(matrix) and col >= 0:
+          if matrix[row][col] == target:
+              return True
+          elif matrix[row][col] > target:
+              col -= 1
+          else:
+              row += 1
+
+      return False
+  ```
+
+---
+
+#### Koko Eating Bananas
+
+Koko loves to eat bananas. There are `n` piles of bananas, the `ith` pile has `piles[i]` bananas. The guards have gone and will come back in `h` hours.
+
+Koko can decide her bananas-per-hour eating speed of `k`. Each hour, she chooses some pile of bananas and eats `k` bananas from that pile. If the pile has less than `k` bananas, she eats all of them instead and will not eat any more bananas during this hour.
+
+Return _the minimum integer_ `k` _such that she can eat all the bananas within_ `h` _hours_.
+
+- Ex:
+
+  - `piles = [3, 6, 7, 11], h = 8 --> 4`
+  - `piles = [30, 11, 23, 4, 20], h = 5 --> 30`
+  - `piles = [30, 11, 23, 4, 20], h = 6 --> 23`
+
+- Explanation:
+
+  - We want to get the minimum `k` number where `k` is the maximum number of bananas Koko can eat per hour (eating speed)
+  - for example: `piles = [3, 6, 7, 11], h = 8`
+    - `k = 1` -> we will require `3` hours to eat the first pile, then `6` hours to eat the second pile, then `7` hours to eat the third pile, then `11` hours to eat the fourth pile, this will exceed the `8` hours threshold
+    - `k = 4` -> we will require `1` hour to eat the first pile, then `2` hours to eat the second pile, then `2` hours to eat the third pile, then `3` hours to eat the fourth pile, this will not exceed the `8` hours threshold so this is the minimum `k` number
+
+- Steps:
+  - Instead of brute-forcing all the possible `k` values (`1` -> `max(piles)`), we can use **binary search** to find the minimum `k` value
+    ![koko banana](./img/koko-banana-1.png)
+  - We can start with `k = 1` and `k = max(piles)`, then we can get the `mid` value and check if it is possible to eat all the bananas within `h` hours
+    ![koko banana](./img/koko-banana-2.png)
+  - If it is possible, then we can try to get a smaller `k` value, so we can set `right = mid - 1`
+  - If it is not possible, then we can try to get a bigger `k` value, so we can set `left = mid + 1`
+    ![koko banana](./img/koko-banana-3.png)
+
+```py
+def minEatingSpeed(piles, h):
+    l, r = 1, max(piles)
+    res = r # if we can't eat all the bananas within h hours, then we will return the upper bound
+
+    while l <= r:
+        # k = mid
+        k = (l + r) // 2
+        totalTime = 0
+        for p in piles:
+            totalTime += math.ceil(p / k)
+
+        if totalTime <= h:
+          res = min(res, k)
+          r = k - 1
+        else:
+          l = k + 1
+
+    return res
+```
+
+---
+
+#### Search in Rotated Sorted Array
+
+You are given an integer array `nums` sorted in ascending order, and an integer `target`. Suppose that `nums` is rotated at some pivot unknown to you beforehand (i.e., `[0, 1, 2, 4, 5, 6, 7]` might become `[4, 5, 6, 7, 0, 1, 2]`). Given `nums` and `target`, return the index of `target` if it is in `nums`, or `-1` if it is not in `nums`. **You must write an algorithm with `O(log n)` runtime complexity.**
+
+- Ex:
+
+  - `nums = [4, 5, 6, 7, 0, 1, 2], target = 0 --> 4`
+  - `nums = [4, 5, 6, 7, 0, 1, 2], target = 3 --> -1`
+
+- Steps:
+  - We can use **binary search** to find the target value
+  - We can check if the `mid` value is equal to the `target` value
+  - Also we will chack if the left/right side of the `mid` value is sorted (we have 2 sorted halves in the array after the rotation)
+    ![search rotated array](./img/search-rotated-arr-1.png)
+  - to choose which side to search in, we can check if the `mid` value is greater than the `left` value or less than the `right` value
+    ![search rotated array](./img/search-rotated-arr-2.png)
+    - If the `left` side is sorted, then we can check if the `target` value is in the `left` side
+    - If the `right` side is sorted, then we can check if the `target` value is in the `right` side
+    - If the `target` value is not in the left/right side, then we can set `left = mid + 1` or `right = mid - 1`
+
+```py
+def search(nums, target):
+    l, r = 0, len(nums) - 1
+
+    while l <= r:
+        mid = (l + r) // 2
+        if nums[mid] == target:
+            return mid
+
+        # left sorted side
+        if nums[l] <= nums[mid]:
+            # check if the target is in the left side
+            if nums[l] <= target <= nums[mid]:
+                r = mid - 1
+            else:
+                l = mid + 1
+        # left sorted side
+        else:
+            if nums[mid] <= target <= nums[r]:
+                l = mid + 1
+            else:
+                r = mid - 1
+
+    return -1
+```
+
+---
+
+### Time Based Key-Value Store
+
+Design a time-based key-value data structure that can store multiple values for the same key at different time stamps and retrieve the key's value at a certain timestamp.
+
+- Ex: ![Time based store](./img/time-based-store-1.png)
+
+- Solution:
+  - `"All the timestamps timestamp of set are strictly increasing"` -> sorted
+- Ex: ![Time based store](./img/time-based-store-2.png)
+  - So, we can use **binary search** to find the value at a certain timestamp
+
+```py
+class TimeMap:
+    def __init__(self):
+        self.store = {} # key: list of [val, timestamp]
+
+    def set(self, key, val, timestamp):
+        if key not in self.store:
+            self.store[key] = []
+        self.store[key].append([val, timestamp])
+
+    def get(self, key, timestamp):
+      res = ''
+      values = self.store.get(key, []) # To handle the case where the key is not in the store
+
+      # Binary search
+      l, r = 0, len(values) - 1
+      while l <= r:
+        mid = (l + r) // 2
+        if values[mid][1] <= timestamp:
+          res = values[mid][0] # The closest value to the timestamp we've seen so far
+          l = mid + 1
+        else:
+          r = mid - 1
+
+      return res
+```
+
+---
+
+### Sorting
+
+#### Insertion Sort List
+
+Sort a linked list using insertion sort.
+
+---
+
+#### Largest Number
+
+Given a list of non-negative integers `nums`, arrange them such that they form the largest number.
+
+> Note: The result may be very large, so you need to return a string instead of an integer.
+
+- Ex:
+
+  - `nums = [10, 2] --> '210'`
+  - `nums = [3, 30, 34, 5, 9] --> '9534330'`
+
+- Explanation:
+  - We can sort the numbers by comparing the first digit of each number
+  - If the first digit of `a` is bigger than the first digit of `b`, then `a` should come before `b`
+  - If the first digit of `a` is smaller than the first digit of `b`, then `b` should come before `a`
+  - If the first digit of `a` is equal to the first digit of `b`, then we need to compare the second digit of each number
+  - We can do this by converting the numbers to strings and comparing the strings
+
+```py
+def largestNumber(nums):
+    def compare(x, y):
+        if int(str(x)+str(y)) > int(str(y)+str(x)):
+            return -1
+        else:
+            return 1
+
+    # sort the numbers using the compare function
+    nums = sorted(nums, key=cmp_to_key(compare))
+    return str(int(''.join(map(str, nums))))
+```
+
+---
+
+#### Merge Intervals
+
+Given an array of intervals where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+
+- Ex:
+
+  - `intervals = [[1, 3], [2, 6], [8, 10], [15, 18]] --> [[1, 6], [8, 10], [15, 18]]`
+    ![merge intervals](./img/merge-intervals-1.png)
+
+- Explanation:
+  - We can sort the intervals by the `start` time
+  - Then we can check if the current interval overlaps with the previous interval
+    - If there is no overlap, then we can add the current interval to the merged intervals
+    - If there is overlap, then we can merge the current interval with the previous interval
+
+```py
+def merge(intervals):
+    # sort the intervals by the start time
+    intervals.sort(key=lambda x: x[0])
+
+    merged = []
+    for interval in intervals:
+        # check if interval does not overlap with the previous one
+        if not merged or merged[-1][1] < interval[0]:
+            merged.append(interval)
+        else:
+            # otherwise, there is overlap, so we merge the current and previous interval (which is the last interval in the `merged` list)
+            merged[-1][1] = max(merged[-1][1], interval[1])
+
+    return merged
+
+# another way
+
+def merge(intervals):
+    intervals.sort(key=lambda x: x[0])
+
+    res = [intervals[0]]
+    for interval in intervals[1:]:
+        lastEnd = res[-1][1]
+
+        if interval[0] <= lastEnd:
+            res[-1][1] = max(lastEnd, interval[1])
+        else:
+            res.append(interval)
+
+    return res
+```
+
+---
+
+#### Non-overlapping Intervals
+
+Given an array of intervals `intervals` where `intervals[i] = [starti, endi]`, return the **minimum** number of intervals you need to remove to make the rest of the intervals non-overlapping.
+
+- Ex:
+
+  - `intervals = [[1, 2], [2, 3], [3, 4], [1, 3]] --> 1`
+  - Explanation: [1, 3] can be removed and the rest of intervals are non-overlapping.
+
+- Explanation:
+  - We can sort the intervals by the `start` time
+  - Then we can check if the current interval overlaps with the previous interval
+    - If there is no overlap, then we can add the current interval to the merged intervals
+    - If there is overlap, then we can merge the current interval with the previous interval
+
+```py
+def eraseOverlapIntervals(intervals):
+    # sort the intervals by the start time
+    intervals.sort(key=lambda x: x[0])
+
+    res = 0
+    prevEnd = intervals[0][1]
+    for start, end in intervals[1:]:
+        # overlap
+        if start < prevEnd:
+            res += 1
+            prevEnd = min(prevEnd, end) # remove the interval with the larger end time
+        # no overlap
+        else:
+            prevEnd = end
+
+    return res
+```
+
+---
+
 ## Creating Shapes
 
 ### Steps shape
@@ -4298,7 +4681,91 @@ def pyramid(n, row=0, level=''):
 
 ---
 
-## Numbers
+## Numbers & Math
+
+### Power of Two
+
+Given an integer `n`, return `true` if it is a power of two. Otherwise, return `false`.
+An integer `n` is a power of two, if there exists an integer `x` such that `n == 2^x`.
+
+- Solution 1: using loop (reusable for any number and not just `2`)
+
+  ```py
+  def is_power_of_two(n):
+      if n == 0:
+          return False
+
+      while n > 1:
+          if n % 2 != 0:
+            return False
+          n //= 2
+
+      return True
+  ```
+
+- Solution 2: using bitwise operators
+
+  ![power of two](./img/power-of-two-1.jpg)
+
+  - We can check this by using the **bitwise AND** operator between `n` and `n - 1`
+  - This is because `n` and `n - 1` will have all the same bits as `n`, except for the rightmost `1` in `n`, **so all the bits in `n` and `n - 1` will be different**
+    ![power of two](./img/power-of-two-2.png)
+
+  ```py
+  def is_power_of_two(n):
+      return n > 0 and n & (n - 1) == 0
+  ```
+
+---
+
+### Pow(x, n)
+
+Implement `pow(x, n)`, which calculates `x` raised to the power `n` (i.e., `x^n`).
+
+- Explanation:
+
+  - instead of looping and multiplying `x` by itself `n` times, we can use **Divide & conquer** to reduce the number of multiplications
+    - `x^n = x^(n/2) * x^(n/2) * x^(n%2)`
+    - `x^10` = `x^5 * x^5`
+      - `x^5` = `x^2 * x^2 * x`
+        - `x^2` = `x * x`
+          - `x^1` = `x`
+            - `x^0` = `1`
+
+- Time complexity: `O(log n)`
+
+```py
+def my_pow(x, n):
+    if n == 0:
+        return 1
+
+    if n > 0:
+        partial = my_pow(x, n // 2)
+        if n % 2 == 0:
+            return partial * partial
+        else:
+            return partial * partial * x
+    else:
+        partial = my_pow(x, -n // 2)
+        if n % 2 == 0:
+            return 1 / (partial * partial)
+        else:
+            return 1 / (partial * partial * x)
+
+# ---------------------------OR------------------------------
+
+def my_pow(x, n):
+    def helper(x, n):
+      if x == 0: return 0 # base case
+      if n == 0: return 1 # base case
+
+      res = helper(x, n // 2)
+      return res * res * x if n % 2 else res * res
+
+    return helper(x, n) if n >= 0 else 1 / helper(x, -n)
+```
+
+---
 
 ### Climbing Stairs
 
@@ -4351,34 +4818,18 @@ Given a string `n` that represents a positive decimal integer, return the **mini
 
 - EX:
 
-  ```py
-  Input: n = "32"
-  Output: 3
-  Explanation: 10 + 11 + 11 = 32
-  ```
+  - Input: `n = "32"`
+    - Output: `3`
+    - Explanation: `10 + 11 + 11 = 32`
+  - Input: `n = "82734"`
+  - Output: `8`
 
-  ```py
-  Input: n = "82734"
-  Output: 8
-  ```
+- Explanation:
 
-- **Steps:**
-
-  1. Find the largest digit in `n`. This digit will be used to create a deci-binary number.
-
-  2. Create a deci-binary number using only the digits `0` and `1`, with the length equal to the largest digit found in step 1. This deci-binary number represents the largest multiple of 10 (in decimal) that is less than or equal to n.
-
-     - ex: `n = 42`, largest digit is 4, so create a deci-binary number with 4 digits: `1111`
-       - **How** -> Create a deci-binary number with length `4`. The largest multiple of `10` (in decimal) that is less than or equal to `42` is `40`, which is represented in deci-binary as `11110`.
-
-  3. Subtract the deci-binary number from n to get a new number. Repeat steps 1-3 with the new number until the new number becomes `0`.
-
-     - Subtract `40` from `42` to get `2`. Repeat steps 1-3 with `2`.
-     - Subtract `2` from `2` to get `0`. Stop.
-
-  4. The number of deci-binary numbers created in steps 2-3 is the minimum number of deci-binary numbers required to represent n.
-
-- **EX** -> `82734`
+  - If each deci-binary number has no higher than a `1` in the each position, then it will take at least `x` numbers to sum up to `n`, where `x` is the largest digit in `n`
+  - This means that the largest character in any position in `n` will determine how many deci-binary numbers must be added together to obtain `n`.
+    ![minimum-deci-bi](./img/minimum-deci-bi-1.png)
+    ![minimum-deci-bi](./img/minimum-deci-bi-2.png)
 
   ```py
   # 82734 - 11111 = 71623
@@ -4406,27 +4857,23 @@ def min_partitions(n):
 
     # return the largest digit in the list
     return max(nums)
-
-# another solution using for loop
-def min_partitions(n):
-    max_num = 0
-    for num in n:
-        if int(num) > max_num:
-            max_num = int(num)
-    return max_num
 ```
 
 ---
 
-### Series
+## Recursion & Backtracking
 
-#### Fibonacci Number
+- Usually the time complexity of backtracking is `O(2^n)`
+  - `2` because we have two choices at each step
+  - `n` because we have to make `n` decisions which is usually the `height` of the decision tree
+
+### Fibonacci Number
 
 The Fibonacci sequence is a series of numbers where a number is the sum of the two preceding numbers. The sequence starts with `0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...`
 
 - EX: nth entry = `fib(4) --> 3`
 
-##### Recursion solution steps
+#### Recursion solution steps
 
 - The function takes an integer n as input, which represents the position of the number we want to find in the Fibonacci sequence.
 - If n is not 0 or 1, the function returns the sum of the previous two numbers in the sequence, which are found by recursively calling the function with `n-1` and `n-2` as inputs.
@@ -4491,7 +4938,7 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 
 ---
 
-##### Fibonacci looping solution
+#### Fibonacci looping solution
 
 ```py
 # Solution 1 - using loops O(n)
@@ -4526,4 +4973,649 @@ def fib(n):
                 fib0 = fib1
                 fib1 = total
     return total
+```
+
+---
+
+### Restore IP Addresses
+
+Given a string s containing only digits, return all possible valid IP addresses that can be obtained from s. You can return them in any order.
+
+A valid IP address consists of exactly four integers, each integer is between `0` and `255`, separated by single dots and cannot have leading zeros. For example, `"0.1.2.201"` and `"192.168.1.1"` are valid IP addresses and `"0.011.255.245"`, `"192.168.1.312"` and `"
+
+- Ex: `s = "25525511135"`
+
+  - Output: `["255.255.11.135", "255.255.111.35"]`
+
+- Explanation:
+  - What we want to do is to just know **where to insert the dots**.
+  - We can use **Decision Tree** to solve this problem.
+    - we can put the first `dot` after the first number, second `dot` after the second number, and third `dot` after the third number.
+      - this will result `3` possible combinations for each number
+        ![restore-ip-addresses](./img/restore-ip-addresses-1.png)
+      - for each of these combinations, if **(the number is less than `256` or length of the combination is less than `3`)**, we can put the second `dot` after the second number, and third `dot` after the third number.
+        ![restore-ip-addresses](./img/restore-ip-addresses-2.png)
+  - We can do this by using a helper function that will add the dots to the string. We can then use a `for` loop to iterate through the string and add the dots to the string. We can then use a helper function to check if the current string is a valid IP address. If it is, we can add it to the result list. We can then return the result list.
+  - Time complexity: `O(3^4) = O(1)` because we are only checking 3 possible combinations for each number, and we have a total of 4 numbers (4 levels).
+
+```py
+def restoreIpAddresses(s):
+    res = []
+    # check if the string is valid
+    if len(s) > 12 or len(s) < 4:
+        return res
+
+    def backtrack(i, dots, curIP):
+      """
+      i: current index in the string
+      dots: number of inserted dots in the current IP address so far
+      curIP: current IP address that we are building
+      """
+      # base case
+      if dots == 4 and i == len(s):
+        res.append(curIP[:-1]) # remove the last dot and append to the result
+        return
+      if dots > 4:
+        return
+
+      # loop through the string and add the dots to the string (using min -> to avoid index out of range error if the string is less than 3 characters)
+      for j in range(i, min(i+3, len(s))):
+        if int(s[i:j+1]) <= 255 and (i == j or s[i] != '0'):
+          backtrack(j+1, dots+1, curIP + s[i:j+1] + '.')
+
+    backtrack(0, 0, '')
+    return res
+```
+
+---
+
+### Permutations
+
+Given an array `nums` of distinct integers, return all the possible permutations. You can return the answer in **any order**.
+
+- Ex: `nums = [1, 2, 3]`
+
+  - Output: `[[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]`
+
+- Explanation:
+  - We can use **Decision Tree** to solve this problem.
+  - For each element, we can either choose to include it in the permutation or not include it in the permutation.
+    ![permutations](./img/permutations-1.png)
+    - if we choose to include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
+    - if we choose to not include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
+      ![permutations](./img/permutations-2.png)
+  - We can do so by dividing the problem into subproblems by removing the element and getting the permutations of the remaining elements until we have no more elements left.
+    ![permutations](./img/permutations-3.png)
+    - we can then add the removed element to the permutations of the remaining elements.
+
+```py
+def permute(nums):
+    res = []
+
+    def backtrack(nums, cur):
+        # base case
+        if not nums:
+            res.append(cur)
+            return
+
+        # loop through the nums and remove the current element and get the permutations of the remaining elements
+        for i in range(len(nums)):
+            backtrack(nums[:i] + nums[i+1:], cur + [nums[i]])
+
+    backtrack(nums, [])
+    return res
+```
+
+---
+
+### Permutations II
+
+Given a collection of numbers, `nums`, that might contain duplicates, return all possible unique permutations in any order.
+
+- Ex: `nums = [1, 1, 2]`
+
+  - Output: `[[1,1,2], [1,2,1], [2,1,1]]`
+
+- Solution 1: **sorting**
+
+  - Explanation:
+    - We can use **Decision Tree** to solve this problem.
+    - Same as the previous problem, but we need to check if the current element is the same as the previous element. If it is, we can skip it.
+      - This is done by **sorting** the array first. so that the same elements are next to each other.
+
+  ```py
+  def permuteUnique(nums):
+      res = []
+      nums.sort()
+
+      def backtrack(nums, cur):
+          # base case
+          if not nums:
+              res.append(cur)
+              return
+
+          for i in range(len(nums)):
+              # skip the current element if it is the same as the previous element
+              if i > 0 and nums[i] == nums[i-1]:
+                  continue
+              backtrack(nums[:i] + nums[i+1:], cur + [nums[i]])
+
+      backtrack(nums, [])
+      return res
+  ```
+
+- Solution 2: **HashMap**
+
+  - Explanation:
+    - Same as the previous problem, but we need to check if the current element is the same as the previous element. If it is, we can skip it.
+      - This is done using a **HashMap** to keep track of the elements that we have seen so far.
+    - We create a Hashmap with the count of each element in the array. to have unique keys
+      ![permutations](./img/permutations-II-1.png)
+    - we use this hashmap to create the decision tree.
+      - we update the hashmap by decrementing the count of the current element on each level of the decision tree.
+        ![permutations](./img/permutations-II-2.png)
+
+  ```py
+  def permuteUnique(nums):
+      res = []
+      count = {}
+      for num in nums:
+          count[num] = count.get(num, 0) + 1
+
+      def backtrack(cur):
+          # base case
+          if cur and len(cur) == len(nums):
+              res.append(cur)
+              return
+
+          # loop through the hashmap (unique keys) and add the current element to the permutation if the count is greater than 0
+          for num in count:
+              if count[num] > 0:
+                  count[num] -= 1
+                  backtrack(cur + [num])
+                  count[num] += 1
+
+      backtrack([])
+      return res
+  ```
+
+---
+
+### Combinations
+
+Given two integers `n` and `k`, return all possible combinations of `k` numbers out of the range `[1, n]`.
+
+You may return the answer in **any order**.
+
+- Ex: `n = 4, k = 2`
+
+  - Output: `[[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]`
+
+> **Compination vs Permutation** > ![combination-vs-permutation](./img/combination-vs-permutation.webp)
+
+- Explanation:
+  - We can use **Decision Tree** to solve this problem. (Backtracking)
+  - For each element, we can either choose to include it in the combination or not include it in the combination.
+  - The height of the decision tree is `k` because we need to choose `k` elements.
+    ![combinations](./img/combinations-1.png)
+  - As this is a `combination` problem and not a `permutation` problem, we need to make sure that we don't include the same element twice in the combination.
+    - To do so, we need to keep track of the `start` index of the elements that we can choose from. so that we don't choose the same element twice.
+
+```py
+# Time complexity: O(K * n^k) -> O(n^k) Exponential
+def combine(n, k):
+    res = []
+
+    def backtrack(start, cur):
+        # base case
+        if len(cur) == k:
+            res.append(cur)
+            return
+
+        # loop through the numbers from start to n (including n)
+        for i in range(start, n+1):
+            backtrack(i+1, cur + [i])
+
+    backtrack(1, [])
+    return res
+```
+
+---
+
+### Subsets
+
+Given an integer array `nums` of **unique** elements, return all possible subsets (the power set).
+
+The solution set **must not** contain duplicate subsets. Return the solution in **any order**.
+
+- Ex: `nums = [1, 2, 3]`
+
+  - Output: `[[], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3]]`
+
+- Explanation:
+
+  - We can use **Decision Tree** to solve this problem.
+    - For each element, we can either choose to include it in the subset or not include it in the subset.
+      ![subsets](./img/subsets-1.png)
+      - if we choose to include it in the subset, we can then **choose to include the next element in the subset or not**.
+      - if we choose to not include it in the subset, we can then choose to include the next element in the subset or not include the next element in the subset.
+
+- Steps:
+
+  - We can use a helper function `dfs` to build the subsets.
+  - We can then use a `for` loop to iterate through the array and call the helper function.
+  - We can then return the result list.
+  - Time complexity: `O(2^n)` because we are making 2 decisions for each element in the array.
+
+- Time complexity: `O(n * 2^n)`
+
+```py
+def subsets(nums):
+    res = []
+    subset = []
+
+    def dfs(i):
+        # base case
+        if i == len(nums):
+            res.append(subset[:]) # append a copy of the subset to the result because subset will be modified
+            return
+
+        # decision to include the current element in the subset
+        subset.append(nums[i])
+        dfs(i+1)
+
+        # decision to not include the current element in the subset
+        subset.pop()
+        dfs(i+1)
+
+    dfs(0)
+    return res
+
+#-----------------------------------------------------------
+# another solution ✅
+def subsets(nums):
+    res = []
+
+    def dfs(i, cur):
+        # base case
+        if i == len(nums):
+            res.append(cur)
+            return
+
+        # decision to include the current element in the subset
+        dfs(i+1, cur + [nums[i]])
+        # decision to not include the current element in the subset
+        dfs(i+1, cur)
+
+    dfs(0, [])
+    return res
+```
+
+---
+
+### Subsets II
+
+Given an integer array `nums` that may contain duplicates, return all possible subsets (the power set).
+
+The solution set **must not** contain duplicate subsets. Return the solution in **any order**.
+
+- Ex: `nums = [1, 2, 2]`
+
+  - Output: `[[], [1], [1,2], [1,2,2], [2], [2,2]]`
+
+- Explanation:
+  - Difference between this problem and the previous problem is that this problem contains duplicates.
+    ![subsets II](./img/subsets-II-1.png)
+  - To avoid duplicates, we can sort the array first. then we can skip the current element if it is the same as the previous element (by checking `nums[i] == nums[i+1]` and that the next-index is not out of bounds) and then we can skip the current element. by `i += 1`.
+
+```py
+def subsetsWithDup(nums):
+    res = []
+    nums.sort()
+
+    def dfs(i, cur):
+        # base case
+        if i == len(nums):
+            res.append(cur)
+            return
+
+        # include the current element in the subset
+        dfs(i+1, cur + [nums[i]])
+
+        # skip the current element if it is the same as the next element
+        while i+1 < len(nums) and nums[i] == nums[i+1]:
+          i += 1
+
+        # not include the current element in the subset
+        dfs(i+1, cur)
+
+    dfs(0, [])
+    return res
+```
+
+---
+
+### Sum of All Subset XOR Totals
+
+The **XOR total** of an array is defined as the bitwise `XOR` of **all its elements**, or `0` if the array is **empty**.
+
+- Ex: `nums = [1, 3]`
+
+  - Output: `6`
+  - Explanation: `1 XOR 3 = 2`
+
+- Explanation:
+
+  - We can use **Decision Tree** to solve this problem.
+  - we need to get all the `XOR` of all the **subsets**.
+    - getting the subsets is the same as the previous problems. (include the current element in the subset or not include the current element in the subset)
+    - Then we can get the `XOR` of each subset and add it to the result.
+
+- `XOR` is calculated by `^` operator.
+
+```py
+def subsetXORSum(nums):
+    res = 0
+
+    def dfs(i, cur):
+        nonlocal res
+        # base case
+        if i == len(nums):
+            res += cur
+            return
+
+        # include the current element in the subset
+        dfs(i+1, cur ^ nums[i])
+
+        # not include the current element in the subset
+        dfs(i+1, cur)
+
+    dfs(0, 0)
+    return res
+```
+
+---
+
+### Count Number of Maximum Bitwise-OR Subsets
+
+Given an integer array `nums`, find the **maximum** possible `bitwise OR` of a **subset** of `nums` and return the number of different **non-empty** subsets with the **maximum** `bitwise OR`.
+
+An array `a` is a **subset** of an array `b` if `a` can be obtained from `b` by deleting some (possibly zero) elements of `b`. Two subsets are considered **different** if the indices of the elements chosen are different.
+
+The `bitwise OR` of an array `a` is equal to `a[0] OR a[1] OR ... OR a[a.length - 1]` (**0-indexed**).
+
+- Ex: `nums = [3, 1]`
+
+  - Output: `2`
+  - Explanation: The maximum possible bitwise OR of a subset is `3`. There are `2` subsets with a bitwise OR of `3`:
+    - `[3]`
+    - `[3,1]`
+
+- Explanation:
+
+  - **We just want to count the number of subsets that have the maximum `bitwise OR`**.
+  - We can use **Decision Tree** to solve this problem.
+    - For each element, we can either choose to include it in the subset or not include it in the subset.
+  - **Maximum Bitwise-OR Subsets** is the maximum bitwise `OR` of a subset -> so we calculate the maximum bitwise `OR` of the array first.
+  - Time complexity: `O(2^n)` because we are making 2 decisions for each element in the array.
+
+- `OR` is calculated by `|` operator.
+
+```py
+def countMaxOrSubsets(nums):
+    res = 0
+    max_or = 0
+    for num in nums:
+        max_or |= num
+
+    def dfs(i, cur):
+        nonlocal res
+        # base case
+        if i == len(nums):
+            # max is the maximum bitwise OR of a subset which is the max number in the array
+            if cur == max_or:
+                res += 1
+            return
+
+        # include the current element in the subset
+        dfs(i+1, cur | nums[i])
+
+        # not include the current element in the subset
+        dfs(i+1, cur)
+
+    dfs(0, 0)
+    return res
+```
+
+---
+
+### Letter combinations of a phone number
+
+Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent. Return the answer in **any order**.
+
+- A mapping of digit to letters (just like on the telephone buttons) is given below. Note that `1` does not map to any letters.
+  ![letter combinations of a phone number](./img/letter-combinations-of-phone-num-1.jpeg)
+
+- EX:
+
+  - Input: `digits = "23"`
+
+- Explanation:
+  - We can use a **backtracking** approach to solve this problem.
+    ![letter combinations of a phone number](./img/letter-combinations-of-phone-num-2.png)
+    1. We can start with an empty string and then append each letter of the first digit to the string.
+    2. Then we can **recursively** call the function with the next digit and append each letter of the next digit to the string. We can continue this process until we reach the end of the string.
+    3. Once we reach the end of the string, we can add the string to the result array.
+  - Time complexity: `O(n.4^n)` where `n` is the length of the input string; `4` because some digits has 4 letters
+
+```py
+def letterCombinations(digits):
+    # create a dictionary to store the mapping of each digit to its letters
+    digit_letters = {
+        '2': 'abc',
+        '3': 'def',
+        '4': 'ghi',
+        '5': 'jkl',
+        '6': 'mno',
+        '7': 'pqrs',
+        '8': 'tuv',
+        '9': 'wxyz'
+    }
+
+    # create an array to store the result
+    result = []
+
+    # create a helper function to do the backtracking
+    def backtrack(i, curStr):
+        """
+        i: the index of the current digit
+        curStr: the current string that we're building
+        """
+        # if we reached the end of the string, add the string to the result array
+        if i == len(digits):
+            result.append(curStr)
+            return
+
+        # Else: we continue building the string
+        # iterate through the letters of the current digit
+        for letter in digit_letters[digits[i]]:
+            # recursively call the function with the next digit (i+1 because we're moving to the next digit, and add the updated string)
+            backtrack(i+1, curStr+letter)
+
+    # call the helper function
+    if digits:
+        backtrack(0, '')
+    return result
+```
+
+---
+
+### N-Queens
+
+The **n-queens** puzzle is the problem of placing `n` queens on an `n x n` chessboard such that no two queens attack each other.
+
+Given an integer `n`, return _all distinct solutions to the **n-queens puzzle**_. You may return the answer in **any order**.
+
+Each solution contains a distinct board configuration of the n-queens' placement, where `'Q'` and `'.'` both indicate a queen and an empty space, respectively.
+
+- Ex: `n = 4`
+  ![n queens](./img/n-queens-1.png)
+
+  - Output: `[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]`
+
+- Explanation:
+  - To prevent any queen from attacking another queen, we need to make sure that no two queens are in the same row, column, or diagonal. as the queen moves like this: (Horizontal, Vertical, Positive/Negative Diagonals)
+    ![n queens](./img/n-queens-3.jpg)
+  - So:
+    - Each queen must be in a different `row`
+    - Each queen must be in a different `column`
+    - Each queen must be in a different `diagonal`
+      ![n queens](./img/n-queens-4.png)
+      - Positive diagonals goes from bottom left to top right **(UP)**
+        ![n queens](./img/n-queens-5.png)
+      - Negative diagonals goes from top left to bottom right **(DOWN)**
+        ![n queens](./img/n-queens-6.png)
+  - We can use **Decision Tree** to solve this problem.
+    ![n queens](./img/n-queens-2.png)
+  - Each time we place a queen, we will move to the next row and then, We will need to maintain 3 sets:
+    ![n queens](./img/n-queens-7.png)
+    - `cols`: to keep track of the columns that have been used
+    - `positive_diagonals`: to keep track of the positive diagonals that have been used
+    - `negative_diagonals`: to keep track of the negative diagonals that have been used
+
+```py
+def solveNQueens(n):
+    colSet = set()
+    posDiag = set() # (row + col) is the same for all cells in the same positive diagonal (r + c)
+    negDiag = set() # (row - col) is the same for all cells in the same negative diagonal (r - c)
+
+    # create a board with all empty cells
+    board = [['.'] * n for _ in range(n)]
+
+    # create an array to store the result
+    res = []
+
+    def backtrack(row):
+        # if we reached the end of the board, add the board to the result array
+        if row == n:
+            res.append([''.join(row) for row in board])
+            return
+
+        # Else: we continue building the board
+        # iterate through the columns
+        for col in range(n):
+            # check if the current column is not used and the current positive diagonal is not used and the current negative diagonal is not used
+            if col not in colSet and (row + col) not in posDiag and (row - col) not in negDiag:
+                # place the queen
+                board[row][col] = 'Q'
+
+                # add the current pos to our sets
+                colSet.add(col)
+                posDiag.add(row + col)
+                negDiag.add(row - col)
+
+                # recursively call the function with the next row
+                backtrack(row + 1)
+                
+                # remove the queen
+                board[row][col] = '.'
+
+                # remove the current pos from our sets
+                colSet.remove(col)
+                posDiag.remove(row + col)
+                negDiag.remove(row - col)
+
+    backtrack(0)
+    return res
+```
+
+---
+
+### Combination Sum
+
+Given an array of **distinct** integers `candidates` and a target integer `target`, return a list of all **unique combinations** of `candidates` where the chosen numbers sum to `target`. You may return the combinations in **any order**.
+
+The **same** number may be chosen from `candidates` an **unlimited number of times**. Two combinations are unique if the frequency of at least one of the chosen numbers is different.
+
+- Ex: `candidates = [2, 3, 6, 7], target = 7`
+
+  - Output: `[[2, 2, 3], [7]]`
+
+- Explanation:
+- We can use **Decision Tree** to solve this problem.
+  - For each element, we can either choose to include it in the combination or not include it in the combination.
+    - Note: we don't use the decision tree in the pic below, because it will lead to **duplicate** combinations
+      ![combination-sum](./img/combination-sum-1.png)
+    - But we can use the decision tree below, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
+      ![combination-sum](./img/combination-sum-2.png)
+      - Now we garentee that we will not have duplicate combinations, because in the second side of the tree, we will not include the same element twice in the same combination.
+      - if we choose to include it in the combination, we can then choose to include the next element in the combination or not include the next element in the combination.
+      - if we choose to not include it in the combination, we can then choose to include the next element in the combination or not include the next element in the combination.
+
+- Time complexity: `O(n^target)` because we are making `2` decisions for each element in the array, and we have `target` levels (height of the decision tree).
+
+```py
+def combinationSum(candidates, target):
+    res = []
+    
+    def dfs(i, cur, total):
+        """
+        i: pointer to the current index in the array
+        cur: current combination that we are building
+        total: total sum of the current combination (used instead of sum(cur) to avoid calling sum() function -> O(n)) each time
+        """
+        if total == target:
+            res.append(cur)
+            return
+        if i >= len(candidates) or total > target:
+            return
+
+        # decision to include or not the current element in the combination
+        dfs(i, cur + [candidates[i]], total + candidates[i]) # i stays the same because we can use the same element multiple times
+
+        dfs(i+1, cur, total) # i increases by 1 because we want to skip the current element to avoid duplicate combinations
+
+    dfs(0, [], 0)
+    return res
+```
+
+---
+
+### Combination Sum II
+
+Given a collection of candidate numbers (`candidates`) and a target number (`target`), find all unique combinations in `candidates` where the candidate numbers sum to `target`.
+
+Each number in `candidates` may only be used **once** in the combination. -> **The solution set must not contain duplicate combinations**
+
+- Ex: `candidates = [10, 1, 2, 7, 6, 1, 5], target = 8`
+
+  - Output: `[[1, 1, 6], [1, 2, 5], [1, 7], [2, 6]]`
+  - Notice how `1` is used **twice** in the same combination, but it is not used twice in the same combination.
+
+- Explanation:
+  - Same as the previous problem, but we need to avoid duplicate combinations.
+  - we do so by sorting the array, and then skipping the duplicates.
+
+```py
+def combinationSum2(candidates, target):
+    res = []
+    candidates.sort()
+    
+    def dfs(i, cur, total):
+        if total == target:
+            res.append(cur)
+            return
+        if i >= len(candidates) or total > target:
+            return
+
+        dfs(i+1, cur + [candidates[i]], total + candidates[i])
+
+        # skip the duplicates
+        while i < len(candidates) - 1 and candidates[i] == candidates[i+1]:
+            i += 1
+
+        dfs(i+1, cur, total)
+
+    dfs(0, [], 0)
+    return res
 ```
