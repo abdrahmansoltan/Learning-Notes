@@ -16,6 +16,7 @@
       - [Polynomials](#polynomials)
     - [O(1)](#o1)
     - [O(n^2)](#on2)
+      - [Explaining O(n^2) for loops](#explaining-on2-for-loops)
     - [O(log(n))](#ologn)
     - [O(n log(n))](#on-logn)
     - [O(!n)](#on-1)
@@ -38,27 +39,29 @@
     - [Selection Sort](#selection-sort)
     - [Insertion Sort](#insertion-sort)
     - [Divide \& Conquer](#divide--conquer)
-      - [Merge Sort](#merge-sort)
-        - [Merge Function](#merge-function)
-        - [Merge Sort Function](#merge-sort-function)
-      - [Quick Sort](#quick-sort)
+    - [Merge Sort](#merge-sort)
+      - [Merge sort implementation](#merge-sort-implementation)
+    - [Quick Sort](#quick-sort)
+      - [Quick sort implementation](#quick-sort-implementation)
+    - [Bucket Sort](#bucket-sort)
     - [Radix Sort](#radix-sort)
     - [Sorting Notes](#sorting-notes)
   - [Searching](#searching)
     - [Linear(sequential) Search](#linearsequential-search)
     - [Binary Search](#binary-search)
       - [How it works](#how-it-works)
-  - [Traversals](#traversals)
+  - [Graph Traversals](#graph-traversals)
     - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
       - [BFS Implementation](#bfs-implementation)
     - [Depth First Search/Traversal DFS](#depth-first-searchtraversal-dfs)
-      - [PreOrder DFS](#preorder-dfs)
-      - [PostOrder DFS](#postorder-dfs)
-      - [InOrder DFS](#inorder-dfs)
+      - [Tree PreOrder DFS](#tree-preorder-dfs)
+      - [Tree PostOrder DFS](#tree-postorder-dfs)
+      - [Tree InOrder DFS](#tree-inorder-dfs)
     - [Shortest Path](#shortest-path)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
       - [How Dijkstra's Algorithm works](#how-dijkstras-algorithm-works)
-      - [Implementing Dijkstra's Algorithm](#implementing-dijkstras-algorithm)
+      - [Implementing Dijkstra's algorithm](#implementing-dijkstras-algorithm)
+    - [Topological Sort](#topological-sort)
 
 ---
 
@@ -377,6 +380,16 @@ function(arr){
 this is called **Quadratic Time**
 Ex: usually nested loops
 
+#### Explaining O(n^2) for loops
+
+Usually when we have nested loops, we always think of `O(n^2)`, but that's not always the case.
+
+- we don't always loop through the whole array in the inner loop, sometimes we loop through half of it or a quarter of it, etc.
+- so when we say that It's `O(n^2)`, we're talking about the worst case scenario, which is looping through the whole array in the inner loop.
+- Plus that the final number of operations will be **bounded by `n^2`** (the number of operations will never be more than `n^2`)
+  - `O(c * n^2) -> O(n^2)`
+    ![o(n^2)](./img/o-n2.png)
+
 ---
 
 ### O(log(n))
@@ -678,8 +691,9 @@ A sorting algorithm is said to be **stable** if two objects with equal keys appe
 
 - **Stable Sorting Algorithms**: maintains the relative order of records with equal keys (if the keys are equal, the order of the records remains unchanged)
   ![stable-vs-unstable-sorting](./img/stable-vs-unstable-sorting-1.png)
+
   - Ex: `Merge Sort`, `Insertion Sort`, `Bubble Sort`
-  -
+
 - **Unstable Sorting Algorithms**: does not maintain the relative order of records with equal keys (if the keys are equal, the order of the records may change)
   - Ex: `Quick Sort`, `Selection Sort`
 
@@ -688,10 +702,26 @@ A sorting algorithm is said to be **stable** if two objects with equal keys appe
 - Any given sorting algorithm which is not stable can be modified to be stable. There can be algorithm-specific ways to make it stable, but in general, **any comparison-based sorting algorithm which is not stable by nature can be modified to be stable by changing the key comparison operation** so that the comparison of two keys considers position as a factor for objects with equal keys.
 
 - Where stable sorting algorithms are useful?
+
   - When we want to sort objects by multiple attributes
-  - Consider the following dataset of Student Names and their respective class sections: `[(Alice, 2), (Bob, 1), (John, 2), (Mary, 1), (Mike, 2), (Sarah, 1), (Tom, 1)]`
-    - If we sort this dataset by name, we get the following: `[(Alice, 2), (Bob, 1), (John, 2), (Mary, 1), (Mike, 2), (Sarah, 1), (Tom, 1)]`
-    - But if we sort this dataset by class section, we get the following: `[(Bob, 1), (Mary, 1), (Sarah, 1), (Tom, 1), (Alice, 2), (John, 2), (Mike, 2)]`
+  - Consider the following dataset of Student Names and their respective class sections:
+
+    ```py
+    [(Alice, 2), (Bob, 1), (John, 2), (Mary, 1), (Mike, 2), (Sarah, 1), (Tom, 1)]
+    ```
+
+    - If we sort this dataset by name, we get the following:
+
+      ```py
+      [(Alice, 2), (Bob, 1), (John, 2), (Mary, 1), (Mike, 2), (Sarah, 1), (Tom, 1)]
+      ```
+
+    - But if we sort this dataset by class section, we get the following:
+
+      ```py
+      [(Bob, 1), (Mary, 1), (Sarah, 1), (Tom, 1), (Alice, 2), (John, 2), (Mike, 2)]
+      ```
+
       - Notice that the relative order of students with class section `1` and students with class section `2` is maintained in the sorted output
       - if we used unstable sorting algorithm, the relative order of students with class section `1` and students with class section `2` may change in the sorted output
 
@@ -788,12 +818,14 @@ def selection_sort(arr):
 It's called `insertion` because we're **inserting** the element in the correct place in the sorted part of the array
 
 - it's used when you know or think that the list is **"almost/already sorted"**
-  - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
-- works well with small datasets
-- steps:
 
-  1. start by picking the second element in the array
-  2. now compare the second element with (the one before it) and swap if necessary
+  - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
+
+- **steps:**
+
+  1. start by picking the `second` element in the array because we assume that the `first` element is already sorted.
+     ![insertion-sort](./img/insertion-sort-0.png)
+  2. now compare the second element with (the one before it) and **swap** if necessary, this is to know where to insert the element in the sorted part of the array
      ![insertion-sort](./img/insertion-sort-1.png)
      ![insertion-sort](./img/insertion-sort-2.png)
   3. continue to the next element and if it is in the (incorrect order), iterate through the sorted portion (the left side) to place the element in the correct place
@@ -801,22 +833,19 @@ It's called `insertion` because we're **inserting** the element in the correct p
      ![insertion-sort](./img/insertion-sort-3.png)
 
 - Time complexity:
-  - **Best case**: `O(n)` -> when the array is already sorted (because we don't even go inside the `while` loop)
+  - **Best case**: `O(n)` -> when the array is already sorted (because we don't even go inside the `while` loop and just iterate through the array once)
   - **Worst case**: `O(n^2)` -> when the array is sorted in reverse order
   - **Average case**: `O(n^2)`
 
 ```py
 def insertion_sort(arr):
   for i in range(1, len(arr)):
-    current_value = arr[i]
     j = i - 1
-    # loop from the current element to the beginning of the array
-    while j >= 0 and arr[j] > current_value:
-      # if the current element is greater than its adjacent element, swap them
-      arr[j + 1] = arr[j]
+    # keep swapping the element with the one before it until it's in the correct place
+    while j >= 0 and arr[j + 1] < arr[j]:
+      arr[j], arr[j + 1] = arr[j + 1], arr[j]
       j -= 1
-    # insert the current element in its correct place
-    arr[j + 1] = current_value
+
   return arr
 ```
 
@@ -834,35 +863,51 @@ Both merge sort and quicksort employ a common algorithmic paradigm based on **re
   - unlike `merge sort` which is always `O(n log n)`
   - Sometimes the constant can make a difference. `Quicksort` versus `merge sort` is one example. `Quicksort` has a smaller constant than `merge sort`. So if they're both `O(n log n)` time, `quicksort` is faster. And `quicksort` is faster in practice because it hits the average case way more often than the worst case.
 
-#### Merge Sort
+---
+
+### Merge Sort
+
+It's all about continually splitting the array into halves until you have arrays that are empty or have one element (can't split anymore), then you merge those arrays, while sorting them at the same time
+
+> So it's about breaking down the problem of sorting into subproblems, and then building up a solution from the subproblems
 
 ![merge-sort](./img/Merge-Sort.png)
 
-- It's a combination of 2 things:
-  - [dividing](#merge-sort-function)
-  - [merging](#merge-function)
+- It's a combination of 2 things: `dividing` & `merging`
 - it exploits the fact that arrays of `0` or `1` elements are always sorted
   - as it works by decomposing an array into smaller arrays of `0` or `1` elements, then building up a newly sorted array
 - it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions which gives us **`O(n log n)`** time complexity which is better than **`O(n^2)`**
+
   - the number of times we **divide**(split-up/decompose) is equal to `log(n)` and the number of **merging**(comparisons) is `n`
     ![merge-sort](./img/merge-sort3.png)
-- usually the "divide" part is done by **recursion**
+
+- The "divide" part is done by **recursion**
   ![merge-sort](./img/Merge-Sort2.png)
+- The "conquer" part is done by **Two pointers** (one for each array) or **slicing** and a `while` loop
+
 - it's one of the most efficient ways to sort lists
-- one downside is that it has a bigger space-complexity : **space-complexity of `O(n)`** unlike most sorting algorithms which has `O(1)`
+- one downside is that it has a bigger space-complexity: **space-complexity of `O(n)`** unlike most sorting algorithms which has `O(1)`
   - this is due to holding off to the divided lists in memory
   - so we use it if we have enough memory
 
-##### Merge Function
+#### Merge sort implementation
 
-It's a function for joining 2 sorted arrays into one sorted array
+Consists of 2 functions: `merge` & `merge_sort`
 
-- **Steps:**
-  1. create an empty `results` array, take a look at the smallest values in each input array
-  2. while there are still elements in both arrays (`arr1`, `arr2`) we haven't looked at:
+1. `merge` function
+
+   - is used to merge 2 sorted arrays into one sorted array
+   - while there are still elements in both arrays (`arr1`, `arr2`) we haven't looked at:
      - if the first value in the first array is smaller than the first value in the second array, push the value in the first array into our `results` and move on to the next value in the first array
      - if the value in the first array is larger than the value in the second array, push the value in the second array into our results and move on to the next value in the second array
-     - once we exhaust one array, push in all remaining values from the other array
+   - once we exhaust one array, push in all remaining values from the other array
+   - > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
+
+2. `merge_sort` function
+
+   - is used to split the array into halves until we have arrays that are empty or have one element
+   - then we merge those arrays, while sorting them at the same time
+   - it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions
 
 ```py
 def merge(arr1, arr2):
@@ -870,55 +915,25 @@ def merge(arr1, arr2):
   i = 0
   j = 0
 
-  # while there are still elements in both arrays (`arr1`, `arr2`) we haven't looked at:
   while i < len(arr1) and j < len(arr2):
-    # if the first value in the first array is smaller than the first value in the second array
-    if arr1[i] < arr2[j]:
+    if arr1[i] <= arr2[j]:
       results.append(arr1[i])
       i += 1 # move on to the next value in the first array
     else:
       results.append(arr2[j])
       j += 1 # move on to the next value in the second array
 
-  # once we exhaust one array, push in all remaining values from the other array
+  # once we exhaust one array, push in all remaining values from the other arrays
   while i < len(arr1):
     results.append(arr1[i])
     i += 1
+
   while j < len(arr2):
     results.append(arr2[j])
     j += 1
+
   return results
-
-# -----------------------------------------------------------------
-
-# Different way to write the same function ✅
-def merge(arr1, arr2):
-  results = []
-  i = 0
-  j = 0
-
-  while arr1 and arr2:
-    if arr1[0] < arr2[0]:
-      results.append(arr1.pop(0))
-    else:
-      results.append(arr2.pop(0))
-
-  # once we exhaust one array, join all remaining values from the other array
-  return results + arr1 + arr2
-```
-
-- > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
-
-##### Merge Sort Function
-
-![merge-sort](./img/merge-sort-4.png)
-
-- **Steps:**
-  1. break up the array into halves until you have arrays that are **(empty or have one element)**
-  2. once you have smaller sorted arrays, merge those arrays with other sorted arrays using the [merge-function](#merge-function) until you are back at the full length of the array
-  3. once the array has been merged back together, return the merged (and sorted) array
-
-```py
+ # ------------------------------------------------------------------------------ #
 def merge_sort(arr):
   # base case
   if len(arr) <= 1:
@@ -929,31 +944,56 @@ def merge_sort(arr):
   left = merge_sort(arr[:mid])
   right = merge_sort(arr[mid:])
 
-  # merge the sorted arrays (look at image below)
+  # conquer
   return merge(left, right)
 ```
 
 ![merge-sort](./img/merge-sort-5.png)
 
+- Time complexity: **`O(n log n)`**
+  ![merge-sort](./img/merge-sort3.png)
+  - `log(n)` -> the number of times we **divide by 2**(split-up/decompose)`is equal to`log(n)`
+  - `n` -> the number of **merging**(comparisons)
+
 ---
 
-#### Quick Sort
+### Quick Sort
 
 ![Quick-sort](./img/quick-sort.png)
 
+- How it works:
+
+  - it picks an element as a **"pivot point"** and partitions the given array around the picked pivot
+  - it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions
+  - it's a combination of 2 things: `partitioning` & `sorting`
+    - `partitioning` is done by splitting the array into 2 sub-arrays: `left` & `right` sub-arrays relative to the **"pivot point"**, where the `left` sub-array has all the elements smaller than the **"pivot point"** and the `right` sub-array has all the elements larger than the **"pivot point"**
+      ![quick sort](./img/quick-sort-2.png)
+    - we perform the partitioning **in-place** (less memory), and we do this by using `2 pointers`:
+      ![quick sort](./img/quick-sort-3.png)
+      ![quick sort](./img/quick-sort-4.png)
+      - `i` -> keeps track of the index of the last element in the `left` sub-array which is the middle-point between the `left` sub-array and the `right` sub-array
+      - j -> keeps track of the index of the first element in the `right` sub-array so that we can swap it with any element smaller than the **"pivot point"** in the `left` sub-array
+    - After the partitioning is done, we **recursively** apply the above steps to the `left` sub-array and the `right` sub-array until the entire array is sorted
+      ![quick sort](./img/quick-sort-5.png)
+      ![quick sort](./img/quick-sort-6.png)
+
 - it also uses the technique: "Divide & Conquer"
 - it has better **space-complexity of `O(log(n))`**, so it can be sorted in memory if the database is not massive
-- Quick sort is unique, because its speed depends on the pivot point you choose
+- Quick sort is unique, because its speed depends on the `pivot point` you choose
 
   - best case for time-complexity is `O(n log n)`
     ![quick-sort-best-case](./img/quick-sort-best-case.png)
     - In this example, there are `O(log n)` levels (the technical way to say that is, “he height of the call stack is `O(log n)`”). And each level takes `O(n)` time. he entire algorithm will take `O(n) * O(log n) = O(n log n)` time. This is the best-case scenario.
-  - it may have a worst-case for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element.
+  - it may have a worst-case for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element. because we're not splitting by half, we're splitting by `1` element at a time
     ![quick-sort-worst-case](./img/quick-sort-worst-case.png)
     - In this example, there're `O(n)` levels, so the entire algorithm will take `O(n) * O(n) = O(n^2)` time
   - average case for time-complexity is `O(n log n)`
     ![quick-sort-average-case](./img/quick-sort-average-case.png)
     - > **Note:** The best case is also the average case. If you always choose a random element in the array as the pivot, quicksort will complete in O(n log n) time on average. **Quicksort is one of the fastest sorting algorithms out there**, and it’s a very good example of D&C.
+
+> **Note:** To avoid the worst-case scenario, we can choose the **"pivot point"** randomly but not the last element/first element, and there're optimizations that can be done to avoid the worst-case scenario
+
+#### Quick sort implementation
 
 - Quick sort Pseudocode
   ![pivot-point](./img/quick-sort-pivot.png)
@@ -982,6 +1022,46 @@ def quicksort(array):
 ```
 
 ![quick sort](./img/quick-sort-1.png)
+
+- Note: Quick sort is not a stable sort, because it doesn't preserve the order of the elements with the same value
+
+---
+
+### Bucket Sort
+
+It's a sorting algorithm that works by distributing the elements of an array into a number of buckets and then each bucket is sorted individually using a different sorting algorithm or by recursively applying the bucket sorting algorithm
+
+- It's a rare sorting algorithm, because it requires specific conditions to work:
+  - the elements of the array must be uniformly distributed -> the elements must be evenly distributed across the range of the array
+  - all the unique elements must fit within a **finite** range
+- For every single element in the array, we need to create a bucket for it
+  - The bucket is just a container that holds the elements with the index of the element as the key
+    ![bucket sort](./img/bucket-sort-1.png)
+  - here, bucket `0` holds the number of times `0` appears in the array, bucket `1` holds the number of times `1` appears in the array, and so on
+- Then we sort the buckets
+  - we will go through each bucket and add the `index` of of the bucket to the sorted array as many times as the value of the `bucket[index]`
+    ![bucket sort](./img/bucket-sort-2.png)
+- it's a **non-comparison** sorting algorithm, as it doesn't compare the elements of the array, it just distributes the elements into buckets
+
+```py
+def bucket_sort(array, max_val):
+  # fill the buckets
+  buckets = [0] * (max_val + 1)
+  for i in array:
+    buckets[i] += 1
+
+  # sort the elements
+  sorted_array = []
+  for j in range(len(buckets)):
+    for _ in range(buckets[j]):
+      sorted_array.append(j)
+
+  return sorted_array
+```
+
+- Time complexity: `O(n + k)`, where `n` is the number of elements in the array and `k` is the number of buckets
+- **Note:** the bucket sort is not a stable sort, because it doesn't preserve the order of the elements with the same value
+  - one way to make it stable is to use a **linked list** instead of an array to store the buckets
 
 ---
 
@@ -1069,7 +1149,7 @@ def binary_search(data, target, low, high):
 
 # -------------------------------------------------------------------------------------------------
 
-# 2. Iterative Binary Search
+# 2. Iterative Binary Search ✅
 def binary_search_iterative(nums, target):
   l, r = 0, len(nums) - 1
 
@@ -1085,17 +1165,16 @@ def binary_search_iterative(nums, target):
   return -1
 ```
 
-> **Notes**:
->
-> - An unsuccessful search occurs if we reached the end of array where: `start = middle = end`, so we won't be able to continue as the next step would result this: `low > high`, as the interval `[low,high]` is empty
->
->   - so we need to create an edge case to prevent infinite loop
->
-> - making a copy of half the list would already take `O(n)` time, negating the whole benefit of the binary search algorithm.
+- **Notes**:
+  - An unsuccessful search occurs if we reached the end of array where: `start = middle = end`, so we won't be able to continue as the next step would result this: `low high`, as the interval `[low,high]` is empty
+    - so we need to create an edge case to prevent infinite loop
+  - making a copy of half the list would already take `O(n)` time, negating the whole benefit of the binary search algorithm.
+  - when we get the middle element, we use: `mid = (low + high) // 2`, Actually this can lead to an **integer overflow**. Imagine that `low` and `high` are very large numbers. Adding them up will cause an integer overflow. 
+    - A better way is to compute `mid` as `mid = low + (high - low) // 2`. Dividing `high - low` before adding `low` avoids the integer overflow.
 
 ---
 
-## Traversals
+## Graph Traversals
 
 it means going through each item in the list, like checking for something on each item in a `tree` --> **(visiting every node O(n))**
 
@@ -1110,6 +1189,7 @@ it means going through each item in the list, like checking for something on eac
 
 ![traversal](./img/traversal.png)
 ![traversal](./img/traversal1.png)
+![traversal](./img/traversal3.png)
 
 - The time-complexity of **BFS** vs **DFS** is the same as we visit each node one time, but the difference here is in the space-complexity as it depends on the structure of the tree:
   - if we're talking about a breadth-first on a wide tree vs on depth-first, we will not be storing all the nodes across the tree in **BFS** as we only need to keep-track of the nodes in a given branch all the way down to the end
@@ -1121,6 +1201,7 @@ it means going through each item in the list, like checking for something on eac
 
 It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores all of the `neighbor` nodes at the present depth before moving on to the nodes at the next depth level.
 
+- **It's all about finding a Path**
 - It can answer questions like:
   - Is there a path from node `A` to node `B`?
   - What is the shortest path from node `A` to node `B`?
@@ -1198,11 +1279,42 @@ def search(name):
 search("you") # thom is a mango seller!
 ```
 
+- **BFS implementation**
+
+  ```py
+  from collections import deque
+  def BFS(src, adj):
+    visited = set()
+    q = deque()
+
+    q.append(src)
+    visited.add(src)
+
+    while len(q) > 0:
+      currentNode = q.popleft()
+
+      # Visit here just represents whatever you want to do with the current node.
+      visit(currentNode)
+
+      # Here we assume that if a neighbour has no neighbors, the adjacency map still maps to an empty list (i.e. not null)
+      for neighbour in adj[currentNode]:
+        # For BFS, if a neighbour is already in the queue, there's no point in adding it again.
+        if neighbour not in visited:
+          # For BFS we mark as visited when we put a node in the queue.
+          visited.add(neighbour)
+          q.append(neighbour)
+  ```
+
 ---
 
 ### Depth First Search/Traversal DFS
 
 It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores as far as possible along each branch before backtracking.
+
+- **It's all about "Exploring" and Backtracking**
+  - Think of it as a **maze**, where you're trying to find a way out and you're exploring all the possible paths until you find the exit and when you reach a dead-end, you go back to the last intersection and try another path
+
+> It's called `Depth First Search` because we go deep into the tree before we go wide (asking its children)
 
 - the search follows one branch of the tree down as many levels as possible until the target notice is found or the end is reached, then it continues at the next ancestor with an unexplored children
   - the idea is to go as deep as possible from the left side and then start going to the right until the traversal of the tree is done
@@ -1216,17 +1328,64 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
 ![BFS](./img/dfs0.png)
 ![BFS](./img/dfs.png)
 
-#### PreOrder DFS
+- Graph DFS
+
+  ```py
+  def dfs(graph, node):
+    visited = []
+    stack = [node]
+
+    while stack:
+      current = stack.pop()
+
+      # prevent visiting the same node twice
+      if current not in visited:
+        visited.append(current)
+        stack += graph[current]
+    return visited
+  ```
+
+#### Tree PreOrder DFS
 
 ![BFS](./img/dfs1.png)
 
-#### PostOrder DFS
+```py
+def preOrderDFS(root):
+  if root is None:
+    return
+
+  print(root.value)
+  preOrderDFS(root.left)
+  preOrderDFS(root.right)
+```
+
+#### Tree PostOrder DFS
 
 ![BFS](./img/dfs2.png)
 
-#### InOrder DFS
+```py
+def postOrderDFS(root):
+  if root is None:
+    return
+
+  postOrderDFS(root.left)
+  postOrderDFS(root.right)
+  print(root.value)
+```
+
+#### Tree InOrder DFS
 
 ![BFS](./img/dfs3.png)
+
+```py
+def inOrderDFS(root):
+  if root is None:
+    return
+
+  inOrderDFS(root.left)
+  print(root.value)
+  inOrderDFS(root.right)
+```
 
 ---
 
@@ -1246,10 +1405,10 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
 #### How Dijkstra's Algorithm works
 
 - Each segment has a travel time in minutes. You’ll use Dijkstra’s algorithm to go from start to finish in the shortest possible time.
-  ![Dijkstra-algorithm](./img/dijkstra-algorithm-1.png)
+  ![Dijkstra-algorithm](./img/dijkstra-1.png)
 - Cost of a node is how long it takes to get to that node from the start.
 - If you ran breadth-first search on this graph, you’d get this shortest path.
-  ![Dijkstra-algorithm](./img/dijkstra-algorithm-2.png)
+  ![Dijkstra-algorithm](./img/dijkstra-2.png)
 
   - But that path takes 7 minutes. Let’s see if you can ind a path that takes less time!
 
@@ -1290,4 +1449,115 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
 
 ---
 
-#### Implementing Dijkstra's Algorithm
+#### Implementing Dijkstra's algorithm
+
+- It depends on 2 columns: `cost`(shortest path) and `parent/previous vertex`
+  ![Dijkstra-algorithm](./img/dijkstra-3.png)
+- We also use 2 lists: `visited` and `unvisited`
+
+  - `visited` list: keeps track of all the nodes we've already processed
+  - `unvisited` list: keeps track of all the nodes we haven't processed yet
+
+- **Steps:**
+  ![Dijkstra-algorithm](./img/dijkstra-7.png)
+
+  1. We start by adding the starting node to the `unvisited` list and setting the cost to `0` and others to `infinity` and the parent to `None`
+     ![Dijkstra-algorithm](./img/dijkstra-4.png)
+  2. We find the node with the lowest cost (cheapest node) and we add it to the `visited` list and examine all its neighbors
+  3. We then calculate the cost to reach each of those neighbors. If it's cheaper to get to a neighbor through the current node, we update the cost and the parent.
+     ![Dijkstra-algorithm](./img/dijkstra-5.png)
+  4. Add the node to the `visited` list update the `unvisited` list and repeat the process until we've visited every node in the graph.
+     ![Dijkstra-algorithm](./img/dijkstra-6.png)
+
+---
+
+### Topological Sort
+
+A **topological sort** of a directed graph is a way of ordering the list of nodes such that if `(a, b)` is an edge in the graph then `a` will appear before `b` in the list.
+
+> Many real world situations can be modelled as a `graph` with directed edges where some events must occur before others.
+
+- Another way of thinking about topological sort is that it's a way of arranging the nodes of a graph in a line such that all the edges point in the same direction to the right.
+  ![top sort](./img/top-sort-5.png)
+
+- **Examples:**
+
+  - "Applying in class `X`", but we won't be able to take the class, until we take class `A`, `B`, `C` first as prerequisites.
+    ![top sort](./img/top-sort-1.png)
+    - The topological sort algorithm tells us the ordering on which we should enroll in classes such that we never enroll in a course that we don't have the prerequisites for.
+  - program/package build dependencies
+  - How to get dressed in the morning
+    ![top sort](./img/top-sort-4.png)
+
+  - The topological sort algorithm tells us the order in which we should install the packages such that we never install a package that depends on another package that we haven't installed yet.
+
+- Only certain types of graphs can be topologically sorted. These are **directed acyclic graphs** (DAGs).
+  - "DACs" are directed graphs with no directed cycles.
+    ![top sort](./img/top-sort-6.png)
+  - If a graph has **cycles** or is **not directed**, then there is no topological sort.
+- We can construct a topological sort using **Khan's algorithm**:
+  ![khan-algorithm](./img/khan-algorithm.png)
+
+  1. Find a node with no incoming edges (i.e., no edges directed towards it) and add it to the sorted list.
+
+     - We know that such a node must exist if there's no cycle. After all, if we picked an arbitrary node we could just walk edges backwards arbitrarily.
+     - We'll either stop at some point (in which case we've found a node with no incoming edges) or we'll return to a prior node (in which case there is a cycle).
+
+  2. Remove that node from the graph, along with its outgoing edges.
+     - Those nodes have already been added to the topological sort, so they're basically irrelevant. We can't violate those edges anymore.
+  3. Repeat steps 1 and 2 until the graph is empty.
+     ![top sort](./img/top-sort-3.png)
+     - Repeat the above, adding nodes with no incoming edges and removing their outbound edges.
+     - When all the nodes have been added to the topological sort, then we are done.
+  4. If the graph is not empty, then we have detected a cycle, which means no valid topological sort exists.
+  5. Return the sorted list.
+
+- Topological sort is not unique, there can be multiple valid topological sorts for a graph and all of them are correct.
+- Topological sort algorithm is not the most efficient algorithm,
+- it runs in `O(V + E)` time, where
+
+  - `V` is the number of vertices
+  - `E` is the number of edges in the graph.
+
+- Steps:
+  ![top sort](./img/top-sort-2.png)
+  1. create queues: `processing_queue` and a list `sorted_list`, which are empty at the beginning.
+  2. find all the nodes with **no incoming edges** and add them to the `processing_queue` so that we can process them first.
+  3. while the `processing_queue` is not empty:
+     - remove a node from the `processing_queue` and add it to the `sorted_list`.
+     - remove all of its outgoing edges.
+     - if any of the nodes that were connected to the removed node now have no incoming edges, add them to the `processing_queue`.
+  4. if order contains all nodes, then it has succeeded. Otherwise, the topological sort has failed due to a cycle.
+
+```py
+def topological_sort(graph):
+    processing_queue = Queue()
+    sorted_list = []
+
+    # find all the nodes with no incoming edges and add them to the processing_queue so that we can process them first.
+    for node in graph.nodes:
+        if len(node.incoming_edges) == 0:
+            processing_queue.enqueue(node)
+
+    # while the processing_queue is not empty:
+    while processing_queue.size() > 0:
+        # remove a node from the processing_queue and add it to the sorted_list.
+        node = processing_queue.dequeue()
+        sorted_list.append(node)
+
+        # remove all of its outgoing edges.
+        edges = list(node.outgoing_edges)
+        for edge in edges:
+            edge.destroy()
+
+        # if any of the nodes that were connected to the removed node now have no incoming edges, add them to the processing_queue.
+        for node in nodes:
+            if len(node.incoming_edges) == 0:
+                processing_queue.enqueue(node)
+
+    # if order contains all nodes, then it has succeeded. Otherwise, the topological sort has failed due to a cycle.
+    if len(sorted_list) == len(graph.nodes):
+        return sorted_list
+    else:
+        return None
+```

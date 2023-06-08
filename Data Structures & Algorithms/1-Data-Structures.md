@@ -931,6 +931,7 @@ They're nodes (vertices) connected via "Edges"
 
 - **Adjacency Matrix**
   ![graphs-adjacency-matrix](./img/graphs-adjacency-matrix.png)
+  - In an `undirected` graph, an adjacency matrix will be symmetric. In a directed graph, it will not (necessarily) be.
 - **Adjacency List**
   ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
   - here:
@@ -950,6 +951,8 @@ They're nodes (vertices) connected via "Edges"
 ## Trees
 
 It's a special type of graph, where no edges point back to the root node (no cycles). It consists of nodes in a **parent/child relationship**
+
+> A tree is actually a type of graph, but not all graphs are trees. Simply put, a tree is a connected graph without cycles.
 
 ![trees](./img/trees1.png)
 ![trees](./img/trees.png)

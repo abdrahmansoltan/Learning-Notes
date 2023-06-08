@@ -54,6 +54,7 @@
       - [Queue using two stacks](#queue-using-two-stacks)
       - [Sliding Window Maximum](#sliding-window-maximum)
     - [Stacks](#stacks)
+      - [Implement Stack using Queues](#implement-stack-using-queues)
       - [Next Greater Element I](#next-greater-element-i)
       - [Next Greater Element II](#next-greater-element-ii)
       - [Daily Temperatures](#daily-temperatures)
@@ -120,12 +121,18 @@
       - [Search a 2D Matrix](#search-a-2d-matrix)
       - [Koko Eating Bananas](#koko-eating-bananas)
       - [Search in Rotated Sorted Array](#search-in-rotated-sorted-array)
-    - [Time Based Key-Value Store](#time-based-key-value-store)
+      - [Find Minimum in Rotated Sorted Array](#find-minimum-in-rotated-sorted-array)
+      - [Time Based Key-Value Store](#time-based-key-value-store)
+      - [Single Element in a Sorted Array](#single-element-in-a-sorted-array)
+      - [Find First and Last Position of Element in Sorted Array](#find-first-and-last-position-of-element-in-sorted-array)
     - [Sorting](#sorting)
       - [Insertion Sort List](#insertion-sort-list)
       - [Largest Number](#largest-number)
       - [Merge Intervals](#merge-intervals)
       - [Non-overlapping Intervals](#non-overlapping-intervals)
+      - [Sort colors](#sort-colors)
+      - [Median of Two Sorted Arrays](#median-of-two-sorted-arrays)
+      - [Squares of a Sorted Array](#squares-of-a-sorted-array)
   - [Creating Shapes](#creating-shapes)
     - [Steps shape](#steps-shape)
     - [Pyramid](#pyramid)
@@ -152,6 +159,28 @@
     - [N-Queens](#n-queens)
     - [Combination Sum](#combination-sum)
     - [Combination Sum II](#combination-sum-ii)
+    - [Word Break](#word-break)
+    - [Word Search](#word-search)
+    - [Word Search II](#word-search-ii)
+  - [Graphs](#graphs)
+    - [Flood Fill](#flood-fill)
+    - [Max Area of Island](#max-area-of-island)
+    - [Rotting Oranges](#rotting-oranges)
+    - [All Paths From Source to Target](#all-paths-from-source-to-target)
+    - [Clone Graph](#clone-graph)
+    - [Course Schedule](#course-schedule)
+    - [Course Schedule II](#course-schedule-ii)
+    - [Network Delay Time](#network-delay-time)
+    - [Path with Maximum Probability](#path-with-maximum-probability)
+    - [Redundant Connection](#redundant-connection)
+    - [Accounts Merge](#accounts-merge)
+    - [Sort Items by Groups Respecting Dependencies](#sort-items-by-groups-respecting-dependencies)
+    - [Find if Path Exists in Graph](#find-if-path-exists-in-graph)
+    - [Check if There is a Valid Path in a Grid](#check-if-there-is-a-valid-path-in-a-grid)
+    - [Couples Holding Hands](#couples-holding-hands)
+    - [Minimum Obstacle Removal to Reach Corner](#minimum-obstacle-removal-to-reach-corner)
+    - [Trapping Rain Water II](#trapping-rain-water-ii)
+    - [Longest Increasing Path in a Matrix](#longest-increasing-path-in-a-matrix)
 
 ---
 
@@ -289,6 +318,10 @@ This pattern involves dividing a dataset into smaller chunks and then repeating 
 #### Dynamic Programming
 
 #### Greedy Algorithms
+
+It's an algorithm that makes the locally optimal choice at each stage with the hope of finding a global optimum.
+
+- Ex: **Dijkstra's algorithm** for finding the shortest path between two nodes in a graph.
 
 #### Backtracking
 
@@ -1609,6 +1642,32 @@ def max_sliding_window(nums, k):
 
 ### Stacks
 
+#### Implement Stack using Queues
+
+```py
+class MyStack:
+
+    def __init__(self):
+        self.q = collections.deque()
+
+    def push(self, x: int) -> None:
+        self.q.append(x)
+        # rotate the queue so that the last element is the first one
+        for _ in range(len(self.q) - 1):
+            self.q.append(self.q.popleft())
+
+    def pop(self) -> int:
+        return self.q.popleft()
+
+    def top(self) -> int:
+        return self.q[0]
+
+    def empty(self) -> bool:
+        return len(self.q) == 0
+```
+
+---
+
 #### Next Greater Element I
 
 You are given two arrays (without duplicates) `nums1` and `nums2` where `nums1`’s elements are subset of `nums2`. Find all the next greater numbers for `nums1`'s elements in the corresponding places of `nums2`.
@@ -2298,6 +2357,42 @@ Merge `k` sorted linked lists and return it as one sorted list. Analyze and desc
           curr = curr.next
       curr.next = l1 or l2
       return [dummy.next]
+  ```
+
+- Another solution using **Priority Queue** (Min Heap)
+
+  - **Time Complexity:** `O(nk log(k))`
+  - **Space Complexity:** `O(k)`
+  - **Steps:**
+    1. create a priority queue and add the head of each list to the queue
+    2. create a dummy node and a pointer `curr` to the dummy node
+    3. while the queue is not empty
+       - pop the node with the smallest value from the queue
+       - append the node to the curr.next pointer
+       - if the popped node has a next node, add it to the queue
+       - advance the curr pointer to the next node
+    4. return the next node of the dummy node
+
+  ```py
+  def mergeKLists(self, lists: List[ListNode]) -> ListNode:
+      # modify the ListNode class to support comparison operators
+      ListNode.__eq__ = lambda self, other: self.val == other.val
+      ListNode.__lt__ = lambda self, other: self.val < other.val
+
+      h = []
+      head = tail = ListNode(0)
+      for i in lists:
+          if i:
+              heapq.heappush(h, (i.val, i))
+
+      while h:
+          node = heapq.heappop(h)[1]
+          tail.next = node
+          tail = tail.next
+          if node.next:
+              heapq.heappush(h, (node.next.val, node.next))
+
+      return head.next
   ```
 
 ---
@@ -4194,6 +4289,9 @@ class Trie:
 
 ### Searching
 
+- **Note:** In `binary search`, when we get the middle element, we use: `mid = (low + high) // 2`, Actually this can lead to an **integer overflow**. Imagine that `low` and `high` are very large numbers. Adding them up will cause an integer overflow.
+  - A better way is to compute `mid` as `mid = low + (high - low) // 2`. Dividing `high - low` before adding `low` avoids the integer overflow.
+
 #### Binary Search
 
 ```py
@@ -4268,7 +4366,7 @@ You are given an `m x n` integer matrix `matrix` sorted in ascending order, and 
               left = mid + 1
             else:
               return True
-          return False
+          return False # MUST RETURN FALSE HERE AND NOT OUTSIDE THE WHILE LOOP
   ```
 
 - Solution 2 -> `O(m + n)`
@@ -4396,7 +4494,43 @@ def search(nums, target):
 
 ---
 
-### Time Based Key-Value Store
+#### Find Minimum in Rotated Sorted Array
+
+Same as the previous problem, but instead of returning the index of the target value, we will return the minimum value in the array
+
+- Explanation
+  - We can use **binary search** to find the minimum value
+  - We can check if the `mid` value in the `left` portion or the `right` portion
+    - if we're in the `left` portion, then we can check if the `mid` value is less than the `right` value
+      - This is because the `left` side will have values greater than every value in the `right` side, so the minimum value will be in the `right` side
+        ![find-min-in-rotated-sorted-arr](./img/find-min-in-rotated-sorted-arr-1.png)
+  - To check if the `mid` value is in the `left` portion, we can check if the `mid` value is greater than the first value in the `left` portion
+    ![find-min-in-rotated-sorted-arr](./img/find-min-in-rotated-sorted-arr-2.png)
+  - If the `mid` value is in the `right` portion, then we can check if the `mid` value is less than the `right` value and repeat
+    ![find-min-in-rotated-sorted-arr](./img/find-min-in-rotated-sorted-arr-3.png)
+
+```py
+def findMin(nums):
+    l, r = 0, len(nums) - 1
+    curMin = nums[0]
+
+    while l <= r:
+        mid = (l + r) // 2
+        curMin = min(curMin, nums[mid])
+
+        # right side is not sorted -> right side has the minimum value
+        if nums[r] < nums[mid]:
+            l = mid + 1
+        # left side has the min
+        else:
+            r = mid - 1
+
+    return curMin
+```
+
+---
+
+#### Time Based Key-Value Store
 
 Design a time-based key-value data structure that can store multiple values for the same key at different time stamps and retrieve the key's value at a certain timestamp.
 
@@ -4432,6 +4566,96 @@ class TimeMap:
           r = mid - 1
 
       return res
+```
+
+---
+
+#### Single Element in a Sorted Array
+
+You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once. Find this single element that appears only once. **Do it in O(logn) time and O(1) space**.
+
+- Ex:
+
+  - `nums = [1, 1, 2, 3, 3, 4, 4, 8, 8] --> 2`
+
+- Explanation:
+  - We can use **binary search** to find the single element
+  - We will make use of that **"the array is sorted"**, We can check if the `mid` value is the single element by checking if the `mid` value is equal to the value before and after it
+  - If the `mid` value is not the single element, then we want to know which side the single element is in
+    - This can be figured out by also using another operation that **"All the elements are repeated twice, except for one element which appears exactly once"** -> So the length of the array will be **odd**
+      ![single element in a sorted array](./img/single-element-in-sorted-arr.png)
+    - So we will use the length of the left/right sides to determine which side the single element is in
+      - If the length of the left side is odd, then the single element is in the left side
+      - If the length of the right side is odd, then the single element is in the right side
+
+```py
+def singleNonDuplicate(nums):
+    l, r = 0, len(nums) - 1
+
+    while l <= r:
+        m = l + (r - l) // 2
+
+        if (
+          (m - 1 < 0 or nums[m - 1] != nums[m]) and
+          (m + 1 >= len(nums) or nums[m + 1] != nums[m])
+        ):
+            return nums[m]
+
+        leftSize = m - 1 if nums[m - 1] == nums[m] else m
+        if leftSize % 2:
+            r = m - 1
+        else:
+            l = m + 1
+```
+
+---
+
+#### Find First and Last Position of Element in Sorted Array
+
+Given an array of integers `nums` sorted in ascending order, find the starting and ending position of a given `target` value. If `target` is not found in the array, return `[-1, -1]`.
+
+**You must write an algorithm with `O(log n)` runtime complexity.**
+
+- Ex:
+
+  - `nums = [5, 7, 7, 8, 8, 10], target = 8 --> [3, 4]`
+  - `nums = [5, 7, 7, 8, 8, 10], target = 6 --> [-1, -1]`
+
+- Explanation:
+  - We can use **binary search** to find the starting and ending position of the target value
+  - We will use **two binary searches** to find the starting and ending position
+    - The first binary search will find the starting position
+      - If the `mid` value is equal to the target value, then we will check if the `mid` value is the starting position by checking if the value before it is less than the `mid` value
+    - The second binary search will find the ending position
+      - If the `mid` value is equal to the target value, then we will check if the `mid` value is the ending position by checking if the value after it is greater than the `mid` value
+
+```py
+def searchRange(nums, target):
+    def search(leftBias):
+        """
+        leftBias(boolean): True if we are looking for the left most index
+        """
+        l, r = 0, len(nums) - 1
+        res = -1
+
+        while l <= r:
+            m = l + (r - l) // 2
+
+            if nums[m] == target:
+                res = m
+                # If we are looking for the left most index, then we want to keep searching the left side
+                if leftBias:
+                    r = m - 1
+                else:
+                    l = m + 1
+            elif nums[m] < target:
+                l = m + 1
+            else:
+                r = m - 1
+
+        return res
+
+    return [search(True), search(False)]
 ```
 
 ---
@@ -4517,6 +4741,7 @@ def merge(intervals):
     for interval in intervals[1:]:
         lastEnd = res[-1][1]
 
+        # check if start of current interval is less than or equal to the end of the last interval
         if interval[0] <= lastEnd:
             res[-1][1] = max(lastEnd, interval[1])
         else:
@@ -4559,6 +4784,197 @@ def eraseOverlapIntervals(intervals):
             prevEnd = end
 
     return res
+```
+
+---
+
+#### Sort colors
+
+Given an array `nums` with `n` objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with the colors in the order red, white, and blue.
+
+- Ex:
+
+  - `nums = [2, 0, 2, 1, 1, 0] --> [0, 0, 1, 1, 2, 2]`
+
+- Explanation:
+
+  - We know that the array only contains 3 colors: red, white, and blue (represented by 0, 1, and 2) -> **Finite range**
+    - So we can use `bucket sort` to sort the array in-place
+  - We can also use the 3-way partitioning algorithm to sort the array in-place
+
+- Solution 1: Bucket sort
+
+  ```py
+  def sortColors(nums):
+      # count the number of 0s, 1s, and 2s
+      buckets = [0] * (1+max(nums))
+      for num in nums:
+          buckets[num] += 1
+
+      # overwrite the original array with the sorted array
+      i = 0
+      for j in range(len(buckets)):
+          while buckets[j] > 0:
+              nums[i] = j
+              i += 1
+              buckets[j] -= 1
+  ```
+
+- Solution 2: 3-way partitioning **(not fully understood ❌)**
+
+  ```py
+  def sortColors(nums):
+      # 3-way partitioning
+      low, mid, high = 0, 0, len(nums)-1
+
+      while mid <= high:
+          if nums[mid] == 0:
+              nums[low], nums[mid] = nums[mid], nums[low]
+              low += 1
+              mid += 1
+          elif nums[mid] == 1:
+              mid += 1
+          else:
+              nums[mid], nums[high] = nums[high], nums[mid]
+              high -= 1
+  ```
+
+---
+
+#### Median of Two Sorted Arrays
+
+Given two sorted arrays `nums1` and `nums2` of size `m` and `n` respectively, return **the median** of the two sorted arrays.
+
+**The overall run time complexity should be `O(log(m+n))`.**
+
+- Ex:
+
+  - `nums1 = [1, 3], nums2 = [2] --> 2.00000`
+  - `nums1 = [1, 2], nums2 = [3, 4] --> 2.50000`
+  - `nums1 = [0, 0], nums2 = [0, 0] --> 0.00000`
+  - `nums1 = [], nums2 = [1] --> 1.00000`
+
+- Explanation:
+  - Here It requires solving it with `O(log(n+m))`, so we can't just merge the two arrays and find the median as we would do in `O(n+m)`
+  - To do so, we can use the **binary search** algorithm
+    - We will have 2 partitions, one in each array, and the `median` will be the average of the max of the left partition and the min of the right partition
+      - if the total length of the two arrays is **odd**, then the median will be the middle element
+        ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-1.png)
+      - if the total length of the two arrays is **even**, then the median will be the average of the middle 2 elements
+        ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-2.png)
+  - The total number of elements in the left partition should be equal to the total number of elements in the right partition (half of the total number of elements in the two arrays)
+    - `len(left_part) == len(right_part)`
+    - `half` = `(len(nums1) + len(nums2) + 1) // 2`
+  - we use the `half` to find the correct partition in the two arrays
+    - `partitionX = (low + high) // 2`
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-3.png)
+    - `partitionY = half - partitionX`
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-4.png)
+  - Now We need to know if the `left` partition is correct or not
+    - So, we will check if the overall left partition is less than the overall right partition
+    - This is done by checking if the max of the left partition in `nums1` is less than the min of the right partition in `nums2` and vice versa
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-5.png)
+      - `maxLeftX <= minRightY`
+      - `maxLeftY <= minRightX`
+  - If the left partition is correct, then we can return the median
+    ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-6.png)
+    - if the total length of the two arrays is **odd**, then the median will be the middle element which is the **minimum** of the `2 mins` of the right partitions
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-7.png)
+    - if the total length of the two arrays is **even**, then the median will be the average of the middle 2 elements which are:
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-10.png)
+      - the **maximum** of the `2 maxs` of the left partitions
+      - the **minimum** of the `2 mins` of the right partitions
+  - If the left partition is not correct, then we need to move the `low` or `high` pointer to the correct position
+    - if `maxLeftX > minRightY`, then we need to move `high` pointer to the left
+    - if `maxLeftY > minRightX`, then we need to move `low` pointer to the right
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-8.png)
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-9.png)
+
+```py
+def findMedianSortedArrays(nums1, nums2):
+    A, B = nums1, nums2
+    total = len(nums1) + len(nums2)
+    half = total // 2
+
+    # make sure that A is the smaller array
+    if len(A) > len(B):
+        A, B = B, A
+
+    # set the low and high pointers
+    low, high = 0, len(A) - 1
+
+    # loop until we find the correct partition
+    while True:
+        # get the partition of A
+        i = (low + high) // 2
+        # get the partition of B
+        j = half - i - 2 # -2 because we start from 0
+
+        # get the elements of the left and right partitions
+        Aleft = A[i] if i >= 0 else float('-inf')
+        Aright = A[i + 1] if (i + 1) < len(A) else float('inf')
+        Bleft = B[j] if j >= 0 else float('-inf')
+        Bright = B[j + 1] if (j + 1) < len(B) else float('inf')
+
+        # check if the left partition is correct
+        if Aleft <= Bright and Bleft <= Aright:
+            # check if the total length is odd or even
+            if total % 2:
+                # return the median
+                return min(Aright, Bright)
+            else:
+                # return the median
+                return (max(Aleft, Bleft) + min(Aright, Bright)) / 2
+        else:
+            # if the max of the left partition in A is greater than the min of the right partition in B
+            if Aleft > Bright:
+                # move the high pointer to the left
+                high = i - 1
+            # if the max of the left partition in B is greater than the min of the right partition in A
+            else:
+                # move the low pointer to the right
+                low = i + 1
+```
+
+---
+
+#### Squares of a Sorted Array
+
+Given an integer array `nums` sorted in **non-decreasing** order, return an array of **the squares of each number sorted in non-decreasing order**.
+
+- EX: `[-4,-1,0,3,10] --> [0,1,9,16,100]`
+
+- Explanation:
+  - We can solve it normally in `O(nlogn)` time by squaring each element and then sorting the array
+  - But we can do better in `O(n)` time by using **2 pointers**
+    ![sort squares](./img/sort-squares.jpg)
+    - This is done by using 2 pointers, one at the start of the array and one at the end of the array
+    - this is because the array is sorted in **non-decreasing** order so we can get the largest element by comparing the absolute values of the 2 pointers (both sides)
+    - we can then square the largest element and add it to the result array using the index of the responding pointer
+
+```py
+def sortedSquares(nums):
+    l, r = 0, len(nums) - 1
+    result = [0] * len(nums)
+    # set the index of the result array
+    index = len(nums) - 1
+
+    # loop until the left pointer is greater than the right pointer
+    while l <= r:
+        left_abs, right_abs = abs(nums[l]), abs(nums[r])
+
+        # check if the left absolute value is greater than the right absolute value and change the result array accordingly
+        if left_abs > right_abs:
+            result[index] = left_abs ** 2
+            l += 1
+        else:
+            result[index] = right_abs ** 2
+            r -= 1
+
+        # move the index pointer to the left
+        index -= 1
+
+    return result
 ```
 
 ---
@@ -4916,24 +5332,24 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 - using generic memoization function (useful for interviews)
 
   ```py
-  # def slowFib(n):
-  #   if (n < 2):
-  #     return n
-  #   return fib(n - 1) + fib(n - 2)
+  def slowFib(n):
+    if (n < 2):
+      return n
+    return fib(n - 1) + fib(n - 2)
 
-  # # generic memoization function
-  # def memoize(fn):
-  #   cache = {}
-  #   def memoized(*args):
-  #     if args in cache:
-  #       return cache[args]
-  #     res = fn(*args)
-  #     cache[args] = res
-  #     return res
-  #   return memoized
+  # generic memoization function
+  def memoize(fn):
+    cache = {}
+    def memoized(*args):
+      if args in cache:
+        return cache[args]
+      res = fn(*args)
+      cache[args] = res
+      return res
+    return memoized
 
-  # # apply memoization to fib function
-  # fib = memoize(slowFib)
+  # apply memoization to fib function
+  fib = memoize(slowFib)
   ```
 
 ---
@@ -4941,26 +5357,7 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 #### Fibonacci looping solution
 
 ```py
-# Solution 1 - using loops O(n)
-def fib(n):
-    # base case
-    if n < 2:
-        return n
-
-    # initialize first 2 elements (a and b)
-    a, b = 0, 1
-
-    # loop through n -> [a, b, c] and change the values of a, b, and c or create an array and append the values of c
-    for i in range(2, n + 1):
-        # update a, b, and c
-        c = a + b
-        a = b
-        b = c
-    return b
-
-# -------------------------------------------------
-
-# Solution 2 - using loops O(n)
+# O(n)
 def fib(n):
     total = 0
     fib0, fib1 = 0, 1
@@ -4988,15 +5385,26 @@ A valid IP address consists of exactly four integers, each integer is between `0
   - Output: `["255.255.11.135", "255.255.111.35"]`
 
 - Explanation:
+
   - What we want to do is to just know **where to insert the dots**.
   - We can use **Decision Tree** to solve this problem.
-    - we can put the first `dot` after the first number, second `dot` after the second number, and third `dot` after the third number.
+    - we can put the first `dot` after the first number, **or** after the second number, **or** after the third number.
       - this will result `3` possible combinations for each number
         ![restore-ip-addresses](./img/restore-ip-addresses-1.png)
-      - for each of these combinations, if **(the number is less than `256` or length of the combination is less than `3`)**, we can put the second `dot` after the second number, and third `dot` after the third number.
+      - for each of these combinations, We check if it's valid -> **(if the number is less than `256` or length of the combination is less than `3` or it doesn't start with `0`)**. If it's valid, we then can put the second `dot` after the second number **or** after the third number and so on.
         ![restore-ip-addresses](./img/restore-ip-addresses-2.png)
   - We can do this by using a helper function that will add the dots to the string. We can then use a `for` loop to iterate through the string and add the dots to the string. We can then use a helper function to check if the current string is a valid IP address. If it is, we can add it to the result list. We can then return the result list.
   - Time complexity: `O(3^4) = O(1)` because we are only checking 3 possible combinations for each number, and we have a total of 4 numbers (4 levels).
+
+- Example with steps for explanation
+  ![restore-ip-addresses](./img/restore-ip-addresses-3.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-4.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-5.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-6.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-7.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-8.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-9.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-10.png)
 
 ```py
 def restoreIpAddresses(s):
@@ -5020,6 +5428,7 @@ def restoreIpAddresses(s):
 
       # loop through the string and add the dots to the string (using min -> to avoid index out of range error if the string is less than 3 characters)
       for j in range(i, min(i+3, len(s))):
+        # check if the current string is a valid IP address (if the number is less than 256 or the starting character is not 0)
         if int(s[i:j+1]) <= 255 and (i == j or s[i] != '0'):
           backtrack(j+1, dots+1, curIP + s[i:j+1] + '.')
 
@@ -5038,6 +5447,7 @@ Given an array `nums` of distinct integers, return all the possible permutations
   - Output: `[[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]`
 
 - Explanation:
+
   - We can use **Decision Tree** to solve this problem.
   - For each element, we can either choose to include it in the permutation or not include it in the permutation.
     ![permutations](./img/permutations-1.png)
@@ -5045,8 +5455,15 @@ Given an array `nums` of distinct integers, return all the possible permutations
     - if we choose to not include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
       ![permutations](./img/permutations-2.png)
   - We can do so by dividing the problem into subproblems by removing the element and getting the permutations of the remaining elements until we have no more elements left.
+    ![permutations](./img/permutations-5.png)
+    ![permutations](./img/permutations-6.png)
+  - Then we can go up the tree and add the element back to the permutation and remove the next element and get the permutations of the remaining elements.
+    ![permutations](./img/permutations-7.png)
     ![permutations](./img/permutations-3.png)
-    - we can then add the removed element to the permutations of the remaining elements.
+  - When we have no more elements left, we can append the current permutation to the result list.
+    ![permutations](./img/permutations-8.png)
+
+  ![permutations](./img/permutations-4.png)
 
 ```py
 def permute(nums):
@@ -5151,15 +5568,20 @@ You may return the answer in **any order**.
 
   - Output: `[[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]]`
 
-> **Compination vs Permutation** > ![combination-vs-permutation](./img/combination-vs-permutation.webp)
+> - **Compination:** s a mathematical technique that determines the number of possible arrangements in a collection of items where the **order of the selection does not matter**
+> - **Compination vs Permutation (تباديل و توافيق)** > ![combination-vs-permutation](./img/combination-vs-permutation.webp)
 
 - Explanation:
+
   - We can use **Decision Tree** to solve this problem. (Backtracking)
   - For each element, we can either choose to include it in the combination or not include it in the combination.
   - The height of the decision tree is `k` because we need to choose `k` elements.
     ![combinations](./img/combinations-1.png)
-  - As this is a `combination` problem and not a `permutation` problem, we need to make sure that we don't include the same element twice in the combination.
+  - As this is a `combination` problem and not a `permutation` problem, meaning that the order doesn't matter so we don't want duplicates like (`[1,2]` and `[2, 1]`)
+    - So, we need to make sure that we don't include the same element twice in the combination.
     - To do so, we need to keep track of the `start` index of the elements that we can choose from. so that we don't choose the same element twice.
+
+  ![combinations](./img/combinations-2.png)
 
 ```py
 # Time complexity: O(K * n^k) -> O(n^k) Exponential
@@ -5200,6 +5622,8 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
       - if we choose to include it in the subset, we can then **choose to include the next element in the subset or not**.
       - if we choose to not include it in the subset, we can then choose to include the next element in the subset or not include the next element in the subset.
 
+  ![subsets](./img/subsets-2.png)
+
 - Steps:
 
   - We can use a helper function `dfs` to build the subsets.
@@ -5210,29 +5634,6 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
 - Time complexity: `O(n * 2^n)`
 
 ```py
-def subsets(nums):
-    res = []
-    subset = []
-
-    def dfs(i):
-        # base case
-        if i == len(nums):
-            res.append(subset[:]) # append a copy of the subset to the result because subset will be modified
-            return
-
-        # decision to include the current element in the subset
-        subset.append(nums[i])
-        dfs(i+1)
-
-        # decision to not include the current element in the subset
-        subset.pop()
-        dfs(i+1)
-
-    dfs(0)
-    return res
-
-#-----------------------------------------------------------
-# another solution ✅
 def subsets(nums):
     res = []
 
@@ -5266,7 +5667,12 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
 - Explanation:
   - Difference between this problem and the previous problem is that this problem contains duplicates.
     ![subsets II](./img/subsets-II-1.png)
-  - To avoid duplicates, we can sort the array first. then we can skip the current element if it is the same as the previous element (by checking `nums[i] == nums[i+1]` and that the next-index is not out of bounds) and then we can skip the current element. by `i += 1`.
+  - To avoid duplicates, we can sort the array first. then we can **skip** the current element if it is the same as the previous element (by checking `nums[i] == nums[i+1]` and that the next-index is not out of bounds) and then we can skip the current element. by `i += 1`.
+    - We **only skip it for the second decision**, for example, if we are at the first decision which to include/exclude `2` in the subset, we can't skip it because we need to make sure that we include `2` in the subset. So we add it to the left subtree.
+      ![subsets II](./img/subsets-II-2.png)
+    - But if we include it in the right subtree, we will have duplicates. So we need to skip it (by moving the index to the next element)
+      ![subsets II](./img/subsets-II-3.png)
+      ![subsets II](./img/subsets-II-4.png)
 
 ```py
 def subsetsWithDup(nums):
@@ -5357,6 +5763,7 @@ The `bitwise OR` of an array `a` is equal to `a[0] OR a[1] OR ... OR a[a.length 
   - We can use **Decision Tree** to solve this problem.
     - For each element, we can either choose to include it in the subset or not include it in the subset.
   - **Maximum Bitwise-OR Subsets** is the maximum bitwise `OR` of a subset -> so we calculate the maximum bitwise `OR` of the array first.
+    - which is the (`OR` of all the elements in the array).
   - Time complexity: `O(2^n)` because we are making 2 decisions for each element in the array.
 
 - `OR` is calculated by `|` operator.
@@ -5428,7 +5835,7 @@ def letterCombinations(digits):
     # create a helper function to do the backtracking
     def backtrack(i, curStr):
         """
-        i: the index of the current digit
+        i: the index of the current digit in input digits
         curStr: the current string that we're building
         """
         # if we reached the end of the string, add the string to the result array
@@ -5516,7 +5923,7 @@ def solveNQueens(n):
 
                 # recursively call the function with the next row
                 backtrack(row + 1)
-                
+
                 # remove the queen
                 board[row][col] = '.'
 
@@ -5542,22 +5949,25 @@ The **same** number may be chosen from `candidates` an **unlimited number of tim
   - Output: `[[2, 2, 3], [7]]`
 
 - Explanation:
-- We can use **Decision Tree** to solve this problem.
-  - For each element, we can either choose to include it in the combination or not include it in the combination.
-    - Note: we don't use the decision tree in the pic below, because it will lead to **duplicate** combinations
-      ![combination-sum](./img/combination-sum-1.png)
-    - But we can use the decision tree below, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
-      ![combination-sum](./img/combination-sum-2.png)
-      - Now we garentee that we will not have duplicate combinations, because in the second side of the tree, we will not include the same element twice in the same combination.
-      - if we choose to include it in the combination, we can then choose to include the next element in the combination or not include the next element in the combination.
-      - if we choose to not include it in the combination, we can then choose to include the next element in the combination or not include the next element in the combination.
 
-- Time complexity: `O(n^target)` because we are making `2` decisions for each element in the array, and we have `target` levels (height of the decision tree).
+  - Here we won't be able to solve it like [combination-sum-2](#Combinations), because we want **Unique** combinations and if we used the same decision tree, we will have duplicate combinations like this:
+    ![combination-sum](./img/combination-sum-1.png)
+  - To overcome this problem, we will use the same same decision tree in [subsets](#Subsets) problem, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
+    - For each element, we can either choose to include it in the combination or not include it in the combination.
+    - we can use the decision tree below, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
+      ![combination-sum](./img/combination-sum-3.png)
+    - Now we garentee that we will not have duplicate combinations, because in the second side of the tree, we will not include the same element twice in the same combination.
+    - if we choose to include it in the combination, we can then choose to include the next element in the combination or not include the next element in the combination.
+    - if we choose to not include it in the combination, we can then choose to include the next element in the combination or not include the next element in the combination.
+
+![combination-sum](./img/combination-sum-2.png)
+
+- Time complexity: `O(2^target)` because we are making `2` decisions for each element in the array, and we have `target` levels (height of the decision tree).
 
 ```py
 def combinationSum(candidates, target):
     res = []
-    
+
     def dfs(i, cur, total):
         """
         i: pointer to the current index in the array
@@ -5593,14 +6003,17 @@ Each number in `candidates` may only be used **once** in the combination. -> **T
   - Notice how `1` is used **twice** in the same combination, but it is not used twice in the same combination.
 
 - Explanation:
+
   - Same as the previous problem, but we need to avoid duplicate combinations.
   - we do so by sorting the array, and then skipping the duplicates.
+
+- Time complexity: `O(nlog(n) . 2^target)`
 
 ```py
 def combinationSum2(candidates, target):
     res = []
     candidates.sort()
-    
+
     def dfs(i, cur, total):
         if total == target:
             res.append(cur)
@@ -5619,3 +6032,1497 @@ def combinationSum2(candidates, target):
     dfs(0, [], 0)
     return res
 ```
+
+---
+
+### Word Break
+
+Given a string `s` and a dictionary of strings `wordDict`, return `true` if `s` can be segmented into a space-separated sequence of one or more dictionary words.
+
+> Note that the same word in the dictionary may be reused multiple times in the segmentation.
+
+- Ex: `s = "leetcode", wordDict = ["leet", "code"]`
+
+  - Output: `true`
+  - Explanation: Return true because "leetcode" can be segmented as "leet code".
+
+- Explanation:
+
+  - What we want is to find the index on which we split the string into two substrings, and both substrings are in the dictionary.
+    - This is done by using **Dynamic Programming (Backtracking)**.
+  - We can check each substring of the string, and check if it is in the dictionary.
+    - If it is in the dictionary, then we can check the rest of the string.
+      ![word break](./img/word-break-2.png)
+    - If it is not in the dictionary, then we can skip it and check the next substring.
+      ![word break](./img/word-break-1.png)
+  - We can use a `dp` array to store the result of the subproblems.
+    - `dp[i]` will be `true` if the substring `s[:i]` can be segmented into a space-separated sequence of one or more dictionary words.
+  - We can iterate through the string, and for each index `i`, we can check if the substring `s[:i]` can be segmented into a space-separated sequence of one or more dictionary words.
+    - We can do so by iterating through the string from `0` to `i`, and for each index `j`, we can check if the substring `s[:j]` can be segmented into a space-separated sequence of one or more dictionary words, and if the substring `s[j:i]` is in the dictionary.
+  - So if we can get to the **last index** in the `db` and then:
+    - If both conditions are `true`, then we can set `dp[i]` to `true`.
+      ![word break](./img/word-break-3.png)
+    - Else: we set `dp[i]` to `false`.
+      ![word break](./img/word-break-4.png)
+    - We can return `dp[-1]` as the result.
+
+- Time complexity: `O(n.m)` where `n` is the length of the string, and `m` is the length of the dictionary.
+
+```py
+# Solution 1 ✅
+def wordBreak(s, wordDict):
+    res = [0] * (len(s))
+    l = 0
+    for r in range(len(s)):
+        if s[l:r+1] in wordDict:
+            while l <= r:
+                res[l]  True
+                l += 1
+    return res[-1]
+
+# ------------------------------------------------------
+# Or
+def wordBreak(s, wordDict):
+    dp = [False] * (len(s) + 1)
+    dp[0] = True
+
+    for i in range(1, len(s) + 1):
+        for j in range(i):
+            if dp[j] and s[j:i] in wordDict:
+                dp[i] = True
+                break
+
+    return dp[-1]
+
+# ----------------------------------------------------------
+
+# Solution 2
+def wordBreak(s, wordDict):
+    dp = [False] * (len(s) + 1)
+    dp[len(s)] = True # base case -> empty string is in the dictionary
+
+    for i in range(len(s)-1, -1, -1):
+        for w in wordDict:
+            # check if the substring s[i:] is in the dictionary (we first check if there is enough characters to check the substring s[i:])
+            if i + len(w) <= len(s) and s[i:i+len(w)] == w:
+                dp[i] = dp[i+len(w)]
+            if dp[i]:
+                # if the substring s[i:] is in the dictionary, then we can break the loop
+                break
+
+    # return the result of the subproblem s[:0]
+    return dp[0]
+```
+
+---
+
+### Word Search
+
+Given an `m x n` grid of characters `board` and a string `word`, return `true` if `word` exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
+
+- Ex: `board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"`
+
+  - Output: `true`
+    img
+    ![word search](./img/word-search-1.jpg)
+  - Output: `true`
+
+- Explanation:
+
+  - We can use **Backtracking** to solve this problem.
+    1. Scan board, find starting position with matching word first letter
+    2. From starting position, DFS (4 (`up`, `down`, `left`, `right` **4 directions**) match word's rest letters)
+    3. For each visited letter, mark it as visited, by adding it to the `path` set.
+       - This is done so that if we started at a letter, and then we went to the right, then when calling `dfs` again on the new letter, we don't go back to the letter we started at (left).
+    4. If found any matching, terminate, Otherwise, no matching found, return false.
+
+- Solution Example
+  ![word search](./img/word-search-2.jpeg)
+  ![word search](./img/word-search-3.jpeg)
+  ![word search](./img/word-search-4.jpeg)
+  ![word search](./img/word-search-5.jpeg)
+  ![word search](./img/word-search-6.jpeg)
+  ![word search](./img/word-search-7.jpeg)
+  ![word search](./img/word-search-8.jpeg)
+
+- Time complexity: `O(n.m.4^s)` where:
+  - `n` is the number of rows
+  - `m` is the number of columns
+  - `s` is the length of the word -> `4` because we have `4` directions
+
+```py
+def exist(board, word):
+    ROWS, COLS = len(board), len(board[0])
+    path = set() # to keep track of the current path and make sure we don't visit the same cell twice
+
+    def dfs(r, c, i):
+        if i == len(word):
+            return True
+
+        # check if out of bounds or if the current cell is not equal to the current character of the word or if the current cell is in the current path
+        if r < 0 or r >= ROWS or c < 0 or c >= COLS or (r, c) in path or board[r][c] != word[i]:
+            return False
+
+        # Else we can add the current cell to the current path
+        path.add((r, c))
+
+        # Check the neighbors
+        res = (
+            dfs(r + 1, c, i + 1)
+            or dfs(r - 1, c, i + 1)
+            or dfs(r, c + 1, i + 1)
+            or dfs(r, c - 1, i + 1)
+        )
+
+        # Remove the current cell from the current path
+        path.remove((r, c))
+
+        return res
+
+    for r in range(ROWS):
+      for c in range(COLS):
+        if dfs(r, c, 0):
+          return True
+
+    return False
+```
+
+---
+
+### Word Search II
+
+Given an `m x n` `board` of characters and a list of strings `words`, return all words on the board.
+
+Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. **The same letter cell may not be used more than once in a word**.
+
+- Ex: `board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]`
+  ![word search II](./img/word-search-II-1.jpg)
+
+  - Output: `["eat","oath"]`
+
+- Explanation:
+
+  - The difference here between this problem and the previous one is that we have a list of words instead of one word.
+    - So if we used the same solution as the previous problem, we will have to call the `exist` function for each word in the list of words, which will result in a **bad** time complexity as we use the `dfs` function for each word in the list of words without making use of current iterations in other words
+  - So the better solution is to use a **Trie** data structure to store the list of words and make use of the **prefixes**, and then we can use the `dfs` function to check if the current word is in the Trie or not.
+    - If it is, then we can add it to the result list, otherwise, we can continue searching for other words.
+  - Steps:
+    1. start with the prefix from the board, ex: `"a"` and check if it is in the Trie or not
+       ![word search II](./img/word-search-II-2.png)
+    2. do the same for `"ap"` and so on
+       ![word search II](./img/word-search-II-3.png)
+       ![word search II](./img/word-search-II-4.png)
+    3. if we didn't have a word with prefix `"ap"` in the Trie, then we can stop searching for other words with the same prefix
+       ![word search II](./img/word-search-II-5.png)
+    4. if we found a word (in the path that we're maintaining), ex: called `"ape"` then we can add it to the result list
+       ![word search II](./img/word-search-II-6.png)
+
+- Time complexity: `O(n.m.4^s + w.l)` where:
+  - `n` is the number of rows
+  - `m` is the number of columns
+  - `s` is the length of the word -> `4` because we have `4` directions
+  - `w` is the number of words
+  - `l` is the length of the longest word
+
+```py
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.isWord = False # mark if the current node is the end of a word
+        self.refs = 0 # to keep track of the number of words that end at the current node
+
+    def addWord(self, word):
+        cur = self
+        cur.refs += 1 # increment the number of words that end at the current node
+        for c in word:
+            if c not in cur.children:
+                cur.children[c] = TrieNode() # insert the current character in the Trie
+            cur = cur.children[c] # move to the next character
+            cur.refs += 1 # increment the number of words that end at the current node
+
+        cur.isWord = True # mark the end of the word
+
+    def removeWord(self, word):
+        cur = self
+        cur.refs -= 1
+        for c in word:
+            if c in cur.children:
+                cur = cur.children[c]
+                cur.refs -= 1
+
+class Solution:
+    def findWords(self, board: List[List[str]], words: List[str]) -> List[str]:
+        # build the Trie
+        root = TrieNode()
+        for w in words:
+            root.addWord(w)
+
+        ROWS, COLS = len(board), len(board[0])
+        res, visit = set(), set() # to avoid duplicates
+
+        def dfs(r, c, node, word):
+            # node is the current node in the Trie
+            # Base case
+            if (
+              r not in range(ROWS)  or
+              c not in range(COLS) or
+              board[r][c] not in node.children or
+              node.children[board[r][c]].refs < 1 or
+              (r, c) in visit
+            ):
+                return
+
+            visit.add((r, c)) # mark the current cell as visited
+
+            # update node & word
+            node = node.children[board[r][c]]
+            word += board[r][c]
+
+            if node.isWord:
+                res.add(word)
+                node.isWord = False # to avoid duplicates
+                root.removeWord(word) # to avoid duplicates
+
+            # check the neighbors
+            dfs(r + 1, c, node, word)
+            dfs(r - 1, c, node, word)
+            dfs(r, c + 1, node, word)
+            dfs(r, c - 1, node, word)
+
+            visit.remove((r, c)) # backtrack
+
+        for r in range(ROWS):
+            for c in range(COLS):
+                dfs(r, c, root, "")
+
+        return res
+```
+
+---
+
+## Graphs
+
+### Flood Fill
+
+An image is represented by an `m x n` integer grid `image` where `image[i][j]` represents the pixel value of the image.
+
+You are also given three integers `sr`, `sc`, and `newColor`. You should perform a **flood fill** on the image starting from the pixel `image[sr][sc]`.
+
+To perform a **flood fill**, consider the starting pixel, plus any pixels connected **4-directionally** to the starting pixel of the same color as the starting pixel, plus any pixels connected **4-directionally** to those pixels (also with the same color), and so on. Replace the color of all of the aforementioned pixels with `newColor`.
+
+Return _the modified image after performing the flood fill_.
+
+- Ex: `image = [[1,1,1],[1,1,0],[1,0,1]], sr = 1, sc = 1, newColor = 2`
+  ![flood fill](./img/flood-fill-1.jpg)
+
+  - Output: `[[2,2,2],[2,2,0],[2,0,1]]`
+
+![flood-fill](./img/flood-fill.gif)
+
+- Explanation:
+
+  - From the center of the image `(sr, sc) = (1, 1)` (i.e., the red pixel), all pixels connected by a path of the same color as the starting pixel (i.e., the blue pixels) are colored with the new color.
+    - Note the bottom corner is not colored 2, because it is not 4-directionally connected to the starting pixel.
+  - Basically, we need to change the color of the current pixel and all the pixels that are connected to it (4-directionally) to the new color.
+  - We can use **DFS** to solve this problem.
+    - We start with the current pixel `(sr, sc)` and change its color to the new color.
+    - Then we check the **horizontal/vertical** neighbors of the current pixel and if they have the same color as the current pixel, we change their color to the new color and do the same for their neighbors and so on.
+      ![flood fill](./img/flood-fill-5.png)
+    - We can use a `visited` set to keep track of the visited pixels to avoid infinite loops.
+    - Base cases:
+      ![flood fill](./img/flood-fill-2.png)
+      - If the current pixel is not in the image (row/column out of bound), we return.
+      - If the current pixel has a different color than the starting pixel, we return.
+      - If the current pixel is already visited, we return.
+
+- Time Complexity: `O(n.m)` -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the pixels in the image.
+  ![flood fill](./img/flood-fill-3.png)
+- Space Complexity: `O(n.m)` -> call stack + visited set
+  ![flood fill](./img/flood-fill-4.png)
+
+```py
+class Solution:
+    def floodFill(self, image: List[List[int]], sr: int, sc: int, newColor: int) -> List[List[int]]:
+        ROWS, COLS = len(image), len(image[0])
+        color = image[sr][sc]
+        visit = set()
+
+        def dfs(r, c):
+            # Base case
+            if (
+              r not in range(ROWS) or
+              c not in range(COLS) or
+              image[r][c] != color or
+              (r, c) in visit
+            ):
+                return
+
+            visit.add((r, c)) # mark the current cell as visited
+            image[r][c] = newColor # change the color of the current cell
+
+            # check the neighbors (bottom, top, right, left)
+            dfs(r + 1, c)
+            dfs(r - 1, c)
+            dfs(r, c + 1)
+            dfs(r, c - 1)
+
+        dfs(sr, sc)
+        return image
+```
+
+---
+
+### Max Area of Island
+
+You are given an `m x n` binary matrix `grid`. An island is a group of `1`'s (representing land) connected **4-directionally** (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
+
+The **area** of an island is the number of cells with a value `1` in the island.
+
+Return _the maximum **area** of an island in `grid`_. If there is no island, return `0`.
+
+- Ex: `grid = [[0,0,1,0,0,0,0,1,0,0,0,0,0],
+[0,0,0,0,0,0,0,1,1,1,0,0,0],
+[0,1,1,0,1,0,0,0,0,0,0,0,0],
+[0,1,0,0,1,1,0,0,1,0,1,0,0],
+[0,1,0,0,1,1,0,0,1,1,1,0,0],
+[0,0,0,0,0,0,0,0,0,0,1,0,0],
+[0,0,0,0,0,0,0,1,1,1,0,0,0],
+[0,0,0,0,0,0,0,1,1,0,0,0,0]]`
+  ![max area of island](./img/max-area-of-island-1.jpeg)
+
+  - Output: `6`
+  - Explanation: The answer is not `11`, because the island must be connected 4-directionally.
+
+- Time Complexity: `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
+
+```py
+class Solution:
+    def maxAreaOfIsland(self, grid: List[List[int]]) -> int:
+        ROWS, COLS = len(grid), len(grid[0])
+        visit = set()
+
+        def dfs(r, c):
+            # Base case
+            if (
+              r < 0 or r == ROWS or
+              c < 0 or c == COLS or
+              grid[r][c] == 0 or
+              (r, c) in visit
+            ):
+                return 0
+
+            visit.add((r, c)) # mark the current cell as visited
+            return (
+              1 +
+              dfs(r + 1, c) +
+              dfs(r - 1, c) +
+              dfs(r, c + 1) +
+              dfs(r, c - 1)
+            )
+
+        max_area = 0
+        for r in range(ROWS):
+            for c in range(COLS):
+                max_area = max(max_area, dfs(r, c))
+
+        return max_area
+```
+
+- **Optimization:** if you don't want to use a `set`, You can ask the interviewer if you can modify the grid. If `yes`, you can change the value of the current cell to `0` to mark it as visited.
+
+---
+
+### Rotting Oranges
+
+You are given an `m x n` grid `grid` where each cell can have one of three values:
+
+- `0` representing an empty cell,
+- `1` representing a fresh orange, or
+- `2` representing a rotten orange.
+
+Every minute, any fresh orange that is **4-directionally adjacent** to a rotten orange becomes rotten. Return _the minimum number of minutes that must elapse until no cell has a fresh orange_. If this is impossible, return `-1`.
+
+- Ex: `grid = [[2,1,1],[1,1,0],[0,1,1]]`
+  ![rotting oranges](./img/rotting-oranges-1.png)
+
+  - Output: `4`
+  - Explanation: The orange in the bottom left corner (row 2, column 0) is never rotten, because rotting only happens 4-directionally.
+
+- Explanation:
+
+  - Here we can't use `DFS` because we need to know the time it takes for each orange to rot. as there may be multiple rotten oranges at the same time. which simultaneously rotting neibouring oranges.
+  - So, we can use `BFS` to solve this problem. as it can simultaneously process all the nodes at the same level at the same time. -> **Multi source BFS**
+    - Out sources will be the rotten oranges. which will be added to the `queue` at the beginning.
+    - Then we add the neibouring oranges to the `queue` and mark them as rotten.
+    - once we finish processing all the oranges in the current level, we increment the time by `1`.
+    - once the queue is empty, we stop and return the time.
+  - We also we need to store the number of fresh oranges in the grid. to know when to stop. if there are no fresh oranges left, we return the time. if there are still fresh oranges left, we return `-1`.
+
+- Time and Space Complexity: `O(n.m)` = size of the grid
+
+```py
+class Solution:
+    def orangesRotting(self, grid: List[List[int]]) -> int:
+        ROWS, COLS = len(grid), len(grid[0])
+        queue = deque()
+        fresh_oranges = 0
+        time = 0
+
+        # Step 1). build the initial queue of rotten oranges and count the fresh oranges
+        for r in range(ROWS):
+            for c in range(COLS):
+                if grid[r][c] == 2:
+                    queue.append((r, c))
+                elif grid[r][c] == 1:
+                    fresh_oranges += 1
+
+        while queue and fresh_oranges > 0:
+            for i in range(len(queue)):
+                r, c = queue.popleft()
+
+                # nr: new row, nc: new column
+                for nr, nc in (
+                  (r + 1, c),
+                  (r - 1, c),
+                  (r, c + 1),
+                  (r, c - 1)):
+                    # check if it's not a fresh orange
+                    if (
+                      nr < 0 or nr == ROWS or
+                      nc < 0 or nc == COLS or
+                      grid[nr][nc] != 1
+                    ):
+                        continue
+
+                    # if it's a fresh orange, set it as rotten
+                    grid[nr][nc] = 2
+                    fresh_oranges -= 1
+                    queue.append((nr, nc))
+
+            # after this level, increment the time by 1
+            time += 1
+
+        return time if fresh_oranges == 0 else -1
+```
+
+---
+
+### All Paths From Source to Target
+
+Given a directed acyclic graph (**DAG**) of `n` nodes labeled from `0` to `n - 1`, find all possible paths from node `0` to node `n - 1`, and return them in any order.
+
+The graph is given as follows: `graph[i]` is a list of all nodes you can visit from node `i` (i.e., there is a directed edge from node `i` to node `graph[i][j]`).
+
+- Ex: `graph = [[1,2],[3],[3],[]]`
+
+  ![all paths from source to target](./img/all-paths-from-source-to-target-1.jpg)
+
+  - Output: `[[0,1,3],[0,2,3]]`
+  - Explanation: There are two paths: 0 -> 1 -> 3 and 0 -> 2 -> 3.
+
+- Explanation:
+
+  - We can use `DFS` to solve this problem.
+    ![all paths from source to target](./img/all-paths-from-source-to-target-2.png)
+  - We start from node `0` and keep going until we reach node `n-1`
+    - We keep track of the current `path` and add it to the result when we reach node `n-1`.
+
+- Solution 1: `DFS` with backtracking
+
+  - Time and Space Complexity: `O(2^n)` = number of nodes in the graph
+
+  ```py
+  def allPathsSourceTarget(graph):
+      def dfs(node, path):
+          # Base case
+          if node == len(graph) - 1:
+              result.append(path)
+              return
+
+          for neighbor in graph[node]:
+              dfs(neighbor, path + [neighbor])
+
+      result = []
+      dfs(0, [0])
+      return result
+  ```
+
+- Solution 2: `BFS`
+
+  - We will use a `queue` to store the current `node` and the current `path`.
+  - Time and Space Complexity: `O(2^n)` = number of nodes in the graph
+
+  ```py
+  def allPathsSourceTarget(graph):
+      queue = deque([(0, [0])])
+      result = []
+      end = len(graph) - 1
+
+      while queue:
+          node, path = queue.popleft()
+
+          if node == end:
+              result.append(path)
+              continue
+
+          for neighbor in graph[node]:
+              queue.append((neighbor, path + [neighbor]))
+
+      return result
+  ```
+
+---
+
+### Clone Graph
+
+Given a reference of a node in a **connected** undirected graph. Return a **deep copy** (clone) of the graph.
+
+- The clone should have the exact structure and values as the original graph.
+  ![clone graph](./img/clone-graph-1.png)
+
+- Explanation:
+
+  - We will need to clone each node and also its neighbors **(recursively)**.
+  - We will create a `HashMap` to keep track of the cloned nodes.
+    - The key will be the original node, and the value will be the cloned node.
+    - We will use this `HashMap` to check if we already cloned a node or not, so that we don't clone it again and just return the cloned node from the `HashMap`.
+    - if a node is already cloned, then we make it double sided (pointing to each other).
+      ![clone graph](./img/clone-graph-2.png)
+
+- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
+  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph, because we need to create a clone for each one
+
+```py
+def cloneGraph(node):
+    # Create a HashMap to keep track of the cloned nodes
+    oldToNew = {}
+
+    def dfs(node):
+        # Check if the node is already cloned
+        if node in oldToNew:
+            return oldToNew[node] # Return the cloned node to double-side it
+
+        # Create a clone for the node
+        clone = Node(node.val, [])
+
+        # Add the node to the HashMap
+        oldToNew[node] = clone
+
+        # Loop through the neighbors of the node
+        for neighbor in node.neighbors:
+            # Clone the neighbor and add it to the clone's neighbors
+            clone.neighbors.append(dfs(neighbor))
+
+        return clone
+
+    return dfs(node) if node else None
+```
+
+---
+
+### Course Schedule
+
+There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [ai, bi]` indicates that you must take course `bi` first if you want to take course `ai`.
+
+For example, the pair `[0, 1]`, indicates that to take course `0` you have to first take course `1`. Return `true` if you can finish all courses. Otherwise, return `false`.
+
+- Ex: `numCourses = 2, prerequisites = [[1,0]]`
+  - Output: `true`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible.
+- Ex: `numCourses = 2, prerequisites = [[1,0],[0,1]]`
+
+  - Output: `false`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+
+- Explanation:
+
+  - To check if we can take any course, we need to check if there is a **cycle** or not in the graph.
+  - We create a graph from the prerequisites in the adjacency list format.
+    - This is because we want to know if for each node, can we reach the end node or not (finish all courses).
+      ![course-schedule](./img/course-schedule-3.png)
+    - We notice that our `base` cases are the nodes that don't have any prerequisites (no neighbours).
+      - To keep track of these nodes, we use a `HashMap` with adjacency list.
+        ![course-schedule](./img/course-schedule-4.png)
+  - Then we use `DFS` to check if there is a cycle or not.
+    - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
+      ![course-schedule](./img/course-schedule-5.png)
+    - To prevent running `DFS` on the same node twice, we remove it from the `HashMap` after we run `DFS` on it and knowing that it can be completed.
+      ![course-schedule](./img/course-schedule-6.png)
+    - if all nodes can be completed, then we return `true`
+      ![course-schedule](./img/course-schedule-7.png)
+    - If there is a cycle, then we return `false`.
+      ![course-schedule](./img/course-schedule-1.png)
+      ![course-schedule](./img/course-schedule-2.png)
+      - A cycle is detected using a `visited` set .
+        ![course-schedule](./img/course-schedule-8.png)
+
+- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
+  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+
+```py
+def canFinish(numCourses, prerequisites):
+    # Create a graph from the prerequisites
+    preMap = {i: [] for i in range(numCourses)}
+    # preMap = collections.defaultdict(list)
+    for course, pre in prerequisites:
+        preMap[course].append(pre)
+
+    # Create a set to keep track of the visited nodes
+    visited = set()
+
+    def dfs(node):
+        # Base case
+        if node in visited:
+            return False
+        if preMap[node] == []:
+            return True
+
+        # Add the node to the visited set
+        visited.add(node)
+
+        # Loop through the prerequisites of the node
+        for pre in preMap[node]:
+            # Check if there is a cycle
+            if not dfs(pre):
+                return False
+
+        # Remove the node from the visited set
+        visited.remove(node)
+
+        preMap[node] = [] # Remove the node from the graph map
+
+        return True
+
+    for node in range(numCourses):
+        if dfs(node) == False:
+            return False
+
+    # Else
+    return True
+```
+
+---
+
+### Course Schedule II
+
+Same as above, but return the order of the courses to take.
+
+- Ex: `numCourses = 2, prerequisites = [[1,0]]`
+
+  - Output: `[0,1]`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is `[0,1]`.
+
+- Explanation:
+
+  - We use the same approach as above, with a preMap to create a graph from the prerequisites.
+    ![course-schedule-ii](./img/course-schedule-ii-1.png)
+  - We use `DFS` to check if there is a cycle or not.
+    - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
+      ![course-schedule-ii](./img/course-schedule-ii-2.png)
+    - To prevent running `DFS` on the same node twice, we remove it from the `HashMap` after we run `DFS` on it and knowing that it can be completed, and then go back to the previous node and repeat the process.
+      ![course-schedule-ii](./img/course-schedule-ii-3.png)
+      ![course-schedule-ii](./img/course-schedule-ii-4.png)
+      ![course-schedule-ii](./img/course-schedule-ii-5.png)
+    - if all nodes can be completed, then we return `true`
+      ![course-schedule-ii](./img/course-schedule-ii-6.png)
+    - If there is a cycle, then we return `false`.
+      - A cycle is detected using a `visited` set .
+
+```py
+def findOrder(numCourses, prerequisites):
+    # Create a graph from the prerequisites
+    preMap = {course: [] for course in range(numCourses)}
+    for course, pre in prerequisites:
+        preMap[course].append(pre)
+
+    # Create sets to keep track of the visited nodes and potential cycles
+    visited, cycle = set(), set()
+
+    # Create a output to keep track of the order of the courses
+    output = []
+
+    def dfs(node):
+        # Base case
+        if node in cycle:
+            return False
+        if node in visited:
+            return True # so that we don't stop the algotithm
+
+        # Add the node to the cycle set
+        cycle.add(node)
+
+        # Loop through the prerequisites of the node
+        for pre in preMap[node]:
+            # Check if there is a cycle
+            if not dfs(pre):
+                return False
+
+        # Remove the node from the cycle set
+        cycle.remove(node)
+
+        # Finally add the node to the visited set
+        visited.add(node)
+
+        output.append(node)
+        return True
+
+    for course in range(numCourses):
+        if dfs(course) == False:
+            return []
+
+    # Else
+    return output
+```
+
+---
+
+### Network Delay Time
+
+You are given a network of `n` nodes, labeled from `1` to `n`. You are also given `times`, a list of travel times as directed edges `times[i] = (ui, vi, wi)`, where `ui` is the source node, `vi` is the target node, and `wi` is the time it takes for a signal to travel from source to target.
+
+We will send a signal from a given node `k`. Return the time it takes for all the `n` nodes to receive the signal. If it is impossible for all the `n` nodes to receive the signal, return `-1`.
+
+- Ex: `times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2`
+  ![network-delay-time](./img/network-delay-time-1.png)
+
+  - Output: `2`
+  - Explanation: The signal will take 1 minute to travel from node 2 to node 1, and 1 minute to travel from node 2 to node 3.
+    - Then, it will take 1 minute for all the nodes to receive the signal.
+
+- Explanation:
+
+  - We use `Dijkstra's Algorithm` to find the shortest path from the source node to all other nodes.
+  - This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
+    - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
+      ![network-delay-time](./img/network-delay-time-2.png)
+    - Here we will usre a `min heap` to keep track of the shortest path.
+      - It's logical to search the node with shortest distance, So we will use the `min heap` to pop the node with the shortest distance from the source node and add its neighbors to the `Priority Queue` with their distance from the source node.
+        ![network-delay-time](./img/network-delay-time-3.png)
+  - Starting at the source node `k`, we loop through its neighbors and add them to the `Priority Queue` with their distance from the source node.
+    ![network-delay-time](./img/network-delay-time-4.png)
+    ![network-delay-time](./img/network-delay-time-5.png)
+
+- Time complexity: `O(ElogV)`
+  - `E` is the number of edges
+  - `V` is the number of vertices
+
+```py
+def networkDelayTime(times, n, k):
+    # Create a graph from the times
+    graph = collections.defaultdict(list)
+    for u, v, w in times:
+        graph[u].append((v, w))
+
+    # Create a min heap to keep track of the shortest path
+    minHeap = [(0, k)] # (path-distance, node)
+
+    visit = set()
+    res = 0
+
+    while minHeap:
+      w1, n1 = heapq.heappop(minHeap)
+      if n1 not in visit:
+        visit.add(n1)
+        res = max(res, w1) # max because we want the path to the farthest node (n-1) which indicate the delay time
+
+        for n2, w2 in graph[n1]:
+          if n2 not in visit:
+            heapq.heappush(minHeap, (w1 + w2, n2))
+
+    return res if len(visit) == n else -1
+```
+
+---
+
+### Path with Maximum Probability
+
+You are given an undirected weighted graph of `n` nodes `(0-indexed)`, represented by an edge list where `edges[i] = [a, b]` is an undirected edge connecting the nodes `a` and `b` with a probability of success of traversing that edge `succProb[i]`.
+
+Given two nodes `start` and `end`, find the path with the maximum probability of success to go from `start` to `end` and return its success probability.
+
+If there is no path from `start` to `end`, return `0`.
+
+- Ex: `n = 3, edges = [[0,1],[1,2],[0,2]], succProb = [0.5,0.5,0.2], start = 0, end = 2`
+
+  ![path-with-maximum-probability](./img/path-with-max-prop-1.png)
+
+  - Output: `0.25`
+  - Explanation: There are two paths from start to end, one having a probability of success = 0.2 and the other has 0.5 \* 0.5 = 0.25.
+
+- Explanation:
+
+  - Here, we want to find the path with the maximum probability of success to go from `start` to `end`. So we can use `Dijkstra's Algorithm` to find the shortest path from `start` to `end`, but instead of keeping track of the shortest path, we keep track of the path with the maximum probability of success aka "longest path".
+  - We will use a `Priority Queue` to keep track of the path with the maximum probability of success.
+    - Here we will usre a `max heap` to keep track of the path with the maximum probability of success.
+      - we will use the `max heap` to pop the node with the maximum probability of success from the source node and add its neighbors to the `Priority Queue` with their probability of success.
+        ![path-with-maximum-probability](./img/path-with-max-prop-2.png)
+        ![path-with-maximum-probability](./img/path-with-max-prop-3.png)
+    - Python doesn't have a `max heap`, so we will use a `min heap` and multiply the probability of success by `-1` to get the maximum probability of success.
+      - `heapq.heappush(minHeap, (-1 * w1 * w2, n2))`
+      - `heapq.heappop(minHeap)[0] * -1`
+
+- Time complexity: `O(ElogV)`
+
+```py
+def maxProbability(n, edges, succProb, start, end):
+    # Create a graph from the edges
+    graph = collections.defaultdict(list)
+    for i in range(len(edges)):
+        src, dst = edges[i]
+        # Add the probability of success to the graph to the 2 sides of the edge
+        graph[src].append((dst, succProb[i]))
+        graph[dst].append((src, succProb[i]))
+
+
+    # Create a max heap to keep track of the path with the maximum probability of success
+    minHeap = [(-1, start)] # (path-probability, node)
+
+    visit = set()
+
+    while minHeap:
+      prob, cur = heapq.heappop(minHeap)
+      visit.add(cur)
+
+      if cur == end:
+        return prob * -1
+
+      for nei, edgeProb in graph[cur]:
+        if nei not in visit:
+          heapq.heappush(minHeap, (prob * edgeProb, nei))
+
+    # If there is no path from start to end
+    return 0
+```
+
+---
+
+### Redundant Connection
+
+In this problem, a tree is an undirected graph that is connected and has no cycles.
+
+You are given a graph that started as a tree with `n` nodes labeled from `1` to `n`, with one additional edge added. The added edge has two different vertices chosen from `1` to `n`, and was not an edge that already existed. The graph is represented as an array `edges` of length `n` where `edges[i] = [ai, bi]` indicates that there is an edge between nodes `ai` and `bi` in the graph.
+
+Return an edge that can be removed so that the resulting graph is a tree of `n` nodes. If there are multiple answers, return the answer that occurs last in the input.
+
+- Ex: `edges = [[1,2],[1,3],[2,3]]`
+
+  ![redundant-connection](./img/redundant-connection-1.jpg)
+
+  - Output: `[2,3]`
+
+![redundant-connection](./img/redundant-connection-2.png)
+
+- Explanation:
+
+  - The problem is called "Redundant Connection" because we want to find the edge that is `redundant` aka the edge that we can remove to make the graph a tree.
+  - We want to know what edge we can remove to make the graph a tree **(no cycles)**.
+  - We can use **Union Find** to find the redundant connection.
+    - This is because we know that a tree is an undirected graph that is **connected** and has no cycles.
+    - So if we find a cycle in the graph, then we know that the edge that created the cycle is the **redundant connection**.
+    - `union find` algo will be used in 2 steps:
+      1. `union` the nodes together if they don't have the same parent -> **no cycle**
+         ![redundant-connection](./img/redundant-connection-3.png)
+      2. `find` the parent of each node and check if the parent of the 2 nodes are the same -> **cycle**
+
+- Solution 1: DFS
+
+  - Time complexity: `O(n^2)`
+
+  ```py
+  def findRedundantConnection(edges):
+      # Create a graph from the edges
+      graph = collections.defaultdict(list)
+      for node1, node2 in edges:
+          graph[node1].append(node2)
+          graph[node2].append(node1)
+
+      def dfs(node1, node2):
+          # If we found a cycle, then return True
+          if node1 == node2:
+              return True
+          # If we haven't visited the node yet, then visit it
+          if node1 not in visit:
+              visit.add(node1)
+              # Check if there is a cycle in the graph
+              return any(dfs(nei, node2) for nei in graph[node1])
+
+      for node1, node2 in edges:
+          visit = set()
+          # If there is a cycle in the graph, then return the edge that created the cycle
+          if dfs(node1, node2):
+              return [node1, node2]
+  ```
+
+- Solution 2: Union Find by **rank** ✅
+
+  - Time complexity: `O(nlogn)`
+  - Steps:
+    1. We start with nodes that are not connected to any other nodes, and the rank of each node is `1` -> size of the starting tree.
+       ![redundant-connection](./img/redundant-connection-4.png)
+    2. we will go through each edge and `union` (connecting) the nodes together in the shape of a `tree` if they don't have the same parent.
+       - If the parent of the 2 nodes are the same, then we found a cycle.
+       - If the parent of the 2 nodes are not the same, then we `union` the nodes together and update:
+         - the rank of the parent node as the size of the tree will increase by `1`.
+           ![redundant-connection](./img/redundant-connection-5.png)
+         - The parent of the node1 as the parent of the `node2`.
+           ![redundant-connection](./img/redundant-connection-6.png)
+    3. repeat step 2 until we find a cycle in the graph.
+       ![redundant-connection](./img/redundant-connection-7.png)
+       ![redundant-connection](./img/redundant-connection-8.png)
+
+  ```py
+  def findRedundantConnection(edges):
+      # Create a parent array to keep track of the parent of each node
+      parent = [i for i in range(len(edges) + 1)]
+      # Create a rank array to keep track of the rank of each node
+      rank = [1 for i in range(len(edges) + 1)]
+
+      def find(node):
+          p = parent[node] # going up the parent of the node
+          # If the parent of the node is itself, then we found the Top parent
+          while p != parent[p]:
+              parent[p] = parent[parent[p]] # path compression to make the tree flat -> O(logn)
+              p = parent[p]
+          return p
+
+      # Union the nodes together if they don't have the same parent
+      def union(node1, node2):
+          p1, p2 = find(node1), find(node2)
+
+          if p1 == p2:
+              return False
+
+          # check the rank of the 2 nodes to see which one is the parent and update the rank of the parent
+          if rank[p1] > rank[p2]:
+              parent[p2] = p1
+              rank[p1] += rank[p2]
+          else:
+              parent[p1] = p2
+              rank[p2] += rank[p1]
+
+          return True
+
+      for node1, node2 in edges:
+          # If the parent of the 2 nodes are the same, then we found a cycle
+          if not union(node1, node2):
+              return [node1, node2]
+  ```
+
+- Solution 3: Union Find
+
+  - Time complexity: `O(nlogn)`
+
+  ```py
+  def findRedundantConnection(edges):
+      # Create a parent array to keep track of the parent of each node
+      parent = [i for i in range(len(edges) + 1)]
+
+      def find(node):
+          p = parent[node] # going up the parent of the node
+          # If the parent of the node is itself, then we found the Top parent
+          if p == node:
+            return p
+          p = find(p)
+
+      # Union the nodes together if they don't have the same parent
+      def union(node1, node2):
+          # make the parent of node1 the parent of node2
+          parent[find(node1)] = find(node2)
+
+      for node1, node2 in edges:
+          # If the parent of the 2 nodes are the same, then we found a cycle
+          if find(node1) == find(node2):
+              return [node1, node2]
+          else:
+              union(node1, node2)
+
+      return []
+  ```
+
+---
+
+### Accounts Merge
+
+problem: [Here](https://leetcode.com/problems/accounts-merge/)
+
+- Explanation:
+
+  - first string will be the `name` of the account, and the rest of the strings will be the `emails` of the account.
+    - The problem is that they might be multiple accounts that belong to the same person (same name), and we want to merge them together.
+    - We will know that 2 accounts belong to the same person if they have at least 1 email in common.
+  - So eventually, we want to merge (union) all the accounts that belong to the same person together, and return the result in the form of a list of lists.
+  - So this is a **Graph** problem and can be solved using `union find`.
+    - After connecting all the nodes together, we will have a graph that looks like this:
+      ![accounts-merge](./img/accounts-merge-1.png)
+    - We will go through each node and do a `DFS` to find all the nodes that belong to the same person and append them to a list.
+    - We will also keep track of the emails that we have visited so that we don't visit the same email twice.
+    - We will also sort the emails in the list so that we can return the result in the correct order.
+
+  ```py
+  class UnionFind:
+    def __init__(self, n):
+        self.par = [i for i in range(n)]
+        self.rank = [1] * n
+
+    def find(self, x):
+        while x != self.par[x]:
+            self.par[x] = self.par[self.par[x]]
+            x = self.par[x]
+        return x
+
+    def union(self, x1, x2):
+        p1, p2 = self.find(x1), self.find(x2)
+        if p1 == p2:
+            return False
+        if self.rank[p1] > self.rank[p2]:
+            self.par[p2] = p1
+            self.rank[p1] += self.rank[p2]
+        else:
+            self.par[p1] = p2
+            self.rank[p2] += self.rank[p1]
+        return True
+
+  class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        uf = UnionFind(len(accounts))
+        emailToAcc = {} # email -> index of acc
+
+        for i, a in enumerate(accounts):
+            for e in a[1:]:
+                if e in emailToAcc:
+                    uf.union(i, emailToAcc[e])
+                else:
+                    emailToAcc[e] = i
+
+        emailGroup = defaultdict(list) # index of acc -> list of emails
+        for e, i in emailToAcc.items():
+            leader = uf.find(i)
+            emailGroup[leader].append(e)
+
+        res = []
+        for i, emails in emailGroup.items():
+            name = accounts[i][0]
+            res.append([name] + sorted(emailGroup[i])) # array concat
+        return res
+  ```
+
+---
+
+### Sort Items by Groups Respecting Dependencies
+
+problem: [Here](https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/)
+
+- Explanation:
+
+  - At first glance it is clear that this is a **topological sorting** problem, but it's difficulty rise from the fact that there is grouping, thus we need to think about dependancies between the nodes(items) in each group and between groups as a whole.
+  - We start by creating a new representation for the groups using dictionaries where each `groups[groupId]` is a set of all nodes with `id == groupId`, and we create a new group for each node that is not in any group.
+  - Then we find the dependencies within each `group` and between `groups`.
+  - lastly we sort each group by it self using the depenancies between the nodes inside said group, and the groups by their `id` using the between groups depencancy topologically and merge the results.
+
+- Time and space complexity:
+
+  - Time: `O(n + m)` where `n` is the number of items and `m` is the number of dependencies.
+  - Space: `O(n + m)`
+
+```py
+
+```
+
+---
+
+### Find if Path Exists in Graph
+
+problem: [Here](https://leetcode.com/problems/find-if-path-exists-in-graph/description/)
+
+- BFS
+
+  ```py
+  def validPath(n: int, edges: List[List[int]], start: int, end: int) -> bool:
+      graph = defaultdict(list)
+      for u, v in edges:
+          graph[u].append(v)
+          graph[v].append(u)
+
+      visited = set()
+      queue = deque([start])
+      while queue:
+          node = queue.popleft()
+          if node == end:
+              return True
+          if node in visited:
+              continue
+          visited.add(node)
+          for nei in graph[node]:
+              queue.append(nei)
+      return False
+  ```
+
+- DFS
+
+  ```py
+  def validPath(n: int, edges: List[List[int]], start: int, end: int) -> bool:
+      graph = defaultdict(list)
+      for u, v in edges:
+          graph[u].append(v)
+          graph[v].append(u)
+
+      visited = set()
+      def dfs(node):
+          if node == end:
+              return True
+          if node in visited:
+              return False
+          visited.add(node)
+          for nei in graph[node]:
+              if dfs(nei):
+                  return True
+          return False
+
+      return dfs(start)
+  ```
+
+---
+
+### Check if There is a Valid Path in a Grid
+
+problem: [Here](https://leetcode.com/problems/check-if-there-is-a-valid-path-in-a-grid/)
+
+- Explanation:
+
+  - The idea is to use a `directions` dictionary to store the possible directions for each type of street.
+  - Then we will use `DFS` to traverse the grid and check if we can reach the bottom right cell.
+
+- Time and space complexity: `O(m * n)`
+
+```py
+def hasValidPath(grid: List[List[int]]) -> bool:
+    ROWS, COLS = len(grid), len(grid[0])
+    directions = {
+        1: [(0, -1), (0, 1)],
+        2: [(-1, 0), (1, 0)],
+        3: [(0, -1), (1, 0)],
+        4: [(0, 1), (1, 0)],
+        5: [(0, -1), (-1, 0)],
+        6: [(0, 1), (-1, 0)]
+    }
+
+    # Backtracking
+    def dfs(r, c):
+        # If we reach the bottom right square, it means we've found a path
+        if r == ROWS - 1 and c == COLS - 1:
+            return True
+        # If we reach a square that has been visited or is a wall, we can't move forward
+        if grid[r][c] == -1:
+            return False
+        # Mark the current square as visited
+        oldVal = grid[r][c]
+        grid[r][c] = -1
+
+        # Try to move in each direction
+        for dr, dc in directions[oldVal]:
+            nr, nc = r + dr, c + dc
+            # If we can move in a direction, return True if we can reach the bottom right square from there
+            if 0 <= nr < ROWS and 0 <= nc < COLS and grid[nr][nc] != -1:
+                # negative dr and dc because we are going backwards in the path
+                if (-dr, -dc) in directions[grid[nr][nc]]:
+                    if dfs(nr, nc):
+                        return True
+        # Backtrack
+        return False
+
+    return dfs(0, 0)
+```
+
+---
+
+### Couples Holding Hands
+
+There are `n` couples sitting in `2n` seats arranged in a row and want to hold hands. The people and seats are represented by an integer array `row` where `row[i]` is the ID of the person sitting in the `i`th seat. The couples are numbered in order, the first couple being `(0, 1)`, the second couple being `(2, 3)`, and so on with the last couple being `(2n - 2, 2n - 1)`.
+
+Return the minimum number of swaps so that every couple is sitting side by side. A swap consists of choosing any two people, then they stand up and switch seats.
+
+- Ex:
+
+  - Input: row = [0, 2, 1, 3]
+  - Output: 1
+  - Explanation: We only need to swap the second (row[1]) and third (row[2]) person.
+
+- Explanation:
+
+  - The idea is to use a `couples` dictionary to store the index of each couple. Then we will iterate over the array and for each couple we will check if they are sitting side by side, if not we will swap the current person with the person sitting next to their partner.
+  - This is a Graph problem, we can also solve it using `DFS` or `BFS`. We will create a graph where each node is a person and each edge is a couple, then we will count the number of connected components.
+  - Time and space complexity: `O(n)`, where `n` is the number of couples.
+
+- Look at this explanation: [https://medium.com/@jolyon129/765-couples-holding-hands-a9ce4d50b25e](https://medium.com/@jolyon129/765-couples-holding-hands-a9ce4d50b25e)
+
+- Solution 1: `Greedy`
+
+  ```py
+  def minSwapsCouples(row: List[int]) -> int:
+      swaps = 0
+      couples = {}
+      for i, person in enumerate(row):
+          couples[person] = i
+
+      # Iterate over the array by pairs
+      for i in range(0, len(row), 2):
+          # Get the partner of the current person using XOR
+          partner = row[i] ^ 1 # XOR
+          if row[i + 1] != partner:
+              swaps += 1
+
+              # Swap the current person with the person sitting next to their partner
+              row[couples[partner]], row[i + 1] = row[i + 1], row[couples[partner]]
+
+              # Update the index of the partner
+              couples[row[couples[partner]]] = couples[partner]
+              couples[partner] = i + 1
+      return swaps
+  ```
+
+- Solution 2: `Union-Find`
+
+  ```py
+  class UnionFind:
+      def __init__(self, n):
+          self.parent = list(range(n))
+          self.count = n # Number of connected components
+
+      def find(self, x):
+          if self.parent[x] != x:
+              self.parent[x] = self.find(self.parent[x])
+          return self.parent[x]
+
+      def union(self, x, y):
+          px, py = self.find(x), self.find(y)
+          if px != py:
+              self.parent[px] = py
+              self.count -= 1 # Decrease the number of connected components
+
+  def minSwapsCouples(row: List[int]) -> int:
+      n = len(row) // 2
+      uf = UnionFind(n)
+      for i in range(0, len(row), 2):
+          uf.union(row[i] // 2, row[i + 1] // 2)
+      return n - uf.count
+  ```
+
+---
+
+### Minimum Obstacle Removal to Reach Corner
+
+Problem: [Here](https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/)
+
+- Explanation:
+
+  - This can be solved using `Dijsktra` algorithm or `BFS`.
+
+- Solution 1: `BFS`
+
+  ```py
+  def minimumEffortPath(heights: List[List[int]]) -> int:
+      rows = len(grid)
+      cols = len(grid[0])
+      dist = [[inf] * cols for _ in range(rows)]
+      dist[0][0] = 0
+      dq = deque([(0, 0, 0)])
+      directions = [[0,1],[0,-1],[1,0],[-1,0]]
+
+      while dq:
+          count, r, c = dq.popleft()
+          for dr, dc in directions:
+              row = r + dr
+              col = c + dc
+              if 0 <= row < rows and 0 <= col < cols and dist[row][col] == inf:
+                  new_count = count
+                  if grid[row][col] == 1:
+                      dist[row][col] = count + 1
+                      dq.append((count + 1, row, col))
+                  else:
+                      dist[row][col] = count
+                      dq.appendleft((count, row, col))
+      return dist[-1][-1]
+  ```
+
+- Solution 2: `Dijkstra`
+
+  ```py
+  m, n = len(grid), len(grid[0])
+  distance = collections.defaultdict(int)
+  for i in range(m):
+      for j in range(n):
+          distance[(i,j)] = float("inf")
+
+  distance[(0,0)] = grid[0][0]
+  stack = [(0,0,0)]
+
+  while stack:
+      weight, i, j = heapq.heappop(stack)
+
+      if i == m-1 and j == n-1:
+          return weight
+
+      for ni,nj in [(i-1,j),(i+1,j),(i,j-1),(i,j+1)]:
+          if 0 <= ni < m and 0 <= nj < n and distance[(ni,nj)] > weight + grid[ni][nj]:
+              distance[(ni,nj)] = weight + grid[ni][nj]
+              heapq.heappush(stack,(weight+grid[ni][nj],ni,nj))
+  ```
+
+---
+
+### Trapping Rain Water II
+
+Given an `m x n` integer matrix `heightMap` representing the height of each unit cell in a 2D elevation map, return the volume of water it can trap after raining.
+
+- Ex:
+  ![trapping-rain-water-ii](./img/trapping-rain-water-ii-1.jpg)
+
+  - Input: heightMap = [[1,4,3,1,3,2],[3,2,1,3,2,4],[2,3,3,2,3,1]]
+  - Output: 4
+  - Explanation: After the rain, water is trapped between the blocks.
+    - We have two small pounds 1 and 3 units trapped.
+    - The total volume of water trapped is 4.
+
+- Explanation:
+
+  - It's a `Graph` problem, because we will will be going to each `node` and then look into its neighbors to see if it can trap water.
+  - This is a `BFS` problem, we will use a `priority queue` to store the cells with the lowest height.
+    - We use a `priority queue` (`min heap`) because **we want to start with the lowest height**.
+  - We will start by adding the cells on the **border** to the queue and mark them as visited. so that we can start at the boundaries and move **inwards**.
+    ![trapping-rain-water-ii](./img/trapping-rain-water-ii-2.png)
+    - border cells because they can't trap water.
+  - Then we will iterate over the queue and for each cell we will check its neighbors to calculate the amount of water it can trap.
+    ![trapping-rain-water-ii](./img/trapping-rain-water-ii-3.png)
+    - Formula: `min(current_cell_height, neighbor_height) - current_cell_height`
+    - if the neighbor is lower than the current cell, we will add the difference between the heights to the result and update the height of the neighbor to the current cell height.
+    - Then we will add the neighbor to the queue.
+      - when doing so we want to make the height of the neighbor the maximum between the current cell height and the neighbor height. so that it can trap water.
+  - Time and space complexity: `O(mnlog(mn))`, where `m` is the number of rows and `n` is the number of columns.
+
+```py
+def trapRainWater(heightMap: List[List[int]]) -> int:
+    ROWS, COLS = len(heightMap), len(heightMap[0])
+    visited = [[False] * COLS for _ in range(ROWS)]
+
+    # Add the cells on the border to the queue and mark them as visited
+    pq = []
+    for r in range(ROWS):
+        for c in range(COLS):
+            if r == 0 or r == ROWS - 1 or c == 0 or c == COLS - 1:
+                heapq.heappush(pq, (heightMap[r][c], r, c))
+                visited[r][c] = True
+
+    result = 0
+    while pq:
+        height, r, c = heapq.heappop(pq)
+
+        # Check the neighbors for all 4 directions for each cell
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nr, nc = r + dr, c + dc # new row, new column
+
+            # check if the neighbor is in the grid and not visited
+            if 0 <= nr < ROWS and 0 <= nc < COLS and not visited[nr][nc]:
+                visited[nr][nc] = True
+                # water = neighbor_height - current_cell_height, if neighbor_height < current_cell_height to prevent negative values
+                result += max(0, height - heightMap[nr][nc])
+                # update the height of the neighbor to the current cell height if it's higher
+                heapq.heappush(pq, (max(height, heightMap[nr][nc]), nr, nc))
+
+    return result
+```
+
+---
+
+### Longest Increasing Path in a Matrix
+
+Given an `m x n` integers matrix, return the length of the longest increasing path in matrix.
+
+From each cell, you can either move in four directions: left, right, up, or down. You may not move diagonally or move outside the boundary (i.e., wrap-around is not allowed).
+
+- Ex:
+
+  ![longest-increasing-path-matrix](./img/longest-increasing-path-matrix-1.jpg)
+
+  - Input: `matrix = [[9,9,4],[6,6,8],[2,1,1]]`
+  - Output: `4`
+  - Explanation: The longest increasing path is `[1, 2, 6, 9]`.
+
+- Explanation:
+
+  - It's a `Graph` problem, because we will will be going to each `node` and then look into its neighbors to see if it can trap water.
+  - Using `DFS`, we will use a `memoization` matrix to store the length of the longest increasing path for each cell.
+    - We use a `memoization` because we will be visiting the same cell multiple times inside the recursion of the `dfs` function.
+      ![longest-increasing-path-matrix](./img/longest-increasing-path-matrix-2.png)
+  - We will start by iterating over the matrix and for each cell we will call the `dfs` function.
+    - The `dfs` function will return the length of the longest increasing path for the current cell.
+    - We will check if the length is already calculated and return it if it is.
+    - Then we will iterate over the neighbors of the current cell and call the `dfs` function for each neighbor.
+      ![longest-increasing-path-matrix](./img/longest-increasing-path-matrix-3.png)
+      - We will only call the `dfs` function if the neighbor is greater than the current cell.
+      - We will store the maximum length of the neighbors in a variable.
+
+- Time and space complexity: `O(mn)`, where `m` is the number of rows and `n` is the number of columns.
+
+```py
+def longestIncreasingPath(matrix: List[List[int]]) -> int:
+    ROWS, COLS = len(matrix), len(matrix[0])
+    memo = [[0] * COLS for _ in range(ROWS)]
+
+    def dfs(r, c):
+        if memo[r][c] != 0:
+            return memo[r][c]
+
+        result = 1 # minimum length is 1 -> the cell itself
+        for dr, dc in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            nr, nc = r + dr, c + dc
+            # check if the neighbor is in the grid and greater than the current cell
+            if 0 <= nr < ROWS and 0 <= nc < COLS and matrix[nr][nc] > matrix[r][c]:
+                result = max(result, dfs(nr, nc) + 1)
+
+        memo[r][c] = result
+        return result
+
+    result = 0
+    for r in range(ROWS):
+        for c in range(COLS):
+            result = max(result, dfs(r, c))
+
+    return result
+
+# Or
+
+def longestIncreasingPath(matrix: List[List[int]]) -> int:
+    ROWS, COLS = len(matrix), len(matrix[0])
+    memo = {} # (r, c) -> LTP
+
+    def dfs(r, c, prevVal):
+        if (
+          r < 0 or r >= ROWS or
+          c < 0 or c >= COLS or
+          matrix[r][c] <= prevVal
+          ):
+            return 0
+
+        if (r, c) in memo:
+            return memo[(r, c)]
+
+        res = 1 + max(
+            dfs(r + 1, c, matrix[r][c]),
+            dfs(r - 1, c, matrix[r][c]),
+            dfs(r, c + 1, matrix[r][c]),
+            dfs(r, c - 1, matrix[r][c])
+        )
+
+        memo[(r, c)] = res
+        return res
+
+    for r in range(ROWS):
+        for c in range(COLS):
+            dfs(r, c, -float('inf'))
+
+    return max(memo.values())
+```
+
+---
