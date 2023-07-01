@@ -33,6 +33,7 @@
     - [Eliminating Tail Recursion](#eliminating-tail-recursion)
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
+    - [Dynamic programming types](#dynamic-programming-types)
   - [Sorting](#sorting)
     - [Stable vs Unstable Sorting](#stable-vs-unstable-sorting)
     - [Bubble Sort](#bubble-sort)
@@ -57,11 +58,17 @@
       - [Tree PreOrder DFS](#tree-preorder-dfs)
       - [Tree PostOrder DFS](#tree-postorder-dfs)
       - [Tree InOrder DFS](#tree-inorder-dfs)
+      - [Tree Traversal Notes](#tree-traversal-notes)
     - [Shortest Path](#shortest-path)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
       - [How Dijkstra's Algorithm works](#how-dijkstras-algorithm-works)
       - [Implementing Dijkstra's algorithm](#implementing-dijkstras-algorithm)
     - [Topological Sort](#topological-sort)
+      - [Implementing Topological Sort](#implementing-topological-sort)
+    - [Union Find](#union-find)
+    - [Matrix graph](#matrix-graph)
+      - [Matrix DFS](#matrix-dfs)
+      - [Matrix BFS](#matrix-bfs)
 
 ---
 
@@ -650,7 +657,9 @@ def fib(n):
 
 ## Dynamic Programming
 
-It's an optimization technique using `"caching"` (Do you have something you can cache?)
+It's a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions using a memory-based data structure (array, map, etc).
+
+> It's an optimization technique using `"caching"` ("Do you have something you can cache?")
 
 ![dynamic programming](./img/dynamic-programming.png)
 
@@ -660,10 +669,36 @@ It's an optimization technique using `"caching"` (Do you have something you can 
 
 **Memoization**: is a specific kind of caching used to involves caching the **return value** of functions based on their parameters
 
+- Example of using memoization
+
+  ```py
+  cache = {}
+
+  def fib(n):
+      if n in cache:
+          return cache[n]
+      elif n < 2:
+          return n
+      else:
+          result = fib(n-1) + fib(n-2)
+          cache[n] = result
+          return result
+  ```
+
 - it's better when using `Memoization` to save the cache in the local variable of the function instead of the global scope, you can do that in Javascript, using **closures**
 - What if I told you that you can reduce the time complexity of any complex operation to **`O(n)`** with using `Memoization` to reach the optimal solution
   ![what if I told you](./img/what-if-i-told-you.png)
   ![memoization](./img/memoization.png)
+
+---
+
+### Dynamic programming types
+
+- **Top-down** approach: start with the **big picture** and then break it down into smaller pieces
+  ![dynamic-programming-1](./img/dynamic-programming-1.png)
+  - **Memoization** is a top-down approach
+
+- **Bottom-up** approach: start with the **smaller pieces** and then build it up into the big picture
 
 ---
 
@@ -1169,7 +1204,7 @@ def binary_search_iterative(nums, target):
   - An unsuccessful search occurs if we reached the end of array where: `start = middle = end`, so we won't be able to continue as the next step would result this: `low high`, as the interval `[low,high]` is empty
     - so we need to create an edge case to prevent infinite loop
   - making a copy of half the list would already take `O(n)` time, negating the whole benefit of the binary search algorithm.
-  - when we get the middle element, we use: `mid = (low + high) // 2`, Actually this can lead to an **integer overflow**. Imagine that `low` and `high` are very large numbers. Adding them up will cause an integer overflow. 
+  - when we get the middle element, we use: `mid = (low + high) // 2`, Actually this can lead to an **integer overflow**. Imagine that `low` and `high` are very large numbers. Adding them up will cause an integer overflow.
     - A better way is to compute `mid` as `mid = low + (high - low) // 2`. Dividing `high - low` before adding `low` avoids the integer overflow.
 
 ---
@@ -1201,6 +1236,8 @@ it means going through each item in the list, like checking for something on eac
 
 It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores all of the `neighbor` nodes at the present depth before moving on to the nodes at the next depth level.
 
+It's also called **"Level Order Traversal"**
+
 - **It's all about finding a Path**
 - It can answer questions like:
   - Is there a path from node `A` to node `B`?
@@ -1227,82 +1264,77 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
 
 #### BFS Implementation
 
-BFS Implementation for a mango seller example
-![bfs example](./img/bfs-implementation.png)
-![bfs example](./img/bfs-implementation-1.png)
-
-```py
-from collections import deque
-
-# create a graph
-graph = {}
-graph["you"] = ["alice", "bob", "claire"]
-graph["bob"] = ["anuj", "peggy"]
-graph["alice"] = ["peggy"]
-graph["claire"] = ["thom", "jonny"]
-graph["anuj"] = []
-graph["peggy"] = []
-graph["thom"] = []
-graph["jonny"] = []
-
-# helper: check if a person is a mango seller
-def person_is_seller(name):
-  # mango sellers' names end with 'm' letter (e.g. thom)
-  return name[-1] == "m"
-
-
-def search(name):
-  # Create a new queue
-  search_queue = deque()
-  # Add all of your neighbors to the search queue
-  search_queue += graph[name]
-
-  # This array is how you keep track of which people you've searched before.
-  searched = []
-
-  while search_queue:
-    # pop the first person off the queue
-    person = search_queue.popleft()
-    # Only search this person if you haven't already searched them to avoid infinite loops (the search queue will keep going back and forth between neighbors nodes)
-    if not person in searched:
-      if person_is_seller(person):
-        print(person + " is a mango seller!")
-        return True
-      else:
-        # add this person's friends to the search queue
-        search_queue += graph[person]
-        # Marks this person as searched
-        searched.append(person)
-  return False
-
-
-search("you") # thom is a mango seller!
-```
-
 - **BFS implementation**
 
   ```py
   from collections import deque
-  def BFS(src, adj):
-    visited = set()
-    q = deque()
 
-    q.append(src)
-    visited.add(src)
+  def bfs(root):
+    # create a queue
+    queue = deque()
+    if root: queue.append(root)
 
-    while len(q) > 0:
-      currentNode = q.popleft()
+    while len(queue) > 0:
+      node = queue.popleft()
+      # do something with the node
+      print(node.value)
+      # add the children of the node to the queue
+      if node.left:
+        queue.append(node.left)
+      if node.right:
+        queue.append(node.right)
+  ```
 
-      # Visit here just represents whatever you want to do with the current node.
-      visit(currentNode)
+- BFS Implementation for a "mango seller example"
+  ![bfs example](./img/bfs-implementation.png)
+  ![bfs example](./img/bfs-implementation-1.png)
 
-      # Here we assume that if a neighbour has no neighbors, the adjacency map still maps to an empty list (i.e. not null)
-      for neighbour in adj[currentNode]:
-        # For BFS, if a neighbour is already in the queue, there's no point in adding it again.
-        if neighbour not in visited:
-          # For BFS we mark as visited when we put a node in the queue.
-          visited.add(neighbour)
-          q.append(neighbour)
+  ```py
+  from collections import deque
+
+  # create a graph
+  graph = {}
+  graph["you"] = ["alice", "bob", "claire"]
+  graph["bob"] = ["anuj", "peggy"]
+  graph["alice"] = ["peggy"]
+  graph["claire"] = ["thom", "jonny"]
+  graph["anuj"] = []
+  graph["peggy"] = []
+  graph["thom"] = []
+  graph["jonny"] = []
+
+  # helper: check if a person is a mango seller
+  def person_is_seller(name):
+    # mango sellers' names end with 'm' letter (e.g. thom)
+    return name[-1] == "m"
+
+
+  def search(name):
+    # Create a new queue
+    search_queue = deque()
+    # Add all of your neighbors to the search queue
+    search_queue += graph[name]
+
+    # This array is how you keep track of which people you've searched before.
+    searched = []
+
+    while search_queue:
+      # pop the first person off the queue
+      person = search_queue.popleft()
+      # Only search this person if you haven't already searched them to avoid infinite loops (the search queue will keep going back and forth between neighbors nodes)
+      if not person in searched:
+        if person_is_seller(person):
+          print(person + " is a mango seller!")
+          return True
+        else:
+          # add this person's friends to the search queue
+          search_queue += graph[person]
+          # Marks this person as searched
+          searched.append(person)
+    return False
+
+
+  search("you") # thom is a mango seller!
   ```
 
 ---
@@ -1312,7 +1344,9 @@ search("you") # thom is a mango seller!
 It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores as far as possible along each branch before backtracking.
 
 - **It's all about "Exploring" and Backtracking**
+  - **"Backtracking"** means that when you reach a dead-end, you go back to the last intersection and try another path
   - Think of it as a **maze**, where you're trying to find a way out and you're exploring all the possible paths until you find the exit and when you reach a dead-end, you go back to the last intersection and try another path
+  - Usually time-complexity is `O(n)` as we visit each node once
 
 > It's called `Depth First Search` because we go deep into the tree before we go wide (asking its children)
 
@@ -1349,6 +1383,8 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
 
 ![BFS](./img/dfs1.png)
 
+Here, we visit the `root` node first, then the `left` node, then the `right` node and so on
+
 ```py
 def preOrderDFS(root):
   if root is None:
@@ -1362,6 +1398,8 @@ def preOrderDFS(root):
 #### Tree PostOrder DFS
 
 ![BFS](./img/dfs2.png)
+
+Here, we visit the `left` node first, then the `right` node, then the `root` node and so on
 
 ```py
 def postOrderDFS(root):
@@ -1377,6 +1415,15 @@ def postOrderDFS(root):
 
 ![BFS](./img/dfs3.png)
 
+Inorder means traversing the tree in a sorted order (smaller to larger) and to do so, we need to visit the left node first, then the root node, then the right node and so on
+
+- we do this by :
+  1. recursively calling the function on the **left** node to reach the smallest node
+  2. then we print the value of the node
+  3. then we recursively call the function on the **right** node to reach the largest node
+
+So, Here we visit the `left` node first, then the `root` node, then the `right` node and so on
+
 ```py
 def inOrderDFS(root):
   if root is None:
@@ -1386,6 +1433,12 @@ def inOrderDFS(root):
   print(root.value)
   inOrderDFS(root.right)
 ```
+
+#### Tree Traversal Notes
+
+- For all the 3 types of DFS, the time-complexity is `O(n)` as we visit each node once
+- For all of them, if we want to do it in a **reverse order**, we just need to change the order of the recursive calls
+  - replace `left` with `right` and vice versa to visit the nodes in a reverse order (biggest to smallest) -> (right to left)
 
 ---
 
@@ -1464,16 +1517,17 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
   1. We start by adding the starting node to the `unvisited` list and setting the cost to `0` and others to `infinity` and the parent to `None`
      ![Dijkstra-algorithm](./img/dijkstra-4.png)
   2. We find the node with the lowest cost (cheapest node) and we add it to the `visited` list and examine all its neighbors
-  3. We then calculate the cost to reach each of those neighbors. If it's cheaper to get to a neighbor through the current node, we update the cost and the parent.
+  3. We will use `Min Heap` to get the node with the lowest cost
+  4. We then calculate the cost to reach each of those neighbors. If it's cheaper to get to a neighbor through the current node, we update the cost and the parent.
      ![Dijkstra-algorithm](./img/dijkstra-5.png)
-  4. Add the node to the `visited` list update the `unvisited` list and repeat the process until we've visited every node in the graph.
+  5. Add the node to the `visited` list update the `unvisited` list and repeat the process until we've visited every node in the graph.
      ![Dijkstra-algorithm](./img/dijkstra-6.png)
 
 ---
 
 ### Topological Sort
 
-A **topological sort** of a directed graph is a way of ordering the list of nodes such that if `(a, b)` is an edge in the graph then `a` will appear before `b` in the list.
+A **topological sort** of a directed graph is a way of ordering the list of nodes such that if `(a, b)` is an edge in the graph then `a` will appear before `b` in the list. (Ordering the vertices of a directed acyclic graph such that each vertex is visited before its children)
 
 > Many real world situations can be modelled as a `graph` with directed edges where some events must occur before others.
 
@@ -1495,6 +1549,20 @@ A **topological sort** of a directed graph is a way of ordering the list of node
   - "DACs" are directed graphs with no directed cycles.
     ![top sort](./img/top-sort-6.png)
   - If a graph has **cycles** or is **not directed**, then there is no topological sort.
+
+#### Implementing Topological Sort
+
+There are two common implementations of topological sort:
+
+1. **Khan's algorithm (iterative)**
+    - It's the most common implementation of topological sort
+    - It's a `BFS` and `queue` based algorithm
+    - Here, we fill the ordering from the beginning of the list to the end
+2. **Depth-first search (recursive)**
+   - It's a `DFS` and `stack` based algorithm
+   - Here, we fill the ordering from the end of the list to the beginning
+   - the recursive implementation is a **PostOrder DFS** traversal, meaning that we assign the order of the nodes after we've visited all of their children/neighbors (as they don't need to be visited in a specific order)
+
 - We can construct a topological sort using **Khan's algorithm**:
   ![khan-algorithm](./img/khan-algorithm.png)
 
@@ -1561,3 +1629,116 @@ def topological_sort(graph):
     else:
         return None
 ```
+
+---
+
+### Union Find
+
+It's a data structure that keeps track of elements which are split into one or more disjoint sets.
+
+The Union Find data structure allows us to **detect a cycle in an undirected graph** by iterating over just its edges. (Instead of doing the full `O(V+E)` search. This way we get an `O(E)` complexity).
+
+- Each node starts off as its own separate set, as we iterate over the edges, we will **union** the nodes together if they are not already in the same set.
+- if we find an edge where both nodes are in the same set, then we have found a cycle.
+
+---
+
+### Matrix graph
+
+#### Matrix DFS
+
+When dealing with matrix, we can use `DFS` to traverse the matrix for many types of problems
+
+- Ex: count num of unique paths from topLeft to bottomRight
+
+  ```py
+  def uniquePaths(grid, m: int, n: int) -> int:
+    ROWS, COLS = m, n
+    visited = set()
+
+    def dfs(r, c):
+      # base case
+      if (
+        min(r, c) < 0 or
+        r >= ROWS or
+        c >= COLS or
+        (r, c) in visited or
+        grid[r][c] == 1
+      ):
+        return 0 # invalid path
+
+      # if we reached the bottomRight cell, we found a valid path
+      if r == ROWS - 1 and c == COLS - 1:
+        return 1 # valid path
+
+      # mark the current cell as visited
+      visited.add((r, c))
+
+      # explore all the neighbors
+      paths = (
+        dfs(r + 1, c) +
+        dfs(r - 1, c) +
+        dfs(r, c + 1) +
+        dfs(r, c - 1)
+      )
+
+      # backtrack: remove the current cell from visited
+      visited.remove((r, c))
+
+      return paths
+
+    return dfs(0, 0)
+  ```
+
+---
+
+#### Matrix BFS
+
+When dealing with matrix, we can use `BFS` to traverse the matrix for many types of problems especially when we need to **find the shortest path**
+
+- Here, we use a `queue` to keep track of the cells we need to visit next instead of recursion like in `DFS`
+
+- Ex: find the length of the shortest path from topLeft to bottomRight
+
+  ```py
+  def shortestPath(grid, m: int, n: int) -> int:
+    ROWS, COLS = m, n
+    visited = set()
+
+    def bfs(r, c):
+      queue = deque([(r, c, 0)]) # (row, col, distance)
+      visited.add((r, c))
+
+      while queue:
+        row, col, distance = queue.popleft()
+
+        # if we reached the bottomRight cell, we found a valid path
+        if row == ROWS - 1 and col == COLS - 1:
+          return distance
+
+        # explore all the neighbors
+        for (nr, nc) in [
+          (row + 1, col),
+          (row - 1, col),
+          (row, col + 1),
+          (row, col - 1)
+        ]:
+          if (
+            min(nr, nc) < 0 or
+            nr >= ROWS or
+            nc >= COLS or
+            (nr, nc) in visited or
+            grid[nr][nc] == 1
+          ):
+            continue # invalid path
+
+          # mark the current cell as visited
+          visited.add((nr, nc))
+
+          # add the neighbor to the queue
+          queue.append((nr, nc, distance + 1))
+
+      return -1 # no valid path
+
+    return bfs(0, 0)
+  ```

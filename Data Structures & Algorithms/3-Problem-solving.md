@@ -10,14 +10,14 @@
       - [Monotonic decreasing queue](#monotonic-decreasing-queue)
       - [Divide and Conquer](#divide-and-conquer)
         - [Inductive proofs](#inductive-proofs)
-      - [Dynamic Programming](#dynamic-programming)
+      - [Shortest path](#shortest-path)
       - [Greedy Algorithms](#greedy-algorithms)
-      - [Backtracking](#backtracking)
   - [Testing and Debugging](#testing-and-debugging)
     - [Testing](#testing)
       - [Test fail situations](#test-fail-situations)
       - [Testing order](#testing-order)
     - [Debugging](#debugging)
+  - [Notes](#notes)
   - [String](#string)
     - [Substring (Sliding Window)](#substring-sliding-window)
       - [Longest Substring Without Repeating Characters](#longest-substring-without-repeating-characters)
@@ -66,6 +66,7 @@
       - [Solution 2: using Bucket Sort](#solution-2-using-bucket-sort)
     - [Top K Frequent Words](#top-k-frequent-words)
     - [Reorganize String](#reorganize-string)
+    - [Kth Largest Element in a Stream](#kth-largest-element-in-a-stream)
     - [Find Median from Data Stream](#find-median-from-data-stream)
   - [Linked Lists](#linked-lists)
     - [Singly Linked List](#singly-linked-list)
@@ -93,7 +94,6 @@
   - [Trees](#trees)
     - [General Tree Questions](#general-tree-questions)
       - [Level Width](#level-width)
-      - [Number of islands](#number-of-islands)
       - [Path Sum](#path-sum)
       - [Symmetric Tree](#symmetric-tree)
       - [Lowest Common Ancestor of a Binary Tree](#lowest-common-ancestor-of-a-binary-tree)
@@ -101,6 +101,7 @@
       - [Flatten Binary Tree to Linked List](#flatten-binary-tree-to-linked-list)
     - [Binary Search Trees (BST)](#binary-search-trees-bst)
       - [BST Insertion](#bst-insertion)
+      - [Delete Node in a BST](#delete-node-in-a-bst)
       - [Validate BST](#validate-bst)
       - [Binary Tree Inorder Traversal](#binary-tree-inorder-traversal)
       - [Binary Tree Postorder Traversal](#binary-tree-postorder-traversal)
@@ -143,6 +144,9 @@
     - [Pow(x, n)](#powx-n)
     - [Climbing Stairs](#climbing-stairs)
     - [Partitioning Into Minimum Number Of Deci-Binary Numbers](#partitioning-into-minimum-number-of-deci-binary-numbers)
+  - [Bit manipulation](#bit-manipulation)
+    - [Counting Bits](#counting-bits)
+    - [Reverse Bits](#reverse-bits)
   - [Recursion \& Backtracking](#recursion--backtracking)
     - [Fibonacci Number](#fibonacci-number)
       - [Recursion solution steps](#recursion-solution-steps)
@@ -155,15 +159,23 @@
     - [Subsets II](#subsets-ii)
     - [Sum of All Subset XOR Totals](#sum-of-all-subset-xor-totals)
     - [Count Number of Maximum Bitwise-OR Subsets](#count-number-of-maximum-bitwise-or-subsets)
+    - [Find Unique Binary String](#find-unique-binary-string)
+    - [Partition to K Equal Sum Subsets](#partition-to-k-equal-sum-subsets)
     - [Letter combinations of a phone number](#letter-combinations-of-a-phone-number)
     - [N-Queens](#n-queens)
+    - [N-Queens II](#n-queens-ii)
     - [Combination Sum](#combination-sum)
     - [Combination Sum II](#combination-sum-ii)
     - [Word Break](#word-break)
     - [Word Search](#word-search)
     - [Word Search II](#word-search-ii)
+    - [Generate Parentheses](#generate-parentheses)
+    - [Palindrome Partitioning](#palindrome-partitioning)
+    - [Matchsticks to Square](#matchsticks-to-square)
+    - [Splitting a String Into Descending Consecutive Values](#splitting-a-string-into-descending-consecutive-values)
   - [Graphs](#graphs)
     - [Flood Fill](#flood-fill)
+    - [Number of islands](#number-of-islands)
     - [Max Area of Island](#max-area-of-island)
     - [Rotting Oranges](#rotting-oranges)
     - [All Paths From Source to Target](#all-paths-from-source-to-target)
@@ -175,12 +187,17 @@
     - [Redundant Connection](#redundant-connection)
     - [Accounts Merge](#accounts-merge)
     - [Sort Items by Groups Respecting Dependencies](#sort-items-by-groups-respecting-dependencies)
+    - [Is Graph Bipartite?](#is-graph-bipartite)
     - [Find if Path Exists in Graph](#find-if-path-exists-in-graph)
     - [Check if There is a Valid Path in a Grid](#check-if-there-is-a-valid-path-in-a-grid)
+    - [Shortest Path in Binary Matrix](#shortest-path-in-binary-matrix)
     - [Couples Holding Hands](#couples-holding-hands)
     - [Minimum Obstacle Removal to Reach Corner](#minimum-obstacle-removal-to-reach-corner)
     - [Trapping Rain Water II](#trapping-rain-water-ii)
     - [Longest Increasing Path in a Matrix](#longest-increasing-path-in-a-matrix)
+    - [Circular Array Loop](#circular-array-loop)
+  - [Dynamic Programming](#dynamic-programming)
+    - [Unique Paths](#unique-paths)
 
 ---
 
@@ -315,15 +332,22 @@ This pattern involves dividing a dataset into smaller chunks and then repeating 
 
 ---
 
-#### Dynamic Programming
+#### Shortest path
+
+It's a path between two vertices in a graph such that the sum of the weights of its constituent edges is minimized.
+
+you can use `BFS` or `Dijkstra's algorithm` to find the shortest path
+
+- Use `BFS` when the graph is **unweighted**
+- Use `Dijkstra's algorithm` when the graph is **weighted**
+
+---
 
 #### Greedy Algorithms
 
 It's an algorithm that makes the locally optimal choice at each stage with the hope of finding a global optimum.
 
 - Ex: **Dijkstra's algorithm** for finding the shortest path between two nodes in a graph.
-
-#### Backtracking
 
 ---
 
@@ -366,6 +390,16 @@ The dependencies among the classes and functions of a program induce a hierarchy
 The simplest debugging technique consists of using `print` statements to track the values of variables during the execution of the program. A problem with this approach is that eventually the print statements need to be removed or commented out, so they are not executed when the software is finally released.
 
 A better approach is to run the program within a **debugger**, which is a specialized environment for controlling and monitoring the execution of a program. The basic functionality provided by a debugger is the insertion of breakpoints within the code. When the program is executed within the debugger, it stops at each breakpoint. While the program is stopped, the current value of variables can be inspected.
+
+---
+
+## Notes
+
+- When using pointers, and you want to skip duplicates, you can:
+  - use a `while` loop and check if the current element is equal to the **next element**, if so, skip it by incrementing the pointer
+    - EX: `while nums[i] == nums[i+1]: i+= 1`
+  - or if you are inside a `for` loop, you can check if the current element is equal to the **previous element**, if so, skip it by using `continue`
+    - EX: `if nums[i] == nums[i+1]: continue`
 
 ---
 
@@ -2013,6 +2047,42 @@ def reorganize_string(s):
 
 ---
 
+### Kth Largest Element in a Stream
+
+Design a class to find the `kth` largest element in a stream. Note that it is the `kth` largest element in the sorted order, not the `kth` distinct element.
+
+Implement `KthLargest` class
+
+- Ex:
+
+  - input: `["KthLargest", "add", "add", "add", "add", "add"]`, `[[3, [4, 5, 8, 2]], [3], [5], [10], [9], [4]]`
+  - output: `[null, 4, 5, 5, 8, 8]`
+
+- Explanation:
+  - Use `minHeap` to store the largest `k` elements by popping the top element if the size of the minHeap is larger than `k`, so that after popping the top element, the minHeap will contain the largest `k` elements.
+  - and now to get the `kth` largest element, we just need to return the top element of the minHeap -> `minHeap[0]`
+
+```py
+class KthLargest:
+    def __init__(self, k: int, nums: List[int]):
+        self.k = k
+        self.nums = nums
+
+        # create a minHeap with the first k elements
+        heapq.heapify(self.nums)
+        # pop the top element of the minHeap until the size of the minHeap is equal to k
+        while len(self.nums) > k:
+            heapq.heappop(self.nums)
+
+    def add(self, val: int) -> int:
+        heapq.heappush(self.nums, val)
+        if len(self.nums) > self.k:
+            heapq.heappop(self.nums)
+        return self.nums[0]
+```
+
+---
+
 ### Find Median from Data Stream
 
 The median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value and the median is the mean of the two middle values.
@@ -3154,64 +3224,6 @@ def level_width(root):
 
 ---
 
-#### Number of islands
-
-Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
-![number of islands](./img/num-of-islands.png)
-
-- EX: `numIslands(grid) --> 1`
-  ![number of islands](./img/num-of-islands-1.png)
-
-- It can be solved using `BFS`, where we create layers of islands and keep track of the number of layers we have created.
-  ![number of islands](./img/num-of-islands-2.png)
-
-- **Steps:** -> `BFS`
-  - loop through the rows of the grid (i) and loop through the columns of the grid (j) and if the current cell is a `'1'`, increment the number of islands by 1 and call the helper function to mark the current island as visited
-  - the bfs-helper-function (`mark_island`) will mark the current cell as visited and then recursively call itself on the adjacent cells (up, down, left, right) that are `'1'`s
-  - once the helper function is done, we return the number of islands
-
-```py
-def numIslands(grid):
-    # if the grid is empty, return 0
-    if not grid:
-        return 0
-
-    # initialize number of islands to 0
-    num_islands = 0
-    # get dimensions of the grid
-    rows, cols = len(grid), len(grid[0])
-    # initialize set of visited islands to mark visited positions
-    visited = set()
-
-    # Helper BFS function to mark the current island as visited
-    def mark_island(r, c):
-        if grid[r][c] != '1' or (r, c) in visited:
-            return
-        # mark the current cell as visited
-        visited.add((r, c))
-        # recursively call the helper function on the adjacent cells (up, down, left, right) that are '1's
-        if r > 0:
-            mark_island(r - 1, c)
-        if r < rows - 1:
-            mark_island(r + 1, c)
-        if c > 0:
-            mark_island(r, c - 1)
-        if c < cols - 1:
-            mark_island(r, c + 1)
-
-    for r in range(rows):
-        for c in range(cols):
-            # if the current cell is a '1', increment the number of islands by 1
-            # and call the helper function to mark the current island as visited
-            if grid[r][c] == '1' and (r, c) not in visited:
-                mark_island(r, c)
-                num_islands += 1
-
-    return num_islands
-```
-
----
-
 #### Path Sum
 
 Given the `root` of a binary tree and an integer `targetSum`, return `true` if the tree has a **root-to-leaf** path such that adding up all the values along the path equals `targetSum`.
@@ -3499,6 +3511,54 @@ def insert(root, value):
 
 ---
 
+#### Delete Node in a BST
+
+- Explanation:
+
+  - We can use a **Depth-First Search** to traverse the tree and find the node that we want to delete.
+  - Once we find the node, we can use a **Bottom-Up Approach** to delete the node, and we have multiple cases to consider:
+    1. If the node is a leaf node (has no childern), then we can simply delete the node by returning `None`.
+    2. If the node has only one child, then we can delete the node by returning its child.
+    3. If the node has two children, then we can delete the node by replacing its value with the value of its successor node (the smallest node in its right subtree) and then recursively call the function on the right subtree to delete the successor node.
+
+```py
+def deleteNode(root, key):
+    # if the root is None, return None
+    if root is None:
+        return None
+
+    # if the key is less than the root's value, delete the key from the left subtree
+    if key < root.value:
+        root.left = deleteNode(root.left, key)
+    # if the key is greater than the root's value, delete the key from the right subtree
+    elif key > root.value:
+        root.right = deleteNode(root.right, key)
+    # if the key is equal to the root's value, delete the key from the current node
+    else:
+        # if the node is a leaf node (has no childern), then we can simply delete the node by returning None
+        if not root.left and not root.right:
+            return None
+        # if the node has only one child, then we can delete the node by returning its child
+        elif not root.left:
+            return root.right
+        elif not root.right:
+            return root.left
+        # if the node has two children, then we can delete the node by replacing its value with the value of its successor node (the smallest node in its right subtree) and then recursively call the function on the right subtree to delete the successor node
+        else:
+            # find the successor node
+            successor = root.right
+            while successor.left:
+                successor = successor.left
+            # replace the root's value with the successor's value
+            root.value = successor.value
+            # delete the successor node
+            root.right = deleteNode(root.right, successor.value)
+
+    return root
+```
+
+---
+
 #### Validate BST
 
 Write a function that accepts a root node of a BST and returns `True` if the tree is a valid BST and `False` if it is not.
@@ -3593,10 +3653,18 @@ Given the `root` of a binary tree, return the inorder traversal of its nodes' va
 
 - Explanation:
 
-  - We can use a `DFS` to traverse the tree and add the values of the nodes to an array.
-  - We can use a helper function to do the `DFS` and then return the array.
+  - **Inorder** means traversing the tree in a sorted order (smaller to larger) and to do so, we need to visit the left node first, then the root node, then the right node and so on
+
+- Time complexity: `O(n)` where `n` is the number of nodes in the tree
 
 - Solution 1: using `DFS` **recursively**
+
+  - we do this by :
+    1. recursively calling the function on the **left** node to reach the smallest node
+    2. then we print the value of the node
+    3. then we recursively call the function on the **right** node to reach the largest node
+  - We can use a `DFS` to traverse the tree and add the values of the nodes to an array.
+  - We can use a helper function to do the `DFS` and then return the array.
 
   ```py
   def inorderTraversal(root):
@@ -5277,6 +5345,74 @@ def min_partitions(n):
 
 ---
 
+## Bit manipulation
+
+### Counting Bits
+
+Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.
+
+```py
+def countBits(n):
+    # create an array of size n + 1 to store the number of 1s in the binary representation of each number
+    dp = [0] * (n + 1)
+
+    # loop through the array and calculate the number of 1s in the binary representation of each number
+    for i in range(1, n + 1):
+        # if the number is even, then the number of 1s in its binary representation is equal to the number of 1s in the binary representation of the number divided by 2
+        if i % 2 == 0:
+            dp[i] = dp[i // 2]
+        # if the number is odd, then the number of 1s in its binary representation is equal to the number of 1s in the binary representation of the number divided by 2 + 1
+        else:
+            dp[i] = dp[i // 2] + 1
+
+    # return the array
+    return dp
+```
+
+---
+
+### Reverse Bits
+
+Reverse bits of a given 32 bits unsigned integer.
+
+- Ex:
+
+  - Input: `n = 00000010100101000001111010011100`
+  - Output: `964176192 (00111001011110000010100101000000)`
+  - Explanation: The input binary string `00000010100101000001111010011100` represents the unsigned integer `43261596`, so return `964176192` which its binary representation is `00111001011110000010100101000000`.
+
+- Explanation:
+  ![reverse bits](./img/reverse-bits.png)
+  - We can use the **bitwise AND** operator to get the last bit of the number
+    - `n & 1` -> This will give us the last bit of the number
+      - Ex: `n = 5` -> `n & 1` -> `101 & 001` -> `001`
+  - We can then shift the number to the right by 1 bit
+    - `n >> 1` -> This will shift the number to the right by 1 bit
+      - Ex: `n = 5` -> `n >> 1` -> `101 >> 1` -> `10`
+  - We can then shift the result to the left by 1 bit
+    - `result << 1` -> This will shift the result to the left by 1 bit
+      - Ex: `result = 0` -> `result << 1` -> `0 << 1` -> `0`
+  - Finally, we can add the last bit to the result
+    - `result | (n & 1)` -> This will add the last bit to the result
+      - Ex: `result = 0` -> `result | (n & 1)` -> `0 | (101 & 001)` -> `0 | 001` -> `1`
+
+```py
+def reverseBits(n):
+    result = 0
+
+    for _ in range(32):
+        # shift the result to the left by 1 bit
+        result = result << 1
+        # add the last bit to the result
+        result = result | (n & 1)
+        # shift the number to the right by 1 bit
+        n = n >> 1
+
+    return result
+```
+
+---
+
 ## Recursion & Backtracking
 
 - Usually the time complexity of backtracking is `O(2^n)`
@@ -5391,9 +5527,13 @@ A valid IP address consists of exactly four integers, each integer is between `0
     - we can put the first `dot` after the first number, **or** after the second number, **or** after the third number.
       - this will result `3` possible combinations for each number
         ![restore-ip-addresses](./img/restore-ip-addresses-1.png)
-      - for each of these combinations, We check if it's valid -> **(if the number is less than `256` or length of the combination is less than `3` or it doesn't start with `0`)**. If it's valid, we then can put the second `dot` after the second number **or** after the third number and so on.
+      - for each of these combinations, We check if it's valid -> **(if the number is less than `256` or it doesn't start with `0`)**. If it's valid, we then can put the second `dot` after the second number **or** after the third number and so on.
         ![restore-ip-addresses](./img/restore-ip-addresses-2.png)
+        - The "doesn't start with `0` part is vague, because the problem says that we can't have **leading** zeros, so leading zero means that the number starts with `0` and not just contains `0` in the middle of the number.
+          - Ex: `"01"` is not valid, but `"10"` is valid, `"0"` is valid, `"00"` is not valid.
+          - So, we can check if `i == j` or `s[i] != '0'` to make sure that the number consists of only 1 number or that it doesn't start with `0`.
   - We can do this by using a helper function that will add the dots to the string. We can then use a `for` loop to iterate through the string and add the dots to the string. We can then use a helper function to check if the current string is a valid IP address. If it is, we can add it to the result list. We can then return the result list.
+    - > To check if the IP is valid before adding it to the result list, we can check that we have `4` dots in the string and that the current index is equal to the length of the string.
   - Time complexity: `O(3^4) = O(1)` because we are only checking 3 possible combinations for each number, and we have a total of 4 numbers (4 levels).
 
 - Example with steps for explanation
@@ -5796,6 +5936,79 @@ def countMaxOrSubsets(nums):
 
 ---
 
+### Find Unique Binary String
+
+Given an array of strings `nums` containing `n` **unique** binary strings each of length `n`, return _a binary string of length `n` that does not appear in `nums`_. If there are multiple answers, you may return **any of them**.
+
+- EX: `nums = ["01", "10"]`
+
+  - Output: `"11"`
+  - Explanation: `"11"` does not appear in `nums` (`"00"` would also be correct) . All the other binary strings of length `2` do appear in `nums`.
+
+- Explanation
+
+  - This is actually a **permutation or subsets** problem.
+  - We can use **Decision Tree** to solve this problem.
+  - For each element, we can either choose to include `0` in the permutation or include `1` in the permutation.
+  - The height of the decision tree is `n` because we need to choose `n` elements.
+
+- Time complexity: `O(2^n)` because we are making 2 decisions for each element in the array.
+  - > But actually it's `O(n^2)` because we are making `n` decisions for each element in the array and we will return the first string that is not in the array and not continue to the end of the tree.
+
+```py
+def findDifferentBinaryString(nums):
+    strSet = set(nums)
+
+    def backtrack(i, cur):
+      if i == len(nums):
+        res = ''.join(cur)
+        return None if res in strSet else res
+
+      # include 0 in the permutation
+      res = backtrack(i+1, cur + '0')
+      if res: return res
+
+      # include 1 in the permutation
+      res = backtrack(i+1, cur + '1')
+      if res: return res
+
+    return backtrack(0, '')
+```
+
+---
+
+### Partition to K Equal Sum Subsets
+
+Given an integer array `nums` and an integer `k`, return `true` if it is possible to divide this array into `k` non-empty subsets whose sums are all equal.
+
+- Ex: `nums = [4, 3, 2, 3, 5, 2, 1], k = 4`
+
+  - Output: `true`
+  - Explanation: It's possible to divide it into 4 subsets (5), (1, 4), (2,3), (2,3) with equal sums.
+
+```py
+def canPartitionKSubsets(nums, k):
+    target, rem = divmod(sum(nums), k)
+    if rem: return False
+
+    def backtrack(i, cur):
+        if i == len(nums):
+            return True
+        if cur == target:
+            return backtrack(0, 0)
+        for j in range(i, len(nums)):
+            if cur + nums[j] <= target:
+                nums[i], nums[j] = nums[j], nums[i]
+                if backtrack(i+1, cur + nums[i]):
+                    return True
+                nums[i], nums[j] = nums[j], nums[i]
+        return False
+
+    return backtrack(0, 0)
+```
+
+---
+
 ### Letter combinations of a phone number
 
 Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent. Return the answer in **any order**.
@@ -5878,9 +6091,9 @@ Each solution contains a distinct board configuration of the n-queens' placement
     - Each queen must be in a different `column`
     - Each queen must be in a different `diagonal`
       ![n queens](./img/n-queens-4.png)
-      - Positive diagonals goes from bottom left to top right **(UP)**
-        ![n queens](./img/n-queens-5.png)
       - Negative diagonals goes from top left to bottom right **(DOWN)**
+        ![n queens](./img/n-queens-5.png)
+      - Positive diagonals goes from bottom left to top right **(UP)**
         ![n queens](./img/n-queens-6.png)
   - We can use **Decision Tree** to solve this problem.
     ![n queens](./img/n-queens-2.png)
@@ -5908,29 +6121,75 @@ def solveNQueens(n):
             res.append([''.join(row) for row in board])
             return
 
-        # Else: we continue building the board
         # iterate through the columns
         for col in range(n):
             # check if the current column is not used and the current positive diagonal is not used and the current negative diagonal is not used
-            if col not in colSet and (row + col) not in posDiag and (row - col) not in negDiag:
-                # place the queen
+            if col not in colSet and (row + col) not in negDiag and (row - col) not in posDiag:
+                # place the queen and add the current pos to our sets
                 board[row][col] = 'Q'
-
-                # add the current pos to our sets
                 colSet.add(col)
-                posDiag.add(row + col)
-                negDiag.add(row - col)
+                negDiag.add(row + col)
+                posDiag.add(row - col)
 
-                # recursively call the function with the next row
                 backtrack(row + 1)
 
-                # remove the queen
+                # remove the queen and remove the current pos from our sets
                 board[row][col] = '.'
-
-                # remove the current pos from our sets
                 colSet.remove(col)
-                posDiag.remove(row + col)
-                negDiag.remove(row - col)
+                negDiag.remove(row + col)
+                posDiag.remove(row - col)
+
+    backtrack(0)
+    return res
+```
+
+---
+
+### N-Queens II
+
+The **n-queens** puzzle is the problem of placing `n` queens on an `n x n` chessboard such that no two queens attack each other.
+
+Given an integer `n`, return _the number of distinct solutions to the **n-queens puzzle**_.
+
+- Ex: `n = 4`
+
+  - Output: `2`
+
+- Explanation:
+
+  - Same as the previous problem, but we need to return the number of distinct solutions instead of the solutions themselves.
+
+- Time complexity: `O(n!)` because we are making `n` decisions for each row in the board.
+  - **factorial** because we are making `n` decisions for each row in the board. so it's like `n^n` but we are not making `n` decisions for the last row because we are only placing one queen in the last row. so it's like `n!`
+
+```py
+def totalNQueens(n):
+    colSet = set()
+    posDiag = set() # (row + col) is the same for all cells in the same positive diagonal (r + c)
+    negDiag = set() # (row - col) is the same for all cells in the same negative diagonal (r - c)
+    res = 0
+
+    def backtrack(row):
+        # if we reached the end of the board, increase the result by 1
+        if row == n:
+            res += 1
+            return
+
+        # iterate through the columns
+        for col in range(n):
+            # check if the current column is not used and the current positive diagonal is not used and the current negative diagonal is not used
+            if col not in colSet and (row + col) not in negDiag and (row - col) not in posDiag:
+                # place the queen and add the current pos to our sets
+                colSet.add(col)
+                negDiag.add(row + col)
+                posDiag.add(row - col)
+
+                backtrack(row + 1)
+
+                # remove the queen and remove the current pos from our sets
+                colSet.remove(col)
+                negDiag.remove(row + col)
+                posDiag.remove(row - col)
 
     backtrack(0)
     return res
@@ -5950,9 +6209,9 @@ The **same** number may be chosen from `candidates` an **unlimited number of tim
 
 - Explanation:
 
-  - Here we won't be able to solve it like [combination-sum-2](#Combinations), because we want **Unique** combinations and if we used the same decision tree, we will have duplicate combinations like this:
+  - Here we won't be able to solve it like [combination-sum-2](#combinations), because we want **Unique** combinations and if we used the same decision tree, we will have duplicate combinations like this:
     ![combination-sum](./img/combination-sum-1.png)
-  - To overcome this problem, we will use the same same decision tree in [subsets](#Subsets) problem, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
+  - To overcome this problem, we will use the same same decision tree in [subsets](#subsets) problem, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
     - For each element, we can either choose to include it in the combination or not include it in the combination.
     - we can use the decision tree below, because it will not lead to duplicate combinations as it doesn't use the same element twice in the same combination.
       ![combination-sum](./img/combination-sum-3.png)
@@ -6068,51 +6327,64 @@ Given a string `s` and a dictionary of strings `wordDict`, return `true` if `s` 
 
 - Time complexity: `O(n.m)` where `n` is the length of the string, and `m` is the length of the dictionary.
 
-```py
-# Solution 1 ✅
-def wordBreak(s, wordDict):
-    res = [0] * (len(s))
-    l = 0
-    for r in range(len(s)):
-        if s[l:r+1] in wordDict:
-            while l <= r:
-                res[l]  True
-                l += 1
-    return res[-1]
+- Solution 1 ❌❌ (Doesn't work)
 
-# ------------------------------------------------------
-# Or
-def wordBreak(s, wordDict):
-    dp = [False] * (len(s) + 1)
-    dp[0] = True
+  - This solution doesn't work because it doesn't check all the possible combinations.
+  - ex: `s = "aaaaaaa", wordDict = ["aaaa", "aaa"]`
+    - Output: `false`
+    - Explanation: We can't split the string into two substrings, and both substrings are in the dictionary.
 
-    for i in range(1, len(s) + 1):
-        for j in range(i):
-            if dp[j] and s[j:i] in wordDict:
-                dp[i] = True
-                break
+  ```py
+  def wordBreak(s, wordDict):
+      res = [False] * (len(s))
+      l = 0
+      for r in range(len(s)):
+          if s[l:r+1] in wordDict:
+              while l <= r:
+                  res[l]  True
+                  l += 1
+      return res[-1]
+  ```
 
-    return dp[-1]
+- Solution 2 ✅
 
-# ----------------------------------------------------------
+  - This solution works because it checks all the possible combinations.
+  - ex: `s = "aaaaaaa", wordDict = ["aaaa", "aaa"]`
+    - Output: `true`
+    - Explanation: We can split the string into two substrings, and both substrings are in the dictionary.
 
-# Solution 2
-def wordBreak(s, wordDict):
-    dp = [False] * (len(s) + 1)
-    dp[len(s)] = True # base case -> empty string is in the dictionary
+  ```py
+  def wordBreak(s, wordDict):
+      dp = [False] * (len(s) + 1)
+      dp[0] = True
 
-    for i in range(len(s)-1, -1, -1):
-        for w in wordDict:
-            # check if the substring s[i:] is in the dictionary (we first check if there is enough characters to check the substring s[i:])
-            if i + len(w) <= len(s) and s[i:i+len(w)] == w:
-                dp[i] = dp[i+len(w)]
-            if dp[i]:
-                # if the substring s[i:] is in the dictionary, then we can break the loop
-                break
+      for i in range(1, len(s) + 1):
+          for j in range(i):
+              if dp[j] and s[j:i] in wordDict:
+                  dp[i] = True
+                  break
 
-    # return the result of the subproblem s[:0]
-    return dp[0]
-```
+      return dp[-1]
+
+  # ----------------------------------------------------------
+
+  # Solution 2
+  def wordBreak(s, wordDict):
+      dp = [False] * (len(s) + 1)
+      dp[len(s)] = True # base case -> empty string is in the dictionary
+
+      for i in range(len(s)-1, -1, -1):
+          for w in wordDict:
+              # check if the substring s[i:] is in the dictionary (we first check if there is enough characters to check the substring s[i:])
+              if i + len(w) <= len(s) and s[i:i+len(w)] == w:
+                  dp[i] = dp[i+len(w)]
+              if dp[i]:
+                  # if the substring s[i:] is in the dictionary, then we can break the loop
+                  break
+
+      # return the result of the subproblem s[:0]
+      return dp[0]
+  ```
 
 ---
 
@@ -6302,6 +6574,206 @@ class Solution:
 
 ---
 
+### Generate Parentheses
+
+Given `n` pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+- Ex: `n = 3`
+
+  - Output: `["((()))","(()())","(())()","()(())","()()()"]`
+
+- Explanation:
+
+  - We can use **Backtracking** to solve this problem.
+    - We can start with an empty string and then append `(` to the string and then recursively call the function with the next `(` and then append `)` to the string and then recursively call the function with the next `)` and so on.
+    - We can use a `left` variable to keep track of the number of `(` that we have used so far, and a `right` variable to keep track of the number of `)` that we have used so far.
+      - We can only add `(` if `left < n` and we can only add `)` if `right < left`.
+      - We can stop when `left == right == n`.
+    - We can use a `res` array to store the result.
+    - We can use a `cur` string to store the current combination that we are building.
+    - We can use a `dfs` function to do the backtracking.
+      - The base case is when `left == right == n`, we can add the current combination to the result array.
+      - Else: we can continue building the combination.
+        - If `left < n`, we can add `(` to the current combination and then recursively call the function with the next `(`.
+        - If `right < left`, we can add `)` to the current combination and then recursively call the function with the next `)`.
+
+![generate parenthesis](./img/generate-parentheses.png)
+
+```py
+def generateParenthesis(n):
+    res = []
+
+    def dfs(left, right, cur):
+        if left == right == n:
+            res.append(cur)
+            return
+
+        if left < n:
+            dfs(left + 1, right, cur + '(')
+
+        if right < left:
+            dfs(left, right + 1, cur + ')')
+
+    dfs(0, 0, '')
+    return res
+```
+
+---
+
+### Palindrome Partitioning
+
+Given a string `s`, partition `s` such that every substring of the partition is a **palindrome**. Return all possible palindrome partitioning of `s`.
+
+A **palindrome** string is a string that reads the same backward as forward.
+
+- Ex: `s = "aab"`
+
+  - Output: `[["a","a","b"],["aa","b"]]`
+
+- Explanation:
+
+  - We know that a string with single character is a palindrome. this is because the string reads the same backward as forward.
+  - So we can use backtracking to partition the input so that each substring is a palindrome.
+    - We can start with an empty array and then add each character of the string to the array and then recursively call the function with the next character and so on.
+    - we only add the current character to the array if the current substring is a palindrome.
+      - we check if it is a palindrome by checking if the current substring is equal to the reversed substring.
+
+![palindrome partitioning](./img/palindrome-partitioning.png)
+
+```py
+def partition(s):
+    res = []
+
+    def dfs(l, cur):
+        if l == len(s):
+            res.append(cur)
+            return
+
+        # Else: we continue building the array
+        for r in range(l, len(s)):
+            # check if s[l:r+1] is a palindrome
+            if s[l:r+1] == s[l:r+1][::-1]:
+                dfs(r + 1, cur + [s[l:r+1]])
+
+    dfs(0, [])
+    return res
+```
+
+---
+
+### Matchsticks to Square
+
+You are given an integer array `matchsticks` where `matchsticks[i]` is the length of the `ith` matchstick. You want to use **all the matchsticks** to make one square. You should **not break** any stick, but you can **link** them up, and each matchstick must be used **exactly one time**.
+
+Return `true` if you can make this square and `false` otherwise.
+
+![matchsticks](./img/matchsticks-1.jpeg)
+
+- Ex: `matchsticks = [1,1,2,2,2]`
+
+  - Output: `true`
+  - Explanation: You can form a square with length 2, one side of the square came two sticks with length 1.
+
+- Explanation:
+
+  - We can use **Backtracking** to solve this problem.
+    - We can create a decision tree, where each node represents a matchstick and each level represents a side of the square **(`left`, `right`, `top`, `bottom`)**.
+    - We can start with the first matchstick and then we can add it to the first side of the square and then recursively call the function with the next matchstick and then add it to the first side of the square and so on.
+      ![matchsticks](./img/matchsticks-2.png)
+      ![matchsticks](./img/matchsticks-3.png)
+    - if a side of the square is bigger than the target length, then we can stop searching for other combinations as we won't be able to make a square from this combination. And if so we **BACKTRACK**.
+      ![matchsticks](./img/matchsticks-4.png)
+    - We do this recursively until we reach the last matchstick.
+      - If we reached the last matchstick and we were able to make a square, then we can return `True`, otherwise, we can return `False`.
+
+- Time complexity: `O(4^n)` where `n` is the number of matchsticks.
+  - We are making `4` decisions for each matchstick, and we have `n` matchsticks.
+
+```py
+def makesquare(matchsticks):
+    length = sum(matchsticks) // 4
+    sides = [0] * 4
+
+    if sum(matchsticks) % 4 != 0:
+        return False
+
+    # sort the matchsticks in descending order to make the backtracking faster (exit the decision tree at the beginning)
+    matchsticks.sort(reverse=True)
+
+    def dfs(i):
+        """
+        i: pointer to the current index in the matchsticks array
+        """
+        # Base case (if we reached the end of the matchsticks array)
+        if i == len(matchsticks):
+            return True
+
+        # Else: we continue building the square
+        for j in range(4):
+            # check if the current matchstick can be added to the current side of the square
+            if sides[j] + matchsticks[i] <= length:
+                sides[j] += matchsticks[i]
+                if dfs(i + 1):
+                    return True
+                # BACKTRACK -> remove the current matchstick from the current side of the square after processing it
+                sides[j] -= matchsticks[i]
+
+        return False
+
+    return dfs(0)
+```
+
+---
+
+### Splitting a String Into Descending Consecutive Values
+
+You are given a string `s` that consists of only digits.
+
+Check if we can split `s` into two or more **non-empty** substrings such that:
+
+1. the **numerical values** of the substrings are in **descending order**
+2. the **difference** between **numerical values** of every two **adjacent** substrings is equal to `1`.
+
+- Ex: `s = "1234"`
+
+  - Output: `false`
+  - Explanation: There is no valid way to split s.
+
+- Explanation:
+  - We can use **Backtracking** to solve this problem.
+    - We can start with an empty string and then add each character of the string to the string and then recursively call the function with the next character and so on.
+      ![split-string-descending-value](./img/split-string-descending-values-1.png)
+    - We can use a `prev` variable to keep track of the previous substring.
+      - We can check if the current substring is equal to the previous substring + 1.
+        ![split-string-descending-value](./img/split-string-descending-values-2.png)
+      - If so, we can continue building the string.
+      - Else: we can stop building the string.
+
+```py
+def splitString(s):
+    def dfs(i, prev):
+        if i == len(s):
+            return True
+
+        # Else: we continue building the string
+        for j in range(i, len(s)):
+            cur = int(s[i:j+1])
+            # check if the current substring is equal to the previous substring - 1 (DESCENDING ORDER)
+            if cur == prev - 1 and dfs(j + 1, cur):
+                return True
+
+        return False
+
+    for i in range(len(s) - 1): # -1 because we need at least 2 substrings
+        val = int(s[:i+1])
+        if dfs(i + 1, val):
+            return True
+
+    return False
+```
+
+---
+
 ## Graphs
 
 ### Flood Fill
@@ -6371,6 +6843,101 @@ class Solution:
         dfs(sr, sc)
         return image
 ```
+
+---
+
+### Number of islands
+
+Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+![number of islands](./img/num-of-islands.png)
+
+- EX: `numIslands(grid) --> 1`
+  ![number of islands](./img/num-of-islands-1.png)
+
+- It can be solved using `BFS`, where we create layers of islands and keep track of the number of layers we have created.
+  ![number of islands](./img/num-of-islands-2.png)
+
+  - We use `BFS` because we want to visit all the adjacent cells of the current cell **(neighbours)** before moving to the next cell in the `for loop`.
+
+- **Solution 1:** -> `BFS` ✅
+
+  - loop through the rows of the grid (i) and loop through the columns of the grid (j) and if the current cell is a `'1'`, increment the number of islands by 1 and call the helper function to mark the current island as visited
+  - the bfs-helper-function (`bfs`) will mark the current cell as visited and then recursively call itself on the adjacent cells (up, down, left, right) that are `'1'`s
+  - once the helper function is done, we return the number of islands
+
+  ```py
+  def numIslands(grid):
+      ROWS, COLS = len(grid), len(grid[0])
+      count = 0
+      visit = set()
+
+      def bfs(r, c):
+          q = deque([(r, c)])
+          directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+          while q:
+              row, col = q.popleft()
+              for dr, dc in directions:
+                  nr, nc = row+dr, col+dc
+                  if (
+                      nr in range(ROWS) and
+                      nc in range(COLS) and
+                      (nr, nc) not in visit and
+                      grid[nr][nc] == '1'
+                  ):
+                      visit.add((nr, nc))
+                      bfs(nr, nc)
+
+      for r in range(ROWS):
+          for c in range(COLS):
+              if grid[r][c] == '1' and (r, c) not in visit:
+                  bfs(r, c)
+                  count += 1
+
+      return count
+  ```
+
+- Solution 2 -> `DFS
+
+  ```py
+  def numIslands(grid):
+      # if the grid is empty, return 0
+      if not grid:
+          return 0
+
+      # initialize number of islands to 0
+      num_islands = 0
+      # get dimensions of the grid
+      rows, cols = len(grid), len(grid[0])
+      # initialize set of visited islands to mark visited positions
+      visited = set()
+
+      # Helper BFS function to mark the current island as visited
+      def dfs(r, c):
+          if grid[r][c] != '1' or (r, c) in visited:
+              return
+          # mark the current cell as visited
+          visited.add((r, c))
+          # recursively call the helper function on the adjacent cells (up, down, left, right) that are '1's
+          if r > 0:
+              dfs(r - 1, c)
+          if r < rows - 1:
+              dfs(r + 1, c)
+          if c > 0:
+              dfs(r, c - 1)
+          if c < cols - 1:
+              dfs(r, c + 1)
+
+      for r in range(rows):
+          for c in range(cols):
+              # if the current cell is a '1', increment the number of islands by 1
+              # and call the helper function to mark the current island as visited
+              if grid[r][c] == '1' and (r, c) not in visited:
+                  dfs(r, c)
+                  num_islands += 1
+
+      return num_islands
+  ```
 
 ---
 
@@ -6456,7 +7023,7 @@ Every minute, any fresh orange that is **4-directionally adjacent** to a rotten 
   - So, we can use `BFS` to solve this problem. as it can simultaneously process all the nodes at the same level at the same time. -> **Multi source BFS**
     - Out sources will be the rotten oranges. which will be added to the `queue` at the beginning.
     - Then we add the neibouring oranges to the `queue` and mark them as rotten.
-    - once we finish processing all the oranges in the current level, we increment the time by `1`.
+    - once we finish processing all the oranges in the **current level**, we increment the time by `1`.
     - once the queue is empty, we stop and return the time.
   - We also we need to store the number of fresh oranges in the grid. to know when to stop. if there are no fresh oranges left, we return the time. if there are still fresh oranges left, we return `-1`.
 
@@ -6473,22 +7040,23 @@ class Solution:
         # Step 1). build the initial queue of rotten oranges and count the fresh oranges
         for r in range(ROWS):
             for c in range(COLS):
+                # check if it's a rotten orange, then add it to the queue so that we can process it later
                 if grid[r][c] == 2:
                     queue.append((r, c))
+                # check if it's a fresh orange, then increment the number of fresh oranges
                 elif grid[r][c] == 1:
                     fresh_oranges += 1
 
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
         while queue and fresh_oranges > 0:
-            for i in range(len(queue)):
+            # process all the rotten oranges at the current level then increment the time by 1
+            for _ in range(len(queue)):
                 r, c = queue.popleft()
 
-                # nr: new row, nc: new column
-                for nr, nc in (
-                  (r + 1, c),
-                  (r - 1, c),
-                  (r, c + 1),
-                  (r, c - 1)):
-                    # check if it's not a fresh orange
+                for dr, dc in directions:
+                    nr, nc = r + dr, c + dc
+                    # check if is in bound or it's not a fresh orange
                     if (
                       nr < 0 or nr == ROWS or
                       nc < 0 or nc == COLS or
@@ -6524,12 +7092,17 @@ The graph is given as follows: `graph[i]` is a list of all nodes you can visit f
 
 - Explanation:
 
+  - > "Acyclic graph" means that there are no cycles in the graph. So we can't visit the same node twice. So we won't ge stuck in an infinite loop.
+  - Here, in the input array:
+    - index means the node
+    - value means the neighbors of the node
+    - So, node `0` has neighbors `1` and `2`
   - We can use `DFS` to solve this problem.
     ![all paths from source to target](./img/all-paths-from-source-to-target-2.png)
   - We start from node `0` and keep going until we reach node `n-1`
     - We keep track of the current `path` and add it to the result when we reach node `n-1`.
 
-- Solution 1: `DFS` with backtracking
+- **Solution 1:** `DFS` with backtracking
 
   - Time and Space Complexity: `O(2^n)` = number of nodes in the graph
 
@@ -6549,7 +7122,7 @@ The graph is given as follows: `graph[i]` is a list of all nodes you can visit f
       return result
   ```
 
-- Solution 2: `BFS`
+- **Solution 2:** `BFS`
 
   - We will use a `queue` to store the current `node` and the current `path`.
   - Time and Space Complexity: `O(2^n)` = number of nodes in the graph
@@ -6590,6 +7163,18 @@ Given a reference of a node in a **connected** undirected graph. Return a **deep
     - We will use this `HashMap` to check if we already cloned a node or not, so that we don't clone it again and just return the cloned node from the `HashMap`.
     - if a node is already cloned, then we make it double sided (pointing to each other).
       ![clone graph](./img/clone-graph-2.png)
+  - We will use `DFS` to clone the graph.
+
+    - This is because when adding the neighbors to the cloned node, we can't just add its neighbors, we need to clone them first.
+    - And to do that we need to recursively use `DFS` to clone the neighbors of the neighbors and so on.
+
+      ```py
+      for neighbor in node.neighbors:
+        clone.neighbors.append(dfs(neighbor))
+      ```
+
+    - To avoid creating duplicate nodes, we keep track of visited nodes using a `hashMap`. The `oldToNew` dictionary is used to map each original node to its corresponding copy in the new graph. The line `oldToNew[node] = clone` is executed before the `for` loop that iterates through the neighbors of the current node to ensure that we mark the current node as visited and create its copy **before recursively visiting its neighbors**.
+      - This guarantees that we always return the same copy of a node if we encounter it again later in the traversal and create a proper deep copy of the original graph with no duplicate nodes.
 
 - Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
   - This is because we may visit all nodes (`V`) and edges (`E`) in the graph, because we need to create a clone for each one
@@ -6643,12 +7228,12 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
     - This is because we want to know if for each node, can we reach the end node or not (finish all courses).
       ![course-schedule](./img/course-schedule-3.png)
     - We notice that our `base` cases are the nodes that don't have any prerequisites (no neighbours).
-      - To keep track of these nodes, we use a `HashMap` with adjacency list.
+      - To keep track of these nodes, **we use a `HashMap` with adjacency list**.
         ![course-schedule](./img/course-schedule-4.png)
   - Then we use `DFS` to check if there is a cycle or not.
     - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
       ![course-schedule](./img/course-schedule-5.png)
-    - To prevent running `DFS` on the same node twice, we remove it from the `HashMap` after we run `DFS` on it and knowing that it can be completed.
+    - To prevent running `DFS` on the same node twice, we remove its `value` from the `HashMap` after we run `DFS` on it and knowing that it can be completed **(because it now has no prerequisites)**, and then go back to the previous node and repeat the process.
       ![course-schedule](./img/course-schedule-6.png)
     - if all nodes can be completed, then we return `true`
       ![course-schedule](./img/course-schedule-7.png)
@@ -6663,7 +7248,7 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
 
 ```py
 def canFinish(numCourses, prerequisites):
-    # Create a graph from the prerequisites
+    # Create a graph from the prerequisites (Adjacency List)
     preMap = {i: [] for i in range(numCourses)}
     # preMap = collections.defaultdict(list)
     for course, pre in prerequisites:
@@ -6690,8 +7275,8 @@ def canFinish(numCourses, prerequisites):
 
         # Remove the node from the visited set
         visited.remove(node)
-
-        preMap[node] = [] # Remove the node from the graph map
+        # Remove the node from the graph map
+        preMap[node] = []
 
         return True
 
@@ -6730,15 +7315,18 @@ Same as above, but return the order of the courses to take.
     - If there is a cycle, then we return `false`.
       - A cycle is detected using a `visited` set .
 
+- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
+  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+
 ```py
 def findOrder(numCourses, prerequisites):
-    # Create a graph from the prerequisites
+    # Create a graph from the prerequisites (Adjacency List)
     preMap = {course: [] for course in range(numCourses)}
     for course, pre in prerequisites:
         preMap[course].append(pre)
 
     # Create sets to keep track of the visited nodes and potential cycles
-    visited, cycle = set(), set()
+    visited, cycleSet = set(), set()
 
     # Create a output to keep track of the order of the courses
     output = []
@@ -6746,25 +7334,26 @@ def findOrder(numCourses, prerequisites):
     def dfs(node):
         # Base case
         if node in cycle:
-            return False
+            return False # because there is a cycle
         if node in visited:
             return True # so that we don't stop the algotithm
 
         # Add the node to the cycle set
-        cycle.add(node)
+        cycleSet.add(node)
 
         # Loop through the prerequisites of the node
         for pre in preMap[node]:
             # Check if there is a cycle
             if not dfs(pre):
-                return False
+                return False # Terminate the algorithm
 
         # Remove the node from the cycle set
-        cycle.remove(node)
+        cycleSet.remove(node)
 
         # Finally add the node to the visited set
         visited.add(node)
 
+        # Add the node to the output after visiting all its prerequisites
         output.append(node)
         return True
 
@@ -6797,9 +7386,10 @@ We will send a signal from a given node `k`. Return the time it takes for all th
   - This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
     - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
       ![network-delay-time](./img/network-delay-time-2.png)
-    - Here we will usre a `min heap` to keep track of the shortest path.
+    - Here, we will use a `minHeap` to keep track of the shortest path.
       - It's logical to search the node with shortest distance, So we will use the `min heap` to pop the node with the shortest distance from the source node and add its neighbors to the `Priority Queue` with their distance from the source node.
         ![network-delay-time](./img/network-delay-time-3.png)
+      - > So the `minHeap` tells us which node to visit next by popping the **node with the shortest distance from the source node**. For example in the picture below, we have 2 paths from node `1`, and the `minHeap` will give us the path with the shortest distance from the source node. `(path 1)` > ![network-delay-time](./img/network-delay-time-6.png)
   - Starting at the source node `k`, we loop through its neighbors and add them to the `Priority Queue` with their distance from the source node.
     ![network-delay-time](./img/network-delay-time-4.png)
     ![network-delay-time](./img/network-delay-time-5.png)
@@ -6810,13 +7400,13 @@ We will send a signal from a given node `k`. Return the time it takes for all th
 
 ```py
 def networkDelayTime(times, n, k):
-    # Create a graph from the times
+    # Create a graph from the times (Adjacency List)
     graph = collections.defaultdict(list)
     for u, v, w in times:
         graph[u].append((v, w))
 
-    # Create a min heap to keep track of the shortest path
-    minHeap = [(0, k)] # (path-distance, node)
+    # Create a minHeap to keep track of the shortest path
+    minHeap = [(0, k)] # (path-distance, node) -> we start with the given node k
 
     visit = set()
     res = 0
@@ -6825,11 +7415,9 @@ def networkDelayTime(times, n, k):
       w1, n1 = heapq.heappop(minHeap)
       if n1 not in visit:
         visit.add(n1)
-        res = max(res, w1) # max because we want the path to the farthest node (n-1) which indicate the delay time
-
+        res = max(res, w1) # max because we want the path to the farthest node (n-1) which indicate the biggest delay time
         for n2, w2 in graph[n1]:
-          if n2 not in visit:
-            heapq.heappush(minHeap, (w1 + w2, n2))
+          heapq.heappush(minHeap, (w1 + w2, n2))
 
     return res if len(visit) == n else -1
 ```
@@ -6926,36 +7514,38 @@ Return an edge that can be removed so that the resulting graph is a tree of `n` 
          ![redundant-connection](./img/redundant-connection-3.png)
       2. `find` the parent of each node and check if the parent of the 2 nodes are the same -> **cycle**
 
-- Solution 1: DFS
+- Solution 1: Union Find ✅
 
-  - Time complexity: `O(n^2)`
+  - explanation in solution 2
+  - Time complexity: `O(nlogn)`
 
   ```py
-  def findRedundantConnection(edges):
-      # Create a graph from the edges
-      graph = collections.defaultdict(list)
-      for node1, node2 in edges:
-          graph[node1].append(node2)
-          graph[node2].append(node1)
+  class UnionFind:
+    def __init__(self, n):
+        self.par = [i for i in range(n)]
 
-      def dfs(node1, node2):
-          # If we found a cycle, then return True
-          if node1 == node2:
-              return True
-          # If we haven't visited the node yet, then visit it
-          if node1 not in visit:
-              visit.add(node1)
-              # Check if there is a cycle in the graph
-              return any(dfs(nei, node2) for nei in graph[node1])
+    def find(self, x):
+        p = self.par[x]
+        while p != self.par[p]:
+            p = self.par[p]
+        return p
 
-      for node1, node2 in edges:
-          visit = set()
-          # If there is a cycle in the graph, then return the edge that created the cycle
-          if dfs(node1, node2):
-              return [node1, node2]
+    def union(self, x1, x2):
+        p1, p2 = self.find(x1), self.find(x2)
+        self.par[p1] = p2 # make the parent of node1 the parent of node2
+
+  class Solution:
+    def findRedundantConnection(self, edges: List[List[int]]) -> List[int]:
+        uf = UnionFind(len(edges) + 1) # +1 because the nodes are 1-indexed
+        for node1, node2 in edges:
+            # If the parent of the 2 nodes are the same, then we found a cycle and this is the redundant connection
+            if uf.find(node1) == uf.find(node2):
+                return [node1, node2]
+            # else, union the nodes together to make a tree
+            uf.union(node1, node2)
   ```
 
-- Solution 2: Union Find by **rank** ✅
+- Solution 1: Union Find by **rank**
 
   - Time complexity: `O(nlogn)`
   - Steps:
@@ -6991,6 +7581,7 @@ Return an edge that can be removed so that the resulting graph is a tree of `n` 
       def union(node1, node2):
           p1, p2 = find(node1), find(node2)
 
+          # If the parent of the 2 nodes are the same, then we found a cycle
           if p1 == p2:
               return False
 
@@ -7008,37 +7599,6 @@ Return an edge that can be removed so that the resulting graph is a tree of `n` 
           # If the parent of the 2 nodes are the same, then we found a cycle
           if not union(node1, node2):
               return [node1, node2]
-  ```
-
-- Solution 3: Union Find
-
-  - Time complexity: `O(nlogn)`
-
-  ```py
-  def findRedundantConnection(edges):
-      # Create a parent array to keep track of the parent of each node
-      parent = [i for i in range(len(edges) + 1)]
-
-      def find(node):
-          p = parent[node] # going up the parent of the node
-          # If the parent of the node is itself, then we found the Top parent
-          if p == node:
-            return p
-          p = find(p)
-
-      # Union the nodes together if they don't have the same parent
-      def union(node1, node2):
-          # make the parent of node1 the parent of node2
-          parent[find(node1)] = find(node2)
-
-      for node1, node2 in edges:
-          # If the parent of the 2 nodes are the same, then we found a cycle
-          if find(node1) == find(node2):
-              return [node1, node2]
-          else:
-              union(node1, node2)
-
-      return []
   ```
 
 ---
@@ -7059,6 +7619,58 @@ problem: [Here](https://leetcode.com/problems/accounts-merge/)
     - We will go through each node and do a `DFS` to find all the nodes that belong to the same person and append them to a list.
     - We will also keep track of the emails that we have visited so that we don't visit the same email twice.
     - We will also sort the emails in the list so that we can return the result in the correct order.
+
+- Time and space complexity:
+
+  - Time: `O(nlogn)` where `n` is the number of accounts
+  - Space: `O(n)`
+
+- Solution 1: without Rank ✅
+
+  ```py
+  class UnionFind:
+    def __init__(self, n):
+        self.par = [i for i in range(n)]
+
+    def find(self, x):
+        p = self.par[x]
+        while p != self.par[p]:
+            p = self.par[p]
+        return p
+
+    def union(self, x1, x2):
+        p1, p2 = self.find(x1), self.find(x2)
+        self.par[p1] = p2 # make the parent of node1 the parent of node2
+
+  class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        uf = UnionFind(len(accounts))
+        emailToAcc = {} # email -> index of acc
+
+        # 1. Loop through the accounts and union the accounts that have the same email
+        for i, acc in enumerate(accounts):
+            # Loop through the emails of the account and union them together if they don't have the same parent
+            for email in acc[1:]:
+                if email in emailToAcc:
+                    uf.union(i, emailToAcc[email])
+                else:
+                    emailToAcc[email] = i # add the email to the emailToAcc map
+
+        # 2. Loop through the accounts and group the emails of the same account together (same parent)
+        emailGroup = defaultdict(list) # index of acc -> list of emails
+        for email, i in emailToAcc.items():
+            p = uf.find(i)
+            emailGroup[p].append(email) # add the email to the emailGroup map
+
+        # 3. Loop through the emailGroup and return the result
+        res = []
+        for i, emails in emailGroup.items():
+            name = accounts[i][0]
+            res.append([name] + sorted(emails)) # array concat
+        return res
+  ```
+
+- Solution 2: with Rank
 
   ```py
   class UnionFind:
@@ -7116,10 +7728,16 @@ problem: [Here](https://leetcode.com/problems/sort-items-by-groups-respecting-de
 
 - Explanation:
 
-  - At first glance it is clear that this is a **topological sorting** problem, but it's difficulty rise from the fact that there is grouping, thus we need to think about dependancies between the nodes(items) in each group and between groups as a whole.
+  - At first glance it is clear that this is a **topological sorting** problem, but its difficulty rise from the fact that there is **grouping**, thus we need to think about dependancies between the nodes(items) in each group and between groups as a whole.
   - We start by creating a new representation for the groups using dictionaries where each `groups[groupId]` is a set of all nodes with `id == groupId`, and we create a new group for each node that is not in any group.
+    - We can think of it as **adjacency list** for the groups.
+    - > So we need to do Typological sort for the groups and for the items inside each group.
   - Then we find the dependencies within each `group` and between `groups`.
-  - lastly we sort each group by it self using the depenancies between the nodes inside said group, and the groups by their `id` using the between groups depencancy topologically and merge the results.
+    - to know if a group comes before another group, we need to know if all the items in the first group come before all the items in the second group.
+    ![sort groups](./img/sort-groups-1.png)
+  - lastly we sort each group by it self using the depenancies between the nodes inside a group, and the groups by their `id` using the (between groups depencancy) topologically and merge the results.
+
+> So mainly, **we need to do Typological sort for the groups and for the items inside each group**.
 
 - Time and space complexity:
 
@@ -7127,7 +7745,123 @@ problem: [Here](https://leetcode.com/problems/sort-items-by-groups-respecting-de
   - Space: `O(n + m)`
 
 ```py
+def sortItems(n, m, group, beforeItems):
+    # Helper function: returns topological order of a graph, if it exists
+    def getTopOrder(graph, indegree):
+        """
+        graph: adjacency list
+        indegree: array of indegree of each node
+        """
+        # Create a queue to keep track of the nodes with indegree = 0
+        queue = deque()
+        for node in range(len(indegree)):
+            if indegree[node] == 0:
+                queue.append(node)
 
+        # Create a list to keep track of the topological order
+        topOrder = []
+        while queue:
+            node = queue.popleft()
+            topOrder.append(node)
+            for nei in graph[node]:
+                # decrement the indegree of the neighbor so that we know that we visited it
+                indegree[nei] -= 1
+                # If the indegree of the neighbor is 0, then add it to the queue to visit it later
+                if indegree[nei] == 0:
+                    queue.append(nei)
+
+        # If there is a cycle, then return an empty list
+        return topOrder if len(topOrder) == len(indegree) else []
+
+    # STEP 1: Create a new group for each item that belongs to no group
+    for i in range(n):
+        if group[i] == -1:
+            group[i] = m
+            m += 1 # increment the number of groups
+
+    # STEP 2: Create a graph for the groups and the items inside each group
+    groupGraph = [[] for _ in range(m)]
+    groupIndegree = [0] * m
+
+    itemGraph = [[] for _ in range(n)]
+    itemIndegree = [0] * n
+
+    # Loop through the items and their prerequisites to create the graph
+    for item in range(n):
+        curGroup = group[item]
+        for pre in beforeItems[item]:
+            preGroup = group[pre]
+            # If the item and its prerequisite are in the same group, then add them to the itemGraph
+            if preGroup == curGroup:
+                itemGraph[pre].append(item)
+                itemIndegree[item] += 1
+            # If the item and its prerequisite are in different groups, then add them to the groupGraph
+            else:
+                groupGraph[preGroup].append(curGroup)
+                groupIndegree[curGroup] += 1
+
+    # STEP 3: Find the topological order of the groups &  the items inside each group
+    groupOrder = getTopOrder(groupGraph, groupIndegree)
+    itemOrders = getTopOrder(itemGraph, itemIndegree)
+    if not groupOrder or not itemOrders:
+        return []
+
+    # STEP 4: Find the topological order of the items inside each group
+    # Create a map to keep track of the items inside each group
+    groupToItems = defaultdict(list)
+    for item in range(n):
+        groupToItems[group[item]].append(item)
+    
+    # STEP 5: Merge the results
+    res = []
+    for groupId in groupOrder:
+        res += groupToItems[groupId]
+    return res
+```
+
+---
+
+### Is Graph Bipartite?
+
+problem: [Here](https://leetcode.com/problems/is-graph-bipartite/)
+
+return `true` if and only if it is bipartite.
+
+- Explanation:
+
+  - > A **bipartite graph** is a graph that can be colored such that no two adjacent nodes share a color. The algorithm for coloring and checking this graph is pretty straightforward. We start at some arbitrary source node, assign it a color and then assign each of this neighbours the opposite of that color. We continue this process for each node we see in the graph, returning false if we ever find a neighbour that is already colored the same as the current node.
+    > ![bipartite-graph](./img/bipartite-graph-1.svg.png)
+  - We can use `BFS` to check if the graph is bipartite or not.
+    - We will use a `color` array to keep track of the color of each node. (2 groups `red` and `blue`)
+      - `color[i] = 0` -> not colored yet
+      - `color[i] = 1` -> color 1 (red)
+      - `color[i] = -1` -> color 2 (blue)
+    - We will use a `queue` to keep track of the nodes that we need to visit.
+    - We will start by coloring the first node with `color = 1` and add it to the queue.
+    - Then we will loop through the queue and color the neighbors of the current node **with the opposite color** and add them to the queue.
+      - If we find a neighbor that has the same color as the current node, then the graph is not bipartite.
+      - If we can color all the nodes without finding a neighbor with the same color, then the graph is bipartite.
+
+```py
+def isBipartite(graph: List[List[int]]) -> bool:
+    n = len(graph)
+    colors = [0] * n
+
+    for i in range(n):
+        if colors[i] == 0:
+            colors[i] = 1 # color 1 (red)
+            queue = deque([i])
+            while queue:
+                node = queue.popleft()
+                for nei in graph[node]:
+                    # If the neighbor is not colored yet, color it with the opposite color and add it to the queue
+                    if colors[nei] == 0:
+                        colors[nei] = -colors[node]
+                        queue.append(nei)
+                    # If the neighbor has the same color as the current node, then the graph is not bipartite
+                    elif colors[nei] == colors[node]:
+                        return False
+    return True
 ```
 
 ---
@@ -7237,6 +7971,53 @@ def hasValidPath(grid: List[List[int]]) -> bool:
 
 ---
 
+### Shortest Path in Binary Matrix
+
+problem: [Here](https://leetcode.com/problems/shortest-path-in-binary-matrix/)
+
+- Explanation:
+  - As this is a shortest path problem, we can use `BFS` to find the shortest path from the top left cell to the bottom right cell.
+  - We use `BFS` beacuse we want to go through the neighbors of the current cell first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
+    - the first time we will reach the bottom right cell, we will have the shortest path **(FASTEST)**.
+  - The trick here, that we can move in **8 directions** not just **4**, so we will use a `directions` array to store the possible directions.
+    - possible directions:
+      ![binary matrix path](./img/binary-matrix.png)
+      - `(0, 1)` -> right
+      - `(0, -1)` -> left
+      - `(1, 0)` -> down
+      - `(-1, 0)` -> up
+      - `(1, 1)` -> down right
+      - `(1, -1)` -> down left
+      - `(-1, 1)` -> up right
+      - `(-1, -1)` -> up left
+
+```py
+def shortestPathBinaryMatrix(grid: List[List[int]]) -> int:
+    N = len(grid)
+    q = deque([(0, 0, 1)]) # (row, col, path length)
+    visit = set((0, 0))
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+    while q:
+        r, c, pathLen = q.popleft()
+        # Check if we can/can't move in the current direction
+        if min(r, c) < 0 or max(r, c) >= N or grid[r][c] == 1:
+            continue
+        # Check if we reached the bottom right cell (VALID PATH)
+        if r == N - 1 and c == N - 1:
+            return pathLen
+        # Try to move in each direction
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < N and 0 <= nc < N and grid[nr][nc] == 0 and (nr, nc) not in visit:
+                visit.add((nr, nc))
+                q.append((nr, nc, pathLen + 1))
+
+    return -1
+```
+
+---
+
 ### Couples Holding Hands
 
 There are `n` couples sitting in `2n` seats arranged in a row and want to hold hands. The people and seats are represented by an integer array `row` where `row[i]` is the ID of the person sitting in the `i`th seat. The couples are numbered in order, the first couple being `(0, 1)`, the second couple being `(2, 3)`, and so on with the last couple being `(2n - 2, 2n - 1)`.
@@ -7325,7 +8106,7 @@ Problem: [Here](https://leetcode.com/problems/minimum-obstacle-removal-to-reach-
   def minimumEffortPath(heights: List[List[int]]) -> int:
       rows = len(grid)
       cols = len(grid[0])
-      dist = [[inf] * cols for _ in range(rows)]
+      dist = [[1] * cols for _ in range(rows)]
       dist[0][0] = 0
       dq = deque([(0, 0, 0)])
       directions = [[0,1],[0,-1],[1,0],[-1,0]]
@@ -7335,8 +8116,7 @@ Problem: [Here](https://leetcode.com/problems/minimum-obstacle-removal-to-reach-
           for dr, dc in directions:
               row = r + dr
               col = c + dc
-              if 0 <= row < rows and 0 <= col < cols and dist[row][col] == inf:
-                  new_count = count
+              if 0 <= row < rows and 0 <= col < cols and dist[row][col] == 1:
                   if grid[row][col] == 1:
                       dist[row][col] = count + 1
                       dq.append((count + 1, row, col))
@@ -7526,3 +8306,88 @@ def longestIncreasingPath(matrix: List[List[int]]) -> int:
 ```
 
 ---
+
+### Circular Array Loop
+
+problem: [Here](https://leetcode.com/problems/circular-array-loop/)
+
+if there is a cycle in the array, return `true` otherwise, return `false`.
+
+- EX:
+  ![circular array loop](./img/circular-array-loop-1.jpeg)
+
+  - Input: `nums = [2,-1,1,2,2]`
+  - Output: `true`
+  - Explanation: There is a cycle from index 0 -> 2 -> 3 -> 0 -> ...
+
+```py
+def circularArrayLoop(nums: List[int]) -> bool:
+    if len(nums) < 2:
+        return False
+    
+    for i, num in enumerate(nums):
+        if num == 0:
+            continue
+        slow, fast = i, next(nums, i)
+        
+        # Check if the direction of the cycle is the same
+        while num * nums[fast] > 0 and num * nums[getNextIndex(nums, fast)] > 0:
+            if slow == fast:
+                # Check if the cycle has length > 1
+                if slow == getNextIndex(nums, slow):
+                    break
+                return True
+
+            slow = getNextIndex(nums, slow)
+            fast = getNextIndex(nums, getNextIndex(nums, fast))
+        
+        # Mark the current cycle as visited by setting all its elements to 0
+        slow, val = i, nums[i]
+        while val * nums[slow] > 0:
+            nums[slow] = 0
+            slow = getNextIndex(nums, slow)
+
+def getNextIndex(nums, i):
+    n = len(nums)
+    return (i + nums[i]) % n # ensure that the next index is in the range [0, n - 1]
+```
+
+---
+
+## Dynamic Programming
+
+### Unique Paths
+
+A robot is located at the top-left corner of a `m x n` grid. Given the two integers `m` and `n`, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+
+- Ex:
+  ![unique paths](./img/unique-paths-1.png)
+
+  - Input: `m = 3, n = 7`
+  - Output: `28`
+
+- Explanation:
+
+  - This is a `DP` problem, because we will be using the results of the subproblems to solve the main problem.
+    - Actually you would figure that out if you tried to solve it using `recursion` and `backtracking` (`DFS`) as you will get `TIME LIMIT` error.
+  - We will use a `dp` matrix to store the number of unique paths for each cell.
+    - `dp[i][j]` -> number of unique paths to reach the cell at `i`th row and `j`th column.
+  - We will start by filling the first row and first column with `1` because there is only one way to reach them.
+  - Then we will iterate over the matrix and for each cell we will calculate the number of unique paths to reach it.
+    - `dp[i][j] = dp[i - 1][j] + dp[i][j - 1]`
+    - `dp[i - 1][j]` -> number of unique paths to reach the cell above the current cell.
+    - `dp[i][j - 1]` -> number of unique paths to reach the cell on the left of the current cell.
+  - Time and space complexity: `O(mn)`, where `m` is the number of rows and `n` is the number of columns.
+
+```py
+def uniquePaths(m: int, n: int) -> int:
+    # Create a dp matrix to store the number of unique paths for each cell
+    dp = [[1] * n for _ in range(m)]
+
+    for r in range(1, m):
+        for c in range(1, n):
+            # number of unique paths to reach the cell at rth row and cth column
+            dp[r][c] = dp[r - 1][c] + dp[r][c - 1]
+
+    return dp[-1][-1]
+```

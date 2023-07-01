@@ -51,6 +51,7 @@
       - [Perfect vs Full vs Complete Binary Trees](#perfect-vs-full-vs-complete-binary-trees)
       - [Binary Search Tree (BST)](#binary-search-tree-bst)
       - [Tree Traversal](#tree-traversal)
+    - [TreeMap](#treemap)
     - [Binary Heap](#binary-heap)
       - [Array implementation](#array-implementation)
       - [Heap methods](#heap-methods)
@@ -559,6 +560,8 @@ Here we have **Key/value pairs**
 - Hash tables are great for:
   1. creating a mapping from one thing to another
   2. looking something up
+- Hash tables are not good for:
+  1. storing -> `O(nlog(n))`
 - **Use cases:**
   - create a mapping from one thing to another thing
     - In technical terminology, we’d say that a hash function “maps strings to numbers.”
@@ -622,17 +625,20 @@ with enough data and limited memory, sometimes keys are hashed to the same value
      ![separate chaining](./img/hash-collision2.png)
      - at each index in our array we store values using more sophisticated data-structure like (array or linked-list)
      - this allows us to store multiple key-value pairs at the same index
-  2. **linear probing (open addressing or closed hashing)**:
+  2. **linear probing ("Open Addressing" or closed hashing)**:
      ![linear probing](./img/hash-collision3.png)
      ![linear probing](./img/hash-collision4.jpg)
-     - In `open addressing`, instead of in linked lists, all entry records are stored in the array itself. When a new entry has to be inserted, the hash index of the hashed value is computed and then the array is examined (starting with the hashed index). If the slot at the hashed index is unoccupied, then the entry record is inserted in slot at the hashed index else it proceeds in some probe sequence until it finds an unoccupied slot.
+     - In `open addressing`, instead of in linked lists, all entry records are stored in the array itself. When a new entry has to be inserted, the hash index of the hashed value is computed and then the array is 
        - when we find a collision, we search through the array to find the next empty slot
        - When searching for an entry, the array is scanned in the same sequence until either the target element is found or an unused slot is found. This indicates that there is no such key in the table.
      - > The name `"open addressing"` refers to the fact that the location or address of the item is not determined by its hash value.
      - also here, we may improve the **time complexity**, but we might also accidentally increase the **space complexity** as a tradeoff by creating an object and storing values inside it in the memory
      - also this may result in a `O(n)` time complexity in the worst case, as we may have to search through the entire array to find an empty slot
-  3. **double hashing**: Similar to linear probing, but instead of using a constant "skip" value, we use a second hash function to determine the next index to check.
-  4. **quadratic probing**: Similar to linear probing, but instead of using a constant "skip" value, we use a quadratic function to determine the next index to check.
+  3. **Rehashing**: (most common)
+     - When the load factor of the hash table increases, the hash table is rehashed (i.e., the size of the table is increased approximately by a factor of 2 and the table is rehashed -> like **dynamic arrays**).
+     - > **Note:** The load factor is the ratio of the number of elements in the hash table to the size of the hash table.
+  4. **double hashing**: Similar to linear probing, but instead of using a constant "skip" value, we use a second hash function to determine the next index to check.
+  5. **quadratic probing**: Similar to linear probing, but instead of using a constant "skip" value, we use a quadratic function to determine the next index to check.
 
 - To avoid collisions, we want to distribute our values evenly throughout, So we need:
   - A low **load factor**
@@ -655,7 +661,10 @@ If the entire hash table is totally empty except for one slot. And that slot has
 
 - Your hash function is really important. If your hash function mapped all the keys to a single slot. Ideally, your hash function would map keys evenly all over the hash.
 - If those linked lists get long, it slows down your hash table a lot. But they won’t get long if you use a good hash function!
+
 - **Time complexity:** The time complexity of a hash table is `O(1)` for insertions, deletions, and lookups. But that’s only true if you have a good hash function. If you have a bad hash function, you could end up with a hash table that’s as slow as a linked list, and then the time complexity would be `O(n)`.
+  - Average case: `O(1)`
+  - Worst case: `O(n)`
 
 ---
 
@@ -712,12 +721,13 @@ It is what a program uses to keep track of method calls.
     - return address --> what the program should do after the function returns
 
 - **procedure call stack**:
+
   - The call stack is a stack data structure maintained inside computers and ran by the operating system. It stores information about when the active procedures and functions call each other, and how they pass parameters to each other.
-  ![procedure call stack](./img/procedure-call-stack-1.png)
-  ![procedure call stack](./img/procedure-call-stack-2.png)
+    ![procedure call stack](./img/procedure-call-stack-1.png)
+    ![procedure call stack](./img/procedure-call-stack-2.png)
   - Ex: when `procedure 1` calls `procedure 2`, `procedure 2` is pushed onto the stack. and so on when `3` calls `2`, ..., When `procedure 2` returns, it is popped off the stack and `procedure 1` resumes execution.
-  ![procedure call stack](./img/procedure-call-stack-3.png)
-  ![procedure call stack](./img/procedure-call-stack-4.png)
+    ![procedure call stack](./img/procedure-call-stack-3.png)
+    ![procedure call stack](./img/procedure-call-stack-4.png)
 
   - reference: [Procedures, Video 2: Call stack](https://www.youtube.com/watch?v=XbZQ-EonR_I)
 
@@ -742,7 +752,7 @@ def greet(name):
 > - You can use something called [tail recursion](./2-Algorithms.md#eliminating-tail-recursion). That's an advanced recursion topic. It's also only supported by some languages, not all.
 
 - **StackOverFlow**
-  - During the stack-framing  process, if `JVM` encounters a situation where there is no space for a new stack frame to be created, it will throw a `StackOverflowError`.
+  - During the stack-framing process, if `JVM` encounters a situation where there is no space for a new stack frame to be created, it will throw a `StackOverflowError`.
   - causes:
     - unterminated/infinite recursion – too deep recursion in a particular code snippet.
     - It can also happen in a situation where an application keeps calling methods from within methods until the stack is exhausted. This is a rare case since no developer would intentionally follow bad coding practices.
@@ -932,10 +942,15 @@ They're nodes (vertices) connected via "Edges"
 - **Adjacency Matrix**
   ![graphs-adjacency-matrix](./img/graphs-adjacency-matrix.png)
   - In an `undirected` graph, an adjacency matrix will be symmetric. In a directed graph, it will not (necessarily) be.
-- **Adjacency List**
+  - Here, `1` means that there's an edge between the two vertices, and `0` means that there's no edge between them
+  - It's not commonly used, as it's not very space-efficient, as it's `O(n^2)` space complexity
+    - This is because we have to store a value for every possible edge (either `0` or `1`)
+- **Adjacency List** (most common)
   ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
   - here:
     - we use `hash-table` to store the edges with the vertex as the key and the edges as the value array
+  - Here it's more space-efficient, as it's `O(n + e)` space complexity
+    - This is because we only have to store the values for the edges that actually exist in an array for each node
   - it's the most used, as most data in real-world tends to lend itself to sparser and/or larger graphs
 
 ### Graphs implementation
@@ -964,7 +979,7 @@ It's a special type of graph, where no edges point back to the root node (no cyc
 - Other important concepts to understand are `height` and `depth`:
 
   - `height` of a tree is the number of edges from the `root` to the furthest `leaf`.
-  - `depth` of a node is the number of edges from the `root` to that node.
+  - `depth` of a node is the number of edges from the desired `node` to the `root`.
 
 - used in:
   - the **HTML DOM**
@@ -1068,26 +1083,26 @@ class Tree:
       30 50
   ```
 
-- **Complete Binary Tree**: A Binary Tree is complete Binary Tree if all levels are completely filled except possibly the last level and the last level has all keys as left as possible.
+- **Complete Binary Tree**: A Binary Tree is complete Binary Tree if all levels are completely filled **except possibly the last level** and the last level has all keys as left as possible.
 
   ```sh
               18
-          /      \
+           /      \
         15         30
-      /  \       /  \
-    40    5    100   40
-  / \   /
-  8  7  9
+      /   \       /  \
+    40     5    100   40
+   / \    /
+  8  7   9
   ```
 
 - **Perfect Binary Tree**: A Binary tree is Perfect Binary Tree in which all internal nodes have two children and all leaves are at same level.
 
   ```sh
           18
-      /       \
-    15         30
+       /       \
+     15          30
     /  \        /  \
-  40    50    100   40
+  40    50     100   40
   ```
 
   - this type is really efficient and desirable as they have 2 interesting properties:
@@ -1119,7 +1134,7 @@ class Tree:
 
 - **Problems:**
 
-  - **unbalanced search tree** - it's when we have a side that is more occupied than the other side, which make us move from **`O(log n)`** to **`O(n)`** as it turns more into a long **linked list**
+  - **unbalanced search tree** - it's when we have a side that is more occupied than the other side, which make us move from **`O(log n)`** to **`O(height) = O(n)`** as it turns more into a long **linked list**
     ![unbalanced-search-tree](./img/unbalanced-search-tree.png)
     - this is solved by:
       - selecting another **root** node and reorder the tree
@@ -1133,13 +1148,88 @@ class Tree:
     - Answer: `O(n)`
   - Binary Search Tree is sometimes called **Ordered** or **Sorted** Binary Tree.
     - it keeps its values in sorted order, so that lookup and other operations can use the principle of binary search
+    - This is why it's sometimes used instead of sorted arrays:
+      - > binary search trees provide more flexibility, in that we can always **insert/delete a node in `O(log(n))` time**, but searching for an element in a sorted array takes `O(log(n))` time in the average case and `O(n)` in the worst case.
 
 - Class Construction
   ![BST class](./img/bst1.png)
-- Inserting a node:
-  ![BST insertion](./img/bst-insertion.png)
-- Finding a node (lookup):
+
+- **Finding a node (lookup):**
   ![BST insertion](./img/bst-finding.png)
+
+  ```py
+  # BST
+  def search(root, target):
+    if not root:
+      return False
+    if target > root.value:
+      return search(root.right, target)
+    elif target < root.value:
+      return search(root.left, target)
+    else:
+      return True
+  ```
+
+- **Inserting a node:**
+  ![BST insertion](./img/bst-insertion.png)
+
+  ```py
+  def insert(root, val):
+    if not root:
+      return TreeNode(val)
+
+    if val > root.val:
+      root.right = insert(root.right, val)
+    elif val < root.val:
+      root.left = insert(root.left, val)
+
+    return root
+  ```
+
+- **Removing a node:**
+
+  ![BST insertion](./img/bst-removing.png)
+
+  ```py
+  def remove(root, target):
+    if not root:
+      return None
+
+    # First, search for the node to remove
+    if target > root.val:
+      root.right = remove(root.right, target)
+    elif target < root.val:
+      root.left = remove(root.left, target)
+
+    # Then we found it and we can remove it
+    else:
+      # case 1: no children
+      if not root.left and not root.right:
+        return None # remove the node
+
+      # case 2: one child
+      elif not root.left:
+        return root.right
+      elif not root.right:
+        return root.left
+
+      # case 3: two children
+      else:
+        # find the minimum value in the right subtree because it's the next largest value in the tree
+        # copy that value to the current node
+        # then recursively delete the minimum value in the right subtree
+        min_val = find_min(root.right)
+        root.val = min_val
+        root.right = remove(root.right, min_val)
+
+    return root
+
+   # Helper function to find the minimum value in a tree
+   def find_min(root):
+     while root.left:
+       root = root.left
+     return root.val
+  ```
 
 ---
 
@@ -1151,6 +1241,21 @@ class Tree:
   3. Post-order traversal (`left` -> `right` -> `root`)
 
 > It's covered in [Traversals section in Algorithms.md](./2-Algorithms.md#traversals)
+
+---
+
+### TreeMap
+
+It's a `BST` that uses `keys` instead of `values` to store data in the tree
+
+- Time complexity:
+  - `O(log n)` for insertion, deletion, and lookup
+
+```py
+from sortedcontainers import SortedDict
+
+treeMap = SortedDict({"a": 1, "b": 2, "c": 3})
+```
 
 ---
 
@@ -1178,7 +1283,7 @@ class Tree:
   - used with **Graph-traversal** Algorithms
 
 - When implementing a Binary-heap, we can use an `Array` to store the values, as it's more efficient than using `Nodes` and `Pointers` like in `Binary-trees`
-  - this is because we don't need to store the `left` and `right` pointers, as we can calculate them using the index of the parent node as the elements of the heap will be stored in a specific location in the array
+  - this is because we don't need to store the `left` and `right` nodes-pointers, as we can calculate them using the index of the parent node as the elements of the heap will be stored in a specific location in the array
 
 #### Array implementation
 
@@ -1186,6 +1291,7 @@ class Tree:
 ![Array Implementation](./img/binary-heap1.png)
 
 - For any parent node of an Array at index `n`:
+  ![Array Implementation](./img/binary-heap3.png)
   - the `left` child is stored at `2n + 1`
   - the `right` child is stored at `2n + 2`
 - For any child node at index `n`:
@@ -1193,11 +1299,17 @@ class Tree:
 
 #### Heap methods
 
-- Inserting:
+Time complexity:
+
+- push/pop: `O(log n)`
+- search: `O(n)`
+- `heapify`: `O(n)`
+
+- **Inserting**
   - when inserting, we first add item to the end of the `values` array, then we bubble-up (swap it up until it finds its correct spot)
     ![binary-heap-insertion](./img/binary-heap-insertion1.png)
     ![binary-heap-insertion](./img/binary-heap-insertion.png)
-- Removing (Extract max)
+- **Removing** (Extract max)
 
   1. remove the root
   2. replace with the most recently added (last element in values array)
