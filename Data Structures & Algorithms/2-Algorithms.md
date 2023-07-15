@@ -26,7 +26,6 @@
     - [Recursion Types](#recursion-types)
     - [How recursion works with the call stack](#how-recursion-works-with-the-call-stack)
     - [Recursion Steps](#recursion-steps)
-      - [Helper Method Recursion](#helper-method-recursion)
     - [Big-O Runtime for Recursive Functions](#big-o-runtime-for-recursive-functions)
     - [Maximum Recursive Depth](#maximum-recursive-depth)
       - [When recursion goes wrong](#when-recursion-goes-wrong)
@@ -34,11 +33,15 @@
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
     - [Dynamic programming types](#dynamic-programming-types)
+      - [Top-down approach](#top-down-approach)
+      - [Bottom-up approach](#bottom-up-approach)
+    - [Dynamic Programming vs Divide and Conquer (Brute Force)](#dynamic-programming-vs-divide-and-conquer-brute-force)
   - [Sorting](#sorting)
     - [Stable vs Unstable Sorting](#stable-vs-unstable-sorting)
     - [Bubble Sort](#bubble-sort)
     - [Selection Sort](#selection-sort)
     - [Insertion Sort](#insertion-sort)
+    - [Heap Sort](#heap-sort)
     - [Divide \& Conquer](#divide--conquer)
     - [Merge Sort](#merge-sort)
       - [Merge sort implementation](#merge-sort-implementation)
@@ -55,9 +58,9 @@
     - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
       - [BFS Implementation](#bfs-implementation)
     - [Depth First Search/Traversal DFS](#depth-first-searchtraversal-dfs)
-      - [Tree PreOrder DFS](#tree-preorder-dfs)
-      - [Tree PostOrder DFS](#tree-postorder-dfs)
-      - [Tree InOrder DFS](#tree-inorder-dfs)
+      - [PreOrder DFS traversal](#preorder-dfs-traversal)
+      - [PostOrder DFS traversal](#postorder-dfs-traversal)
+      - [InOrder DFS traversal](#inorder-dfs-traversal)
       - [Tree Traversal Notes](#tree-traversal-notes)
     - [Shortest Path](#shortest-path)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
@@ -502,24 +505,27 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
   - `nested operations`
     - ex: Object-traversal like ->`JSON.parse()` and `JSON.stringify()`
   - `file systems`
-- Advantages:
+- **Advantages:**
 
   - DRY
   - Readability
 
-  - Ex: looking for a key in boxes:
-    - looping
-      ![recursion-vs-loops](./img/recursion-vs-loops-1.png)
-    - recursion
-      ![recursion-vs-loops](./img/recursion-vs-loops-2.png)
+- Ex: looking for a key in boxes:
+  - looping
+    ![recursion-vs-loops](./img/recursion-vs-loops-1.png)
+  - recursion
+    ![recursion-vs-loops](./img/recursion-vs-loops-2.png)
   - Both approaches have the same time complexity, but recursion is more readable
-  - There's no performance gain in using recursion over looping. In fact recursion is slower than looping in most cases.
-    - > Quote: "Loops may achieve a performance gain for your program. Recursion may achieve a performance gain for your programmer."
-    - This because **recursion uses more memory than looping**, as each recursive call adds a new stack frame to the call stack, which can lead to stack overflow if the recursion is too deep.
+  - **Note:** There's no performance gain in using recursion over looping. In fact recursion is slower than looping in most cases.
+    - This is because **recursion uses more memory than looping**, as each recursive call adds a new stack frame to the call stack, which can lead to stack overflow if the recursion is too deep.
+
+> Quote: "Loops may achieve a performance gain for your program. Recursion may achieve a performance gain for your programmer."
 
 - **Rules**:
+
   - Every time you're using a `tree` or converting something into a `tree`, consider **recursion**
-- Divide and conquer using recursion:
+
+- **Divide and conquer using recursion:**
   1. divided into a number of sub-problems that are smaller instances of the same problem
   2. each instance of the sub-problem is identical in nature
   3. the solutions of each sub-problem can be combined to solve the problem at hand
@@ -585,22 +591,16 @@ When the execution of a function leads to a nested function call, the execution 
      - If not a base case, we perform one or more recursive calls. This recursive step may involve a test that decides which of several possible recursive calls to make. We should define each possible recursive call so that it makes progress towards a base case.
   3. get closer and closer and return when needed. usually have 2 returns
 
-#### Helper Method Recursion
-
-It's a pattern when using recursion, it consists of `outer function` that contains the `helper(recursion)` function which calls itself
-
-![helper-method-recursion](./img/helper-method-recursion.png)
-
 ---
 
 ### Big-O Runtime for Recursive Functions
 
-The Big-O runtime for a recursive function is equivalent to the number of recursive function calls. This value **varies** depending on the complexity of the algorithm of the recursive function. For example:
+The Big-O runtime for a recursive function is equivalent to the number of recursive calls. This **varies** depending on the complexity of the algorithm of the recursive function. For example:
 
 - A recursive function of input `N` that is called `N` times will have a runtime of `O(N)`.
 - On the other hand, a recursive function of input `N` that calls itself twice per function may have a runtime of `O(2^N)`.
 
-> **Note**: a bad use of recursion can lead to `Big-O` of `O(2^n)` which is extremely inefficient
+> **Note**: a bad use of recursion can lead to `O(2^n)` which is extremely inefficient
 
 ---
 
@@ -626,13 +626,13 @@ def fib(n):
 - for this you always need to return the recursive calls to bubble-up the returned value from the last call
 - A programmer should ensure that each recursive call is in some way progressing toward a base case (for example, by having a parameter value that **decreases** with each call).
 
-> **Note**: Fortunately, the Python interpreter can be dynamically reconfigured to change the default recursive limit. This is done through use of a module named sys, which supports a `getrecursionlimit` function and a `setrecursionlimit`. Sample usage of those functions is demonstrated as follows:
->
-> ```py
-> import sys
-> old = sys.getrecursionlimit() # perhaps 1000 is typical
-> sys.setrecursionlimit(1000000) # change to allow 1 million nested calls
-> ```
+- **Note**: Fortunately, the Python interpreter can be dynamically reconfigured to change the default recursive limit. This is done through use of a module named sys, which supports a `getrecursionlimit` function and a `setrecursionlimit`. Sample usage of those functions is demonstrated as follows:
+
+  ```py
+  import sys
+  old = sys.getrecursionlimit() # perhaps 1000 is typical
+  sys.setrecursionlimit(1000000) # change to allow 1 million nested calls
+  ```
 
 ---
 
@@ -657,7 +657,7 @@ def fib(n):
 
 ## Dynamic Programming
 
-It's a method for solving a complex problem by breaking it down into a collection of simpler subproblems, solving each of those subproblems just once, and storing their solutions using a memory-based data structure (array, map, etc).
+It's a technique to solve the problems by breaking it down into a collection of sub-problems, solving each of those sub-problems just once, and storing their solutions using a memory-based data structure (`array`, `map`, etc).
 
 > It's an optimization technique using `"caching"` ("Do you have something you can cache?")
 
@@ -686,7 +686,7 @@ It's a method for solving a complex problem by breaking it down into a collectio
   ```
 
 - it's better when using `Memoization` to save the cache in the local variable of the function instead of the global scope, you can do that in Javascript, using **closures**
-- What if I told you that you can reduce the time complexity of any complex operation to **`O(n)`** with using `Memoization` to reach the optimal solution
+- What if I told you that you can reduce the time complexity of any complex operation to **`O(n)`** with using `Memoization` to reach the optimal solution, it's because we're saving the results of the sub-problems in the cache, so we don't need to solve them again, we just return the result from the cache. So it becomes linear time complexity.
   ![what if I told you](./img/what-if-i-told-you.png)
   ![memoization](./img/memoization.png)
 
@@ -694,11 +694,104 @@ It's a method for solving a complex problem by breaking it down into a collectio
 
 ### Dynamic programming types
 
-- **Top-down** approach: start with the **big picture** and then break it down into smaller pieces
-  ![dynamic-programming-1](./img/dynamic-programming-1.png)
-  - **Memoization** is a top-down approach
+#### Top-down approach
 
-- **Bottom-up** approach: start with the **smaller pieces** and then build it up into the big picture
+We start with the **big picture** and then break it down into smaller pieces
+![dynamic-programming](./img/dynamic-programming-1.png)
+
+- It uses **memoization** (storing the result of each sub-problem in an array or map) and **recursion** (calling the function itself) to solve the problem.
+- **Memoization** is a top-down approach
+
+#### Bottom-up approach
+
+We start with the **smaller pieces** and then build it up into the big picture -> Real Dynamic Programming
+
+- It's the opposite of `Memoization` and `recursion`, because we start from the bottom (base case) and build it up to the top until we reach the final result.
+- It uses **tabulation** (storing the result of each sub-problem in an array or map) and **iteration** (looping) to solve the problem.
+
+> `Bottom-up` solution usually has less code than the `top-down` solution (recursion), but it's harder to think of
+
+- Solving `Fibonacci` problem using `Bottom-up` approach
+  ![dynamic-programming](./img/dynamic-programming-2.png)
+  ![dynamic-programming](./img/dynamic-programming-3.png)
+
+  - Notice that we don't even need array of `5` elements, we just need the last 2 elements, so we can use array of `2` elements instead of `5` elements. so we can reduce the space complexity to `O(1)` instead of `O(n)`
+    ![dynamic-programming](./img/dynamic-programming-4.png)
+
+  ```py
+  # Bottom-up Dynamic Programming
+  def dp(n):
+    if n < 2:
+      return n
+
+    arr = [0, 1]
+    for i in range(2, n + 1):
+      temp = arr[1]
+      arr[1] = arr[0] + arr[1]
+      arr[0] = temp
+
+    return arr[1]
+  ```
+
+---
+
+### Dynamic Programming vs Divide and Conquer (Brute Force)
+
+We can use DP to improve problems that are solved using Divide and Conquer usually `graph` and `tree` problems, Ex:
+
+**Q:** count the number of unique paths from `top-left` to `bottom-left`. You're only allowed to move `down` or `right` at any point in time.
+
+- Brute Force Solution - Time and space: `O(2^(n+m))`
+
+  ```py
+  def bruteForce(r, c, rows, cols):
+    if r == rows or c == cols:
+      return 0
+    if r == rows - 1 and c == cols - 1:
+      return 1
+    return bruteForce(r + 1, c, rows, cols) + bruteForce(r, c + 1, rows, cols)
+
+  print(bruteForce(0, 0, 4, 4))
+  ```
+
+- Tob-down (Memoization) Solution - Time and space: `O(n*m)`
+  ![dynamic-programming](./img/dynamic-programming-5.png)
+
+  ```py
+  # Top-down Dynamic Programming
+  def memoization(r, c, rows, cols, cache):
+    if r == rows or c == cols:
+      return 0
+    if cache[r][c] > 0:
+      return cache[r][c]
+    if r == rows - 1 and c == cols - 1:
+      return 1
+
+    cache[r][c] = memoization(r + 1, c, rows, cols, cache) + memoization(r, c + 1, rows, cols, cache)
+    return cache[r][c]
+
+  print(memoization(0, 0, 4, 4, [[0] * 4 for _ in range(4)]))
+  ```
+
+- Bottom-up (Tabulation) Solution - Time: `O(n*m)` and space: `O(m)`, where `m` is the number of columns and `n` is the number of rows
+  ![dynamic-programming](./img/dynamic-programming-6.png)
+
+  ```py
+  # Bottom-up Dynamic Programming
+  def tabulation(rows, cols):
+    prevRow = [0] * cols
+
+    for r in range(rows -1, -1, -1):
+      currRow = [0] * cols
+      currRow[cols - 1] = 1 # last column is always 1
+      for c in range(cols - 2, -1, -1):
+        currRow[c] = currRow[c + 1] + prevRow[c] # add the right and bottom cells
+      prevRow = currRow # set the current row as the previous row
+
+    return prevRow[0] # return the first element of the previous row
+
+  print(tabulation(4, 4))
+  ```
 
 ---
 
@@ -789,10 +882,11 @@ def bubble_sort(arr):
 
 ### Selection Sort
 
-![selection-sort](./img/selection-sort.png)
+It's a sorting algorithm where we **select** the smallest element and put it in the first position, then select the next smallest element and put it in the second position, and so on.
 
 - it works by scanning a list of items for the smallest element and then swapping that element for the one in the first position
 - also one of the simplest but not efficient either
+  - the first operation takes `n` steps, the second takes `n-1` steps, and so on, until the last operation takes `1` step -> `n + (n-1) + (n-2) + ... + 1` -> `O(n^2)`
 - **steps:**
   ![selection-sort](./img/selection-sort-1.png)
 
@@ -848,15 +942,14 @@ def selection_sort(arr):
 
 ### Insertion Sort
 
-![insertion-sort](./img/insertion-sort.png)
-
-It's called `insertion` because we're **inserting** the element in the correct place in the sorted part of the array
+It's a sorting algorithm where we **insert** each element in the correct place in the sorted part of the array (the left side of the array)
 
 - it's used when you know or think that the list is **"almost/already sorted"**
 
   - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
 
 - **steps:**
+  ![insertion-sort](./img/insertion-sort.png)
 
   1. start by picking the `second` element in the array because we assume that the `first` element is already sorted.
      ![insertion-sort](./img/insertion-sort-0.png)
@@ -883,6 +976,32 @@ def insertion_sort(arr):
 
   return arr
 ```
+
+---
+
+### Heap Sort
+
+It's a sorting algorithm where we use a **heap** data structure to sort the array
+
+- It usually implements sorting **in-place** (no extra memory needed)
+- It's not a stable sorting algorithm (it doesn't maintain the relative order of records with equal keys)
+- It's not an online algorithm (it can't sort a list as it receives it) as it needs the entire array to start sorting
+
+```py
+import heapq
+
+def heapSort(arr):
+  heap = []
+  for element in arr:
+    heapq.heappush(heap, element)
+
+  for i in range(len(arr)):
+    arr[i] = heapq.heappop(heap)
+```
+
+- Time complexity: `O(n log n)`
+  - `O(n)` to create the heap
+  - `O(log n)` to insert each element to the heap **(Bottom-up approach)**
 
 ---
 
@@ -1200,6 +1319,20 @@ def binary_search_iterative(nums, target):
   return -1
 ```
 
+- Time complexity: `O(log(n))`
+
+  - Because we divide the search space in half at each step, the total number of steps required to find the target is `log(n)`, where `n` is the number of elements in the list
+
+    ```py
+    # n is the number of elements in the list (r-l+1)
+    # k is the number of steps required to find the target
+    n/2^k = 1
+    n = 2^k
+    log(n) = log(2^k)
+    log(n) = k log(2)
+    log(n) = k
+    ```
+
 - **Notes**:
   - An unsuccessful search occurs if we reached the end of array where: `start = middle = end`, so we won't be able to continue as the next step would result this: `low high`, as the interval `[low,high]` is empty
     - so we need to create an edge case to prevent infinite loop
@@ -1379,11 +1512,11 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
     return visited
   ```
 
-#### Tree PreOrder DFS
+#### PreOrder DFS traversal
 
-![BFS](./img/dfs1.png)
+Here, we visit the `root` node first, then the sub-trees at its children nodes, if the tree is ordered from `left` to `right`, then the `left` node, then the `right` node and so on.
 
-Here, we visit the `root` node first, then the `left` node, then the `right` node and so on
+![preorder](./img/preorder.png)
 
 ```py
 def preOrderDFS(root):
@@ -1395,11 +1528,13 @@ def preOrderDFS(root):
   preOrderDFS(root.right)
 ```
 
-#### Tree PostOrder DFS
+#### PostOrder DFS traversal
 
-![BFS](./img/dfs2.png)
+it recursively traverses the subtrees tooted at the children of the root first, then visits the root node itself.
 
-Here, we visit the `left` node first, then the `right` node, then the `root` node and so on
+Here, we visit the `left` node first, then the `right` node, then the `root` node and so on.
+
+![postorder](./img/postorder.png)
 
 ```py
 def postOrderDFS(root):
@@ -1411,28 +1546,33 @@ def postOrderDFS(root):
   print(root.value)
 ```
 
-#### Tree InOrder DFS
+#### InOrder DFS traversal
 
-![BFS](./img/dfs3.png)
-
-Inorder means traversing the tree in a sorted order (smaller to larger) and to do so, we need to visit the left node first, then the root node, then the right node and so on
+Inorder means traversing the tree in a sorted order (smaller to larger) and to do so, we need to visit the `left` node first, then the `root` node, then the `right` node and so on
+![inorder](./img/inorder.png)
 
 - we do this by :
+
   1. recursively calling the function on the **left** node to reach the smallest node
   2. then we print the value of the node
   3. then we recursively call the function on the **right** node to reach the largest node
 
-So, Here we visit the `left` node first, then the `root` node, then the `right` node and so on
+  ```py
+  def inOrderDFS(root):
+    if root is None:
+      return
 
-```py
-def inOrderDFS(root):
-  if root is None:
-    return
+    inOrderDFS(root.left)
+    print(root.value)
+    inOrderDFS(root.right)
+  ```
 
-  inOrderDFS(root.left)
-  print(root.value)
-  inOrderDFS(root.right)
-```
+- Only works with **Binary Trees** (not graphs)
+- Application for `InOrder DFS`:
+  - if we have a **Binary Search Tree**, we can use `InOrder DFS` to get the elements in a sorted order, as left node is always smaller than the root node and the right node is always larger than the root node
+    - So we traverse the tree in `InOrder DFS` and we get the elements in a sorted order
+
+---
 
 #### Tree Traversal Notes
 
@@ -1555,9 +1695,9 @@ A **topological sort** of a directed graph is a way of ordering the list of node
 There are two common implementations of topological sort:
 
 1. **Khan's algorithm (iterative)**
-    - It's the most common implementation of topological sort
-    - It's a `BFS` and `queue` based algorithm
-    - Here, we fill the ordering from the beginning of the list to the end
+   - It's the most common implementation of topological sort
+   - It's a `BFS` and `queue` based algorithm
+   - Here, we fill the ordering from the beginning of the list to the end
 2. **Depth-first search (recursive)**
    - It's a `DFS` and `stack` based algorithm
    - Here, we fill the ordering from the end of the list to the beginning

@@ -3,7 +3,8 @@
 - [INDEX](#index)
   - [Static vs Dynamic websites](#static-vs-dynamic-websites)
   - [HTML](#html)
-    - [Head Element](#head-element)
+    - [HTML document structure](#html-document-structure)
+      - [Metadata](#metadata)
     - [Other HTML Elements](#other-html-elements)
   - [Semantic HTML](#semantic-html)
     - [Why Semantic?](#why-semantic)
@@ -11,7 +12,7 @@
   - [some inline elements to be aware of](#some-inline-elements-to-be-aware-of)
   - [tricks](#tricks)
   - [Forms](#forms)
-    - [Form elements](#form-elements)
+    - [Form elements (controls)](#form-elements-controls)
     - [Autofill Forms](#autofill-forms)
     - [Form validation](#form-validation)
     - [How is the Form data is transferred?](#how-is-the-form-data-is-transferred)
@@ -31,7 +32,7 @@
     - [background img in css](#background-img-in-css)
     - [image size optimization (responsive images)](#image-size-optimization-responsive-images)
       - [HTML `<picture>` Element](#html-picture-element)
-      - [srcset](#srcset)
+      - [`srcset` and `sizes` attributes](#srcset-and-sizes-attributes)
       - [Background images](#background-images)
       - [Which to use ?](#which-to-use-)
   - [Tables](#tables)
@@ -57,55 +58,73 @@
 - **markup language** allows you to annotate text, and these annotations provide additional meaning to the contents of a document
 - **void(empty) element** is html element with no contents and no closing tag
 
-### Head Element
+### HTML document structure
 
-**`<head>` element**: It's a container for **metadata**(data about data) is for things that are not visible in the browser window or things that describe the document
+We should provide the browser with information about the structure of the document by using `doctype` and `html` tags to make the browser understand the document
 
-- **metadata** define the document `title`, `character set`, `styles`, `scripts`, and other meta information
-- This contains information about the page
-- **DOCTYPE** tells the browser which version of HTML the page is using (although browsers usually display the page even if it is not included). without it the browser will go to `Quirks mode`
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Content goes here -->
+  </body>
+</html>
+```
 
-  ```html
-  <!-- HTML5 -->
-  <!DOCTYPE html>
-  ```
+- **DOCTYPE** tells the browser which version of `HTML` the page is using (although browsers usually display the page even if it is not included). without it the browser will go to `Quirks mode`
+
+- **`<head>` element**: It's a container for **metadata**(data about data) is for things that are not visible in the browser window or things that describe the document
+
+#### Metadata
+
+It defines the document `title`, `character set`, `styles`, `scripts`, and other meta information
 
 - **`<meta>`** element lives inside the `<head>` element and contains information about that web page.
 
   - it tells search engines about your page, who created it, and whether or not it is time sensitive. (If the page is time sensitive, it can be set to expire.)
   - **`<meta charset="UTF-8">`** is as the letters we use in the English language (**character encoding**)
-    - Specify character encoding **at first of the document**
 
-  ```html
-  <head>
-    <title>Information About Your Pages</title>
+    - > it Specifies character encoding. The character encoding is specified by the `charset` attribute. The most common character encodings are `UTF-8` and `ISO-8859-1`.
 
-    <meta name="description" content="An Essay on Installation Art" />
-    <meta name="keywords" content="installation, art, opinion" />
-    <meta name="robots" content="nofollow" />
-    <meta http-equiv="author" content="Jon Duckett" />
-    <meta http-equiv="pragma" content="no-cache" />
-    <meta http-equiv="expires" content="Fri, 04 Apr 2014 23:59:59 GMT" />
-  </head>
-  ```
+    ```html
+    <head>
+      <meta name="description" content="An Essay on Installation Art" />
+      <meta name="keywords" content="installation, art, opinion" />
+      <meta name="robots" content="nofollow" />
+      <meta http-equiv="author" content="Jon Duckett" />
+      <meta http-equiv="pragma" content="no-cache" />
+      <meta http-equiv="expires" content="Fri, 04 Apr 2014 23:59:59 GMT" />
+    </head>
+    ```
 
-  - **`<meta name="viewport">`**
+  - `<meta name="viewport">`
 
     ```html
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     ```
 
-    - The browser's viewport is the area of the window in which web content can be seen. This is often not the same size as the rendered page, in which case the browser provides scrollbars for the user to scroll around and access all the content.
-    - Some mobile devices and other narrow screens render pages in a virtual window or viewport, which is usually wider than the screen, and then shrink the rendered result down so it can all be seen at once. Users can then pan and zoom to see different areas of the page. For example, if a mobile screen has a width of 640px, pages might be rendered with a virtual viewport of 980px, and then it will be shrunk down to fit into the 640px space.
-    - his is done because not all pages are optimized for mobile and break (or at least look bad) when rendered at a small viewport width. This **virtual viewport is a way to make non-mobile-optimized sites in general look better on narrow screen devices**.
-    - The basic properties of the "viewport" `<meta>` tag include:
-      - `width`: Controls the size of the viewport. It can be set to a specific number of pixels like width=600 or to the special value **device-width, which is 100vw, or 100% of the viewport width**. Minimum: 1. Maximum: 10000. Negative values: ignored.
+    - The browser's viewport is the area of the window in which web content can be seen. This is often not the same size as the rendered page, in which case the browser provides **scrollbars** for the user to scroll around and access all the content.
+    - Some mobile devices and other narrow screens render pages in a virtual window or viewport, which is usually wider than the screen, and then shrink the rendered result down so it can all be seen at once. Users can then pan and zoom to see different areas of the page.
+
+      - For example, if a mobile screen has a width of `640px`, pages might be rendered with a virtual viewport of `980px`, and then it will be shrunk down to fit into the `640px` space.
+        ![meta-viewport](./img/meta-viewport.png)
+
+    - This is done because not all pages are optimized for mobile and break (or at least look bad) when rendered at a small viewport width. This **virtual viewport is a way to make non-mobile-optimized sites in general look better on narrow screen devices**.
+    - The basic properties of the "`viewport`" `<meta>` tag include:
+      - `width`: Controls the size of the viewport. It can be set to a specific number of pixels like `width=600` or to the special value **device-width, which is 100vw, or 100% of the viewport width**. `Minimum: 1`. `Maximum: 10000`. Negative values: ignored.
       - `height`: same
       - `initial-scale`: Controls the zoom level when the page is first loaded. Minimum: 0.1. Maximum: 10. Default:1. Negative values: ignored.
       - `minimum-scale`
       - `maximum-scale`
       - `user-scalable`: Controls whether zoom in and zoom out actions are allowed on the page. Valid values: 0, 1, yes, or no. Default: 1
-        ![meta-viewport](./img/meta-viewport.png)
+
+---
 
 ### Other HTML Elements
 
@@ -127,8 +146,8 @@ A semantic element clearly describes its meaning to both the browser and the dev
   - they tell us nothing about their content.
   - Avoid `<span>` and `<div>` elements as much as possible
 - Examples of semantic elements: `<form>, <table>`, and `<article>`
-
-Writing Semantic HTML means that tags are never chosen based on the way they appear in a web browser, instead, they’re chosen based on the importance and structure of the content.
+  - They behave the same way as non-semantic elements e.g. `<div>`, but they have a **meaning**.
+    Writing Semantic HTML means that tags are never chosen based on the way they appear in a web browser, instead, they’re chosen based on the importance and structure of the content.
 
 > We shouldn’t use `<h1>` just because of its large text size. The same goes for other HTML elements. HTML should be coded to represent the data that will be populated with and not based on its default style.
 
@@ -149,7 +168,16 @@ Why do we need to tell the browser what our HTML elements represent?
     - **EX:** What if instead of using a semantically correct tag for a paragraph like `<p>` we use a `<div>` instead? The reading machine will never understand that it must make a pause before and after the paragraph reading. Therefore, the user experience for that visually impaired person will be deficient.
 
 - **Easy Maintenance**
+
   - makes it easier to maintain the code and have a well-organized code.
+
+- **Separation markup from style**
+
+  - It's now recommended to use CSS to style your HTML elements instead of using HTML attributes or tags. This is because CSS is easier to maintain and reuse across multiple pages. Semantic HTML makes it easier to style elements with CSS.
+  - **EX:**
+    - use `<strong>` instead of `<b>` as `<strong>` is semantic and `<b>` is not
+    - use `<em>` instead of `<i>` as `<em>` is semantic and `<i>` is not
+      - > `em` short for "emphasis", and `i` short for "italic"
 
 ---
 
@@ -222,7 +250,7 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<a>`
 - `<button>`
 - `<img>`
-- `<i>`
+- `<i>` -> old way to make text italic
 - `<span>`
 - `<input>`
 
@@ -237,7 +265,6 @@ Why do we need to tell the browser what our HTML elements represent?
 - to make link go to other tab and not the current one, use the **target** attribute : `target="_blank"`
 - to check if your HTML syntax is right => [HTML validation](https://validator.w3.org/)
 - `&nbsp;` will add more whiteSpace to a line but won't break it. (as HTML is space-collapsing)
-- use `<span>` to isolate part of a paragraph
 - **Lorem ipsum**
   - using `emmet`, you can type `lorem` and it will continue the paragraph
   - you can specify how many characters you want by typing the number after the `lorem` word: ex: `lorem50`
@@ -274,17 +301,52 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ## Forms
 
-### Form elements
+- `<form>` element is used to
+
+  - group related form controls together
+  - collect user input and send data. The data is most often sent to a server for processing.
+
+    - this is done by using `action` attribute
+
+  ```html
+  <form action="/signup" method="get">
+    <!-- Form controls go in here -->
+  </form>
+  ```
+
+### Form elements (controls)
 
 - `<label>` makes the form control accessible to screen readers, and provides a bigger target, since you can tap or click the label to set focus on the control.
-
+  - `for` attribute is used to link the label to the form control using the `id` attribute of the form control.
+- `<input>` element.
+  - `type` attribute to specify the type of control to display.
+  - `name` attribute to identify the data the user enters with the control.
+    - If you submit the form, this `name` is included in the request with the value.
+  - `value` attribute to specify the value of the control (used with controls that have a value, such as `radio button` and `option` elements).
+  - `placeholder` attribute to provide a hint to the user about what to enter in the control.
 - `<textarea>` element is used to enter multiple lines of text
-  - it takes attributes for columns `cols` and rows `rows`
-- `name` attribute to identify the data the user enters with the control.
-  - If you submit the form, this `name` is included in the request with the value.
+
+  - it takes attributes for columns `cols` and rows `rows` to specify the size of the control.
+
+    ```html
+    <textarea cols="30" rows="10"></textarea>
+    ```
+
 - `<select>` element gives users a list of options to select from
-  - The browser by default uses the first option in the list if user didn't select an option,
+
+  - The browser by default uses the first option in the list if user didn't select an option.
+  - `<option>` element is used to define an option in a select list.
+    - The content of the element is the value of the option.
+    - The `value` attribute is used to specify the value of the option.
   - With the `selected` attribute you can pre-select one option.
+
+  ```html
+  <select name="language">
+    <option value="javascript">JavaScript</option>
+    <option value="python">Python</option>
+  </select>
+  ```
+
 - `<fieldset>` element is used to group form controls.
 
   - Every `<fieldset>` element requires a `<legend>` element, which is used to describe the group of form controls
@@ -565,6 +627,8 @@ Live Region roles are used to define elements with **content that will be dynami
 
 ## images
 
+- Don't leave the `alt` attribute empty, as it will be read by screen readers, instead, use `alt=""` to tell the screen reader to skip it.
+
 ### Image Formats
 
 - **JPEG** -> Whenever you have many different colors
@@ -698,7 +762,9 @@ Or Show different images for different screen sizes:
 
 > Also see `<figure>` element [here](#semantic-tags)
 
-#### srcset
+---
+
+#### `srcset` and `sizes` attributes
 
 There're new attributes for `<img>` element used to provide several additional source images along with hints to help the browser pick the right one:
 
@@ -721,9 +787,13 @@ There're new attributes for `<img>` element used to provide several additional s
 <img src="elva-fairy-480w.jpg" width="480" />
 ```
 
+---
+
 #### Background images
 
 for that we use media queries as we put each image in each media
+
+---
 
 #### Which to use ?
 
@@ -744,6 +814,7 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
 
 ### Table Notes
 
+- `<td>` stands for **table data cell**
 - Part of the reason for having separate `<thead>` and `<tfoot>` elements is so that, if you have a table that is taller than the screen (or, if printed, longer than one page) then the browser can keep the header and footer visible whilst the contents of the table scroll. This is intended to make it easier for users to see which column the data is in.
   - however this functionality is not implemented by default in any current browser.
 
@@ -751,7 +822,17 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
 
 ## Escape Characters
 
-There are some characters that are used in and reserved by HTML code.
+There are some characters that are used in and reserved by HTML code:
+
+- `<` and `>` are used to mark tags
+- `&` is used to start an entity reference
+- `"` and `'` are used to mark the start and end of attribute values
+- `&lt;` is used to write the less-than symbol
+- `&gt;` is used to write the greater-than symbol
+- `&amp;` is used to write the ampersand symbol
+- `&quot;` is used to write the double-quote symbol
+- `&apos;` is used to write the single-quote symbol
+- `&copy;` is used to write the copy right symbol
 
 ---
 
@@ -768,9 +849,11 @@ Here the **Tree structure** is the operation that make html code looks the way i
 ## Notes
 
 - `<div>` element allows you to group multiple elements together in one **block-level box**.
-- `<span>` element acts like an inline equivalent of the `<div>` element (group inline content). It is used to either:
-  - Contain a section of text where there is no other suitable element to differentiate it from its surrounding text
-  - Contain a number of inline elements
+- `<span>` element acts like an inline equivalent of the `<div>` element (group inline content).
+  - use `<span>` to isolate part of a paragraph **to style it differently**
+  - It is used to either:
+    - Contain a section of text where there is no other suitable element to differentiate it from its surrounding text
+    - Contain a number of inline elements
   - You will usually see that a **class** or **id** attribute is used with `<span>` elements:
     - To explain the purpose of this `<span>` element
     - So that CSS styles can be applied to elements that have specific values for these attributes
@@ -782,3 +865,20 @@ Here the **Tree structure** is the operation that make html code looks the way i
     - consists of a series of 2 matching element (**terms** and their **definitions**) (key-value pairs).
     - `<dl>` element works with pairs of `<dt>` and `<dd>` elements.
 - use `<section>` element instead of `<div>`
+- To create a blockqoute, use `<blockquote>` element.
+
+  - The `<blockquote>` element specifies a section that is quoted from another source.
+  - Browsers usually indent `<blockquote>` elements.
+  - `cite=""` attribute specifies the source of the quotation.
+  - Tip: Use `<q>` element to mark up inline quotations.
+
+  ```html
+  <blockquote cite="https://www.worldwildlife.org/who/index.html">
+    For 50 years, WWF has been protecting the future of nature. The world's leading conservation
+    organization, WWF works in 100 countries and is supported by 1.2 million members in the United
+    States and close to 5 million globally.
+  </blockquote>
+  ```
+
+- To add custom **underline** to element, use `border-bottom` property instead of `text-decoration` property to have more control over the underline.
+  - usually to control the space between the text and the underline, use `padding-bottom` property.

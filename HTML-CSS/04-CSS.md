@@ -11,10 +11,14 @@
       - [Selectors Notes](#selectors-notes)
   - [Properties Types](#properties-types)
   - [Box Model](#box-model)
+    - [Outline](#outline)
+    - [Inline elements spacings](#inline-elements-spacings)
+    - [Collapsing Margins and Borders](#collapsing-margins-and-borders)
+    - [box model notes](#box-model-notes)
   - [Display](#display)
-    - [pseudo Elements/Classes](#pseudo-elementsclasses)
-      - [pseudo elements](#pseudo-elements)
-      - [pseudo classes](#pseudo-classes)
+  - [pseudo Elements/Classes](#pseudo-elementsclasses)
+    - [pseudo elements](#pseudo-elements)
+    - [pseudo classes](#pseudo-classes)
   - [Color](#color)
     - [HSL Colors](#hsl-colors)
   - [Font](#font)
@@ -26,14 +30,15 @@
     - [box-shadow](#box-shadow)
     - [text-shadow](#text-shadow)
   - [images](#images)
-    - [object-fit](#object-fit)
+    - [`object-fit` property](#object-fit-property)
     - [`background-` properties](#background--properties)
       - [`background-image` property](#background-image-property)
-      - [`background-image` notes](#background-image-notes)
+        - [Linear Gradient](#linear-gradient)
+        - [`background-image` notes](#background-image-notes)
       - [`background-size` property](#background-size-property)
-      - [`background-position` property](#background-position-property)
+      - [`background-clip` property](#background-clip-property)
       - [`background-attachment` property](#background-attachment-property)
-      - [`background` property](#background-property)
+      - [`background` shorthand property](#background-shorthand-property)
     - [image filter](#image-filter)
     - [clip-path](#clip-path)
     - [Images Notes](#images-notes)
@@ -43,19 +48,27 @@
     - [`z-index`](#z-index)
     - [Float](#float)
     - [Flexbox](#flexbox)
-      - [align-items \& align-content](#align-items--align-content)
-      - [justify-content](#justify-content)
-      - [`flex` vs `inline-flex`](#flex-vs-inline-flex)
-      - [flex-wrap](#flex-wrap)
-      - [order](#order)
-      - [flex-grow \& flex-shrink](#flex-grow--flex-shrink)
-      - [flex-basis](#flex-basis)
-      - [flex-gap (NEW FEATURE)](#flex-gap-new-feature)
-    - [GRID](#grid)
-      - [Old Grid (960 pixel grid)](#old-grid-960-pixel-grid)
-      - [CSS3 Grid](#css3-grid)
-        - [auto vs fr](#auto-vs-fr)
-        - [auto-fill vs auto-fit](#auto-fill-vs-auto-fit)
+      - [`display: flex` vs `display: inline-flex`](#display-flex-vs-display-inline-flex)
+      - [`flex-direction`](#flex-direction)
+      - [`flex-wrap`](#flex-wrap)
+      - [`justify-content`](#justify-content)
+      - [`align-items`](#align-items)
+      - [`align-content`](#align-content)
+      - [`align-self`](#align-self)
+      - [`order`](#order)
+      - [`flex` shorthand (`flex-grow`, `flex-shrink`, `flex-basis`)](#flex-shorthand-flex-grow-flex-shrink-flex-basis)
+      - [flex `gap` (NEW FEATURE)](#flex-gap-new-feature)
+      - [Flexbox notes](#flexbox-notes)
+    - [Grid](#grid)
+      - [Grid terminology and implementation](#grid-terminology-and-implementation)
+      - [`auto` vs `fr`](#auto-vs-fr)
+      - [Grid gap](#grid-gap)
+      - [Grid functions](#grid-functions)
+        - [`minmax()`](#minmax)
+        - [`repeat()`](#repeat)
+        - [`fit-content()`](#fit-content)
+      - [`auto-fill` vs `auto-fit`](#auto-fill-vs-auto-fit)
+      - [Grid items](#grid-items)
         - [Grid Lines (start/end)](#grid-lines-startend)
         - [Grid Areas](#grid-areas)
   - [CSS Variables (custom properties)](#css-variables-custom-properties)
@@ -67,20 +80,22 @@
     - [calc()](#calc)
     - [clamp()](#clamp)
   - [icons - SVG](#icons---svg)
-  - [Animation](#animation)
-    - [What to animate?](#what-to-animate)
+  - [Animation \& Transitions](#animation--transitions)
+    - [What to animate? (Animation Performance)](#what-to-animate-animation-performance)
     - [transform](#transform)
     - [transition](#transition)
-      - [`transition-timing-function`](#transition-timing-function)
       - [Animating(transitioning) background](#animatingtransitioning-background)
-    - [Animation Keyframes](#animation-keyframes)
-      - [choreograph](#choreograph)
-    - [data state](#data-state)
+    - [CSS Animation](#css-animation)
+      - [Animation properties](#animation-properties)
+      - [Animation Keyframes](#animation-keyframes)
+      - [Animation choreograph](#animation-choreograph)
+    - [data state animation](#data-state-animation)
     - [Animation Notes](#animation-notes)
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
-  - [media queries](#media-queries)
+  - [Responsive Web Design (RWD)](#responsive-web-design-rwd)
+    - [Media Queries](#media-queries)
     - [Break points](#break-points)
   - [Browser Prefixes (CSS Vendor Prefixes)](#browser-prefixes-css-vendor-prefixes)
   - [Scrolling](#scrolling)
@@ -112,15 +127,16 @@ in this repo, you will find source for [CSS Default Starter / Global Styles / To
 3. external style
    - imported in `link` tag with attribute `rel="stylesheet"` in `head`
 
-> **Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
->
-> - **cascade** is the algorithm for solving conflicts where multiple CSS rules apply to an HTML element.
+**Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
+
+- **cascade** is the algorithm for solving conflicts where multiple CSS rules apply to an HTML element.
+  - Great article about it [here](https://2019.wattenberger.com/blog/css-cascade)
 
 ---
 
 ## selectors
 
-- Basic: Element selectors => p,div,..
+- Basic: Element selectors => `p`,`div`,..
 - Class selectors
 - ID selectors
 
@@ -143,25 +159,64 @@ selector in a selector, ex: `p em`
   - `owl selector` -> applies to the elements with is not the first one
     ![owl-selector](./img/owl-selector.png)
 
+---
+
 ### `[attribute]` Selector
 
 - `[]` selector -> Matches a specific attribute (whatever its value)
+
   - ex: `p[class]`
+
+    ```css
+    input[type='email'] {
+      background-color: yellow;
+    }
+    ```
+
 - `[=]` selector -> Matches a specific attribute with a specific value
   - ex: `p[class="dog"]`
 - `[~=]` selector -> Matches a specific attribute whose value appears in a space-separated list of words
   - ex: `p[class~="dog"]`
 - `[*=]` selector -> Matches a specific attribute whose value contains a specific substring
+
   - ex: `p[attr*"do"]`
-- `[$=]` selector -> Matches a specific attribute whose value **ends** with a specific string
-  - ex: `p[attr$"g"]`
+
+    ```css
+    a[href*='wiki'] {
+      color: red;
+    }
+    ```
+
 - The `[attribute^=value]` selector matches every element whose attribute value **begins** with a specified value.
 
   ```css
   div[class^='test-'] {
     background: #ffff00;
   }
+
+  a[href^='https'] {
+    color: red;
+  }
+
+  /* this will match all links that start with # (anchor links) */
+  a[href^='#'] {
+    color: green;
+  }
+
+  a[href^='https']::before {
+    content: '🔒';
+  }
   ```
+
+- `[$=]` selector -> Matches a specific attribute whose value **ends** with a specific string
+
+  ```css
+  a[href$='.org'] {
+    color: red;
+  }
+  ```
+
+---
 
 ### css selector specificity
 
@@ -183,6 +238,8 @@ If there are two or more CSS rules that point to the same element, the selector 
 
 - Universal selector (**`*`**) has **no specificity** and gets **0 points** (least specificity so it's like a fallback or when overriding default styles).
 - `!important` gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
+
+  - if 2 rules have `!important`, then the last one will be applied
 
 - Specificity in CSS only concerns selectors, not their associated declarations. **!important** applies to a declaration, so it alone plays no role in specificity.
 - more info & examples here [css-specificity](https://www.webfx.com/blog/web-design/css-specificity/)
@@ -211,6 +268,9 @@ If there are two or more CSS rules that point to the same element, the selector 
   ![box-sizing](./img/box-sizing.png)
 - margin can be negative as it's related to the surrounding elements and not the element itself
 - **auto margin trick**: ![autoMargin](./img/autoMargin.png)
+
+### Outline
+
 - **outline** is outside of the border (and it may overlap with other elements)
   ![outline](./img/outline.png)
 - **outline vs border**:
@@ -233,12 +293,28 @@ If there are two or more CSS rules that point to the same element, the selector 
 
   - **`outline` is an animated property**
 
-- inline elements respect padding & margin **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they don't respect `width`/`height`
-- to make global reset for margin/padding => use `*` and not `body`
-- **Collapsing margins** : it's when we have 2 margins(only vertical margins) that occupied the same space, so only one of them will be visible to the page which is the larger one and **not** their sum ![Margin Collapse](./img/MarginCollapse.png)
+### Inline elements spacings
+
+- **inline elements** respect padding & margin **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
+  - To make them respect `width`/`height` -> use `display: inline-block;`
+
+---
+
+### Collapsing Margins and Borders
+
+- **Collapsing margins** : it's when we have 2 margins(only **vertical** margins) that occupied the same space, so only one of them will be visible to the page which is the larger one and **not** their sum ![Margin Collapse](./img/MarginCollapse.png)
+
+  - This doesn't happen with horizontal margins
   - this is not the same for **padding** as they get added together
+    - **So, between sections use padding not margin**
+
 - **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/border-collapse.png)
-- between sections use padding not margin
+
+---
+
+### box model notes
+
+- to make global reset for margin/padding => use `*` and not `body`
 
 - When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
 
@@ -286,12 +362,17 @@ If there are two or more CSS rules that point to the same element, the selector 
   - doesn't start a new line (like inline element)
   - respects `margin`, `width`, `height` (like block element)
 
-### pseudo Elements/Classes
+---
 
-#### pseudo elements
+## pseudo Elements/Classes
 
-They create element and insert it before/after content
+They are used to style certain parts of an element or to style an element in a certain state
 
+### pseudo elements
+
+They create element and insert it before/after content of an element without inserting it in the HTML.
+
+- We only use them for **styling** and not for **content** (as it's not part of the HTML so it's not accessible by screen readers).
 - we must provide a `content` property
 
   ```css
@@ -314,15 +395,6 @@ They create element and insert it before/after content
 
 - they are inline elements, so you can convert them to `inline-block` to control padding
 - you can't add **pseudo elements** like `::before` with `img` element (as it's a content by itself), instead use it on a `div` that contains the `img`
-- when you have a sliding item (animate from right to center like a **sidebar**) => use this :
-
-  ```css
-  body,
-  html {
-    overflow-x: hidden;
-  }
-  ```
-
 - when you have `pseudo element` like `::before` that has no content, you have 2 choices :
 
   - `width` / `height` in `px,rem`
@@ -336,7 +408,7 @@ They create element and insert it before/after content
     .step-img-box::before {
       width: 60%;
 
-      this mimik -> "height: 60%;"
+      /* this mimics -> "height: 60%;" */
       padding-bottom: 60%;
 
       background-color: #fdf2e9;
@@ -344,22 +416,74 @@ They create element and insert it before/after content
     }
     ```
 
-> You can use `::before` and `::after` to write content after repeated elements like in **tables** or **lists**
->
-> - like unit after the number -> **kg**, **meter**,...
-> - like words before number -> **weight:**, **length:**,...
->
-> ```css
-> td:nth-of-type(3)::after {
->   content: 'kg';
-> }
-> ```
+- You can use `::before` and `::after` to write content after repeated elements like in **tables** or **lists**
 
-- You can check new pseudo classes -> `:has()`, `:where()`, `:is()`
+  - like unit after the number -> **kg**, **meter**,...
+  - like words before number -> **weight:**, **length:**,...
+
+  ```css
+  td:nth-of-type(3)::after {
+    content: 'kg';
+  }
+  ```
+
+- **Some usecases:**
+
+  - adding quotes to `blockquote` element
+  - Gradient borders
+
+    - one way is to create a element with `::before` and `::after` and give them `width` and `height` bigger than the element and give them `background` with `gradient` color
+      ![border gradient](./img/border-gradient.png)
+
+      ```css
+      .box {
+        width: 200px;
+        height: 200px;
+        background-color: #fff;
+        position: relative;
+      }
+      .box::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 10px;
+        left: 10px;
+        background: linear-gradient(to right, #f00, #00f);
+        z-index: -1;
+      }
+      ```
+
+    - another way is to use `box-shadow` with `inset` and `blur-radius` to create gradient border
+
+  - Animating buttons background
+    ![button gradient](./img/button-gradient.png)
+
+    ```css
+    .btn::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background: linear-gradient(to right, #f00, #00f);
+      z-index: -1;
+      transition: opacity 0.3s ease-in-out;
+      opacity: 0;
+    }
+
+    .btn:hover::before {
+      opacity: 1;
+    }
+    ```
+
+  - Create custom form controls like toggle checkbox input element
+    ![toggle checkbox](./img/toggle-checkbox.webp)
 
 ---
 
-#### pseudo classes
+### pseudo classes
 
 They are style-reactions to certain actions on elements
 
@@ -374,11 +498,14 @@ They are style-reactions to certain actions on elements
     - `a:focus` => `<a>` when we are **tab focusing**
 
 - **root pseudo class**
+
   - for the root element of the document (`html` element), higher specificity
     - note that `rem` values will depend on values here
   - used for:
     - general styles
     - css variables
+
+- You can check new pseudo classes -> `:has()`, `:where()`, `:is()`
 
 ---
 
@@ -462,13 +589,22 @@ p {
 
   - You can also use pt for point sizes instead of px for pixels, but you should only do this when creating style sheets for printer-friendly versions of pages.
 
-- `line-height` is a term to control **Leading (pronounced ledding)**
+- **`line-height`** is a term to control **Leading (pronounced ledding)**
 
   - it is a term typographers use for the **vertical space between lines of text**, and doesn't affect the font-size
   - In a typeface, the part of a letter that drops beneath the baseline is called a **descender**, while the highest point of a letter is called the **ascender**. Leading is measured from the bottom of the descender on one line to the top of the ascender on the next.
     ![leading](./img/leading.png)
   - Increasing the line-height makes the vertical gap between lines of text larger.
   - if we didn't use a unit then it's relevant to the current **font size**
+
+    - Ex:
+
+      ```css
+      p {
+        font-size: 20px;
+        line-height: 1.5; /* 30px */
+      }
+      ```
 
 - `letter/word-spacing` : **Kerning** is the term typographers use for the space between each letter. You can control the space between each letter with the letter-spacing property.
   - When you specify a value for these properties, it should be given in **em**
@@ -500,10 +636,10 @@ p {
 - in the `html` element-selector we set the `font-size` to **62.5%** and not 10px => because we want to respect the user's font-size settings.
 - `rem` (root element) vs `em` (parent element) : ![rem-em](./img/rem-em.png)
   - **em** ->
-    - em are measured relative to their **parent font-size**, if used to specify **font-size**
-    - em are measured relative to the **current font-size within element**, if used to specify **lengths (spacing)**
+    - `em` are measured relative to their **parent font-size**, if used to specify **font-size**
+    - `em` are measured relative to the **current font-size within element**, if used to specify **lengths (spacing)**
       - as length/gap/spacing using `em` in `<p>` will be smaller than in `<h1>`
-  - **rem** -> is relative to the html (root) font-size
+  - **rem** -> is relative to the html (`root`) font-size
 - **Viewport Units**: They create layouts that depend on the screen size
 
   - values from 0 to 100
@@ -565,10 +701,18 @@ p {
 
 ```css
 .myClass {
-  /*           x   y   blur color */
+  /*           x   y  blur-radius  color */
   text-shadow: 1px 1px 0px #ff0000;
 }
 ```
+
+- you can add multiple text-shadows to the same element by separating them with a comma
+
+  ```css
+  .myClass {
+    text-shadow: 1px 1px 0px #ff0000, 2px 2px 0px #0000ff;
+  }
+  ```
 
 > To generate text-shadow -> [Here](https://html-css-js.com/css/generator/text-shadow/)
 
@@ -576,13 +720,13 @@ p {
 
 ## images
 
-### object-fit
+### `object-fit` property
 
-It is used to specify how an `<img>` or `<video>` should be resized to fit its container.
+It is used to specify how an `<img>` or `<video>` should be resized to fit its container **(specially when the image is bigger than the container or when resizing the browser window)**
 
 - This property tells the content to fill the container in a variety of ways; such as "preserve that aspect ratio" or "stretch up and take up as much space as possible".
   ![object-fit](./img/object-fit.png)
-- we use it to use images with specified width&height without distorting them
+- we use it to use images with specified `width`&`height` without distorting them
 
   ```css
   img {
@@ -600,7 +744,7 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 
 - **background-repeat**
 
-  - By default, as the element gets bigger, if the background-image is not big enough, it will repeat to fill the entire element(box). to control that, you can use `background-repeat` property
+  - By default, as the element gets bigger, if the background-image is not big enough, it will **repeat** to fill the entire element(box). to control that, you can use `background-repeat` property
 
     ```css
     body {
@@ -617,9 +761,17 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 
 - **background-position**
 
-  - When an image is not being repeated, you can use the `background-position` property to specify where in the browser window the background image should be placed.
+  - When an image is not being repeated, It's likely that the image is bigger than the element, so we can control the position of the image inside the element using `background-position` property
+    ![background-position](./img/background-position.png)
+  - you can use the `background-position` property to specify where in the browser window the background image should be placed.
+
+    ![background-position](./img/background-position-2.png)
 
   - This property usually has a pair of values. The first represents the horizontal position and the second represents the vertical. -> ex:
+
+    - `[top,bottom, left, right, center]`
+    - length values from the top-left `20% 70%;`
+    - absolute length values `1rem 2rem`
 
     ```css
     body {
@@ -631,7 +783,7 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
     }
     ```
 
-    - If you only specify one value, the second value will default to **center**.
+    - > Note: If you only specify one value, the second value will default to **center**.
 
 - **background-attachment**
 
@@ -640,7 +792,10 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
     - `fixed`
     - `scroll`
 
-- **linear gradient**
+---
+
+##### Linear Gradient
+
 - we have the ability to specify a **gradient** for the background of a box. The gradient is created using the `background-image` property:
 
   - to add overlay gradient with one color, you make the linear-gradient with the same value for the 2 gradient colors
@@ -654,10 +809,11 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
   ```
 
 - **RECOMMENDED:** you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
+- There's also `radial-gradient` which is a gradient from the center to the outside
 
 ---
 
-#### `background-image` notes
+##### `background-image` notes
 
 - when you have an empty div that have a `background-image` and want to make it available for screen readers for **SEO** -> add these attributes: [`role`, `aria-label`], ex:
 
@@ -679,14 +835,23 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 
 ---
 
-#### `background-position` property
+#### `background-clip` property
 
-position of the image in the background
+It specifies the painting area of the background of an element. meaning that it specifies the area where the background image or color is painted.
 
-- values:
-  - `[top,bottom, left, right, center]`
-  - length values from the top-left `20% 70%;`
-  - absolute length values `1rem 2rem`
+- Ex: making the background image extend under the border or not
+
+  ```css
+  div {
+    background-image: url('img_flwr.gif');
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-attachment: fixed;
+    background-clip: content-box;
+  }
+  ```
+
+  ![background-clip](./img/background-clip.png)
 
 ---
 
@@ -707,9 +872,11 @@ body {
 
 ---
 
-#### `background` property
+#### `background` shorthand property
 
-The background property acts like a shorthand for all of the other background properties you have just seen, and also the background-color property
+The `background` property acts like a **shorthand** for all of the other background properties you have just seen, and also the background-color property
+
+![background](./img/background-1.png)
 
 ```css
 body {
@@ -729,8 +896,17 @@ body {
   - make image color **grey** =>
 
     ```css
-    filter: brightness(0);
-    opacity: 50%;
+    img {
+      filter: grayscale(100%);
+    }
+    /* or */
+    img {
+      filter: brightness(0.5);
+    }
+    /* or */
+    img {
+      filter: contrast(0.5) brightness(0.5) saturate(0.5);
+    }
     ```
 
   - also you can try `filter: greyscale/blur/invert`
@@ -741,6 +917,26 @@ body {
 
 - `clip-path` tool => [clippy](https://bennettfeely.com/clippy/)
   ![clip-path](./img/clip-path.webp)
+
+- Note that a similar result can be done using pseudo elements `::before` & `::after`
+  ![skew background](./img/../skew-background.png)
+
+  ```css
+  .box::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: linear-gradient(to right, #f00, #00f);
+    z-index: -1;
+    transform: skewY(-5deg);
+    transform-origin: top left;
+  }
+  ```
+
+  - if done in a bigger scope like sections backgrounds, look at colt steel's **"Swipe"** project.
 
 ---
 
@@ -764,9 +960,13 @@ body {
 
 ### Position
 
+![position](./img/position-1.jpeg)
+
 - `position: static;` is the default value
 - `position: relative;` moves an element in relation to where it would have been in normal flow (relative to its current position).
+  - its space is still reserved in the normal flow
 - `position: absolute;` relative to nearest parent element with `position: relative` until we reach the `<body>` element
+  - its space is removed from the normal flow
 - `position: fixed;` relative to **viewport(screen)**, and stays as we're scrolling
 - `position: sticky;` toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
 
@@ -787,9 +987,11 @@ body {
 
 ### `z-index`
 
+It specifies the elevation of an element relative to other elements on the page.
+
 - by default, it's equal to `0`
-- if multiple elements have the same `z-index`, then the last one is higher than the others and so on..
-- it doesn't work on elements with a `position: absolute`
+- if multiple elements have the same `z-index`, then the last one is higher than the others and so on.
+- it doesn't work on elements with a `position: static;`
 - you can't hover on something that have a negative `z-index`
 
 ---
@@ -852,85 +1054,191 @@ body {
 
 ### Flexbox
 
-#### align-items & align-content
-
-> - The `align-items` property of flex-box aligns the items inside a flex container along the cross axis just like `justify-content` does along the main axis.
-> - But `align-content` is for multi line flexible boxes. It has no effect when items are in a single line. It aligns the whole structure according to its value.
-
-- align-items
-  ![flex-align-items](./img/flex-align-items.gz)
-
-  - default value for `align-items` is **stretch**
-  - when to use `align-items: baseline` ??
-    - usually in **Navbar**, where we have a **logo** and you want the navbar links to be aligned with the logo
-
-- align-content
-  - use it when you have multiple rows/columns in your flex-container
-    ![flex-align-content](./img/flex-align-content.jpg.gz)
-
-#### justify-content
-
-![flex-justify-content](./img/flex-justify-content.avif)
-![flex-justify-content](./img/flex-justify-content.png)
-
-#### `flex` vs `inline-flex`
+#### `display: flex` vs `display: inline-flex`
 
 ![inline-flex](./img/inline-flex.gz)
 
-`display: inline-flex` does not make flex items display `inline`. It makes the flex container display `inline`. That is the only difference between `display: inline-flex` and `display: flex`. A similar comparison can be made between `display: inline-block` and `display: block`
+`display: inline-flex` does not make flex items display `inline`. It makes the flex container display `inline`. That is the only difference between `display: inline-flex;` and `display: flex;`.
 
 - flex containers act as a **Block element**, so note this when you apply `display: flex` to a small item in order to center its contents
 
-#### flex-wrap
+---
 
-It defines whether the flex items are forced in a single line or can be flowed into multiple lines (**wrapped into new line**). If set to multiple lines, it also defines the cross-axis which determines the direction new lines are stacked in.
+#### `flex-direction`
+
+You can use the `flex-direction` property to specify the direction in which the flex items are displayed. The default value of this property is `row`, which means that the flex items are laid out horizontally, from left-to-right.
+
+- `flex-direction: row;` => default
+- `flex-direction: row-reverse;` => reverse the order of the items (usually for **RTL languages**)
+- `flex-direction: column;` => make the items go vertically
+- `flex-direction: column-reverse;` => make the items go vertically and reverse the order of the items
+
+---
+
+#### `flex-wrap`
+
+It defines whether the flex items are forced in a single line (default) or can be flowed into multiple lines (**wrapped into new line**). If set to multiple lines, it also defines the `cross-axis` which determines the direction new lines are stacked in.
+
+> The `cross axis` is the axis perpendicular to the main axis.
 
 ![flex-wrap](./img/flex-wrap.jpg.gz)
-
-> The **cross axis** is the axis perpendicular to the main axis.
 
 - **nowrap**: (default) single-line(doesn't make flex go(wrap) into a new line) which may cause the container to overflow if couldn't squeeze and fit the flex-items
   ![wrap](./img/nowrap.PNG)
   - It means that when the end of line is reached, make the items smaller to fit the line together
-- **wrap**: multi-lines, direction is defined by flex-direction
+- **wrap**: multi-lines, direction is defined by `flex-direction`
   ![wrap](./img/wrap.PNG)
-  - It means that when the end of line is reached, make the items keep their width and go to next line
-- **wrap-reverse**: multi-lines, opposite to direction defined by flex-direction
+  - It means that when the end of line is reached, make the items keep their `width/height` and go to next line
+    - if `flex-direction: row` => the items will go to next row vertically
+    - if `flex-direction: column` => the items will go to next column horizontally
+- **wrap-reverse**: multi-lines, opposite to direction defined by `flex-direction`
   ![wrap](./img/wrap-reverse.PNG)
 
-#### order
+---
 
-By default, all children have `order: 0`
+#### `justify-content`
+
+It aligns the flex items along the **main axis**. It helps distribute extra free space leftover when either all the flex items on a line are inflexible, or are flexible but have reached their maximum size.
+
+![flex-justify-content](./img/flex-justify-content.avif)
+
+- `space-around` vs `space-between` spacing
+  ![flex-justify-content](./img/flex-justify-content.png)
+
+---
+
+#### `align-items`
+
+- It aligns the items inside a flex container along the **cross axis** just like `justify-content` does along the **main axis**.
+  ![flex-align-items](./img/flex-align-items.gz)
+
+- default value -> `align-items: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
+- when to use `align-items: baseline;` ?
+  - usually in **Navbar**, where we have a **logo** and you want the navbar links to be aligned with the logo
+
+---
+
+#### `align-content`
+
+- It controls the spacing between lines of flex items along the **cross axis** between the rows/columns (based on the `flex-direction`)
+- This property has no effect when there is only one line of flex items. Use it when you have multiple rows/columns in your flex-container
+  ![flex-align-content](./img/flex-align-content.jpg.gz)
+- It is for multi line flexible boxes. It has no effect when items are in a single line. It aligns the whole structure according to its value.
+
+  - So the flex items need to be wrapped in order to see the effect of `align-content`
+
+    ```css
+    .flex-container {
+      display: flex;
+      flex-wrap: wrap; /* Required: wrap the items */
+      align-content: space-between;
+    }
+    ```
+
+---
+
+#### `align-self`
+
+It allows the default alignment (or the one specified by align-items) to be overridden for **individual flex items**.
+
+- `align-self: auto;` => default
+- `align-self: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
+- `align-self: center;` => center the items vertically
+- `align-self: baseline;` => align the items to the baseline of the container (usually used in **Navbar**)
+  ![align-self](./img/align-self.png)
+
+---
+
+#### `order`
+
+By default, all children have `order: 0`, and are laid out in the order they appear in the source code. You can use the `order` property to change this ordering.
 
 ![flex-order](./img/flexbox-order.jpg)
 
-#### flex-grow & flex-shrink
+```css
+.item {
+  order: 0; /* default */
+  order: 1; /* move the item to the end */
+  order: -1; /* move the item to the beginning */
+}
+```
 
-> They are for flex items(children)
+- Why do we need to use `order` ?
+  - It is useful when you want to change the order of the items in the source code, but you don't want to change the HTML structure
+  - **Accessability**: with **screen-readers**, it is important to have the correct order in the source code so that the screen-reader can read the content in the correct order
+    - so we can set the items order in the source code as we want the screen-reader to read it, and then use `order` to change the order of the items visually
 
-- flex-grow
+---
 
-  - default is zero (this means that the item is not allowed to grow)
+#### `flex` shorthand (`flex-grow`, `flex-shrink`, `flex-basis`)
 
-  ![flex-grow](./img/flex-grow.jpg.gz)
-  ![flex-grow](./img/flex-grow-1.png)
+It is used to specify the components of a flexible length (`flex-grow`, `flex-shrink` and `flex-basis`) in a short form.
 
-- flex-shrink
-  - it determines how much the flex item will shrink relative to the rest of the flex items in the flex container when there isn't enough space on the row.
-  - default is `1` (this means that the item is allowed to shrink)
+```css
+.item {
+  /* flex-grow: 1; flex-shrink: 1; flex-basis: 0%; */
+  flex: 1, 1, 0%;
+}
+```
+
+- `flex-grow`
+
+  - Determines how much of the available space inside the flex container the item should take up.
+    ![flex-grow](./img/flex-grow.jpg.gz)
+
+    ```css
+    .item {
+      flex-grow: 0; /* default -> item is not allowed to grow */
+      flex-grow: 1; /* item is allowed to take up all the extra available space */
+      flex-grow: 2; /* item should take twice as much space as the other flex elements */
+    }
+    ```
+
+  - > **Note:** It indicates the proportion of the empty space the item will take up relative to the other items in the container. Not the proportion of the size of the item itself.
+
+  - Example comparing items with `flex-grow: 2` with items with `flex-grow: 1`
+    ![flex-grow](./img/flex-grow-1.png)
+
+- `flex-shrink`
+
+  - it determines how much the flex item will shrink relative to the rest of the flex items in the flex container **when there isn't enough space on the row/column**.
+
+    ```css
+    .item {
+      flex-shrink: 0; /* item is not allowed to shrink */
+      flex-shrink: 1; /* default -> item is allowed to shrink */
+      flex-shrink: 2; /* item is allowed to shrink twice (faster) as much as the other flex elements */
+    }
+    ```
+
+    ![flex-shrink](./img/flex-shrink.avif)
+
   - to prevent flex item from shrinking when there's not enough space, we set `flex-shrink: 0`
 
-#### flex-basis
+- `flex-basis`
 
-use it instead of `width` for **flex-items**:
+  - It sets the initial main size of a flex item unless `width`/`height` is set first.
+  - use it instead of `width` for **flex-items**:
 
-- it's recommended to ues percentages and not pixel units
-- for flexItems => `flex-basis` is used as a width-percentile if row-direction, and a height if column-direction, (by default it's set to `auto`)
-- for flexItems => try not to use `width` and use `flex-basis` with remembering that if it doesn't work that means that the `flex-shrink` is set to 1 not 0
-  ![basis](./img/flex-basis1.gz)
-  ![basis](./img/flex-basis2.gz)
+    ```css
+    .flex-item {
+      flex-basis: auto; /* default */
+      flex-basis: 100px; /* fixed size */
+      flex-basis: 50%; /* percentage */
+    }
+    ```
 
-#### flex-gap (NEW FEATURE)
+  - it's recommended to ues `percentages %` and not `pixel` units
+  - for flexItems => `flex-basis` is used as:
+    - `width`-percentile if `row`-direction
+    - `height`-percentile if `column`-direction
+  - for flexItems => try not to use `width` and use `flex-basis` with remembering that if it doesn't work that means that the `flex-shrink` is set to 1 not 0
+    ![basis](./img/flex-basis1.gz)
+    ![basis](./img/flex-basis2.gz)
+
+---
+
+#### flex `gap` (NEW FEATURE)
 
 To Have a space between flex items, we needed to use `justify-content` or by adding `margin` to the flex items
 
@@ -940,9 +1248,9 @@ Instead we use the new feature `gap`
 .flex-container {
   display: flex;
   gap: 5px;
-  // or
+  /* or */
   gap: 5px 3px;
-  // or
+  /* or */
   column-gap: 5px;
   row-gap: 3px;
 }
@@ -977,50 +1285,73 @@ Instead we use the new feature `gap`
 
 ---
 
-### GRID
+#### Flexbox notes
 
-#### Old Grid (960 pixel grid)
-
-- It's a 960 pixel wide, 12 column grid, each of which is is **60 pixels** wide
-- Each column has a margin set to 10 pixels, which creates a a gap of **20 pixels** between each column and 10 pixels to the left and right-hand sides of the page.
-
-![960 grid](./img/960-grid.png)
-
-**CSS frameworks** aim to make your life easier by providing the code for common tasks, such as creating layout grids,
-
-- They save you from repeatedly writing code for the same tasks.
-- They will have been tested across different browser versions (which helps avoid browser bugs).
+- usually `margin-right: auto` is used with the last flex item to push it to the right side of the flex container (usually in **navbar**)
 
 ---
 
-#### CSS3 Grid
+### Grid
+
+It's a layout system that allows you to create a css grid of columns and rows to place content into.
+
+> Ultimate Guide to css grid ->
+>
+> - [complete-guide-grid](https://css-tricks.com/snippets/css/complete-guide-grid/)
+> - [grid-item-placement](https://mastery.games/post/grid-item-placement/)
+
+- **Old Grid (960 pixel grid)**
+
+  - It's a 960 pixel wide, 12 column grid, each of which is is **60 pixels** wide
+  - Each column has a margin set to 10 pixels, which creates a a gap of **20 pixels** between each column and 10 pixels to the left and right-hand sides of the page.
+
+  ![960 grid](./img/960-grid.png)
+
+  **CSS frameworks** aim to make your life easier by providing the code for common tasks, such as creating layout grids,
+
+  - They save you from repeatedly writing code for the same tasks.
+  - They will have been tested across different browser versions (which helps avoid browser bugs).
+
+- **Grid vs Flexbox**
+  - **Flexbox** is a one-dimensional layout model, meaning that it can lay out content in only one direction at a time — either as a row or as a column.
+    - flexbox = `row` **Or** `column`
+  - **Grid** is a two-dimensional layout model, meaning that it can lay out items in rows and columns simultaneously.
+    - grid = `row` **And** `column`
+
+#### Grid terminology and implementation
+
+- Grid container
+
+  - `display`
+    - `display: grid;` => creates a grid container, this container will be a `block`-level element
+    - `display: inline-grid;` => creates a grid container, this container will be an `inline`-level element
+  - dimensions
+
+    - `grid-template-columns` => defines the columns of the grid
+    - `grid-template-rows` => defines the rows of the grid
+    - `grid-template-area` => defines a grid template by referencing the names of the grid areas which are specified with the `grid-area` property
+      - it is used to name the rows and columns of a grid and to set its layout, **then** you assign the named area to each element according to where you want it to be shown on the grid , this is done by => `grid-area`
+        ![grid-template-area](./img/grid-template-areas.png)
+      - > **Note:** before using `grid-template-area`, you need to define the rows and columns of the grid using `grid-template-columns` and `grid-template-rows`
+    - `grid-template` => shorthand that defines both the columns and the rows of the grid
+
+      ```css
+      .container {
+        display: grid;
+        grid-template-columns: 100px 100px 100px;
+        grid-template-rows: 100px 100px 100px;
+        /* or */
+        grid-template: 100px 100px 100px / 100px 100px 100px;
+      }
+      ```
+
+-
 
 - some css grid terms:
 
   - **gutter**: another name for the gap.
   - **grid track**: multiple connected grid cells
   - **Explicit grid**: means that the css grid is smart that as we add more items, it adds more rows
-
-- instead of `px` or `fr` you can use **`minmax()`** => ex:
-
-  - `minmax` can’t handle responsive design by itself. We need to handle that by ourselves
-
-  ```css
-  .container {
-    grid-template-columns: 1fr minmax(200px, 1fr) 1fr;
-  }
-  ```
-
-  - It's used to prevent grid cells from getting too **small** / **big**
-  - note: using a `1fr` as the max value will ensure that the track expands and takes up the available space
-
-- if we have the same unit for rows/columns, we can use the `repeat()` function
-
-  ```css
-  .container {
-    grid-template-rows: repeat(2, 300px);
-  }
-  ```
 
 - **overlapping grid items**:
   - Grid allows cells to overlap with each other
@@ -1041,30 +1372,37 @@ Instead we use the new feature `gap`
 
 ---
 
-##### auto vs fr
+#### `auto` vs `fr`
 
-- `fr` beats `auto`, when they are together
+- `fr` -> stands for **fraction** of the available space of the grid container
 
+  ![grid fr](./img/grid-fr.png)
+
+  - useful when you don't want to calculate the width-percentages of the columns/rows manually.
+
+    ```css
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      /* same as */
+      grid-template-columns: 50% 50%;
+    }
+    ```
+
+  - it makes the cell responsive
+  - beats `auto`, when they are together
   - `auto` will take just it's width and `fr` will take all remaining space left
 
-  ```css
-  grid-template-columns: auto 1fr auto;
-  ```
+    ```css
+    grid-template-columns: auto 1fr auto;
+    ```
 
 - `auto`
-  - is greedy (take the remaining space available)
+
+  - is greedy (take the required space available for its content)
+    - for example, if we have a grid container with 2 columns, and the first column has a width of `auto`, then the first column will take the width of its content, and the second column will take the remaining space.
   - it makes the cell responsive as it takes the remaining space
   - it's the default behavior in implicit grids
-- `fr` (fraction of available space)
-
-  - it's the space we'd like to use for the column/row from the available space
-  - it makes the cell responsive
-
-- `fr` could be used with any values to determine relationship between rows/columns like:
-
-  ```css
-  grid-template-columns: 55fr 45fr;
-  ```
 
 - **Note:** it's preferred to use `fr` over the percent unit `%`, using the `%` unit for columns/rows in addition to `gap` with px values would result mismatch calculations
 
@@ -1082,7 +1420,67 @@ Instead we use the new feature `gap`
 
 ---
 
-##### auto-fill vs auto-fit
+#### Grid gap
+
+- `gap` is a shorthand for `row-gap` and `column-gap`
+
+```css
+.container {
+  display: grid;
+  gap: 20px;
+  /* or */
+  row-gap: 20px;
+  column-gap: 20px;
+}
+```
+
+---
+
+#### Grid functions
+
+##### `minmax()`
+
+![minmax](./img/minmax-1.png)
+![minmax](./img/minmax-2.png)
+
+- it lets you define a minimum and maximum size (range) for column width or row height
+
+  - convenient way to set the `min` as fixed value and the `max` as `fr` or percentage
+
+- `minmax()` can’t handle responsive design by itself. We need to handle that by ourselves
+- It's used to prevent grid cells from getting too **small** / **big**
+- It can be used instead of `px` or `fr`
+- note: using a `1fr` as the max value will ensure that the track expands and takes up the available space
+
+##### `repeat()`
+
+- It lets you repeat the same value multiple times in a `grid-template-columns` or `grid-template-rows` declaration to prevent you from writing out the same value over and over again.
+
+  ```css
+  .container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* same as */
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  ```
+
+##### `fit-content()`
+
+- It lets you define the size of a grid track based on the size of its content.
+
+  - It's useful when you want to make a grid cell as big as its content, but not bigger than a certain value.
+
+  ```css
+  .container {
+    display: grid;
+    grid-template-columns: repeat(3, fit-content(100px)); /* 3 columns with at most 100px */
+  }
+  ```
+
+---
+
+#### `auto-fill` vs `auto-fit`
 
 When using CSS grid `minmax()` function, it's important to decide between using the `auto-fit` or `auto-fill` keywords. When used incorrectly, it can lead to unexpected results.
 
@@ -1124,7 +1522,16 @@ When using CSS grid `minmax()` function, it's important to decide between using 
 
 ---
 
+#### Grid items
+
+By default, a grid-item will take up one grid cell.
+![grid item](./img/grid-item-1.png)
+
+However You can make a grid-item span multiple rows and/or columns using the following properties:
+
 ##### Grid Lines (start/end)
+
+It's used to position the grid items using values to specify which grid lines the item should start and end on.
 
 ![grid-lines](./img/grid-lines.png)
 
@@ -1138,13 +1545,26 @@ When using CSS grid `minmax()` function, it's important to decide between using 
   /* or */
   grid-column: 1/3;
   grid-row: 1/3;
+
+  /* if provided with one value, it will be the end value */
+  grid-column: 1; /* grid-column-end: 1; */
+}
 ```
 
 - we can use negative values for row/column:
 
   ```css
-  }.cell-4 {
+  .cell-4 {
     grid-column: 1/-1;
+  }
+  ```
+
+- `span` keyword is used to specify the number of columns/rows that the grid item should span
+
+  ```css
+  .cell-1 {
+    grid-column: 2 / span 2; /* span 2 columns */
+    grid-row: 1 / span 2; /* span 2 rows */
   }
   ```
 
@@ -1152,13 +1572,28 @@ When using CSS grid `minmax()` function, it's important to decide between using 
 
 ##### Grid Areas
 
-![grid-areas](./img/grid-area.png)
+`grid-area` property is used to assign a grid item to a grid area, or to create a named grid area.
 
-- **`grid-area`** property specifies a grid item's size and location in a grid layout
+- `grid-area` is a shorthand property that sets all of the following properties in a single declaration: `grid-row-start`, `grid-column-start`, `grid-row-end`, and `grid-column-end`.
+
+  ```css
+  .item {
+    grid-area: 1 / 1 / 2 / 3;
+    /* same as */
+    grid-row-start: 1;
+    grid-column-start: 1;
+    grid-row-end: 2;
+    grid-column-end: 3;
+  }
+  ```
+
+- it specifies a grid item's size and location in a grid layout
 
   - `grid-area: 2 / 1 / span 2 / span 3;` => start on row 2 column 1, and span 2 rows and 3 columns
 
-- `grid-template-areas` is used to name the rows and columns of a grid and to set its layout, **then** you assign the named area to each element according to whare you want it to be shown on the grid , this is done by => `grid-area`
+- It's also used with `grid-template-areas` to name the grid areas
+
+  ![grid-areas](./img/grid-area.png)
 
   - if there is a column you want it to be empty => use `.` instead of the area name
 
@@ -1166,17 +1601,28 @@ When using CSS grid `minmax()` function, it's important to decide between using 
 
 ## CSS Variables (custom properties)
 
+They let us define variables in CSS that can be reused throughout the stylesheet.
+
 - they're also called **custom properties**
   - they're called like that as they act as css-properties where they're `inherited` and they `cascade` (override based on specificity)
-- usually in the `:root` selector **(global scope)**
-
-  - because the `:root` pseudo-class selector resolve to the `<html>` element which includes all elements and pseudo elements in the **DOM** unlike `*` selector
-    - > so we can use them because they're **inherited** from the `root` element
-    - in **HTML** --> `:root`=`html` but with higher specificity
+- **Declaring** them is usually in the `:root` selector **(global scope)**
 
   ```css
   :root {
     --primary: blue;
+  }
+  ```
+
+  - because the `:root` pseudo-class represents the root `<html>` element and is identical to the selector `html`, except that **its specificity is higher**.
+    - > Note: the `<html>` element selector includes all elements and pseudo elements in the **DOM** unlike `*` selector
+    - We do this so that the variable is available everywhere in the stylesheet **(Global scope)**
+    - We can use them because they're **inherited** from the `root` element
+
+- **Using** css variables is done by using the `var()` function:
+
+  ```css
+  .box {
+    background-color: var(--primary);
   }
   ```
 
@@ -1380,9 +1826,10 @@ document.addEventListener('pointermove', evt => {
 
 ### calc()
 
-Gives us the ability to do math in css
+Gives us the ability to do math in css, usually used with `width` and `height` properties
 
 - compatible with `length`, `frequency`, `angle`, `time`, `number` and `integer`
+- commonly used with percentages `%` and `vw` units
 - make sure there's a space between the operators inside calc
 
 - **Advantages**
@@ -1431,21 +1878,27 @@ font-size: clamp(1rem, 2.5vw, 2rem);
 
 ---
 
-## Animation
+## Animation & Transitions
 
-### What to animate?
+### What to animate? (Animation Performance)
 
-note that animation in an expensive process of CPU/GPU and specially on CPU, so these are some guidelines (CSS triggers):
+Note that animation in an expensive process of CPU/GPU and specially on CPU, and it's related to how the browser rendering engine works:
+![browser render](./img/browser-render.png)
+
+Here are some guidelines (CSS triggers):
 
 - **Composite** ✅ -> It's for blending things together like with: `transform`, `opacity`
   - If you change a property that requires neither layout nor paint, and the browser jumps to just do compositing.
   - This final version is the cheapest and most desirable for high pressure points in an app's lifecycle, like `animations` or `scrolling`.
+    ![browser render](./img/browser-render-3.png)
   - > You can find more here: [Stick to Compositor](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/)
 - **Painting** 🤞 -> `color`, `background`
   - browser skips layout, but it will still do paint.
+    ![browser render](./img/browser-render-2.png)
   - it's not too expensive for rendering
 - **Layouts** ❌ -> one that changes an element’s geometry, like its `height`, `width`, `left`, `right`, `margin`, `padding` etc (**things that trigger layouts**)
   - the browser will have to check all the other elements and “reflow” the page. Any affected areas will need to be repainted
+    ![browser render](./img/browser-render-1.png)
   - it's very costly so try to avoid it
   - instead use `transform: translate()`
 
@@ -1458,6 +1911,9 @@ note that animation in an expensive process of CPU/GPU and specially on CPU, so 
 ![transform](./img/transform.png)
 ![skew](./img/transform-skew.png)
 
+- To change the origin of the transform, use `transform-origin` property
+  ![transform-origin](./img/transform-origin.png)
+
 > To generate 3D transform -> [CSS 3D Transform Generator](https://www.cssportal.com/css-3d-transform-generator/)
 
 ---
@@ -1465,10 +1921,11 @@ note that animation in an expensive process of CPU/GPU and specially on CPU, so 
 ### transition
 
 - `transition` property consists of multiple properties:
+  ![transition](./img/transition-1.png)
 
   - `transition-property`
 
-    - used to specify which properties to apply the transition data on it
+    - used to specify which css-properties to apply the transition data on them.
     - if you have multiple different properties and want to make their transition different:
 
       - you can declare each on in the block where it happens
@@ -1493,24 +1950,22 @@ note that animation in an expensive process of CPU/GPU and specially on CPU, so 
         }
         ```
 
-  - `transition-delay`
-  - `transition-duration` -->
+  - `transition-delay` -> it's the time before the transition starts
+
+  - `transition-duration` -> it's the time the transition takes
 
     - must specify the unit (`s`), even it's zero seconds
 
-#### `transition-timing-function`
-
-It's how the transition takes place
-
-- `ease` - default = slow start, fast, slow end
-- `linear` = same speed start to end
-- `ease-in` = slow start
-- `ease-out` = slow end
-- `ease-in-out` = slow start, fast, slow end
+  - `transition-timing-function` -> it's how the transition takes place
+    - `ease` - default = slow start, fast, slow end
+    - `linear` = same speed start to end
+    - `ease-in` = slow start
+    - `ease-out` = slow end
+    - `ease-in-out` = slow start, fast, slow end
 
 #### Animating(transitioning) background
 
-If you can't use `background` with `transition` property, so if you want to animate the background you can use `box-shadow` with `inset` instead:
+You can't use `background` with `transition` property, so if you want to animate the background you can use `box-shadow` with `inset` instead:
 
 ```css
 button {
@@ -1524,29 +1979,41 @@ button:hover {
 
 ---
 
-### Animation Keyframes
+### CSS Animation
+
+Applying animation to an element is done by 2 steps:
+
+1. Define the animation -> `@keyframes`
+2. Apply the animation -> `animation` name and properties
+
+#### Animation properties
+
+`animation` property consists of multiple properties:
+
+- `animation-name`
+- `animation-duration`
+- `animation-delay`
+  - note that it's for each single `iteration`
+- `animation-iteration-count`
+- `animation-direction`
+- `animation-timing-function`
+- `animation-fill-mode`
+  - it's what happens when the animation finishes or before it starts (before the first iteration)
+    ![CSS-Animation-Fill-mode](./img/CSS-Animation-Fill-mode.webp)
+  - values:
+    - `none` -> default -> go to initial state (`0%`) before start and go to final state (`100%`) after finish
+    - `forwards` -> **stick to final state (100%)**
+    - `backwards` -> default -> go to initial state (`0%`) after finish
+    - `both` -> `forwards` + `backwards` -> **stick to final state (100%)** + go to initial state (`0%`) after finish
+
+#### Animation Keyframes
+
+They're used to define the animation states and the time between them (the animation steps)
+![animation keyframes](./img/animation-keyframes-1.png)
 
 `keyframes` are different from `transition` as:
 
 - they define what happens between state **A** and state **B**
-
-- `animation` property consists of multiple properties:
-  - `@keyframes`
-  - `animation-name`
-  - `animation-duration`
-  - `animation-delay`
-    - note that it's for each single `iteration`
-  - `animation-iteration-count`
-  - `animation-direction`
-  - `animation-timing-function`
-  - `animation-fill-mode`
-    - its's what values are applied by the animation outside the time it's executing (after ot finishes)
-      ![CSS-Animation-Fill-mode](./img/CSS-Animation-Fill-mode.webp)
-    - values:
-      - `node` -> default
-      - `forwards` -> **stick to final state (100%)**
-      - `backwards` -> default -> go to initial state (0%) after finish
-      - `both`
 
 ```css
 div {
@@ -1554,7 +2021,7 @@ div {
   animation-duration: 10s;
   animation-iteration-count: 3;
 
-  /* or */
+  /* or using the shorthand */
   animation: move 10s infinite;
 }
 
@@ -1575,14 +2042,28 @@ div {
     background: green;
   }
 }
+
+/* or when we have one start point and one end point */
+
+@keyframes move {
+  from {
+    transform: translateX(20px);
+  }
+  to {
+    transform: translateX(100px);
+    background: red;
+  }
+}
 ```
 
-> **Notes**:
->
-> - instead of writing different final state in `100%`, you can call it any name and use `to <name>`
-> - to see animation for an element in **DevTools** -> **ctrl + shift + p** and type **animation**
+- Ex: converting hamburger `menu` icon to `close` icon using `animation` and `keyframes`
+  ![hamburger](./img/hamburger-icon.png)
+  - [Codepen example 1](https://codepen.io/designcouch/pen/ExvwPY)
+  - [Codepen example 2](https://codepen.io/Danilo06/pen/PoNNvGm)
 
-#### choreograph
+---
+
+#### Animation choreograph
 
 it's to use the `nth-child` selector and **CSS variables** to choreograph animations between multiple elements.
 
@@ -1602,7 +2083,7 @@ it's to use the `nth-child` selector and **CSS variables** to choreograph animat
 
 ---
 
-### data state
+### data state animation
 
 You can use `data-state` attribute to define state and make css values established based on current data-state
 
@@ -1619,6 +2100,10 @@ You can use `data-state` attribute to define state and make css values establish
 ### Animation Notes
 
 - don't use hover or any effect without using `transition` property
+- instead of writing different final state in `100%`, you can call it any name and use `to <name>`
+- to see animation for an element in **DevTools** -> **ctrl + shift + p** and type **animation**
+- **Interview question**: "What if you add the `transition` in the `:hover` body instead of the normal body?"
+  - it will work but it's not recommended as it will make the transition happen when the mouse leaves the element and not when it enters it
 - `transform` is more efficient than `position` for animation
 - to change anchor point of element => `transform-origin`, find more [here](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin)
 
@@ -1732,9 +2217,11 @@ You can use `data-state` attribute to define state and make css values establish
 
 ---
 
-## media queries
+## Responsive Web Design (RWD)
 
-- before anything make sure that you write this in the `head`
+It's the art of making websites work on all devices and screens. in other words, it's the art of making websites **responsive** to the user's device to ensure that it's always displayed in the best possible way.
+
+- Before anything make sure that you write this in the `head`
 
   ```html
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1742,19 +2229,75 @@ You can use `data-state` attribute to define state and make css values establish
 
   Because without this meta, responsive web design won't work on physical mobile devices as their browser will zoom the page out by default until it fits the screen, and by writing this line of code we make sure that it will fit their screen width
 
-- there's a value of `landscape / portrait` instead of `max-width` for **media queries**
+### Media Queries
 
-- **Bugs** : `rem` and `em` do NOT depend on html font-size in **media queries**! Instead, 1rem = 1em = 16px => so use `em`
+They allow us to specify different styles for different devices and different screen sizes.
 
-  ```css
-  /* BELOW 1344px(84*16px) (Smaller desktops) */
+```css
+@media (max-width: 600px) {
+  /* styles here */
+}
+```
 
-  @media (max-width: 84em) {
-    .hero {
-      max-width: 120rem; // it's ok to use (rem) inside it as normal
+- **Anatomy of a media query**:
+
+  - `@media` keyword
+  - `only` keyword is used to prevent old browsers that don't support media queries from applying the styles inside it. Otherwise, older browser will apply the styles in general (not just for the specified screen size media query)
+
+    ```css
+    @media only and (max-width: 600px) {
+      /* styles here */
     }
-  }
-  ```
+    ```
+
+  - `screen` keyword is used to specify that the styles inside the media query will only be applied for screens and not for printers or other devices
+
+    ```css
+    @media only screen and (max-width: 600px) {
+      /* styles here */
+    }
+    ```
+
+  - `media feature`
+
+    ```css
+    @media (max-width: 600px) {
+      /* styles here apply for screens with width <= 600px */
+    }
+
+    @media (min-width: 600px) {
+      /* styles here apply for screens with width >= 600px */
+    }
+
+    @media (min-width: 600px) and (max-width: 900px) {
+      /* styles here apply for screens with width >= 600px and <= 900px */
+    }
+
+    @media (width: 600px) {
+      /* styles here apply for screens with width = 600px */
+    }
+
+    @media (orientation: portrait) {
+      /* styles here apply for screens with portrait orientation */
+    }
+    ```
+
+    - `max-width` is the default
+    - there's a value of `landscape / portrait` instead of `max-width` for **media queries**
+
+  - `media value` -> `600px` is the default
+
+    - **Note** : `rem` and `em` do NOT depend on html font-size in **media queries**! Instead, `1rem = 1em = 16px` => **so use `em`**
+
+      ```css
+      /* BELOW 1344px(84*16px) (Smaller desktops) */
+      @media (max-width: 84em) {
+        /* Don't use 84rem here */
+        .hero {
+          max-width: 120rem; /* it's ok to use (rem) inside it as normal */
+        }
+      }
+      ```
 
 - **TRICK**: instead of using `min-width` in media-query, to specify the width of a container or a grid, we can use the `min()` function
 
@@ -1766,6 +2309,8 @@ You can use `data-state` attribute to define state and make css values establish
   /*OR: width: min(1000px, 100% - margin_width-left&right); */
 }
 ```
+
+---
 
 ### Break points
 
@@ -1903,6 +2448,37 @@ There are two ways to add multiple style sheets to a page:
 ## Notes
 
 - By default, most browsers add a margin to the top of the `<h1>` element. This is why there is a gap between the top of the browser and the box containing the `<h1>` element.
+
+  - That's why we use `* { margin: 0; }` to remove the default margin
+
+- To create a container for the whole page, we use `<div>` element with `id` attribute and give it a name like `container` or `wrapper` and then we put all the page content inside it. and to give the sections inside it a `max-width` and center them, we use:
+
+  - page's container width:
+
+    ```css
+    .container {
+      width: 100%;
+      max-width: 120rem;
+    }
+    ```
+
+  - centering the sections inside it:
+
+    ```css
+    /* OPTION 1 */
+    .section {
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* OPTION 2 */
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    ```
+
 - to center an inline element on the page:
 
   ```css
@@ -1976,3 +2552,97 @@ There are two ways to add multiple style sheets to a page:
        padding: 5px 20px;
      }
      ```
+
+- To center an element vertically and horizontally in a container, we have these options:
+
+  1. using `flexbox`:
+
+     ```css
+     .container {
+       display: flex;
+       justify-content: center;
+       align-items: center;
+     }
+     ```
+
+  2. using `position: absolute`:
+
+     ```css
+     .container {
+       position: relative;
+     }
+     .element {
+       width: 100px;
+       height: 100px;
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       transform: translate(-50%, -50%);
+
+       /* or */
+       top: calc(50% - 50px); /* 50px is half of the element height */
+       left: calc(50% - 50px); /* 50px is half of the element width */
+     }
+     ```
+
+  3. using `grid`:
+
+     - center a container:
+
+       ```css
+       .container {
+         display: grid;
+         place-items: center;
+       }
+       ```
+
+     - center a grid-item inside its cell:
+       ![place-self](./img/../place-self.png)
+
+       ```css
+       .grid-item {
+         place-self: center;
+       }
+       ```
+
+- To add custom **underline** to element:
+
+  - use `border-bottom` property instead of `text-decoration` property to have more control over the underline.
+    - usually to control the space between the text and the underline, use `padding-bottom` property.
+  - Or: use `::after` pseudo-element with `content` property to add the underline.
+
+    - this option is better if you want to have more control over the underline like: `color`, `width`, `z-index`, `position`, `border-radius`, etc.
+
+    ```css
+    .underline::after {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 2px;
+      background-color: #000;
+    }
+    ```
+
+- To add `border-radius` to just one side left/right, we need to specify the 2 left/right corners:
+
+  ```css
+  /* Correct */
+  .box {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+
+  /* Wrong */
+  .box {
+    border-left-radius: 10px;
+  }
+  ```
+
+- when you have a sliding item (animate from right to center like a **sidebar**) => use this :
+
+  ```css
+  body,
+  html {
+    overflow-x: hidden;
+  }
+  ```

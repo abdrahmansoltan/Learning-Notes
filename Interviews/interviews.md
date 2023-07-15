@@ -13,6 +13,8 @@
     - [Feedback](#feedback)
       - [Situation-Behavior-Impact (SBI)](#situation-behavior-impact-sbi)
   - [Negotiation](#negotiation)
+  - [Problem-solving questions](#problem-solving-questions)
+    - [Curveball questions](#curveball-questions)
 
 ---
 
@@ -141,10 +143,11 @@ A hiring manager may ask you to describe your strengths and weaknesses. When you
     > - While these questions don't ask you about your strengths directly, they encourage you to talk about your positive attributes.
 
 - Weakness
+
   - > Another format of the weakness question is: **"What is one thing that you can change about yourself?"** or **"What feedback have you received from your manager?"**
     >
     > - This question is similar to the weakness question, but it's more specific. It asks you to describe a specific area you're working to improve, rather than a general weakness.
-  
+
   - You can use this formula for answering this question:
     - **Weakness** + **Context** + **Improvement measures**
   - EX:
@@ -192,6 +195,7 @@ One of the important things to think about here is the fact that even though you
 Here are some questions to get you started. I love opinion questions because you get interesting answers and can ask everyone the same question. Don’t be afraid to ask about the negatives too:
 
 - **Questions to ask about the job**:
+
   - "Can you share more about the day-to-day responsibilities of this position? What's a typical day like?"
   - "What Are Your Expectations for the Person in This Role?"
   - "What are the characteristics of someone who would succeed in this role?"
@@ -203,10 +207,12 @@ Here are some questions to get you started. I love opinion questions because you
   - What you wish somebody told them when they just started the job at this company?
 
 - **Questions to ask about the company**:
+
   - "What do you like best about working here?"
   - career advancement: "I'd love to talk about career advancements. In my next career move, I really want to find a company that is prioritizing upward mobility and career growth. I want to be a senior engineer in the next couple of years, So it's really important that I have clear opportunities for growth in this role. If you'd be able to share, I'd like to understand how many people have been promoted out of this position?"
 
 - **Questions to ask about the culture**:
+
   - How would you describe the company culture?
 
 - Questions to avoid:
@@ -269,3 +275,61 @@ Here are some questions to get you started. I love opinion questions because you
     - show your employer why you deserve a higher salary based on the previous note, showing that you're a different person than you were when they first hired you when they didn't know that you were going to be valuable
     - Ask for a salary-level that is a lot higher than you actually want, as they would find a middle ground that is happy for both parties
     - Remember, to value yourself, you've done a great job with the company, they want to keep you because they value you
+
+---
+
+## Problem-solving questions
+
+To solve these questions use **STAR** technique:
+
+- **Tell me a time when you solved a difficult problem at work?**
+
+  - **Situation:** I was working on a project that was due in 1 week, and my teammate that was responsible for making the new implementation compatible with the infrastructure pipeline was sick and couldn't work on it.
+  - **Task:** I had to figure out how to handle the infrastructure part myself to ensure that the project is delivered on time.
+  - **Action:** I considered my options like discussing with my manager the option of borrowing a teammate from another team, but that would take a lot of time to get them up to speed with the project, so I decided to learn how to do it myself by reading the documentation and asking my teammates for help instead of impacting other teams timelines. Fortunately my manager was very supportive and gave me the time to learn how to do it myself.
+  - **Result:** I was able to deliver the project on time, and I learned a new skill that I can use in the future. Also, I became able to help my teammates with the same problem in the future.
+
+- **Describe a time when you had to solve a problem without managerial input. How did you handle it, and what was the result? or Give an example of a time when you identified and fixed a problem before it became urgent.**
+
+  - **Situation:** I faced an issue where a website I was developing was loading slowly, affecting the user experience.
+  - **Task:** I had to figure out what was causing the issue and how to fix it.
+  - **Action:** I gathered all available information, analyzed the root cause, and facilitated a brainstorming session with the team to come up with a solution. I then implemented the solution and tested it to make sure that it fixed the issue.
+  - **Result:** My proactive approach helped me to solve the issue quickly and efficiently, and the website was loading faster, and the user experience improved.
+
+- **What steps do you follow when solving problems?**
+
+  - I always follow a 4 step process:
+    1. **Understand the problem:** I make sure that I understand the problem by asking questions and clarifying the problem with the product manager.
+    2. **Plan:** I plan how to solve the problem by breaking it down into smaller problems and then solving each one of them.
+    3. **Execute:** I execute my plan by writing the code and testing it.
+    4. **Review and Retrospect:** I review my code and make sure that it's clean and readable, and I retrospect on the problem to know the root cause of the problem and how to avoid it in the future.
+
+- **How would you handle a situation where your team disagrees with your idea?**
+
+  - I would first listen to their ideas and try to understand their point of view, and then I would try to convince them by showing them the benefits of my idea and how it would help the team and the company.
+  - If they still disagree with my idea, I would try to find a middle ground that would satisfy both parties.
+  - If we still can't agree on a solution, I would escalate the issue to my manager and let them decide on the best solution.
+
+- **What do you consider before making decisions?**
+  - I consider the impact of my decision on the team and the company.
+  - I also consider the pros and cons **(risk and rewards)** of my decision and the risks associated with it.
+  - I also consider the time it would take to implement my decision and the resources needed to implement it.
+  - I also consider the impact of my decision on the product and the users.
+
+---
+
+### Curveball questions
+
+- Tips for handling these questions
+
+  1. Stay calm and don't panic
+  2. Take a moment to think about the question -> "That's a fun question, let me think about it for a second"
+  3. Don't stress about getting the right answer, they're not looking for the right answer, they're looking for how you think and how you approach the problem
+  4. Reveal your thought process and talk out loud
+     - Ex: "if you were a tree, what kind of tree would you be?"
+       - Don't just say "I would be a pine tree", instead say "well, I consider myself a very strong person, and I'm always growing and looking up and learning new things, so I would be a pine tree because it's a strong tree that grows tall and it's always green"
+  5. Show your personality and have fun with it
+
+- Ex: "Does your current manager know that you're interviewing today?"
+  - This is a tricky question, because it's asked to better understand your relationship with your current manager and to see if you're a trustworthy person.
+  - Answer: "I took the day off today, when asked what I was doing for my time off, I said that I had personal things to take care of, as I wouldn't help to start a conversation about me leaving the company, So I haven't explicitly told my manager that I'm interviewing today, but he knows that I'm willing to pursue potential opportunities that are better for me and my career growth. and he is very supportive of that."
