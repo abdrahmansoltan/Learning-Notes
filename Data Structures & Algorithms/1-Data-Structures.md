@@ -1082,14 +1082,18 @@ They're nodes (vertices) connected via "Edges"
 
 - **Adjacency Matrix**
   ![graphs-adjacency-matrix](./img/graphs-adjacency-matrix.png)
+  ![graphs-adjacency-matrix](./img/graphs-adjacency-matrix-1.png)
   - In an `undirected` graph, an adjacency matrix will be symmetric. In a directed graph, it will not (necessarily) be.
   - Here, `1` means that there's an edge between the two vertices, and `0` means that there's no edge between them
   - It's not commonly used, as it's not very space-efficient, as it's `O(n^2)` space complexity
     - This is because we have to store a value for every possible edge (either `0` or `1`)
 - **Adjacency List** (most common)
-  ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
   - here:
     - we use `hash-table` to store the edges with the vertex as the key and the edges as the value array
+      ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
+    - or we can use `array` to store the edges with the vertex as the index and the edges as the value array
+      ![graphs-adjacency-list](./img/graphs-adjacency-list-1.png)
+      - this is more space-efficient than using `hash-table` as we don't have to store the keys as the `indices` are the keys
   - Here it's more space-efficient, as it's `O(n + e)` space complexity
     - This is because we only have to store the values for the edges that actually exist in an array for each node
   - it's the most used, as most data in real-world tends to lend itself to sparser and/or larger graphs
@@ -1764,11 +1768,14 @@ class Trie:
     def insert(self, word):
         current = self.root
         for letter in word:
+            # 1. if the letter doesn't exist in the children of the current node -> add it
             node = current.children.get(letter)
             if node is None:
                 node = TrieNode()
                 current.children[letter] = node
+            # 2. move to the next node
             current = node
+        # 3. mark the end of the word at the last node (after the loop is done)
         current.endOfWord = True
 
     def search(self, word):
@@ -1778,7 +1785,7 @@ class Trie:
             if node is None:
                 return False
             current = node
-        return current.endOfWord
+        return current.endOfWord # return True if the endOfWord is True
 
     def delete(self, word):
         self.deleteRecursively(self.root, word, 0)

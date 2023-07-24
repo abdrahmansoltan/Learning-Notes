@@ -291,7 +291,7 @@ why we do this instead of declaring the function with the class properties each 
 
 ### The "new Function" syntax
 
-When a function is executed with **new** keyword, it does the following steps:
+When a function is executed with **`new`** keyword, it does the following steps:
 
 - A new empty object is created and assigned to `this`.
 - The function body executes. Usually it modifies `this`, adds new properties to it.
@@ -300,6 +300,21 @@ When a function is executed with **new** keyword, it does the following steps:
 ```js
 // new Function([arg1, arg2, ...argN], functionBody);
 let sum = new Function('a', 'b', 'return a + b');
+```
+
+So, the `new` keyword behind the scenes does all the prototype stuff for us.
+
+```js
+function User(name) {
+  this.name = name;
+}
+
+let user = new User('John');
+// the new keyword does the following:
+// 1. create a new function + an empty object with the hidden property (prototype)
+// 2. assign the new object to the (this) keyword
+// 3. sets the __proto__ of the new object to the prototype of the function
+// 4. return the new object
 ```
 
 - The major difference from other ways we’ve seen is that **the function is created literally from a string**; For example, we can receive a new function from a server and then execute it:
@@ -314,6 +329,18 @@ let sum = new Function('a', 'b', 'return a + b');
   ```
 
 - all is that is possible because (functions in JS are both **function & objects combo**)
+
+- We use `new` keyword also when we want to create a new instance of a class, because classes are just syntactic sugar for constructor functions
+
+  ```js
+  class User {
+    constructor(name) {
+      this.name = name;
+    }
+  }
+
+  let user = new User('John');
+  ```
 
 > **NOTE**: other built in objects like arrays have the hidden `__proto__` property
 
@@ -818,6 +845,25 @@ class Account {
 
 ## Notes
 
+- We can create objects using functions, but that’s an old-school and frowned-upon way of making objects. Here're some of the reasons:
+  - the object methods are created anew for each object. In the code above we create greet twice, and they do the same thing, but occupy different memory. It’s inefficient. Plus in order to modify or remove a method, we need to find all its occurrences in the code and fix them.
+    - The main issue is that if we have many functions, then all of them are stored in memory. That’s not good. Because functions may be big, and we may need only one of them at a time.
+    - That's where the [protoType chain](#prototypal-inheritance-delegation) comes in handy, as it allows us to create a function once (in memory), and then inherit it in other objects -> which is done using `Object.create()`
+
+      ```js
+      function User(name) {
+        const user = Object.create(sayHi); // (functions) is the prototype object and we use (Object.create) to set the prototype manually
+        user.name = name;
+      }
+
+      function sayHi() {
+        alert(this.name);
+      }
+
+      new User('John').sayHi(); // John
+      ```
+
+  - Another problem with functions is that they use the `[[Environment]]` property to store the outer lexical environment reference. That’s needed to access outer variables. But here we don’t need it at all.
 - if you want a class method to be automatically called when an instance of the class is created, then you should put this method in the `constructor()`
 - in old syntax if we didn't use the word **"new"**, then **this** keyword will point to the `window` object
 - Is it possible to create functions `A` and `B` so that `new A() == new B()`?
@@ -837,4 +883,5 @@ class Account {
   alert(new A() == new B()); // true
   ```
 
-- Values null and undefined have no object wrappers (are not Objects like other types)
+- Values `null` and `undefined` have no object wrappers (are not Objects like other types)
+- the `prototypal` nature of JavaScript means that when an object can't find a property in itself, it will look up the `prototype` chain to see if the property is defined on the object's `prototype`. If it can't find the property in the `prototype` either, it will look up the `prototype` chain again, until it reaches the end of the `prototype` chain. If it still can't find the property, it will return `undefined`.

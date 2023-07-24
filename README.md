@@ -206,6 +206,18 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Data Structures & Algorithms
 
-- [Data-Structures](./Data%20Structures%20%26%20Algorithms/1-Data-Structures.md)
+- [Data-Structures](./Data%20Structures%20&%20Algorithms/1-Data-Structures.md)
 - [Algorithms](./Data%20Structures%20%26%20Algorithms/2-Algorithms.md)
 - [Problem-solving](./Data%20Structures%20%26%20Algorithms/3-Problem-solving.md)
+- [System-Design](./Data%20Structures%20%26%20Algorithms/4-System-Design.md)
+- [Problem-solving-Arrays](./Data%20Structures%20%26%20Algorithms/5-PS-Arrays.md)
+- [Problem-solving-Strings](./Data%20Structures%20%26%20Algorithms/6-PS-Strings.md)
+- [Problem-solving-Stacks-Queues](./Data%20Structures%20%26%20Algorithms/7-PS-Stacks-Queues.md)
+- [Problem-solving-Linked-Lists](./Data%20Structures%20%26%20Algorithms/8-PS-Linked-Lists.md)
+- [Problem-solving-Hash-maps](./Data%20Structures%20%26%20Algorithms/9-PS-Hash-maps.md)
+- [Problem-solving-Sorting-Searching](./Data%20Structures%20%26%20Algorithms/10-PS-Sorting-Searching.md)
+- [Problem-solving-Trees](./Data%20Structures%20%26%20Algorithms/11-PS-Trees.md)
+- [Problem-solving-Recursion](./Data%20Structures%20%26%20Algorithms/12-PS-Recursion.md)
+- [Problem-solving-Graphs](./Data%20Structures%20%26%20Algorithms/13-PS-Graphs.md)
+- [Problem-solving-DP](./Data%20Structures%20%26%20Algorithms/14-PS-DP.md)
+- [Problem-solving-Heaps](./Data%20Structures%20%26%20Algorithms/15-PS-Heaps.md)

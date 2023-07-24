@@ -40,8 +40,9 @@
 
 > More on modules here -> [Modules & Bundlers](../DEV/Modules%20%26%20Bundlers.md)
 
-A **module** is just a file. One script is one module. As simple as that.
+Modules let us split big codebases into multiple small files that can be loaded and executed on demand.
 
+- A **module** is just a file. One script is one module. As simple as that.
 - Modules can load each other and use special directives export and import to interchange functionality, call functions of one module from another one:
 
   - `export` keyword labels variables and functions that should be accessible from outside the current module.
@@ -55,15 +56,18 @@ A **module** is just a file. One script is one module. As simple as that.
   <script type="module" defer src="script.js"></script>
   ```
 
-- Modules work only via **HTTP(s)**, not locally as it requires CORS access and other protocols
-  - That's why we use a local web-server, such as “live server” and can't open it locally without a server
+- Modules work only via **HTTP(s)**, not locally as it requires `CORS` access and other protocols
+  - That's why we use a local web-server, such as “live server” and can't open it locally without a server, as it pretends to be a real server and provides the `http` protocol
+    - This is because when sending a request to a server, the browser adds a special header `Origin` to it, with the current domain (origin) in it. The server then may reply with the header `Access-Control-Allow-Origin` with the allowed origin, or with the header `Access-Control-Allow-Origin: *` to allow access from everywhere.
+  - The `file://` protocol is not a part of the `origin`, so it can’t be used with modules.
+  - **Summary:** the modules files need to be sent from the same **origin** (`domain`, `protocol`, `port`), otherwise they won’t work.
 
 ---
 
 ### Module Features
 
 - Always **“use strict”**
-- Module-level scope
+- Module-level scope (It creates a local scope in a module)
 
   - Each module has its own top-level scope. In other words, top-level variables and functions from a module are not seen in other scripts.
   - This will cause error as each module has independent variables and we shouldn't depend on the order of the scripts

@@ -208,7 +208,11 @@ you can use `BFS` or `Dijkstra's algorithm` to find the shortest path
 
 #### Greedy Algorithms
 
-It's an algorithm that makes the locally optimal choice at each stage with the hope of finding a global optimum.
+It's an algorithm that makes the locally **optimal** choice at each stage with the hope of finding a global optimum.
+
+- It only applies when working with **optimization problems**.
+  - Optimization problems: problems that require us to find the **maximum** or **minimum** value of a function.
+  - `minimization` problems: problems that require us to find the **minimum** value of a function.
 
 - Ex: **Dijkstra's algorithm** for finding the shortest path between two nodes in a graph.
 
@@ -263,6 +267,8 @@ A better approach is to run the program within a **debugger**, which is a specia
     - EX: `while nums[i] == nums[i+1]: i+= 1`
   - or if you are inside a `for` loop, you can check if the current element is equal to the **previous element**, if so, skip it by using `continue`
     - EX: `if nums[i] == nums[i+1]: continue`
+- If you want to use **Tail Recursion** in your solution, make sure to let the interviewer know that you are using it, as it's not supported in all languages
+  - not supported in `python` and `java` but supported in `javascript` and `c++`
 
 ---
 

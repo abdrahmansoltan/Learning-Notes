@@ -2,6 +2,9 @@
 
 - [INDEX](#index)
   - [Starter CSS Code](#starter-css-code)
+  - [How CSS works](#how-css-works)
+    - [Visual Formatting Model](#visual-formatting-model)
+    - [Inheritance](#inheritance)
   - [styling Types](#styling-types)
   - [selectors](#selectors)
     - [Descendant selectors](#descendant-selectors)
@@ -77,8 +80,8 @@
     - [variables token: Number, string, images](#variables-token-number-string-images)
     - [Css variables with Javascript](#css-variables-with-javascript)
   - [Calculations Built in Functions](#calculations-built-in-functions)
-    - [calc()](#calc)
-    - [clamp()](#clamp)
+    - [`calc()`](#calc)
+    - [`clamp()`](#clamp)
   - [icons - SVG](#icons---svg)
   - [Animation \& Transitions](#animation--transitions)
     - [What to animate? (Animation Performance)](#what-to-animate-animation-performance)
@@ -94,9 +97,6 @@
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
-  - [Responsive Web Design (RWD)](#responsive-web-design-rwd)
-    - [Media Queries](#media-queries)
-    - [Break points](#break-points)
   - [Browser Prefixes (CSS Vendor Prefixes)](#browser-prefixes-css-vendor-prefixes)
   - [Scrolling](#scrolling)
   - [Modules (multiple style sheets)](#modules-multiple-style-sheets)
@@ -109,6 +109,52 @@
 in this repo, you will find source for [CSS Default Starter / Global Styles / Tools](https://github.com/john-smilga/default-starter)
 
 > read the README.md file for instructions
+
+---
+
+## How CSS works
+
+What happens when we load a page in the browser?
+![how css works](./img/how-css-works-1.png)
+
+1. The browser receives the HTML file and starts to parse it:
+   - When parsing the HTML file, it encounters a `<link>` tag with a `rel="stylesheet"` attribute, so it starts to download the CSS file
+   - The browser continues parsing the HTML file and builds the **DOM** tree, in parallel with loading the CSS file.
+2. Loading CSS file:
+   - The browser parses the CSS file, and builds the **CSSOM** tree.
+     - `CSSOM` is the CSS Object Model, which is very similar to the DOM tree, but for CSS.
+     - it involves:
+       - parsing the CSS file
+       - figuring out which CSS rules apply to which elements
+       - resolving conflicts
+       - evaluating final values (`vm` -> `px`)
+   - The `CSSOM` and `DOM` trees are combined into a **render tree**.
+   - The render tree is used to compute the layout of each visible element and displays them on the screen.
+3. Rendering the page:
+   - The browser paints the pixels on the screen. **(Visual formatting model)**
+
+---
+
+### Visual Formatting Model
+
+It's the process of turning the render tree into the actual pixels on the screen.
+
+- It uses an algorithm called **Box Model** to determine the size and position of each box to be painted on the screen.
+- To do that it takes into account factors like:
+  - dimensions of the box -> `box-sizing`
+  - box type -> `inline`, `block`, `inline-block`
+  - positioning scheme -> `float`, `absolute`, `relative`
+  - stacking context -> `z-index`
+  - viewport size
+
+---
+
+### Inheritance
+
+It's when a property of a parent element is passed to its children elements.
+
+- How inheritance works
+  ![css inheritance](./img/css-inheritance.png)
 
 ---
 
@@ -126,6 +172,7 @@ in this repo, you will find source for [CSS Default Starter / Global Styles / To
    - in the `style` tag in `head`
 3. external style
    - imported in `link` tag with attribute `rel="stylesheet"` in `head`
+   - when using 3rd party stylesheets, always put your own stylesheet after it, so it can override it.
 
 **Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
 
@@ -919,7 +966,7 @@ body {
   ![clip-path](./img/clip-path.webp)
 
 - Note that a similar result can be done using pseudo elements `::before` & `::after`
-  ![skew background](./img/../skew-background.png)
+  ![skew background](./img/skew-background.png)
 
   ```css
   .box::before {
@@ -1824,7 +1871,7 @@ document.addEventListener('pointermove', evt => {
 
 ## Calculations Built in Functions
 
-### calc()
+### `calc()`
 
 Gives us the ability to do math in css, usually used with `width` and `height` properties
 
@@ -1859,7 +1906,7 @@ Gives us the ability to do math in css, usually used with `width` and `height` p
 
 ---
 
-### clamp()
+### `clamp()`
 
 The `clamp()` CSS function clamps a middle value within a range of values between a defined minimum bound and a maximum bound. The function takes three parameters: a `minimum value`, a `preferred value`, and a `maximum allowed value`.
 
@@ -2217,112 +2264,6 @@ You can use `data-state` attribute to define state and make css values establish
 
 ---
 
-## Responsive Web Design (RWD)
-
-It's the art of making websites work on all devices and screens. in other words, it's the art of making websites **responsive** to the user's device to ensure that it's always displayed in the best possible way.
-
-- Before anything make sure that you write this in the `head`
-
-  ```html
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  ```
-
-  Because without this meta, responsive web design won't work on physical mobile devices as their browser will zoom the page out by default until it fits the screen, and by writing this line of code we make sure that it will fit their screen width
-
-### Media Queries
-
-They allow us to specify different styles for different devices and different screen sizes.
-
-```css
-@media (max-width: 600px) {
-  /* styles here */
-}
-```
-
-- **Anatomy of a media query**:
-
-  - `@media` keyword
-  - `only` keyword is used to prevent old browsers that don't support media queries from applying the styles inside it. Otherwise, older browser will apply the styles in general (not just for the specified screen size media query)
-
-    ```css
-    @media only and (max-width: 600px) {
-      /* styles here */
-    }
-    ```
-
-  - `screen` keyword is used to specify that the styles inside the media query will only be applied for screens and not for printers or other devices
-
-    ```css
-    @media only screen and (max-width: 600px) {
-      /* styles here */
-    }
-    ```
-
-  - `media feature`
-
-    ```css
-    @media (max-width: 600px) {
-      /* styles here apply for screens with width <= 600px */
-    }
-
-    @media (min-width: 600px) {
-      /* styles here apply for screens with width >= 600px */
-    }
-
-    @media (min-width: 600px) and (max-width: 900px) {
-      /* styles here apply for screens with width >= 600px and <= 900px */
-    }
-
-    @media (width: 600px) {
-      /* styles here apply for screens with width = 600px */
-    }
-
-    @media (orientation: portrait) {
-      /* styles here apply for screens with portrait orientation */
-    }
-    ```
-
-    - `max-width` is the default
-    - there's a value of `landscape / portrait` instead of `max-width` for **media queries**
-
-  - `media value` -> `600px` is the default
-
-    - **Note** : `rem` and `em` do NOT depend on html font-size in **media queries**! Instead, `1rem = 1em = 16px` => **so use `em`**
-
-      ```css
-      /* BELOW 1344px(84*16px) (Smaller desktops) */
-      @media (max-width: 84em) {
-        /* Don't use 84rem here */
-        .hero {
-          max-width: 120rem; /* it's ok to use (rem) inside it as normal */
-        }
-      }
-      ```
-
-- **TRICK**: instead of using `min-width` in media-query, to specify the width of a container or a grid, we can use the `min()` function
-
-```css
-.el {
-  width: min(1000px, 100%);
-  /* this will choose between the minimum of these 2 values 1000px or the 100% width of the screen */
-
-  /*OR: width: min(1000px, 100% - margin_width-left&right); */
-}
-```
-
----
-
-### Break points
-
-- mobile-first -> `min-width`
-- desktop-first -> `max-width`
-  - but be aware of the overlapping
-
-we do breaks when **design breaks**
-![responsive](./img/responsive.PNG)
-
----
-
 ## Browser Prefixes (CSS Vendor Prefixes)
 
 > Browser vendors used to add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers could experiment with new ideas. This, in theory, helped to prevent their experiments from being relied upon and then breaking web developers' code during the standardization process.
@@ -2597,7 +2538,7 @@ There are two ways to add multiple style sheets to a page:
        ```
 
      - center a grid-item inside its cell:
-       ![place-self](./img/../place-self.png)
+       ![place-self](./img/place-self.png)
 
        ```css
        .grid-item {

@@ -189,6 +189,10 @@ BEM gives everyone on a project a declarative syntax that they can share so that
 
 ### BEM Notes
 
+- `BEM` is great for making code maintainable and modular, this is because it depends on selecting an element using one class selector only, which means:
+
+  - lower specificity -> easier to override & maintain
+
 - `BEM` helps us avoid **nesting**
 
   - in BEM, **everything is a class and nothing is nested**. That makes CSS specificity very flat and low

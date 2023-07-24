@@ -47,6 +47,8 @@
       - [Merge sort implementation](#merge-sort-implementation)
     - [Quick Sort](#quick-sort)
       - [Quick sort implementation](#quick-sort-implementation)
+      - [Hoare's Partitioning Scheme (Quick Select)](#hoares-partitioning-scheme-quick-select)
+        - [Implementing Quick sort using Hoare's Partitioning Scheme (Quick Select)](#implementing-quick-sort-using-hoares-partitioning-scheme-quick-select)
     - [Bucket Sort](#bucket-sort)
     - [Radix Sort](#radix-sort)
     - [Sorting Notes](#sorting-notes)
@@ -62,15 +64,17 @@
       - [PostOrder DFS traversal](#postorder-dfs-traversal)
       - [InOrder DFS traversal](#inorder-dfs-traversal)
       - [Tree Traversal Notes](#tree-traversal-notes)
-    - [Shortest Path](#shortest-path)
+  - [Shortest Path](#shortest-path)
     - [Dijkstra's Algorithm](#dijkstras-algorithm)
       - [How Dijkstra's Algorithm works](#how-dijkstras-algorithm-works)
       - [Implementing Dijkstra's algorithm](#implementing-dijkstras-algorithm)
-    - [Topological Sort](#topological-sort)
-      - [Implementing Topological Sort](#implementing-topological-sort)
-    - [Union Find](#union-find)
-    - [Matrix graph](#matrix-graph)
-      - [Matrix DFS](#matrix-dfs)
+    - [Bellman-Ford Algorithm](#bellman-ford-algorithm)
+      - [How Bellman-Ford Algorithm works](#how-bellman-ford-algorithm-works)
+  - [Topological Sort](#topological-sort)
+    - [Implementing Topological Sort](#implementing-topological-sort)
+  - [Union Find](#union-find)
+  - [Matrix graph](#matrix-graph)
+    - [Matrix DFS](#matrix-dfs)
       - [Matrix BFS](#matrix-bfs)
 
 ---
@@ -640,16 +644,37 @@ def fib(n):
 
 > By making our algorithm description exploit the repetitive structure in a recursive way, we can often avoid complex case analyses and nested loops. This approach can lead to more readable algorithm descriptions, while still being quite efficient.
 
-**Tail recursion** is when any recursive call that is made from one context is the very last operation in that context, with the return value of the recursive call (if any) immediately returned by the enclosing recursion.
+**Tail recursion** is a version of recursion impacts the final phase of a recursive function. In tail recursion, the recursive call is the last thing that happens in the function. This means that **the return value of the recursive call is returned as the return value of the function**, without any additional processing.
+
+- This is important because it means that the function does not have to wait for the recursive call to be resolved. It can return immediately with the recursive call, and the recursive call can be resolved later.
+- It results a much better space complexity, because we don't need to store the recursive calls in the call stack, we can just return the result of the recursive call and then return the final result of the function.
+
+  ```py
+  # Normal recursion | Space complexity -> O(n)
+  def sum(n):
+    if n == 0:
+      return 0
+    else:
+      return n + sum(n-1) # we will have to wait for the recursive call to be resolved before returning the final result
+
+  # Tail recursion | Space complexity -> O(1)
+  def sum(n, running_total=0):
+    if n == 0:
+      return running_total
+    else:
+      return sum(n-1, running_total + n) # we don't have to wait for the recursive call to be resolved before returning the final result because we're returning the result of the recursive call directly
+  ```
+
+  ![tail recursion](./img/tail-recursion.png)
 
 - a tail recursion must be a linear recursion (since there is no way to make a second recursive call if you must immediately return the result of the first).
 - Example:
 
-  ```py
-  return n factorial(n−1)
-  ```
-
   - This is not a tail recursion because an additional multiplication is performed after the recursive call is completed.
+
+    ```py
+    return n factorial(n−1)
+    ```
 
 - Any tail recursion can be reimplemented non-recursively by enclosing the body in a loop for repetition, and replacing a recursive call with new parameters by a reassignment of the existing parameters to those values.
 
@@ -668,6 +693,8 @@ It's a technique to solve the problems by breaking it down into a collection of 
 ### Memoization
 
 **Memoization**: is a specific kind of caching used to involves caching the **return value** of functions based on their parameters
+
+- What we memoize is the **return value** of the function based on its parameters which is usually calculated from something called **Reccurence Relation** (the relation between the current problem and the sub-problems)
 
 - Example of using memoization
 
@@ -706,7 +733,8 @@ We start with the **big picture** and then break it down into smaller pieces
 
 We start with the **smaller pieces** and then build it up into the big picture -> Real Dynamic Programming
 
-- It's the opposite of `Memoization` and `recursion`, because we start from the bottom (base case) and build it up to the top until we reach the final result.
+- It's the opposite of `Memoization` and `recursion`, because we start from the bottom **(base case)** and build it up to the top until we reach the final result.
+  - the `bottom` (base case) is the smallest sub-problem that we already know the answer for it
 - It uses **tabulation** (storing the result of each sub-problem in an array or map) and **iteration** (looping) to solve the problem.
 
 > `Bottom-up` solution usually has less code than the `top-down` solution (recursion), but it's harder to think of
@@ -1126,7 +1154,7 @@ def merge_sort(arr):
       ![quick sort](./img/quick-sort-3.png)
       ![quick sort](./img/quick-sort-4.png)
       - `i` -> keeps track of the index of the last element in the `left` sub-array which is the middle-point between the `left` sub-array and the `right` sub-array
-      - j -> keeps track of the index of the first element in the `right` sub-array so that we can swap it with any element smaller than the **"pivot point"** in the `left` sub-array
+      - `j` -> keeps track of the index of the first element in the `right` sub-array so that we can swap it with any element smaller than the **"pivot point"** in the `left` sub-array
     - After the partitioning is done, we **recursively** apply the above steps to the `left` sub-array and the `right` sub-array until the entire array is sorted
       ![quick sort](./img/quick-sort-5.png)
       ![quick sort](./img/quick-sort-6.png)
@@ -1178,6 +1206,84 @@ def quicksort(array):
 ![quick sort](./img/quick-sort-1.png)
 
 - Note: Quick sort is not a stable sort, because it doesn't preserve the order of the elements with the same value
+
+---
+
+#### Hoare's Partitioning Scheme (Quick Select)
+
+It's a partitioning scheme that is used in `quick sort` to choose the `pivot point` and partition the array into 2 sub-arrays
+
+- Explanation:
+
+  - It uses 2 pointers: `i` & `j`
+    - `i` -> keeps track of the index of the last element in the `left` sub-array which is the middle-point between the `left` sub-array and the `right` sub-array
+    - `j` -> keeps track of the index of the first element in the `right` sub-array so that we can swap it with any element smaller than the **"pivot point"** in the `left` sub-array
+  - It starts from the ends of the array and works its way **inwards**
+  - `i` starts from the left side of the array and moves to the right until it finds an element that is greater than the **"pivot point"**
+  - `j` starts from the right side of the array and moves to the left until it finds an element that is smaller than the **"pivot point"**
+  - then we swap the 2 elements
+  - we repeat this process until `i` and `j` cross each other
+  - then we swap the **"pivot point"** with the element at index `j`
+  - then we return the index of the **"pivot point"**
+
+  ```py
+  def partition(arr, low, high):
+    pivot = arr[low]
+    i = low - 1
+    j = high + 1
+
+    while True:
+      i += 1
+      while arr[i] < pivot:
+        i += 1
+
+      j -= 1
+      while arr[j] > pivot:
+        j -= 1
+
+      if i >= j:
+        return j
+
+      arr[i], arr[j] = arr[j], arr[i]
+  ```
+
+##### Implementing Quick sort using Hoare's Partitioning Scheme (Quick Select)
+
+```py
+def partition(arr, low, high):
+  pivot = arr[low]
+  i = low - 1
+  j = high + 1
+
+  while True:
+    i += 1
+    while arr[i] < pivot:
+      i += 1
+
+    j -= 1
+    while arr[j] > pivot:
+      j -= 1
+
+    if i >= j:
+      return j
+
+    arr[i], arr[j] = arr[j], arr[i]
+
+def quicksort(array, low, high):
+  # base case
+  if low < high:
+    # partition the array into 2 sub-arrays
+    pivot = partition(array, low, high)
+    # call quicksort recursively on both sub-arrays
+    quicksort(array, low, pivot)
+    quicksort(array, pivot + 1, high)
+
+  return array
+
+# Using it
+arr = [10, 7, 8, 9, 1, 5]
+print(quicksort(arr, 0, len(arr) - 1))
+```
 
 ---
 
@@ -1477,7 +1583,24 @@ It's also called **"Level Order Traversal"**
 It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores as far as possible along each branch before backtracking.
 
 - **It's all about "Exploring" and Backtracking**
-  - **"Backtracking"** means that when you reach a dead-end, you go back to the last intersection and try another path
+  - **"Backtracking"** means that when you reach a dead-end, you go back to the last intersection (last valid point) and try another path from there
+    - it consists of 3 steps:
+
+      ```py
+      # Ex of backtracking with the 3 steps
+      def dfs(node):
+        # 1. "Adding a node" to the list of visited nodes or do operations on it
+        visited.append(node)
+        # 2. "Validating" if the node is a valid node to visit
+        if node is None:
+          return
+        # 3. Removing the node from the list of visited nodes or undoing the operations on it
+        visited.pop()
+      ```
+
+      1. **"Adding a node"** to the list of visited nodes or do operations on it
+      2. **"Validating / Making decision"** if the node is a valid node to visit
+      3. **Removing** the node from the list of visited nodes or undoing the operations on it
   - Think of it as a **maze**, where you're trying to find a way out and you're exploring all the possible paths until you find the exit and when you reach a dead-end, you go back to the last intersection and try another path
   - Usually time-complexity is `O(n)` as we visit each node once
 
@@ -1582,10 +1705,10 @@ Inorder means traversing the tree in a sorted order (smaller to larger) and to d
 
 ---
 
-### Shortest Path
+## Shortest Path
 
-- Beliman-Ford
-- Dijkstra
+- Dijkstra algorithm (positive-weighted edges)
+- Bellman-Ford algorithm (negative-weighted edges)
 
 ---
 
@@ -1594,6 +1717,8 @@ Inorder means traversing the tree in a sorted order (smaller to larger) and to d
 It's one of the most famous and widely used algorithms around. It finds (the **shortest path** between 2 vertices on a **weighted-graph**)
 
 > Shortest path doesn't have to be about the physical distance, it can be about minimizing something.
+
+- It's a **greedy algorithm** (it always chooses the cheapest next step)
 
 #### How Dijkstra's Algorithm works
 
@@ -1639,6 +1764,7 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
   - Dijkstra’s algorithm only works with **directed acyclic graphs**, called `DAGs` for short.
     - because undirected graphs can have cycles, which can lead to infinite loops or double-counting
   - We can't use Dijkstra’s algorithm if we have **negative-weighted edges**.
+  - To find if we can't reach a node, we check if the distance to the node is `infinity` after we're done with the algorithm
 
 ---
 
@@ -1665,14 +1791,73 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
 
 ---
 
-### Topological Sort
+### Bellman-Ford Algorithm
+
+It's an algorithm that computes shortest paths from a **single source** vertex to all of the other vertices in a weighted digraph.
+
+- It's slower than Dijkstra's algorithm, but it can handle **negative edge weights**.
+- It uses `Dynamic Programming` to solve the problem
+- It uses decision trees to solve the problem by breaking it down into sub-problems and then solving those sub-problems and then combining the solutions to solve the original problem
+  - `DP` is used here to **Memoize** the results of the sub-problems to avoid solving them again
+  ![bellman-ford](./img/bellman-ford-1.png)
+
+#### How Bellman-Ford Algorithm works
+
+- It's used to find the shortest path between 2 nodes in a graph, So it's a **path-finding algorithm**
+- We start by setting the distance to the starting node to `0` and the distance to all other nodes to `infinity`
+- Then we go through each of the edges and update the `distance` to each of the neighboring nodes by adding the cost of the edge to the distance to the current node
+- We repeat this process `V-1` times, where `V` is the number of vertices in the graph
+- This is because the longest possible path without a cycle is `V-1` edges
+
+```py
+def bellman_ford(graph, start):
+  # initialize the distance to all nodes to infinity
+  distances = {node: float("inf") for node in graph}
+  # set the distance to the starting node to 0
+  distances[start] = 0
+
+  # repeat this process V-1 times, where V is the number of vertices in the graph
+  for _ in range(len(graph) - 1):
+    # go through each edge in the graph
+    for node in graph:
+      for neighbor in graph[node]:
+        # if the distance to the neighbor is shorter than the current distance, update the distance to the shorter distance
+        if distances[neighbor] > distances[node] + graph[node][neighbor]:
+          distances[neighbor] = distances[node] + graph[node][neighbor]
+
+  return distances
+```
+
+---
+
+## Topological Sort
 
 A **topological sort** of a directed graph is a way of ordering the list of nodes such that if `(a, b)` is an edge in the graph then `a` will appear before `b` in the list. (Ordering the vertices of a directed acyclic graph such that each vertex is visited before its children)
 
-> Many real world situations can be modelled as a `graph` with directed edges where some events must occur before others.
+It returns a specific ordering of the nodes in a directed graph as long as the graph is **acyclic**.
+
+- Every `vertex` has `indgree` and `outdegree`:
+  - `indegree`: the number of edges that **point to** the vertex
+    ![top sort](./img/top-sort-7.png)
+  - `outdegree`: the number of edges that **point from** the vertex
+
+- Mainly in `Topological Sort`, we're trying to find the `indegee` value of each node, then we start with the node with `indegree = 0` and we add it to the `sorted_list`, then we remove all the edges that point from it, then we repeat the process until we have no more nodes left.
+
+  ![top sort](./img/top-sort-8.png)
+  ![top sort](./img/top-sort-9.png)
+  ![top sort](./img/top-sort-10.png)
+  ![top sort](./img/top-sort-11.png)
+  ![top sort](./img/top-sort-12.png)
+  ![top sort](./img/top-sort-13.png)
+
+- It only works on **directed acyclic graphs** (DAGs).
+  - This is because the `top sort` only add the `vertices` with `indegree = 0` to the `sorted_list`, so if we have a cycle, then we will never be able to reach a `vertex` with `indegree = 0` as we will always have a `vertex` with `indegree > 0` that points to it.
+  ![top sort](./img/top-sort-14.png)
 
 - Another way of thinking about topological sort is that it's a way of arranging the nodes of a graph in a line such that all the edges point in the same direction to the right.
   ![top sort](./img/top-sort-5.png)
+
+> Many real world situations can be modelled as a `graph` with directed edges where some events must occur before others.
 
 - **Examples:**
 
@@ -1690,7 +1875,7 @@ A **topological sort** of a directed graph is a way of ordering the list of node
     ![top sort](./img/top-sort-6.png)
   - If a graph has **cycles** or is **not directed**, then there is no topological sort.
 
-#### Implementing Topological Sort
+### Implementing Topological Sort
 
 There are two common implementations of topological sort:
 
@@ -1772,7 +1957,7 @@ def topological_sort(graph):
 
 ---
 
-### Union Find
+## Union Find
 
 It's a data structure that keeps track of elements which are split into one or more disjoint sets.
 
@@ -1783,9 +1968,9 @@ The Union Find data structure allows us to **detect a cycle in an undirected gra
 
 ---
 
-### Matrix graph
+## Matrix graph
 
-#### Matrix DFS
+### Matrix DFS
 
 When dealing with matrix, we can use `DFS` to traverse the matrix for many types of problems
 

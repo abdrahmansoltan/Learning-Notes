@@ -4,13 +4,14 @@
   - [Notes](#notes)
   - [Searching](#searching)
     - [Binary Search](#binary-search)
+    - [Find first and last position of element in sorted array](#find-first-and-last-position-of-element-in-sorted-array)
     - [Search a 2D Matrix](#search-a-2d-matrix)
     - [Koko Eating Bananas](#koko-eating-bananas)
     - [Search in Rotated Sorted Array](#search-in-rotated-sorted-array)
     - [Find Minimum in Rotated Sorted Array](#find-minimum-in-rotated-sorted-array)
     - [Time Based Key-Value Store](#time-based-key-value-store)
     - [Single Element in a Sorted Array](#single-element-in-a-sorted-array)
-    - [Find First and Last Position of Element in Sorted Array](#find-first-and-last-position-of-element-in-sorted-array)
+    - [Find First and Last Position of Element in Sorted Array](#find-first-and-last-position-of-element-in-sorted-array-1)
   - [Sorting](#sorting)
     - [Insertion Sort List](#insertion-sort-list)
     - [Largest Number](#largest-number)
@@ -53,6 +54,82 @@ def binary_search(arr, target):
 > Interview question: what if `left` and `right` values are in the upper limit of the `32` bit integer? so adding them will result in an **"overflow"**
 >
 > - Answer: we can instead get the `mid` value by using `mid = left + (right - left) // 2`
+
+---
+
+### Find first and last position of element in sorted array
+
+Given an array of integers `nums` sorted in ascending order, find the starting and ending position of a given `target` value. If `target` is not found in the array, return `[-1, -1]`.
+
+**You must write an algorithm with `O(log n)` runtime complexity.**
+
+- Ex:
+
+  - `nums = [5, 7, 7, 8, 8, 10], target = 8 --> [3, 4]`
+  - `nums = [5, 7, 7, 8, 8, 10], target = 6 --> [-1, -1]`
+
+- Bad solution `O(n)` -> will eventually be `O(log(n))` if the target value is found in the array, but not the best solution ❌
+
+  - `O(log(n)) + O(log(n/2)) + O(log(n/4)) + ... + O(log(1)) = O(log(n))`
+
+  ```py
+  def searchRange(nums, target):
+      def search():
+          l, r = 0, len(nums) - 1
+          start, end = -1, -1
+
+          while l <= r:
+              m = l + (r - l) // 2
+
+              if nums[m] == target:
+                  # check if there's a value on the left of the current index that is equal to the target value
+                  while m - 1 >= 0 and nums[m - 1] == target:
+                      start = m - 1
+                  while m + 1 < len(nums) and nums[m + 1] == target:
+                      end = m + 1
+
+                  return [start, end]
+
+              elif nums[m] < target:
+                  l = m + 1
+              else:
+                  r = m - 1
+
+          return [start, end]
+
+      return search()
+  ```
+
+- Good solution `O(log(n))` ✅
+
+  ```py
+  def searchRange(nums, target):
+      def search(leftBias):
+          """
+          leftBias(boolean): True if we are looking for the left most index
+          """
+          l, r = 0, len(nums) - 1
+          res = -1
+
+          while l <= r:
+              m = l + (r - l) // 2
+
+              if nums[m] == target:
+                  res = m
+                  # If we are looking for the left most index, then we want to keep searching the left side
+                  if leftBias:
+                      r = m - 1
+                  else:
+                      l = m + 1
+              elif nums[m] < target:
+                  l = m + 1
+              else:
+                  r = m - 1
+
+          return res
+
+      return [search(True), search(False)]
+  ```
 
 ---
 

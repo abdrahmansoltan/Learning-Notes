@@ -8,7 +8,8 @@
     - [How the engine works ?](#how-the-engine-works-)
     - [call-stack \& Memory-heap](#call-stack--memory-heap)
   - [Types](#types)
-    - [`==` vs `===`](#-vs-)
+    - [`null` vs `undefined`](#null-vs-undefined)
+    - [Double equal (`==`) vs Triple equal (`===`)](#double-equal--vs-triple-equal-)
     - [Type Coercion](#type-coercion)
   - [Implicit vs Explicit](#implicit-vs-explicit)
   - [Scope](#scope)
@@ -16,7 +17,7 @@
   - [Functional Programming](#functional-programming)
     - [currying \& partial Application](#currying--partial-application)
     - [Currying](#currying)
-    - [Partial Function Application](#partial-function-application)
+    - [Partial Application](#partial-application)
       - [Why do we usually make a partial function?](#why-do-we-usually-make-a-partial-function)
     - [Closure](#closure)
       - [Function returning Functions](#function-returning-functions)
@@ -27,6 +28,7 @@
     - [Iteration vs. Recursion](#iteration-vs-recursion)
     - [Recursion \& performance](#recursion--performance)
     - [first-class functions and higher order functions](#first-class-functions-and-higher-order-functions)
+      - [Examples of higher order functions (`call`, `apply`, `bind`)](#examples-of-higher-order-functions-call-apply-bind)
     - [Referential Transparency](#referential-transparency)
     - [Composition](#composition)
     - [Functional Decoration](#functional-decoration)
@@ -35,7 +37,6 @@
     - [Generators are Iterable](#generators-are-iterable)
     - [Generators in Async Code](#generators-in-async-code)
   - [JS : The weird parts](#js--the-weird-parts)
-    - [Advanced Types](#advanced-types)
     - [Numbers](#numbers)
     - [short circuiting =\> **nullish coalescing operator** `??`](#short-circuiting--nullish-coalescing-operator-)
   - [Miscellaneous](#miscellaneous)
@@ -90,6 +91,8 @@
 2. Then it converts (**“compiles”**) the script to machine code.
 3. And then the machine code runs, pretty fast.
 
+> the browser's **Console** is a live interpreter of the javascript engine
+
 ### call-stack & Memory-heap
 
 **Heap**: a much larger part of the memory that stores everything allocated dynamically, that allows a faster code execution, and protects it from corruption and makes the execution faster.
@@ -112,12 +115,42 @@
 
 ## Types
 
+Javascript has 2 main types of values:
+
+1. **primitive values** : they are the most basic data types in the language. They are **immutable** (cannot be changed) and **copied by value** (when assigning or passing). There are 7 primitive types: `string`, `number`, `bigint`, `boolean`, `null`, `undefined`, `symbol`.
+2. **objects** : they are more complex data types. They are **mutable** (can be changed), **copied by reference** (when assigning or passing). There are 3 types of objects: `object`, `function`, `array`.
+
 - **permatives** & **reference**
   ![pvr](./img/permatives%20vs%20reference.PNG)
   - `value` at a specific `address` (**in the `call stack`**) is immutable ,,, but in the `Heap` its mutable
   - `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack`
 
-### `==` vs `===`
+---
+
+### `null` vs `undefined`
+
+To remember the difference, use the song "I want it that way"
+  ![null-undefined](./img/null-undefined-1.png)
+
+- **`null` vs `undefined`**
+  ![null-undefined](./img/null-undefined.png)
+  - `null`: is you set it to **empty** intentionally, (a variable with no value - it may have had one at some point, but no longer has a value)
+    - developer sets the value
+  - `undefined`: is you set it to **empty** unintentionally, (a variable that should have a value assigned to it, but doesn't yet, , or hasn't been created yet)
+    - javascript can't find value for it
+    - it's empty because it:
+      - variable without value:
+        - **has not been set**
+        - **Doesn't currently have a value**.
+      - missing function arguments
+      - missing object properties
+- or `null` is empty on purpose, while `undefined` is still empty.
+- `undefined` means a variable has been declared but **has not yet been assigned a value**
+- `null` is an assignment value. It can be assigned to a variable as a representation of **no value**.
+
+---
+
+### Double equal (`==`) vs Triple equal (`===`)
 
 - Because of **type coercion**, the strict equality operators `===` and `!==` result in fewer unexpected values than `==` and `!=` do.
 - If you know the types in comparison: prefer `==` as it's faster
@@ -136,6 +169,8 @@
     alert(undefined == null); // true
     alert(undefined === null); // false
     ```
+
+---
 
 ### Type Coercion
 
@@ -299,12 +334,13 @@ alert(curriedSum(1)(2)); // 3
 
 ---
 
-### Partial Function Application
+### Partial Application
 
 > Creating a new function by fixing some parameters of the existing one.
 
 It's the process of applying a function to some of its arguments. The partially applied function gets returned for later use
 
+- It depends on [Closure](#closure) concept
 - it's creating a new outer-function that calls our multi-argument function with the argument, and the multi-argument function stored conveniently in the **Backpack**
 
   ```js
@@ -385,22 +421,39 @@ It's the ability to treat functions (when executed) as values
 
 > **a function remembers where it was born in the special property `[[Environment]]`. It references the Lexical Environment from where it’s created**
 >
-> - But when a function is created using **new Function()** have `[[Environment]]` referencing the global Lexical Environment, not the outer one. Hence,
-> - they cannot use outer variables. But that’s actually good, because it insures us from errors. Passing parameters explicitly is a much better method architecturally and causes no problems with minifiers.
+> - But when a function is created using **new Function()** have `[[Environment]]` referencing the global Lexical Environment, not the outer one. Hence, they can't use outer variables. But that’s actually good, because it insures us from errors. Passing parameters explicitly is a much better method architecturally and causes no problems with minifiers.
 
-- A closure gives you an access to an outer function's scope from an inner function
+- A closure gives you an access to an outer function's scope from an inner function (function inside a function)
   - It is a function that remembers its outer variables and can access them.
+  - **It's done by returning a function from another function**
 
-> When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work.
+    ```js
+    function makeCounter() {
+      let count = 0;
+      return function () {
+        return count++;
+      };
+    }
+
+    // using it
+    let counter = makeCounter();
+    // now, counter() gives the next number each time it is called
+    // `count` variable is in the backpack of the counter function (in [[Environment]] property)
+    alert(counter()); // 0
+    alert(counter()); // 1
+    ```
+
+> When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work (Where the function was created, not where it was called).
 
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
+
 one of the biggest examples of closures is **timers**: ![closure](./img/closure2.PNG)
 ![closure](./img/closure3.PNG)
 
 - A closure is the combination of a function bundled together (`enclosed`) with references to its surrounding state (the lexical environment). In other words, **a closure gives you access to an outer function's scope from an inner function**. In JavaScript, closures are created every time a function is created, at function creation time.
-- A closure makes sure that a function doesn’t loose connection to variables that existed at the function’s birth place
-- inner function can remember outer function's scope
+- A closure makes sure that a function doesn’t lose connection to variables that existed at the function’s birth place (`lexical environment`)
+- `inner` function can remember `outer` function's scope, even after the `outer` function has been removed from the `call stack`
 
   ```javascript
   function multiplier(factor) {
@@ -579,21 +632,31 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 ### first-class functions and higher order functions
 
-- **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values:
+- **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values):
   - can be assigned to variables
   - can be passed as arguments to another function
   - can be returned as values from another function --> **closure**
     ![first class objects](./img/first%20class%20objects.png)
+
 - There are however **higher order functions** in practice, which are possible because the language supports "first class functions".
 
   - it's a function that accepts another function as an argument or returns another function as a result.
     ![higher order functions](./img/higher%20order%20functions.png)
 
   - Easier to add features, more readable, easier to debug
+  - makes code more **DRY**, as we can use the same function with different `arguments`
   - we can **chain** these higher order functions (pass the output of one as the input of the next)
-  - ex: `call`, `apply`, `bind` :
 
-  - `call` => calls a function with the given lexical context as parameter (`call` it's like calling the `this` of the one object that calls the function)
+- The ability to pass functions as arguments to other functions is a powerful feature of JavaScript and it's the core of **functional programming** and **asynchronous programming**.
+  - even if we use `promises` or `async/await` we still use **higher order functions** as we pass a function as an argument to another function
+
+---
+
+#### Examples of higher order functions (`call`, `apply`, `bind`)
+
+`call`, `apply`, `bind` are higher order functions
+
+- `call` => calls a function with the given lexical context as parameter (`call` it's like calling the `this` of the one object that calls the function)
 
     ```javascript
     let human = { name: 'Ahmed' };
@@ -603,9 +666,9 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     sayName.call(human, 'Hi!'); // Outputs Hi! Ahmed
     ```
 
-  - `apply` => is just like `call()`, **the difference is how we pass the arguments to the method** -> it accepts arguments in array
+- `apply` => is just like `call()`, **the difference is how we pass the arguments to the method** -> it accepts arguments in array
 
-    - it's not used in modern javascript because we can instead use `spread operator ...` with `call()`
+  - it's not used in modern javascript because we can instead use `spread operator ...` with `call()`
 
     ```javascript
     let human = { name: ‘Ahmed’ }
@@ -615,13 +678,13 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     sayName.apply(human, ['Hi', 'Cairo']) // Outputs Hi! Ahmed from Cairo
     ```
 
-  - `bind` => is somewhat special. It is a higher-order function which means when you invoke it => **it returns a new function where `this` keyword is bound**. The function returned is curried, meaning you can call it multiple times to provide different arguments in each call.
+- `bind` => is somewhat special. It is a higher-order function which means when you invoke it => **it returns a new function where `this` keyword is bound**. The function returned is curried, meaning you can call it multiple times to provide different arguments in each call.
 
-    - > it's used for later-use and not immediate invocation
-    - It takes a list of arguments like `call`
+  - > it's used for later-use and not immediate invocation
+  - It takes a list of arguments like `call`
 
-    - _note_ => `bind` doesn't call the function that's why it's used in `eventListeners`
-    - it's also used to set arguments so that we won't have to write them each time
+  - _note_ => `bind` doesn't call the function that's why it's used in `eventListeners`
+  - it's also used to set arguments so that we won't have to write them each time
 
     ```javascript
     let human = { name: 'Ahmed' };
@@ -894,26 +957,6 @@ They differ from Regular functions which return only single value (or nothing). 
 
 ## JS : The weird parts
 
-### Advanced Types
-
-- **`null` vs `undefined`**
-  ![null-undefined](./img/null-undefined.png)
-  - `null` is you set it to **empty**, (a variable with no value - it may have had one at some point, but no longer has a value)
-    - developer sets the value
-  - `undefined`
-    - javascript can't find value for it
-    - it's empty because it:
-      - variable without value:
-        - **has not been set**
-        - **Doesn't currently have a value**.
-      - missing function arguments
-      - missing object properties
-- or `null` is empty on purpose, while `undefined` is still empty.
-- `undefined` means a variable has been declared but **has not yet been assigned a value**
-- `null` is an assignment value. It can be assigned to a variable as a representation of **no value**.
-
----
-
 ### Numbers
 
 - **NaN**:
@@ -1041,6 +1084,8 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 
 There’s an endless loop, where the JavaScript engine waits for tasks, executes them and then sleeps, waiting for more tasks.
 
+Mainly its job is to always check "is the call stack empty?". If it is, then it checks the **task queue** and **microtask queue** and executes the oldest task (the task that is waiting the longest time to be executed) and then goes back to check the call stack again.
+
 - The general algorithm of the engine:
 
   1. While there are tasks: execute them, starting with the oldest task.
@@ -1098,8 +1143,9 @@ There’s an endless loop, where the JavaScript engine waits for tasks, executes
 - `console` is not built in js, but it's from the `webApi`
 - ( \` ) is called a backticks
 - **Statements Vs Expressions** :
-  - expression we get a value from it like `5+4` or `Ternary Operator` or `short circuiting` and then you can use it in a `${}`
-  - Statements doesn't return a value
+  - `Expression`: it's a piece of code that produces a value and expected to be used in places where values are expected
+    - Ex: `5+4` or `Ternary Operator` or `short circuiting` and then you can use it in a `${}`
+  - `Statements` doesn't return a value
 - **Strict mode** :
   - It is not a statement, but a literal expression, ignored by earlier versions of JavaScript.
   - The purpose of `"use strict"` is to indicate that the code should be executed in "strict mode".

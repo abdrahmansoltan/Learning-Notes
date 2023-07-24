@@ -6,11 +6,16 @@
   - [Number of islands](#number-of-islands)
   - [Max Area of Island](#max-area-of-island)
   - [Rotting Oranges](#rotting-oranges)
+  - [Walls and Gates](#walls-and-gates)
+  - [Sudoku Solver](#sudoku-solver)
+  - [Time Needed to Inform All Employees](#time-needed-to-inform-all-employees)
   - [All Paths From Source to Target](#all-paths-from-source-to-target)
   - [Clone Graph](#clone-graph)
   - [Course Schedule](#course-schedule)
   - [Course Schedule II](#course-schedule-ii)
   - [Network Delay Time](#network-delay-time)
+    - [Solution 1: `Dijkstra's Algorithm`](#solution-1-dijkstras-algorithm)
+    - [Solution 2: `Bellman-Ford Algorithm` (SLOWER ❌)](#solution-2-bellman-ford-algorithm-slower-)
   - [Path with Maximum Probability](#path-with-maximum-probability)
   - [Redundant Connection](#redundant-connection)
   - [Accounts Merge](#accounts-merge)
@@ -28,6 +33,60 @@
 ---
 
 ## Notes
+
+- Usually when traversing 2D arrays, we use `DFS` or `BFS` or `sequential traversal`.
+  - `DFS` is usually used when we want to visit all the nodes in the graph.
+    - It's done by checking the `neighbors` of the current node and recursively calling the function on them.
+  - `BFS` is usually used when we want to visit all the nodes in the graph **level by level**.
+    - It's done by adding the current node to a `queue` and then looping through the `queue` and adding the `neighbors` of the current node to the `queue` and so on.
+  - In both approaches, we need to:
+    1. Keep track of the visited nodes to avoid infinite loops.
+       - This can be done in 2 ways:
+        1. Using a `visited` set.
+        2. Modifying the grid by changing the value of the current node to `0` to mark it as visited.
+    2. check if current node is bound or not (in the grid) by checking the `rows` and `columns` of the grid.
+
+        ```py
+        if (
+          r not in range(ROWS) or
+          c not in range(COLS) or
+          (r, c) in visited
+        ):
+          return
+
+        # Or
+        if (
+          r < 0 or r == ROWS or
+          c < 0 or c == COLS or
+          (r, c) in visited
+        ):
+          return
+        ```
+
+  - `Sequential traversal` is usually used when we want to visit all the nodes in the graph **sequentially**.
+    - It's also called `ZigZag traversal`.
+      ![sequential-traversal](./img/sequential-traversal-3.jpeg)
+    - It's done by looping through the `rows` and `columns` of the grid and checking the `direction` of the traversal. if it's `up` or `down`.
+      ![sequential-traversal](./img/sequential-traversal-1.png)
+      ![sequential-traversal](./img/sequential-traversal-2.png)
+    - We also need to check if the current node is bound or not (in the grid) by checking the `rows` and `columns` of the grid.
+
+        ```py
+        if (
+          r not in range(ROWS) or
+          c not in range(COLS)
+        ):
+          continue
+
+        # Or
+        if (
+          r < 0 or r == ROWS or
+          c < 0 or c == COLS
+        ):
+          continue
+        ```
+
+    - It doesn't need extra space to keep track of the visited nodes like `DFS` and `BFS`. because we are looping through the `rows` and `columns` of the grid sequentially.
 
 ---
 
@@ -119,6 +178,10 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
   - loop through the rows of the grid (i) and loop through the columns of the grid (j) and if the current cell is a `'1'`, increment the number of islands by 1 and call the helper function to mark the current island as visited
   - the bfs-helper-function (`bfs`) will mark the current cell as visited and then recursively call itself on the adjacent cells (up, down, left, right) that are `'1'`s
   - once the helper function is done, we return the number of islands
+  - **Time Complexity:** `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
+  - **Space Complexity:**
+    - if using a stack: `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
+    - if overriding array input: It's the maximum number of cells in the `queue` at the same time. which is the number of cells in the `diagonal` of the grid. -> `O(max(n, m))` = `O(n)` = number of rows
 
   ```py
   def numIslands(grid):
@@ -152,7 +215,9 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
       return count
   ```
 
-- Solution 2 -> `DFS
+- Solution 2 -> `DFS`
+  - Drawback here, is that space complexity will be `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
+    - also this will happen if we didn't use a `visited` set to keep track of the visited cells. because we will keep calling the function on the same cell over and over again. and the `stack` will keep growing.
 
   ```py
   def numIslands(grid):
@@ -192,6 +257,39 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
                   num_islands += 1
 
       return num_islands
+  ```
+
+- Solution 3: `Sequential traversal (BFS)` ✅
+  - Time Complexity: `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
+  - Space Complexity: `O(max(n, m))` = `O(n)` = number of rows (better than `DFS` and `BFS`)
+
+  ```py
+  def numIslands(grid):
+      ROWS, COLS = len(grid), len(grid[0])
+      count = 0
+
+      for r in range(ROWS):
+          for c in range(COLS):
+              if grid[r][c] == '1':
+                  count += 1
+                  dfs(r, c)
+
+      return count
+
+  def dfs(r, c):
+      if (
+          r not in range(ROWS) or
+          c not in range(COLS) or
+          grid[r][c] != '1'
+      ):
+          return
+
+      grid[r][c] = '0' # mark the current cell as visited
+
+      dfs(r + 1, c)
+      dfs(r - 1, c)
+      dfs(r, c + 1)
+      dfs(r, c - 1)
   ```
 
 ---
@@ -272,15 +370,21 @@ Every minute, any fresh orange that is **4-directionally adjacent** to a rotten 
   - Output: `4`
   - Explanation: The orange in the bottom left corner (row 2, column 0) is never rotten, because rotting only happens 4-directionally.
 
+- Verify the constraints:
+  - What do we return if it's not possible to rot all the oranges? -> `-1`
+  ![rotting oranges](./img/rotten-oranges-1.png)
+  - What do we return if we have no oranges? -> `0`
+  - What do we return if we have no rotten oranges? -> `0`
+
 - Explanation:
 
   - Here we can't use `DFS` because we need to know the time it takes for each orange to rot. as there may be multiple rotten oranges at the same time. which simultaneously rotting neibouring oranges.
   - So, we can use `BFS` to solve this problem. as it can simultaneously process all the nodes at the same level at the same time. -> **Multi source BFS**
     - Out sources will be the rotten oranges. which will be added to the `queue` at the beginning.
-    - Then we add the neibouring oranges to the `queue` and mark them as rotten.
+    - Then we add the neighboring oranges to the `queue` and mark them as rotten.
     - once we finish processing all the oranges in the **current level**, we increment the time by `1`.
     - once the queue is empty, we stop and return the time.
-  - We also we need to store the number of fresh oranges in the grid. to know when to stop. if there are no fresh oranges left, we return the time. if there are still fresh oranges left, we return `-1`.
+  - We also we need to store the `number of fresh oranges` in the grid. to know when to stop. if there are no fresh oranges left, we return the time. if there are still fresh oranges left, we return `-1`.
 
 - Time and Space Complexity: `O(n.m)` = size of the grid
 
@@ -328,6 +432,272 @@ class Solution:
             time += 1
 
         return time if fresh_oranges == 0 else -1
+```
+
+---
+
+## Walls and Gates
+
+You are given an `m x n` grid `rooms` initialized with these three possible values.
+
+1. `-1` A wall or an obstacle.
+2. `0` A gate.
+3. `INF` Infinity means an empty room. We use the value `2^31 - 1 = 2147483647` to represent `INF` as you may assume that the distance to a gate is less than `2147483647`.
+
+Fill each empty room with the distance to its nearest gate. If it is impossible to reach a gate, it should be filled with `INF`.
+  ![walls and gates](./img/walls-gates-3.png)
+
+- Ex: `rooms = [[INF,-1,0,INF],[INF,INF,INF,-1],[INF,-1,INF,-1],[0,-1,INF,INF]]`
+  ![walls and gates](./img/walls-gates-1.png)
+  ![walls and gates](./img/walls-gates-2.png)
+
+  - Output: `[[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]`
+
+- Solution 1: `BFS`
+  - Here, we should use `BFS` to solve this problem. because we need to visit all the cells in the grid **level by level** to know the distance of each cell from the gate.
+  - We start by **adding all the gates to the `queue`** and mark them as `visited`.
+  - Then we process all the cells in the `queue` and add their `neighbors` to the `queue` and mark them as `visited` and set their distance to the current cell + 1.
+  - We also need to check if the current cell is a `wall` or not. if it's a `wall`, we skip it.
+
+  ```py
+  def wallsAndGates(rooms):
+      ROWS, COLS = len(rooms), len(rooms[0])
+      queue = deque()
+      directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+      # Step 1). build the initial queue of gates
+      for r in range(ROWS):
+          for c in range(COLS):
+              # check if it's a gate, then add it to the queue so that we can process it later
+              if rooms[r][c] == 0:
+                  queue.append((r, c))
+
+      # Step 2). start the BFS traversal from all gates at the same time
+      while queue:
+          r, c = queue.popleft()
+
+          for dr, dc in directions:
+              nr, nc = r + dr, c + dc
+              # check if is in bound or it's not an empty room (not infinity)
+              if (
+                nr < 0 or nr == ROWS or
+                nc < 0 or nc == COLS or
+                rooms[nr][nc] != 2147483647
+              ):
+                  continue
+
+              # if it's an empty room, set its distance to the current cell + 1
+              rooms[nr][nc] = rooms[r][c] + 1
+              queue.append((nr, nc))
+  ```
+
+- Solution 2: `DFS`
+  - Time complexity: `O(n.m)` = size of the grid
+  - Space complexity: `O(n.m)` = size of the grid (in the `call stack`)
+
+  ```py
+  def wallsAndGates(rooms):
+      ROWS, COLS = len(rooms), len(rooms[0])
+      directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+      def dfs(r, c, distance):
+          # Base case
+          if (
+            r < 0 or r == ROWS or
+            c < 0 or c == COLS or
+            rooms[r][c] < distance
+          ):
+              return
+
+          rooms[r][c] = distance # set the distance of the current cell
+          for dr, dc in directions:
+              dfs(r + dr, c + dc, distance + 1)
+
+      for r in range(ROWS):
+          for c in range(COLS):
+              if rooms[r][c] == 0:
+                  dfs(r, c, 0)
+  ```
+
+---
+
+## Sudoku Solver
+
+Write a program to solve a Sudoku puzzle by filling the empty cells.
+
+A sudoku solution must satisfy **all of the following rules**:
+
+1. Each of the digits `1-9` must occur exactly once in each row.
+2. Each of the digits `1-9` must occur exactly once in each column.
+3. Each of the digits `1-9` must occur exactly once in each of the 9 `3x3` sub-boxes of the grid.
+  ![sudoku solver](./img/sudoku-1.png)
+
+- The `9x9` board is initially partially filled with digits from `1-9` and empty cells. The empty cells are represented by the character `'.'`.
+
+- Ex:
+  ![sudoku solver](./img/sudoku-2.png)
+
+- Explanation:
+
+  - We can use `backtracking` to solve this problem.
+  - We start by looping through the rows and columns of the grid and if the current cell is empty, we try to fill it with a number from `1` to `9` and check if it's valid or not. if it's valid, we recursively call the function on the next cell. if it's not valid, we try another number.
+    - We also need to check if the current cell is empty or not. if it's not empty, we skip it.
+    ![sudoku solver](./img/sudoku-3.png)
+  - We also need to check if the current number is valid or not. we can do that by checking the current row, column and sub-box of the current cell.
+    - we use **sub-box** to check if the current number is valid or not. because we need to check if the current number is valid in the current sub-box. which is a `3x3` box.
+      ![sudoku solver](./img/sudoku-4.png)
+      - `subRow` = `(r // 3) * 3` -> `(4 // 3) * 3` -> `1 * 3` -> `3`
+      - `subCol` = `(c // 3) * 3` -> `(4 // 3) * 3` -> `1 * 3` -> `3`
+
+- Time Complexity: `O(9^(n.m))` -> `n` is the number of rows and `m` is the number of columns because in the worst case we will try all the numbers from `1` to `9` for each cell in the grid.
+
+```py
+class Solution:
+    def solveSudoku(self, board: List[List[str]]) -> None:
+        ROWS, COLS = len(board), len(board[0])
+        digits = {'1', '2', '3', '4', '5', '6', '7', '8', '9'} # set of digits
+
+        # Helper function
+        def is_valid(r, c, num):
+            # check if the current row is valid
+            for col in range(COLS):
+                if board[r][col] == num:
+                    return False
+
+            # check if the current column is valid
+            for row in range(ROWS):
+                if board[row][c] == num:
+                    return False
+
+            # check if the current sub-box is valid (3x3)
+            sub_box_r = (r // 3) * 3
+            sub_box_c = (c // 3) * 3 
+            for row in range(sub_box_r, sub_box_r + 3):
+                for col in range(sub_box_c, sub_box_c + 3):
+                    if board[row][col] == num:
+                        return False
+
+            return True
+
+        def backtrack(r, c):
+            # Base case
+            if r == ROWS or c == COLS:
+                return True
+
+            # if the current cell is not empty, skip it
+            if board[r][c] != '.':
+                nr = r + 1 if c == COLS - 1 else r # go to the next row if we reached the end of the current row
+                nc = 0 if c == COLS - 1 else c + 1 # go to the first column if we reached the end of the current row
+                return backtrack(nr, nc)
+
+            # try to fill the current cell with a number from 1 to 9
+            for num in digits:
+                if is_valid(r, c, num):
+                    board[r][c] = num
+                    nr = r + 1 if c == COLS - 1 else r # go to the next row if we reached the end of the current row
+                    nc = 0 if c == COLS - 1 else c + 1 # go to the first column if we reached the end of the current row
+                    if backtrack(nr, nc):
+                        return True
+                    board[r][c] = '.' # reset the current cell
+
+            return False
+
+        backtrack(0, 0)
+```
+
+---
+
+## Time Needed to Inform All Employees
+
+A company has `n` employees with a unique ID for each employee from `0` to `n - 1`. The head of the company has is the one with `headID`.
+
+Each employee has one direct manager given in the `manager` array where `manager[i]` is the direct manager of the `i-th` employee, `manager[headID] = -1`. Also, it is guaranteed that the subordination relationships have a tree structure.
+  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-2.png)
+  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-3.png)
+
+The head of the company wants to inform all the employees of the company of an urgent piece of news. He will inform his direct subordinates, and they will inform their subordinates, and so on until all employees know about the urgent news.
+
+The `i-th` employee needs `informTime[i]` minutes to inform all of his direct subordinates (i.e., After informTime[i] minutes, all his direct subordinates can start spreading the news).
+  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-4.png)
+
+Return _the number of minutes needed to inform all the employees about the urgent news_.
+
+- Ex: `n = 6, headID = 2, manager = [2,2,-1,2,2,2], informTime = [0,0,1,0,0,0]`
+  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-1.png)
+
+  - Output: `1`
+  - Explanation: The head of the company with id = 2 is the direct manager of all the employees in the company and needs 1 minute to inform them all.
+
+- Verify the constraints:
+  - is the graph directed or undirected? -> directed
+  - is the graph acyclic or cyclic? (can employees have more than one manager?) -> acyclic (each employee has only one manager)
+    - This is because the subordination relationships have a **tree** structure.
+  - is the graph weighted or unweighted? -> weighted
+  - is the graph connected or disconnected? -> connected
+
+- Explanation:
+
+  - This is a graph problem. where:
+    - the `headID` is the `root` of the graph
+    - the `manager` array is the `adjacency list` of the graph
+    - the `informTime` array is the `weight` of the graph. which is the time needed to inform the current employee's subordinates.
+  - We want to know the `max_time` needed to inform all the employees which is the `max_path` from the `root` to the `leaf` nodes.
+  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-5.png)
+  - We can use `DFS` to solve this problem:
+    - We start from the `root` and keep going until we reach the `leaf` nodes.
+    - We keep track of the `max_time` and update it whenever we reach a `leaf` node.
+    - We also keep track of the `current_time` and update it whenever we reach a `leaf` node.
+    - We return the `max_time` at the end.
+
+```py
+# DFS
+def numOfMinutes(n, headID, manager, informTime):
+    graph = defaultdict(list)
+    # or: graph = [[] for _ in range(n)]
+
+    # build the graph (adjacency list)
+    for i, m in enumerate(manager):
+        if m != -1:
+            graph[m].append(i) # m is the manager of i
+
+    def dfs(node, current_time):
+        if not graph[node]:
+            nonlocal max_time # if using python2, use: global max_time or max_time = [0]
+            max_time = max(max_time, current_time)
+            return
+
+        for neighbor in graph[node]:
+            dfs(neighbor, current_time + informTime[node])
+
+    max_time = 0
+    dfs(headID, 0)
+    return max_time
+
+# ----------------------------------------------------------------------------------------------
+
+# BFS
+def numOfMinutes(n, headID, manager, informTime):
+    graph = defaultdict(list)
+
+    # build the graph (adjacency list)
+    for i, m in enumerate(manager):
+        if m != -1:
+            graph[m].append(i) # m is the manager of i
+
+    queue = deque([(headID, 0)])
+    max_time = 0
+
+    while queue:
+        node, current_time = queue.popleft()
+
+        if not graph[node]:
+            max_time = max(max_time, current_time)
+            continue
+
+        for neighbor in graph[node]:
+            queue.append((neighbor, current_time + informTime[node]))
+
+    return max_time
 ```
 
 ---
@@ -476,7 +846,7 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
   - Output: `false`
   - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
 
-- Explanation:
+- **Solution 1: `BFS / DFS`** (not the best solution ❌)
 
   - To check if we can take any course, we need to check if there is a **cycle** or not in the graph.
   - We create a graph from the prerequisites in the adjacency list format.
@@ -498,50 +868,137 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
       - A cycle is detected using a `visited` set .
         ![course-schedule](./img/course-schedule-8.png)
 
-- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
-  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+  - Time complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
+    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+  - Space complexity: `O(n^2)` = `O(numCourses^2)`
+    - This is because we may have a graph with `n` nodes and `n` edges.
+    - the adjacency list will have `n` nodes and each node will have `n` edges.
 
-```py
-def canFinish(numCourses, prerequisites):
-    # Create a graph from the prerequisites (Adjacency List)
-    preMap = {i: [] for i in range(numCourses)}
-    # preMap = collections.defaultdict(list)
-    for course, pre in prerequisites:
-        preMap[course].append(pre)
+  ```py
+  def canFinish(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List)
+      preMap = {i: [] for i in range(numCourses)}
+      # preMap = collections.defaultdict(list)
+      for course, pre in prerequisites:
+          preMap[course].append(pre)
 
-    # Create a set to keep track of the visited nodes
-    visited = set()
+      # Create a set to keep track of the visited nodes
+      visited = set()
 
-    def dfs(node):
-        # Base case
-        if node in visited:
-            return False
-        if preMap[node] == []:
-            return True
+      def dfs(node):
+          # Base case
+          if node in visited:
+              return False
+          if preMap[node] == []:
+              # means that the node has no prerequisites
+              return True
 
-        # Add the node to the visited set
-        visited.add(node)
+          # 1. Add the node to the visited set
+          visited.add(node)
 
-        # Loop through the prerequisites of the node
-        for pre in preMap[node]:
-            # Check if there is a cycle
-            if not dfs(pre):
-                return False
+          # 2. Loop through the prerequisites of the node
+          for pre in preMap[node]:
+              # Check if there is a cycle
+              if not dfs(pre):
+                  return False
 
-        # Remove the node from the visited set
-        visited.remove(node)
-        # Remove the node from the graph map
-        preMap[node] = []
+          # 3. Remove the node from the visited set
+          visited.remove(node)
+          # 4. Remove the node from the graph map
+          preMap[node] = []
 
-        return True
+          return True
 
-    for node in range(numCourses):
-        if dfs(node) == False:
-            return False
+      # we have to run dfs on all nodes to handle if the graph isn't connected so that we'd cover all nodes in the graph
+      for node in range(numCourses):
+          if dfs(node) == False:
+              return False
 
-    # Else
-    return True
-```
+      # Else
+      return True
+
+  # ----------------------------------------------------------------------------------------------
+
+  # BFS
+  def canFinish(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List)
+      preMap = {i: [] for i in range(numCourses)}
+      # preMap = collections.defaultdict(list)
+      for course, pre in prerequisites:
+          preMap[course].append(pre)
+
+      # Create a set to keep track of the visited nodes
+      visited = set()
+
+      # Create a queue to keep track of the nodes to visit
+      queue = deque()
+
+      for node in range(numCourses):
+          if preMap[node] == []:
+              # means that the node has no prerequisites
+              queue.append(node)
+
+      while queue:
+          node = queue.popleft()
+
+          if node in visited:
+              return False
+
+          visited.add(node)
+
+          for pre in preMap[node]:
+              queue.append(pre)
+
+          preMap[node] = []
+
+      # Else
+      return True
+  ```
+
+- **Solution 2: `Topological Sort`** (better solution ✅)
+  - This problem can also be solved using `Topological Sort` because we can use it to detect cycles in a graph (if there is a cycle, then we can't finish all courses).
+  - First, we need to build the `indegre` array.
+    - This is because we need to know which nodes have no prerequisites (no incoming edges).
+      ![course-schedule](./img/course-schedule-9.png)
+    - We can do that by looping through the prerequisites and incrementing the `indegree` of the node by `1`.
+      ![course-schedule](./img/course-schedule-10.png)
+  - Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
+    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+  - Space complexity: `O(n^2)` = `O(numCourses^2)`
+    - This is because we may have a graph with `n` nodes and `n` edges.
+    - the adjacency list will have `n` nodes and each node will have `n` edges.
+  
+  ```py
+  def canFinish(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List) & an indegree array
+      preMap = [[] for _ in range(numCourses)]
+      indegree = [0] * numCourses
+      for course, pre in prerequisites:
+          indegree[pre] += 1
+          preMap[course].append(pre)
+
+      # Create a stack to keep track of the nodes to visit
+      stack = []
+
+      for node in range(numCourses):
+          if indegree[node] == 0:
+              stack.append(node)
+
+      # Create a set to keep track of the visited nodes
+      count = 0 # or use a set() and check if len(set) == numCourses
+
+      while stack:
+          node = stack.pop()
+          count += 1 # increment the count of visited nodes
+
+          # Loop through the prerequisites of the node and decrement their indegree by 1 and add them to the stack if their indegree is 0
+          for pre in preMap[node]:
+              indegree[pre] -= 1
+              if indegree[pre] == 0:
+                  stack.append(pre)
+
+      return count == numCourses
+  ```
 
 ---
 
@@ -635,17 +1092,22 @@ We will send a signal from a given node `k`. Return the time it takes for all th
   - Explanation: The signal will take 1 minute to travel from node 2 to node 1, and 1 minute to travel from node 2 to node 3.
     - Then, it will take 1 minute for all the nodes to receive the signal.
 
-- Explanation:
+- Verify the constraints:
+  - is the graph connected or disconnected? -> It can be disconnected, so account for that
+  - is the graph weighted or unweighted? -> weighted
+    - can the weights be negative? -> no (because it's a time)
 
-  - We use `Dijkstra's Algorithm` to find the shortest path from the source node to all other nodes.
-  - This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
-    - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
+### Solution 1: `Dijkstra's Algorithm`
+
+- We use `Dijkstra's Algorithm` to find the shortest path from the source node to all other nodes.
+- This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
+  - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
       ![network-delay-time](./img/network-delay-time-2.png)
-    - Here, we will use a `minHeap` to keep track of the shortest path.
-      - It's logical to search the node with shortest distance, So we will use the `min heap` to pop the node with the shortest distance from the source node and add its neighbors to the `Priority Queue` with their distance from the source node.
+  - Here, we will use a `minHeap` to keep track of the shortest path.
+    - It's logical to search the node with shortest distance, So we will use the `min heap` to pop the node with the shortest distance from the source node and add its neighbors to the `Priority Queue` with their distance from the source node.
         ![network-delay-time](./img/network-delay-time-3.png)
-      - > So the `minHeap` tells us which node to visit next by popping the **node with the shortest distance from the source node**. For example in the picture below, we have 2 paths from node `1`, and the `minHeap` will give us the path with the shortest distance from the source node. `(path 1)` > ![network-delay-time](./img/network-delay-time-6.png)
-  - Starting at the source node `k`, we loop through its neighbors and add them to the `Priority Queue` with their distance from the source node.
+    - > So the `minHeap` tells us which node to visit next by popping the **node with the shortest distance from the source node**. For example in the picture below, we have 2 paths from node `1`, and the `minHeap` will give us the path with the shortest distance from the source node. `(path 1)` > ![network-delay-time](./img/network-delay-time-6.png)
+- Starting at the source node `k`, we loop through its neighbors and add them to the `Priority Queue` with their distance from the source node.
     ![network-delay-time](./img/network-delay-time-4.png)
     ![network-delay-time](./img/network-delay-time-5.png)
 
@@ -667,14 +1129,46 @@ def networkDelayTime(times, n, k):
     res = 0
 
     while minHeap:
-      w1, n1 = heapq.heappop(minHeap)
+      # get the node with the shortest distance from the source node
+      w1, n1 = heapq.heappop(minHeap) # w: weight, n: node
+
       if n1 not in visit:
         visit.add(n1)
         res = max(res, w1) # max because we want the path to the farthest node (n-1) which indicate the biggest delay time
+
+        # Loop through the neighbors of the node
         for n2, w2 in graph[n1]:
           heapq.heappush(minHeap, (w1 + w2, n2))
 
-    return res if len(visit) == n else -1
+    return res if len(visit) == n else -1 # if len(visit) != n, then there is a node that we didn't visit
+```
+
+### Solution 2: `Bellman-Ford Algorithm` (SLOWER ❌)
+
+- We use `Bellman-Ford Algorithm` to find the shortest path from the source node to all other nodes. **(If there is a negative weight in the graph)**
+- We will use `Dynamic Programming` in the algorithm
+
+```py
+def networkDelayTime(times, n, k):
+    # Create a dist array to keep track of the shortest distance from the source node to all other nodes
+    dist = [float('inf')] * (n + 1) # +1 because the nodes are labeled from 1 to n
+    dist[k] = 0 # the distance from the source node to itself is 0
+
+    # Loop through the nodes
+    for _ in range(n):
+        # Loop through the edges
+        for u, v, w in times:
+            # Relax the edges (update the shortest distance)
+            if dist[u] + w < dist[v]:
+                dist[v] = dist[u] + w
+
+    # Check for negative cycles
+    for u, v, w in times:
+        if dist[u] + w < dist[v]:
+            return -1 # there is a negative cycle
+
+    # Else return the max distance
+    return -1 if max(dist[1:]) == float('inf') else max(dist[1:]) # we start from 1 because the nodes are labeled from 1 to n
 ```
 
 ---
@@ -706,7 +1200,8 @@ If there is no path from `start` to `end`, return `0`.
       - `heapq.heappush(minHeap, (-1 * w1 * w2, n2))`
       - `heapq.heappop(minHeap)[0] * -1`
 
-- Time complexity: `O(ElogV)`
+- Time complexity: `O(E.log(V))`
+  - `E` is the number of edges (from generating the adjacency list), `V` is the number of vertices (`log(V)` because we use a `Priority Queue`)
 
 ```py
 def maxProbability(n, edges, succProb, start, end):

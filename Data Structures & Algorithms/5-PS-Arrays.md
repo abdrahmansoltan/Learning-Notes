@@ -18,7 +18,7 @@
   - [Interval scheduling problems (overlapping intervals)](#interval-scheduling-problems-overlapping-intervals)
     - [Meeting Rooms](#meeting-rooms)
     - [Meeting Rooms II](#meeting-rooms-ii)
-  - [Matrix](#matrix)
+  - [2D Array ( Matrix )](#2d-array--matrix-)
     - [Rotate Image](#rotate-image)
     - [Create a Spiral Matrix](#create-a-spiral-matrix)
     - [Return elements of Spiral Matrix](#return-elements-of-spiral-matrix)
@@ -719,7 +719,7 @@ def minMeetingRooms(intervals):
 
 ---
 
-## Matrix
+## 2D Array ( Matrix )
 
 ### Rotate Image
 

@@ -2,13 +2,13 @@
 
 - [INDEX](#index)
   - [CSS Preprocessors](#css-preprocessors)
-    - [SCSS vs SASS vs Less vs Stylus](#scss-vs-sass-vs-less-vs-stylus)
     - [Reasons to use a CSS Preprocessor](#reasons-to-use-a-css-preprocessor)
+    - [SCSS vs SASS vs Less vs Stylus](#scss-vs-sass-vs-less-vs-stylus)
   - [Sass](#sass)
     - [When to use Sass over CSS](#when-to-use-sass-over-css)
   - [Installation](#installation)
-    - [Using Extension](#using-extension)
-    - [Using Task Runner: NPM (preferred way)](#using-task-runner-npm-preferred-way)
+    - [1. Using Extension](#1-using-extension)
+    - [2. Using Task Runner: NPM (preferred way ✅)](#2-using-task-runner-npm-preferred-way-)
       - [Build Setup](#build-setup)
       - [Project Structure](#project-structure)
   - [Architecture and folder structure](#architecture-and-folder-structure)
@@ -28,7 +28,7 @@
   - [Interpolation](#interpolation)
   - [Loops and Iteration](#loops-and-iteration)
   - [Mixins](#mixins)
-    - [Mixins null values](#mixins-null-values)
+    - [Mixins `null` values](#mixins-null-values)
     - [passing declaration block](#passing-declaration-block)
   - [Functions](#functions)
     - [Error handling](#error-handling)
@@ -58,20 +58,6 @@ A CSS preprocessor is a scripting language that extends CSS and compile the code
 
 ---
 
-### SCSS vs SASS vs Less vs Stylus
-
-![scss](./img/sass-scss.jpg)
-
-- `Sass` was built on Ruby and has frameworks like Gumby and Foundation. Sass also has great mixin libraries
-- `SCSS` is like `Sass`, but is closer to regular CSS. **SCSS is fully CSS compliant**, meaning you can import regular CSS into a SCSS file, and it will work immediately.
-  - ![sass-vs-scss](./img/sass-vs-scss.png)
-- `Less` runs inside Node Javascript, in the browser.
-  - The main difference between LESS and other CSS preprocessors is that LESS allows real-time compilation via less.js in the browser.
-  - With `Sass` or `Stylus`, when creating a mixin you create a group of CSS declarations, but in LESS you embed the mixin into the property of a class.
-- `Stylus` is built on node.js, Stylus really strips down all of the extra characters that clog up your CSS. Stylus allows freedom in terms of syntax – you can omit braces, semicolons and even colons. Stylus incorporates powerful in-language functions and conditionals.
-
----
-
 ### Reasons to use a CSS Preprocessor
 
 - It will make your code **faster to build** and **easier to maintain**
@@ -80,6 +66,20 @@ A CSS preprocessor is a scripting language that extends CSS and compile the code
 - It will make your CSS more organized
   - nested definitions. This is an excellent feature and keeps things organized
 - It will add stuff that should have been there.
+
+---
+
+### SCSS vs SASS vs Less vs Stylus
+
+![scss](./img/sass-scss.jpg)
+
+- `Sass` was built on Ruby and has frameworks like `Gumby` and Foundation. Sass also has great mixin libraries
+- `SCSS` is like `Sass`, but is closer to regular CSS. **SCSS is fully CSS compliant**, meaning you can import regular CSS into a SCSS file, and it will work immediately.
+  - ![sass-vs-scss](./img/sass-vs-scss.png)
+- `Less` runs inside Node Javascript, in the browser.
+  - The main difference between LESS and other CSS preprocessors is that LESS allows real-time compilation via less.js in the browser.
+  - With `Sass` or `Stylus`, when creating a mixin you create a group of CSS declarations, but in LESS you embed the mixin into the property of a class.
+- `Stylus` is built on node.js, Stylus really strips down all of the extra characters that clog up your CSS. Stylus allows freedom in terms of syntax – you can omit braces, semicolons and even colons. Stylus incorporates powerful in-language functions and conditionals.
 
 ---
 
@@ -97,11 +97,10 @@ Sass has features that don't exist in CSS yet like nesting, mixins, inheritance 
 
 ### When to use Sass over CSS
 
-in general
+in general, it depends on many factors like:
 
-- it depends on many factors like
-  - team preference
-  - browser support
+- team preference
+- browser support
 
 variables:
 
@@ -112,7 +111,7 @@ variables:
 
 ## Installation
 
-### Using Extension
+### 1. Using Extension
 
 > use the updated and maintained version of `live sass compiler` extension as it supports new css syntax
 
@@ -131,7 +130,7 @@ when using `live sass compiler` extension, use these settings in your `settings.
 
 ---
 
-### Using Task Runner: NPM (preferred way)
+### 2. Using Task Runner: NPM (preferred way ✅)
 
 #### Build Setup
 
@@ -191,7 +190,8 @@ src/
 
 ## Architecture and folder structure
 
-- **7-1** pattern ![7-1 pattern](./img/sass-architecture.png)
+**7-1** pattern
+![7-1 pattern](./img/sass-architecture.png)
 
 ---
 
@@ -199,24 +199,44 @@ src/
 
 These're scss files that starts with `_`, ex: `_layout.scss`
 
+> `partials` are designed to be **imported** into other scss files and they **won't become css files** by themselves
+
 - it's for instead of working with one long css file, you can actually **split up** your styles into multiple files and be more organized with subfolders
   - also it can lower the chance of **code-conflict** between developers working on the same project as they won't be working in the same file
-- partials are designed to be **imported** into other scss files and they **won't become css files** by themselves
 - sass will ignore any file that starts with `_`
 - The underscore lets Sass know that the file is only a partial file and that it should not be generated into a CSS file.
 - `Sass` partials are used with the `@use` rule.
+
+```scss
+// _layout.scss
+.container {
+  // code
+}
+// now you can import it in another file
+```
 
 ---
 
 ### Importing
 
 - **old**: `@import ""`
+
   - using an `@import` in **CSS** results in a new round-trip HTTP request, this is a concern
   - using `@import` in **SASS** does something more powerful
     - now when importing we import **partials**
     - also here `@import` is not limited to partials, it can import other `sass` files and libraries too
+
+  ```scss
+  @import 'partials/_layout.scss';
+  ```
+
 - **new**: `@use ""`
+
   - the difference here is that when using `@use` the module / partial you imported will be **Namespaced** (to prevent naming collisions)
+
+  ```scss
+  @use 'partials/_layout.scss';
+  ```
 
 Now usually all the imports are done in a high level file usually called `app.scss` and this is the file that will be converted to `main.css` file
 
@@ -363,6 +383,11 @@ $primary-color: #eee !global;
 }
 ```
 
+> The difference between `placeholders` and `mixins`:
+>
+> - `placeholders` are not compiled to CSS, they are only used to extend selectors. and `mixins` are compiled to CSS.
+> - `placeholders` consolidates shared code, whereas `mixins` allow you to pass in values to make your code more flexible.
+
 ---
 
 ## Control-flow
@@ -483,6 +508,7 @@ It's like a variable for a block of style-code (allow for re-use of style)
   - if you want to re-use a block of style without **arguments**, you should use [Placeholder](#placeholder)
 
 ```scss
+// theme-mixin.scss
 // mixin with an argument with a default value
 @mixin theme($theme: DarkGray) {
   background: $theme;
@@ -490,6 +516,7 @@ It's like a variable for a block of style-code (allow for re-use of style)
   color: #fff;
 }
 
+// Use in the same file
 .info {
   @include theme;
 }
@@ -499,15 +526,23 @@ It's like a variable for a block of style-code (allow for re-use of style)
 .success {
   @include theme($theme: DarkGreen);
 }
+
+// ---------------------------------------------------------
+// Use in another file
+@use 'theme-mixin';
 ```
 
-### Mixins null values
+---
+
+### Mixins `null` values
 
 if mixin has a property that doesn't apply to a specific element, the element will only take what is possible and ignore the `null` values
 
 - so you don't need to worry about inheritance if no argument is provided
 
 ![mixins-null_values](./img/mixins.png)
+
+---
 
 ### passing declaration block
 

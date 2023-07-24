@@ -3,7 +3,7 @@
 - [INDEX](#index)
   - [Notes](#notes)
   - [General Tree Questions](#general-tree-questions)
-    - [Level Width](#level-width)
+    - [Count Complete Tree Nodes](#count-complete-tree-nodes)
     - [Path Sum](#path-sum)
     - [Symmetric Tree](#symmetric-tree)
     - [Lowest Common Ancestor of a Binary Tree](#lowest-common-ancestor-of-a-binary-tree)
@@ -12,10 +12,11 @@
   - [Binary Search Trees (BST)](#binary-search-trees-bst)
     - [BST Insertion](#bst-insertion)
     - [Delete Node in a BST](#delete-node-in-a-bst)
-    - [Validate BST](#validate-bst)
+    - [Validate Binary Search Tree](#validate-binary-search-tree)
     - [Binary Tree Inorder Traversal](#binary-tree-inorder-traversal)
     - [Binary Tree Postorder Traversal](#binary-tree-postorder-traversal)
     - [Maximum Depth of Binary Tree](#maximum-depth-of-binary-tree)
+    - [Binary Tree Level Order Traversal](#binary-tree-level-order-traversal)
     - [Check Completeness of a Binary Tree](#check-completeness-of-a-binary-tree)
     - [Binary Tree Zigzag Level Order Traversal](#binary-tree-zigzag-level-order-traversal)
     - [Sum of Left Leaves](#sum-of-left-leaves)
@@ -34,8 +35,128 @@
 - **Trees Tips:**
   - Whenever you see the word **"width"** in any tree question, it's a **Breadth First Search** problem
   - Always ask if the tree is binary search tree (BST) or not, so that you can use the BST properties to solve the problem (e.g. left < root < right)
+- When verifying constraints, ask these questions:
+  - are there any duplicates in the BST? and how to handle this case?
 
 ## General Tree Questions
+
+### Count Complete Tree Nodes
+
+Given the `root` of a **complete** binary tree, return the number of the nodes in the tree.
+
+- Ex:
+
+  - Input: `root = [1,2,3,4,5,6]`
+  - Output: `6`
+
+- Explanation:
+  - tree is complete when all levels are filled except the last level
+  - The brute force solution is to traverse the tree and count the number of nodes. But this solution is not efficient because it takes `O(n)` time to traverse the tree.
+  - We're given that the tree is a **complete** binary tree, which means that the tree is **perfectly balanced**. This means that the left subtree and the right subtree of the root node have the same height.
+    - So we can use this property to solve the problem and get a solution with `O(log(n))` time complexity.
+    - We can break the problem into 2 sections:
+      ![count-complete-tree-nodes](./img/count-complete-tree-nodes-1.png)
+      1. Count the number of nodes above the last level -> `2^(h-1) - 1` -> because with each level, the number of nodes doubles (1, 2, 4, 8, ...)
+         - To get `h`, we can traverse the left subtree and count the number of levels -> `O(log(n))`
+      2. Count the number of nodes in the last level -> `O(log(n))`
+         - in the last level, we know that the number of nodes is between `1` and `2^(h-1)`, so we can use a **Binary Search** to traverse the last level and count the number of nodes -> `O(log(n))`
+         - when using `binary search`, we need to know the `mid` node of the last level, so we can use the `h` that we got from the previous step to calculate the `mid` node -> `2^(h-1)`
+         - then we can use the `mid` node to check if the node exists or not:
+           - if `mid` is not `None`, then we know that the node exists and we can move to the **right subtree**
+           - if `mid` is `None`, then we know that the node doesn't exist and we can move to the **left subtree**
+         - we can keep doing this until we reach the last level and count the number of nodes -> `O(log(n))`
+
+- Bad solution: O(n) time complexity ❌
+
+  ```py
+  def countNodes(root):
+      # helper function
+      def dfs(node):
+          if node is None:
+              return 0
+
+          return dfs(node.left) + dfs(node.right) + 1
+
+      # return the result of the function
+      return dfs(root)
+  ```
+
+- Good solution using Binary search: O(log(n)) time complexity ✅
+
+  ```py
+  def countNodes(root):
+      # helper function to get the height of the tree
+      def getHeight(node):
+          height = 0
+          while node.left:
+              height += 1
+              node = node.left
+          return height
+
+      # helper function to check if the node exists or not
+      def exists(idx_to_find, height, node):
+          left = 0
+          right = (2 ** height) - 1
+          for _ in range(height):
+              mid = -(-(left + right) // 2) # use (-) to round up the result of the division
+              # check if the index is in the left or right subtree
+              if idx_to_find >= mid:
+                  node = node.right
+                  left = mid
+              else:
+                  node = node.left
+                  right = mid - 1
+
+          return node is not None
+
+      # if the root is None, return 0
+      if root is None:
+          return 0
+
+      # get the height of the tree
+      height = getHeight(root)
+
+      # if the height of the tree is 0, return 1
+      if height == 0:
+          return 1
+
+      # get the number of nodes above the last level
+      upperCount = (2 ** height) - 1
+
+      # use binary search to get the number of nodes in the last level
+      left = 0
+      right = upperCount
+      while left < right:
+          mid = -(-(left + right) // 2)
+
+          # check if the node exists or not
+          if exists(mid, height, root):
+              left = mid # move to the right subtree
+          else:
+              right = mid - 1 # move to the left subtree
+
+      # return the total number of nodes
+      return upperCount + left + 1
+  ```
+
+- Another good solution -> using recursion
+
+  ```py
+  def get_height(node):
+     if not node:
+         return 0
+     return 1 + get_height(node.left)
+        
+     if not root:
+         return 0
+     left_height = get_height(root.left)
+     right_height = get_height(root.right)
+     if left_height == right_height:
+         return (2 ** left_height) - 1 + self.countNodes(root.right) + 1
+     else:
+         return (2 ** right_height) - 1 + self.countNodes(root.left) + 1
+
+---
 
 ### Level Width
 
@@ -442,13 +563,13 @@ def deleteNode(root, key):
 
 ---
 
-### Validate BST
+### Validate Binary Search Tree
 
 Write a function that accepts a root node of a BST and returns `True` if the tree is a valid BST and `False` if it is not.
 
 - EX: `validate(root) --> True`
 - Explanation:
-  - The first solution that comes into mind is to check the right & left children of each node and check if they're less than or greater than the root node
+  - The first solution that comes into mind is to check the `right` & `left` children of each node and check if they're less than or greater than the root node
     - but that's not enough because the right child of the root node might be less than the root node, but it's greater than the left child of the root node.
       ![validate bst](./img/validate-bst-1.png)
   - So we can't just check the neighbors and children one time and we have to check the whole tree for each node -> `O(n^2)` **BAD!**
@@ -456,24 +577,20 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
   ![validate bst](./img/validate-bst-2.png)
 
   - root node should be in the range of `(-inf, inf)`
+    - we use infinity because we don't know the values of the nodes in the tree
   - left child of the root node should be in the range of `(-inf, root.value)`
   - right child of the root node should be in the range of `(root.value, inf)`
 
-- **Solution 1:** Using min and max ranges
+- **Solution 1:** Using `min` and `max` ranges
 
   - **Steps:**
-    1. create a function that accepts a `root` node, a `min` value and a `max` value
-    2. if the root is None, return `True`
-    3. if the root's value is less than or equal to the `min` value or greater than or equal to the `max` value, return `False`
-    4. recursively call the function with the root's left node and the `min` value and the root's value
-    5. recursively call the function with the root's right node and the root's value and the `max` value
-    6. return `True`
+    - create a function that accepts a `root` node, a `min` value and a `max` value
 
   ```py
   def isValidBST(root):
       # helper function
       def validate(root, min, max):
-          if root is None:
+          if root is None: # if reached a leaf node,
               return True
           if root.value <= min or root.value >= max:
               return False
@@ -663,6 +780,9 @@ A binary tree's **maximum depth** is the number of nodes along the longest path 
 - Explanation:
   - We will use **recursive DFS** to solve this problem
     ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree.png)
+- Time complexity: `O(n)` where `n` is the number of nodes in the tree
+  - best case: `O(log(n))` if the tree is balanced
+  - worst case: `O(n)` if the tree is not balanced
 
 ```py
 def maxDepth(root):
@@ -676,6 +796,19 @@ def maxDepth(root):
 
     # return the maximum depth of the tree
     return max(left, right) + 1
+
+# same solution with tail recursion (Better)
+def maxDepth(root, depth=0):
+    # if the root is None, return 0
+    if root is None:
+        return depth
+
+    # recursively call the function with the root's left node and the root's right node
+    left = maxDepth(root.left, depth + 1)
+    right = maxDepth(root.right, depth + 1)
+
+    # return the maximum depth of the tree
+    return max(left, right)
 ```
 
 - **Other solutions without recursion**
@@ -728,6 +861,54 @@ def maxDepth(root):
 
         return level
     ```
+
+---
+
+### Binary Tree Level Order Traversal
+
+Given the `root` of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+
+- Ex:
+  - Input: `root = [3,9,20,null,null,15,7]`
+  - Output: `[[3],[9,20],[15,7]]`
+
+![level order traversal](./img/level-order-traversal-1.png)
+
+- Explanation
+  - We can use a **Breadth-First Search** to traverse the tree level by level and add the values of the nodes to an array.
+  - We can use a `queue` to store the nodes of each level, and a `level` array to store the values of the nodes of each level.
+  - We can use a `while` loop to traverse the tree level by level and a `for` loop to traverse the nodes of each level.
+    - We can use a `deque` to store the nodes of each level.
+
+```py
+def levelOrder(root):
+    if root is None:
+        return []
+
+    result = []
+    q = deque([root])
+
+    # while the queue is not empty
+    while q:
+        # create an array to store the nodes of the current level
+        level = []
+        # loop through the queue
+        for i in range(len(q)):
+            # pop the first node in the queue
+            node = q.popleft()
+            # add the node's value to the level array
+            level.append(node.value)
+            # add the node's children to the queue
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+        # add the level array to the result array
+        result.append(level)
+
+    return result
+```
 
 ---
 

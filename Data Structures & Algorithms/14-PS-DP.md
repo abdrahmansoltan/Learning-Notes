@@ -3,12 +3,14 @@
 - [INDEX](#index)
   - [Notes](#notes)
   - [Unbounded KnapSack (Revisit again)](#unbounded-knapsack-revisit-again)
+  - [Min Cost Climbing Stairs](#min-cost-climbing-stairs)
   - [Climbing Stairs](#climbing-stairs)
   - [Best Time to Buy and Sell Stock](#best-time-to-buy-and-sell-stock)
   - [Counting Bits](#counting-bits)
   - [House Robber](#house-robber)
   - [House Robber II](#house-robber-ii)
   - [Best Time to Buy and Sell Stock with Cooldown](#best-time-to-buy-and-sell-stock-with-cooldown)
+  - [Knight Probability in Chessboard](#knight-probability-in-chessboard)
   - [Knight Dialer](#knight-dialer)
   - [Partition Equal Subset Sum](#partition-equal-subset-sum)
   - [Coin Change](#coin-change)
@@ -19,6 +21,15 @@
 ---
 
 ## Notes
+
+- Usually when you see `min` or `max` in the problem, it's a sign that we can use **dynamic programming**. because we will be using the results of the subproblems to solve the main problem and is a way of optimizing recursive algorithms.
+- When solving `DP` problems, we usually need to figure out the **base cases** and the **recurrence relation**.
+  - **Base cases** are the simplest cases that we can solve without using the results of the subproblems.
+  - **Recurrence relation** is the relation between the current problem and the subproblems. -> what is memoized.
+- Usually `Bottom-up` approach is better than `Top-down` approach because it doesn't use recursion and it's faster.
+  - `Bottom-up` usually is Iterative and `Top-down` is Recursive.
+  - `Bottom-up` Time complexity is usually `O(n)` and `Top-down` is usually `O(n^2)`.
+  - `Bottom-up` Space complexity is usually `O(n)` and `Top-down` is usually `O(n)`.
 
 ---
 
@@ -52,6 +63,93 @@ def unboundedKnapsack(capacity: int, profit: List[int], weight: List[int]) -> in
 
     return dp[-1][-1]
 ```
+
+---
+
+## Min Cost Climbing Stairs
+
+You are given an integer array `cost` where `cost[i]` is the cost of `ith` step on a staircase. Once you pay the cost, you can either climb one or two steps.
+
+You can either start from the step with index `0`, or the step with index `1`.
+
+Return the minimum cost to reach the top of the floor.
+
+- Ex:
+
+  - Input: `cost = [10,15,20]`
+  - Output: `15`
+  - Explanation: Cheapest is: start on cost[1], pay that cost, and go to the top.
+
+- Explanation:
+
+  - This is a `DP` problem, because we will be using the results of the subproblems to solve the main problem.
+
+- **Top-down approach (memoization)**
+
+  - Here, we start at the top step and try to reach the bottom step.
+  - We can then create a `dfs helper` function that takes the current step as an argument
+  - We can create a `memo` dictionary to store the minimum cost to reach each step
+
+  ```py
+  # O(n) time | O(n) space
+  def minCostClimbingStairs(cost: List[int]) -> int:
+      memo = {} # key=index, value=minCost
+
+      def dfs(index):
+          if index >= len(cost):
+              return 0
+
+          if index in memo:
+              return memo[index]
+
+          memo[index] = min(dfs(index + 1), dfs(index + 2)) + cost[index]
+          return memo[index]
+
+      return min(dfs(0), dfs(1))
+  ```
+
+- **Bottom-up approach** ✅
+
+  - Here, we start at the bottom step **(Base cases)** and try to reach the top step.
+  - We can create an array of size `n` to store the minimum cost to reach each step
+    - last step is the top step and will have default value of `0` which is the minimum cost to reach it
+    - the step before the top step and will also have default value of `0` which is the minimum cost to reach the top step
+  - We can then loop through the array and calculate the minimum cost to reach each step
+    - The minimum cost to reach the current step is equal to `the minimum cost to reach the previous step + the cost of the current step`.
+    ![min cost stairs](./img/min-cost-climbing-stairs-1.webp)
+    - We can then return the **minimum between the last two elements** in the array which indicates the minimum cost to reach the top step
+
+  ```py
+  def minCostClimbingStairs(cost: List[int]) -> int:
+      # Array with minimum cost to reach each step
+      dp = [0] * len(cost)
+
+      # Set the first two elements in the array to the cost of the first two steps
+      dp[0] = cost[0]
+      dp[1] = cost[1]
+
+      # Loop through the array and calculate the minimum cost to reach each step
+      for i in range(2, len(cost)):
+          # The minimum cost to reach the current step is equal to the minimum cost to reach the previous step + the cost of the current step
+          dp[i] = min(dp[i - 1], dp[i - 2]) + cost[i]
+
+      # Return the minimum between the last two elements in the array
+      return min(dp[-1], dp[-2])
+  
+  # Optimizing space complexity
+  def minCostClimbingStairs(cost: List[int]) -> int:
+      # Set the first two elements in the array to the cost of the first two steps
+      first = cost[0]
+      second = cost[1]
+
+      for i in range(2, len(cost)):
+          current = min(first, second) + cost[i]
+          first = second
+          second = current
+
+      # Return the minimum between the last two elements in the array
+      return min(first, second)
+  ```
 
 ---
 
@@ -422,6 +520,74 @@ Find the maximum profit you can achieve. You may complete as many transactions a
       # return the last element in the array
       return dp[-1]
   ```
+
+---
+
+## Knight Probability in Chessboard
+
+On an `n x n` chessboard, a knight starts at the cell `(row, column)` and attempts to make exactly `k` moves. The rows and columns are 0-indexed, so the top-left cell is `(0, 0)`, and the bottom-right cell is `(n - 1, n - 1)`.
+
+A chess knight has eight possible moves it can make, as illustrated below. Each move is two cells in a cardinal direction, then one cell in an orthogonal direction.
+
+![knight probability](./img/knight-probability-1.png)
+
+Each time the knight is to move, it chooses one of eight possible moves uniformly at random (even if the piece would go off the chessboard) and moves there.
+
+The knight continues moving until it has made exactly `k` moves or has moved off the chessboard. Return the probability that the knight remains on the board after it has stopped moving.
+
+- Ex:
+
+  - Input: `n = 6, k = 2, row = 2, column = 2`
+    ![knight probability](./img/knight-probability-2.png)
+  - Output: `0.62500`
+  - Explanation: There are `6` possible paths for the knight to move. Out of the `6` paths, only `2` of them are staying on the chessboard. Therefore, the answer is `2 / 6 = 0.62500`
+    ![knight probability](./img/knight-probability-3.png)
+    ![knight probability](./img/knight-probability-4.png)
+    - and so on until we get all the possible paths with possible probabilities.
+
+- Explanation:
+  - This is a `DP` problem, because we will be optimizing the process of generating all the possible paths.
+  - We will use a `dp` matrix to store the probability of the knight remaining on the board for each cell.
+    - Here we use a `3D` matrix because we need to store the probability of the knight remaining on the board for each cell for each move. **(we need to store the probability of the knight remaining on the board for each cell for each move because the knight can move to `8` different cells)**
+  - We will start by filling the first row with `1` because the knight can only stand on the first row.
+  - Then we will iterate over the matrix and for each cell we will calculate the probability of the knight remaining on the board for the current cell.
+  - The probability of the knight remaining on the board for the current cell is equal to the sum of the probabilities of the knight remaining on the board for each neighbor cell divided by `8` **(because the knight can move to `8` different cells)**.
+
+- Time complexity: `O(n^2 * k)` -> `O(n^3)`
+  - without `memoization`, the time complexity will be `O(8^k)` -> `O(8^n)`
+    - `8` -> because the knight can move to `8` different cells.
+  - with `memoization`, the time complexity will be `O(n^2 * k)` -> `O(n^3)` because we are calculating the probability of the knight remaining on the board for each cell for each move.
+    - `3` -> because we are using a `3D` matrix.
+
+```py
+def knightProbability(n: int, k: int, row: int, column: int) -> float:
+    # Create a 3D dp matrix to store the probability of the knight remaining on the board for each cell
+    dp = [[[0] * n for _ in range(n)] for _ in range(k + 1)]
+    # startPoint -> [possible moves]
+    directions = [
+        (2,1), (1,2), (-1,2), (-2,1), 
+        (-2,-1), (-1,-2), (1,-2), (2,-1)
+    ]
+
+    def knightProb(r, c, k):
+        # If the knight is out of the board, return 0
+        if r < 0 or r >= n or c < 0 or c >= n:
+            return 0
+        # Memoization
+        if dp[k][r][c] != 0:
+            return dp[k][r][c]
+        # If we reached the last move, return 1
+        if k == 0:
+            return 1
+
+        # Calculate the probability of the knight remaining on the board for the current cell
+        for dr, dc in directions:
+            dp[k][r][c] += knightProb(r + dr, c + dc, k - 1) / 8
+
+        return dp[k][r][c]
+
+    return knightProb(row, column, k)
+```
 
 ---
 

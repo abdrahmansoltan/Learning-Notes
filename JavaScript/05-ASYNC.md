@@ -3,9 +3,9 @@
 - [INDEX](#index)
   - [Notes](#notes)
   - [Scheduling: setTimeout and setInterval](#scheduling-settimeout-and-setinterval)
-    - [setTimeout](#settimeout)
-    - [Canceling with clearTimeout](#canceling-with-cleartimeout)
-    - [setInterval](#setinterval)
+    - [`setTimeout()`](#settimeout)
+    - [Canceling with `clearTimeout()`](#canceling-with-cleartimeout)
+    - [`setInterval()`](#setinterval)
     - [Garbage collection and setInterval/setTimeout callback](#garbage-collection-and-setintervalsettimeout-callback)
   - [Is JavaScript `synchronous` or `asynchronous` ?](#is-javascript-synchronous-or-asynchronous-)
   - [Building a Promise](#building-a-promise)
@@ -14,7 +14,8 @@
     - [AJAX Call : `XMLHttpRequest`](#ajax-call--xmlhttprequest)
     - [Callback Hell (Callback in callback)](#callback-hell-callback-in-callback)
   - [consume promise : (Modern Way)](#consume-promise--modern-way)
-    - [Promises / Fetch API](#promises--fetch-api)
+    - [Promises / `fetch()` API](#promises--fetch-api)
+      - [How `fetch()` works behind the scenes](#how-fetch-works-behind-the-scenes)
       - [Consumers: `then`, `catch`](#consumers-then-catch)
       - [Cleanup: `finally` method](#cleanup-finally-method)
       - [Handling errors when fetching](#handling-errors-when-fetching)
@@ -60,6 +61,7 @@
 - in `event loop` :
   - `callback functions` that are coming from **promises** go to **microTasks queue** not the `callback queue`.
   - **microTasks queue** has priority over **callback queue** in `event loop`
+- Promises, web-api, the callback & microTasks queue, and event-loop are all part of the **browser** not `javascript` and enable us to write `asynchronous` code in `javascript` (non-blocking applications)
 
 ---
 
@@ -70,7 +72,9 @@
   - `setTimeout` allows us to run a function once after the interval of time.
   - `setInterval` allows us to run a function repeatedly, starting after the interval of time, then repeating continuously at that interval.
 
-### setTimeout
+- **Note:** Javascript doesn't have a timer, as the timer-function is **Web-browser feature**
+
+### `setTimeout()`
 
 ```js
 // syntax
@@ -111,7 +115,7 @@ let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...)
 
 ---
 
-### Canceling with clearTimeout
+### Canceling with `clearTimeout()`
 
 A call to `setTimeout` returns a “timer identifier” **timerId** that we can use to cancel the execution.
 
@@ -122,7 +126,7 @@ clearTimeout(timerId);
 
 ---
 
-### setInterval
+### `setInterval()`
 
 You can do intervals using `setInterval()` or with **nested setTimeOut()**:
 
@@ -342,7 +346,7 @@ setTimeout(() => {
 
 ## consume promise : (Modern Way)
 
-### Promises / Fetch API
+### Promises / `fetch()` API
 
 - **Promise** : An object that is used as a placeholder for the future result of an asynchronous operation.
 - or: it's an object that may produce a single value some time in the future, either a resolved-value or a (reason that it's rejected)
@@ -372,7 +376,10 @@ setTimeout(() => {
   ![promise](./img/promise.png)
   ![promise](./img/promise_state_inspect.png)
 
-- In frontend programming, promises are often used for network requests. and we use the `fetch` method to load the information from the server.
+- In frontend programming, promises are often used for network requests. and we use the `fetch()` method to load the information from the server.
+- **Note:** `fetch()` is not part of `javascript` but it's a **browser API** that we can use in `javascript` to make `AJAX` calls
+
+  - `fetch()` returns a promise that resolves to the `Response` to that request, whether it is successful or not. You can also `reject` this promise, but that is not shown in the above example.
 
 - clean code :
 
@@ -394,6 +401,28 @@ setTimeout(() => {
     reject(new Error('…')); // ignored
     setTimeout(() => resolve('…')); // ignored
   });
+  ```
+
+#### How `fetch()` works behind the scenes
+
+- `fetch()` is a **modern** way to do `AJAX` calls, but it's not part of `javascript` but it's a **browser API** that we can use in `javascript` to make `AJAX` calls
+- when calling `fetch()` it returns a `promise` that we can use to handle the `response` of the `AJAX` call, so the value expected from `fetch()` is a `promise` with 2 properties:
+
+  - `state` : which is initially `pending` and then changes to `fulfilled` or `rejected`
+  - `result` : which is initially `undefined` and then changes to `value` or `error`
+
+- after the `state` property changes to `fulfilled` or `rejected` the `result` property will change to `value` or `error` respectively and passed to the `then()` method as the parameter of the `callback` function
+
+  - `then()` method takes 2 callback functions as parameters
+    - the first one is for the `fulfilled` value
+    - the second one is for the `rejected` value
+
+  ```js
+  fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+    });
   ```
 
 #### Consumers: `then`, `catch`
@@ -635,6 +664,8 @@ asyncCall(); // this returns a promise
     }
   })();
   ```
+
+**Note:** `await` only works in `modules` and `async functions`, because it requires `block scoping`. So we need to specify `type="module"` in the `<script>` tag.
 
 ---
 
