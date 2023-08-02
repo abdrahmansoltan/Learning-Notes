@@ -342,7 +342,13 @@ let user = new User('John');
   let user = new User('John');
   ```
 
-> **NOTE**: other built in objects like arrays have the hidden `__proto__` property
+- **NOTES**:
+  - other built in objects like arrays have the hidden `__proto__` property
+  - Here are the things that you should/shouldn't use the `new` keyword with:
+    - **Use** it with `constructor functions` (classes) that you want to create an instance of an object from (type of object)
+      - `Object()`, `Array()`, `Date()`, `Function()`, `Promise()`, `RegExp()`, `Error()`, `Map()`, `Set()`
+    - **Don't use** it with things that you don't want to become an object-type instead of primitive-type
+      - `Number()`, `String()`, `Boolean()`
 
 ---
 

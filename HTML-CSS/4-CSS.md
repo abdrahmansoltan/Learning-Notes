@@ -1660,7 +1660,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
   }
   ```
 
-  - because the `:root` pseudo-class represents the root `<html>` element and is identical to the selector `html`, except that **its specificity is higher**.
+  - because the `:root` pseudo-class represents the root `<html>` element and is identical to the selector `html`, except that **its specificity is higher** because `:root` is a `pseudo-class` selector and `html` is a `type` selector
     - > Note: the `<html>` element selector includes all elements and pseudo elements in the **DOM** unlike `*` selector
     - We do this so that the variable is available everywhere in the stylesheet **(Global scope)**
     - We can use them because they're **inherited** from the `root` element
@@ -1684,11 +1684,32 @@ They let us define variables in CSS that can be reused throughout the stylesheet
   }
   ```
 
-- rules of **scope** like in Javascript also applies in css variables, but:
+- Rules of **scope** like in Javascript also applies in css variables, but:
 
-  - Sass variables are scoped on `{}` blocks (**block-scoped**) (**lexical-scoped**)
-  - css variables are scoped on elements (**element(local)-scoped**) (**dynamic-scoped**)
+  - `Sass` variables are scoped on `{}` blocks (**block-scoped**) (**lexical-scoped**)
+  - `CSS` variables are scoped on elements (**element(local)-scoped**) (**dynamic-scoped**)
     - this is great if you want the variable-value to only be applied in this element and elements inside it (its descendant elements) only
+    - also it's great if you want to **override** the variable-value in a specific element and its descendant elements only
+      - we can do this by:
+        - declaring the variable in the element itself
+
+          ```css
+          div {
+            --primary: red;
+          }
+          ```
+
+        - or declaring it in the inlined-style of the element
+
+          ```html
+          <div style="--primary: red"></div>
+          ```
+
+        - or declaring it using javascript
+
+          ```js
+          document.documentElement.style.setProperty("--primary", "red");
+          ```
 
   ```css
   /* global scope */
@@ -1731,7 +1752,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
   }
   ```
 
-- you can disable inheritance by setting the property to `initial` on `*`
+- you can disable **inheritance** by setting the property to `initial` on `*`
 
   ```css
   * {
@@ -1739,7 +1760,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
   }
 
   p {
-    --corner-size: 1em;
+    --corner-size: 1em; /* will not be inherited down */
   }
   ```
 

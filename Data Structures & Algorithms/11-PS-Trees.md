@@ -6,6 +6,7 @@
     - [Count Complete Tree Nodes](#count-complete-tree-nodes)
     - [Path Sum](#path-sum)
     - [Symmetric Tree](#symmetric-tree)
+    - [Same Tree](#same-tree)
     - [Lowest Common Ancestor of a Binary Tree](#lowest-common-ancestor-of-a-binary-tree)
     - [Vertical Order Traversal of a Binary Tree](#vertical-order-traversal-of-a-binary-tree)
     - [Flatten Binary Tree to Linked List](#flatten-binary-tree-to-linked-list)
@@ -32,9 +33,11 @@
 
 ## Notes
 
+- Trees usually have `O(log(n))` time complexity because it's the **height** of the tree -> `O(h)`
 - **Trees Tips:**
   - Whenever you see the word **"width"** in any tree question, it's a **Breadth First Search** problem
   - Always ask if the tree is binary search tree (BST) or not, so that you can use the BST properties to solve the problem (e.g. left < root < right)
+- When you find the word `"Autocomplete"` in a question, it's a **Trie** problem
 - When verifying constraints, ask these questions:
   - are there any duplicates in the BST? and how to handle this case?
 
@@ -304,6 +307,36 @@ def isSymmetric(root):
         return dfs(left.left, right.right) and dfs(left.right, right.left)
 
     return dfs(root.left, root.right)
+```
+
+---
+
+### Same Tree
+
+Given the roots of two binary trees `p` and `q`, write a function to check if they are the same or not.
+
+It's very similar to the previous problem (Symmetric Tree), but in this problem we don't need to check if the left subtree is a mirror of the right subtree.
+
+- Explanation:
+  - Here, we want to check if the value & the structure of the two trees are the same. That's why we must use `DFS` to traverse the trees and check if the values of the nodes are equal.
+  - if we used `BFS`, we would only check the values of the nodes in the same level, but we wouldn't be check the values of the nodes in the same position in the tree. **So we won't check its structure**.
+
+```py
+def isSameTree(p, q):
+    def dfs(p, q):
+        # if both nodes are null, means that we reached the end of the tree -> return True
+        if not p and not q:
+            return True
+        # if one of the nodes is null, return False
+        if not p or not q:
+            return False
+        # if the values of the nodes are not equal, return False
+        if p.val != q.val:
+            return False
+
+        return dfs(p.left, q.left) and dfs(p.right, q.right)
+
+    return dfs(p, q)
 ```
 
 ---

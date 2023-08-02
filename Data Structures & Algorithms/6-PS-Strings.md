@@ -4,10 +4,15 @@
   - [Notes](#notes)
   - [Substring (Sliding Window)](#substring-sliding-window)
     - [Longest Substring Without Repeating Characters](#longest-substring-without-repeating-characters)
+    - [Longest Substring with K Distinct Characters](#longest-substring-with-k-distinct-characters)
+    - [Longest Substring with At Least K Repeating Characters](#longest-substring-with-at-least-k-repeating-characters)
     - [Longest Repeating Character Replacement](#longest-repeating-character-replacement)
+    - [Minimum Window Substring](#minimum-window-substring)
+    - [Permutation in String](#permutation-in-string)
+    - [Find All Anagrams in a String](#find-all-anagrams-in-a-string)
+    - [Words Concatenation](#words-concatenation)
     - [Isomorphic Strings](#isomorphic-strings)
     - [Count Vowel Substrings of a String](#count-vowel-substrings-of-a-string)
-    - [Minimum Window Substring](#minimum-window-substring)
     - [Longest Common Prefix](#longest-common-prefix)
   - [Reversing Problems](#reversing-problems)
     - [Valid Palindrome](#valid-palindrome)
@@ -51,7 +56,7 @@ Given a string `s`, find the length of the **longest substring** without repeati
     - we update the maximum window size if the current window size is greater than the maximum window size
   - we return the maximum window size
 
-- Solution 1: `O(n^2)`
+- Solution 1: `O(n^2)` (slow) ❌
 
   ```py
   def lengthOfLongestSubstring(s):
@@ -95,6 +100,82 @@ Given a string `s`, find the length of the **longest substring** without repeati
           res = max(ans, r - l + 1)
 
       return res
+  ```
+
+---
+
+### Longest Substring with K Distinct Characters
+
+Given a string `s`, find the length of the **longest substring** with **at most** `k` distinct characters.
+
+- EX: `s = "eceba", k = 2` -> `3` (substring: `"ece"`)
+
+- Steps:
+  - We will insert characters into a dictionary and keep track of the number of distinct characters in the current window
+  - we will keep track of the current window length using the `left` and `right` pointers
+  - we will slide the window to the right until we have `k` distinct characters in the window
+    ![longest-substring-k-distinct](./img/longest-substring-with-k-distinct-characters-1.png)
+    ![longest-substring-k-distinct](./img/longest-substring-with-k-distinct-characters-2.png)
+    - this is done by shrinking the window from the `left` until we have `k` distinct characters in the window (until the count of distinct characters in the window is equal to `k`)
+      ![longest-substring-k-distinct](./img/longest-substring-with-k-distinct-characters-3.png)
+    - while shrinking, we will decrement the count of the character at the `left` pointer and if the count is equal to `0`, we will remove the character from the dictionary
+  - At the end of each step, we will check if the current window length is greater than the maximum window length and update the maximum window length if it is
+
+Time complexity: `O(n + n)` = `O(n)`, this is because the inner `while` loop will only run `n` times
+
+```py
+def lengthOfLongestSubstringKDistinct(s, k):
+    # Initialize a dictionary to keep track of the characters in the current window
+    char_count = {}
+
+    # Initialize the sliding-window with the first character in the string
+    ans = 0
+    left = 0
+
+    # Iterate over the string
+    for right in range(len(s)):
+        # Add the current character to the window if it is not already in it
+        char_count[s[right]] = char_count.get(s[right], 0) + 1
+
+        # If the current window is invalid, slide the window to the right until it becomes valid
+        while len(char_count) > k:
+            char_count[s[left]] -= 1
+            if char_count[s[left]] == 0:
+                del char_count[s[left]]
+            # Slide the window to the right
+            left += 1
+
+        # Update the maximum window size
+        ans = max(ans, right - left + 1)
+
+    return ans
+```
+
+---
+
+### Longest Substring with At Least K Repeating Characters
+
+Given a string `s` and an integer `k`, return the length of the **longest substring** of `s` such that the frequency of each character in this substring is greater than or equal to `k`.
+
+- EX: `s = "aaabb", k = 3` -> `3` (substring: `"aaa"`)
+
+- Solution using resursion
+
+  ```py
+  def longestSubstring(s, k):
+      if len(s) < k:
+          return 0
+
+      freq = {}
+      for c in s:
+          freq[c] = freq.get(c, 0) + 1
+
+      for c in freq:
+          if freq[c] < k:
+              substrings = s.split(c) # split the string by the character with the lowest frequency
+              return max(longestSubstring(substring, k) for substring in substrings)
+
+      return len(s)
   ```
 
 ---
@@ -155,81 +236,8 @@ def characterReplacement(s, k):
     return ans
 ```
 
----
-
-### Isomorphic Strings
-
-Given two strings `s` and `t`, determine if they are isomorphic.
-
-> Two strings `s` and `t` are isomorphic if the characters in `s` can be replaced to get `t`.
-> ![isomorphic-strings](./img/isomorphic-strings-1.svg)
-
-- EX: `s = "egg", t = "add"` -> `True`
-- Explanation:
-
-  - Note that "No two characters may map to the same character, but a character may map to itself.", so we need to map each character in `s` to a unique character in `t` and vice versa.
-  - we must check if the characters in `s` can be replaced to get `t` and vice versa. This is done by:
-    ![isomorphic-strings](./img/isomorphic-strings-2.webp)
-
-    1. creating a dictionary to keep track of the corresponding characters in each string
-    2. check if the current characters are in the dictionaries, if not, add them
-    3. if they are in the dictionaries, check if they correspond to each other and if not return `False`
-
 Time Complexity: `O(n)`
-
-```py
-def isIsomorphic(s, t):
-    # Initialize dictionaries to keep track of the corresponding characters in each string
-    mapST, mapTS = {}, {}
-
-    for c1, c2 in zip(s, t):
-        # If the current characters are not in the dictionaries, add them
-        if c1 not in mapST and c2 not in mapTS:
-            mapST[c1] = c2
-            mapTS[c2] = c1
-        # If the current characters are in the dictionaries, check if they correspond to each other
-        elif mapST.get(c1) != c2 or mapTS.get(c2) != c1:
-            return False
-
-    return True
-```
-
----
-
-### Count Vowel Substrings of a String
-
-Given a string `s` return the number of substrings that have **all vowels** in order.
-
-- EX: `s = "abciiidef"` -> `3` (substrings: `"ae"`, `"ei"`, `"iii"`)
-- Steps:
-  - we can use a **sliding-window** pattern to check for all the substrings of the string
-  - then we check these pair for the desired condition, and if not we change one of the numbers in pair and check again and so on...
-
-```py
-def countVowelSubstrings(word):
-    # Store vowels in a set for O(1) lookup.
-    vowels = {'a', 'e', 'i', 'o', 'u'}
-
-    # Initialize the sliding-window with the first vowel in the string and the last vowel in the string
-    ans = 0
-    last_consonant = -1
-
-    # Initialize a dictionary to keep track of the last seen vowel
-    last_seen_vowels = {v: -2 for v in vowels} # -2 is the smallest possible index
-
-    for i, x in enumerate(word):
-        # If the current character is a consonant, update the last_consonant variable.
-        if x not in vowels:
-            last_consonant = i
-        # Otherwise, we've found a vowel.
-        else:
-            # Update the last_seen_vowels dictionary with the current index.
-            last_seen_vowels[x] = i
-            # Update the answer variable with the maximum of the current value and the minimum of the last seen vowel's
-            # index and the last consonant's index.
-            ans += max(min(last_seen_vowels.values())-last_consonant, 0)
-    return ans
-```
+Space Complexity: `O(26)` = `O(1)` (because we have a fixed number of characters in the English alphabet)
 
 ---
 
@@ -349,6 +357,211 @@ Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **
 
       return ans
   ```
+
+---
+
+### Permutation in String
+
+Given two strings `s1` and `s2`, return `true` if `s2` contains a permutation of `s1`, or `false` otherwise.
+
+- EX: `s1 = "ab", s2 = "eidbaooo"` -> `true`
+
+- `Permutation`: a rearrangement of the elements of an ordered list `s` into a one-to-one correspondence with `s` itself (the order of the elements in the list is changed, but the elements themselves are not changed)
+
+```py
+def checkInclusion(s1, s2):
+    char_count = {}
+    target_count = {}
+
+    for c in s1:
+        target_count[c] = target_count.get(c, 0) + 1
+
+    ans = 0
+    left = 0
+    have, need = 0, len(target_count) # have is the number of characters in the window that are also in the target string
+
+    for right in range(len(s2)):
+        current_char = s2[right]
+        char_count[current_char] = char_count.get(current_char, 0) + 1
+
+        if current_char in target_count and char_count[current_char] == target_count[current_char]:
+            have += 1
+
+        while have == need:
+            if right - left + 1 == len(s1):
+                return True
+
+            # Else: keep popping values from the left until we have a valid window
+            char_count[s2[left]] -= 1
+            if s2[left] in target_count and char_count[s2[left]] < target_count[s2[left]]:
+                have -= 1
+            left += 1
+
+    return False
+```
+
+---
+
+### Find All Anagrams in a String
+
+Given two strings `s` and `p`, return an array of all the start indices of `p`'s anagrams in `s`. You may return the answer in any order.
+
+> An **anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once. -> **It's actually a permutation of a string**
+
+- It's very similar to the previous problem, but instead of returning `True` if we find an anagram, we will `append` the `left` pointer to the `answer` array
+
+```py
+def findAnagrams(s, p):
+    char_count = {}
+    target_count = {}
+
+    for c in p:
+        target_count[c] = target_count.get(c, 0) + 1
+
+    ans = []
+    left = 0
+    have, need = 0, len(target_count)
+
+    for right in range(len(s)):
+        current_char = s[right]
+        char_count[current_char] = char_count.get(current_char, 0) + 1
+
+        if current_char in target_count and char_count[current_char] == target_count[current_char]:
+            have += 1
+
+        while have == need:
+            if right - left + 1 == len(p):
+                ans.append(left)
+
+            char_count[s[left]] -= 1
+            if s[left] in target_count and char_count[s[left]] < target_count[s[left]]:
+                have -= 1
+            left += 1
+
+    return ans
+```
+
+---
+
+### Words Concatenation
+
+Given a string `s` and a list of words `words`, where each word is the same length, find all starting indices of substrings in `s` that is a concatenation of every word in `words` **exactly once**.
+
+- EX: `s = "barfoothefoobarman", words = ["foo","bar"]` -> `[0,9]`
+
+- Explanation:
+
+  - Here, we will use a **sliding-window** pattern to check for all the substrings of the string
+  - We will use a dictionary to keep track of the frequency of words in `words`
+  - we will use a dictionary to keep track of the frequency of words in the current window
+  - Starting from every index in the string, we will check if the current window is a valid window
+  - if it is, we will append the index of the left pointer to the answer array
+  - if not, we will slide the window to the right until we have a valid window
+
+```py
+def findSubstring(s, words):
+    if not words or not s:
+        return []
+
+    word_count = {}
+    for word in words:
+        word_count[word] = word_count.get(word, 0) + 1
+
+    ans = []
+    word_length = len(words[0])
+    window_length = len(words) * word_length # the required window length to check for the concatenation of every word in words exactly once
+
+    for i in range(len(s) - window_length + 1):
+        seen_words = {}
+        for j in range(i, i + window_length, word_length):
+            current_word = s[j:j+word_length]
+            if current_word not in word_count:
+                break
+            seen_words[current_word] = seen_words.get(current_word, 0) + 1
+            if seen_words[current_word] > word_count[current_word]:
+                break
+        else:
+            # will enter this block if the for loop is not broken (not using "break" in the for loop)
+            ans.append(i)
+
+    return ans
+```
+
+---
+
+### Isomorphic Strings
+
+Given two strings `s` and `t`, determine if they are isomorphic.
+
+> Two strings `s` and `t` are isomorphic if the characters in `s` can be replaced to get `t`.
+> ![isomorphic-strings](./img/isomorphic-strings-1.svg)
+
+- EX: `s = "egg", t = "add"` -> `True`
+- Explanation:
+
+  - Note that "No two characters may map to the same character, but a character may map to itself.", so we need to map each character in `s` to a unique character in `t` and vice versa.
+  - we must check if the characters in `s` can be replaced to get `t` and vice versa. This is done by:
+    ![isomorphic-strings](./img/isomorphic-strings-2.webp)
+
+    1. creating a dictionary to keep track of the corresponding characters in each string
+    2. check if the current characters are in the dictionaries, if not, add them
+    3. if they are in the dictionaries, check if they correspond to each other and if not return `False`
+
+Time Complexity: `O(n)`
+
+```py
+def isIsomorphic(s, t):
+    # Initialize dictionaries to keep track of the corresponding characters in each string
+    mapST, mapTS = {}, {}
+
+    for c1, c2 in zip(s, t):
+        # If the current characters are not in the dictionaries, add them
+        if c1 not in mapST and c2 not in mapTS:
+            mapST[c1] = c2
+            mapTS[c2] = c1
+        # If the current characters are in the dictionaries, check if they correspond to each other
+        elif mapST.get(c1) != c2 or mapTS.get(c2) != c1:
+            return False
+
+    return True
+```
+
+---
+
+### Count Vowel Substrings of a String
+
+Given a string `s` return the number of substrings that have **all vowels** in order.
+
+- EX: `s = "abciiidef"` -> `3` (substrings: `"ae"`, `"ei"`, `"iii"`)
+- Steps:
+  - we can use a **sliding-window** pattern to check for all the substrings of the string
+  - then we check these pair for the desired condition, and if not we change one of the numbers in pair and check again and so on...
+
+```py
+def countVowelSubstrings(word):
+    # Store vowels in a set for O(1) lookup.
+    vowels = {'a', 'e', 'i', 'o', 'u'}
+
+    # Initialize the sliding-window with the first vowel in the string and the last vowel in the string
+    ans = 0
+    last_consonant = -1
+
+    # Initialize a dictionary to keep track of the last seen vowel
+    last_seen_vowels = {v: -2 for v in vowels} # -2 is the smallest possible index
+
+    for i, x in enumerate(word):
+        # If the current character is a consonant, update the last_consonant variable.
+        if x not in vowels:
+            last_consonant = i
+        # Otherwise, we've found a vowel.
+        else:
+            # Update the last_seen_vowels dictionary with the current index.
+            last_seen_vowels[x] = i
+            # Update the answer variable with the maximum of the current value and the minimum of the last seen vowel's
+            # index and the last consonant's index.
+            ans += max(min(last_seen_vowels.values())-last_consonant, 0)
+    return ans
+```
 
 ---
 

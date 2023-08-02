@@ -4,15 +4,16 @@
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
-    - [Performance](#performance)
   - [Progressive Web Apps PWA](#progressive-web-apps-pwa)
     - [PWA Components](#pwa-components)
       - [Manifest](#manifest)
       - [Service Workers](#service-workers)
       - [HTTPS](#https)
-  - [Performance](#performance-1)
-    - [Minimize images](#minimize-images)
-    - [Critical Render PATCH](#critical-render-patch)
+  - [Performance](#performance)
+    - [Minify / Minimize files](#minify--minimize-files)
+    - [Minify tools](#minify-tools)
+      - [Minimize images](#minimize-images)
+    - [Critical Render Path](#critical-render-path)
     - [Rollup Visualizer](#rollup-visualizer)
   - [Gulp.js](#gulpjs)
     - [Gulp vs Webpack](#gulp-vs-webpack)
@@ -23,6 +24,8 @@
 
 ## Web Browsers
 
+> Reference: [How browsers work](https://web.dev/howbrowserswork/)
+
 Web browser is a software application that enables a user to access and display web pages or other online content through its graphical user interface.
 
 ### Architecture of web browser
@@ -31,9 +34,9 @@ Web browser is a software application that enables a user to access and display 
 
 - **User Interface**: This component allows end-users to interact with all visual elements available on the web page. The visual elements include the `address bar`, `home button`, `next button`, and all other elements that fetch and display the web page requested by the end-user.
 - **Browser Engine**: It is a core component of every web browser. The browser engine functions as an intermediary or a bridge between the user interface and the rendering engine. It queries and handles the rendering engine as per the inputs received from the user interface.
-- **Rendering Engine**: As the name suggests, this component is responsible for rendering a specific web page requested by the user on their screen. It interprets HTML and XML documents along with images that are styled or formatted using CSS, and a final layout is generated, which is displayed on the user interface.
+- **Rendering Engine**: It's responsible for rendering a specific web page requested by the user on their screen. It interprets `HTML` and `XML` documents along with `images` that are styled or formatted using `CSS`, and a final layout is generated, which is displayed on the user interface.
 - **Networking**: This component is responsible for managing network calls using standard protocols like `HTTP` or `FTP`. It also looks after security issues associated with internet communication.
-- **JavaScript Interpreter**: As the name suggests, it is responsible for parsing and executing the JavaScript code embedded in a website.
+- **JavaScript Interpreter**: It's responsible for parsing and executing the JavaScript code embedded in a website.
   - Once the interpreted results are generated, they are forwarded to the rendering engine for displaying on the user interface.
 - **UI Backend**: This component uses the user interface methods of the underlying operating system. It is mainly used for drawing basic widgets (windows and combo boxes).
 - **Data Storage/Persistence**: It is a persistent layer. A web browser needs to store various types of data locally, for example, `cookies`. As a result, browsers must be compatible with data storage mechanisms such as `WebSQL`, `IndexedDB`, `FileSystem`, etc.
@@ -54,14 +57,6 @@ The four basic steps include:
 4. The final step is to **paint** the screen, wherein the render tree is traversed, and the renderer’s `paint()` method is invoked, which paints each node on the screen using the UI backend layer.
 
 > **NOTE**: every browser has its own unique rendering engine. So naturally, every browser has its own way of interpreting web pages on a user’s screen. Here’s where a challenge arises for web developers regarding the cross-browser compatibility of their website.
-
----
-
-### Performance
-
-- Fast sites provide better user experiences. Users want and expect web experiences with content that is fast to load and smooth to interact with.
-  - Two major issues in web performance are understanding issues having to do with **latency** and issues having to do with the fact that for the most part, **browsers are single threaded**.
-  - Web performance can be improved by understanding the single-threaded nature of the browser and minimizing the main thread's responsibilities, where possible and appropriate, to ensure rendering is smooth and responses to interactions are immediate.
 
 ---
 
@@ -116,15 +111,76 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 
 ![performance](./img/performance.PNG)
 
-### Minimize images
+### Minify / Minimize files
+
+- `Minify`: It's the process of removing all unnecessary characters from the source code without changing its functionality.
+- `Minimize`: It's the process of reducing the size of the file by changing the format of the file.
+
+### Minify tools
+
+- usually done in frameworks automatically to minify the javascript and css files into one file in the build phase to reduce the size/number of the files and the number of requests
+- used in `webpack`, `gulp`, `rollup`, `parcel`, etc.
+
+#### Minimize images
 
 ![minimize_img](./img/min-img.PNG)
 
-### Critical Render PATCH
+- `imigx`: tool to minimize images and reduce their size and quality + cache them by `CDN`
+- Images `metadata` contains information about the image such as the size, the color profile, the number of pixels, etc.
+  - This information is not needed for the image to be displayed on the web page. Therefore, it can be removed to reduce the size of the image.
+  - Also, it's sometimes removed by the frameworks automatically
+
+---
+
+### Critical Render Path
 
 It's how the files are handled after being downloaded from the source
 
+It's a step in the [rendering process in the browser](#web-browsers) where the browser parses the `HTML` and `CSS` files and builds the DOM and CSSOM trees. The browser then combines the DOM and CSSOM trees to form the render tree. The render tree is then used to compute the layout of each visible element and paints them on the screen.
+
 ![Critical Render PATCH](./img/critical%20render%20path.PNG)
+
+- To improve the critical render path, we need to handle the way the browser handles the files downloading process and the way it parses the files
+
+  - Ex: we can use `async` and `defer` attributes in the `script` tag to handle the way the browser handles the files downloading process to prevent blocking the `DOM` tree from being built
+
+    ```html
+    <script src="script.js" async></script>
+    ```
+
+  - Ex: CSS is considered a **render-blocking resource**. This means that the browser will not render any processed content until the `CSSOM` is constructed.
+
+    - To prevent this, we can use the `preload` attribute in the `link` tag to tell the browser to download the CSS file as soon as possible without blocking the `DOM` tree from being built
+
+      ```html
+      <link rel="preload" href="style.css" as="style" />
+      ```
+
+    - Another way is to load the stylesheets manually using `JavaScript` to prevent blocking the `DOM` tree from being built
+
+      ```js
+      // add this code in the "onload" event listener of the "window" object
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'style.css';
+      document.head.appendChild(link);
+      ```
+
+    - To also improve the performance from the `css` side, we can reduce complicated specificity and reduce the number of selectors to reduce the time needed to calculate these specificities.
+
+      ```css
+      /* bad */
+      .container .item .title {
+        color: red;
+      }
+
+      /* good */
+      .title {
+        color: red;
+      }
+      ```
+
+---
 
 ### Rollup Visualizer
 
@@ -137,7 +193,6 @@ Tool to Visualize and analyze your Rollup bundle to see which modules are taking
 ## Gulp.js
 
 A toolkit (**Task Runner**) to automate & enhance your workflow to automate slow, repetitive workflows and compose them into efficient build pipelines.
-![gulp](./img/gulp.PNG)
 
 > It's like creating the **build** folder in frameworks
 
@@ -158,7 +213,7 @@ Webpack is a **bundler** whereas Gulp is a **task runner**
 
 - Simply put, Webpack is such a powerful tool that it can already perform the vast majority of the tasks you’d otherwise do through a task runner. For instance, Webpack already provides options for minification and sourcemap for your bundle. In addition, Webpack can be run as middleware through a custom server called webpack-dev-server, which supports both live reloading and hot reloading
 
-![Gulp vs Webpack](./img/Gulp-vs-Webpack-info.jpg.jpg)
+![Gulp vs Webpack](./img/Gulp-vs-Webpack-info.jpg)
 
 ---
 

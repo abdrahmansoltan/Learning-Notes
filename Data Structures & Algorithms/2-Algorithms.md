@@ -47,7 +47,7 @@
       - [Merge sort implementation](#merge-sort-implementation)
     - [Quick Sort](#quick-sort)
       - [Quick sort implementation](#quick-sort-implementation)
-      - [Hoare's Partitioning Scheme (Quick Select)](#hoares-partitioning-scheme-quick-select)
+      - [Hoare's Partitioning Scheme (Quick Select) (NOT IMPORTANT ⚠️)](#hoares-partitioning-scheme-quick-select-not-important-️)
         - [Implementing Quick sort using Hoare's Partitioning Scheme (Quick Select)](#implementing-quick-sort-using-hoares-partitioning-scheme-quick-select)
     - [Bucket Sort](#bucket-sort)
     - [Radix Sort](#radix-sort)
@@ -76,6 +76,7 @@
   - [Matrix graph](#matrix-graph)
     - [Matrix DFS](#matrix-dfs)
       - [Matrix BFS](#matrix-bfs)
+  - [Least recently used (LRU)](#least-recently-used-lru)
 
 ---
 
@@ -253,6 +254,12 @@ We analyze different Algorithms by counting the maximum number of guesses we nee
     return True
   ```
 
+> **Note:** when you encounter a pattern `1 + 2 + 3 + ... + n` in a for loop (usually by reducing the inner loop by 1 in each iteration), it's usually `O(n^2)`
+>
+> - to remember it. remember the **`Gauss formula` story (the kid who solved the problem in seconds)**, and that the formula is `n(n+1)/2` which is `O(n^2)`
+>   - The story says that he wanted to sum numbers from `1` to `100`, so he wrote `1 + 2 + 3 + ... + 100` on the board, and then he realized that he can just write `100 + 1` and `99 + 2` and `98 + 3` and so on, and then he realized that he can just write `101` 100 times, and then he realized that he can just write `100 * 101` and then divide it by `2` to get the result, and that's how he solved the problem in seconds.
+>   - So the formula is `(n+1) * n / 2` which is `O(n^2)` (because we have `n^2` in the formula)
+
 ---
 
 #### Space complexity
@@ -367,7 +374,7 @@ where `a0`,`a1`,...,`ad` are constants, called the **coefficients** of the polyn
 
 These are called **"Constant-Time Operations"**, we say that this function runs in `O(1)` time; that is, the running time of this function is independent of the length, `n` of the list.
 
-> `O(1)` is called constant time. It doesn’t mean **"instant"**. It means the time taken will stay the same, regardless of how big the hash table is.
+> `O(1)` is called constant time. It doesn’t mean **"instant / single operation"**. It means the time taken will stay the same, regardless of how big the input is **(constant number of operations)**.
 
 - Computer hardware supports constant-time access to an element based on its memory address. Therefore, we say that the expression `data[j]` is evaluated in `O(1)` time for a Python list.
 - The constant function characterizes the number of steps needed to do a **basic operation** on a computer, like adding two numbers, assigning a value to some variable, or comparing two numbers.
@@ -525,7 +532,7 @@ It's not actually an Algorithm, it's more of a concept that we use in our Algori
 
 > Quote: "Loops may achieve a performance gain for your program. Recursion may achieve a performance gain for your programmer."
 
-- **Rules**:
+- **Notes**:
 
   - Every time you're using a `tree` or converting something into a `tree`, consider **recursion**
 
@@ -601,8 +608,9 @@ When the execution of a function leads to a nested function call, the execution 
 
 The Big-O runtime for a recursive function is equivalent to the number of recursive calls. This **varies** depending on the complexity of the algorithm of the recursive function. For example:
 
-- A recursive function of input `N` that is called `N` times will have a runtime of `O(N)`.
-- On the other hand, a recursive function of input `N` that calls itself twice per function may have a runtime of `O(2^N)`.
+- A recursive function of input `N` that calls itself twice per function may have a runtime of `O(2^N)`.
+  - `2` -> because it calls itself twice (2 branches)
+  - `N` -> because it's a linear recursion (height of the decision tree)
 
 > **Note**: a bad use of recursion can lead to `O(2^n)` which is extremely inefficient
 
@@ -890,10 +898,14 @@ It's a sorting algorithm where the largest values **bubble up to the top**
 > it's also called **sinking sort** as the largest values **sink down to the end**
 
 - it works on the concept of moving the largest number to the end (bubbling the largest number up)
-- it loops on each numbers and compare the 2 values-pairs at hand
-  - if the number in the left is larger than the left one, we swap them, else we continue to the next pair until we have the largest number at the end.
-  - by that we would go to the next iteration and repeat
+- It's like `element-1` tells `element-2` "Hey, if you're larger than me, you go ahead and swap with me", and so on.
+  ![bubble-sort](./img/bubble-sort.png)
+  - it loops on each numbers and compare the 2 values-pairs at hand
+    - if the number in the left is larger than the left one, we swap them, else we continue to the next pair until we have the largest number at the end.
+    - by that we would go to the next iteration and repeat
 - it's one of the simplest sorting algorithms, but the has least performance
+  - Time complexity: `O(n^2)`
+    - this is because we have 2 nested loops and at each iteration, we're looping through the whole array
   - one of its performance drawbacks, is that if the array is **almost-sorted**, it will continue to do all looping and checking steps even if we reached sorted-result after the first few steps
 
 ```py
@@ -1163,11 +1175,12 @@ def merge_sort(arr):
 - it has better **space-complexity of `O(log(n))`**, so it can be sorted in memory if the database is not massive
 - Quick sort is unique, because its speed depends on the `pivot point` you choose
 
-  - best case for time-complexity is `O(n log n)`
+  - **best case** for time-complexity is `O(n log n)`
     ![quick-sort-best-case](./img/quick-sort-best-case.png)
     - In this example, there are `O(log n)` levels (the technical way to say that is, “he height of the call stack is `O(log n)`”). And each level takes `O(n)` time. he entire algorithm will take `O(n) * O(log n) = O(n log n)` time. This is the best-case scenario.
-  - it may have a worst-case for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element. because we're not splitting by half, we're splitting by `1` element at a time
-    ![quick-sort-worst-case](./img/quick-sort-worst-case.png)
+  - it may have a **worst-case** for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element. because we're not splitting by half, we're splitting by `1` element at a time
+    - `n * n-1 * n-2 * ... * 1` -> `O(n^2)`
+      ![quick-sort-worst-case](./img/quick-sort-worst-case.png)
     - In this example, there're `O(n)` levels, so the entire algorithm will take `O(n) * O(n) = O(n^2)` time
   - average case for time-complexity is `O(n log n)`
     ![quick-sort-average-case](./img/quick-sort-average-case.png)
@@ -1177,22 +1190,26 @@ def merge_sort(arr):
 
 #### Quick sort implementation
 
-- Quick sort Pseudocode
-  ![pivot-point](./img/quick-sort-pivot.png)
 - **Quick sort Steps:**
   ![quick sort](./img/quick-sort-0.png)
-  1. pick a pivot point
-  2. partition the array into 2 sub-arrays: one with all the elements less than the pivot point, and one with all the elements greater than the pivot point
-  3. call `quicksort` recursively on both sub-arrays
 
-```py
-def quicksort(array):
-  # base case
-  if len(array) < 2:
-    return array
+  1. pick a `pivot` point
+  2. partition the array into `2` sub-arrays: one with all the elements less than the pivot point, and one with all the elements greater than the pivot point
+  3. call `quicksort` recursively on both `sub-arrays`
 
-  # recursive case
-  else:
+- **Implementation 1:** using `2` sub-arrays
+  ![quick sort](./img/quick-sort-7.png)
+
+  - it's not an `in-place` implementation, because we're creating `2` new arrays
+  - it's a `stable` sort, because it preserves the order of the elements with the same value
+
+  ```py
+  def quicksort(array):
+    # base case -> if the array has 0 or 1 element, it's already sorted
+    if len(array) < 2:
+      return array
+
+    # recursive case
     # choose a pivot point
     pivot = array[0]
     # sub-array of all the elements less than the pivot
@@ -1201,15 +1218,48 @@ def quicksort(array):
     greater = [i for i in array[1:] if i > pivot]
 
     return quicksort(less) + [pivot] + quicksort(greater)
-```
+  ```
 
-![quick sort](./img/quick-sort-1.png)
+- **Implementation 2:** using `2` pointers + swapping **(in-place)**
+  ![quick sort](./img/quick-sort-8.png)
+  ![quick sort](./img/quick-sort-9.png)
 
-- Note: Quick sort is not a stable sort, because it doesn't preserve the order of the elements with the same value
+  - it's an `in-place` implementation, because we're not creating `2` new arrays
+  - it's not a `stable` sort, because it doesn't preserve the order of the elements with the same value
+
+  ```py
+  def quicksort(array, low, high):
+    # base case
+    if low < high:
+      # partition the array into 2 sub-arrays
+      pivot = partition(array, low, high)
+      # call quicksort recursively on both sub-arrays without the pivot
+      quicksort(array, low, pivot - 1)
+      quicksort(array, pivot + 1, high)
+
+    return array
+
+  # helper function to partition the array into 2 sub-arrays
+  def partition(arr, low, high):
+    pivot = arr[high]
+    i = low - 1
+
+    # walk from low to high and swap the elements that are smaller than the pivot with the elements that are larger than the pivot
+    for j in range(low, high):
+      if arr[j] <= pivot:
+        i += 1
+        arr[i], arr[j] = arr[j], arr[i] # swap
+
+    # Now, all the elements that are smaller than the pivot are on the left side of the arr[i], and all the elements that are larger than the pivot are on the right side of the arr[i]
+
+    # swap the pivot with the element at index i + 1
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1 # return the index of the pivot
+  ```
 
 ---
 
-#### Hoare's Partitioning Scheme (Quick Select)
+#### Hoare's Partitioning Scheme (Quick Select) (NOT IMPORTANT ⚠️)
 
 It's a partitioning scheme that is used in `quick sort` to choose the `pivot point` and partition the array into 2 sub-arrays
 
@@ -1379,8 +1429,10 @@ Binary search is a search algorithm that finds the position of a target value wi
 - We call an element of the sequence a **"candidate"**
 - we get the middle element: the item `data[mid]` with index:
 
-  ```js
-  mid = (low + high) / 2;
+  ```py
+  mid = (low + high) // 2;
+  # or
+  mid = low + (high - low) // 2 # to avoid integer overflow
   ```
 
 - We consider three cases:
@@ -1468,6 +1520,8 @@ it means going through each item in the list, like checking for something on eac
 - The time-complexity of **BFS** vs **DFS** is the same as we visit each node one time, but the difference here is in the space-complexity as it depends on the structure of the tree:
   - if we're talking about a breadth-first on a wide tree vs on depth-first, we will not be storing all the nodes across the tree in **BFS** as we only need to keep-track of the nodes in a given branch all the way down to the end
     ![traversal](./img/traversal2.png)
+
+> **Note:** when you want to preserve the structural shape of the tree, you need to use **DFS** as it goes all the way down to the end of the tree, then it goes back up to the next branch
 
 ---
 
@@ -1583,7 +1637,9 @@ It's also called **"Level Order Traversal"**
 It's an algorithm for traversing or searching tree or graph data structures. It starts at the tree root, and explores as far as possible along each branch before backtracking.
 
 - **It's all about "Exploring" and Backtracking**
+
   - **"Backtracking"** means that when you reach a dead-end, you go back to the last intersection (last valid point) and try another path from there
+
     - it consists of 3 steps:
 
       ```py
@@ -1601,6 +1657,7 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
       1. **"Adding a node"** to the list of visited nodes or do operations on it
       2. **"Validating / Making decision"** if the node is a valid node to visit
       3. **Removing** the node from the list of visited nodes or undoing the operations on it
+
   - Think of it as a **maze**, where you're trying to find a way out and you're exploring all the possible paths until you find the exit and when you reach a dead-end, you go back to the last intersection and try another path
   - Usually time-complexity is `O(n)` as we visit each node once
 
@@ -1699,6 +1756,12 @@ Inorder means traversing the tree in a sorted order (smaller to larger) and to d
 
 #### Tree Traversal Notes
 
+- Why do we have 3 different types of tree traversals?
+  - Sometimes, it depends on how the current language handles memory and recursion
+  - Because we can use them to do different things
+    - `PreOrder DFS`: can be used to **"export"** a tree structure so that it can be copied or reconstructed later
+    - `PostOrder DFS`: can be used to **"delete"** a tree
+    - `InOrder DFS`: can be used to get the elements in a **"sorted"** order
 - For all the 3 types of DFS, the time-complexity is `O(n)` as we visit each node once
 - For all of them, if we want to do it in a **reverse order**, we just need to change the order of the recursive calls
   - replace `left` with `right` and vice versa to visit the nodes in a reverse order (biggest to smallest) -> (right to left)
@@ -1789,6 +1852,50 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
   5. Add the node to the `visited` list update the `unvisited` list and repeat the process until we've visited every node in the graph.
      ![Dijkstra-algorithm](./img/dijkstra-6.png)
 
+```py
+def dijkstra(graph, start):
+  # initialize the distance to all nodes to infinity
+  distances = {node: float("inf") for node in graph}
+  # set the distance to the starting node to 0
+  distances[start] = 0
+
+  # initialize the unvisited set
+  unvisited = set(graph.keys())
+
+  # initialize the previous vertex dict
+  previous_vertices = {node: None for node in graph}
+
+  while len(unvisited) > 0:
+    # select the unvisited node with the smallest distance
+    current_node = min(unvisited, key=lambda node: distances[node])
+
+    # break if the smallest distance among the unvisited nodes is infinity
+    if distances[current_node] == float("inf"):
+      break # means that we can't reach any other node from the starting node
+
+    # remove the current node from the unvisited set
+    unvisited.remove(current_node)
+
+    # go through each neighbor of the current node
+    for neighbor, weight in graph[current_node].items():
+      # calculate the distance to the neighbor through the current node
+      distance = distances[current_node] + weight
+
+      # update the distance if the new distance is shorter than the existing distance to the neighbor
+      if distance < distances[neighbor]:
+        distances[neighbor] = distance
+        # set the current node as the previous vertex of the neighbor
+        previous_vertices[neighbor] = current_node
+
+  return distances, previous_vertices
+```
+
+- Time complexity: `O(V^2)`, where `V` is the number of vertices in the graph
+  - because we're going through each node in the graph and for each node, we're going through each of its neighbors
+  - > You might think that it will be `O(E.V)`, where `E` is the number of edges in the graph, but `E` can be as large as `V^2`, so `O(E.V)` is actually `O(V^3)`, also we don't visit each edge more than once, so it's `O(V^2)`
+  - If we use `min heap` to get the node with the lowest cost, then the time complexity will be `O(E.log(V))`, where `E` is the number of edges in the graph and `V` is the number of vertices in the graph
+    - because we're going through each node in the graph and for each node, we're going through each of its neighbors, and we're using `min heap` to get the node with the lowest cost, so it will take `log(V)` time to get the node with the lowest cost
+
 ---
 
 ### Bellman-Ford Algorithm
@@ -1799,7 +1906,7 @@ It's an algorithm that computes shortest paths from a **single source** vertex t
 - It uses `Dynamic Programming` to solve the problem
 - It uses decision trees to solve the problem by breaking it down into sub-problems and then solving those sub-problems and then combining the solutions to solve the original problem
   - `DP` is used here to **Memoize** the results of the sub-problems to avoid solving them again
-  ![bellman-ford](./img/bellman-ford-1.png)
+    ![bellman-ford](./img/bellman-ford-1.png)
 
 #### How Bellman-Ford Algorithm works
 
@@ -1837,6 +1944,7 @@ A **topological sort** of a directed graph is a way of ordering the list of node
 It returns a specific ordering of the nodes in a directed graph as long as the graph is **acyclic**.
 
 - Every `vertex` has `indgree` and `outdegree`:
+
   - `indegree`: the number of edges that **point to** the vertex
     ![top sort](./img/top-sort-7.png)
   - `outdegree`: the number of edges that **point from** the vertex
@@ -1851,8 +1959,9 @@ It returns a specific ordering of the nodes in a directed graph as long as the g
   ![top sort](./img/top-sort-13.png)
 
 - It only works on **directed acyclic graphs** (DAGs).
+
   - This is because the `top sort` only add the `vertices` with `indegree = 0` to the `sorted_list`, so if we have a cycle, then we will never be able to reach a `vertex` with `indegree = 0` as we will always have a `vertex` with `indegree > 0` that points to it.
-  ![top sort](./img/top-sort-14.png)
+    ![top sort](./img/top-sort-14.png)
 
 - Another way of thinking about topological sort is that it's a way of arranging the nodes of a graph in a line such that all the edges point in the same direction to the right.
   ![top sort](./img/top-sort-5.png)
@@ -2067,3 +2176,13 @@ When dealing with matrix, we can use `BFS` to traverse the matrix for many types
 
     return bfs(0, 0)
   ```
+
+---
+
+## Least recently used (LRU)
+
+It's a **caching** algorithm that evicts the least recently used item (the item that was accessed the least recently) first.
+
+The idea is simple: The main memory can't hold all the references to all the pages, so we need to keep track of the most recently used pages and evict the least recently used pages when we need to free up some space.
+
+The goal of caching is to store the most frequently used items in the fastest memory possible.

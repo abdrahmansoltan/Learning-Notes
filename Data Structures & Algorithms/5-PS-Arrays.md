@@ -1,7 +1,8 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
+  - [Two Pointer Technique](#two-pointer-technique)
+    - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
   - [Remove Element](#remove-element)
   - [Replace Elements with Greatest Element on Right Side](#replace-elements-with-greatest-element-on-right-side)
   - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
@@ -10,6 +11,13 @@
     - [Three Sum](#three-sum)
     - [4 Sum](#4-sum)
     - [Continuous SubArray Sum](#continuous-subarray-sum)
+    - [Pair with Target Sum](#pair-with-target-sum)
+  - [Sliding Window](#sliding-window)
+    - [Average of All Contiguous Subarrays of Size K](#average-of-all-contiguous-subarrays-of-size-k)
+    - [Minimum Size Subarray Sum](#minimum-size-subarray-sum)
+    - [Fruit Into Baskets](#fruit-into-baskets)
+    - [Longest Subarray of 1's After Deleting One Element](#longest-subarray-of-1s-after-deleting-one-element)
+    - [Max Consecutive Ones III](#max-consecutive-ones-iii)
   - [Product of Array Except Self](#product-of-array-except-self)
   - [Container with most water](#container-with-most-water)
   - [Trapping Rain Water](#trapping-rain-water)
@@ -26,21 +34,24 @@
 
 ---
 
-## Remove Duplicates From Sorted Array
+## Two Pointer Technique
+
+### Remove Duplicates From Sorted Array
 
 Given a sorted array `nums`, remove the duplicates **in-place** such that each element appears only once and returns the new length.
 
 - Ex:
 
-  - `nums = [1,1,2]` -> `2` (nums = [1,2])
-  - `nums = [0,0,1,1,1,2,2,3,3,4]` -> `5` (nums = [0,1,2,3,4])
+  - `nums = [1,1,2]` -> `2` -> `(nums = [1,2,_])`
+  - `nums = [0,0,1,1,1,2,2,3,3,4]` -> `5` -> `(nums = [0,1,2,3,4,_,_,_,_,_])`
+    ![remove duplicates](./img/remove-duplicates-1.png)
 
 - Explanation:
-  ![remove duplicates](./img/remove-duplicates-1.png)
   - we can use a **two pointers** pattern to check for all the elements in the array
-  - we can use the first pointer to keep track of the last unique element in the array
-  - and the second pointer to iterate over the array and check if the current element is equal to the last unique element
-  - if it is, then we skip it, if not, then we increment the last unique index **and then** update the last unique element
+    ![remove duplicates](./img/remove-duplicates-2.png)
+    - we can use the first pointer to keep track of the last unique element in the array
+    - and the second pointer to iterate over the array and check if the current element is equal to the last unique element
+    - if it is, then we skip it, if not, then we increment the last unique index **and then** update the last unique element
 
 ```py
 def removeDuplicates(nums):
@@ -375,6 +386,163 @@ def check_subarray_sum(nums, k):
 
 ---
 
+### Pair with Target Sum
+
+Given an array of sorted numbers and a target sum, find a pair in the array whose sum is equal to the given target.
+
+- EX: `arr = [1, 2, 3, 4, 6], target = 6` --> `[1, 3]` because `1 + 3 = 6`
+
+- Explanation:
+  - the thing here is to make use of the fact that the **array is sorted**
+  - So, one solution would be to use a `binary search` to find the second number -> `O(nlog(n))`, but we can do better
+  - The best solution would be to use a **two pointers** pattern to check for all the elements in the array -> `O(n)`
+
+```py
+def pair_with_targetsum(arr, target_sum):
+    left = 0
+    right = len(arr) - 1
+
+    while left < right:
+        if arr[left] + arr[right] == target_sum:
+            return [left, right]
+        elif arr[left] + arr[right] < target_sum:
+            left += 1
+        else:
+            right -= 1
+    # If the target was not found, return [-1, -1]
+    return [-1, -1]
+```
+
+---
+
+## Sliding Window
+
+### Average of All Contiguous Subarrays of Size K
+
+Given an array, find the average of all contiguous subarrays of size `k` in it.
+
+- EX: `arr = [1, 3, 2, 6, -1, 4, 1, 8, 2], k = 5` --> `[2.2, 2.8, 2.4, 3.6, 2.8]`
+
+  - Explanation:
+    - For the first `5` numbers (subarray from index `0-4`), the average is: `(1 + 3 + 2 + 6 - 1) / 5` => `2.2`
+    - The average of next `5` numbers (subarray from index `1-5`) is: `(3 + 2 + 6 - 1 + 4) / 5` => `2.8`
+    - and so on...
+
+- Explanation
+
+  - we can re-use the `sum` result of the previous subarray to calculate the `sum` of the next subarray
+  - The efficient way to solve this problem would be to visualize each contiguous subarray as a sliding window of ‘5’ elements. This means that when we move on to the next subarray, we will slide the window by one element. So, to reuse the sum from the previous subarray, we will subtract the element going out of the window and add the element now being included in the sliding window. This will save us from going through the whole subarray to find the sum and, as a result, the algorithm complexity will reduce to `O(N)`.
+
+    ![sliding window](./img/average-contiguous-subarrays-1.svg)
+
+```py
+def find_averages_of_subarrays(k, arr):
+    result = []
+    windowSum = 0.0
+    windowStart = 0
+
+    for windowEnd in range(len(arr)):
+        windowSum += arr[windowEnd]
+
+        if windowEnd >= k - 1:
+            result.append(windowSum / k)
+            windowSum -= arr[windowStart]
+            windowStart += 1
+
+    return result
+```
+
+---
+
+### Minimum Size Subarray Sum
+
+Given an array of positive integers `nums` and a positive integer `target`, return the minimal length of a **contiguous subarray** `[nums[l], nums[l+1], ..., nums[r-1], nums[r]]` of which the sum is greater than or equal to `target`. If there is no such subarray, return `0` instead.
+
+```py
+# Time: O(n) -> O(n + n) = O(n)
+def min_sub_array_len(target, nums):
+    minLength = float('inf')
+    start = 0
+    windowSum = 0
+
+    for end in range(len(nums)):
+        windowSum += nums[end]
+
+        while windowSum >= target:
+            minLength = min(minLength, end - start + 1)
+            windowSum -= nums[start]
+            start += 1
+
+    return minLength if minLength != float('inf') else 0
+```
+
+- Time complexity: `O(n + n) = O(n)` because the outer `for` loop runs for all elements and the inner `while` loop processes each element **only once**, therefore the time complexity of the algorithm will be `O(n+n)` which is asymptotically equivalent to `O(n)`.
+  - It's not `O(n^2)` because the inner `while` loop will process each element **only once**.
+
+---
+
+### Fruit Into Baskets
+
+Given an array of integers where each integer represents a fruit tree, you are given two baskets, and your goal is to put maximum number of fruits in each basket. The only restriction is that each basket can have only one type of fruit.
+
+It's similar to the [Longest Substring with K Distinct Characters](./6-PS-Strings.md#longest-substring-with-k-distinct-characters) problem.
+
+```py
+def fruits_into_baskets(fruits):
+    windowStart = 0
+    maxLength = 0
+    fruitFrequency = {}
+
+    for windowEnd in range(len(fruits)):
+        rightFruit = fruits[windowEnd]
+        fruitFrequency[rightFruit] = fruitFrequency.get(rightFruit, 0) + 1
+
+        # Shrink the sliding window, until we are left with '2' fruits in the fruit frequency dictionary
+        while len(fruitFrequency) > 2:
+            leftFruit = fruits[windowStart]
+            fruitFrequency[leftFruit] -= 1
+            if fruitFrequency[leftFruit] == 0:
+                del fruitFrequency[leftFruit]
+            windowStart += 1
+
+        maxLength = max(maxLength, windowEnd - windowStart + 1)
+
+    return maxLength
+```
+
+Note: the space complexity of the above algorithm will be `O(1)` not `O(n)`, because we can have a maximum of three types of fruits stored in the `fruitFrequency` dictionary.
+
+---
+
+### Longest Subarray of 1's After Deleting One Element
+
+Same as the [Longest Repeating Character Replacement](./6-PS-Strings.md#longest-repeating-character-replacement) problem.
+
+---
+
+### Max Consecutive Ones III
+
+Given a binary array `nums` and an integer `k`, return the maximum number of consecutive `1`'s in the array if you can flip at most `k` `0`'s.
+
+- Solution 1: Sliding window like the [Longest Repeating Character Replacement](./6-PS-Strings.md#longest-repeating-character-replacement) problem.
+
+- Solution 2: (Faster)
+
+  ```py
+  def longest_ones(nums, k):
+      l = 0
+
+      for r in range(len(nums)):
+          if nums[r] == 0:
+              k -= 1
+          if k < 0: # If we have more than k zeros, move the left pointer to the right
+              if nums[l] == 0:
+                  k += 1
+              l += 1
+
+      return r - l + 1
+  ```
+
 ## Product of Array Except Self
 
 Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`.
@@ -582,9 +750,10 @@ def trap(height):
 ![rain water](./img/trapping-rain-water-3.png)
 
 - In [solution-1](#solution-1-extra-memory-used-on-space), we actually used 2 pointers (1 individual pointer with one iteration for each) but we were iterating pointers **outwards**. Here we will use 2 pointers to iterate **inwards**.
-    ![rain water](./img/trapping-rain-water-4.png)
+  ![rain water](./img/trapping-rain-water-4.png)
 - We can't use the 2 pointers in order to single handedly figure out what (the walls are for some container and the water inside), but what we can keep track of is the **maximum height of the left and right walls**.
 - So we will have 2 pointers, one at the beginning and one at the end of the array, and we will move the pointer that is pointing to the shorter wall inwards.
+
   - pointer 1: points to the left wall
   - pointer 2: points to the right wall
   - meaning that we keep track of every point that we have seen and keep track of the maximum value that is's seen and then decide which one to move inwards.

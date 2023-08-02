@@ -2,10 +2,10 @@
 
 - [INDEX](#index)
   - [HTTP](#http)
-    - [HTTP/1.1 vs HTTP/2](#http11-vs-http2)
-    - [HTTP/3](#http3)
+    - [HTTP History](#http-history)
+    - [HTTP/3 (Not important 🚫)](#http3-not-important-)
       - [Why we need HTTP/3](#why-we-need-http3)
-    - [What Is QUIC](#what-is-quic)
+      - [What Is QUIC](#what-is-quic)
   - [URL `universal resource locator`](#url-universal-resource-locator)
   - [Request / Response](#request--response)
     - [HTTP Request Methods](#http-request-methods)
@@ -24,42 +24,63 @@
 
 ## HTTP
 
+> Reference: [MDN HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
+
 HTTP (**Hypertext Transfer Protocol**), is the format used to structure request and responses for effective communication between a client and a server.
 
-It's an application layer protocol designed to transfer information between networked devices and runs on top of other layers of the network protocol stack.
+It's a `TCP/IP` application layer protocol designed to transfer information between networked devices and runs on top of other layers of the network protocol stack.
 
-- The message that is sent by a client to a server is what is known as an HTTP request. When these requests are being sent, clients can use various methods.
-- HTTP request methods are the assets that indicate the specific desired action to be performed on a given resource.
+> "Application layer" refers to one of the seven layers of the [Open Systems Interconnection (OSI) model](./Internet.md#osi-model), which is used to describe the flow of data between two nodes in a network. The application layer is the seventh layer of the OSI model.
+
+- The message that is sent by a client to a server is what is known as an `HTTP request`. When these requests are being sent, clients can use various methods.
+
+  - HTTP methods indicate the specific desired action to be performed on a given resource.
 
 - HTTP is a **stateless** protocol. That means each individual request sent over the protocol is unique and hat each command runs independent of any other command.
 
-  - HTTP has **no memory of previous requests**. Go to a web page with a photo gallery, and it will show you the first picture. Go reload your browser or type in the URL again
-  - This statelessness ensures users don't get trapped in the middle of **sequences** of content, but it also means they can't walk their way through sequences because the requests are not connected.
-  - To fix this, HTTP allows **sessions**.
+  - HTTP doesn't remember previous requests.
+    - Go to a web page with a photo gallery, and it will show you the first picture. Go reload your browser or type in the URL again and it will re-request the first picture again.
+  - This `statelessness` ensures users don't get trapped in the middle of **sequences** of content, but it also means they can't walk their way through sequences because the requests are not connected.
+    - To fix this, HTTP allows `sessions`.
 
 - `sessions` : Stored states shared between the browser and the server by passing information back and forth in the form of `cookies`.
 
 ---
 
-### HTTP/1.1 vs HTTP/2
+### HTTP History
 
-![alt](./img/http1-2.webp)
+- `HTTP/0.9`
+  - only `GET` method was supported and designed to transfer `HTML` documents.
+- `HTTP/1.0`
+  - `GET`, `POST`, `HEAD` methods and headers were supported and can deal with different types of data (images, videos, etc..)
+  - drawback: couldn't have multiple requests at the same time which led to ("Three-way handshake")
+- `HTTP/1.1`
+  - More methods were added (`PUT`, `DELETE`, ...) and added `Host` header to support multiple websites on the same IP address.
+  - Enabled **"persistent connections" (keep-alive)** which means that the connection between the client and the server will be kept open after the first request, so that the client can send multiple requests over the same connection.
+  - Included proxy authentication, caching, and more.
+- `HTTP/2`
 
-- **HTTP/2** is faster and more secure. It uses compression algorithms to speed up requests, allows for multi-plexing, meaning multiple files are sent over connection at the same time and requires an encrypted connection between the client and the server through `HTTPS`
-
-  - establish one connection over a big pipe
-  - data will be broken-down and send in chunks according to the priority of the request, this is called **Multiplexing**
-  - also with `HTTP/2`, the server will assume that the browser wants other files like (`css`, `js`), and will send (push) them automatically, this is called **Server Pushing**
-
-- **HTTP/1** sends uncompressed headers, transfers only one file at a time over a connection, and has no default encryption.
+  - It was designed for modern websites and applications to ensure low latency.
+  - `Binary Protocol` : HTTP/2 uses binary format instead of text format which makes it faster and more secure.
+  - `Multiplexing` : multiple requests can be sent at the same time over the same connection.
+    - data will be broken-down and send in chunks according to the priority of the request.
+  - `Server Pushing` : multiple responses for a single request.
+    - the server can send multiple responses for a single request, so that the client doesn't have to wait for the server to send the response for each request. the server will assume that the browser wants other files like (`css`, `js`), and will send (push) them automatically.
+    - > Note: this feature is not used a lot because it's hard to implement and even if it's implemented, it's not always useful. Actually `Chrome` and `Firefox` have disabled this feature by default.
+  - `Header Compression` : headers are compressed using a new algorithm called `HPACK` which reduces the size of the headers by `80%`.
+  - `Security` : `HTTP/2` requires `HTTPS` to work.
 
 ---
 
-### HTTP/3
+### HTTP/3 (Not important 🚫)
+
+Summary: HTTP/3 is a new version of HTTP protocol that uses QUIC instead of TCP. It was designed to improve performance and security but it's not widely used yet.
+
+More details here: [HTTP/3 From A To Z](https://www.smashingmagazine.com/2021/08/http3-core-concepts-part1/)
 
 #### Why we need HTTP/3
 
-we didn’t really need a new HTTP version in the first place, but rather an upgrade of the underlying Transmission Control Protocol (**TCP**).
+we didn’t really need a new `HTTP` version in the first place, but rather an upgrade of the underlying Transmission Control Protocol (**TCP**).
 
 > **TCP** is the main protocol that provides crucial services such as reliability and in-order delivery to other protocols such as HTTP. It’s also one of the reasons we can keep using the Internet with many concurrent users, because it smartly limits each user’s bandwidth usage to their fair share.
 
@@ -77,7 +98,7 @@ HTTP/2 was adjusted in a few key areas to make it compatible with QUIC. This twe
 
 ---
 
-### What Is QUIC
+#### What Is QUIC
 
 QUIC is a generic transport protocol which, much like TCP, can and will be used for many use cases in addition to HTTP and web page loading. For example, DNS, SSH, SMB, RTP, and so on can all run over QUIC.
 
@@ -89,9 +110,9 @@ QUIC is a generic transport protocol which, much like TCP, can and will be used 
 
 ## URL `universal resource locator`
 
-is for. A URL is a human-readable address, describing exactly where on the web and in what location on a server the information you are requesting is located.
+It is a human-readable address, describing exactly where on the web and in what location on a server the information you are requesting is located.
 
-<img src='./img/url.svg' style='background-color:#fff'>
+![url](./img/url.svg)
 
 ---
 
@@ -100,7 +121,7 @@ is for. A URL is a human-readable address, describing exactly where on the web a
 ### HTTP Request Methods
 
 - HTTP request is an action to be performed on a resource identified by a given Request-`URL`
-- **HTTP method**, sometimes referred to as an HTTP verb, indicates the action that the HTTP request expects from the queried server.
+- **HTTP method**, sometimes referred to as an HTTP `verb`, indicates the action that the HTTP request expects from the queried server.
 
 #### Content methods
 
@@ -110,9 +131,9 @@ is for. A URL is a human-readable address, describing exactly where on the web a
 ![HTTP method](./img/patch.PNG)
 ![HTTP method](./img/del.PNG)
 
-- PUT vs PATCH
-  - `put`: **replace** a source in collection
-  - `patch`: **modify** a source in collection
+- `PUT` vs `PATCH`
+  - `PUT`: **replace** a source in collection
+  - `PATCH`: **modify** a source in collection
 
 #### Information-getter methods
 
@@ -132,7 +153,7 @@ HTTP status codes are **3-digit codes** most often used to indicate whether an H
 ![status codes](./img/status%20messages.jpeg)
 ![status codes](./img/http-status.png)
 
-> **304** means that you made **200OK** request then requested it again and it got you the same message (not modified), and in the server if you modified the response message and requested again it will be **200OK** again
+> **`304`** means that you made **`200OK`** request then requested it again and it got you the same message (not modified), and in the server if you modified the response message and requested again it will be **`200OK`** again
 
 ---
 

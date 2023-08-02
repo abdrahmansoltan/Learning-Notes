@@ -149,13 +149,24 @@ sort data-items in the data-structure to be ordered (next to each other in memor
 
 ## Arrays
 
-Arrays are stored contiguously in memory, which means that all elements of the array are stored next to each other in memory. This is why we can access any element of an array in constant time, as long as we know the index of that element.
+Arrays are stored **contiguously in memory**, which means that all elements of the array are stored next to each other in memory. This is why we can access any element of an array in constant time, as long as we know the index of that element.
 ![arrays](./img/arrays.png)
+
+```js
+// this is not an array, it's a list
+let array = [1, 2, 3, 4, 5];
+
+// these are arrays
+let array = new ArrayList(5); // Array with 5 elements
+let array = new Unit16Array(5); // Array with 5 elements of 16 bits each
+```
 
 - Note that the addresses in the picture are not real addresses, they are just used to illustrate the concept of contiguous memory. also they are incremented by `4` as each **number** element is `4 bytes` (32 bits)
   - This will differ if storing **ASCII** characters as each character is `1 byte` (8 bits)
     ![arrays](./img/arrays-1.png)
   - If storing **Unicode** characters as each character is `2 bytes` (16 bits)
+
+---
 
 ### Static Array
 
@@ -222,6 +233,7 @@ The downside of this approach is that the size of the array must be specified in
      - `insertions = (4+9+14+...+N)` --> `O(N^2)`
   2. Increase the capacity by a constant factor `F` each time a resize occurs --> **This is the best solution**
      - `insertions = (4+8+16+...+N)` --> `O(2N)` --> `O(N)`
+       - Notice that it's dominated by the last term `N` as `2` is a constant
      - `space` --> `O(2N)` --> `O(N)`
 
 - As soon as the first element is inserted into the list, we detect a change in the underlying size of the structure. In particular, we see the number of bytes jump from 72 to 104, an increase of exactly `32 bytes`. Usually, we run on a `64-bit` machine architecture, meaning that each memory address is a `64-bit` number (i.e., `8 bytes`). We speculate that the increase of `32 bytes` reflects the allocation of an underlying array capable of storing four object references. This hypothesis is consistent with the fact that we do not see any underlying change in the memory usage after inserting the second, third, or fourth element into the list.
@@ -363,6 +375,8 @@ It doesn't have a predetermined fixed size, It uses space proportionally to its 
 ### Singly linked list
 
 ![linked-list](./img/linked-list0.png)
+
+It's based on **nodes** that have a `value` and a `pointer` to another node or `null`
 
 - **single-linked** list contains a set of nodes, each node has 2 elements:
   - data to store
@@ -1072,6 +1086,10 @@ They're nodes (vertices) connected via "Edges"
     - directions assigned to distances between nodes
     - `Undirected` -> If you made a facebook friend-request to someone; you become his friend and he becomes your friend
     - `directed` -> (graph that goes in one direction): If you made a twitter follow to someone; you follow him, but he doesn't automatically follow you
+  - **Complete** and **incomplete** graphs:
+    ![graphs](./img/graphs-complete.jpeg)
+    - `complete` -> all nodes are connected to each other
+    - `incomplete` -> not all nodes are connected to each other
   - **weighted** and **unweighted**
     - values assigned to distances between nodes
   - **cyclic** and **Acyclic**
@@ -1316,6 +1334,8 @@ An alternative representation of a binary tree is to have a single array `A` of 
   - value of the right child is always greater than the parent node
     - this means if I keep going to the right, the number or the value of the node constantly increases
 
+- It's somehow similar to `Quick Sort` algorithm, where we have a `pivot` point and all the values to the left of the `pivot` are less than the `pivot` and all the values to the right of the `pivot` are greater than the `pivot`
+
 - **Advantages:**
 
   - searching, look-ups and inserting which here is `O(log(n))` **(not guaranteed! as we may have unbalanced-search-tree)** which is much faster as we won't loop like in arrays (better than `O(n)`)
@@ -1380,6 +1400,9 @@ An alternative representation of a binary tree is to have a single array `A` of 
 - **Removing a node:**
 
   ![BST insertion](./img/bst-removing.png)
+  - Here, when we need to remove a node that has children, we need to
+    - find the **minimum value** in the **right subtree (largest side)** and replace the node with it, then remove the minimum value from the right subtree
+    - or find the **maximum value** in the **left subtree (smallest side)** and replace the node with it, then remove the maximum value from the left subtree
 
   ```py
   def remove(root, target):
@@ -1495,7 +1518,7 @@ It's a more efficient data structure for presenting Priority-queue.
 
 - It's very similar to Binary-search-tree, but with some different rules:
 
-  - There's no order to nodes in left and right nodes
+  - There's no order to nodes in left and right nodes **(Weak order)**, but there's an order between the parent node and its children nodes **(Heap order)**
     - left and right child nodes can be any value as long as they're less than the upper node
   - in a **MinBinaryHeap**, parent nodes are always smaller than child nodes
     - for every position `p` in the heap, the `key` stored at `p` is **greater** than or equal to the `key` stored at `p's parent`
@@ -1543,7 +1566,7 @@ Time complexity:
 
 - **Popping / Removing**
   1. remove the root
-  2. swap its position with the most recently added (last element in values array)
+  2. swap its position with the most recently added (last element in values array) -> **bubble-up** to the top.
   3. adjust (**sink/bubble-down**) until we have correct spots
      ![binary-heap-removing](./img/binary-heap-removing.png)
 

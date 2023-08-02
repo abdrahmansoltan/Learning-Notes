@@ -7,6 +7,7 @@
     - [Find first and last position of element in sorted array](#find-first-and-last-position-of-element-in-sorted-array)
     - [Search a 2D Matrix](#search-a-2d-matrix)
     - [Koko Eating Bananas](#koko-eating-bananas)
+    - [Two Crystal Balls Problem](#two-crystal-balls-problem)
     - [Search in Rotated Sorted Array](#search-in-rotated-sorted-array)
     - [Find Minimum in Rotated Sorted Array](#find-minimum-in-rotated-sorted-array)
     - [Time Based Key-Value Store](#time-based-key-value-store)
@@ -258,6 +259,46 @@ def minEatingSpeed(piles, h):
           l = k + 1
 
     return res
+```
+
+---
+
+### Two Crystal Balls Problem
+
+Given two crystal balls that will break if dropped from high enough distance, determine the exact spot in which it will break in the most optimized way.
+
+To understand the problem, let us assume the crystal ball will break if dropped from a height of `8` meters. So, if we drop from `1` meter, the ball will not `break(0)`. If dropped from height of `2` meter, again the ball will not `break(0)`. We keep on doing it. When dropped from `8` meters, the ball will `break(1)`. If we list all 0s and 1s in an array, it will look like below:
+  
+  `[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, ...]`
+
+So, basically, we have to find the index of the first `1` in the array.
+
+- Explanation:
+  - the array is sorted, so we can use **binary search** to find the index of the first `1` in the array
+  - since there're 2 balls, we can use first ball to find the breaking point by using `binary search`. Then we will do `linear search` in that interval to find the correct breaking point
+    - This solution will take `O(log(n) + k)` time, where `n` is the number of floors and `k` is the number of floors in the interval where the first ball will break, So It's `O(n)` time in the worst case ❌
+  - Instead, we can run it in `O(sqrt(n))` time by searching in intervals of `sqrt(n)` floors
+    - We can drop the first ball from `sqrt(n)` floors, then we can drop the second ball from `sqrt(n) - 1` floors, then `sqrt(n) - 2` floors, and so on
+    - This will take `O(sqrt(n))` time to find the interval where the first ball will break
+    - Then we can do `linear search` in that interval to find the correct breaking point
+
+```py
+def twoCrystalBalls(arr):
+    # find the interval where the first ball will break
+    interval = int(math.sqrt(len(arr)))
+    start = 0
+
+    # looping through the array in intervals of sqrt(n)
+    for i in range(interval, len(arr), interval):
+        if arr[i] == 1:
+            break # we found the interval where the first ball will break
+
+    # Go back to the start of the interval and do linear search
+    for i in range(i - interval, i + 1):
+        if arr[i] == 1:
+            return i # we found the breaking point
+
+    return -1 # no breaking point found
 ```
 
 ---

@@ -29,6 +29,7 @@
   - [Trapping Rain Water II](#trapping-rain-water-ii)
   - [Longest Increasing Path in a Matrix](#longest-increasing-path-in-a-matrix)
   - [Circular Array Loop](#circular-array-loop)
+  - [Escape a Large Maze](#escape-a-large-maze)
 
 ---
 
@@ -2103,3 +2104,62 @@ def getNextIndex(nums, i):
 ```
 
 ---
+
+## Escape a Large Maze
+
+problem: [Here](https://leetcode.com/problems/escape-a-large-maze/)
+
+Return `true` if and only if it is possible to reach the `target` square from the `starting` square through a sequence of valid moves.
+
+- Ex:
+  - Input: `blocked = [[0,1],[1,0]], source = [0,0], target = [0,2]`
+  -  
+
+- Explanation:
+
+  - It's a `Graph` problem, because we will will be going to each `node` and then look into its neighbors to see if it can trap water.
+  - This is a `BFS` problem, we will use a `queue` to store the cells that we need to visit.
+    - We use a `queue` because **we want to visit the cells in the order that we added them**.
+  - We will start by adding the `source` and `target` cells to the queue and mark them as `visited`.
+  - Then we will iterate over the queue and for each cell we will check its `neighbors` to see if we can reach the target cell.
+    - We will check if the neighbor is in the grid and not visited.
+    - If the neighbor is the target cell, then we can reach it.
+    - If the neighbor is not the target cell, then we will add it to the queue and mark it as visited.
+  - **Tha main trick here is:** we will call the `bfs` function twice, once with the `source` and `target` cells and once with the `target` and `source` cells.
+    - This is because the `blocked` array can be very large, so we will limit the number of cells that we visit to `20000` for each `bfs` call.
+    - If we can reach the `target` cell from the `source` cell and vice versa, then we can reach the `target` cell from the `source` cell.
+    - If we can't reach the `target` cell from the `source` cell or vice versa, then we can't reach the target cell from the source cell.
+  - Time and space complexity: `O(n)`, where `n` is the number of cells in the grid.
+
+```py
+def isEscapePossible(blocked: List[List[int]], source: List[int], target: List[int]) -> bool:
+    escapeDist = len(blocked) # maximum number of cells that we can visit
+    
+    def dfs(start, end, blockedSet):
+        nonlocal escapeDist
+        stack = [start] # (row, col)
+        r, c = start
+        blockedSet.add((r, c))
+
+        while stack:
+            r, c = stack.pop()
+            # check if we can reach the end cell from the current cell
+            if abs(start[0] - r) + abs(start[1] - c) >= escapeDist:
+                return True
+
+            # check the neighbors
+            directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < 10**6 and 0 <= nc < 10**6 and (nr, nc) not in blockedSet:
+                    stack.append((nr, nc))
+                    blockedSet.add((nr, nc))
+
+        # check if we can reach the end cell from the start cell after visiting 20000 cells
+        return (end[0], end[1]) in blockedSet
+
+    # convert the blocked array to a set to make the lookup faster
+    blocked = {(a[0], a[1]) for a in blocked}
+    # Check if we can escape from start to destination, and vice versa
+    return dfs(source, target, set(blocked)) and dfs(target, source, set(blocked))
+```

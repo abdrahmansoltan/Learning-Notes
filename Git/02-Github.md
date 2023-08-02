@@ -284,6 +284,11 @@ A pull request is a request to the original or source repository's maintainer to
 
 ## Notes
 
+- Difference between cloning `HTTPS` vs `SSH`
+
+  - `HTTPS` cloning requires password every time you push or pull
+  - `SSH` cloning uses the SSH key to authenticate, so you don't need to enter your password every time
+
 - `Assign yourself`
 
   - When you’re assigned to an issue or pull request, it tells repository visitors and contributors that you'll be facilitating the conversation or task

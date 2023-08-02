@@ -1,19 +1,22 @@
 # INDEX
 
 - [INDEX](#index)
-  - [What is Internet](#what-is-internet)
+  - [Networking](#networking)
+    - [OSI Model](#osi-model)
+  - [Internet](#internet)
+    - [What is Internet](#what-is-internet)
+    - [How internet works](#how-internet-works)
+  - [Important Concepts](#important-concepts)
     - [IP address](#ip-address)
-      - [IPv6](#ipv6)
     - [Packet](#packet)
+    - [ISP](#isp)
     - [SSL](#ssl)
-  - [How internet works](#how-internet-works)
-    - [TCP vs UDP](#tcp-vs-udp)
+    - [TCP/IP](#tcpip)
+      - [TCP vs UDP](#tcp-vs-udp)
     - [Domain and DNS](#domain-and-dns)
-      - [DNS Records](#dns-records)
-    - [Hosting](#hosting)
-    - [Server](#server)
-  - [The Cloud](#the-cloud)
-    - [Elastic computing](#elastic-computing)
+      - [DNS Records (not important 🚫)](#dns-records-not-important-)
+      - [Hosting](#hosting)
+    - [SSL / TLS](#ssl--tls)
   - [SSH](#ssh)
     - [How It Works](#how-it-works)
     - [Different Encryption Techniques](#different-encryption-techniques)
@@ -29,58 +32,156 @@
 
 ---
 
-## What is Internet
+## Networking
 
-The internet has **three** basic parts:
+- Here's the network steps in order:
+  ![networking](./img/networking-1.jfif)
+  1. `Modem` -> converts the signal from the `ISP` to a signal that the router can understand.
+  2. `Router` -> it's the device that connects your devices to the internet
+  3. `Switch` -> it's the device that connects your devices to the router (it's like a router but for local network) -> it sends the data to the right device
+  4. `Network Interface Card (NIC)` -> it's the device that connects your device to the switch
+  5. `Home router` -> it's the device that connects your devices to the internet
+     - It's a multi-functional device -> `modem` + `router` + `switch`
 
-- **The last mile**
-  - is the part of the internet that connects homes and small businesses to the internet.
-  - it's called **last mile** as it's the last (outer) layer of the internet where user can access
-  - it also includes the towers that allow people to access the internet with their cell phones.
-- **Data centers**
-  - rooms full of servers that store user data and host online apps and content.
-- **The backbone**
-  - consists of long-distance networks — mostly on fiber optic cables — that carry data between data centers and consumers
+### OSI Model
 
-![internet](./img/internet.png)
-![internet-layers](./img/internet-layers.png)
+It's a standard that defines the steps of the network
 
-> The web is just one of many internet applications. Other popular Internet applications include email and BitTorrent.
+![OSI Model](./img/osi-model.png)
+
+When entering a website, the data goes through all the layers of the OSI model like this:
+
+1. **Application layer** -> the data is in the form of a message (ex: `HTTP` request)
+   - Here, it processes the data and adds the **header** to it + it resolves the `domain` name to the `ip` address
+2. **Presentation layer** -> It's the layer that converts the data to a format that the application can understand
+
+   - The encryption happens here (if the website is using `HTTPS`) using **TLS** (formerly known as **SSL**) protocol
+
+   ```sh
+    # Before encryption
+    GET / HTTP/1.1
+    Host: www.example.com
+    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0
+    Upgrade-Insecure-Requests: 1
+
+    # After encryption
+    GET / HTTP/1.1
+    JRPKJSDFDAADSFHDUASFHADJSHFDSALFGUEAHGFJDSEANFJADHUFHEUFGAESYBFGHES
+    Host: 196.145.54.11
+    JRPKJSDFDAADSFHDUASFHADJSHFDSALFGUEAHGFJDSEANFJADHUFHEUFGAESYBFGHES
+   ```
+
+3. **Session layer** -> It's the layer that creates and manages the connection between the client and the server
+
+   - It's possible to directly work with this layer to handle the connection (as a frontend developer)
+
+4. **Transport layer** -> It's the layer that splits the data into `packets` and sends them to the server
+
+   - this is done in the `TCP` protocol (it's a protocol that ensures that the data is sent and received correctly)
+   - the size of the `TCP` packet (segment) is `64kb` (it's the maximum size of the packet) and sometimes it's less than that based on the network speed and the size of the data
+
+5. **Network layer** -> It's the layer that adds the `ip` address to the `packet` and sends it to the server
+
+6. **Data link layer** -> It's the layer that adds the `mac` address to the `packet` and sends it to the server
+
+   - `mac` address is the address of the device (it's unique for each device)
+
+7. **Physical layer** -> It's the layer that sends the `packet` to the server using the `cable`
+
+   - At this stage the data is in this form:
+     ![packet](./img/osi-model-1.png) 1. `http data` -> from the `application` layer 2. `tcp segment` -> from the `transport` layer 3. `ip packet` -> from the `network` layer 4. `Ethernet frame` -> from the `data link` layer
+   - The cable is made of `copper` or `fiber` (fiber is faster than copper)
+
+After all of this, the server receives the data and it goes through the same steps **but in reverse order**
+![packet](./img/osi-model-2.png)
+
+---
+
+## Internet
+
+### What is Internet
+
+The internet is a global network of computers that communicate with each other (network of computer networks) using a common set of rules. These rules are called **protocols**.
+
+> The internet was developed in the late 1960s by the United States Department of Defense as a means of creating a decentralized communication network that could withstand a nuclear attack
+
+- **Network**: is a group of computers / systems that can communicate with each other.
+
+- The internet has **three** basic parts: (Not important 🚫)
+
+  - **The last mile**
+    - is the part of the internet that connects homes and small businesses to the internet.
+    - it's called **last mile** as it's the last (outer) layer of the internet where user can access
+    - it also includes the towers that allow people to access the internet with their cell phones.
+  - **Data centers**
+    - rooms full of servers that store user data and host online apps and content.
+  - **The backbone**
+    - consists of long-distance networks — mostly on fiber optic cables — that carry data between data centers and consumers
+
+---
+
+### How internet works
+
+> watch the first question from [this video](https://www.youtube.com/watch?v=qvyvysDV17w)
+
+The internet works by connecting devices and systems together through a series of routers, switches, and servers using a set of rules called **protocols**.
+
+- `protocol` define how information in exchanged between devices and systems and ensure that data is transmitted reliably and securely.
+- The core of the internet is a global network of connected **routers** which are responsible for directing traffic to its destination.
+  - When sending data over the internet, it's broken up into small `packets` that are sent from your device to a `router` and then to another `router` until it reaches its destination.
+    ![routers](./img/routers-1.png)
+- To ensure that `packets` are send and received correctly, the internet uses a protocols like **IP** and **TCP** (Transmission Control Protocol).
+  - `TCP` ensures that the data is received in the correct order and that no data is lost or corrupted during transmission.
+- In addition to these core protocols, there are many other protocols that are used to enable communication and data-exchange over the internet like:
+  - `DNS` (Domain Name System) -> used to translate domain names to IP addresses.
+  - `HTTP` (HyperText Transfer Protocol) -> used to transfer data between clients and servers.
+  - `HTTPS` (HyperText Transfer Protocol Secure) -> a more secure version of `HTTP` that uses `SSL/TLS` encryption to protect data.
+  - `SSL` (Secure Sockets Layer) / `TLS` (Transport Layer Security) -> used to encrypt data and ensure that it's sent and received securely.
+
+---
+
+## Important Concepts
 
 ### IP address
 
-Internet Protocol addresses are numbers that computers use to identify each other on the internet. For example, an IP address for `vox.com` is `216.146.46.10`.
+Internet Protocol addresses are unique identifiers assigned to every device connected to a network.
 
-#### IPv6
+- It's responsible for routing data `packets` to their correct destination.
+- Ex: `vox.com` -> `216.146.46.10`
 
-- The current internet standard, known as **IPv4**, only allows for about `4 billion` IP addresses. This was considered a very big number in the 1970s, but today, the supply of IPv4 addresses is nearly exhausted.
+- `IPv6` -> is a `32-bit` number (4 bytes) that represents an IP address
   ![ip](./img/ip.png)
   ![ipv4](./img/ipv4.png)
-- internet engineers have developed a new standard called **IPv6**.
-  - IPv6 allows for a big number of unique addresses — the exact figure is `39`digits long — ensuring that the world will never again run out.
+
+- Now, there's a new standard called `IPv6` which allows for a much larger number of unique addresses.
 
 ---
 
 ### Packet
 
-**packet** is the basic unit of information transmitted over the internet. Splitting information up into small, digestible pieces allows the network’s capacity to be used more efficiently.
+It's a small piece of data that is sent over the internet.
 
 - it contains **MetaData** (where to/from the data is sent and headers ..)
 
-> it's:
->
-> 1. breaking message into small parts
-> 2. labeling these parts individually
-> 3. then throwing them into the shared network (the cloud)
+  1. breaking message into small parts
+  2. labeling these parts individually
+  3. then throwing them into the shared network (the cloud)
 
 - A packet has two parts:
-  - **header** contains information that helps the packet get to its destination, including the length of the packet, its source and destination
-  - **checksum value** that helps the recipient detect if a packet was damaged in transit.
-- transmission speed of packets depend on bandwidth as packet consists of bytes
-  - bandwidth is number of bytes ber second
-    - amount of data the hosting company will send to your site's visitors.
-- in order to send the `0 / 1` data we want a way which has low data-loss and can transfer for long distances, thats why we use light and not electricity
+  - `header` contains information that helps the packet get to its destination, including the `length` of the packet, its `source` and destination
+  - `checksum value` that helps the recipient detect if a packet was damaged in transit.
+- transmission speed of packets depend on bandwidth as packet consists of `bytes`
+  - bandwidth is number of `bytes` ber `second`
+- in order to send the `0 | 1` data we want a way which has low data-loss and can transfer for long distances, thats why we use **light** and not electricity
   - light is transmitted in **fiber / copper** cables
+
+---
+
+### ISP
+
+**Internet Service Provider (ISP)**: is a company that provides customers with internet access by connecting them to its network.
+
+- Ex: `Verizon`, `AT&T`
 
 ---
 
@@ -94,41 +195,48 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
 
 ---
 
-## How internet works
+### TCP/IP
 
-> watch the first question from [this video](https://www.youtube.com/watch?v=qvyvysDV17w)
+**Transmission Control Protocol/Internet Protocol (TCP/IP)**: is a set of rules that governs the connection of devices on the internet and provides a reliable, ordered, and error-checked delivery of data
 
-### TCP vs UDP
+- TCP/IP key concepts:
+  - `Ports` -> is a number that identifies a specific process or service on a computer or server. Each application or service is assigned a unique `port` number, allowing data to be sent to the correct destination.
+    - ex: `80` for `HTTP` and `443` for `HTTPS`
+  - `Sockets` -> is a combination of an IP address and a port number. It's used to establish a connection between a client and a server.
+  - `Connection` -> is a communication channel established between two devices on a network. It's used to exchange data between the two devices.
 
-- TCP is a **connection**-oriented protocol (it's like saying hi and wait to see if the other side heard it)
+When building applications with `TCP/IP`, We need to ensure that the application is designed to work with the appropriate `ports`, `sockets`, and `connections`.
+
+#### TCP vs UDP
+
+- `TCP` is a **connection**-oriented protocol (it's like saying "hi" and wait to see if the other side heard it)
 
   - TCP do this by checking the packets in the receiver part and see if they're complete and all is there
     ![TCP](./img/tcp.png)
-  - TCP is the main protocol that provides crucial services such as reliability and in-order delivery to other protocols such as HTTP. It’s also one of the reasons we can keep using the Internet with many concurrent users, because it smartly limits each user’s bandwidth usage to their fair share.
+  - It provides **reliability** and **error checking**
 
-- UDP is a **connection-less** protocol. (it's like yelling HI! and assume that the other side heard it and keep sending data like that anyway)
-- A key difference between TCP and UDP is **speed**, as TCP is comparatively slower than UDP. Overall, **UDP is a much faster**, simpler, and efficient protocol, however, retransmission of lost data packets is only possible with TCP.
+- `UDP` is a **connection-less** protocol. (it's like yelling "HI!" and assume that the other side heard it and keep sending data like that anyway)
 
-> cheat sheet to check your website for debugging: use **ping**
->
-> - it's like saying: `hey hey hey hey hey ...` and get back `I'm here I'm here I'm here I'm here I'm here ...`
+A key difference between TCP and UDP is **speed**, as `TCP` is comparatively slower than `UDP`. Overall, **UDP is a much faster**, simpler, and efficient protocol, However, retransmission of lost data packets is only possible with `TCP`.
+
+---
 
 ### Domain and DNS
 
-- **DNS**:
-  - Is a server that translates the domain to the corresponding ip address to supply the specified webpage
+**Domain name**: is a human-readable address for a website. It’s what you type into a web browser’s address bar to go to a website. it's translated to an `IP` address by the `DNS` server.
+
+- **Domain name system (DNS)**:
+  - It's part of the internet infrastructure that translates domain names to IP addresses.
   - It is the phone-book of the Internet
+  - DNS servers are connected to each other in a hierarchy or tree-like structure to split responsibility for translating domain names to different `domains` like `.com` or `.org`.
 - **Domain**: Is a piece of string that helps to spot a specific web site
   ![DNS](./img/dns.png)
 
-- `TLD`: top level domain
-- The unique number that the DNS server returns to your computer allows your browser to contact the web server that hosts the website you requested.
-- Modern web browsers are designed by default to **cache** DNS records for a set amount of time.
-  - the closer the DNS caching occurs to the web browser, the fewer processing steps must be taken in order to check the cache and make the correct requests to an IP address.
+- `TLD`: top level domain -> `.com`
+- Modern web browsers are designed by default to **cache** `DNS` records for a set amount of time after they’re first requested.
+  ![DNS Cashing](./img/dns2.png)
 
-![DNS Cashing](./img/dns2.png)
-
-#### DNS Records
+#### DNS Records (not important 🚫)
 
 **DNS records**: they hold information related to your domain name and help people find your website, email servers, and more
 
@@ -148,60 +256,53 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
 
 ---
 
-### Hosting
+#### Hosting
 
 Shared Hosting vs. VPS (virtual private server) Hosting vs. Dedicated Server
 ![hosting](./img/hosting.webp)
 
 ---
 
-### Server
+### SSL / TLS
 
-It serves data or receives requests
+It's a protocol used to **encrypt** data being transmitted over the internet. It is commonly used to **provide secure connections** for applications such as web browsers, email clients, and file transfer programs.
 
-> Note: we usually select port 8080 as it's a high number in the upper end and there's a big chance that it't not occupied
-
----
-
-## The Cloud
-
-### Elastic computing
-
-it enables you to take more resources for your services when needed
-
-- **Load balancers** -> elastics and comprises based on your needs
+- When using `SSL/TLS` to secure internet communication, there are a few key concepts to understand:
+  - `Certificate`: is a digital document that contains information about the identity of a website or service. It's used to establish trust between the client and server. It's signed by a **certificate authority (CA)** to verify their authenticity.
+  - `Handshake`: is the process of establishing a secure connection where the client and server exchange information about their identity and the encryption algorithms they support.
+  - `Encryption`: is the process of encoding data so that only the intended recipient can read it. It's used to protect data from being intercepted by malicious parties.
+    - `Public key`: is a long string of characters that is used to **encrypt** data. It is included in the certificate and is publicly available.
+    - `Private key`: is a long string of characters that is used to **decrypt** data. It is kept secret and is only known to the owner of the certificate.
 
 ---
 
 ## SSH
 
-**Secure Socket Shell (SSH)**: is a network protocol that allows users to access, control, and modify their remote servers over the internet.
+**Secure Socket Shell (SSH)**: is a network `protocol` that allows users to access, control, and modify their remote servers over the internet. (It's a way for computers to talk to each other)
+![SSH](./img/ssh.png)
 
-- It's a **secure way to access a computer over an unsecured network**.
+- It's a **secure way to access a computer over an unsecured network**. you can think of it like `HTTPS` but for **remote access and control between computers**.
+  ![SSH](./img/ssh-1.png)
 - It depends on 2 keys
   - Public key (`.pub`)
-    - used to encrypt (lock) data (message)
+    - used to `encrypt` (lock) data (message)
     - the remote server (cloud) uses this
   - Private Key
-    - your computer/server uses this to **ssh into the server that have the public key**
-    - it's used to decrypt data and have access (open a box locked with the public key pair.)
-
-![SSH](./img/ssh.PNG)
+    - your computer/server uses this key to **ssh (access) into the server that have the public key**
+    - it's used to `decrypt` data and have access (open a box locked with the public key pair.)
 
 > This is great not only for privacy, but also for **identification** since we know for sure that only the owner of the 2 keys can open the message.
 
 ### How It Works
 
-- The most popular SSH client is **PuTTY**
+- The **SSH command** consists of 3 distinct parts:
 
-The **SSH command** consists of 3 distinct parts:
+  ```sh
+  ssh {user}@{host}
 
-```sh
-ssh {user}@{host}
-
-# Ex:
-ssh -i <location_of_Private_key> root@165.22.140.238
-```
+  # Ex:
+  ssh -i <location_of_Private_key> root@165.22.140.238
+  ```
 
 > You can add your private key to keyChain to prevent writing it each time
 > ![ssh](./img/ssh2.png)
@@ -216,14 +317,15 @@ ssh -i <location_of_Private_key> root@165.22.140.238
 
 #### Symmetric Encryption
 
-is a form of encryption where a secret key is used for both encryption and decryption of a message by both the client and the host.
+is a form of encryption where **one** secret key is used for both `encryption` and `decryption` of a message by both the client and the host.
 ![Symmetric Encryption](./img/Symmetric%20Encryption.webp)
 
-> Symmetrical encryption is often called **shared key** or **shared secret encryption**.
+- It's often called **shared key** or **shared secret encryption**.
+- if anyone knows the key, they can decrypt the message (it's not secure)
 
 #### Asymmetric Encryption
 
-Unlike symmetrical encryption, asymmetrical encryption uses two separate keys for encryption and decryption. These two keys are known as the **public key** and the **private key**. Together, both these keys form a public-private key pair.
+Unlike `symmetrical encryption`, Asymmetrical encryption uses **two** separate keys for `encryption` and `decryption`. These two keys are known as the **public key** and the **private key**. Together, both these keys form a public-private key pair.
 
 ![Asymmetric Encryption](./img/asymmetric-encryption.webp)
 
@@ -231,14 +333,27 @@ Unlike symmetrical encryption, asymmetrical encryption uses two separate keys fo
 
 #### Hashing
 
-One-way-hash functions differ from the above two forms of encryption in the sense that they are never meant to be decrypted. They generate a unique value of a fixed length for each input that shows no clear trend which can be exploited. This makes them practically impossible to reverse.
+One-way-hash functions differ from the above two forms of `encryption` in the sense that they are never meant to be `decrypted`. They generate a unique value of a fixed length for each input that shows no clear trend which can be exploited. This makes them practically impossible to reverse.
+
+- It's used to hash the data sent from the client to the server to ensure that the data is not changed during the transmission by a hacker
 
 ---
 
 ### Connecting using SSH
 
-- You can use the password provided but it can be compromised by hacker
-- You can Create SSH Keys -> **rsa**
+1. You can use the `password` but it can be compromised by hacker
+2. You can Create SSH Keys -> **rsa**
+
+   - create a public key and a private key to use them to connect to the server
+   - `rsa` is a type of encryption algorithm that uses 2 keys (public and private)
+   - you can create them using `ssh-keygen` command
+
+     ```sh
+     ssh-keygen -t rsa -b 4096 -C "
+     # this generates 2 files:
+      # 1. id_rsa -> private key
+      # 2. id_rsa.pub -> public key
+     ```
 
 ---
 

@@ -34,7 +34,7 @@ Most CSS developers are familiar with preprocessors. Tools including `Sass`, `Le
 
 ### What is PostCSS ?
 
-Despite what its name seems to imply, it is not a post-processor (nor is it a pre-processor), but rather it is a transpiler to turn PostCSS-specific (or PostCSS plugin-specific, to be more precise) syntax into vanilla CSS.
+Despite what its name seems to imply, it is not a post-processor (nor is it a pre-processor), but rather it is a transpiler to turn PostCSS-specific (or PostCSS plugin-specific, to be more precise) syntax into vanilla CSS so that it can be understood by the browser.
 
 **PostCSS**: PostCSS is **not a preprocessor** (although it can behave like one). It’s a Node.js tool which takes valid CSS and enhances it. Even those using Sass, Less, or Stylus often run a PostCSS step after the initial CSS compilation. You may have encountered the PostCSS `Autoprefixer plugin` which automatically prepends `-webkit`, `-moz`, and `-ms` vendor prefixes to CSS properties which require them.
 
@@ -103,6 +103,8 @@ npm install -g postcss-import
 
   - AutoPrefixer uses the browserlist module to determine which browser prefixes to add.
 
+---
+
 ### Enabling and Disabling Source Maps
 
 An inline source map is output by default. When the compiled CSS file is used in an HTML page, examining it in the browser’s developer tools will show the original src file and line. For example, viewing `<body>` styles will highlight `src/_elements.css` line 2 rather than `styles.css` line 8.
@@ -110,6 +112,8 @@ An inline source map is output by default. When the compiled CSS file is used in
 - You can create an external source map by adding a `--map` (or `-m`) switch to the postcss command. There’s little benefit other than the CSS file is cleaner and the browser doesn’t need to load the source map unless the developer tools are open.
 - You can remove the source map with `--no-map`.
   - Always use this option when outputting CSS files for production deployment.
+
+---
 
 ### Automatically Build when Source Files Change
 
@@ -178,4 +182,23 @@ The `postcss` command will become long and cumbersome as you add further plugins
 
 ## PostCSS plugins
 
-you can find plugins here [postcss.parts](https://www.postcss.parts/)
+They are a lot of plugins for PostCSS, which help us to do a lot of things, like: `minify`, `autoprefix`, `nesting`, `variables`, `mixins`, `functions`, `import`, `extend`.
+
+You can find plugins here [postcss.parts](https://www.postcss.parts/)
+
+- Ex: adding `nesting` ability:
+
+  ```js
+  // postcss.config.js
+  module.exports = {
+    plugins: [require('postcss-nesting')]
+  };
+
+  // ------------------------------OR------------------------------
+  
+  // if using Vite or Webpack (uses ES6 modules instead of CommonJS)
+  import nesting from 'postcss-nesting';
+  export default {
+    plugins: [nesting()]
+  };
+  ```

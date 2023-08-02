@@ -749,7 +749,7 @@ git log --oneline --decorate
 
 Git keeps a record of when the tips of branches and other references were updated in the repo. We can view and update these **reference logs** using the `git reflog` command
 
-> This will be in **logs/refs** folder in **.git** folder
+> This will be in **logs/refs** folder in `.git` folder
 
 - in `heads` folder, you will find logs with each time we changed the **HEAD** of the branch (as we make more commits)
 - Git only keeps **reflogs** on your **local activity**, they're not shared with collaborators remotely

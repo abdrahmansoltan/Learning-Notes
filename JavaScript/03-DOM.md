@@ -94,6 +94,8 @@ The JavaScript language was initially created for **web browsers**. Since then, 
 >
 > - The **document** object is the main “entry point” to the page. We can change or create anything on the page using it.
 
+- `Dom` is not a part of `javascript` language, it is a part of `browser` environment -> `Web API`
+
 ### object model
 
 is a group of objects, each of which represent related things from the real world. Together they form a model of something larger.

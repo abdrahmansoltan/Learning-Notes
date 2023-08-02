@@ -11,7 +11,9 @@
     - [Relational Model](#relational-model)
   - [Relational Databases](#relational-databases)
     - [Columns / Rows](#columns--rows)
+    - [Relationships between tables](#relationships-between-tables)
     - [Keys](#keys)
+    - [Data Consistency](#data-consistency)
   - [DBMS](#dbms)
     - [What DBMS do](#what-dbms-do)
 
@@ -129,22 +131,53 @@ This model is based on the **relational algebra** and is the most widely used da
 
 ---
 
+### Relationships between tables
+
+- **One to One:** It's a relationship between two tables where each record in one table is linked to one and only one record in another table.
+  ![one-to-one](./img/relationship-1.png)
+- **One to Many:** It's a relationship between two tables where each record in one table can be linked to one or more records in another table.
+  ![one-to-many](./img/relationship-2.jpeg)
+
+- **Many to Many:** It's a relationship between two tables where each record in one table can be linked to one or more records in another table and vice versa.
+  ![many-to-many](./img/relationship-3.jpeg)
+
+> **Note:** The **One to One** relationship is not common in relational databases, and it's usually better to combine the two tables into one table.
+
+---
+
 ### Keys
 
 ![alt](./img/key.PNG)
 
 - **Primary Key:** It's a column or a set of columns that uniquely identifies a row in a table.
   - It's a column that has a unique value for each row of data.
-  - It's a column that can't be `null`.
-  - It's a column that can't be duplicated.
+  - It's a column that **can't** be `null`.
+  - It's a column that **can't** be duplicated.
 - **Foreign Key:** It's a terminology used in relational databases to refer to a column or a set of columns that is used to establish and enforce a **link (reference) between data in two tables**.
   - It's a column that has a value that matches the primary key of another table.
-  - It's a column that can be `null`.
-  - It's a column that can be duplicated.
+  - It's a column that **can** be `null`.
+  - It's a column that **can** be duplicated.
 
 > A **Foreign Key** is a key that will reference the **Primary Key** of another table. Therefore allowing a relationship between the two tables.
 >
 > - This is done by injecting the (foreign key column) into the table that will reference the primary key of another table.
+
+---
+
+### Data Consistency
+
+It's a term used in relational databases to refer to the **validity and accuracy of data**.
+
+- It's used when dealing with **Foreign Keys** to ensure that the data is valid and accurate.
+- It's done by putting in place **constraints** on the data to ensure that the data is valid and accurate.
+- **Constraints** are rules that are put in place to ensure that the data is valid and accurate.
+  - `NOT NULL:` It's a constraint that ensures that a column can't have a null value.
+  - `UNIQUE:` It's a constraint that ensures that all values in a column are unique.
+  - `PRIMARY KEY:` It's a constraint that ensures that a column has a unique value for each row of data and that it can't be null.
+  - `FOREIGN KEY:` It's a constraint that ensures that a column has a value that matches the primary key of another table.
+  - `CHECK:` It's a constraint that ensures that all values in a column satisfy a specific condition.
+  - `DEFAULT:` It's a constraint that assigns a default value for a column when no value is specified.
+  - `INDEX:` It's a constraint that allows for faster retrieval of data from a table.
 
 ---
 

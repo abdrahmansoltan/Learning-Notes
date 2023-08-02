@@ -27,6 +27,7 @@
   - [Palindrome Partitioning](#palindrome-partitioning)
   - [Matchsticks to Square](#matchsticks-to-square)
   - [Splitting a String Into Descending Consecutive Values](#splitting-a-string-into-descending-consecutive-values)
+  - [Concatenated Words](#concatenated-words)
 
 ---
 
@@ -1391,3 +1392,41 @@ def splitString(s):
 ```
 
 ---
+
+## Concatenated Words
+
+Given an array of strings `words` (without duplicates), return all the concatenated words in the given list of words.
+
+TODO: watch [neetcode video](https://www.youtube.com/watch?v=iHp7fjw1R28)
+
+```py
+def findAllConcatenatedWordsInADict(words):
+    def dfs(word):
+        if word in memo:
+            return memo[word]
+
+        for i in range(1, len(word)):
+            prefix = word[:i]
+            suffix = word[i:]
+
+            if prefix in word_set and suffix in word_set:
+                memo[word] = True
+                return True
+
+            if prefix in word_set and dfs(suffix):
+                memo[word] = True
+                return True
+
+        memo[word] = False
+        return False
+
+    memo = {}
+    word_set = set(words)
+    ans = []
+
+    for word in words:
+        if dfs(word):
+            ans.append(word)
+
+    return ans
+```
