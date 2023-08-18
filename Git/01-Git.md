@@ -61,6 +61,8 @@
 
 Git is software that keeps track of changes that you make to files and directories. And it's especially good at keeping track of text changes.
 
+> Git cheatsheet: [link](https://cs.fyi/guide/git-cheatsheet)
+
 - Git is referred to as a version control system or **VCS**
 - they're also called source code management tools or **SCM**
 - Git is **distributed version control**. Different users each maintain their own repositories instead of working from a central repository, and the changes are stored as sets or patches, and we're focused on tracking `changes`, not the versions of the documents.
@@ -74,9 +76,10 @@ Git is software that keeps track of changes that you make to files and directori
 ### Advantages of distributed version control
 
 - no need to communicate with a central server
-- faster
+- Encourages collaboration and discipline
+- allow for "Archive versions" and managing historical data
 - no network access required
-- no single failure point as (Everyone can keep working. They've each got their own repository)
+- no single failure point as (Everyone can keep working. They've each got their own repository) + we can recover from accidental deletions
 
 ---
 
@@ -104,8 +107,6 @@ Git is software that keeps track of changes that you make to files and directori
   - `git rm --cached` : remove from staging index
 
 - **repository**, and that's what's actually being tracked by Git. The changes that Git has, and that it's going to hold onto and keep track of.
-
----
 
 ---
 

@@ -85,6 +85,7 @@
 ](https://www.frontendinterviewhandbook.com/)
 
 - What are `call()` and `apply()`?
+
   - **short answer:** They're ways of changing scope of `this` inside a function.
 
   - **detailed answer:**
@@ -94,6 +95,7 @@
     - `apply()` takes the function arguments in an array.
 
 - How can you tell if an image element is loaded on a page?
+
   - Use the `complete` property of the image element.
 
     ```js
@@ -105,6 +107,7 @@
 - What is event delegation?
   - It is a technique involving adding event listeners to a parent element instead of adding them multiple times to the descendant elements.
 - What is a worker? and when would you use one?
+
   - A worker is a JavaScript process that runs in the background independently of other scripts and without affecting the performance of the page.
   - You can use workers to perform tasks such as:
     - Simulating user interaction by generating events and performing DOM manipulation.
@@ -141,7 +144,7 @@
       };
     };
     ```
-  
+
 - What is **Debounce** and **Throttle**?
 
   - **Debounce** and **Throttle** are two similar (but different!) techniques to control how many times we allow a function to be executed over time.
@@ -180,6 +183,7 @@
 
 - We have 2 identical `DOM` trees, `A` and `B`. For `DOM` tree `A` we have the `location` of an element. Create a function to find that element in `DOM` tree `B`
   ![domTree](./img/domTree-1.png)
+
   - This is a **Reverse-Back** algorithm, meaning that we start from the element we want to find, and we traverse the DOM tree **upwards** to the root. Then, we traverse the DOM tree **downwards** to the element we want to find in the other DOM tree.
 
     ```js
@@ -194,7 +198,7 @@
         path.push(index);
         pointer = pointer.parentNode;
       }
-      
+
       // 2. Traverse the DOM tree Downwards to the element we want to find
       pointer = root;
       // now, path has the indexes from the target node to the root
@@ -206,20 +210,21 @@
     ```
 
 - Create a function that moves an element **(Rendering Performance)**
+
   - Hint: usually here, the interviewer wants to see if you know about `requestAnimationFrame()`, which is a method that tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next **repaint**.
 
     ```js
     function moveElement(element, duration, distance) {
       const start = performance.now(); // get the start time
-      
+
       function move(currentTime) {
         const elapsed = currentTime - start; // get the time since the animation started
-        const progress = elapsed / duration;  // calculate how far along the animation is (ratio of the elapsed time to the total duration)
+        const progress = elapsed / duration; // calculate how far along the animation is (ratio of the elapsed time to the total duration)
         const amountToMove = progress * distance; // calculate how far we should move the element
 
         // move the element
         element.style.transform = `translateX(${amountToMove}px)`;
-        
+
         // stop the animation after the specified duration
         if (amountToMove < distance) {
           requestAnimationFrame(move); // call the function again to repeat the animation loop
@@ -241,20 +246,22 @@
 
   // Solution
   function getData() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       setTimeout(() => resolve('data'), 1000);
     });
   }
   ```
 
 - Can you trigger a `Sleep` in Javascript?
+
   - No, you can't. JavaScript is a single-threaded language, meaning that only one task can be executed at a time. If you block the thread, the browser UI will be blocked as well, and the user won't be able to interact with the page.
   - one trick is to make a function sleeps and not the main thread
+
     - To do so use `await` in `async` function with a `timeout` function
 
       ```js
       function sleep(ms) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
         // we use a promise to make the function asynchronous and wait for the specified amount of time before resolving it
       }
 
@@ -266,3 +273,37 @@
       ```
 
     - funny fact: this is similar to `promisify()` function in `node.js`
+
+- what does double brackets mean in properties, ex: `[[prototype]]`?
+
+  - These are **internal properties** that are not accessible directly from the code, but only indirectly through other internal mechanisms.
+
+- How to get the last element in the array in multiple ways?
+
+  ```js
+  const arr = [1, 2, 3, 4, 5];
+
+  // 1. using length
+  const lastElement = arr[arr.length - 1];
+
+  // 2. using slice
+  const lastElement = arr.slice(-1)[0];
+
+  // 3. using at
+  const lastElement = arr.at(-1);
+
+  // 4. using pop
+  const lastElement = arr.pop();
+  ```
+
+- What will happen if you used `forEach` on a `Set`?
+
+  - `forEach` will iterate over the values of the `Set`. where the `index`/`key` will be the same as the `value`.
+
+    ```js
+    const set = new Set(['a', 'b', 'c']);
+    set.forEach((value, key) => console.log(value, key));
+    // a a
+    // b b
+    // c c
+    ```

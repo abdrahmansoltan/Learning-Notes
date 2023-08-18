@@ -1,25 +1,25 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Two Pointer Technique](#two-pointer-technique)
-    - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
   - [Remove Element](#remove-element)
   - [Replace Elements with Greatest Element on Right Side](#replace-elements-with-greatest-element-on-right-side)
   - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
-  - [Array Sums](#array-sums)
+  - [Two pointers](#two-pointers)
     - [Two Sum II](#two-sum-ii)
     - [Three Sum](#three-sum)
     - [4 Sum](#4-sum)
     - [Continuous SubArray Sum](#continuous-subarray-sum)
     - [Pair with Target Sum](#pair-with-target-sum)
+    - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
+    - [Container with most water](#container-with-most-water)
   - [Sliding Window](#sliding-window)
     - [Average of All Contiguous Subarrays of Size K](#average-of-all-contiguous-subarrays-of-size-k)
     - [Minimum Size Subarray Sum](#minimum-size-subarray-sum)
     - [Fruit Into Baskets](#fruit-into-baskets)
     - [Longest Subarray of 1's After Deleting One Element](#longest-subarray-of-1s-after-deleting-one-element)
     - [Max Consecutive Ones III](#max-consecutive-ones-iii)
+    - [Sliding Window Maximum](#sliding-window-maximum)
   - [Product of Array Except Self](#product-of-array-except-self)
-  - [Container with most water](#container-with-most-water)
   - [Trapping Rain Water](#trapping-rain-water)
     - [Solution 1: Extra memory used (O(n) space)](#solution-1-extra-memory-used-on-space)
     - [Solution 2: Two pointers Less memory used (O(1) space)](#solution-2-two-pointers-less-memory-used-o1-space)
@@ -31,44 +31,6 @@
     - [Create a Spiral Matrix](#create-a-spiral-matrix)
     - [Return elements of Spiral Matrix](#return-elements-of-spiral-matrix)
     - [Valid Tic-Tac-Toe State](#valid-tic-tac-toe-state)
-
----
-
-## Two Pointer Technique
-
-### Remove Duplicates From Sorted Array
-
-Given a sorted array `nums`, remove the duplicates **in-place** such that each element appears only once and returns the new length.
-
-- Ex:
-
-  - `nums = [1,1,2]` -> `2` -> `(nums = [1,2,_])`
-  - `nums = [0,0,1,1,1,2,2,3,3,4]` -> `5` -> `(nums = [0,1,2,3,4,_,_,_,_,_])`
-    ![remove duplicates](./img/remove-duplicates-1.png)
-
-- Explanation:
-  - we can use a **two pointers** pattern to check for all the elements in the array
-    ![remove duplicates](./img/remove-duplicates-2.png)
-    - we can use the first pointer to keep track of the last unique element in the array
-    - and the second pointer to iterate over the array and check if the current element is equal to the last unique element
-    - if it is, then we skip it, if not, then we increment the last unique index **and then** update the last unique element
-
-```py
-def removeDuplicates(nums):
-    if len(nums) == 0: return 0
-
-    # initialize the index of the last unique element
-    last_unique = 0
-
-    for i in range(1, len(nums)):
-        # if the current element is not equal to the last unique element, increment the last unique index and then update the last unique element
-        if nums[i] != nums[last_unique]:
-            last_unique += 1
-            nums[last_unique] = nums[i]
-
-    # return the length of the array
-    return last_unique + 1
-```
 
 ---
 
@@ -157,7 +119,7 @@ def chunk(arr, size):
 
 ---
 
-## Array Sums
+## Two pointers
 
 ### Two Sum II
 
@@ -192,15 +154,6 @@ Given an array `nums` of n integers, are there elements a, b, c in `nums` such t
 - EX: `nums = [-1, 0, 1, 2, -1, -4]` --> `[[-1, 0, 1], [-1, -1, 2]]`
 - **Steps:**
   ![3sum](./img/3sum.png)
-
-  - Sort the array
-  - Loop through the array
-    - If the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
-    - Set left and right pointers to find the other two values
-    - If the sum is less than zero, move the left pointer to the right to get a larger value
-    - If the sum is greater than zero, move the right pointer to the left to get a smaller value
-    - If the sum is zero, append the three values to the result
-    - Move the left and right pointers to the next unique values to avoid duplicates
 
 - Method 1:
 
@@ -415,6 +368,91 @@ def pair_with_targetsum(arr, target_sum):
 
 ---
 
+### Remove Duplicates From Sorted Array
+
+Given a sorted array `nums`, remove the duplicates **in-place** such that each element appears only once and returns the new length.
+
+- Ex:
+
+  - `nums = [1,1,2]` -> `2` -> `(nums = [1,2,_])`
+  - `nums = [0,0,1,1,1,2,2,3,3,4]` -> `5` -> `(nums = [0,1,2,3,4,_,_,_,_,_])`
+    ![remove duplicates](./img/remove-duplicates-1.png)
+
+- Explanation:
+  - we can use a **two pointers** pattern to check for all the elements in the array
+    ![remove duplicates](./img/remove-duplicates-2.png)
+    - we can use the first pointer to keep track of the last unique element in the array
+    - and the second pointer to iterate over the array and check if the current element is equal to the last unique element
+    - if it is, then we skip it, if not, then we increment the last unique index **and then** update the last unique element
+
+```py
+def removeDuplicates(nums):
+    if len(nums) == 0: return 0
+
+    # initialize the index of the last unique element
+    last_unique = 0
+
+    for i in range(1, len(nums)):
+        # if the current element is not equal to the last unique element, increment the last unique index and then update the last unique element
+        if nums[i] != nums[last_unique]:
+            last_unique += 1
+            nums[last_unique] = nums[i]
+
+    # return the length of the array
+    return last_unique + 1
+```
+
+---
+
+### Container with most water
+
+Given n non-negative integers `a1`, `a2`, ..., `an` , where each represents a point at coordinate `(i, ai)`. `n` vertical lines are drawn such that the two endpoints of the line `i` is at `(i, ai)` and `(i, 0)`. Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.
+
+- EX: height =`[1, 8, 6, 2, 9, 4]`-->`24`
+  ![water container](./img/water-container.png)
+- Notes:
+
+  - Here, the width has a direct impact on the area, so the distance between indexes matters.
+  - We don't know if we should increase or decrease the width, so we will see which one is shorter and move the pointer in that direction.
+
+- **Steps**:
+
+  1. Verify the constraints:
+
+     - Does the thickness of the lines matter? No.
+     - Do the left and right sides of the container form a wall? No.
+     - Does a higher line inside the container affect the area, breaking it into 2 parts? No.
+       ![water container](./img/water-container-1.png)
+
+  2. Initialize **two pointers**, one at the beginning and one at the end of the array constituting the length of the lines.
+  3. At every step, find out the area formed between them
+     - width = `right index - left index`
+     - height = `min(height[left], height[right])`
+  4. update the result and move the pointer pointing to the shorter line towards the other end by one step.
+     - we choose which pointer to move by comparing the heights of the two lines and moving the pointer pointing to the shorter line towards the other end by one step
+       - so that we may get a relatively longer line next time and possibly will be able to hold more water.
+
+```py
+def max_area(height):
+    max_area = 0
+    # Two pointers at the beginning and the end of the array
+    left, right = 0, len(height) - 1
+
+    while left < right:
+        # The width is the distance between them, and the height is the lower line.
+        area = (right - left) * min(height[left], height[right])
+        # Update max_area if we have a new maximum
+        max_area = max(max_area, area)
+        # Move the left and right pointers, depending on which line is shorter
+        if height[left] < height[right]:
+            left += 1
+        else:
+            right -= 1
+    return max_area
+```
+
+---
+
 ## Sliding Window
 
 ### Average of All Contiguous Subarrays of Size K
@@ -543,6 +581,77 @@ Given a binary array `nums` and an integer `k`, return the maximum number of con
       return r - l + 1
   ```
 
+---
+
+### Sliding Window Maximum
+
+You are given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very left of the array to the very right. You can only see the `k` numbers in the window. Each time the sliding window moves right by one position.
+
+Return the max sliding window.
+
+- EX: `nums = [1, 3, -1, -3, 5, 3, 6, 7], k = 3` --> `[3, 3, 5, 5, 6, 7]`
+
+  - Explanation:
+    | Window Position | Max |
+    | --------------- | --- |
+    | [1 3 -1] -3 5 3 6 7 | 3 |
+    | 1 [3 -1 -3] 5 3 6 7 | 3 |
+    | 1 3 [-1 -3 5] 3 6 7 | 5 |
+    | 1 3 -1 [-3 5 3] 6 7 | 5 |
+    | 1 3 -1 -3 [5 3 6] 7 | 6 |
+    | 1 3 -1 -3 5 [3 6 7] | 7 |
+
+- **Explanation:** (recap: it's like (next greater element) using a stack, but we use dqueue to remove from left as well)
+
+  - The brute force solution is to iterate on all windows of size `k` and find the maximum element in each window. This solution takes `O(n.k)` since we have `O(n-k+1)` windows and for each window we take `O(k)` time to find the maximum element in it.
+    - to get a better solution, we will use the `next greater element` approach, using a **Monotonic decreasing queue (double-ended queue (`deque`))** to store the indices of the elements in the window.
+    - > `deque` allows for fast appends and pops **from both ends**.
+  - The first element in the `queue` is the index of the maximum element in the window.
+  - When we move the window to the right, we need to remove the element that is out of the window, and remove all elements that are smaller than the current element. Then we add the current element to the queue.
+    - This is done because we know that when going to the next window, the first element in the queue is out of the window, so we remove it. Then we remove all elements that are smaller than the current element, because **they will never be the maximum element in the window**. Then we add the current element to the queue.
+  - we use queue and not a stack, because we want to remove elements from the left side of the queue, and we want to remove the first element in the queue, which is the maximum element in the window.
+
+So, to recap: we use a `queue` to store the indices of the elements in the current window in a **decreasing order**. At each step, we add the current element to the queue, and then we pop from the `queue` (from the right) all the elements that are smaller than the current element. We then remove (from the left) the first element in the queue if it is outside of the current window. Finally, we add the first element of the queue to the output. **(The first element of the queue will always be the maximum element of the window because we are using a decreasing order)**
+
+- **Steps:**
+  1. Initialize a deque `q` to store the indices of the elements in the current sliding window, and initialize `l` and `r` pointers to `0`
+  2. iterate over the array `nums` and do the following:
+     - pop smaller values from `q` until we find a value that is greater than the current value
+     - append the current index ('r') to `q`
+     - remove the left val from the window
+       - If the index of the oldest element in the sliding window (`l`) is outside of the current sliding window, remove it from the deque `q` using the `popleft()` method
+     - check if the window is at least size `k` to add the maximum element (`nums[q[0]]`) to the result
+
+![sliding-window-maximum](./img/sliding-window-maximum.png)
+
+```py
+def max_sliding_window(nums, k):
+    if not nums: return []
+    result = []
+    q = collections.deque() # indices of the elements in the window
+    l = r = 0
+
+    while r < len(nums):
+      # pop smaller values from q if the current value is greater than the last value in q to always make the queue contain the max element
+      while q and nums[q[-1]] < nums[r]:
+          q.pop()
+      q.append(r)
+
+      # remove left val from window if it is outside of the current window
+      if l > q[0]:
+        q.popleft()
+
+      # check if the window is at least size k to start adding the maximum element to the result
+      if (r+1) >= k:
+        result.append(nums[q[0]])
+        l += 1 # left pointer will only move when the window is at least size k
+      r += 1
+
+    return res
+```
+
+---
+
 ## Product of Array Except Self
 
 Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`.
@@ -615,55 +724,6 @@ def product_except_self(nums):
         postfix *= nums[i]
 
     return result
-```
-
----
-
-## Container with most water
-
-Given n non-negative integers `a1`, `a2`, ..., `an` , where each represents a point at coordinate `(i, ai)`. `n` vertical lines are drawn such that the two endpoints of the line `i` is at `(i, ai)` and `(i, 0)`. Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.
-
-- EX: height =`[1, 8, 6, 2, 9, 4]`-->`24`
-  ![water container](./img/water-container.png)
-- Notes:
-
-  - Here, the width has a direct impact on the area, so the distance between indexes matters.
-  - We don't know if we should increase or decrease the width, so we will see which one is shorter and move the pointer in that direction.
-
-- **Steps**:
-
-  1. Verify the constraints:
-
-     - Does the thickness of the lines matter? No.
-     - Do the left and right sides of the container form a wall? No.
-     - Does a higher line inside the container affect the area, breaking it into 2 parts? No.
-       ![water container](./img/water-container-1.png)
-
-  2. Initialize **two pointers**, one at the beginning and one at the end of the array constituting the length of the lines.
-  3. At every step, find out the area formed between them
-     - width = `right index - left index`
-     - height = `min(height[left], height[right])`
-  4. update the result and move the pointer pointing to the shorter line towards the other end by one step.
-     - we choose which pointer to move by comparing the heights of the two lines and moving the pointer pointing to the shorter line towards the other end by one step
-       - so that we may get a relatively longer line next time and possibly will be able to hold more water.
-
-```py
-def max_area(height):
-    max_area = 0
-    # Two pointers at the beginning and the end of the array
-    left, right = 0, len(height) - 1
-
-    while left < right:
-        # The width is the distance between them, and the height is the lower line.
-        area = (right - left) * min(height[left], height[right])
-        # Update max_area if we have a new maximum
-        max_area = max(max_area, area)
-        # Move the left and right pointers, depending on which line is shorter
-        if height[left] < height[right]:
-            left += 1
-        else:
-            right -= 1
-    return max_area
 ```
 
 ---

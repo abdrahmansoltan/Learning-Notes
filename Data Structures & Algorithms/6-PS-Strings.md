@@ -2,6 +2,8 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
+  - [Two Pointers](#two-pointers)
+    - [Valid Palindrome](#valid-palindrome)
   - [Substring (Sliding Window)](#substring-sliding-window)
     - [Longest Substring Without Repeating Characters](#longest-substring-without-repeating-characters)
     - [Longest Substring with K Distinct Characters](#longest-substring-with-k-distinct-characters)
@@ -15,7 +17,6 @@
     - [Count Vowel Substrings of a String](#count-vowel-substrings-of-a-string)
     - [Longest Common Prefix](#longest-common-prefix)
   - [Reversing Problems](#reversing-problems)
-    - [Valid Palindrome](#valid-palindrome)
     - [Valid Palindrome II](#valid-palindrome-ii)
     - [Reverse Integer](#reverse-integer)
     - [Length of Last Word](#length-of-last-word)
@@ -35,6 +36,73 @@
   - Are all the characters in the string lowercase/uppercase?
   - Are there any leading or trailing whitespaces?
   - Does case sensitivity matter? (e.g. "A" vs "a")
+
+---
+
+## Two Pointers
+
+### Valid Palindrome
+
+A palindrome is a word, phrase, number, or other sequence of characters which **reads the same backward or forward**. Allowances may be made for adjustments to capital letters, punctuation, and word dividers.
+
+- EX: `racecar`, `tacocat`, `madam`, `kayak`, `level`
+- Here's a possible approach to solve this problem:
+
+  1. Convert the string to lowercase to ignore any case differences.
+  2. Remove any non-alphanumeric characters from the string.
+
+     - > **Note:** numbers within the string will be considered alphanumeric.
+
+  3. Use two pointers to iterate through the string from both ends.
+  4. Compare the characters at each pointer position. If they are not equal, the string is not a palindrome. If they are equal, move both pointers towards the center of the string.
+  5. If the pointers meet in the middle of the string, the string is a palindrome.
+
+```py
+# using two pointers
+# helper
+def isAlphaNum(char):
+            # using ASCII values
+           return (ord('A') <= ord(char) <= ord('Z') or
+                   ord('a') <= ord(char) <= ord('z') or
+                   ord('0') <= ord(char) <= ord('9'))
+# or use the built-in isalnum() string-method
+
+def is_palindrome(s):
+  # First & last pointers
+  left, right = 0, len(s)-1
+
+  while left < right:
+    while left < right and not isAlphaNum(s[left]):
+      left += 1
+    while left < right and not isAlphaNum(s[right]):
+      right -= 1
+
+    if s[left].lower() != s[right].lower():
+      return False
+
+    left += 1
+    right -= 1
+
+  return True
+
+# --------------------------------------------------
+
+# Or (Extra space)
+newStr = ''
+for char in s:
+  if char.isalnum():
+    newStr += char.lower()
+
+return newStr == newStr[::-1]
+
+# --------------------------------------------------
+
+# Or using regular expressions
+import re
+def is_palindrome(s):
+  s = re.sub('[^a-z0-9]', '', s.lower()) # remove non-alphanumeric characters
+  return s == s[::-1]
+```
 
 ---
 
@@ -366,7 +434,13 @@ Given two strings `s1` and `s2`, return `true` if `s2` contains a permutation of
 
 - EX: `s1 = "ab", s2 = "eidbaooo"` -> `true`
 
-- `Permutation`: a rearrangement of the elements of an ordered list `s` into a one-to-one correspondence with `s` itself (the order of the elements in the list is changed, but the elements themselves are not changed)
+- `Permutation`: a permutation of a string is another string that contains the same characters, only the order of characters can be different
+
+- Explanation:
+  - We need to count the number of times each character appears in `s1` and store it in a dictionary
+  - Then we need to iterate over `s2` using the sliding-window pattern and keep track of the number of times each character appears in the current window using a dictionary
+  - If the number of times a character appears in the current window is equal to the number of times it appears in `s1` then we have one more character in the window that is also in `s1`
+  - In order to have `O(n)` solution instead of `O(26 n)`, we need to keep track of the number of characters in the window that are also in `s1` using two counter-variables `have` and `need`
 
 ```py
 def checkInclusion(s1, s2):
@@ -591,82 +665,6 @@ def longestCommonPrefix(strs):
 ---
 
 ## Reversing Problems
-
-### Valid Palindrome
-
-A palindrome is a word, phrase, number, or other sequence of characters which **reads the same backward or forward**. Allowances may be made for adjustments to capital letters, punctuation, and word dividers.
-
-- EX: `racecar`, `tacocat`, `madam`, `kayak`, `level`
-- Here's a possible approach to solve this problem:
-
-  1. Convert the string to lowercase to ignore any case differences.
-  2. Remove any non-alphanumeric characters from the string.
-
-     - > **Note:** numbers within the string will be considered alphanumeric.
-
-  3. Use two pointers to iterate through the string from both ends.
-  4. Compare the characters at each pointer position. If they are not equal, the string is not a palindrome. If they are equal, move both pointers towards the center of the string.
-  5. If the pointers meet in the middle of the string, the string is a palindrome.
-
-```py
-# using two pointers
-# helper
-def isAlphaNum(char):
-            # using ASCII values
-           return (ord('A') <= ord(char) <= ord('Z') or
-                   ord('a') <= ord(char) <= ord('z') or
-                   ord('0') <= ord(char) <= ord('9'))
-# or use the built-in isalnum() string-method
-
-def is_palindrome(s):
-  # First & last pointers
-  left, right = 0, len(s)-1
-
-  while left < right:
-    while left < right and not isAlphaNum(s[left]):
-      left += 1
-    while left < right and not isAlphaNum(s[right]):
-      right -= 1
-
-    if s[left].lower() != s[right].lower():
-      return False
-
-    left += 1
-    right -= 1
-
-  return True
-
-# --------------------------------------------------
-
-# Or
-newStr = ''
-for char in s:
-  if char.isalnum():
-    newStr += char.lower()
-
-return newStr == newStr[::-1]
-
-# --------------------------------------------------
-
-# Or using regular expressions
-import re
-def is_palindrome(s):
-  s = re.sub('[^a-z0-9]', '', s.lower()) # remove non-alphanumeric characters
-  return s == s[::-1]
-```
-
-- recursive solution
-
-  ```py
-  def isPalindrome(s):
-      if len(s) <= 1:
-          return True
-      if s[0] != s[-1]:
-          return False
-      return isPalindrome(s[1:-1])
-  ```
-
----
 
 ### Valid Palindrome II
 

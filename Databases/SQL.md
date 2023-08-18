@@ -7,6 +7,7 @@
       - [CRUD](#crud)
     - [SQL Operations](#sql-operations)
     - [notes](#notes)
+  - [Data Types](#data-types)
   - [Date](#date)
     - [date Operators](#date-operators)
   - [Filtering Queries](#filtering-queries)
@@ -20,6 +21,7 @@
     - [`LIKE` Keyword](#like-keyword)
     - [`Distinct` Keyword](#distinct-keyword)
     - [`HAVING` Keyword](#having-keyword)
+    - [`GREATEST` - `LEAST` functions](#greatest---least-functions)
     - [`CASE` Keyword (if-then-else)](#case-keyword-if-then-else)
   - [Grouping](#grouping)
     - [`GROUP BY`](#group-by)
@@ -180,6 +182,92 @@ A sql statement consists of 3 parts:
   - or use parenthesis `()` to change the order
 - `PRIMARY KEY` : it's used for indexing (to reach row fast instead of going through all rows before)
   ![indexing](./img/indexing.png)
+
+---
+
+## Data Types
+
+When creating a table, each `column` must be declared with a data type. The data type tells the database what type of data the `column` can hold.
+
+- **Numeric Data Types**
+  ![numeric data types](./img/data-types-1.png)
+
+  - `INTEGER` : whole numbers
+  - `DECIMAL` : decimal numbers
+  - `SMALLINT` : small whole numbers
+  - `BIGINT` : large whole numbers
+  - `NUMERIC` : decimal numbers
+  - `REAL` : decimal numbers
+  - `DOUBLE PRECISION` : decimal numbers
+
+- **Character Data Types**
+  ![character data types](./img/data-types-2.png)
+
+  - `CHARACTER(n)` : fixed-length character string
+  - `VARCHAR(n)` : variable-length character string
+  - `TEXT` : variable-length character string
+  - `CHAR(n)` and `VARCHAR(n)` are the same, except that `CHAR` pads spaces at the end of the string to fill the specified length, while `VARCHAR` does not.
+
+- **Boolean Data Type**
+  ![boolean data type](./img/data-types-3.png)
+
+  - `BOOLEAN` : true or false
+
+- **Date and Time Data Types**
+  ![date and time data types](./img/data-types-4.png)
+  ![date and time data types](./img/data-types-5.png)
+  ![date and time data types](./img/data-types-6.png)
+  ![date and time data types](./img/data-types-7.png)
+
+  - `DATE` : date
+  - `TIME` : time of day
+  - `TIMESTAMP` : date and time
+  - `INTERVAL` : a period of time
+
+- **UUID Data Type**
+  - `UUID` : universally unique identifier
+
+```sql
+CREATE TABLE <table_name> (
+  <column_name> <data_type> <constraint>,
+  <column_name> <data_type> <constraint>,
+  <column_name> <data_type> <constraint>
+);
+
+-- example
+CREATE TABLE worlds (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  sighting_date DATE,
+  confirmed BOOLEAN DEFAULT false
+);
+```
+
+- **Notes**:
+
+  - `::` -> cast operator, is used to convert one data type to another.
+
+    ```sql
+     SELECT 99999999999999999::SMALLINT; -- 32767
+    ```
+
+    - Usually, it's used when you want to do operations on columns with different data types.
+
+      ```sql
+      SELECT 1 + 1::DECIMAL; -- 2.0
+
+      SELECT 'abc' + 2; -- ERROR ❌
+      SELECT 'abc' + 2::TEXT; -- abc2 ✅
+      ```
+
+  - We use `VARCHAR()` with character-limit, not for performance reasons, but to prevent users from entering too much data.
+  - We don't usually store time/date as `INTERVAL` data type. We use `INTERVAL` when we want to do operations on time/date.
+
+    ```sql
+    SELECT NOW() + INTERVAL '1 day';
+
+    SELECT NOW() - ('4 D'::INTERVAL + '3 H'::INTERVAL)
+    ```
 
 ---
 
@@ -461,19 +549,52 @@ SELECT * FROM numbers WHERE percentage LIKE '2_%_%'; -- values that start with 2
 
 ---
 
+### `GREATEST` - `LEAST` functions
+
+- `GREATEST` : is used to return the greatest value in a list of arguments.
+
+  ```sql
+  SELECT GREATEST(1, 2, 3); -- 3
+
+  SELECT GREATEST(30, 2 * <table_column>) FROM <table_name>;
+  ```
+
+- `LEAST` : is used to return the smallest value in a list of arguments.
+
+---
+
 ### `CASE` Keyword (if-then-else)
 
 - `CASE` : is used to create different outputs (usually in the `SELECT` statement). It is SQL's way of handling **`if-then-else`** logic.
+
+  - It creates a new column. So we should give it an alias.
+
+  - `ELSE` : is used to return a value if none of the conditions are true.
+    - if we don't use `ELSE`, it will return `NULL` if none of the conditions are true.
+  - `END` : is used to end the `CASE` statement.
 
   ```sql
   SELECT name,
     CASE
       WHEN name = 'Dan' THEN 'Hello Dan'
       WHEN name = 'John' THEN 'Hello John'
-      ELSE 'I don't know you'
+      ELSE 'I don''t know you'
     END AS greeting
   FROM worlds;
   ```
+
+  ```sql
+  SELECT name,
+  price,
+  CASE
+    WHEN price > 100 THEN 'Expensive'
+    WHEN price > 50 THEN 'Moderate'
+    ELSE 'Cheap'
+  END AS price_category
+  FROM products;
+  ```
+
+> Usually, It's not used in real-world applications. Instead this logic is handled in the application code before/after the query is sent to the database.
 
 ---
 

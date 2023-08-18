@@ -2,6 +2,9 @@
 
 - [INDEX](#index)
   - [PostgreSQL](#postgresql)
+    - [Postgres server](#postgres-server)
+    - [psql CLI](#psql-cli)
+    - [pgAdmin](#pgadmin)
   - [Environment Variables](#environment-variables)
   - [Connecting Node to a Postgres Database](#connecting-node-to-a-postgres-database)
   - [Migrations](#migrations)
@@ -22,6 +25,28 @@
 ---
 
 ## PostgreSQL
+
+It is a relational database management system (RDBMS) that uses the SQL (Structured Query Language) querying language to interact with data.
+
+- `postgres server` is the software that manages the database and allows other programs to interact with it.
+- `postgres database` is a collection of tables and other data structures that are organized in a way that makes it easy to access and manage the data.
+- `postgres client` is a program that allows you to interact with the database.
+  - The client we will use is called `psql` and it is a command line interface (CLI) for postgres.
+  - another client is `pgAdmin` which is a `GUI` for postgres.
+
+### Postgres server
+
+- The postgres server is the software that manages the database and allows other programs to interact with it.
+- It runs in the background and listens for requests from other programs.
+- a pg server can manage multiple databases at the same time.
+  - having multiple databases is useful for:
+    - separating data and permissions.
+    - working with more than one application.
+    - working with different versions of the same application.
+
+---
+
+### psql CLI
 
 - If you already know the name of the database you want to connect to, you can write `psql name_of_database`
 
@@ -71,6 +96,13 @@
   be unique to each row
 - If you already know the name of the database you want to connect to, you can write `psql name_of_database` and that would be equivalent to `psql postgres` `\c name_of_database`
   - `psql <database name> <username>` --> to connect to database as user ..
+
+---
+
+### pgAdmin
+
+- pgAdmin is a GUI for postgres, it's used to manage and interact with databases.
+- It can connect to a local or remote database.
 
 ---
 

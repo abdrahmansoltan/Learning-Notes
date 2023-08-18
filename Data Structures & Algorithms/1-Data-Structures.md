@@ -35,10 +35,10 @@
   - [Hash Tables (Map)](#hash-tables-map)
     - [Hash function](#hash-function)
       - [Good Hash functions](#good-hash-functions)
-      - [Problem of Hash functions in hash-tables (bad hash functions)](#problem-of-hash-functions-in-hash-tables-bad-hash-functions)
-      - [Collision](#collision)
-        - [Drawbacks of bad hash functions](#drawbacks-of-bad-hash-functions)
+    - [Collision](#collision)
+      - [Drawbacks of bad hash functions](#drawbacks-of-bad-hash-functions)
     - [Hash table implementation](#hash-table-implementation)
+      - [Time complexity of HashMap](#time-complexity-of-hashmap)
   - [Stacks and Queues](#stacks-and-queues)
     - [Stacks](#stacks)
       - [Call Stack](#call-stack)
@@ -63,8 +63,7 @@
     - [Implementation of Priority Queue](#implementation-of-priority-queue)
     - [Binary Heap](#binary-heap)
       - [Binary heap efficiency \& performance](#binary-heap-efficiency--performance)
-      - [Heap methods](#heap-methods)
-        - [Adaptable Priority Queue (heap)](#adaptable-priority-queue-heap)
+    - [Binary heap methods](#binary-heap-methods)
     - [Array-based representation of Binary Heap](#array-based-representation-of-binary-heap)
     - [Implementing a Priority queue with a Heap](#implementing-a-priority-queue-with-a-heap)
     - [Python `heapq` module](#python-heapq-module)
@@ -630,47 +629,43 @@ Here we have **Key/value pairs**
   - DNS resolution
     - `Google.com` -> `74.125.239.133`
 
+---
+
 ### Hash function
 
 The goal of hash function is to **convert** a **key** to an **index** in the array.
 
-- it's a function that generates a value of **fixed length** for each input that it gets.
-- it's one way
-- the resulted hash-value is converted to **index-biased** which is pointer to where the value of the key is in the memory
-  - this is great for accessing values of a hash-table as we only give it a **key** and it gets the value from the location immediately -> **O(1)**
-    - unlike lists where we depended on the sequence of elements in the list
+- the resulted hash-value is converted to **index-biased** which is pointer to where the value of the `key` is in the memory
+  - this is great for accessing values of a hash-table as we only give it a `key` and it gets the value from the location immediately -> `O(1)`
+- it's **one way** function, which means that you can't get the `input` from the `output`
 
 ![hash-function](./img/hashFunction2.png)
 
-- Hashing is implemented in two steps:
+- Simple example of a hash function:
 
-  ```py
-  hash = hashfunc(key)
-  index = hash % array_size
+  ```js
+  def hash(self, key):
+      index = 0
+      for char in key:
+          index += ord(char)
+      return index % self.size
   ```
-
-  1. An element is converted into an integer by using a hash function. This element can be used as an `index` to store the original element, which falls into the hash table.
-  2. The element is stored in the hash table where it can be quickly retrieved using hashed key.
 
 #### Good Hash functions
 
 To achieve a good hashing mechanism, It is important to have a good hash function with the following basic requirements:
 
-1. **Easy to compute:** It should be easy to compute and must not become an algorithm in itself.
-2. **Uniform distribution:** It should provide a uniform distribution across the hash table and should not result in clustering.
+1. **Easy to compute:**
+2. **Uniform distribution:**
    ![good hash function](./img/good-hash-function.png)
-3. **Less collisions:** Collisions occur when pairs of elements are mapped to the same hash value. These should be avoided.
-
-> Note: Irrespective of how good a hash function is, collisions are bound to occur. Therefore, to maintain the performance of a hash table, it is important to manage collisions through various collision resolution techniques. Assume that you’ll get the average case performance: constant time.
-
-#### Problem of Hash functions in hash-tables (bad hash functions)
+3. **Less collisions:**
 
 A bad hash function groups values together and produces a lot of **collisions**.
 ![bad hash function](./img/bad-hash-function-1.png)
 
 ---
 
-#### Collision
+### Collision
 
 with enough data and limited memory, sometimes keys are hashed to the same value (2 keys have been assigned the same memory slot) so they have the same address in memory(**memory-space**) as there's no concept of ordering keys(indexes), which causes collision
 
@@ -678,17 +673,19 @@ with enough data and limited memory, sometimes keys are hashed to the same value
   ![hash-collision](./img/hash-collision.png)
 - when we have a collision **(worst case)**, the performance becomes **O(n/k) -> O(n)**, where `n` is the number of elements(entries) in the hash-table and `k` is the number of slots in the hash-table
   - > **Note:** `k` is usually a constant, so we can ignore it and say that the time complexity is `O(n)` which is the same as the time complexity of a linked-list
+
+> Note: Irrespective of how good a hash function is, collisions are bound to occur. Therefore, to maintain the performance of a hash table, it is important to manage collisions through various collision resolution techniques. Assume that you’ll get the average case performance: constant time.
+
 - There're many strategies for dealing with collisions:
 
   1. **separate chaining (open hashing)**: (most common)
      ![separate chaining](./img/hash-collision2.png)
      - at each index in our array we store values using more sophisticated data-structure like (array or linked-list)
      - this allows us to store multiple key-value pairs at the same index
-  2. **linear probing ("Open Addressing" or closed hashing)**:
+  2. **linear probing ("Open Addressing" or "Closed Hashing")**:
      ![linear probing](./img/hash-collision3.png)
      ![linear probing](./img/hash-collision4.jpg)
-     ![linear probing](./img/hash-collision5.png)
-     - In `open addressing`, instead of in linked lists, all entry records are stored in the array itself. When a new entry has to be inserted, the hash index of the hashed value is computed and then the array is examined, starting with the hashed index. If the slot at the hashed index is unoccupied, then the entry record is inserted in slot at the hashed index else it proceeds in some probe sequence until it finds an unoccupied slot.
+     - In `open addressing`, entry records are stored directly in the array instead of linked lists. When inserting a new entry, the hashed index is computed and the array is checked from that index onwards. If the slot at the hashed index is empty, the entry is inserted there. Otherwise, it follows a probe sequence until an empty slot is found.
        - when we find a collision, we search through the array to find the next empty slot
        - it requires that the `load factor` be kept less than `1`.
        - When searching for an entry, the array is scanned in the same sequence until either the target element is found or an unused slot is found. This indicates that there is no such key in the table.
@@ -696,7 +693,7 @@ with enough data and limited memory, sometimes keys are hashed to the same value
      - also here, we may improve the **time complexity**, but we might also accidentally increase the **space complexity** as a tradeoff by creating an object and storing values inside it in the memory
      - also this may result in a `O(n)` time complexity in the worst case, as we may have to search through the entire array to find an empty slot
   3. **Rehashing**: (most common)
-     - When the load factor of the hash table increases, the hash table is rehashed (i.e., the size of the table is increased approximately by a factor of 2 and the table is rehashed -> like **dynamic arrays**).
+     - When the `load factor` of the hash table increases, the hash table is rehashed (i.e., the `size` of the table is increased approximately by a factor of `2` and the table is rehashed -> like **dynamic arrays**).
      - > **Note:** The load factor is the ratio of the number of elements in the hash table to the size of the hash table.
   4. **double hashing**: Similar to linear probing, but instead of using a constant "skip" value, we use a second hash function to determine the next index to check.
   5. **quadratic probing**: Similar to `linear probing`, but instead of using a constant "skip" value, we use a quadratic function to determine the next index to check.
@@ -714,7 +711,7 @@ with enough data and limited memory, sometimes keys are hashed to the same value
 
 ---
 
-##### Drawbacks of bad hash functions
+#### Drawbacks of bad hash functions
 
 If the entire hash table is totally empty except for one slot. And that slot has a giant linked list! Every single element in this hash table is in the linked list. hat’s as bad as putting everything in a linked list to begin with. It’s going to slow down your hash table.
 
@@ -731,14 +728,60 @@ If the entire hash table is totally empty except for one slot. And that slot has
 
 ### Hash table implementation
 
-![hash table class](./img/hash-table-class.png)
-
 - `set`:
   - accepts a key and a value + hashes the key
   - stores the key-value pair in the hash table array via **separate chaining**
 - `get`:
   - accepts a key + hashes the key + retrieves the key-value pair in the hash table
   - if the key isn't found, returns `undefined`
+
+```py
+class HashTable:
+    def __init__(self, size=53):
+        self.keyMap = [None] * size
+
+    def _hash(self, key):
+        # Hashing logic
+
+    def set(self, key, value):
+        index = self._hash(key)
+
+        # Open addressing
+        if not self.keyMap[index]:
+            self.keyMap[index] = []
+        self.keyMap[index].append([key, value])
+
+        # Or: Linear probing
+        if self.keyMap[index] is None:
+            self.keyMap[index] = [key, value]
+        else:
+            # try to find an empty slot
+            while self.keyMap[index] is not None:
+                index += 1
+            self.keyMap[index] = [key, value]
+
+    def get(self, key):
+        index = self._hash(key)
+        if self.keyMap[index]:
+            for i in range(len(self.keyMap[index])):
+                if self.keyMap[index][i][0] == key:
+                    return self.keyMap[index][i][1]
+        return None
+
+    def keys(self):
+        # returns all the keys in the hash table
+
+    def values(self):
+        # returns all the values in the hash table
+```
+
+#### Time complexity of HashMap
+
+- Insertion: `O(1)`
+- Deletion: `O(1)`
+- Access: `O(1)`
+
+> Note that these are not the worst case time complexities. In the worst case, all the keys hash to the same index and we have to iterate through a linked list to find the key. In that case, the time complexity would be `O(n)`. But if we have a good hash function, we can avoid this situation and have `O(1)` time complexity for all operations.
 
 ---
 
@@ -1105,8 +1148,8 @@ They're nodes (vertices) connected via "Edges"
   - Here, `1` means that there's an edge between the two vertices, and `0` means that there's no edge between them
   - It's not commonly used, as it's not very space-efficient, as it's `O(n^2)` space complexity
     - This is because we have to store a value for every possible edge (either `0` or `1`)
-- **Adjacency List** (most common)
-  - here:
+- **Adjacency List** (most common) ✅
+  - Here:
     - we use `hash-table` to store the edges with the vertex as the key and the edges as the value array
       ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
     - or we can use `array` to store the edges with the vertex as the index and the edges as the value array
@@ -1338,8 +1381,9 @@ An alternative representation of a binary tree is to have a single array `A` of 
 
 - **Advantages:**
 
-  - searching, look-ups and inserting which here is `O(log(n))` **(not guaranteed! as we may have unbalanced-search-tree)** which is much faster as we won't loop like in arrays (better than `O(n)`)
+  - searching (look-ups) -> `O(log(n))` **(not guaranteed! as we may have unbalanced-search-tree)** which is much faster as we won't loop like in arrays (better than `O(n)`)
     - > this is also facilitated by that (even if the number of nodes doubled, then we'll find that we only increase the number of steps to `insert`/`find` by **1** step) ![BST O(n)](./img/bst-2.png)
+  - fast insertion
   - ordered
   - flexible size
 
@@ -1355,6 +1399,10 @@ An alternative representation of a binary tree is to have a single array `A` of 
 
 - **Notes:**
 
+  - **Why do we use BST when we can have a normal list?**
+    - Answer:
+      - because we can do **binary search** on it, which is much faster than looping through the list
+      - Also, we can do **insertion** and **deletion** in `O(log(n))` time, which is much faster than `O(n)` in arrays
   - If a binary search tree is not balanced, how long might it take (worst case) to find an element in it?
     - Answer: `O(n)`
   - Binary Search Tree is sometimes called **Ordered** or **Sorted** Binary Tree.
@@ -1385,6 +1433,7 @@ An alternative representation of a binary tree is to have a single array `A` of 
   ![BST insertion](./img/bst-insertion.png)
 
   ```py
+  # O(log(n))
   def insert(root, val):
     if not root:
       return TreeNode(val)
@@ -1399,7 +1448,6 @@ An alternative representation of a binary tree is to have a single array `A` of 
 
 - **Removing a node:**
 
-  ![BST insertion](./img/bst-removing.png)
   - Here, when we need to remove a node that has children, we need to
     - find the **minimum value** in the **right subtree (largest side)** and replace the node with it, then remove the minimum value from the right subtree
     - or find the **maximum value** in the **left subtree (smallest side)** and replace the node with it, then remove the maximum value from the left subtree
@@ -1516,10 +1564,11 @@ It's a data structure where each element has a priority. Elements with higher pr
 
 It's a more efficient data structure for presenting Priority-queue.
 
-- It's very similar to Binary-search-tree, but with some different rules:
+- It's very similar to Binary-search-tree, but with some different rules: **(It's not a BST)**
 
-  - There's no order to nodes in left and right nodes **(Weak order)**, but there's an order between the parent node and its children nodes **(Heap order)**
-    - left and right child nodes can be any value as long as they're less than the upper node
+  - There's no order to nodes in `left` and `right` nodes **(Weak order)**, but there's an order between the parent node and its children nodes **(Heap order)**
+    - `left` and `right` child nodes can be any value as long as they're less than the upper node
+  - Nodes are added from `left` to `right` in the tree -> This will guarantee that the tree is always **complete binary tree** (all levels are filled except the last level)
   - in a **MinBinaryHeap**, parent nodes are always smaller than child nodes
     - for every position `p` in the heap, the `key` stored at `p` is **greater** than or equal to the `key` stored at `p's parent`
   - in a **MaxBinaryHeap**, parent nodes are always larger than child nodes
@@ -1548,16 +1597,16 @@ Heap's efficiency comes from the structural property requirement that **it must 
 
 - This will make the height of the heap `h` equal to `lon(n)` where `n` is number of nodes (elements) in the heap
 
-#### Heap methods
+---
 
-Time complexity:
+### Binary heap methods
 
 - push/pop: `O(log n)` -> because of **bubbling up/down**
   - > note that this is based on the implementation of the heap, as it can be implemented using an `array` or a `linked-list` which will affect the time complexity
     - > `array` implementation is more efficient than `linked-list` implementation, as it's more space-efficient and it's easier to access the elements in the array than in the linked-list
     - > `linked-list` implementation is less efficient than `array` implementation, as it's less space-efficient and it's harder to access the elements in the linked-list than in the array **but** it's easier to insert/remove elements in the linked-list than in the array
-- search: `O(n)`
-- `heapify`: `O(n)`
+- search: `O(n)` -> because it's **not ordered** like `BST`, so we need to loop through the entire thing to find the element
+- `heapify`: `O(n)` -> because we need to loop through the entire thing to find the element
 
 - **Inserting / Pushing**
 
@@ -1569,15 +1618,6 @@ Time complexity:
   2. swap its position with the most recently added (last element in values array) -> **bubble-up** to the top.
   3. adjust (**sink/bubble-down**) until we have correct spots
      ![binary-heap-removing](./img/binary-heap-removing.png)
-
-##### Adaptable Priority Queue (heap)
-
-It's a priority queue that allows for efficient `remove` operations on arbitrary elements. It's implemented using a **Binary Heap**.
-
-- It uses new methods like: `update`, `remove`, `replace`
-- In order to implement these methods, we need to keep track of the position of each element in the heap
-  - we can do this by returning a special `locator` object when we insert an element into the heap
-  - this `locator` object will contain the position of the element in the heap
 
 ---
 
@@ -1600,6 +1640,12 @@ It's a priority queue that allows for efficient `remove` operations on arbitrary
 
 ### Implementing a Priority queue with a Heap
 
+With every operation in the binary heap, we need to make sure that the **heap-order and structure** are maintained.
+
+- order -> parent nodes are always smaller than child nodes (min-heap)
+- structure -> every level is filled except the last level, and nodes are added from left to right (complete binary tree)
+  - this is important in `dequeue` operation, as we need to remove the root node and replace it with the (**last node in the heap**) because we need to maintain the structure of the heap, then we need to **bubble-down** the new root node until it finds its correct spot
+
 ```py
 class Node:
     def __init__(self, value, priority):
@@ -1612,7 +1658,7 @@ class PriorityQueue:
 
     def enqueue(self, value, priority):
         newNode = Node(value, priority)
-        self.values.append(newNode)
+        self.values.append(newNode) # add the new node to the end of the array
         self.bubbleUp() # to move the node up the tree until it finds its correct spot
 
     def bubbleUp(self):
@@ -1627,14 +1673,17 @@ class PriorityQueue:
             if element.priority <= parent.priority:
                 break # we found the correct spot
 
-            # else, swap the parent with the element
-            self.values[parentIdx] = element
-            self.values[idx] = parent
-            idx = parentIdx
+            # else, swap the parent with the element in one line
+            self.values[parentIdx], self.values[idx] = self.values[idx], self.values[parentIdx]
 
     def dequeue(self):
+        if len(self.values) == 0:
+            return None
+        if len(self.values) == 1:
+            return self.values.pop()
+
         max = self.values[0]
-        end = self.values.pop()
+        end = self.values.pop() # remove the last element in the array
         if len(self.values) > 0:
             self.values[0] = end # replace the root with the last element to start the sinking down process
             self.sinkDown() # move the node down the tree until it finds its correct spot
@@ -1676,7 +1725,11 @@ Python provides a `heapq` module that implements a priority queue using a binary
 - `heappop(heap)` - pop and return the smallest item from the heap and reestablishes the heap property order -> `O(log n)`
 - `heappushpop(heap, item)` - inserts a new item into the heap and removes the largest item from the heap and returns it -> `O(log n)`
 - `heapreplace(heap, item)` - removes the smallest item from the heap first, and then inserts a new item into the heap -> `O(log n)`
-- `heapify(heap)` - converts a regular list to a heap using "bottom-up" heap construction algorithm -> `O(n)
+- `heapify(heap)` - converts a regular list to a heap using "bottom-up" heap construction algorithm -> `O(n)` -> because it has to move every element in the list
+
+  - If you want to sort an array by converting it to a heap, you can use the `heapify()` function to convert the array to a heap in-place, and then use the `heappop()` function to retrieve all the elements in sorted order.
+    - `O(n log n)` -> `O(n)` for `heapify()` + `O(n log n)` for `heappop()`
+    - Note: Heap is not used to sort an array
 
   ```py
   import heapq

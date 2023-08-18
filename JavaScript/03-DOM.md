@@ -6,11 +6,11 @@
     - [object model](#object-model)
     - [Steps for creating an element](#steps-for-creating-an-element)
     - [`insertAdjacentHTML()`](#insertadjacenthtml)
-    - [DOM collections: (HTMLCollection vs NodeList)](#dom-collections-htmlcollection-vs-nodelist)
+    - [DOM collections: (`HTMLCollection` vs `NodeList`)](#dom-collections-htmlcollection-vs-nodelist)
     - [Node.cloneNode()](#nodeclonenode)
     - [DOM Traversing ( relation between elements )](#dom-traversing--relation-between-elements-)
       - [Siblings and the parent](#siblings-and-the-parent)
-      - [Element-only navigation](#element-only-navigation)
+      - [Element-only navigation (Commonly used) ✅](#element-only-navigation-commonly-used-)
     - [Searching: `getElement(s)By*`, `querySelector*`](#searching-getelementsby-queryselector)
   - [Node properties: type, tag and contents](#node-properties-type-tag-and-contents)
     - [`innerHTML` vs `innerText`](#innerhtml-vs-innertext)
@@ -28,22 +28,22 @@
     - [Window sizes](#window-sizes)
     - [Coordinates](#coordinates)
     - [Scrolling](#scrolling)
-    - [intersection observer](#intersection-observer)
+    - [intersection observer (Detecting when an element is in the viewport)](#intersection-observer-detecting-when-an-element-is-in-the-viewport)
   - [virtual DOM](#virtual-dom)
     - [methods to compare nodes](#methods-to-compare-nodes)
     - [steps](#steps)
   - [Events](#events)
     - [Event Handling](#event-handling)
-      - [HTML EVENT HANDLERS (HTML-attribute) (bad practice)](#html-event-handlers-html-attribute-bad-practice)
-      - [TRADITIONAL DOM EVENT HANDLERS (in Js for a DOM property)](#traditional-dom-event-handlers-in-js-for-a-dom-property)
-      - [DOM LEVEL EVENT LISTENERS](#dom-level-event-listeners)
-        - [The Event object](#the-event-object)
+      - [HTML EVENT HANDLERS (HTML-attribute) (bad practice ❌)](#html-event-handlers-html-attribute-bad-practice-)
+      - [TRADITIONAL DOM EVENT HANDLERS (in Js for a DOM property ❌)](#traditional-dom-event-handlers-in-js-for-a-dom-property-)
+      - [DOM LEVEL EVENT LISTENERS (addEventListener) ✅](#dom-level-event-listeners-addeventlistener-)
+      - [The `Event` object](#the-event-object)
     - [Event Flow (Bubbling and capturing)](#event-flow-bubbling-and-capturing)
       - [Event Bubbling](#event-bubbling)
         - [Stopping Bubbling](#stopping-bubbling)
       - [Event Capturing](#event-capturing)
       - [Event Delegation](#event-delegation)
-        - [data attribute with Event Delegation](#data-attribute-with-event-delegation)
+        - [`data` attribute with Event Delegation](#data-attribute-with-event-delegation)
     - [Browser Default Actions](#browser-default-actions)
       - [Preventing browser actions](#preventing-browser-actions)
     - [Dispatching custom events](#dispatching-custom-events)
@@ -200,9 +200,10 @@ message.innerHTML =
 header.append(message); // inside the element (will be a its child)
 // or
 header.insertAdjacentHTML('beforeend', message);
-
+// or
 header.before(message); // before the element (will be a its sibling)
-//------------------------Remove element------------------------//
+
+//--------------Removing element from the document--------------//
 message.remove();
 ```
 
@@ -244,21 +245,21 @@ message.remove();
 
 - parses a piece of HTML-string and inserts the resulting nodes into the DOM tree at a specified position same manner as `elem.innerHTML`
 
-```js
-elem.insertAdjacentHTML(where, html);
-```
+  ```js
+  elem.insertAdjacentHTML(where, htmlEl);
+  ```
 
-![insertAdjacentHTML](./img/JavaScript-insertAdjacentHTML.png)
+  ![insertAdjacentHTML](./img/JavaScript-insertAdjacentHTML.png)
 
 ---
 
-### DOM collections: (HTMLCollection vs NodeList)
+### DOM collections: (`HTMLCollection` vs `NodeList`)
 
 - Both interfaces are collections of DOM nodes. They differ in the methods they provide and in the type of nodes they can contain.
   | HTMLCollection | NodeList |
   | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
   | supposed to only contain Element nodes | can contain any node type ( including text nodes ) |
-  | HTMLCollection items can be accessed by their name, id, or index number. | NodeList items can only be accessed by their index number. |
+  | HTMLCollection items can be accessed by their `name`, `id`, or `index number`. | NodeList items can only be accessed by their `index number`. |
   | HTMLCollection is always a **live collection**, when your script updates the page, the NodeList is updated at the same time. | NodeList is most often a **static collection**, If the script changes the content of the page, the NodeList is not updated to reflect those changes |
   | `getElementsByClassName()` `getElementsByTagName()` `children` | `querySelectorAll()` `childNodes` |
 
@@ -312,9 +313,11 @@ alert(document.head.nextSibling); // HTMLBodyElement
 alert(document.body.previousSibling); // HTMLHeadElement
 ```
 
-#### Element-only navigation
+---
 
-Navigation properties listed above refer to all nodes. For instance, in childNodes we can see both text nodes, element nodes, and even comment nodes if they exist. But for many tasks we don’t want text or comment nodes. We want to manipulate element nodes that represent tags and form the structure of the page.
+#### Element-only navigation (Commonly used) ✅
+
+Navigation properties listed above refer to all nodes. For instance, in childNodes we can see both `text` nodes, `element` nodes, and even `comment` nodes if they exist. But for many tasks we don’t want text or comment nodes. We want to manipulate element nodes that represent tags and form the structure of the page.
 
 - navigation links that only take element nodes into account:
 
@@ -404,7 +407,7 @@ Different DOM nodes may have different properties. For instance, an element node
 
 ### HTML attributes
 
-In HTML, tags may have attributes. The browser recognizes **standard attributes** and creates DOM properties from them.
+In HTML tags may have attributes. The browser recognizes **standard attributes** and creates DOM properties from them.
 
 - when an element has `id` or another **standard attribute**, the corresponding property gets created. But that doesn’t happen if the attribute is **non-standard**.
 
@@ -418,17 +421,9 @@ In HTML, tags may have attributes. The browser recognizes **standard attributes*
       alert(document.body.something); // undefined
     </script>
   </body>
-
-  <body id="body" type="...">
-    <input id="input" type="text" />
-    <script>
-      alert(input.type); // text
-      alert(body.type); // undefined: DOM property not created, because it's non-standard
-    </script>
-  </body>
   ```
 
-- All attributes are accessible by using the following methods:
+- All attributes (standard and non-standard) are accessible by using the following methods:
 
   - `elem.hasAttribute(name)`
   - `elem.getAttribute(name)`
@@ -535,9 +530,9 @@ There may be a possible problem with custom attributes. What if we use a non-sta
 
 ### Element Style
 
-The property `elem.style` is an **object** that corresponds to what’s written in the "`style`" attribute.
+The property `elem.style` is an **object** that corresponds to what’s written in the "`style`" attribute **(inline styles)**.
 
-- For multi-word property the camelCase is used:
+- For multi-word property the `camelCase` is used:
 
   ```js
   background-color  => elem.style.backgroundColor
@@ -579,28 +574,25 @@ The property `elem.style` is an **object** that corresponds to what’s written 
 
 - **Reading styles values:**
 
-  - we can’t read anything that comes from CSS classes using `elem.style`
+  - we can’t read anything that comes from CSS classes using `elem.style`, because it reflects only the value from the "`style`" attribute, not the effective & computed style.
 
     ```js
     alert(document.body.style.color); // empty
     ```
 
   - to read/change style based on previous value of a style property : use `getComputedStyle()`
-    - The result is an object with styles, like `elem.style`, but now with respect to all CSS classes.
 
-  ```js
-  // getComputedStyle(element, [pseudo])
-  let computedStyle = getComputedStyle(document.body);
-  alert(computedStyle.marginTop); // 5px
+    ```js
+    // getComputedStyle(element, [pseudo])
+    let computedStyle = getComputedStyle(document.body);
+    alert(computedStyle.marginTop); // 5px
+    ```
 
-  message.style.height = Number.parseFloat(getComputedStyle(message).height, 10) + 30 + 'px';
-  // it returns a string so we use parse Float/int
-  ```
-
-  - > Computed and resolved values: There are two concepts in CSS:
-        - > A **computed style** value is the value after all CSS rules and CSS inheritance is applied, as the result of the CSS cascade. It can look like height:1em or font-size:125%.
-        - > A **resolved style** value is the one finally applied to the element. Values like 1em or 125% are relative. The browser takes the computed value and makes all units fixed and absolute, for instance: height:20px or font-size:16px. For geometry properties resolved values may have a floating point, like width:50.5px.
-    A long time ago getComputedStyle was created to get computed values, but it turned out that resolved values are much more convenient, and the standard changed.
+  - **Computed and resolved values**
+    - There are two concepts in CSS:
+      - `computed style` value is the value after all CSS rules and CSS inheritance is applied, as the result of the CSS cascade. It can look like height:1em or font-size:125%.
+      - `resolved style` value is the one finally applied to the element. Values like 1em or 125% are relative. The browser takes the computed value and makes all units fixed and absolute, for instance: height:20px or font-size:16px. For geometry properties resolved values may have a floating point, like width:50.5px.
+        A long time ago getComputedStyle was created to get computed values, but it turned out that resolved values are much more convenient, and the standard changed.
 
 So nowadays getComputedStyle actually returns the resolved value of the property, usually in px for geometry.
 
@@ -843,32 +835,36 @@ The `elem.classList` is a **special object** with methods to add/remove/toggle a
 
 ---
 
-### intersection observer
+### intersection observer (Detecting when an element is in the viewport)
 
 [More Info](https://blog.arnellebalane.com/the-intersection-observer-api-d441be0b088d)
 
-![intersection](./img/intersection1.avif)
-![intersection](./img/intersection2.png)
-![intersection](./img/intersection3.png)
-
-- The Intersection Observer API is a Web platform API that allows for observing changes to how much of a target element’s area intersects with that of an ancestor element or the viewport. The need for such information has a lot of use cases, such as implementing lazy-loading and infinite scrolling !
+- The Intersection Observer API is a Web platform API that allows for **observing changes to how much of a `target` element’s area intersects with that of an ancestor element or the `viewport`**.
   ![intersection](./img/intersection4.png)
+
+  - The need for such information has a lot of use cases, such as implementing lazy-loading and infinite scrolling !
+
 - By default, the Intersection Observer API uses the viewport as the intersection root, and only executes the callback when the target element enters and exits the viewport.
+  ![intersection](./img/intersection1.avif)
 - A `threshold` is a value in which the Intersection Observer will execute the callback function whenever the intersection ratio reaches that value (either as it increases or decreases), and is also expressed as a value between 0 and 1, inclusive.
+  ![intersection](./img/intersection2.png)
+  ![intersection](./img/intersection3.png)
 
   - It is also possible to set multiple threshold values by passing an array of threshold values
 
   ```javascript
   const observer = new IntersectionObserver(function (changes) {
-    // do something with the changes   }, {
     threshold: [0, 0.25, 0.5, 0.75, 1];
   });
   // executes the callback function when the target element enters/exits the intersection root (i.e. intersection ratio of 0), then again when its intersection ratio crosses 0.25, then 0.5, etc.
   ```
 
-```javascript
+```js
 const observer = new IntersectionObserver(function (changes) {
   // do something with the changes   });
+});
+
+// Use the observer to observe a target element
 observer.observe(targetElement);
 ```
 
@@ -897,6 +893,36 @@ observer.observe(targetElement);
   });
 
   headerObserver.observe(header);
+  ```
+
+- **Lazy Loading Images**
+
+  ```js
+  const imgTargets = document.querySelectorAll('img[data-src]');
+
+  const loadImg = function (entries, observer) {
+    const [entry] = entries;
+
+    if (!entry.isIntersecting) return; // exit the function if the entry is not intersecting
+
+    // Replace src with data-src
+    entry.target.src = entry.target.dataset.src;
+
+    entry.target.addEventListener('load', function () {
+      entry.target.classList.remove('lazy-img');
+    });
+
+    // stop observing the target element
+    observer.unobserve(entry.target);
+  };
+
+  const imgObserver = new IntersectionObserver(loadImg, {
+    root: null, // as we are observing the viewport
+    threshold: 0, // from intersection ratio
+    rootMargin: '200px' // to load the image 200px before it appears in the viewport
+  });
+
+  imgTargets.forEach(img => imgObserver.observe(img));
   ```
 
 ---
@@ -994,9 +1020,9 @@ An event is a signal that something has happened. All DOM nodes generate such si
 - There are 3 ways to assign event handlers:
   1. HTML attribute: `onclick="..."`
   2. DOM property: `elem.onclick = function`
-  3. Methods: `elem.addEventListener(event, handler[, phase])` to add, removeEventListener to remove
+  3. Methods: `elem.addEventListener(event, handler[, phase])` to add, removeEventListener to remove ✅
 
-#### HTML EVENT HANDLERS (HTML-attribute) (bad practice)
+#### HTML EVENT HANDLERS (HTML-attribute) (bad practice ❌)
 
 ```html
 <input type="button" id="button" onclick="sayThanks()" />
@@ -1016,7 +1042,7 @@ An event is a signal that something has happened. All DOM nodes generate such si
 - as we know, HTML attribute names are not case-sensitive, so "ONCLICK" works as well as "onClick" and "onCLICK" But usually attributes are lowercased: "onclick".
 - Don’t use `setAttribute()` for handlers. - because attributes are always strings, handler-function becomes a string
 
-#### TRADITIONAL DOM EVENT HANDLERS (in Js for a DOM property)
+#### TRADITIONAL DOM EVENT HANDLERS (in Js for a DOM property ❌)
 
 - The main drawback is that you can only attach a single function to any event
 - here, we omit the parentheses
@@ -1026,9 +1052,10 @@ An event is a signal that something has happened. All DOM nodes generate such si
   el.onblur = checkUsername; // the parentheses are omitted
   ```
 
-#### DOM LEVEL EVENT LISTENERS
+#### DOM LEVEL EVENT LISTENERS (addEventListener) ✅
 
-- They can deal with more than one function at a time, but they are not supported in older browsers.
+- They **can deal with more than one function at a time**, but they are not supported in older browsers.
+- Also, here we can use `removeEventListener` to remove a handler. unlike the other 2 methods
 
 - syntax:
 
@@ -1036,7 +1063,7 @@ An event is a signal that something has happened. All DOM nodes generate such si
   element.addEventListener(event, handler, [options]);
   ```
 
-  - options: An additional optional object with properties:
+  - `options`: An additional optional object with properties:
 
     - `once`: if true, then the listener is automatically removed after it triggers.
     - `capture`: the phase where to handle the event (Bubbling and capturing). For historical reasons, options can also be false/true, that’s the same as {capture: false/true}.
@@ -1087,7 +1114,9 @@ An event is a signal that something has happened. All DOM nodes generate such si
 
 - with event handlers and listeners, you wrap the function call (with the arguments) in an **anonymous function**.
 
-##### The Event object
+---
+
+#### The `Event` object
 
 When an event occurs, the event object tells you information about the event, and the element it happened upon.
 
@@ -1098,10 +1127,27 @@ When an event occurs, the event object tells you information about the event, an
     ![event-object](./img/event-object.png)
 - **`event.currentTarget`**: Element that handled the event. That’s exactly the same as `this` keyword in the handler-function, unless the handler is an arrow function, or its `this` is bound to something else, then we can get the element from `event.currentTarget`
 
+  ```js
+  // this is the same as event.currentTarget
+  elem.addEventListener('click', function (event) {
+    alert(this === event.currentTarget); // true
+    alert(this); // HTMLElement (the same as event.currentTarget)
+  });
+  ```
+
 - **`event.target` vs (`this` | `event.currentTarget`)**:
 
   - `event.target`: is the “target” element that **initiated** the event, it doesn’t change through the bubbling process.
+
     - identifies the element on which the event occurred
+
+      ```js
+      navEl.addEventListener('click', function (e) {
+        console.log(e.target); // the element that was clicked
+        console.log(e.currentTarget); // the element that the event listener is attached to -> navEl
+      });
+      ```
+
   - `this` or `event.currentTarget`: is the **“current”** element, the one that has a currently running handler on it.
     - always refers to the element to which the event handler has been attached to
   - ex:
@@ -1156,6 +1202,8 @@ A bubbling event goes from the target element straight up. Normally, calling all
 </body>
 ```
 
+> `"Propagation"` means jumping from one element to another, visiting parents and ancestors.
+
 - `event.stopPropagation()` stops the move upwards, but on the current element all other handlers will run.
 - `event.stopImmediatePropagation()` To stop the bubbling and prevent handlers on the current element from running.
 - Cases when not to stop bubbling?
@@ -1204,7 +1252,8 @@ The idea is that if we have a lot of elements handled in a similar way, then ins
 - **Advantages:**
 
   - Simplifies initialization and saves memory: no need to add many handlers.
-    - used to prevent event listener to create a lot of callback functions listening to all the items in `forEach`, so we use `event.target` as it shows **where the event happened**
+    - used to `prevent` event listener to create a lot of callback functions listening to all the items in `forEach`, so we use `event.target` as it shows **where the event happened**
+    - This will improve performance because we only need one event listener instead of multiple event listeners.
   - Less code: when adding or removing elements, no need to add/remove handlers.
   - DOM modifications: we can mass add/remove elements with innerHTML and the like.
 
@@ -1225,10 +1274,11 @@ The idea is that if we have a lot of elements handled in a similar way, then ins
     // Don't use `e.target.parentElement`
 
     // Guard clause (as if you clicked on other than '.operations__tab' element )
-    if (!clickedElement) return;}
+    if (!clickedElement) return;
+    }
   ```
 
-##### data attribute with Event Delegation
+##### `data` attribute with Event Delegation
 
 You can use the `data-` attribute to distinguish the element with a category in order to do specific things for each category:
 
@@ -1268,6 +1318,7 @@ There are two ways to tell the browser we don’t want it to act:
 1. The main way is to use the `event` object. There’s a method `event.preventDefault()`.
 
    ```html
+   <!-- Prevent going to href link -->
    <a href="/" onclick="event.preventDefault()">here</a>
    ```
 

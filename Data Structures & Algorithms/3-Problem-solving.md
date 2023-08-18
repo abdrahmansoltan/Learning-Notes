@@ -91,6 +91,7 @@ Creating pointers or values that correspond to an `index` or `position` and move
 
 ![two pointers](./img/two-pointers.png)
 
+- It's used in problems where maintaining a pointer to 2 different positions in an array/string is useful. It's often used on a **sorted array/string**, where we can adjust the pointers until we find a desired condition.
 - very efficient for solving problems with minimal **space-complexity**.
 - `EX`: function that accepts **sorted** array of integers and find the first pair where the sum is `0`.
 
@@ -117,8 +118,9 @@ Creating pointers or values that correspond to an `index` or `position` and move
 
 #### Sliding Window
 
-this pattern involves creating a window which can either be an array or number from one position to another
+In this pattern, we consider a **contiguous** window or subset of elements while iterating through the array. For some problems, this window is of a fixed size while, for others, we grow and shrink the size of the window subject to the rules of the problem.
 
+- In terms of implementation, we employ this pattern by maintaining a `left` and `right` pointer just like in the two-pointer case but this time these pointers are pointing to the boundaries (edges) of the window
 - depending on a certain condition, the window either increases or closes (and a new window is created)
 - very useful for keeping track of a subset of data in an `array`/`string`
 
@@ -211,6 +213,7 @@ you can use `BFS` or `Dijkstra's algorithm` to find the shortest path
 It's an algorithm that makes the locally **optimal** choice at each stage with the hope of finding a global optimum.
 
 - It only applies when working with **optimization problems**.
+
   - Optimization problems: problems that require us to find the **maximum** or **minimum** value of a function.
   - `minimization` problems: problems that require us to find the **minimum** value of a function.
 

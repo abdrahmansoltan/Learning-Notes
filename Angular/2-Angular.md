@@ -105,7 +105,7 @@ transferring code to machine code
 
 Angular uses modules to `bundle` different components into packages
 
-It's where we import components so that Angular knows that they exists
+It's where we import components so that Angular knows that they exist
 
 - BrowserModule
 - CommonModule

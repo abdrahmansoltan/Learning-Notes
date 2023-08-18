@@ -3,10 +3,8 @@
 - [INDEX](#index)
   - [Functional Components](#functional-components)
   - [State](#state)
-    - [State is Async](#state-is-async)
-    - [Difference between state and props](#difference-between-state-and-props)
     - [`useState` Hook](#usestate-hook)
-      - [changing state of type object](#changing-state-of-type-object)
+      - [changing state of type `object`](#changing-state-of-type-object)
       - [Functional state updates](#functional-state-updates)
   - [Refs](#refs)
     - [The Reference object](#the-reference-object)
@@ -19,7 +17,7 @@
     - [`useEffect` dependency array](#useeffect-dependency-array)
     - [`useEffect` cleanup function](#useeffect-cleanup-function)
   - [useReducer()](#usereducer)
-    - [ACtion generator functions](#action-generator-functions)
+    - [Action generator functions](#action-generator-functions)
     - [Not recommended ways of using reducer function](#not-recommended-ways-of-using-reducer-function)
     - [reducer function with Immer](#reducer-function-with-immer)
   - [Context API](#context-api)
@@ -41,39 +39,46 @@ here each time the state change the entire function get called and rerendered un
 
 React functional components are **Pure Functions** which depend on the component's props
 
-- We use hooks to create impure functions as they generate side-effects
+- We use `hooks` to create impure functions as they generate side-effects
+
+  - `hooks` are used to make functional components behave like class components (with state and lifecycle methods)
+  - `hooks` can only be used inside functional components
+
+    ```jsx
+    import { useState } from 'react';
+
+    function App() {
+      // works because it's in the top level of the component ✅
+      const [count, setCount] = useState(0);
+
+      // doesn't work because it's inside a function or a block ❌
+      if (count > 0) {
+        const [count, setCount] = useState(0);
+      }
+    }
+    ```
 
 ---
 
 ## State
 
-**State** is used to store data that changes over time.
-
-![state](./img/state.png)
-![state](./img/state-1.png)
-![state](./img/state-2.png)
-
 [reference](https://reactjs.org/docs/faq-state.html#gatsby-focus-wrapper)
 
+- `useState` is a Hook that allows you to have state variables in functional components.
 - `setState()` schedules an update to a component’s state object. When state changes, the component responds by `re-rendering`.
-  - it happens `ASynchronously` as react finds the best strategy to change it, so it's better to use a callback function inside of `setState`
+  - it happens `ASynchronously` as react finds the best strategy to change it, so it's better to use a `callback function` inside of `setState()`
+- Mutating the `state` directly, without `setState()` is not allowed and will not re-render the component.
 
-> By default, React 18 uses a technique called **"auto-batching"** to group state updates that occur within the same event-loop into a single update. This means that if you call the state-update function multiple times in a short period of time, **React will only perform a single re-render for all of the updates**
+  - Even when mutating `object` state, it's better to use `setState()` as it will make sure to re-render the component
 
-### State is Async
+    ```jsx
+    // ❌
+    person.name = 'Jesse Hall';
+    // ✅
+    setPerson({ ...person, name: 'Jesse Hall' });
+    ```
 
-- Notice that the state changes **asynchronously**
-
-> you can check that with console.logging the state inside tha handler function that sets the state
-
----
-
-### Difference between state and props
-
-props (short for “properties”) and state are both plain JavaScript objects. While both hold information that influences the output of render, they are different in one important way:
-
-- `props` get passed to the component (similar to function `parameters`)
-- `state` is managed within the component (similar to `variables` declared within a function).
+> By default, React 18 uses a technique called **"auto-batching"** to group `state` updates that occur within the same event-loop into a single update. This means that if you call the state-update function multiple times in a short period of time, **React will only perform a single re-render for all of the updates**
 
 ---
 
@@ -83,8 +88,7 @@ It's used to encapsulate a single value from the state of the component
 
 ![useState](./img/useState.png)
 
-- In React, both this.props and this.state represent the rendered values, i.e. what’s currently on the screen.
-- Calls to setState are asynchronous - don’t rely on this.state to reflect the new value immediately after calling setState. Pass an updater function instead of an object if you need to compute values based on the current state
+- Calls to `setState` are **asynchronous** - don’t rely on `state` to reflect the new value immediately after calling `setState`.
 
 - `useState`
 
@@ -122,19 +126,22 @@ function FavoriteColor() {
 - the current state is assigned to the initial state in the first render
 - calling the setter function causes React to **re-render** the component
 - `useState` accepts an `initial state` and returns an `array` with two elements:
+
   - The current state.
   - A function that updates the state.
 
-```js
-// updating state with depending on previous state
-const total = setTotal(state => {
-  return state + 4;
-});
-```
+- To update the state with the current state, we can pass a function to the setter function with the current state as an argument:
 
-#### changing state of type object
+  ```jsx
+  // updating state with depending on previous state
+  setTotal(state => state + 4);
+  ```
 
-when we have a state with type object, when we update any of the state-object properties, make sure to use the previous state using the spread operator:
+---
+
+#### changing state of type `object`
+
+when we have a state with type `object`, when we update any of the state-object properties, make sure to use the previous state using the spread operator:
 
 ```js
 setPerson(curState => {
@@ -142,9 +149,9 @@ setPerson(curState => {
 });
 ```
 
-- this way is commonly used with form inputs, to collect all input values in a state-object and use the name-attribute as the object-key
+- this way is commonly used with `Form inputs`, to collect all input values in a state-object and use the `name-attribute` as the `object-key`
 
-  ```js
+  ```jsx
   const [person, setPerson] = useState({
     firstName: '',
     lastName: '',
@@ -162,8 +169,6 @@ setPerson(curState => {
 
   // in JSX, add the attribute: 'name' in input elements
   ```
-
-> We can also create useState hook for each of the state object properties instead of one useState for the entire object
 
 ---
 
@@ -185,7 +190,7 @@ This way of dealing with state is called: **"Derived State"**, which is that val
 - **Allow us to access DOM properties directly, which makes us have "uncontrolled inputs"**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
 - can be very useful when dealing with different frameworks like `react + JQuery` or `react + Angular`
 
-> Note: refs are escape hatches for React developers, and we should try to avoid using them if possible.
+> Note: `refs` are escape hatches for React developers, and we should try to avoid using them if possible.
 
 - You can gain access to the actual HTML element by creating a React reference and passing it to the element itself.
 
@@ -443,7 +448,7 @@ It's a function from React used to run code **(always)** when a component is ini
 
   - the `cleanup` function runs **before** every new side effect function execution and before the component is removed.
   - it does not run before the first side effect function execution. But thereafter, it will run before every next side effect function execution.
-  - **Note:** the `cleanup` function will only be called if the useEffect callback function will be called again (when there's something in the dependency array or no array what so ever)
+  - **Note:** the `cleanup` function will only be called if the `useEffect` callback function will be called again (when there's something in the dependency array or no array what so ever)
 
 - The cleanup function prevents memory leaks and removes some unnecessary and unwanted behaviors.
 
@@ -534,8 +539,7 @@ It's an alternative to `useState`. Accepts a reducer of type `(state, action) =>
 ```js
 import { useReducer } from 'react';
 
-// reducer function can be here outside the component
-
+// reducer function can be here outside the component as it doesn't use any items from the component, it only uses items rendered by react
 const [state, dispatch] = useReducer(reducer, initialState);
 
 function reducer(state, action) {
@@ -556,7 +560,7 @@ function reducer(state, action) {
 
 ---
 
-### ACtion generator functions
+### Action generator functions
 
 instead of dispatching with the action each time we want to use that action, we can just create an action-generation-function that takes a payload as an argument and dispatches the wanted action
 

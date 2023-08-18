@@ -1,47 +1,47 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [E2E testing](#e2e-testing)
-- [Cypress](#cypress)
-  - [Advantages](#advantages)
-  - [Disadvantages](#disadvantages)
-  - [Guide](#guide)
-  - [Running cypress on CMD](#running-cypress-on-cmd)
-  - [Configuration](#configuration)
-- [File Structure](#file-structure)
-- [Selecting elements](#selecting-elements)
-  - [Aliasing elements](#aliasing-elements)
-  - [Xpath](#xpath)
-- [Actions](#actions)
-  - [Click](#click)
-  - [Trigger](#trigger)
-- [Assertions](#assertions)
-  - [Text Content](#text-content)
-- [Synchronous](#synchronous)
-- [variables](#variables)
-  - [Aliases](#aliases)
-    - [Sharing Context](#sharing-context)
-- [Iteration through Elements](#iteration-through-elements)
-- [Traversal](#traversal)
-- [Upload file](#upload-file)
-- [Hooks](#hooks)
-- [Fixture](#fixture)
-- [API tests](#api-tests)
-  - [`.request()` command](#request-command)
-    - [Passing multiple attributes to `.request()` command](#passing-multiple-attributes-to-request-command)
-  - [Getting data from request](#getting-data-from-request)
-  - [`.intercept()` command](#intercept-command)
-    - [Syntax](#syntax)
-- [Custom Commands](#custom-commands)
-- [General](#general)
-  - [Handling Multiple tabs in browser](#handling-multiple-tabs-in-browser)
-  - [Same Origin Policy (Web Security)](#same-origin-policy-web-security)
-  - [Handling Alerts](#handling-alerts)
-  - [Timeout](#timeout)
-    - [Globally](#globally)
-    - [For a command](#for-a-command)
-    - [For a test suite](#for-a-test-suite)
-  - [Viewport](#viewport)
+  - [E2E testing](#e2e-testing)
+  - [Cypress](#cypress)
+    - [Advantages](#advantages)
+    - [Disadvantages](#disadvantages)
+    - [Guide](#guide)
+    - [Running cypress on CMD](#running-cypress-on-cmd)
+    - [Configuration](#configuration)
+  - [File Structure](#file-structure)
+  - [Selecting elements](#selecting-elements)
+    - [Aliasing elements](#aliasing-elements)
+    - [Xpath](#xpath)
+  - [Actions](#actions)
+    - [Click](#click)
+    - [Trigger](#trigger)
+  - [Assertions](#assertions)
+    - [Text Content](#text-content)
+  - [Synchronous](#synchronous)
+  - [variables](#variables)
+    - [Aliases](#aliases)
+      - [Sharing Context](#sharing-context)
+  - [Iteration through Elements](#iteration-through-elements)
+  - [Traversal](#traversal)
+  - [Upload file](#upload-file)
+  - [Hooks](#hooks)
+  - [Fixture](#fixture)
+  - [API tests](#api-tests)
+    - [`.request()` command](#request-command)
+      - [Passing multiple attributes to `.request()` command](#passing-multiple-attributes-to-request-command)
+    - [Getting data from request](#getting-data-from-request)
+    - [`.intercept()` command](#intercept-command)
+      - [Syntax](#syntax)
+  - [Custom Commands](#custom-commands)
+  - [General](#general)
+    - [Handling Multiple tabs in browser](#handling-multiple-tabs-in-browser)
+    - [Same Origin Policy (Web Security)](#same-origin-policy-web-security)
+    - [Handling Alerts](#handling-alerts)
+    - [Timeout](#timeout)
+      - [Globally](#globally)
+      - [For a command](#for-a-command)
+      - [For a test suite](#for-a-test-suite)
+    - [Viewport](#viewport)
 
 ---
 
@@ -161,9 +161,11 @@ cy.get('a').trigger('mousedown') // Trigger mousedown event on link
 ```
 
 - `.trigger()` yields the same subject it was given from the previous command.
+
   ```js
   cy.get('button').trigger('mouseover'); // yields 'button'
   ```
+
 - other `events`, `options`,.. can be found [here](https://docs.cypress.io/api/commands/trigger#Syntax)
 
 ---
@@ -210,7 +212,7 @@ In cypress, commands are **Asynchronous**
 - or use chaining commands with `.then()` and write your synchronous-code
 
 ```js
-cy.get('button').then(($btn) => {
+cy.get('button').then($btn => {
   // $btn is the object that the previous
   // command yielded us
 });
@@ -256,7 +258,7 @@ Using `.then()` callback functions to access the previous command values is grea
 ```js
 //--------------------------------- The problem ---------------------------------//
 beforeEach(() => {
-  cy.get('button').then(($btn) => {
+  cy.get('button').then($btn => {
     const text = $btn.text();
   });
 });
@@ -277,7 +279,7 @@ it('does not have access to text', () => {
     let text;
 
     beforeEach(() => {
-      cy.get('button').then(($btn) => {
+      cy.get('button').then($btn => {
         // redefine text reference
         text = $btn.text();
       });
@@ -316,7 +318,7 @@ it('has access to text', function () {
 
 Iterate through an array like structure (arrays or objects with a `length` property) using -> **each**
 
-- to use actions on the element -> we **wrap** it using ` cy.wrap()`
+- to use actions on the element -> we **wrap** it using `cy.wrap()`
   - if we didn't do so, it will be dealt with as a `jQuery element`
 
 ```js
@@ -409,7 +411,7 @@ cy.fixture(filePath, encoding, options);
 // usage
 import user from '../fixtures/user.json';
 it('loads the same object', () => {
-  cy.fixture('user').then((userFixture) => {
+  cy.fixture('user').then(userFixture => {
     expect(user, 'the same data').to.deep.equal(userFixture);
   });
 });
@@ -440,13 +442,16 @@ cy.request('/api/boards');
 > Notice you don’t really need to add the method. Cypress optimizes their commands for maximum readability, so if you write a request like this, it will automatically be one with a method of GET.
 
 - If you pass two arguments into .request() command, the first argument will be considered a method, and the second one will be a url.
+
   ```js
   cy.request('DELETE', '/api/boards/9873789121');
   ```
+
 - `.request()` command can take maximum of **3** arguments. The third one will be a request body.
+
   ```js
   cy.request('POST', '/api/boards', {
-    name: 'space travel plan',
+    name: 'space travel plan'
   });
   ```
 
@@ -459,8 +464,8 @@ cy.request({
   method: 'POST',
   url: '/api/boards',
   body: {
-    name: 'space travel plan',
-  },
+    name: 'space travel plan'
+  }
 });
 ```
 
@@ -475,9 +480,9 @@ cy.request({
   method: 'POST',
   url: '/api/boards',
   body: {
-    name: 'space travel plan',
-  },
-}).then((board) => {
+    name: 'space travel plan'
+  }
+}).then(board => {
   console.log(board.status); // 201
   console.log(board.duration); // 11
   console.log(board.body);
@@ -500,8 +505,8 @@ cy.request({
 >     method: 'POST',
 >     url: '/api/boards',
 >     body: {
->       name: 'space travel plan',
->     },
+>       name: 'space travel plan'
+>     }
 >   })
 >   .then(({ status }) => {
 >     console.log(status); // 201
@@ -541,7 +546,7 @@ cy.intercept(url, routeMatcher, staticResponse);
 cy.intercept(
   {
     method: 'GET', // Route all GET requests
-    url: '/users/*', // that have a URL that matches '/users/*'
+    url: '/users/*' // that have a URL that matches '/users/*'
   },
   [] // and force the response to be: []
 ).as('getUsers'); // and assign an alias
@@ -554,19 +559,19 @@ cy.intercept('GET', '/users*');
 cy.intercept({
   method: 'GET',
   url: '/users*',
-  hostname: 'localhost',
+  hostname: 'localhost'
 });
 
 // spying and response stubbing
 cy.intercept('POST', '/users*', {
   statusCode: 201,
   body: {
-    name: 'Peter Pan',
-  },
+    name: 'Peter Pan'
+  }
 });
 
 // spying, dynamic stubbing, request modification, etc.
-cy.intercept('/users*', { hostname: 'localhost' }, (req) => {
+cy.intercept('/users*', { hostname: 'localhost' }, req => {
   /* do something with request and/or response */
 });
 ```
@@ -583,7 +588,7 @@ Cypress comes with its own API for creating custom commands and overwriting exis
 Cypress.Commands.add('login', (email, pw) => {});
 Cypress.Commands.addAll({
   login(email, pw) {},
-  visit(orig, url, options) {},
+  visit(orig, url, options) {}
 });
 Cypress.Commands.overwrite('visit', (orig, url, options) => {});
 ```
@@ -651,7 +656,7 @@ it('navigates', () => {
 An alert is triggered by `window:alert` event. This is by default handled by Cypress and the OK button on the alert gets clicked, without being visible during execution.
 
 ```js
-cy.on('window:alert', (t) => {
+cy.on('window:alert', t => {
   //assertions
   expect(t).to.contains('Your full name');
 });

@@ -52,4 +52,3 @@ Guide: [React TypeScript CheatSheet](https://react-typescript-cheatsheet.netlify
 ---
 
 ## Typescript with Redux
-

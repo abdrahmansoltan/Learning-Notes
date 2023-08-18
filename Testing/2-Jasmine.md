@@ -1,13 +1,13 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [Configuring](#configuring)
-  - [Installation](#installation)
-- [Jasmine Syntax](#jasmine-syntax)
-- [Testing Asynchronous Code](#testing-asynchronous-code)
-  - [Using async/await](#using-asyncawait)
-  - [Using promise](#using-promise)
-  - [Testing promise resolution and rejection](#testing-promise-resolution-and-rejection)
+  - [Configuring](#configuring)
+    - [Installation](#installation)
+  - [Jasmine Syntax](#jasmine-syntax)
+  - [Testing Asynchronous Code](#testing-asynchronous-code)
+    - [Using async/await](#using-asyncawait)
+    - [Using promise](#using-promise)
+    - [Testing promise resolution and rejection](#testing-promise-resolution-and-rejection)
 
 ---
 
@@ -75,8 +75,8 @@
 - A best practice is to start a sentence with `“it”` and then complete the sentence with the description of what the suite is testing.
 
   ```js
-  describe("suite description", () => {
-    it("describes the spec", () => {
+  describe('suite description', () => {
+    it('describes the spec', () => {
       const myVar = true;
       expect(myVar).toBe(true);
     });
@@ -96,7 +96,7 @@ The key to testing async code is letting Jasmine know `when` it’s ready to be 
 - Testing occurs after the return
 
 ```js
-it("expects asyncFun () result to equal value", async () => {
+it('expects asyncFun () result to equal value', async () => {
   const result = await asyncFun();
   expect(result).toEqual(value);
 });

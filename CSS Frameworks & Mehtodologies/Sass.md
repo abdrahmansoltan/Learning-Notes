@@ -350,7 +350,7 @@ $primary-color: #eee !global;
 ### @extend
 
 - the difference here from `mixins` is that `placeholders` help keeping Sass writing **Dry**
-  - `@extend` in Sass that allows for sharing of CSS properties from one selector to another with out rewrite repeated code.
+  - `@extend` in Sass that allows for sharing of CSS properties from one selector to another without rewrite repeated code.
     ![extend-vs-mixin](./img/extend-vs-mixin.png)
     ![extend-vs-mixin](./img/extend-vs-mixin-2.png)
 

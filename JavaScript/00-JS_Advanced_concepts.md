@@ -24,7 +24,7 @@
       - [Why do we usually make a partial function?](#why-do-we-usually-make-a-partial-function)
     - [Closure](#closure)
       - [Function returning Functions](#function-returning-functions)
-      - [Benefits](#benefits)
+      - [Closure Benefits](#closure-benefits)
     - [Pure Functions](#pure-functions)
     - [Decorators](#decorators)
       - [Using “func.call” for the context](#using-funccall-for-the-context)
@@ -45,9 +45,6 @@
   - [Miscellaneous](#miscellaneous)
     - [Mutation observer](#mutation-observer)
     - [Selection and Range](#selection-and-range)
-    - [Event loop: microtasks and macrotasks](#event-loop-microtasks-and-macrotasks)
-      - [Event Loop](#event-loop)
-      - [Macrotasks and Microtasks](#macrotasks-and-microtasks)
   - [Notes](#notes)
 
 ---
@@ -540,15 +537,14 @@ It's the process of applying a function to some of its arguments. The partially 
 
 ### Closure
 
-It's the ability to treat functions (when executed) as values, and makes the function remember all the variables that were accessible at the time of creation (lexical environment / execution context) even after the outer function has returned.
+It's the ability to make the function remember all the variables that were accessible at the time of creation (lexical environment / execution context) even after the outer function has returned.
 
-> **a function remembers where it was born in the special property `[[Environment]]`. It references the Lexical Environment from where it’s created**
+> **a function remembers where it was born in the special property `[[Environment]]` or `[[Scope]]`. It references the Lexical Environment from where it’s created**
 >
 > But when a function is created using **new Function()** have `[[Environment]]` referencing the global Lexical Environment, not the outer one. Hence, they can't use outer variables. But that’s actually good, because it insures us from errors. Passing parameters explicitly is a much better method architecturally and causes no problems with minifiers.
 
-- A closure gives you an access to an outer function's scope from an inner function (function inside a function)
+- A closure gives you an access to an outer function's scope from an inner function (even after the outer function has returned and was popped off the call stack)
 
-  - It is a function that remembers its outer variables and can access them.
   - **It's done by returning a function from another function**
 
     ```js
@@ -572,43 +568,21 @@ It's the ability to treat functions (when executed) as values, and makes the fun
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
 
-one of the biggest examples of closures is **timers**: ![closure](./img/closure2.PNG)
-![closure](./img/closure3.PNG)
+- one of the biggest examples of closures is **timers**:
 
-- A closure is the combination of a function bundled together (`enclosed`) with references to its surrounding state (the lexical environment). In other words, **a closure gives you access to an outer function's scope from an inner function**. In JavaScript, closures are created every time a function is created, at function creation time.
-- A closure makes sure that a function doesn’t lose connection to variables that existed at the function’s birth place (`lexical environment`)
-- `inner` function can remember `outer` function's scope, even after the `outer` function has been removed from the `call stack`
-
-  ```javascript
-  function multiplier(factor) {
-    return number => number * factor;
+  ```js
+  function sayHi() {
+    let phrase = 'Hello';
+    setTimeout(function () {
+      alert(phrase);
+    }, 1000);
   }
-  let twice = multiplier(2);
-  console.log(twice(5)); // → 10
+
+  sayHi(); // Hello after 1 second
+  // it remembers the phrase variable even after the function has finished and was popped off the call stack
   ```
 
-- using callback function which has arguments (Passing "argument" into handler) :
-
-  ```javascript
-  // handleHover is a function with 2 parameters(e,opacity)
-  // Method 1
-  nav.addEventListener('mouseover', function (e) {
-    handleHover(e, 0.5);
-  });
-
-  // Method 2 (see example for explanation)
-  nav.addEventListener('mouseover', handleHover.bind(0.5));
-  ```
-
-- when you want to turn **block-scope** into a **functional-scope** -> use **IIFE**
-  - usually used to prevent variable to be in the global scope like with (variables declared with `var`) here:
-    ![IIFE](./img/iife.PNG)
-  - Often used to ensure that the variable names do not conflict with each other (especially if the page uses more than one script).
-  - also used for
-    - code that only needs to run once within a task, rather than repeatedly being called by other parts of the script.
-    - As an argument when a function is called
-    - In event handlers and listeners
-    - To prevent conflicts between two scripts that might use the same variable names
+---
 
 #### Function returning Functions
 
@@ -621,19 +595,17 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
   ```js
   function f() {
-    let value = Math.random();
-
+    let value = Math.random(); // 0.838
     return function () {
-      alert(value);
+      return value;
     };
   }
 
-  // 3 functions in array, every one of them links to Lexical Environment
-  // from the corresponding f() run
-  let arr = [f(), f(), f()];
+  // 3 functions in array, every one of them links to Lexical Environment (same random value)
+  let arr = [f(), f(), f()]; // [0.838, 0.838, 0.838]
   ```
 
-#### Benefits
+#### Closure Benefits
 
 - It's usually memory-efficient as it caches the values inside its block-scoped (where it was called) **(its local memory (like Backpack) + the returned value from the function)** in case that it was called again, this will be in the hidden property called `__scope__`.
   - > all functions have the hidden property named `[[Environment]]` > ![closure](./img/function-closure.png)
@@ -1102,6 +1074,7 @@ They differ from Regular functions which return only single value (or nothing). 
   - BigInt can mostly be used like a regular number,
 
     - All operations on `bigints` return `bigints`.
+    - it ends with `n` -> `1234567890123456789012345678901234567890n;`
     - for example:
 
       ```js
@@ -1210,70 +1183,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 
 ---
 
-### Event loop: microtasks and macrotasks
-
-`Concurrency model` and the `event loop` are the **most** important concepts in `javascript` and they are part of the **browser** not `javascript`
-
-> **Concurrency model** is how javascript engine handles multiple tasks happening at the same time and how it decides which piece of code to run next.
-
-#### Event Loop
-
-There’s an endless loop, where the JavaScript engine waits for tasks, executes them and then sleeps, waiting for more tasks.
-
-Mainly its job is to always check "is the call stack empty?". If it is, then it checks the **task queue** and **microtask queue** and executes the oldest task (the task that is waiting the longest time to be executed) and then goes back to check the call stack again.
-
-- The general algorithm of the engine:
-
-  1. While there are tasks: execute them, starting with the oldest task.
-  2. Sleep until a task appears, then go to **1**.
-
-- The tasks form a queue, so-called **macrotask queue** (v8 term)
-  - Tasks from the queue are processed on “first come – first served” basis.
-- Notes for the DOM:
-  - Rendering never happens while the engine executes a task. It doesn’t matter if the task takes a long time. Changes to the DOM are painted only after the task is complete.
-  - If a task takes too long, the browser can’t do other tasks, such as processing user events. So after a time, it raises an alert like “Page Unresponsive”, suggesting killing the task with the whole page. That happens when there are a lot of complex calculations or a programming error leading to an infinite loop.
-
-#### Macrotasks and Microtasks
-
-- **Microtasks** come solely from our code. They are usually created by promises: an execution of `.then`/`catch`/`finally` handler becomes a microtask (more [here](./05-ASYNC.md#microtasks)). Microtasks are used “under the cover” of `await` as well, as it’s another form of promise handling.
-
-- **Immediately after every macrotask, the engine executes all tasks from microtask queue, prior to running any other macrotasks or rendering or anything else.**
-
-  - All microtasks are completed before any other event handling or rendering or any other macrotask takes place.
-
-  ```js
-  setTimeout(() => alert('timeout')); // 3 -> because it’s a macrotask.
-
-  Promise.resolve().then(() => alert('promise')); // 2 ->  because .then passes through the microtask queue, and runs after the current code.
-
-  alert('code'); // 1 -> it’s a regular synchronous call.
-  ```
-
-- If we’d like to execute a function asynchronously (after the current code), but before changes are rendered or new events handled, we can schedule it with `queueMicrotask` function.
-
-  ```js
-  let i = 0;
-  function count() {
-    // do a piece of the heavy job (*)
-    do {
-      i++;
-      progress.innerHTML = i;
-    } while (i % 1e3 != 0);
-
-    if (i < 1e6) {
-      queueMicrotask(count);
-    }
-  }
-  ```
-
-- **Web Workers**
-  - For long heavy calculations that shouldn’t block the event loop, we can use Web Workers.
-  - That’s a way to run code in another, parallel thread.
-  - Web Workers can exchange messages with the main process, but they have their own variables, and their own event loop.
-  - Web Workers do not have access to DOM, so they are useful, mainly, for calculations, to use multiple CPU cores simultaneously.
-
----
-
 ## Notes
 
 - `console` is not built in js, but it's from the `webApi`
@@ -1354,7 +1263,7 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
       alert(one); // 1, "one" is visible after loop, it's a global variable
       ```
 
-    - `“var”` tolerates redeclarations
+    - `“var”` tolerates re-declarations
 
       ```js
       let user;

@@ -17,9 +17,9 @@
 
   - it's because like that we would be calling this function each time we render which changes the state (with different state object than the current one in memory) and cause re-render again, and this will lead to **render infinite loop**
 
-- Why React Hook `useState` uses const and not let?
+- Why React Hook `useState` uses `const` and not `let`?
 
-  --> because When the component is rerendered, the function is executed again, creating a new scope, creating a new `color` variable, which has nothing to do with the previous variable.
+  - because the state is immutable, so we can't change it, so we can't use `let` as it's mutable.
 
 - why if I write
 
@@ -36,14 +36,15 @@
 
   - because the state is changed but the component needs to be rerendered as what is shown on the page is what we call **`object's reference by memory`**
   - **Note:** The state must be changed in a way that React recognized in order to trigger "re-rendering", and this is done using `setState()`
-    - `setState` performs a **shallow merge** with the current `state` object which is to update the current object-keys with the keys given
-  - so when we rerender we create a new object(state), so we should use
 
-  ```js
-  this.setState(() => {
-    name: "Ahmed",
-  });
-  ```
+    - `setState` performs a **shallow merge** with the current `state` object which is to update the current object-keys with the keys given
+    - so when we rerender we create a new `object(state)`, so we should use
+
+      ```jsx
+      this.setState(() => {
+        name: "Ahmed",
+      });
+      ```
 
 - Why (fetching with setting the state to the resolved value) without `componentDidMount()` or `useEffect()` results **infinite render**
 
@@ -64,7 +65,7 @@
     ![mutating the state](./img/mutating-state-1.png)
     ![mutating the state](./img/mutating-state-2.png)
 
-- why in reducer function that we always return the current state and override it even if we're overriding all items in the state like here:
+- why in `reducer function` that we always `return` the current state and **override** it even if we're overriding all items in the state like here:
 
   ```js
   currentState: {

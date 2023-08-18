@@ -2,6 +2,7 @@
 
 - [INDEX](#index)
   - [Frameworks](#frameworks)
+    - [Problem with vanilla JavaScript](#problem-with-vanilla-javascript)
   - [Types of Frameworks](#types-of-frameworks)
     - [Configuration-over-convention](#configuration-over-convention)
     - [convention-over-configuration](#convention-over-configuration)
@@ -18,12 +19,29 @@
 
 `JavaScript frameworks` are tried and tested tools for building scalable web applications. They contain a collection of JavaScript code libraries that provide pre-written JS code for standard programming features and tasks.
 
+- Before `2010`, most web applications were built using `Server-side rendering` to render the `html, css, js` on the server and send it to the client
+  ![frameworks](./img/frameworks-1.png)
+
+  - this is an old way, but now it's getting modern again with `Next.js`.
+  - now we use `Client-side rendering` to render the `html, css, js` on the client-side (browser) using `JavaScript` and `DOM` API, this is done with frameworks like `React`, `Angular`, `Vue`, etc.
+
 - A JavaScript framework guides developers on building complex applications faster and more efficiently by providing an ecosystem of tools that improves the developer experience. Frameworks enable you to add functionalities like testing and linting to ensure you're shipping error-free code.
 
 ![frameworks](./img/frameworks.PNG)
 ![frameworks](./img/opinionated.PNG)
 
 > **Opinionated**: having strong opinions on how things should be done and with what tools
+
+---
+
+### Problem with vanilla JavaScript
+
+- `Vanilla JavaScript` is the term used to describe plain JavaScript without any additional libraries or frameworks.
+- We use frameworks instead of vanilla JavaScript because it's hard to build a complex application with vanilla JavaScript, as it's not scalable and it's hard to maintain and test
+  - it requires keeping the `UI` in sync with the `data` and `state` of the application, which is hard to do with vanilla JavaScript
+  - if we want to build a complex application with vanilla JavaScript, we have 2 problems:
+    1. we will require lots of `DOM` manipulation and traversing, which is hard to maintain and test **(spaghetti code)**
+    2. state (data) needs to be stored in a central place instead of storing it in the `DOM`, and we need to keep the `UI` in sync with the `state` of the application
 
 ---
 

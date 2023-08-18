@@ -1066,7 +1066,7 @@ It specifies the elevation of an element relative to other elements on the page.
     ![collapse](./img/collapseFloat2.png)
   - 2 solutions:
     - to fix it we use `clear:both` on the parent element
-    - to fix it we use `clear:both` on the parent element
+    - or we can use `overflow: auto` on the parent element
 - The **`clear`** property allows you to say that no element (within the same containing element) should touch the left or right-hand or both sides of a box.
 
   - `clear` has four valid values (**it's like to ignore any floated item from specified direction**):
@@ -1102,8 +1102,6 @@ It specifies the elevation of an element relative to other elements on the page.
 ### Flexbox
 
 #### `display: flex` vs `display: inline-flex`
-
-![inline-flex](./img/inline-flex.gz)
 
 `display: inline-flex` does not make flex items display `inline`. It makes the flex container display `inline`. That is the only difference between `display: inline-flex;` and `display: flex;`.
 
@@ -1688,9 +1686,12 @@ They let us define variables in CSS that can be reused throughout the stylesheet
 
   - `Sass` variables are scoped on `{}` blocks (**block-scoped**) (**lexical-scoped**)
   - `CSS` variables are scoped on elements (**element(local)-scoped**) (**dynamic-scoped**)
+
     - this is great if you want the variable-value to only be applied in this element and elements inside it (its descendant elements) only
     - also it's great if you want to **override** the variable-value in a specific element and its descendant elements only
+
       - we can do this by:
+
         - declaring the variable in the element itself
 
           ```css
@@ -1708,7 +1709,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
         - or declaring it using javascript
 
           ```js
-          document.documentElement.style.setProperty("--primary", "red");
+          document.documentElement.style.setProperty('--primary', 'red');
           ```
 
   ```css
@@ -2499,7 +2500,7 @@ There are two ways to add multiple style sheets to a page:
      </ul>
      ```
 
-  2. Set Zero Font Size on Parent Element
+  2. Set `zero` Font Size on Parent Element
 
      ```css
      ul {

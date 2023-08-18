@@ -1,13 +1,13 @@
-## INDEX
+# INDEX
 
 - [INDEX](#index)
-- [GraphQL](#graphql)
-- [GraphQL Vs. REST APIs](#graphql-vs-rest-apis)
-- [Using Node & Express](#using-node--express)
-  - [Install Dependencies](#install-dependencies)
-  - [Node Code using graphql.buildSchema](#node-code-using-graphqlbuildschema)
-  - [Node Code using @graphql-tools/schema](#node-code-using-graphql-toolsschema)
-- [GraphQL with React](#graphql-with-react)
+  - [GraphQL](#graphql)
+  - [GraphQL Vs. REST APIs](#graphql-vs-rest-apis)
+  - [Using Node \& Express](#using-node--express)
+    - [Install Dependencies](#install-dependencies)
+    - [Node Code using graphql.buildSchema](#node-code-using-graphqlbuildschema)
+    - [Node Code using @graphql-tools/schema](#node-code-using-graphql-toolsschema)
+  - [GraphQL with React](#graphql-with-react)
 
 ---
 
@@ -59,8 +59,8 @@ npm i @graphql-tools/schema
 ### Node Code using [graphql.buildSchema](https://graphql.org/graphql-js/utilities/#buildschema)
 
 ```js
-const { buildSchema } = require("graphql");
-const { graphqlHTTP } = require("express-graphql"); //  middleware function that resposd to graphq queries
+const { buildSchema } = require('graphql');
+const { graphqlHTTP } = require('express-graphql'); //  middleware function that resposd to graphq queries
 
 const schema = buildSchema(`
 type Query {
@@ -70,16 +70,16 @@ type Query {
 `);
 
 const root = {
-  description: "Red Shoe",
-  price: 42.12,
+  description: 'Red Shoe',
+  price: 42.12
 };
 
 // middleware connection POST-ENDPOINT
 app.use(
-  "/shoeStore",
+  '/shoeStore',
   graphqlHTTP({
     schema: schema,
-    rootValue: root,
+    rootValue: root
   })
 );
 ```
@@ -96,14 +96,14 @@ app.use(
     - So you define types and resolvers and pass them to makeExecutableSchema. You can pass an array of Schema definitions to it so that way you could merge multiple schemas together, modularize it.
 
 ```js
-const { makeExecutableSchema } = require("@graphql-tools/schema");
-const { loadFilesSync } = require("@graphql-tools/load-files");
-const path = require("path");
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { loadFilesSync } = require('@graphql-tools/load-files');
+const path = require('path');
 
-const typesArray = loadFilesSync(path.join(__dirname, "**/*.graphql")); // get all graphq files into an array
+const typesArray = loadFilesSync(path.join(__dirname, '**/*.graphql')); // get all graphq files into an array
 
 const schema = makeExecutableSchema({
-  typeDefs: typesArray,
+  typeDefs: typesArray
 });
 ```
 

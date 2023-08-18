@@ -26,6 +26,10 @@
 
 - As our program grows bigger, it may contain many lines of code. Instead of putting everything in a single file, you can use `modules` to separate codes in separate files as per their functionality. This makes our code organized and easier to maintain.
 - `Module` is a file that contains code to perform a specific task. A module may contain variables, functions, classes etc.
+- As of `ES2022`, `Top-level await` is supported in modules. This means that we can use `await` at the top level of a module without any wrapper function with `async` keyword.
+  - Note that this will only work if the module is loaded as an `ES module` (using `import` or `type="module"`).
+  - also, note that this will block the execution of the module until the promise is resolved. (not recommended ❌)
+    - one use of it is to await the return of a promise from a function in the module. so that the module will be loaded only after the promise is resolved and we won't need to use `.then()` in the main script.
 
 ---
 
@@ -33,14 +37,25 @@
 
 > More on modules here -> [Modules & Bundlers](../DEV/Modules%20%26%20Bundlers.md)
 
-Modules let us split big codebases into multiple small files that can be loaded and executed on demand.
+Modules let us split big codebase into multiple small files that can be loaded and executed on demand.
 
-- A **module** is just a file. One script is one module. As simple as that.
-- Modules can load each other and use special directives export and import to interchange functionality, call functions of one module from another one:
+![module](./img/modules-1.png)
+
+- A **module** is a reusable piece of code (file) that encapsulates implementation details.
+- Modules can load each other and use special directives `export` and `import` to interchange functionality, call functions of one module from another one:
 
   - `export` keyword labels variables and functions that should be accessible from outside the current module.
   - `import` allows the import of functionality from other modules.
 
+- Browsers don't support modules, so we must do a "Build Process" after writing our code to convert it to a format that browsers understand. This includes 3 steps:
+  1. `Bundling` - Combining all the modules into a single file. -> `Webpack / Parcel`
+  2. `Transpiling` - Converting the code to a format that browsers understand. -> `Babel`
+     - This is done by changing the syntax of the code to an older version of JavaScript that is supported by all browsers.
+     - ex: `arrow functions` to `normal functions`
+  3. `Polyfilling` - Adding code to support older browsers. -> `Babel`
+     - This is done by adding a piece of code that adds the missing functionality to the browser.
+     - This is done with new features that wasn't available in older browsers. (new features and not syntax)
+     - ex: `Promise` to `callback functions`
 - As modules support special keywords and features, we **must** tell the browser that a script should be treated as a module, by using the attribute `<script type="module">`.
 
   - The browser automatically fetches and evaluates the imported module (and its imports if needed), and then runs the script.
@@ -59,43 +74,16 @@ Modules let us split big codebases into multiple small files that can be loaded 
 
 ### Module Features
 
+- Why modules?
+  1. **compose** software from separate modules that can be developed, updated, and maintained independently.
+  2. **isolate** components.
+  3. **abstract** code (low-level code in modules)
+  4. **organize** code
+  5. **re-use** code
 - Always **“use strict”**
 - Module-level scope (It creates a local scope in a module)
 
   - Each module has its own top-level scope. In other words, top-level variables and functions from a module are not seen in other scripts.
-  - This will cause error as each module has independent variables and we shouldn't depend on the order of the scripts
-
-    ```js
-    <!doctype html>
-    <script type="module" src="user.js"></script> // let user = "John";
-    <script type="module" src="hello.js"></script> // alert(user);
-    ```
-
-  - This will work fine:
-
-    ```js
-    <!doctype html>
-    <script type="module" src="user.js"></script> // let user = "John";
-
-    <script type="module" src="hello.js"></script> // it contains this:
-    // import {user} from './user.js';
-    // alert(user);
-    ```
-
-  - more explanation
-
-    ```js
-    // Here are two scripts on the same page, both type="module". They don’t see each other’s top-level variables:
-
-    <script type="module">
-      // The variable is only visible in this module script
-      let user = "John";
-    </script>
-
-    <script type="module">
-      alert(user); // Error: user is not defined
-    </script>
-    ```
 
 - A module code is evaluated only the first time when imported
 
@@ -116,7 +104,7 @@ Modules let us split big codebases into multiple small files that can be loaded 
 
 - In a module, **“this”** is undefined
 
-  - Compare it to non-module scripts, where this is a `global` object:
+  - Compare it to non-module `scripts`, where this is a `window` object:
 
     ```html
     <script>
@@ -157,11 +145,11 @@ Modules let us split big codebases into multiple small files that can be loaded 
 
   1. External scripts with the same src run only once:
 
-  ```html
-  <!-- the script my.js is fetched and executed only once -->
-  <script type="module" src="my.js"></script>
-  <script type="module" src="my.js"></script>
-  ```
+     ```html
+     <!-- the script my.js is fetched and executed only once -->
+     <script type="module" src="my.js"></script>
+     <script type="module" src="my.js"></script>
+     ```
 
   2. External scripts that are fetched from another origin (e.g. another site) require **CORS** headers
 
@@ -178,11 +166,7 @@ Modules let us split big codebases into multiple small files that can be loaded 
 
 ## Exporting & Importing code
 
-Most programming languages provide a way to import code from one file into another. JavaScript wasn’t originally designed with this feature, because JavaScript was designed to only run in the browser, with no access to the file system of the client’s computer (for security reasons). So for the longest time, organizing JavaScript code in multiple files required you to load each file with variables shared globally.
-
-In 2009, a project named CommonJS was started with the goal of specifying an ecosystem for JavaScript outside the browser. A big part of CommonJS was its specification for **modules**, which would finally allow JavaScript to import and export code across files like most programming languages, without resorting to global variables. The most well-known of implementation of CommonJS modules is **node.js**.
-
----
+JavaScript initially lacked a code `import` feature due to its limited browser-based functionality. Organizing JavaScript code across multiple files required loading each file with globally shared variables. In 2009, the `CommonJS` project introduced modules to enable code `import`/`export` in JavaScript, bringing it in line with other programming languages. `Node.js` is a popular implementation of `CommonJS` modules.
 
 ### Exporting
 
@@ -191,6 +175,9 @@ In 2009, a project named CommonJS was started with the goal of specifying an eco
 - exports must happen in top-level code (global scope)
 
 There are two types of exports
+
+1. **Named Exports**
+2. **Default Exports**
 
 #### Named Exports (Zero or more exports per module)
 
@@ -250,6 +237,30 @@ They're used with Modules that declare a single entity, e.g. a module `user.js` 
 ### Importing
 
 [reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports)
+
+- How ES6 modules are imported: They're imported **asynchronously**
+
+  - which means that they wait for the imported module to load fully before they can be evaluated. (somehow **Hoisted**)
+  - Also this is done to make imports known before a script executes (at compile time), so that the compiler can better optimize code.
+    - This makes `bundling and`dead code elimination` possible.
+
+  ```js
+  // 📁 module.js
+  console.log('Module is evaluated');
+
+  // 📁 main.js
+  console.log('Main is evaluated');
+  import './module.js';
+
+  // Result:
+  // Module is evaluated
+  // Main is evaluated
+  ```
+
+- Imports are not copies of the exported values, they are **live connections** (bindings) to them.
+
+  - When we import a value from a module, the connection is created, and we may use it, but the value itself is not copied.
+  - If the external module changes its value or exports something else, then the import gets the new value immediately.
 
 ![import-export](./img/import-export.png)
 ![import-export](./img/import-export-1.png)

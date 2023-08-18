@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Intro](#intro)
   - [Programming Fundamentals](#programming-fundamentals)
+  - [Object Oriented Programming](#object-oriented-programming)
   - [Internet-FrontEnd/BackEnd](#internet-frontendbackend)
   - [HTML-CSS](#html-css)
     - [CSS Methodologies \& Frameworks](#css-methodologies--frameworks)
@@ -22,6 +23,7 @@
     - [Automation (E2E) Testing](#automation-e2e-testing)
   - [Development Tools](#development-tools)
   - [Python](#python)
+  - [Cloud](#cloud)
   - [Data Structures \& Algorithms](#data-structures--algorithms)
 
 ---
@@ -48,6 +50,13 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ---
 
+## Object Oriented Programming
+
+- [OOP](./Software%20Engineering/1-OOP.md)
+- [Design Patterns](./Software%20Engineering/2-Design-patterns.md)
+
+---
+
 ## Internet-FrontEnd/BackEnd
 
 - [Internet](./Internet/Internet.md)
@@ -60,8 +69,9 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## HTML-CSS
 
-- [HTML](./HTML-CSS/03-HTML.md)
-- [CSS](./HTML-CSS/04-CSS.md)
+- [HTML](./HTML-CSS/3-HTML.md)
+- [CSS](./HTML-CSS/4-CSS.md)
+- [Responsive-web-design](./HTML-CSS/5-Responsive-web-design.md)
 
 ### CSS Methodologies & Frameworks
 
@@ -112,11 +122,11 @@ This repository contains notes from my learning Journey to be a reference for an
 ## Databases
 
 - [Programming-Foundations-Databases](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/07_Programming%20Foundations%20Databases/Notes.md)
-
-- [Database-SQL](./Databases/Database-SQL.md)
-
+- [Database](./Databases/Database.md)
+- [SQL](./Databases/SQL.md)
+- [PostgreSQL](./Databases/PostgreSQL.md)
 - [MongoDB](./Databases/MongoDB.md)
-
+- [Redis](./Databases/Redis.md)
 - [GraphQL](./Databases/GraphQL.md)
 
 ---
@@ -138,6 +148,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [performance](./React/7-performance.md)
 - [React-Typescript](./React/8-React-Typescript.md)
 - [React Interview Questions](./React/9-React-Interview.md)
+- [React-Testing](./React/10-React-Testing.md)
 
 ---
 
@@ -192,6 +203,7 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [Linters](./DEV/Linters.md)
 - [Modules & Bundlers](./DEV/Modules%20%26%20Bundlers.md)
+- [Package Managers](./DEV/Package-managers.md)
 - [Vite](./DEV/Vite-%26-esbuild.md)
 - [Webpack](./DEV/Webpack.md)
 
@@ -201,6 +213,12 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [Python](./Python/01-Python.md)
 - [OOP](./Python/02-Object-Oriented-Programming.md)
+
+---
+
+## Cloud
+
+- [AWS](./Cloud/1-AWS.md)
 
 ---
 

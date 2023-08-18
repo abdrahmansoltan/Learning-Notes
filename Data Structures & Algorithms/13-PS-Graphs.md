@@ -35,36 +35,39 @@
 
 ## Notes
 
-- Usually when traversing 2D arrays, we use `DFS` or `BFS` or `sequential traversal`.
+- Usually when traversing 2D arrays (Matrix), we use `DFS` or `BFS` or `sequential traversal`.
+
   - `DFS` is usually used when we want to visit all the nodes in the graph.
     - It's done by checking the `neighbors` of the current node and recursively calling the function on them.
   - `BFS` is usually used when we want to visit all the nodes in the graph **level by level**.
     - It's done by adding the current node to a `queue` and then looping through the `queue` and adding the `neighbors` of the current node to the `queue` and so on.
   - In both approaches, we need to:
+
     1. Keep track of the visited nodes to avoid infinite loops.
        - This can be done in 2 ways:
-        1. Using a `visited` set.
-        2. Modifying the grid by changing the value of the current node to `0` to mark it as visited.
+       1. Using a `visited` set.
+       2. Modifying the grid by changing the value of the current node to `0` to mark it as visited.
     2. check if current node is bound or not (in the grid) by checking the `rows` and `columns` of the grid.
 
-        ```py
-        if (
-          r not in range(ROWS) or
-          c not in range(COLS) or
-          (r, c) in visited
-        ):
-          return
+       ```py
+       if (
+         r not in range(ROWS) or
+         c not in range(COLS) or
+         (r, c) in visited
+       ):
+         return
 
-        # Or
-        if (
-          r < 0 or r == ROWS or
-          c < 0 or c == COLS or
-          (r, c) in visited
-        ):
-          return
-        ```
+       # Or
+       if (
+         r < 0 or r == ROWS or
+         c < 0 or c == COLS or
+         (r, c) in visited
+       ):
+         return
+       ```
 
   - `Sequential traversal` is usually used when we want to visit all the nodes in the graph **sequentially**.
+
     - It's also called `ZigZag traversal`.
       ![sequential-traversal](./img/sequential-traversal-3.jpeg)
     - It's done by looping through the `rows` and `columns` of the grid and checking the `direction` of the traversal. if it's `up` or `down`.
@@ -72,22 +75,31 @@
       ![sequential-traversal](./img/sequential-traversal-2.png)
     - We also need to check if the current node is bound or not (in the grid) by checking the `rows` and `columns` of the grid.
 
-        ```py
-        if (
-          r not in range(ROWS) or
-          c not in range(COLS)
-        ):
-          continue
+      ```py
+      if (
+        r not in range(ROWS) or
+        c not in range(COLS)
+      ):
+        continue
 
-        # Or
-        if (
-          r < 0 or r == ROWS or
-          c < 0 or c == COLS
-        ):
-          continue
-        ```
+      # Or
+      if (
+        r < 0 or r == ROWS or
+        c < 0 or c == COLS
+      ):
+        continue
+      ```
 
     - It doesn't need extra space to keep track of the visited nodes like `DFS` and `BFS`. because we are looping through the `rows` and `columns` of the grid sequentially.
+
+- Graph problems time complexity:
+  - In `BFS`:
+    - is usually `O(V + E)` where `V` is the number of vertices and `E` is the number of edges.
+  - This is because we are visiting each node once and each edge once. We could say that then time complexity will be `O(V^2)` but this is not true because the number of edges is usually less than `V^2`.
+- In `DFS`:
+  - it may be `O(v^n)` where `v` is the number of vertices and `n` is the number of nodes in the graph.
+    - This is because we create a decision tree and the number of nodes in the tree is `v^n`.
+  - But it's usually `O(V + E)` where `V` is the number of vertices and `E` is the number of edges.
 
 ---
 
@@ -217,6 +229,7 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
   ```
 
 - Solution 2 -> `DFS`
+
   - Drawback here, is that space complexity will be `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
     - also this will happen if we didn't use a `visited` set to keep track of the visited cells. because we will keep calling the function on the same cell over and over again. and the `stack` will keep growing.
 
@@ -261,6 +274,7 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
   ```
 
 - Solution 3: `Sequential traversal (BFS)` ✅
+
   - Time Complexity: `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
   - Space Complexity: `O(max(n, m))` = `O(n)` = number of rows (better than `DFS` and `BFS`)
 
@@ -372,8 +386,9 @@ Every minute, any fresh orange that is **4-directionally adjacent** to a rotten 
   - Explanation: The orange in the bottom left corner (row 2, column 0) is never rotten, because rotting only happens 4-directionally.
 
 - Verify the constraints:
+
   - What do we return if it's not possible to rot all the oranges? -> `-1`
-  ![rotting oranges](./img/rotten-oranges-1.png)
+    ![rotting oranges](./img/rotten-oranges-1.png)
   - What do we return if we have no oranges? -> `0`
   - What do we return if we have no rotten oranges? -> `0`
 
@@ -446,7 +461,7 @@ You are given an `m x n` grid `rooms` initialized with these three possible valu
 3. `INF` Infinity means an empty room. We use the value `2^31 - 1 = 2147483647` to represent `INF` as you may assume that the distance to a gate is less than `2147483647`.
 
 Fill each empty room with the distance to its nearest gate. If it is impossible to reach a gate, it should be filled with `INF`.
-  ![walls and gates](./img/walls-gates-3.png)
+![walls and gates](./img/walls-gates-3.png)
 
 - Ex: `rooms = [[INF,-1,0,INF],[INF,INF,INF,-1],[INF,-1,INF,-1],[0,-1,INF,INF]]`
   ![walls and gates](./img/walls-gates-1.png)
@@ -455,6 +470,7 @@ Fill each empty room with the distance to its nearest gate. If it is impossible 
   - Output: `[[3,-1,0,1],[2,2,1,-1],[1,-1,2,-1],[0,-1,3,4]]`
 
 - Solution 1: `BFS`
+
   - Here, we should use `BFS` to solve this problem. because we need to visit all the cells in the grid **level by level** to know the distance of each cell from the gate.
   - We start by **adding all the gates to the `queue`** and mark them as `visited`.
   - Then we process all the cells in the `queue` and add their `neighbors` to the `queue` and mark them as `visited` and set their distance to the current cell + 1.
@@ -493,6 +509,7 @@ Fill each empty room with the distance to its nearest gate. If it is impossible 
   ```
 
 - Solution 2: `DFS`
+
   - Time complexity: `O(n.m)` = size of the grid
   - Space complexity: `O(n.m)` = size of the grid (in the `call stack`)
 
@@ -531,7 +548,7 @@ A sudoku solution must satisfy **all of the following rules**:
 1. Each of the digits `1-9` must occur exactly once in each row.
 2. Each of the digits `1-9` must occur exactly once in each column.
 3. Each of the digits `1-9` must occur exactly once in each of the 9 `3x3` sub-boxes of the grid.
-  ![sudoku solver](./img/sudoku-1.png)
+   ![sudoku solver](./img/sudoku-1.png)
 
 - The `9x9` board is initially partially filled with digits from `1-9` and empty cells. The empty cells are represented by the character `'.'`.
 
@@ -543,7 +560,7 @@ A sudoku solution must satisfy **all of the following rules**:
   - We can use `backtracking` to solve this problem.
   - We start by looping through the rows and columns of the grid and if the current cell is empty, we try to fill it with a number from `1` to `9` and check if it's valid or not. if it's valid, we recursively call the function on the next cell. if it's not valid, we try another number.
     - We also need to check if the current cell is empty or not. if it's not empty, we skip it.
-    ![sudoku solver](./img/sudoku-3.png)
+      ![sudoku solver](./img/sudoku-3.png)
   - We also need to check if the current number is valid or not. we can do that by checking the current row, column and sub-box of the current cell.
     - we use **sub-box** to check if the current number is valid or not. because we need to check if the current number is valid in the current sub-box. which is a `3x3` box.
       ![sudoku solver](./img/sudoku-4.png)
@@ -572,7 +589,7 @@ class Solution:
 
             # check if the current sub-box is valid (3x3)
             sub_box_r = (r // 3) * 3
-            sub_box_c = (c // 3) * 3 
+            sub_box_c = (c // 3) * 3
             for row in range(sub_box_r, sub_box_r + 3):
                 for col in range(sub_box_c, sub_box_c + 3):
                     if board[row][col] == num:
@@ -613,13 +630,13 @@ class Solution:
 A company has `n` employees with a unique ID for each employee from `0` to `n - 1`. The head of the company has is the one with `headID`.
 
 Each employee has one direct manager given in the `manager` array where `manager[i]` is the direct manager of the `i-th` employee, `manager[headID] = -1`. Also, it is guaranteed that the subordination relationships have a tree structure.
-  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-2.png)
-  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-3.png)
+![time needed to inform all employees](./img/time-needed-to-inform-all-employees-2.png)
+![time needed to inform all employees](./img/time-needed-to-inform-all-employees-3.png)
 
 The head of the company wants to inform all the employees of the company of an urgent piece of news. He will inform his direct subordinates, and they will inform their subordinates, and so on until all employees know about the urgent news.
 
 The `i-th` employee needs `informTime[i]` minutes to inform all of his direct subordinates (i.e., After informTime[i] minutes, all his direct subordinates can start spreading the news).
-  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-4.png)
+![time needed to inform all employees](./img/time-needed-to-inform-all-employees-4.png)
 
 Return _the number of minutes needed to inform all the employees about the urgent news_.
 
@@ -630,6 +647,7 @@ Return _the number of minutes needed to inform all the employees about the urgen
   - Explanation: The head of the company with id = 2 is the direct manager of all the employees in the company and needs 1 minute to inform them all.
 
 - Verify the constraints:
+
   - is the graph directed or undirected? -> directed
   - is the graph acyclic or cyclic? (can employees have more than one manager?) -> acyclic (each employee has only one manager)
     - This is because the subordination relationships have a **tree** structure.
@@ -643,7 +661,7 @@ Return _the number of minutes needed to inform all the employees about the urgen
     - the `manager` array is the `adjacency list` of the graph
     - the `informTime` array is the `weight` of the graph. which is the time needed to inform the current employee's subordinates.
   - We want to know the `max_time` needed to inform all the employees which is the `max_path` from the `root` to the `leaf` nodes.
-  ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-5.png)
+    ![time needed to inform all employees](./img/time-needed-to-inform-all-employees-5.png)
   - We can use `DFS` to solve this problem:
     - We start from the `root` and keep going until we reach the `leaf` nodes.
     - We keep track of the `max_time` and update it whenever we reach a `leaf` node.
@@ -857,6 +875,7 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
       - To keep track of these nodes, **we use a `HashMap` with adjacency list**.
         ![course-schedule](./img/course-schedule-4.png)
   - Then we use `DFS` to check if there is a cycle or not.
+
     - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
       ![course-schedule](./img/course-schedule-5.png)
     - To prevent running `DFS` on the same node twice, we remove its `value` from the `HashMap` after we run `DFS` on it and knowing that it can be completed **(because it now has no prerequisites)**, and then go back to the previous node and repeat the process.
@@ -957,6 +976,7 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
   ```
 
 - **Solution 2: `Topological Sort`** (better solution ✅)
+
   - This problem can also be solved using `Topological Sort` because we can use it to detect cycles in a graph (if there is a cycle, then we can't finish all courses).
   - First, we need to build the `indegre` array.
     - This is because we need to know which nodes have no prerequisites (no incoming edges).
@@ -968,7 +988,7 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
   - Space complexity: `O(n^2)` = `O(numCourses^2)`
     - This is because we may have a graph with `n` nodes and `n` edges.
     - the adjacency list will have `n` nodes and each node will have `n` edges.
-  
+
   ```py
   def canFinish(numCourses, prerequisites):
       # Create a graph from the prerequisites (Adjacency List) & an indegree array
@@ -1103,14 +1123,14 @@ We will send a signal from a given node `k`. Return the time it takes for all th
 - We use `Dijkstra's Algorithm` to find the shortest path from the source node to all other nodes.
 - This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
   - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
-      ![network-delay-time](./img/network-delay-time-2.png)
+    ![network-delay-time](./img/network-delay-time-2.png)
   - Here, we will use a `minHeap` to keep track of the shortest path.
     - It's logical to search the node with shortest distance, So we will use the `min heap` to pop the node with the shortest distance from the source node and add its neighbors to the `Priority Queue` with their distance from the source node.
-        ![network-delay-time](./img/network-delay-time-3.png)
+      ![network-delay-time](./img/network-delay-time-3.png)
     - > So the `minHeap` tells us which node to visit next by popping the **node with the shortest distance from the source node**. For example in the picture below, we have 2 paths from node `1`, and the `minHeap` will give us the path with the shortest distance from the source node. `(path 1)` > ![network-delay-time](./img/network-delay-time-6.png)
 - Starting at the source node `k`, we loop through its neighbors and add them to the `Priority Queue` with their distance from the source node.
-    ![network-delay-time](./img/network-delay-time-4.png)
-    ![network-delay-time](./img/network-delay-time-5.png)
+  ![network-delay-time](./img/network-delay-time-4.png)
+  ![network-delay-time](./img/network-delay-time-5.png)
 
 - Time complexity: `O(ElogV)`
   - `E` is the number of edges
@@ -2112,8 +2132,9 @@ problem: [Here](https://leetcode.com/problems/escape-a-large-maze/)
 Return `true` if and only if it is possible to reach the `target` square from the `starting` square through a sequence of valid moves.
 
 - Ex:
+
   - Input: `blocked = [[0,1],[1,0]], source = [0,0], target = [0,2]`
-  -  
+  -
 
 - Explanation:
 
@@ -2134,7 +2155,7 @@ Return `true` if and only if it is possible to reach the `target` square from th
 ```py
 def isEscapePossible(blocked: List[List[int]], source: List[int], target: List[int]) -> bool:
     escapeDist = len(blocked) # maximum number of cells that we can visit
-    
+
     def dfs(start, end, blockedSet):
         nonlocal escapeDist
         stack = [start] # (row, col)

@@ -11,6 +11,7 @@
     - [`react` and `react-dom` modules(libraries)](#react-and-react-dom-moduleslibraries)
   - [JSX](#jsx)
     - [Dynamic expressions in JSX](#dynamic-expressions-in-jsx)
+    - [Conditional rendering](#conditional-rendering)
   - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
     - [How does it work?](#how-does-it-work)
   - [Styling and CSS](#styling-and-css)
@@ -21,7 +22,6 @@
       - [CSS Modules In React Application](#css-modules-in-react-application)
   - [Components](#components)
     - [why components](#why-components)
-    - [component tree](#component-tree)
     - [List Components (Looping)](#list-components-looping)
       - [update list-items](#update-list-items)
   - [Custom Components (fragment)](#custom-components-fragment)
@@ -31,20 +31,21 @@
     - [Smart vs Dumb components](#smart-vs-dumb-components)
   - [Forms: Controlled vs uncontrolled components](#forms-controlled-vs-uncontrolled-components)
     - [Controlled components](#controlled-components)
-      - [Controlled Form with FormData API](#controlled-form-with-formdata-api)
     - [Uncontrolled components](#uncontrolled-components)
   - [Props](#props)
-    - [single prop](#single-prop)
-    - [Multiple props](#multiple-props)
-    - [passing default props through components (implicitly)](#passing-default-props-through-components-implicitly)
-    - [Validating Props (propTypes)](#validating-props-proptypes)
+    - [Passing props](#passing-props)
+    - [passing all props through components (implicitly)](#passing-all-props-through-components-implicitly)
+    - [`children` prop](#children-prop)
+    - [Validating Props (PropTypes)](#validating-props-proptypes)
     - [Default Prop Values](#default-prop-values)
-  - [Communicating Between Components](#communicating-between-components)
-    - [From Parent to Child](#from-parent-to-child)
-    - [From Child to Parent](#from-child-to-parent)
-    - [lifting the state up](#lifting-the-state-up)
-  - [React Composition](#react-composition)
-    - [Why Use React Composition?](#why-use-react-composition)
+  - [React Component Composition](#react-component-composition)
+  - [Events](#events)
+  - [State](#state)
+    - [State vs Props](#state-vs-props)
+    - [Communicating Between Components](#communicating-between-components)
+      - [From Parent to Child](#from-parent-to-child)
+      - [From Child to Parent (lifting the state up)](#from-child-to-parent-lifting-the-state-up)
+    - [Derived State](#derived-state)
   - [Handling Events](#handling-events)
     - [Events in HTML vs React](#events-in-html-vs-react)
     - [DocumentWide event handlers (Refs)](#documentwide-event-handlers-refs)
@@ -59,7 +60,9 @@
 
 ## React Fundamentals
 
-It's a library not a framework. However, few people use react on its own, but when combined with things/tools like `react-router`, `webpack`, `redux` -> ("React Ecosystem"), then it become more like a framework
+It's a **library** not a framework. However, few people use react on its own, but when combined with things/tools like `react-router`, `webpack`, `redux` -> ("React Ecosystem"), then it become more like a framework
+
+- It's a library for building user interfaces, based on components, declarative, stateful, and reusable
 
 > there's an actual framework built around React -> **Next.js**
 
@@ -91,7 +94,9 @@ React is based on these concepts:
     - allows you to control your application by saying `"This is what you should do"`
 
 - React's declarative approach
-  - Define the desired target state(s) and let React figure out the actual JavaScript DOM instructions ![declarative](./img/imperative_declarative.PNG)
+  ![declarative](./img/imperative_declarative-1.PNG)
+  - Define the desired target state(s) and let React figure out the actual JavaScript DOM instructions
+    ![declarative](./img/imperative_declarative.PNG)
 
 ---
 
@@ -130,15 +135,18 @@ npm install
 npm start
 ```
 
-- **create-react-app** is built on top of **Webpack**, which:
-  - Enables module importing/exporting
-    - packages/bundles up all css/images/js into a single file for the browser
-    - reduce number of HTTP requests for performance
-  - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
-  - Enables easy testing & deployment
-- **Vite** can also be used instead of `create-react-app`
-  - with `vite`, the starting file will be `main.jsx` instead of `index.js`
-- one `HTML` file is delivered => `index.html`
+- Options for setting up react
+  ![react-setup](./img/react-setup.png)
+
+  - **create-react-app** is built on top of **Webpack**, which:
+    - Enables module importing/exporting
+      - packages/bundles up all `css`/`images`/`js` into a single file for the browser
+      - reduce number of `HTTP` requests for performance
+    - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
+    - Enables easy testing & deployment
+  - **Vite** can also be used instead of `create-react-app`
+    - with `vite`, the starting file will be `main.jsx` instead of `index.js`
+
 - When using the `Create-React-App` tool you are provided with a handy script(command) `eject` that allows you to configure Webpack among other features at your heart content.
 
   - > if you use the script `npm run eject`, it will get you `config` folder which is everything that `create-react-app` does, and it's not recommended to change it or even to `eject` as the configuration is made by people who figured out the best configuration
@@ -157,8 +165,8 @@ npm start
 
 > **StrictMode**: It's a tool for highlighting potential problems in the app. It provides additional checks and warnings for its descendence-components when using legacy or soon to be deprecated code.
 >
-> - It only runs in dev-mode and may result **rendering twice** so that it can catch any weird behaviors that might occur in the side-effects inside the functional component, and **won't run in production mode** so no logs will be shown there
-> - also the re-render happens when the props change, which is the case when providing props
+> - It only runs in `dev-mode` and may result **rendering twice** so that it can catch any weird behaviors that might occur in the side-effects inside the functional component, and **won't run in production mode** so no logs will be shown there
+> - also the re-render happens when the `props` change, which is the case when providing `props`
 
 ---
 
@@ -167,9 +175,9 @@ npm start
 - **Folder structure**
   ![folder-structure](./img/react-folder-structure.png)
 - **Images**
-  - external images (hosted on different server) -> just need url
-  - local images **(public folder)** -> less performant
-  - local images **(src folder)** -> better solution for assets, since under the hood they get optimized
+  - external images (hosted on different server) -> just need `url`
+  - local images **(public folder)** -> less performant as they don't get optimized ❌
+  - local images **(src folder)** -> better solution for assets, since under the hood they get optimized ✅
 
 ---
 
@@ -178,14 +186,16 @@ npm start
 These 2 libraries from React are critical for React to work, these 2 combined is what actually allows us to build web application in React
 
 - `react`: is the engine which does all of the work of how React functions works and be built -> **Application Builder**
-  - > How react works
+  - How react works
 - `react-dom`: is related to the Web-DOM being the document-object-model, which is the different tools that help us actually build web-applications
-  - > what react renders
+  - what react renders
   - It specifies that the engine should be directed towards web related applications
 
 ---
 
 ## JSX
+
+It's a declarative syntax extension to JavaScript that allows us to write `HTML`-like syntax in our JavaScript code.
 
 ![jsx](./img/jsx-1.png)
 ![jsx](./img/jsx.jpg)
@@ -201,19 +211,19 @@ These 2 libraries from React are critical for React to work, these 2 combined is
   // we don't have to write it anymore after V17
   ```
 
-- what [Babel](https://babeljs.io/repl#?browsers=defaults%2C%20not%20ie%2011%2C%20not%20ie_mob%2011&build=&builtIns=false&corejs=3.21&spec=false&loose=false&code_lz=Q&debug=false&forceAllTransforms=false&shippedProposals=false&circleciRepo=&evaluate=false&fileSize=false&timeTravel=false&sourceType=module&lineWrap=true&presets=env%2Creact%2Cstage-2&prettier=false&targets=&version=7.17.9&externalPlugins=&assumptions=%7B%7D) do to jsx :
+- what `Babel` does to `jsx` :
 
-```js
-// jsx that we write
-<p title='Intro text'>React.js is a library for building user interfaces.</p>;
+  ```jsx
+  // jsx that we write
+  <p title='Intro text'>React.js is a library for building user interfaces.</p>;
 
-// Babel converts it to this
-React.createElement(
-  'p',
-  { title: 'Intro text' },
-  'React.js is a library for building user interfaces.'
-);
-```
+  // Babel converts it to this
+  React.createElement(
+    'p',
+    { title: 'Intro text' },
+    'React.js is a library for building user interfaces.'
+  );
+  ```
 
 - **Notes:**
   - if you don't have attributes you can use `{}` or `null` instead
@@ -242,14 +252,51 @@ React.createElement(
 
 ---
 
+### Conditional rendering
+
+- **if-else** statements can't be used inside JSX, but we can use **ternary operator** or **logical && operator** instead
+
+  ```jsx
+  const isLoggedIn = true;
+  return (
+    <div>
+      {isLoggedIn ? <p>Logged in</p> : <p>Logged out</p>}
+      {isLoggedIn && <p>Logged in</p>}
+    </div>
+  );
+  ```
+
+  - **Important Note**: in `jsx`, you must provide a boolean value when using short-circuiting `&&` operator, you should't depend on `type coercion`
+
+    ```jsx
+    const arr = [];
+
+    return (
+      <div>
+        {arr && <p>Logged in</p>} // this will be rendered
+        {arr.length && <p>Logged in</p>} // this won't be rendered | or might return 0 {}
+        {arr.length > 0 && <p>Logged in</p>} // Best approach ✅
+      </div>
+    );
+    ```
+
+- Another way to do conditional rendering is to use multiple `return` statements inside a function
+
+  ```jsx
+  const isLoggedIn = true;
+
+  if (isLoggedIn) {
+    return <p>Logged in</p>;
+  } else {
+    return <p>Logged out</p>;
+  }
+  ```
+
+---
+
 ## Virtual DOM vs Real DOM
 
 **Dom Manipulation** can be very slow and heavy. For example, if you have several image tags inside a div and you replace one of the **images**
-
-- external images (hosted on different server) -> inside with a just need url
-- external images (hosted on different server) -> inside with a just need url
-- external images (hosted on different server) -> inside with a just need url
-  different image source, the DOM re-renders the entire div. What would happen if you frequently update and make a lot of transformations? To address this problem, the React developers came up with an idea to manipulate the VDOM instead which is faster since nothing gets drawn on your browser.
 
 - **Virtual DOM (VDOM)**: is a concept where a virtual representation of a UI is kept in `memory` as an object **(snapshot of what the real DOM looks like)**, and synced with the real DOM by a library (such as ReactDOM). which makes changes to the virtual DOM and not the Real DOM
 
@@ -258,8 +305,7 @@ React.createElement(
 
 ![react-dom](./img/react-dom.png)
 
-- `ReactDOM`: React takes a look at what specific transformations need to be made to the initial DOM and updates them very quickly.
-  - React re-renders only the parts that need to be updated compared to the initial DOM.
+- React re-renders only the parts that need to be updated compared to the initial DOM.
 
 ### How does it work?
 
@@ -278,6 +324,13 @@ React.createElement(
 ---
 
 ## Styling and CSS
+
+There're many ways to style react components:
+
+1. Inline style -> `style={{color: "red"}}`
+2. CSS Modules -> `import styles from "./Button.module.css";`
+3. Styled-components -> `import styled from "styled-components";`
+4. CSS-in-JS -> `import { css } from "@emotion/react";`
 
 ### Inline style
 
@@ -316,6 +369,20 @@ function HelloWorldComponent() {
 To add classes based on certain values, we can use normal conditions `if..else` or short-circuiting `&&` or we can use [classnames](https://www.npmjs.com/package/classnames) package
 
 ![classnames](./img/classnames.png)
+
+- Another way is to use `template literals` to add classes dynamically
+
+  ```js
+  const Button = () => {
+    const [isError, setIsError] = useState(false);
+
+    return (
+      <button className={`btn ${isError ? 'btn--error' : ''}`} onClick={() => setIsError(true)}>
+        Error Button
+      </button>
+    );
+  };
+  ```
 
 ---
 
@@ -400,18 +467,35 @@ There are two different ways of using CSS Modules in a React application.
 
 ## Components
 
-They are the building blocks of React
+They are the building blocks of React, They describe a part of the user interface.
 
-- They are classes / functions that know how to render themselves into HTML
-- They start with a capital letter `<ContactList/>` to let react differentiate it with HTML elements which start with lower-case letter `<div>`
+- They are javascript `classes` / `functions` that return `JSX` elements and know how to render themselves into HTML
+- They start with a capital letter `<ContactList/>` to let react differentiate it with HTML elements which start with lower-case letter elements like: `<div>`
+- **Component Instance** : is a component that is rendered by React and is an `instance` of a component `class`
+  ![component instance](./img/component-instance.png)
+- **React Element** : is a plain `object` describing what you want to appear on the screen in terms of the `DOM` nodes or other components.
+
+  - React elements are created with `React.createElement()` function and are immutable.
+    ![react element](./img/react-element.png)
+
+    - interview question:
+
+      ```jsx
+      // What is the expected output?
+      console.log(<Test />);
+      // result:
+      ReactElement { type: 'div', props: { children: 'Hello World' }, key: null, ref: null }
+      ```
+
+  - It's inserted to the `DOM` as a `HTML` element
+    ![react element](./img/react-element-1.png)
 
 ### why components
 
 ![comp](./img/components.PNG)
 
-### component tree
-
-![tree](./img/components_tree.PNG)
+- Some might say that React doesn't have a "Separation of Concerns" because it mixes `HTML` and `JS` together, but this is not true as React separates the concerns of the UI into `components`, and each component has its own concerns (`HTML`, `CSS`, `JS`)
+  ![comp](./img/components-2.png)
 
 ---
 
@@ -534,11 +618,14 @@ ReactDOM.createPortal(child, container);
 
 ## Forms: Controlled vs uncontrolled components
 
-In React, there are two ways to handle **Form data** in our components.
+In React, there are two ways to handle **Form data** in our components:
+
+1. **Controlled components**: are those in which form data is handled by the component’s `state`.
+2. **Uncontrolled components**: are those for which the form data is handled by the DOM itself (using `ref`).
 
 ### Controlled components
 
-Controlled components are those in which form data is handled by the component’s state.
+Controlled components are those in which form data is handled by the component’s `state`.
 
 > **Controlled Inputs:** are input elements where we provide both the `value` and `onChange` props
 
@@ -549,9 +636,13 @@ function App() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
-  function onSubmit() {
+  function onSubmit(e) {
+    e.preventDefault();
     console.log('Name value: ' + name);
     console.log('Email value: ' + email);
+    // Or, we can get the values from the event object itself
+    console.log('Name value: ' + e.target.name.value);
+    console.log('Email value: ' + e.target.email.value);
   }
   return (
     <form onSubmit={onSubmit}>
@@ -577,72 +668,6 @@ function App() {
 
 ---
 
-#### Controlled Form with FormData API
-
-> more onn FormData [here]('../../../JavaScript/01-JS.md#formdata-api')
-
-It can be used to automatically create a object-ready format for a form in the state without
-
-```jsx
-import { useState } from 'react';
-
-const UncontrolledInputs = () => {
-  const [value, setValue] = useState(0);
-
-  const handleSubmit = e => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget); // get values one by one
-
-    const name = formData.get('name');
-    console.log(name); // get all of them
-    const newUser = Object.fromEntries(formData); // do something (post request, add to list, etc)
-
-    // Gotcha - re-render won't clear out the values
-    setValue(value + 1);
-
-    // Reset values
-    e.currentTarget.reset();
-  };
-
-  return (
-    <div>
-      <form className='form' onSubmit={handleSubmit}>
-        <h4>Form Data API</h4>
-        {/* name */}
-        <div className='form-row'>
-          <label htmlFor='name' className='form-label'>
-            name
-          </label>
-          <input type='text' className='form-input' id='name' name='name' />
-        </div>
-        {/* email */}
-        <div className='form-row'>
-          <label htmlFor='email' className='form-label'>
-            Email
-          </label>
-          <input type='email' className='form-input' id='email' name='email' />
-        </div>
-        {/* email */}
-        <div className='form-row'>
-          <label htmlFor='password' className='form-label'>
-            Password
-          </label>
-          <input type='password' className='form-input' id='password' name='password' />
-        </div>
-
-        <button type='submit' className='btn btn-block'>
-          submit
-        </button>
-      </form>
-    </div>
-  );
-};
-export default UncontrolledInputs;
-```
-
----
-
 ### Uncontrolled components
 
 Uncontrolled components are those for which the form data is handled by the DOM itself. **"Uncontrolled"** refers to the fact that these components are not controlled by React state.
@@ -651,16 +676,20 @@ It is the one that stores its own state internally, and you query the DOM using 
 
 > components that use **ref** are uncontrolled, as they aren't controlled by React
 
-```js
+```jsx
 function App() {
-  function onSubmit() {
-    console.log('Name value: ' + window.name.value);
-    console.log('Email value: ' + window.email.value);
+  const nameInput = useRef();
+  const emailInput = useRef();
+
+  function onSubmit(e) {
+    e.preventDefault();
+    console.log('Name value: ' + nameInput.current.value);
+    console.log('Email value: ' + emailInput.current.value);
   }
   return (
     <form onSubmit={onSubmit}>
-      <input type='text' name='name' id='name' required />
-      <input type='email' name='email' id='email' required />
+      <input type='text' name='name' ref={nameInput} required />
+      <input type='email' name='email' ref={emailInput} required />
       <input type='submit' value='Submit' />
     </form>
   );
@@ -676,20 +705,24 @@ function App() {
 [reference](https://dmitripavlutin.com/react-props/)
 
 - They are used for configuring your component
-- they are **immutable** (can't change component's props)
-- they make components more `flexible`
+- they are **immutable** (can't change component's props), if you want to change them you have to change the `state` of the component
+  - because mutating `props` would be a **side-effect** on the parent, and React doesn't allow side-effects in the `render` function -> `Pure Functions` -> `PureComponent`
+- By using them, React uses "One-way data flow" (data flows in one direction from `parent` to `child`), which makes the app more predictable and easier to understand
 
-### single prop
+### Passing props
 
 - ex: add the `who` prop to `<Message>` component
 
-```js
+```jsx
 // 1) Make the function of your component read the props from the props parameter
 function Hello(props) {
   return <div>Hello, {props.who}!</div>;
 }
-/* Now Hello function has a parameter props. When rendering the component,
-React will make sure to assign to props object all the props you assign to the component.*/
+// or with destructuring
+function Hello({ who }) {
+  return <div>Hello, {who}!</div>;
+}
+/* Now Hello function has a parameter props. When rendering the component, React will make sure to assign to props object all the props you assign to the component.*/
 
 // 2) When rendering the component, add the prop to the component using the attribute-like syntax who="Earth"
 <Hello who="Earth" />
@@ -697,164 +730,266 @@ React will make sure to assign to props object all the props you assign to the c
 <div>Hello, Earth!</div>
 ```
 
-### Multiple props
-
-```js
-// using destructuring
-function Message({ greet, who }) {
-  return (
-    <div>
-      {greet}, {who}!
-    </div>
-  );
-}
-
-// Render
-<Message greet="Welcome" who="Aliens" />
-// Output
-<div>Welcome, Aliens!</div>
-```
-
 ---
 
-### passing default props through components (implicitly)
+### passing all props through components (implicitly)
 
 Instead of passing default props explicitly like passing `onClick` prop from a custom `<Button/>` element to a `<button>` element inside it, we can use the `rest` parameter:
 
 ![rest props](./img/rest-props-1.png)
 ![rest props](./img/rest-props-2.png)
 
-```js
-<Button primary onClick={handleClick} />
+```jsx
+// in Button.jsx
+function Button({ children, ...rest }) {
+  return <button {...rest}>{children}</button>;
+  // instead of: <button onClick={onClick} onMouseOver={onMouseOver}>{children}</button>
+}
 
-// inside:
-const {children, ...rest} = props
-<button {...rest} >{children}</button>
-// instead of: <button onClick={rest.onClick} >{children}</button>
+// in App.jsx
+function App() {
+  return (
+    <div>
+      <Button onClick={() => console.log('clicked')} onMouseOver={() => console.log('hovered')}>
+        Click me
+      </Button>
+    </div>
+  );
+}
 ```
 
 ---
 
-### Validating Props (propTypes)
+### `children` prop
 
-This is done using the library [prop-types](https://www.npmjs.com/package/prop-types)
+`children` is a special prop that is passed to components automatically. It represents the content between the opening and closing tags of a component.
 
-- it used to be very popular. Now **Typescript** does almost the same thing (and more)
+- It allows us to pass `JSX` into an element as a prop, and then render that `JSX` inside the component
+  ![children](./img/children.png)
+
+- It makes components more reusable and configurable **(component content)**
+
+```jsx
+function Button({ children }) {
+  return <button>{children}</button>;
+}
+
+function App() {
+  return (
+    <div>
+      <Button>Click me</Button>
+    </div>
+  );
+}
+```
+
+---
+
+### Validating Props (PropTypes)
+
+It's a way to validate the type of props passed to a component
+
+> It used to be very popular. Now `Typescript` does almost the same thing (and more)
+
+- This is done using the library [prop-types](https://www.npmjs.com/package/prop-types)
+  - `create-react-app` already includes this library
 - if someone passes down the incorrect kind of value (number instead of boolean), a warning will appear in console
   ![prop-types](./img/prop-types.png)
 
 - It can also be used to create custom validations other than checking the type of props, by creating a method in the `component.protoTypes` and return a `new Error()` for the custom condition
 
+  ```js
+  function HelloWorldComponent({ name }) {
+    return <div>Hello, {name}</div>;
+  }
+
+  HelloWorldComponent.propTypes = {
+    name: function (props, propName, componentName) {
+      if (props[propName].length < 3) {
+        return new Error(
+          `Invalid prop ${propName} supplied to ${componentName}. Length must be at least 3 characters.`
+        );
+      }
+    }
+  };
+  ```
+
 ---
 
 ### Default Prop Values
 
-You can define default values for your props by assigning to the special `defaultProps` property
+- The `defaultProps` special property will be used to ensure that the prop-item will have a value if it was not specified by the parent component. - The `propTypes` typechecking happens after `defaultProps` are resolved, so typechecking will also apply to the `defaultProps`.
 
-- The `defaultProps` will be used to ensure that the prop-item will have a value if it was not specified by the parent component. - The `propTypes` typechecking happens after `defaultProps` are resolved, so typechecking will also apply to the `defaultProps`.
+  ```jsx
+  import PropTypes from 'prop-types';
 
-```jsx
-import PropTypes from 'prop-types';
+  function HelloWorldComponent({ name }) {
+    return <div>Hello, {name}</div>;
+  }
 
-function HelloWorldComponent({ name }) {
-  return <div>Hello, {name}</div>;
-}
+  HelloWorldComponent.propTypes = {
+    name: PropTypes.string
+  };
 
-HelloWorldComponent.propTypes = {
-  name: PropTypes.string
-};
+  HelloWorldComponent.defaultProps = {
+    name: 'World'
+  };
+  ```
 
-HelloWorldComponent.defaultProps = {
-  name: 'World'
-};
-```
+- Another way is to have default values for your props, you can use the `destructuring` assignment with default values
+
+  ```jsx
+  function Hello({ who = 'World' }) {
+    return <div>Hello, {who}!</div>;
+  }
+  ```
 
 ---
 
-## Communicating Between Components
+## React Component Composition
+
+React Composition is a pattern where we build components from other **(combine components)** using the implicit `children` prop.
+
+![composition](./img/component-composition-1.png)
+
+- This technique prevents us from building too many `similar` components containing duplicate code and allows us to build fewer components that can be reused anywhere within our application, making them easier to understand and maintain for your team.
+- Also, it fix the problem of **Prop Drilling** (passing props from a parent component to a child component that doesn't need it, just to pass it to another child component that needs it)
+- There's another way of passing `children` prom **explicitly** using the `element` pattern (Not commonly used ❌)
+
+  ```jsx
+  function Button({ element }) {
+    return <div>{element}</div>;
+  }
+
+  function App() {
+    return (
+      <div>
+        <Button element={<button>Click me</button>} />
+      </div>
+    );
+  }
+  ```
+
+---
+
+## Events
+
+- React events are named using **camelCase**, rather than lowercase. ex: `onClick` instead of `onclick`
+- With JSX you pass a function as the event handler, rather than a string.
+
+  ```jsx
+  <button onClick={activateLasers}>Activate Lasers</button>
+  ```
+
+- Always try to use the callback function like this instead of defining it in the `{}` as this improves performance as you won't create it each time you do a (`click` event)
+
+  ```jsx
+  // BAD ❌
+  <button onClick={() => setCount(count + 1)}>Click me</button>
+
+  // GOOD ✅
+  <button onClick={activateLasers}>Activate Lasers</button>
+  ```
+
+---
+
+## State
+
+**State** is used to store data that changes over time.
+
+> react is called "React" because it **reacts** to changes in the state and re-renders the component with the new data
+
+- State allows us to update the component's `view` by re-rendering it with the new data
+  ![state](./img/state.png)
+- Mechanism of `state` in React
+  ![state](./img/state-3.png)
+  ![state](./img/state-4.png)
+- When and where to use `state` in React
+  ![state](./img/state-5.png)
+- `Application (global) state` vs `Component state`
+  ![state](./img/state-1.png)
+
+  - `Application State` is the state that is shared between components, and it's usually stored in the `App` component and passed down to the other components as `props`
+    ![state](./img/state-2.png)
+
+- [Functional components state](./2-Hooks.md#state)
+- [Class components state](./3-Class-Components.md#state)
+
+### State vs Props
+
+![state](./img/state-vs-props.png)
+
+- `props`
+  - `props` (short for “properties”) and state are both plain JavaScript objects. While both hold information that influences the output of render, they are different in one important way:
+  - get passed to the component (similar to function `parameters`)
+- `state` is managed within the component (similar to `variables` declared within a function).
+
+---
+
+### Communicating Between Components
 
 [reference](https://www.pluralsight.com/guides/react-communicating-between-components)
 
-### From Parent to Child
+#### From Parent to Child
 
 - use [props](#props)
 
-### From Child to Parent
+#### From Child to Parent (lifting the state up)
 
-- use Callbacks :
-  - child component must first receive a mechanism to communicate back from its parent.
-  - parents pass data to children through `props`.
-  - A "special" prop of type `function` can be passed down to a child. At the time of a relevant event, the child can then call this function as a callback.
+When we have a parent component that has a state and we want to update it from a child component, we can't just pass it to a sibling component, we have to pass it to the parent component first and then pass it to the sibling component as a `prop`
+![lift state up](./img/lift-state-up-1.png)
+![lift state up](./img/lift-state-up-2.png)
+![lift state up](./img/lift-state-up-3.png)
 
-```js
-// in BookTitle component file (CHILD)
-// It receives a "onTitleChange" function in the props, sent from its parent.
-function BookTitle(props) {
+```jsx
+// in parent component
+function Parent() {
+  const [count, setCount] = useState(0);
+  const increment = () => setCount(count + 1);
+
+  return <Child count={count} onIncrement={increment} />;
+}
+
+// in child component
+function Child({ count, onIncrement }) {
   return (
-    <label>
-      Title:
-      <input onChange={props.onTitleChange} value={props.title} />
-    </label>
+    <div>
+      <p>{count}</p>
+      <button onClick={onIncrement}>Increment</button>
+    </div>
   );
 }
 ```
 
-```js
-// in BookEditForm component file (PARENT)
-// the parent, "BookEditForm", has reference to this function, it can receive the "arguments" that are passed to the function:
-function BookEditForm(props) {
-  const [title, setTitle] = useState(props.book.title);
-  function handleTitleChange(e) {
-    setTitle(e.target.value);
-  }
-  return (
-    <form>
-      <BookTitle onTitleChange={handleTitleChange} title={title} />
-    </form>
-  );
-}
-```
-
-### lifting the state up
-
-![state](./img/liftingStateUp.png)
+- child component must first receive a mechanism to communicate back from its parent.
+- parents pass data to children through `props`.
+- A "special" prop of type `function` can be passed down to a child. At the time of a relevant event, the child can then call this function as a callback.
 
 ---
 
-## React Composition
+### Derived State
 
-React Composition is a development pattern based on React's original component model where we build components from other components using explicit defined props or the implicit `children` prop.
+It is a state that is calculated based on existing `state` or `props`.
 
-![children](./img/children.png)
+- When having multiple pieces of state that are **interdependent**, it might be tempting to combine them into a **single object**. For example, if we have `firstName` and `lastName` state variables, we might be tempted to combine them into a single `name` state variable.
 
-### Why Use React Composition?
+  ```jsx
+  const [name, setName] = useState({ firstName: '', lastName: '' });
 
-- This technique prevents us from building too many `similar` components containing duplicate code and allows us to build fewer components that can be reused anywhere within our application, making them easier to understand and maintain for your team.
+  // instead of
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  ```
 
-```js
-function Card(props) {
-  const classes = 'card ' + props.className;
-  // idea is to use {props.children}
-  return <div className={classes}>{props.children}</div>;
-}
+- By combining them into a single `state` variable, we can reduce the number of state variables we have to manage. However, this can lead to problems when updating `state`. For example, if we want to update the `firstName` state variable, we have to remember to also include the `lastName` state variable in the update.
 
-export default Card;
+  ```jsx
+  // BAD ❌
+  setName({ firstName: 'Bruce' });
 
-///////////////////////////////////////////////////////
-
-// then in the file that we will use the card-component
-import Card from '../UI/Card';
-
-const Expenses = props => {
-  return (
-    <div>
-      <Card className='expenses'>
-        <components />
-      </Card>
-    </div>
-  );
-};
-```
+  // GOOD ✅
+  setName((prevState) => { ...prevState, firstName: 'Bruce' });
+  ```
 
 ---
 

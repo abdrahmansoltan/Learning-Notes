@@ -12,13 +12,12 @@
   - [Code Splitting \& Dynamic Imports](#code-splitting--dynamic-imports)
     - [`React.lazy()`](#reactlazy)
     - [React Suspense](#react-suspense)
-  - [React DevTools Profiler](#react-devtools-profiler)
+  - [React DevTools](#react-devtools)
+    - [Dev tools Profiler](#dev-tools-profiler)
 
 ---
 
 ## Performance Optimization in React
-
-A log of people want to write react app that is performant. But You shouldn't over-optimize your code when starting to write it.
 
 - You only want to start improving the performance of the code once you see there's a **performance bottleneck**
 - if you don't find slow-downs in your code, there's no reason to start optimizing, that is because **Optimization have a cost**, as it will have tradeoffs
@@ -87,7 +86,7 @@ It memorized the return value from a function, for any future call
 - The React `useMemo` Hook returns a `memoized` value.
   - Think of memoization as `caching` a value so that it does not need to be recalculated.
 - only runs when one of its dependencies update This can improve performance.
-- usually with high-computation operations like `sorting`, `a result-value from for-loop
+- usually with high-computation operations like `sorting`, a result-value from `for-loop`
 
 - `useMemo()` accepts 2 arguments — a function compute that computes a result and the dependencies array
 
@@ -237,7 +236,13 @@ return (
 
 ---
 
-## React DevTools Profiler
+## React DevTools
+
+It's a chrome extension that allows us to inspect our react components
+
+- it's a great tool to see how our components are rendered and how they are interacting with each other
+
+### Dev tools Profiler
 
 It shows all the different components and their interactions during the time of profiling
 

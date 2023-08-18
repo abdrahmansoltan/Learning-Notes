@@ -42,7 +42,7 @@ It states that a class should have one and only one reason to change, meaning th
 ![single-responsibility](./img/solid-4.webp)
 
 - If a Class has many responsibilities, it increases the possibility of bugs because making changes to one of its responsibilities, could affect the other ones without you knowing.
-  - This principle aims to separate behaviours so that if bugs arise as a result of your change, it won’t affect other unrelated behaviours.
+  - This principle aims to separate behaviours so that if bugs arise as a result of your change, it won't affect other unrelated behaviours.
 
 - Ex: a class that is responsible for sending emails should not be responsible for storing the email addresses.
   - because if we change the way we store the email addresses, we'll have to change this class. and this is a violation of the S.R.P.

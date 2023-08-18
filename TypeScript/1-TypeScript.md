@@ -1,6 +1,8 @@
 # INDEX
 
 - [INDEX](#index)
+  - [TypeScript](#typescript)
+    - [why use Typescript](#why-use-typescript)
   - [Installing](#installing)
     - [Compiling](#compiling)
       - [Compiling one TS file](#compiling-one-ts-file)
@@ -10,8 +12,6 @@
     - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
     - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
     - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
-  - [TypeScript](#typescript)
-    - [why use Typescript](#why-use-typescript)
   - [TypeScript Types (Annotations)](#typescript-types-annotations)
   - [Type Assertions / Type Casting](#type-assertions--type-casting)
     - [How to use Type Assertion](#how-to-use-type-assertion)
@@ -39,14 +39,37 @@
 
 ---
 
+## TypeScript
+
+**TypeScript** is a **static and strongly typed** superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
+
+> It's just: Javascript with types
+
+![typescript](./img/typescript.PNG)
+
+### why use Typescript
+
+- It helps us find errors before the code runs & analyzes our code as we type
+- It uses "type annotations" to analyze our code
+- It only exists in **development** then it's compiled to javascript
+- It has the potential to move some kinds of errors from **runtime** (users) to **compile time** , ex:
+  - Values that are potentially absent (`null` or `undefined`)
+  - Incomplete refactoring
+  - Breakage around internal code contracts (e.g., an argument becomes required)
+- It serves as the foundation for a great code authoring experience
+  - `Example`: in-editor autocomplete
+- Note: it doesn't provide any performance optimization
+
+---
+
 ## Installing
 
 - [reference](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
 
 ```bash
-npm i typescript --save-dev    # save to devDependencies
+npm i typescript --save-dev  # save to devDependencies
 
-npm i --save-dev ts-node
+npm i --save-dev ts-node  # to run typescript files directly without compiling them
 
 npm i --save-dev @types/node  # type definitions
 
@@ -209,34 +232,15 @@ let y = x + 'dot';
 
 ---
 
-## TypeScript
-
-**TypeScript** is a **static and strongly typed** superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
-
-> It's just: Javascript with types
-
-![typescript](./img/typescript.PNG)
-
-### why use Typescript
-
-- It helps us find errors before the code runs & analyzes our code as we type
-- It allows you, as a code author, to leave more of your intent “on the page”
-  - It only exists in **development** then it's compiled to javascript
-- It has the potential to move some kinds of errors from **runtime** (users) to **compile time** , ex:
-  - Values that are potentially absent (null or undefined)
-  - Incomplete refactoring
-  - Breakage around internal code contracts (e.g., an argument becomes required)
-- It serves as the foundation for a great code authoring experience
-  - `Example`: in-editor autocomplete
-
-![typescript](./img/whytypescript.PNG)
-
----
-
 ## TypeScript Types (Annotations)
 
-We don't always need to write the type for each variable, as we can depend on **"Type Inference"**
-![type inference](./img/type-inference.png)
+**Type** is an easy way to refer to the different `properties` + `functions` that a `value` has (value is anything that can be assigned to a variable)
+
+- We don't always need to write the type for each variable, as we can depend on **"Type Inference"**
+  ![type inference](./img/type-inference.png)
+
+  - `Type annotations` -> code we add to tell Typescript what type of value a variable will refer to (what type of value it will hold)
+  - `Type inference` -> Typescript tries to figure out what type of value a variable refers to
 
 - **Note:** One situation where we shouldn't depend on type-inference and should use type-annotations, is when you declare a variable separately from initializing it **(delayed initialization)**
 
@@ -421,7 +425,7 @@ In the first function, we have a function that takes in a number array and outpu
 - it control the flow of code using the type of something
 - this process is called **Narrowing**
   - as it narrows our choice with the type-guard condition
-- usually used with [unknown type](#unknown----type-guard) or [Union Types](#union-types)
+- usually used with [unknown type](./2-TS-Types.md#unknown----type-guard) or [Union Types](./2-TS-Types.md#union-types)
 
 ```ts
 function calculateTax(price: number | string, tax: number) {
@@ -438,7 +442,7 @@ function calculateTax(price: number | string, tax: number) {
 
 It's checking a value for being truthy or falsy before working with it
 
-- this is helpful in avoiding errors when values might be `null` or `undefined
+- this is helpful in avoiding errors when values might be `null` or `undefined`
 
 ```ts
 function printLetters(word: string | null) {

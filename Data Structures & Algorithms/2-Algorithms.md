@@ -33,14 +33,14 @@
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
     - [Dynamic programming types](#dynamic-programming-types)
-      - [Top-down approach](#top-down-approach)
-      - [Bottom-up approach](#bottom-up-approach)
+      - [Top-down approach (Recursion + Memoization)](#top-down-approach-recursion--memoization)
+      - [Bottom-up approach (Iteration + Tabulation)](#bottom-up-approach-iteration--tabulation)
     - [Dynamic Programming vs Divide and Conquer (Brute Force)](#dynamic-programming-vs-divide-and-conquer-brute-force)
   - [Sorting](#sorting)
     - [Stable vs Unstable Sorting](#stable-vs-unstable-sorting)
+    - [Insertion Sort](#insertion-sort)
     - [Bubble Sort](#bubble-sort)
     - [Selection Sort](#selection-sort)
-    - [Insertion Sort](#insertion-sort)
     - [Heap Sort](#heap-sort)
     - [Divide \& Conquer](#divide--conquer)
     - [Merge Sort](#merge-sort)
@@ -254,7 +254,7 @@ We analyze different Algorithms by counting the maximum number of guesses we nee
     return True
   ```
 
-> **Note:** when you encounter a pattern `1 + 2 + 3 + ... + n` in a for loop (usually by reducing the inner loop by 1 in each iteration), it's usually `O(n^2)`
+> **Note:** when you encounter a pattern `1 + 2 + 3 + ... + n` in a **nested `for` loop** (usually by reducing the inner loop by 1 in each iteration), it's usually `O(n^2)`
 >
 > - to remember it. remember the **`Gauss formula` story (the kid who solved the problem in seconds)**, and that the formula is `n(n+1)/2` which is `O(n^2)`
 >   - The story says that he wanted to sum numbers from `1` to `100`, so he wrote `1 + 2 + 3 + ... + 100` on the board, and then he realized that he can just write `100 + 1` and `99 + 2` and `98 + 3` and so on, and then he realized that he can just write `101` 100 times, and then he realized that he can just write `100 * 101` and then divide it by `2` to get the result, and that's how he solved the problem in seconds.
@@ -729,7 +729,7 @@ It's a technique to solve the problems by breaking it down into a collection of 
 
 ### Dynamic programming types
 
-#### Top-down approach
+#### Top-down approach (Recursion + Memoization)
 
 We start with the **big picture** and then break it down into smaller pieces
 ![dynamic-programming](./img/dynamic-programming-1.png)
@@ -737,7 +737,7 @@ We start with the **big picture** and then break it down into smaller pieces
 - It uses **memoization** (storing the result of each sub-problem in an array or map) and **recursion** (calling the function itself) to solve the problem.
 - **Memoization** is a top-down approach
 
-#### Bottom-up approach
+#### Bottom-up approach (Iteration + Tabulation)
 
 We start with the **smaller pieces** and then build it up into the big picture -> Real Dynamic Programming
 
@@ -833,19 +833,20 @@ We can use DP to improve problems that are solved using Divide and Conquer usual
 
 ## Sorting
 
-> **Note:** Usually sorting algorithms are not taught in the interview, but it's good to know them, so don't focus on them too much
-
 **Sorting**: is the process of rearranging the items in a collection (e.g. `array`) so that the items are in some kind of order
 
 > As more and more data is handled by our computers, **sorting** and **searching** are two of the biggest computer science problems in the software world
 
 - usually the built-in sorting methods are different from language to another; for example, in `javascript`, it convert inputs to `strings` then sort them based on their **"character unicode"**
+
   - usually for `Javascript` as it uses `ECMA` so it's standard and the browser(engine) is the one who decides which algorithms to use
     - `Chrome`, `Mozilla`, ...
-- There're many different ways to sort things, and each technique has its own advantages and disadvantages
 
+- Sorting algorithms use the fact that a collection of a single element is always sorted, and then they build up the collection from there and making sure that the collection is sorted at each step
 - Sorting Algorithms
   ![elementary-sorting-algorithms](./img/sorting-algorithms.png)
+
+---
 
 ### Stable vs Unstable Sorting
 
@@ -888,6 +889,47 @@ A sorting algorithm is said to be **stable** if two objects with equal keys appe
 
       - Notice that the relative order of students with class section `1` and students with class section `2` is maintained in the sorted output
       - if we used unstable sorting algorithm, the relative order of students with class section `1` and students with class section `2` may change in the sorted output
+
+---
+
+### Insertion Sort
+
+It's a sorting algorithm where we **insert** each element in the correct place in the sorted part of the array (the left side of the array)
+
+> It's called **"Insertion Sort"** because we take an element and **insert it in the correct place in the sorted array**
+
+- it's used when you know or think that the list is **"almost/already sorted"**
+
+  - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
+
+- **steps:**
+  ![insertion-sort](./img/insertion-sort-3.png)
+
+  1. start by picking the `second` element in the array because we assume that the `first` element is already sorted.
+     ![insertion-sort](./img/insertion-sort-0.png)
+  2. now compare the second element with (the one before it) and **swap** if necessary, then repeat until the element is in the correct order
+     ![insertion-sort](./img/insertion-sort-1.png)
+  3. continue to the next element and if it is in the (incorrect order), iterate through the sorted portion (the left side) to place the element in the correct place
+     ![insertion-sort](./img/insertion-sort-2.png)
+     ![insertion-sort](./img/insertion-sort-4.png)
+  4. repeat until the array is sorted
+
+- Time complexity:
+  - **Best case**: `O(n)` -> when the array is already sorted (because we don't even go inside the `while` loop and just iterate through the array once)
+  - **Worst case**: `O(n^2)` -> when the array is sorted in reverse order
+  - **Average case**: `O(n^2)`
+
+```py
+def insertion_sort(arr):
+  for i in range(1, len(arr)):
+    j = i - 1 # index of element before current element
+    # keep swapping the element with the one before it until it's in the correct place
+    while j >= 0 and arr[j + 1] < arr[j]:
+      arr[j], arr[j + 1] = arr[j + 1], arr[j] # swap
+      j -= 1
+
+  return arr
+```
 
 ---
 
@@ -980,45 +1022,6 @@ def selection_sort(arr):
 
 ---
 
-### Insertion Sort
-
-It's a sorting algorithm where we **insert** each element in the correct place in the sorted part of the array (the left side of the array)
-
-- it's used when you know or think that the list is **"almost/already sorted"**
-
-  - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
-
-- **steps:**
-  ![insertion-sort](./img/insertion-sort.png)
-
-  1. start by picking the `second` element in the array because we assume that the `first` element is already sorted.
-     ![insertion-sort](./img/insertion-sort-0.png)
-  2. now compare the second element with (the one before it) and **swap** if necessary, this is to know where to insert the element in the sorted part of the array
-     ![insertion-sort](./img/insertion-sort-1.png)
-     ![insertion-sort](./img/insertion-sort-2.png)
-  3. continue to the next element and if it is in the (incorrect order), iterate through the sorted portion (the left side) to place the element in the correct place
-  4. repeat until the array is sorted
-     ![insertion-sort](./img/insertion-sort-3.png)
-
-- Time complexity:
-  - **Best case**: `O(n)` -> when the array is already sorted (because we don't even go inside the `while` loop and just iterate through the array once)
-  - **Worst case**: `O(n^2)` -> when the array is sorted in reverse order
-  - **Average case**: `O(n^2)`
-
-```py
-def insertion_sort(arr):
-  for i in range(1, len(arr)):
-    j = i - 1
-    # keep swapping the element with the one before it until it's in the correct place
-    while j >= 0 and arr[j + 1] < arr[j]:
-      arr[j], arr[j + 1] = arr[j + 1], arr[j]
-      j -= 1
-
-  return arr
-```
-
----
-
 ### Heap Sort
 
 It's a sorting algorithm where we use a **heap** data structure to sort the array
@@ -1061,9 +1064,9 @@ Both merge sort and quicksort employ a common algorithmic paradigm based on **re
 
 ### Merge Sort
 
-It's all about continually splitting the array into halves until you have arrays that are empty or have one element (can't split anymore), then you merge those arrays, while sorting them at the same time
+It's all about continually **splitting** the array into halves until you have arrays that are empty or have one element (can't split anymore), then you **merge** those arrays, while sorting them at the same time
 
-> So it's about breaking down the problem of sorting into subproblems, and then building up a solution from the subproblems
+> So it's about breaking down the problem of sorting into sub-problems, and then building up a solution from the sub-problems
 
 ![merge-sort](./img/Merge-Sort.png)
 
@@ -1073,20 +1076,19 @@ It's all about continually splitting the array into halves until you have arrays
 - it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions which gives us **`O(n log n)`** time complexity which is better than **`O(n^2)`**
 
   - the number of times we **divide**(split-up/decompose) is equal to `log(n)` and the number of **merging**(comparisons) is `n`
-    ![merge-sort](./img/merge-sort3.png)
 
 - The "divide" part is done by **recursion**
-  ![merge-sort](./img/Merge-Sort2.png)
 - The "conquer" part is done by **Two pointers** (one for each array) or **slicing** and a `while` loop
 
 - it's one of the most efficient ways to sort lists
 - one downside is that it has a bigger space-complexity: **space-complexity of `O(n)`** unlike most sorting algorithms which has `O(1)`
-  - this is due to holding off to the divided lists in memory
+  - this is due to storing the divided lists in memory
   - so we use it if we have enough memory
 
 #### Merge sort implementation
 
 Consists of 2 functions: `merge` & `merge_sort`
+![merge-sort](./img/merge-sort-5.png)
 
 1. `merge` function
 
@@ -1106,11 +1108,11 @@ Consists of 2 functions: `merge` & `merge_sort`
 ```py
 def merge(arr1, arr2):
   results = []
-  i = 0
-  j = 0
+  i = 0 # pointer for arr1
+  j = 0 # pointer for arr2
 
   while i < len(arr1) and j < len(arr2):
-    if arr1[i] <= arr2[j]:
+    if arr1[i] <= arr2[j]: # to make it stable, change the comparison operator to <=
       results.append(arr1[i])
       i += 1 # move on to the next value in the first array
     else:
@@ -1127,9 +1129,11 @@ def merge(arr1, arr2):
     j += 1
 
   return results
+
  # ------------------------------------------------------------------------------ #
+
 def merge_sort(arr):
-  # base case
+  # base case (Single element array is already sorted)
   if len(arr) <= 1:
     return arr
 
@@ -1142,8 +1146,6 @@ def merge_sort(arr):
   return merge(left, right)
 ```
 
-![merge-sort](./img/merge-sort-5.png)
-
 - Time complexity: **`O(n log n)`**
   ![merge-sort](./img/merge-sort3.png)
   - `log(n)` -> the number of times we **divide by 2**(split-up/decompose)`is equal to`log(n)`
@@ -1153,9 +1155,12 @@ def merge_sort(arr):
 
 ### Quick Sort
 
-![Quick-sort](./img/quick-sort.png)
+It's all about continually **picking** an element as a **"pivot point"** and **partitioning** the given array around the picked pivot
 
-- How it works:
+- it also uses the technique: "Divide & Conquer" like `merge sort` by implementing `recursion` and combining the solutions
+- it has better **space-complexity of `O(log(n))`**, so it can be sorted in memory if the database is not massive
+
+- **How it works:**
 
   - it picks an element as a **"pivot point"** and partitions the given array around the picked pivot
   - it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions
@@ -1171,10 +1176,9 @@ def merge_sort(arr):
       ![quick sort](./img/quick-sort-5.png)
       ![quick sort](./img/quick-sort-6.png)
 
-- it also uses the technique: "Divide & Conquer"
-- it has better **space-complexity of `O(log(n))`**, so it can be sorted in memory if the database is not massive
 - Quick sort is unique, because its speed depends on the `pivot point` you choose
 
+- **Time complexity:**
   - **best case** for time-complexity is `O(n log n)`
     ![quick-sort-best-case](./img/quick-sort-best-case.png)
     - In this example, there are `O(log n)` levels (the technical way to say that is, “he height of the call stack is `O(log n)`”). And each level takes `O(n)` time. he entire algorithm will take `O(n) * O(log n) = O(n log n)` time. This is the best-case scenario.
@@ -1182,6 +1186,7 @@ def merge_sort(arr):
     - `n * n-1 * n-2 * ... * 1` -> `O(n^2)`
       ![quick-sort-worst-case](./img/quick-sort-worst-case.png)
     - In this example, there're `O(n)` levels, so the entire algorithm will take `O(n) * O(n) = O(n^2)` time
+    - This is worst than `selection sort` and `insertion sort`, but it usually doesn't happen because we usually choose the **"pivot point"** randomly
   - average case for time-complexity is `O(n log n)`
     ![quick-sort-average-case](./img/quick-sort-average-case.png)
     - > **Note:** The best case is also the average case. If you always choose a random element in the array as the pivot, quicksort will complete in O(n log n) time on average. **Quicksort is one of the fastest sorting algorithms out there**, and it’s a very good example of D&C.
@@ -1347,7 +1352,10 @@ It's a sorting algorithm that works by distributing the elements of an array int
 - For every single element in the array, we need to create a bucket for it
   - The bucket is just a container that holds the elements with the index of the element as the key
     ![bucket sort](./img/bucket-sort-1.png)
-  - here, bucket `0` holds the number of times `0` appears in the array, bucket `1` holds the number of times `1` appears in the array, and so on
+    - here:
+      - bucket `0` holds the number of times `0` appears in the array
+      - bucket `1` holds the number of times `1` appears in the array
+      - bucket `2` holds the number of times `2` appears in the array
 - Then we sort the buckets
   - we will go through each bucket and add the `index` of of the bucket to the sorted array as many times as the value of the `bucket[index]`
     ![bucket sort](./img/bucket-sort-2.png)
@@ -1361,17 +1369,35 @@ def bucket_sort(array, max_val):
     buckets[i] += 1
 
   # sort the elements
+
+  # Option 1: using extra space
   sorted_array = []
   for j in range(len(buckets)):
     for _ in range(buckets[j]):
       sorted_array.append(j)
 
   return sorted_array
+
+  # ----------------------------------------------
+
+  # Option 2: in-place
+  i = 0
+  for j in range(len(buckets)):
+    for _ in range(buckets[j]):
+      array[i] = j
+      i += 1
+
+  return array
 ```
 
-- Time complexity: `O(n + k)`, where `n` is the number of elements in the array and `k` is the number of buckets
-- **Note:** the bucket sort is not a stable sort, because it doesn't preserve the order of the elements with the same value
-  - one way to make it stable is to use a **linked list** instead of an array to store the buckets
+- Time complexity:
+  - `O(n + k)`, where `n` is the number of elements in the array and `k` is the number of buckets
+  - notice that its's not `O(n^2)`, even though it has 2 nested loops, because the inner loop doesn't depend on the outer loop
+- **Notes:**
+  - the bucket sort is **not a stable sort**, because it doesn't preserve the order of the elements with the same value
+    - one way to make it stable is to use a **linked list** instead of an array to store the buckets
+  - Normally, you won't be able to use the bucket sort, because the elements of the array won't be uniformly distributed
+    - but if you know that the elements are uniformly distributed, then you should use it because it has the best time complexity `O(n)`
 
 ---
 
@@ -1551,7 +1577,7 @@ It's also called **"Level Order Traversal"**
 - used to find the **shortest path** (the fewest segments) between two nodes
   - > **Note:** It's not necessarily the shortest path in terms of distance (fastest path), but the shortest path in terms of number of segments, To get the fastest path, we need to use [Dijkstra's algorithm](#dijkstras-algorithm)
 - also used with `Graphs`
-- Breadth-first search takes `O(number of people + number of edges)`, and it's more commonly written as `O(V+E)` (`V` for number of vertices, `E` for number of edges).
+- BFS takes `O(number of people + number of edges)`, and it's more commonly written as `O(V+E)` (`V` for number of vertices, `E` for number of edges).
 - Notes:
   - To calculate the shortest path in an unweighted graph, use `breadth-first search`. To calculate the shortest path in a weighted graph, use `Dijkstra’s algorithm`
 
@@ -1567,15 +1593,19 @@ It's also called **"Level Order Traversal"**
     queue = deque()
     if root: queue.append(root)
 
+    level = 0
     while len(queue) > 0:
-      node = queue.popleft()
-      # do something with the node
-      print(node.value)
-      # add the children of the node to the queue
-      if node.left:
-        queue.append(node.left)
-      if node.right:
-        queue.append(node.right)
+      # loop through the queue
+      for i in range(len(queue)):
+        curr = queue.popleft()
+        print(curr.val)
+
+        # add the children to the queue
+        if curr.left: queue.append(curr.left)
+        if curr.right: queue.append(curr.right)
+
+      # increment the level
+      level += 1
   ```
 
 - BFS Implementation for a "mango seller example"
