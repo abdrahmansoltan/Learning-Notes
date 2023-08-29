@@ -4,16 +4,17 @@
   - [React Fundamentals](#react-fundamentals)
     - [React Concepts](#react-concepts)
     - [Declarative vs imperative](#declarative-vs-imperative)
-    - [multi-page application](#multi-page-application)
-    - [single-page application (SPA)](#single-page-application-spa)
+    - [Multi-page application](#multi-page-application)
+    - [Single-page application (SPA)](#single-page-application-spa)
+    - [Function components vs class components](#function-components-vs-class-components)
   - [installation](#installation)
+    - [Create React App installation](#create-react-app-installation)
+    - [Vite installation](#vite-installation)
     - [Folder Structure and Assets](#folder-structure-and-assets)
     - [`react` and `react-dom` modules(libraries)](#react-and-react-dom-moduleslibraries)
   - [JSX](#jsx)
     - [Dynamic expressions in JSX](#dynamic-expressions-in-jsx)
     - [Conditional rendering](#conditional-rendering)
-  - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
-    - [How does it work?](#how-does-it-work)
   - [Styling and CSS](#styling-and-css)
     - [Inline style](#inline-style)
     - [Dynamic classes](#dynamic-classes)
@@ -23,12 +24,14 @@
   - [Components](#components)
     - [why components](#why-components)
     - [List Components (Looping)](#list-components-looping)
+      - [`key` prop](#key-prop)
       - [update list-items](#update-list-items)
+    - [Component logic and structure](#component-logic-and-structure)
+    - [Smart vs Dumb components](#smart-vs-dumb-components)
   - [Custom Components (fragment)](#custom-components-fragment)
     - [fragment](#fragment)
     - [Portals](#portals)
       - [Modal notes](#modal-notes)
-    - [Smart vs Dumb components](#smart-vs-dumb-components)
   - [Forms: Controlled vs uncontrolled components](#forms-controlled-vs-uncontrolled-components)
     - [Controlled components](#controlled-components)
     - [Uncontrolled components](#uncontrolled-components)
@@ -40,12 +43,15 @@
     - [Default Prop Values](#default-prop-values)
   - [React Component Composition](#react-component-composition)
   - [Events](#events)
+    - [How React handles events](#how-react-handles-events)
+    - [Synthetic Events](#synthetic-events)
   - [State](#state)
     - [State vs Props](#state-vs-props)
+    - [State Batch Updates](#state-batch-updates)
+    - [Async \& Derived State](#async--derived-state)
     - [Communicating Between Components](#communicating-between-components)
       - [From Parent to Child](#from-parent-to-child)
       - [From Child to Parent (lifting the state up)](#from-child-to-parent-lifting-the-state-up)
-    - [Derived State](#derived-state)
   - [Handling Events](#handling-events)
     - [Events in HTML vs React](#events-in-html-vs-react)
     - [DocumentWide event handlers (Refs)](#documentwide-event-handlers-refs)
@@ -54,6 +60,17 @@
     - [Controlled Forms](#controlled-forms)
       - [Form-Input](#form-input)
     - [Form Validation](#form-validation)
+  - [Side Effects and Lifecycles](#side-effects-and-lifecycles)
+    - [Component Lifecycle](#component-lifecycle)
+    - [Side Effects](#side-effects)
+  - [How React Works (under the hood)](#how-react-works-under-the-hood)
+    - [Rendering](#rendering)
+    - [1. Triggering Phase](#1-triggering-phase)
+      - [2. Render Phase](#2-render-phase)
+      - [3. Commit Phase](#3-commit-phase)
+      - [4. Browser Paint Phase](#4-browser-paint-phase)
+    - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
+      - [How does it work?](#how-does-it-work)
   - [Environmental Variables](#environmental-variables)
 
 ---
@@ -61,10 +78,14 @@
 ## React Fundamentals
 
 It's a **library** not a framework. However, few people use react on its own, but when combined with things/tools like `react-router`, `webpack`, `redux` -> ("React Ecosystem"), then it become more like a framework
+![react-ecosystem](./img/library-vs-framework-1.png)
 
 - It's a library for building user interfaces, based on components, declarative, stateful, and reusable
+- React ecosystem is a collection of libraries that work together to solve a common problem
+  ![react-ecosystem](./img/react-ecosystem.png)
 
-> there's an actual framework built around React -> **Next.js**
+- There's an actual framework built around React -> **Next.js**
+  ![react-ecosystem](./img/react-ecosystem-1.png)
 
 ---
 
@@ -100,13 +121,13 @@ React is based on these concepts:
 
 ---
 
-### multi-page application
+### Multi-page application
 
 - As the name suggests, a multi-page application (MPA) is an app that has more than one page. It works in a traditional way, requiring the app to reload entirely every time a user interacts with it.
 
 ---
 
-### single-page application (SPA)
+### Single-page application (SPA)
 
 ![spa](./img/spa%20vs%20mpa.jpg)
 ![How react works](./img/how-react-works.png)
@@ -122,7 +143,29 @@ React is based on these concepts:
 
 ---
 
+### Function components vs class components
+
+React always had `function components` and `class components`, but before `React Hooks` we had to use `class components` to use `state` and `lifecycle methods`, but now we can use `function components` with `hooks` to use `state` and `lifecycle methods`
+
+![function vs class](./img/function-vs-class.png)
+
+---
+
 ## installation
+
+- Options for setting up React:
+  ![react-setup](./img/react-setup.png)
+
+  - **create-react-app** is built on top of **Webpack**, which:
+    - Enables module importing/exporting
+      - packages/bundles up all `css`/`images`/`js` into a single file for the browser
+      - reduce number of `HTTP` requests for performance
+    - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
+    - Enables easy testing & deployment
+  - **Vite** can also be used instead of `create-react-app`
+    - with `vite`, the starting file will be `main.jsx` instead of `index.js`
+
+### Create React App installation
 
 - **`npx`** is a command that lets you run **(execute)** code built with Node.js and published through the NPM registry without installing it first locally (It's a Node.js package runner). It's used to execute commands without installing dependencies (**install latest version of something and run it immediately**)
 
@@ -134,18 +177,6 @@ cd my-app
 npm install
 npm start
 ```
-
-- Options for setting up react
-  ![react-setup](./img/react-setup.png)
-
-  - **create-react-app** is built on top of **Webpack**, which:
-    - Enables module importing/exporting
-      - packages/bundles up all `css`/`images`/`js` into a single file for the browser
-      - reduce number of `HTTP` requests for performance
-    - **HMR**, hot module reloading (when changing a source file, automatically reloads(only reloads relevant files))
-    - Enables easy testing & deployment
-  - **Vite** can also be used instead of `create-react-app`
-    - with `vite`, the starting file will be `main.jsx` instead of `index.js`
 
 - When using the `Create-React-App` tool you are provided with a handy script(command) `eject` that allows you to configure Webpack among other features at your heart content.
 
@@ -167,6 +198,39 @@ npm start
 >
 > - It only runs in `dev-mode` and may result **rendering twice** so that it can catch any weird behaviors that might occur in the side-effects inside the functional component, and **won't run in production mode** so no logs will be shown there
 > - also the re-render happens when the `props` change, which is the case when providing `props`
+
+---
+
+### Vite installation
+
+- Here, we need to configure `ESLint` manually:
+
+  1. Install `ESLint` and `eslint-plugin-react` and `eslint-config-react-app` as dev-dependencies
+
+     ```sh
+     npm install eslint vite-plugin-eslint eslint-plugin-react eslint-config-react-app --save-dev
+     ```
+
+  2. Create `.eslintrc.json` file in the root directory and add the following:
+
+     ```json
+     {
+       "extends": ["react-app", "react-app/jest"]
+     }
+     ```
+
+  3. Add the following to `vite.config.js` file:
+
+     ```js
+     import { defineConfig } from 'vite';
+     import reactRefresh from '@vitejs/plugin-react-refresh';
+     import eslint from 'vite-plugin-eslint';
+
+     // https://vitejs.dev/config/
+     export default defineConfig({
+       plugins: [react(), eslint()]
+     });
+     ```
 
 ---
 
@@ -291,35 +355,6 @@ It's a declarative syntax extension to JavaScript that allows us to write `HTML`
     return <p>Logged out</p>;
   }
   ```
-
----
-
-## Virtual DOM vs Real DOM
-
-**Dom Manipulation** can be very slow and heavy. For example, if you have several image tags inside a div and you replace one of the **images**
-
-- **Virtual DOM (VDOM)**: is a concept where a virtual representation of a UI is kept in `memory` as an object **(snapshot of what the real DOM looks like)**, and synced with the real DOM by a library (such as ReactDOM). which makes changes to the virtual DOM and not the Real DOM
-
-  - You can simply think of it as a lightweight copy of the Real DOM.
-  - It's a tree-like object that gives react a blueprint of how it should update the actual DOM
-
-![react-dom](./img/react-dom.png)
-
-- React re-renders only the parts that need to be updated compared to the initial DOM.
-
-### How does it work?
-
-![dom](./img/dom.png)
-
-1. React generates a new Virtual DOM for our application.
-2. React compares the initial Virtual DOM (representing the current html DOM) to the new Virtual DOM.
-3. Based on the comparison above, React runs its **Diffing Algorithm** to calculate the minimum number of operations to update the initial Virtual DOM to the new Virtual DOM.
-4. it update the new DOM by **unmounting**(removing from the DOM tree) the changed things that differ and re-render them with the new data
-   ![react-dom](./img/vdom-1.png)
-5. then React compares the difference between the DOM-snapshot and the real-DOM and update the real-DOM accordingly
-   ![react-dom](./img/vdom-2.png)
-
-> **Re-Evaluating Components !== Re-Rendering the DOM** > ![rerender](./img/rerender.PNG)
 
 ---
 
@@ -468,11 +503,22 @@ There are two different ways of using CSS Modules in a React application.
 ## Components
 
 They are the building blocks of React, They describe a part of the user interface.
+![components](./img/components-0.png)
 
 - They are javascript `classes` / `functions` that return `JSX` elements and know how to render themselves into HTML
 - They start with a capital letter `<ContactList/>` to let react differentiate it with HTML elements which start with lower-case letter elements like: `<div>`
-- **Component Instance** : is a component that is rendered by React and is an `instance` of a component `class`
+- **Component Instance** : is a component that is rendered by React and is an `instance` of the component `class`
   ![component instance](./img/component-instance.png)
+
+  - React component should only be instantiated using JSX syntax
+
+    ```jsx
+    // Correct ✅
+    return <MyComponent />;
+    // Incorrect ❌
+    return MyComponent(); // This will result uncorrect state and component instance
+    ```
+
 - **React Element** : is a plain `object` describing what you want to appear on the screen in terms of the `DOM` nodes or other components.
 
   - React elements are created with `React.createElement()` function and are immutable.
@@ -503,25 +549,25 @@ They are the building blocks of React, They describe a part of the user interfac
 
 - we can use the array `map` method to iterate over our list items to map them from JavaScript primitive to HTML elements.
 
-- Each element must receive a **mandatory** `key` attribute
+#### `key` prop
 
-- `Keys` : Keys help React identify which items have changed, been added, or been removed. so that react only updates this item and not the whole list of items.
+Each element must receive a **mandatory** `key` attribute
 
-  - this makes us do the minimum update possible to the HTML from the rendering as React compares the keys on each list item to the keys from the previous render
+- `Key` : It's a special `prop` that we use to tell the [diffing algorithm](#3-commit-phase) that an element is unique and it should not be re-rendered.
 
-  - Keys should be given to the elements inside the array to give the elements a stable identity.
-  - If you don't have unique `Id` for rendered items, You may use the iteration **index** as a `key` as a last resort:
+- when a `key` stays the same across multiple renders, the element will be kept in the DOM (even if the position in the tree changes)
+- when a `key` changes between renders, the element will be destroyed (removed from the DOM) and a new one will be created (even if the type stays the same)
+- this makes us do the minimum update possible to the `HTML` from the rendering as React compares the keys on each list item to the keys from the previous render
 
-    - This is not recommended, only use it if you know that the list won't change
+- Keys should be given to the elements inside the lists to give the elements a stable identity.
+  ![key](./img/key-1.png)
 
-      ```js
-      const listItems = numbers.map((number, index) => <li key={index}>{number}</li>);
-      ```
+- Another way to use `key` prop is to **Reset State**:
+  - if we have the same element at the same position in the tree, the `DOM` element and `state` will be kept, by changing `key` prop of the component, we are telling React that this is a new component and it should be **re-rendered (with new reset state)**
+    ![key](./img/key-2.png)
+    ![key](./img/key-3.png)
 
-```js
-const numbers = [1, 2, 3, 4, 5];
-const listItems = numbers.map(number => <li key={number.toString()}>{number}</li>);
-```
+---
 
 #### update list-items
 
@@ -542,6 +588,21 @@ const List = () => {
   );
 };
 ```
+
+---
+
+### Component logic and structure
+
+There're 2 types of logic in components: **(Render logic & Event handler functions)**
+![component logic](./img/component-logic-1.png)
+
+---
+
+### Smart vs Dumb components
+
+**Dumb components** are also called ‘presentational’ components because their only responsibility is to present something to the DOM. Once that is done, the component is done with it.
+
+**Smart components** (or container components) on the other hand have a different responsibility. Because they have the burden of being smart, they are the ones that keep track of state and care about how the app works.
 
 ---
 
@@ -605,14 +666,6 @@ ReactDOM.createPortal(child, container);
   ```
 
 - when you want to make the modal appear where you are currently and not in the beginning of the page, use `position: fixed` instead of `absolute`
-
----
-
-### Smart vs Dumb components
-
-**Dumb components** are also called ‘presentational’ components because their only responsibility is to present something to the DOM. Once that is done, the component is done with it.
-
-**Smart components** (or container components) on the other hand have a different responsibility. Because they have the burden of being smart, they are the ones that keep track of state and care about how the app works.
 
 ---
 
@@ -874,7 +927,6 @@ React Composition is a pattern where we build components from other **(combine c
 
 ## Events
 
-- React events are named using **camelCase**, rather than lowercase. ex: `onClick` instead of `onclick`
 - With JSX you pass a function as the event handler, rather than a string.
 
   ```jsx
@@ -889,6 +941,32 @@ React Composition is a pattern where we build components from other **(combine c
 
   // GOOD ✅
   <button onClick={activateLasers}>Activate Lasers</button>
+  ```
+
+### How React handles events
+
+Unlike in `vanilla JavaScript`, where It's recommended to use `event delegation` to handle events, in `React` we don't need to do that as React handles events differently.
+
+- behind the scenes, React uses **event delegation** to listen for events at the top level of the DOM (`#root` element) and then delegates the event to the appropriate component
+  ![event delegation](./img/events-1.png)
+
+---
+
+### Synthetic Events
+
+React uses **Synthetic Events** which is a cross-browser **wrapper around the browser’s native `event`**.
+![event delegation](./img/events-2.png)
+
+- Attributes for event handlers are named using **camelCase** (`onClick` instead of `onclick` or `click`)
+- Default behavior can not be prevented by returning `false`, you must call `preventDefault()` explicitly
+- Attach `Capture` if you need to handle the event in the `capture phase` instead of the `bubbling phase`
+
+  ```jsx
+  // with capture phase
+  <div onClickCapture={handleClick}> ... </div>
+
+  // without capture phase
+  <div onClick={handleClick}> ... </div>
   ```
 
 ---
@@ -923,6 +1001,62 @@ React Composition is a pattern where we build components from other **(combine c
   - `props` (short for “properties”) and state are both plain JavaScript objects. While both hold information that influences the output of render, they are different in one important way:
   - get passed to the component (similar to function `parameters`)
 - `state` is managed within the component (similar to `variables` declared within a function).
+
+---
+
+### State Batch Updates
+
+By default, React uses a technique called **"auto-batching"** to group `state` updates that occur within the same event-loop into a single update. This means that if you call the state-update function multiple times in a short period of time, **React will only perform a single re-render for all of the updates**
+![batching](./img/batching-1.png)
+![batching](./img/batching-2.png)
+
+- React 18 have **"Automatic Batching"** which is a new feature that allows React to batch state updates even if they're not happening within the same event-loop, like: (`setTimeout`, `setInterval`, `Promise.then`, `async/await`, `event handlers`)
+  ![batching](./img/batching-3.png)
+
+---
+
+### Async & Derived State
+
+- Updating / Mutating state is asynchronous, so you can't rely on the previous state when you're updating the state using `setState`
+
+  ```jsx
+  // this won't work (stale state) ❌
+  function handleTripleIncrement() {
+    setCount(count + 1);
+    setCount(count + 1);
+    setCount(count + 1);
+  }
+
+  // instead use this (derived state) ✅
+  function handleTripleIncrement() {
+    setCount(prevState => prevState + 1);
+    setCount(prevState => prevState + 1);
+    setCount(prevState => prevState + 1);
+  }
+  ```
+
+- **Stale State**: It is a state that is outdated and no longer reflects the current state of the application.
+- **Derived State**: It is a state that is calculated based on existing / latest `state` or `props`.
+
+- When having multiple pieces of state that are **interdependent**, it might be tempting to combine them into a **single object**. For example, if we have `firstName` and `lastName` state variables, we might be tempted to combine them into a single `name` state variable.
+
+  ```jsx
+  const [name, setName] = useState({ firstName: '', lastName: '' });
+
+  // instead of
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  ```
+
+- By combining them into a single `state` variable, we can reduce the number of state variables we have to manage. However, this can lead to problems when updating `state`. For example, if we want to update the `firstName` state variable, we have to remember to also include the `lastName` state variable in the update.
+
+  ```jsx
+  // BAD ❌
+  setName({ firstName: 'Bruce' });
+
+  // GOOD ✅
+  setName((prevState) => { ...prevState, firstName: 'Bruce' });
+  ```
 
 ---
 
@@ -964,32 +1098,6 @@ function Child({ count, onIncrement }) {
 - child component must first receive a mechanism to communicate back from its parent.
 - parents pass data to children through `props`.
 - A "special" prop of type `function` can be passed down to a child. At the time of a relevant event, the child can then call this function as a callback.
-
----
-
-### Derived State
-
-It is a state that is calculated based on existing `state` or `props`.
-
-- When having multiple pieces of state that are **interdependent**, it might be tempting to combine them into a **single object**. For example, if we have `firstName` and `lastName` state variables, we might be tempted to combine them into a single `name` state variable.
-
-  ```jsx
-  const [name, setName] = useState({ firstName: '', lastName: '' });
-
-  // instead of
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  ```
-
-- By combining them into a single `state` variable, we can reduce the number of state variables we have to manage. However, this can lead to problems when updating `state`. For example, if we want to update the `firstName` state variable, we have to remember to also include the `lastName` state variable in the update.
-
-  ```jsx
-  // BAD ❌
-  setName({ firstName: 'Bruce' });
-
-  // GOOD ✅
-  setName((prevState) => { ...prevState, firstName: 'Bruce' });
-  ```
 
 ---
 
@@ -1081,6 +1189,138 @@ Great library for forms in React -> [formik.org](https://formik.org/)
 ### Form Validation
 
 ![validation](./img/forms.PNG)
+
+---
+
+## Side Effects and Lifecycles
+
+### Component Lifecycle
+
+It encompasses the three distinct phases a component instance goes through during its entire lifetime.
+![lifecycle](./img/lifecycle-1.png)
+
+- **Mounting** : when an instance of a component is being created and inserted into the DOM
+- **Updating** : when a component is being re-rendered as a result of changes to either its `props` or `state`
+- **Unmounting** : when a component is being removed from the DOM
+
+---
+
+### Side Effects
+
+React components should be **pure functions** with respect to their props. However, sometimes you need to **integrate React with non-React code**, such as a third-party library or an application built with a different framework. These cases are called **side effects** (or `effects` for short) because they can affect other components and can’t be done during rendering.
+
+![side effects](./img/side-effects-1.png)
+
+- To perform side effects in a function component, we shouldn't do it in the component function body, because:
+
+  - it will be executed every time the component re-renders
+  - it will cause infinite loop if we update the state inside it
+
+    ```jsx
+    function App() {
+      const [count, setCount] = useState(0);
+
+      // this will cause infinite loop and infinite requests
+      fetch('https://api.example.com/items')
+        .then(res => res.json())
+        .then(data => setCount(data.count));
+
+      return <div>{count}</div>;
+    }
+    ```
+
+- Instead, we should perform side effects in `event handlers` or `useEffect` hook
+
+  ![side effects](./img/side-effects-2.png)
+
+- `useEffect`: It's a hook that gives us a place to put side effects in a function component
+  - More about `useEffect` in the [Hooks file](./2-Hooks.md#effect-hook)
+
+---
+
+## How React Works (under the hood)
+
+### Rendering
+
+**“Rendering”** only means calling component functions and calculating what DOM elements need to be inserted, deleted, or updated. It has nothing to do with writing to the DOM. Therefore, each time a component instance is rendered and re-rendered, the function is called again
+
+- Only the initial app render and state updates can cause a render, which happens for the **entire application**, not just one single component
+- When a component instance gets re-rendered, **all its children will get re-rendered** as well. This doesn’t mean that all children will get updated in the DOM, thanks to `reconciliation`, which checks which elements have actually changed between two renders. But all this re-rendering can still have an impact on performance
+
+This is how components are rendered in React
+![rendering](./img/rendering-1.png)
+![rendering](./img/rendering-8.png)
+
+Here are the multiple phases in the rendering process in details:
+
+### 1. Triggering Phase
+
+- when the component is rendered for the first time or when the state changes
+- The render process is triggered for the entire application (React checks the entire DOM tree)
+- Here, the renders are not triggered immediately, but they are **scheduled to be executed later**
+  - this is done to avoid multiple renders for the same component in the same cycle
+
+#### 2. Render Phase
+
+![rendering](./img/rendering-3.png)
+
+- React will go through the entire DOM tree and re-render all the component instances that were scheduled to be rendered in the previous phase
+- This will create updated React elements which make the **Virtual DOM** tree
+  ![rendering](./img/rendering-2.png)
+  ![rendering](./img/rendering-4.png)
+- After creating new `VDOM`, React will compare it with the previous `VDOM` to find the differences between them -> **Reconciliation + Diffing**
+- `reconciliation` is the process of comparing the new VDOM with the previous VDOM to find the differences between them, it's done in React using `reconciler` called `"Fiber"`
+  ![rendering](./img/rendering-5.png)
+  - `reconciliation` in action
+    ![rendering](./img/rendering-6.png)
+- `diffing` is the process of finding the minimum number of operations to update the previous `VDOM` to the new `VDOM`
+  - It uses 2 fundamental assumptions (rules):
+    1. Two elements of different types will produce different trees.
+    2. Elements with a stable `key` prop stay the same across renders
+  - Same position, different type:
+    ![rendering](./img/rendering-9.png)
+  - Same position, same element (different attributes/props):
+    ![rendering](./img/rendering-10.png)
+
+#### 3. Commit Phase
+
+- In this phase, the `ReactDOM` library will update the `DOM` with the changes that were found in the previous phase
+- **committing is synchronous** -> DOM is updated in one go, it can't be interrupted. This is necessary to avoid visual inconsistencies in the **UI** (in sync with `state` at all times).
+- After the commit phase completes, the workInProgress `fiber` tree becomes the current tree for the next render cycle
+
+#### 4. Browser Paint Phase
+
+- This is the phase where the browser paints the pixels on the screen using the updated DOM
+  ![rendering](./img/rendering-7.png)
+
+---
+
+### Virtual DOM vs Real DOM
+
+**Dom Manipulation** can be very slow and heavy. For example, if you have several image tags inside a div and you replace one of the **images**
+
+- **Virtual DOM (VDOM)**: is a concept where a virtual representation of a UI is kept in `memory` as an object **(snapshot of what the real DOM looks like)**, and synced with the real DOM by a library (such as ReactDOM). which makes changes to the virtual DOM and not the Real DOM
+
+  - You can simply think of it as a lightweight copy of the Real DOM.
+  - It's a tree-like object that gives react a blueprint of how it should update the actual DOM
+
+![react-dom](./img/react-dom.png)
+
+- React re-renders only the parts that need to be updated compared to the initial DOM.
+
+#### How does it work?
+
+![dom](./img/dom.png)
+
+1. React generates a new Virtual DOM for our application.
+2. React compares the initial Virtual DOM (representing the current html DOM) to the new Virtual DOM.
+3. Based on the comparison above, React runs its **Diffing Algorithm** to calculate the minimum number of operations to update the initial Virtual DOM to the new Virtual DOM.
+4. it update the new DOM by **unmounting**(removing from the DOM tree) the changed things that differ and re-render them with the new data
+   ![react-dom](./img/vdom-1.png)
+5. then React compares the difference between the DOM-snapshot and the real-DOM and update the real-DOM accordingly
+   ![react-dom](./img/vdom-2.png)
+
+> **Re-Evaluating Components !== Re-Rendering the DOM** > ![rerender](./img/rerender.PNG)
 
 ---
 

@@ -625,8 +625,10 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
 ### Pure Functions
 
-- **Pure function**: Function **without side effects (predictable)**. Does not depend on external variables. Given the same inputs, always **returns** the same outputs
-  - pure function **must** return something
+**Pure function**: Function **without side effects (predictable)**. Does not depend on external variables. Given the same inputs, always **returns** the same outputs
+![pure function](./img/pure-functions.png)
+
+- pure function **must** return something
 - **side-effects**: are about MODIFICATION and doesn't count if we created new item
   - usually it's anything that the function does other that returning a value
 
@@ -922,10 +924,11 @@ They differ from Regular functions which return only single value (or nothing). 
 - The main method of a generator is `next()`. When called, it runs the execution until the nearest `yield <value>` statement (value can be omitted, then it’s `undefined`). Then the function execution pauses, and the yielded value is returned to the outer code.
 
   - The result of `next()` is always an object with two properties:
+    ![generator](./img/iterators-1.png)
 
     - `value`: the yielded value.
     - `done`: `true` if the function code has finished, otherwise `false`.
-      - When the generator is done. We should see it from `done:true`, and New calls to `generator.next()` don’t make sense any more. If we do them, they return the same object: `{done: true}`.
+      - When the generator is done. We should see it from `done: true` and `value: undefined`, and New calls to `generator.next()` don’t make sense any more. If we do them, they return the same object: `{done: true}`.
 
     ```js
     function* generateSequence() {
@@ -979,7 +982,7 @@ They differ from Regular functions which return only single value (or nothing). 
 
 ### Generators are Iterable
 
-- We can loop over their values using `for..of`:
+- Iterables are objects that implement the `Symbol.iterator` method, and we can use `ES6` features on them like **`for..of` loop and spread operator `...`**
 
   ```js
   function* generateSequence() {
@@ -994,6 +997,8 @@ They differ from Regular functions which return only single value (or nothing). 
     alert(value); // 1, then 2
   }
   ```
+
+  - `object` is not iterable by default, that's why we can't use `for..of` loop on it, but we can make it iterable by adding the `Symbol.iterator` method to it
 
   - **Note**: the example above shows `1`, then `2`, and that’s all. It doesn’t show `3`!
     - It’s because `for..of` iteration ignores the last value, when `done: true`. So, if we want all results to be shown by `for..of`, we must return them with `yield`

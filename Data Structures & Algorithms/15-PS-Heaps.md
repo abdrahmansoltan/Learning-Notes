@@ -9,8 +9,11 @@
     - [Solution 2: using Bucket Sort](#solution-2-using-bucket-sort)
   - [Top K Frequent Words](#top-k-frequent-words)
   - [Reorganize String](#reorganize-string)
+  - [Task Scheduler](#task-scheduler)
   - [Kth Largest Element in a Stream](#kth-largest-element-in-a-stream)
-  - [Find Median from Data Stream](#find-median-from-data-stream)
+  - [Two Heaps Technique](#two-heaps-technique)
+    - [Find Median from Data Stream](#find-median-from-data-stream)
+    - [Sliding Window Median](#sliding-window-median)
 
 ---
 
@@ -38,12 +41,28 @@ Given an integer array `nums` and an integer `k`, return the `kth` largest eleme
 So the overall complexity will be `O(n + k log(n))` --> `O(n)`
 
 ```py
+# slower solution ❌
 def find_kth_largest(nums, k):
     heap = []
     for num in nums:
         heapq.heappush(heap, num)
     for _ in range(len(nums)-k):
         heapq.heappop(heap)
+    return heapq.heappop(heap)
+
+# --------------------------------------------- #
+
+# faster solution ✅
+def find_kth_largest(nums, k):
+    heap = []
+    for num in nums:
+        if len(heap) < k:
+            heapq.heappush(heap, num)
+        elif num > heap[0]:
+            # if the current number is greater than the root of the heap, then pop the root and push the current number
+            heapq.heappop(heap)
+            heapq.heappush(heap, num)
+            # now the root of the heap is the kth largest element
     return heapq.heappop(heap)
 ```
 
@@ -149,13 +168,12 @@ def top_k_frequent(nums, k):
     for n, c in count.items():
         freq_buckets[c].append(n)
 
+    # now freq_buckets is a list of lists with the index as the frequency and the value as the elements with that frequency, so we can loop through it from the end and append the elements to the result list
     for i in range(len(freq_buckets)-1, -1, -1):
-        if len(res) == k:
-            break
-        if freq_buckets[i]:
-            res.extend(buckets[i])
-
-    return res
+        for n in freq_buckets[i]:
+            res.append(n)
+            if len(res) == k:
+                return res
 ```
 
 ---
@@ -222,25 +240,29 @@ Return any possible rearrangement of `s` or return `""` if not possible.
 ```py
 def reorganize_string(s):
     maxHeap = []
-    freq = {}
+    freqDict = {}
 
     # create a dictionary to store the frequency of each character in the string
     for char in s:
-        freq[char] = freq.get(char, 0) + 1
+        freqDict[char] = freqDict.get(char, 0) + 1
     # push all the elements in the dictionary to the maxHeap by their frequency in negative form (because we want to pop the elements with the highest frequency)
-    for key, val in freq.items():
+    for key, val in freqDict.items():
         heapq.heappush(maxHeap, [-val, key]) # python heapify pairs by the first element
 
     res = ''
     prev = None
     # pop the top element of the maxHeap and append it to the result string
     while maxHeap or prev:
+        # if the maxHeap is empty and the last element of the result string is the same as the current element, return ""
+        if prev and not maxHeap:
+            return ''
+
         # 1. pop the top element of the maxHeap + append it to the result + decrement the frequency by 1 to reach 0
         freq, char = heapq.heappop(maxHeap)
         res += char
-        freq += 1
+        freq += 1 # decrement the frequency by 1 to reach 0
 
-        # 2. if prev is not None, we will push it to the maxHeap
+        # 2. if prev is not None, we will push it back to the maxHeap with updated frequency
         if prev:
             heapq.heappush(maxHeap, prev)
             prev = None
@@ -249,11 +271,63 @@ def reorganize_string(s):
         if freq != 0:
             prev = [freq, char]
 
-        # 4. if the maxHeap is empty and the last element of the result string is the same as the current element, return ""
-        if prev and not maxHeap:
-            return ''
-
     return res
+```
+
+---
+
+## Task Scheduler
+
+Given a characters array `tasks`, representing the tasks a CPU needs to do, where each letter represents a different task. Tasks could be done in any order. Each task is done in one unit of time. For each unit of time, the CPU could complete either one task or just be idle.
+
+However, there is a non-negative integer `n` that represents the **cooldown** period between two **same tasks** (the same letter in the array), that is that there must be at least `n` units of time between any two same tasks.
+
+Return the least number of units of times that the CPU will take to finish all the given tasks.
+
+- EX: `tasks = ["A","A","A","B","B","B"], n = 2` --> `8`
+
+  - Explanation:
+    - A -> B -> idle -> A -> B -> idle -> A -> B
+    - There is at least 2 units of time between any two same tasks.
+
+- Explanation:
+  - The idea here that we can't process the same task twice without a cooldown period of `n`, so we will process the most frequent tasks first and then the less frequent tasks
+  - we can use a dictionary to store the frequency of each task -> `count`
+    ![task scheduler](./img/task-scheduler-1.png)
+  - We want to process the most frequent tasks first, so that we can process the less frequent tasks while we are waiting for the cooldown period to end. so we will use a `maxHeap` to store the tasks with the most frequency
+    ![task scheduler](./img/task-scheduler-2.png)
+  - we can use a `queue` to store the tasks that we can't process yet because of the cooldown period -> `q`
+    ![task scheduler](./img/task-scheduler-3.png)
+  - on each iteration we will pop the top element of the `maxHeap` and append it to the result string
+    - if the cooldown period is over in the `queue`, we will push the element back to the `maxHeap`, so that we can process it again
+      ![task scheduler](./img/task-scheduler-4.png)
+    - if the `maxHeap` is empty, we will add idle time to the result, because we can't process any task yet
+
+```py
+def least_interval(tasks, n):
+    count = Counter(tasks)
+    maxHeap = [-val for val in count.values()] # python heapify pairs by the first element
+    heapq.heapify(maxHeap)
+
+    time = 0
+    q = deque()
+
+    while maxHeap or q:
+        if maxHeap:
+            time += 1
+            freq = heapq.heappop(maxHeap) + 1 # we add 1 to the frequency because we processed the task
+            if freq:
+                q.append([freq, time + n]) # push to the queue with updated frequency and the time
+
+        # if the maxHeap is empty, we will make time = the time of the next element in the queue
+        else:
+            time = q[0][1]
+
+        # if the cooldown period is over, we will push the element back to the maxHeap
+        if q and q[0][1] == time:
+            heapq.heappush(maxHeap, q.popleft()[0]) # push the frequency only
+
+    return time
 ```
 
 ---
@@ -294,7 +368,9 @@ class KthLargest:
 
 ---
 
-## Find Median from Data Stream
+## Two Heaps Technique
+
+### Find Median from Data Stream
 
 The median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value and the median is the mean of the two middle values.
 
@@ -365,3 +441,71 @@ class MedianFinder:
         # if even number of elements:
         return (-1 * self.small[0] + self.large[0]) / 2
 ```
+
+---
+
+### Sliding Window Median
+
+Given an array of integers `nums` and an integer `k`, return the median of the sliding window of size `k`.
+
+You're given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very `left` of the array to the very `right`. You can only see the `k` numbers in the window. Each time the sliding window moves right by one position.
+
+- EX: `nums = [1, 3, -1, -3, 5, 3, 6, 7], k = 3` --> `[1, -1, -1, 3, 5, 6]`
+
+  - Explanation:
+
+    ```py
+    # window position                median
+    # ---------------                -----
+    [1  3  -1] -3  5  3  6  7        1
+     1 [3  -1  -3] 5  3  6  7       -1
+     1  3 [-1  -3  5] 3  6  7       -1
+     1  3  -1 [-3  5  3] 6  7        3
+     1  3  -1  -3 [5  3  6] 7        5
+     1  3  -1  -3  5 [3  6  7]       6
+    ```
+
+- Explanation:
+  - The idea here that we need the data to be sorted to get the middle value (median). So we need to insert elements **in order**, we'll use 2 heaps:
+    ![sliding-window-median](./img/sliding-window-median-1.png)
+    - we can use a `minHeap` to store the larger half of the data
+    - we can use a `maxHeap` to store the smaller half of the data
+      - remember to use negative values to make it a maxHeap in python
+
+```py
+def median_sliding_window(nums, k):
+    res = []
+    small, large = [], []
+
+    for i in range(len(nums)):
+        # add the new element to the minHeap if it's larger than the median, otherwise add it to the maxHeap
+        if not small or nums[i] > small[0]:
+            heapq.heappush(small, nums[i])
+        else:
+            heapq.heappush(large, -nums[i])
+
+        # Balance the 2 heaps
+        if len(small) > len(large) + 1:
+            heapq.heappush(large, -heapq.heappop(small))
+        if len(large) > len(small) + 1:
+            heapq.heappush(small, -heapq.heappop(large))
+
+        # if the window is full, we will calculate the median
+        if i >= k-1:
+            # if the size of the minHeap is equal to the maxHeap, we will calculate the median by getting the average of the top elements of the minHeap and maxHeap
+            if len(small) == len(large):
+                res.append((-large[0] + small[0]) / 2)
+            # if the size of the minHeap is larger than the maxHeap, the median will be the top element of the minHeap
+            elif len(small) > len(large):
+                res.append(small[0])
+            # if the size of the maxHeap is larger than the minHeap, the median will be the top element of the maxHeap
+            else:
+                res.append(-large[0])
+
+            # TODO: remove the element that is out of the window from the heap
+
+
+    return res
+```
+
+---

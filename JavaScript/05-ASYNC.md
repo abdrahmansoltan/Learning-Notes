@@ -45,7 +45,7 @@
     - [Custom Axios Instance](#custom-axios-instance)
   - [Network Requests](#network-requests)
     - [Fetch](#fetch)
-      - [Fetch: Abort](#fetch-abort)
+      - [Fetch: Abort (Canceling request)](#fetch-abort-canceling-request)
       - [Fetch: Cross-Origin Requests](#fetch-cross-origin-requests)
       - [Fetch API in depth](#fetch-api-in-depth)
     - [Long Polling vs WebSockets](#long-polling-vs-websockets)
@@ -1312,7 +1312,7 @@ let promise = fetch(url, [options]);
 
 ---
 
-#### Fetch: Abort
+#### Fetch: Abort (Canceling request)
 
 As we know, `fetch` returns a promise. And JavaScript generally has no concept of “aborting” a promise. So how can we cancel an ongoing `fetch`? E.g. if the user actions on our site indicate that the `fetch` isn’t needed any more.
 
@@ -1363,6 +1363,7 @@ There’s a special built-in object for such purposes: **`AbortController`**. It
   ```
 
 - `AbortController` is scalable. It allows to cancel multiple fetches at once.
+- `Axios` has a built-in `cancelToken` feature that allows you to cancel a request via a cancel `token`.
 
 ---
 

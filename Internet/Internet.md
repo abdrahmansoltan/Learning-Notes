@@ -27,6 +27,7 @@
   - [Nginx](#nginx)
     - [Configuration](#configuration)
     - [Web server vs Application server](#web-server-vs-application-server)
+  - [Performance](#performance)
   - [Security](#security)
     - [OWASP](#owasp)
 
@@ -391,6 +392,15 @@ NGINX is open source software for **web serving**, **reverse proxying**, **cachi
 **Application server**: exposes **business logic** to the clients, which generates dynamic content. - It is a software framework that transforms data to provide the specialized functionality offered by a business, service, or application. Application servers enhance the interactive parts of a website that can appear differently depending on the context of the request.
 
 - EX: `node.js`
+
+---
+
+## Performance
+
+![Performance](./img/performance-0.png)
+
+- [FE performance](./FrontEnd.md#performance)
+- [BE performance](./BackEnd.md#performance)
 
 ---
 

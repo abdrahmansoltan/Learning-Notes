@@ -11,14 +11,6 @@
   - [Time Needed to Inform All Employees](#time-needed-to-inform-all-employees)
   - [All Paths From Source to Target](#all-paths-from-source-to-target)
   - [Clone Graph](#clone-graph)
-  - [Course Schedule](#course-schedule)
-  - [Course Schedule II](#course-schedule-ii)
-  - [Network Delay Time](#network-delay-time)
-    - [Solution 1: `Dijkstra's Algorithm`](#solution-1-dijkstras-algorithm)
-    - [Solution 2: `Bellman-Ford Algorithm` (SLOWER ❌)](#solution-2-bellman-ford-algorithm-slower-)
-  - [Path with Maximum Probability](#path-with-maximum-probability)
-  - [Redundant Connection](#redundant-connection)
-  - [Accounts Merge](#accounts-merge)
   - [Sort Items by Groups Respecting Dependencies](#sort-items-by-groups-respecting-dependencies)
   - [Is Graph Bipartite?](#is-graph-bipartite)
   - [Find if Path Exists in Graph](#find-if-path-exists-in-graph)
@@ -30,6 +22,17 @@
   - [Longest Increasing Path in a Matrix](#longest-increasing-path-in-a-matrix)
   - [Circular Array Loop](#circular-array-loop)
   - [Escape a Large Maze](#escape-a-large-maze)
+  - [Union Find](#union-find)
+  - [Redundant Connection](#redundant-connection)
+  - [Accounts Merge](#accounts-merge)
+  - [Dijkstra Algorithm (Shortest Path)](#dijkstra-algorithm-shortest-path)
+    - [Network Delay Time](#network-delay-time)
+    - [Path with Maximum Probability](#path-with-maximum-probability)
+    - [Swim in Rising Water](#swim-in-rising-water)
+  - [Topological Sort](#topological-sort)
+    - [Course Schedule](#course-schedule)
+    - [Course Schedule II](#course-schedule-ii)
+    - [Course Schedule IV](#course-schedule-iv)
 
 ---
 
@@ -851,648 +854,6 @@ def cloneGraph(node):
 
 ---
 
-## Course Schedule
-
-There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [ai, bi]` indicates that you must take course `bi` first if you want to take course `ai`.
-
-For example, the pair `[0, 1]`, indicates that to take course `0` you have to first take course `1`. Return `true` if you can finish all courses. Otherwise, return `false`.
-
-- Ex: `numCourses = 2, prerequisites = [[1,0]]`
-  - Output: `true`
-  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible.
-- Ex: `numCourses = 2, prerequisites = [[1,0],[0,1]]`
-
-  - Output: `false`
-  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
-
-- **Solution 1: `BFS / DFS`** (not the best solution ❌)
-
-  - To check if we can take any course, we need to check if there is a **cycle** or not in the graph.
-  - We create a graph from the prerequisites in the adjacency list format.
-    - This is because we want to know if for each node, can we reach the end node or not (finish all courses).
-      ![course-schedule](./img/course-schedule-3.png)
-    - We notice that our `base` cases are the nodes that don't have any prerequisites (no neighbours).
-      - To keep track of these nodes, **we use a `HashMap` with adjacency list**.
-        ![course-schedule](./img/course-schedule-4.png)
-  - Then we use `DFS` to check if there is a cycle or not.
-
-    - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
-      ![course-schedule](./img/course-schedule-5.png)
-    - To prevent running `DFS` on the same node twice, we remove its `value` from the `HashMap` after we run `DFS` on it and knowing that it can be completed **(because it now has no prerequisites)**, and then go back to the previous node and repeat the process.
-      ![course-schedule](./img/course-schedule-6.png)
-    - if all nodes can be completed, then we return `true`
-      ![course-schedule](./img/course-schedule-7.png)
-    - If there is a cycle, then we return `false`.
-      ![course-schedule](./img/course-schedule-1.png)
-      ![course-schedule](./img/course-schedule-2.png)
-      - A cycle is detected using a `visited` set .
-        ![course-schedule](./img/course-schedule-8.png)
-
-  - Time complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
-    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
-  - Space complexity: `O(n^2)` = `O(numCourses^2)`
-    - This is because we may have a graph with `n` nodes and `n` edges.
-    - the adjacency list will have `n` nodes and each node will have `n` edges.
-
-  ```py
-  def canFinish(numCourses, prerequisites):
-      # Create a graph from the prerequisites (Adjacency List)
-      preMap = {i: [] for i in range(numCourses)}
-      # preMap = collections.defaultdict(list)
-      for course, pre in prerequisites:
-          preMap[course].append(pre)
-
-      # Create a set to keep track of the visited nodes
-      visited = set()
-
-      def dfs(node):
-          # Base case
-          if node in visited:
-              return False
-          if preMap[node] == []:
-              # means that the node has no prerequisites
-              return True
-
-          # 1. Add the node to the visited set
-          visited.add(node)
-
-          # 2. Loop through the prerequisites of the node
-          for pre in preMap[node]:
-              # Check if there is a cycle
-              if not dfs(pre):
-                  return False
-
-          # 3. Remove the node from the visited set
-          visited.remove(node)
-          # 4. Remove the node from the graph map
-          preMap[node] = []
-
-          return True
-
-      # we have to run dfs on all nodes to handle if the graph isn't connected so that we'd cover all nodes in the graph
-      for node in range(numCourses):
-          if dfs(node) == False:
-              return False
-
-      # Else
-      return True
-
-  # ----------------------------------------------------------------------------------------------
-
-  # BFS
-  def canFinish(numCourses, prerequisites):
-      # Create a graph from the prerequisites (Adjacency List)
-      preMap = {i: [] for i in range(numCourses)}
-      # preMap = collections.defaultdict(list)
-      for course, pre in prerequisites:
-          preMap[course].append(pre)
-
-      # Create a set to keep track of the visited nodes
-      visited = set()
-
-      # Create a queue to keep track of the nodes to visit
-      queue = deque()
-
-      for node in range(numCourses):
-          if preMap[node] == []:
-              # means that the node has no prerequisites
-              queue.append(node)
-
-      while queue:
-          node = queue.popleft()
-
-          if node in visited:
-              return False
-
-          visited.add(node)
-
-          for pre in preMap[node]:
-              queue.append(pre)
-
-          preMap[node] = []
-
-      # Else
-      return True
-  ```
-
-- **Solution 2: `Topological Sort`** (better solution ✅)
-
-  - This problem can also be solved using `Topological Sort` because we can use it to detect cycles in a graph (if there is a cycle, then we can't finish all courses).
-  - First, we need to build the `indegre` array.
-    - This is because we need to know which nodes have no prerequisites (no incoming edges).
-      ![course-schedule](./img/course-schedule-9.png)
-    - We can do that by looping through the prerequisites and incrementing the `indegree` of the node by `1`.
-      ![course-schedule](./img/course-schedule-10.png)
-  - Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
-    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
-  - Space complexity: `O(n^2)` = `O(numCourses^2)`
-    - This is because we may have a graph with `n` nodes and `n` edges.
-    - the adjacency list will have `n` nodes and each node will have `n` edges.
-
-  ```py
-  def canFinish(numCourses, prerequisites):
-      # Create a graph from the prerequisites (Adjacency List) & an indegree array
-      preMap = [[] for _ in range(numCourses)]
-      indegree = [0] * numCourses
-      for course, pre in prerequisites:
-          indegree[pre] += 1
-          preMap[course].append(pre)
-
-      # Create a stack to keep track of the nodes to visit
-      stack = []
-
-      for node in range(numCourses):
-          if indegree[node] == 0:
-              stack.append(node)
-
-      # Create a set to keep track of the visited nodes
-      count = 0 # or use a set() and check if len(set) == numCourses
-
-      while stack:
-          node = stack.pop()
-          count += 1 # increment the count of visited nodes
-
-          # Loop through the prerequisites of the node and decrement their indegree by 1 and add them to the stack if their indegree is 0
-          for pre in preMap[node]:
-              indegree[pre] -= 1
-              if indegree[pre] == 0:
-                  stack.append(pre)
-
-      return count == numCourses
-  ```
-
----
-
-## Course Schedule II
-
-Same as above, but return the order of the courses to take.
-
-- Ex: `numCourses = 2, prerequisites = [[1,0]]`
-
-  - Output: `[0,1]`
-  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is `[0,1]`.
-
-- Explanation:
-
-  - We use the same approach as above, with a preMap to create a graph from the prerequisites.
-    ![course-schedule-ii](./img/course-schedule-ii-1.png)
-  - We use `DFS` to check if there is a cycle or not.
-    - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
-      ![course-schedule-ii](./img/course-schedule-ii-2.png)
-    - To prevent running `DFS` on the same node twice, we remove it from the `HashMap` after we run `DFS` on it and knowing that it can be completed, and then go back to the previous node and repeat the process.
-      ![course-schedule-ii](./img/course-schedule-ii-3.png)
-      ![course-schedule-ii](./img/course-schedule-ii-4.png)
-      ![course-schedule-ii](./img/course-schedule-ii-5.png)
-    - if all nodes can be completed, then we return `true`
-      ![course-schedule-ii](./img/course-schedule-ii-6.png)
-    - If there is a cycle, then we return `false`.
-      - A cycle is detected using a `visited` set .
-
-- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
-  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
-
-```py
-def findOrder(numCourses, prerequisites):
-    # Create a graph from the prerequisites (Adjacency List)
-    preMap = {course: [] for course in range(numCourses)}
-    for course, pre in prerequisites:
-        preMap[course].append(pre)
-
-    # Create sets to keep track of the visited nodes and potential cycles
-    visited, cycleSet = set(), set()
-
-    # Create a output to keep track of the order of the courses
-    output = []
-
-    def dfs(node):
-        # Base case
-        if node in cycle:
-            return False # because there is a cycle
-        if node in visited:
-            return True # so that we don't stop the algotithm
-
-        # Add the node to the cycle set
-        cycleSet.add(node)
-
-        # Loop through the prerequisites of the node
-        for pre in preMap[node]:
-            # Check if there is a cycle
-            if not dfs(pre):
-                return False # Terminate the algorithm
-
-        # Remove the node from the cycle set
-        cycleSet.remove(node)
-
-        # Finally add the node to the visited set
-        visited.add(node)
-
-        # Add the node to the output after visiting all its prerequisites
-        output.append(node)
-        return True
-
-    for course in range(numCourses):
-        if dfs(course) == False:
-            return []
-
-    # Else
-    return output
-```
-
----
-
-## Network Delay Time
-
-You are given a network of `n` nodes, labeled from `1` to `n`. You are also given `times`, a list of travel times as directed edges `times[i] = (ui, vi, wi)`, where `ui` is the source node, `vi` is the target node, and `wi` is the time it takes for a signal to travel from source to target.
-
-We will send a signal from a given node `k`. Return the time it takes for all the `n` nodes to receive the signal. If it is impossible for all the `n` nodes to receive the signal, return `-1`.
-
-- Ex: `times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2`
-  ![network-delay-time](./img/network-delay-time-1.png)
-
-  - Output: `2`
-  - Explanation: The signal will take 1 minute to travel from node 2 to node 1, and 1 minute to travel from node 2 to node 3.
-    - Then, it will take 1 minute for all the nodes to receive the signal.
-
-- Verify the constraints:
-  - is the graph connected or disconnected? -> It can be disconnected, so account for that
-  - is the graph weighted or unweighted? -> weighted
-    - can the weights be negative? -> no (because it's a time)
-
-### Solution 1: `Dijkstra's Algorithm`
-
-- We use `Dijkstra's Algorithm` to find the shortest path from the source node to all other nodes.
-- This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
-  - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
-    ![network-delay-time](./img/network-delay-time-2.png)
-  - Here, we will use a `minHeap` to keep track of the shortest path.
-    - It's logical to search the node with shortest distance, So we will use the `min heap` to pop the node with the shortest distance from the source node and add its neighbors to the `Priority Queue` with their distance from the source node.
-      ![network-delay-time](./img/network-delay-time-3.png)
-    - > So the `minHeap` tells us which node to visit next by popping the **node with the shortest distance from the source node**. For example in the picture below, we have 2 paths from node `1`, and the `minHeap` will give us the path with the shortest distance from the source node. `(path 1)` > ![network-delay-time](./img/network-delay-time-6.png)
-- Starting at the source node `k`, we loop through its neighbors and add them to the `Priority Queue` with their distance from the source node.
-  ![network-delay-time](./img/network-delay-time-4.png)
-  ![network-delay-time](./img/network-delay-time-5.png)
-
-- Time complexity: `O(ElogV)`
-  - `E` is the number of edges
-  - `V` is the number of vertices
-
-```py
-def networkDelayTime(times, n, k):
-    # Create a graph from the times (Adjacency List)
-    graph = collections.defaultdict(list)
-    for u, v, w in times:
-        graph[u].append((v, w))
-
-    # Create a minHeap to keep track of the shortest path
-    minHeap = [(0, k)] # (path-distance, node) -> we start with the given node k
-
-    visit = set()
-    res = 0
-
-    while minHeap:
-      # get the node with the shortest distance from the source node
-      w1, n1 = heapq.heappop(minHeap) # w: weight, n: node
-
-      if n1 not in visit:
-        visit.add(n1)
-        res = max(res, w1) # max because we want the path to the farthest node (n-1) which indicate the biggest delay time
-
-        # Loop through the neighbors of the node
-        for n2, w2 in graph[n1]:
-          heapq.heappush(minHeap, (w1 + w2, n2))
-
-    return res if len(visit) == n else -1 # if len(visit) != n, then there is a node that we didn't visit
-```
-
-### Solution 2: `Bellman-Ford Algorithm` (SLOWER ❌)
-
-- We use `Bellman-Ford Algorithm` to find the shortest path from the source node to all other nodes. **(If there is a negative weight in the graph)**
-- We will use `Dynamic Programming` in the algorithm
-
-```py
-def networkDelayTime(times, n, k):
-    # Create a dist array to keep track of the shortest distance from the source node to all other nodes
-    dist = [float('inf')] * (n + 1) # +1 because the nodes are labeled from 1 to n
-    dist[k] = 0 # the distance from the source node to itself is 0
-
-    # Loop through the nodes
-    for _ in range(n):
-        # Loop through the edges
-        for u, v, w in times:
-            # Relax the edges (update the shortest distance)
-            if dist[u] + w < dist[v]:
-                dist[v] = dist[u] + w
-
-    # Check for negative cycles
-    for u, v, w in times:
-        if dist[u] + w < dist[v]:
-            return -1 # there is a negative cycle
-
-    # Else return the max distance
-    return -1 if max(dist[1:]) == float('inf') else max(dist[1:]) # we start from 1 because the nodes are labeled from 1 to n
-```
-
----
-
-## Path with Maximum Probability
-
-You are given an undirected weighted graph of `n` nodes `(0-indexed)`, represented by an edge list where `edges[i] = [a, b]` is an undirected edge connecting the nodes `a` and `b` with a probability of success of traversing that edge `succProb[i]`.
-
-Given two nodes `start` and `end`, find the path with the maximum probability of success to go from `start` to `end` and return its success probability.
-
-If there is no path from `start` to `end`, return `0`.
-
-- Ex: `n = 3, edges = [[0,1],[1,2],[0,2]], succProb = [0.5,0.5,0.2], start = 0, end = 2`
-
-  ![path-with-maximum-probability](./img/path-with-max-prop-1.png)
-
-  - Output: `0.25`
-  - Explanation: There are two paths from start to end, one having a probability of success = 0.2 and the other has 0.5 \* 0.5 = 0.25.
-
-- Explanation:
-
-  - Here, we want to find the path with the maximum probability of success to go from `start` to `end`. So we can use `Dijkstra's Algorithm` to find the shortest path from `start` to `end`, but instead of keeping track of the shortest path, we keep track of the path with the maximum probability of success aka "longest path".
-  - We will use a `Priority Queue` to keep track of the path with the maximum probability of success.
-    - Here we will usre a `max heap` to keep track of the path with the maximum probability of success.
-      - we will use the `max heap` to pop the node with the maximum probability of success from the source node and add its neighbors to the `Priority Queue` with their probability of success.
-        ![path-with-maximum-probability](./img/path-with-max-prop-2.png)
-        ![path-with-maximum-probability](./img/path-with-max-prop-3.png)
-    - Python doesn't have a `max heap`, so we will use a `min heap` and multiply the probability of success by `-1` to get the maximum probability of success.
-      - `heapq.heappush(minHeap, (-1 * w1 * w2, n2))`
-      - `heapq.heappop(minHeap)[0] * -1`
-
-- Time complexity: `O(E.log(V))`
-  - `E` is the number of edges (from generating the adjacency list), `V` is the number of vertices (`log(V)` because we use a `Priority Queue`)
-
-```py
-def maxProbability(n, edges, succProb, start, end):
-    # Create a graph from the edges
-    graph = collections.defaultdict(list)
-    for i in range(len(edges)):
-        src, dst = edges[i]
-        # Add the probability of success to the graph to the 2 sides of the edge
-        graph[src].append((dst, succProb[i]))
-        graph[dst].append((src, succProb[i]))
-
-
-    # Create a max heap to keep track of the path with the maximum probability of success
-    minHeap = [(-1, start)] # (path-probability, node)
-
-    visit = set()
-
-    while minHeap:
-      prob, cur = heapq.heappop(minHeap)
-      visit.add(cur)
-
-      if cur == end:
-        return prob * -1
-
-      for nei, edgeProb in graph[cur]:
-        if nei not in visit:
-          heapq.heappush(minHeap, (prob * edgeProb, nei))
-
-    # If there is no path from start to end
-    return 0
-```
-
----
-
-## Redundant Connection
-
-In this problem, a tree is an undirected graph that is connected and has no cycles.
-
-You are given a graph that started as a tree with `n` nodes labeled from `1` to `n`, with one additional edge added. The added edge has two different vertices chosen from `1` to `n`, and was not an edge that already existed. The graph is represented as an array `edges` of length `n` where `edges[i] = [ai, bi]` indicates that there is an edge between nodes `ai` and `bi` in the graph.
-
-Return an edge that can be removed so that the resulting graph is a tree of `n` nodes. If there are multiple answers, return the answer that occurs last in the input.
-
-- Ex: `edges = [[1,2],[1,3],[2,3]]`
-
-  ![redundant-connection](./img/redundant-connection-1.jpg)
-
-  - Output: `[2,3]`
-
-![redundant-connection](./img/redundant-connection-2.png)
-
-- Explanation:
-
-  - The problem is called "Redundant Connection" because we want to find the edge that is `redundant` aka the edge that we can remove to make the graph a tree.
-  - We want to know what edge we can remove to make the graph a tree **(no cycles)**.
-  - We can use **Union Find** to find the redundant connection.
-    - This is because we know that a tree is an undirected graph that is **connected** and has no cycles.
-    - So if we find a cycle in the graph, then we know that the edge that created the cycle is the **redundant connection**.
-    - `union find` algo will be used in 2 steps:
-      1. `union` the nodes together if they don't have the same parent -> **no cycle**
-         ![redundant-connection](./img/redundant-connection-3.png)
-      2. `find` the parent of each node and check if the parent of the 2 nodes are the same -> **cycle**
-
-- Solution 1: Union Find ✅
-
-  - explanation in solution 2
-  - Time complexity: `O(nlogn)`
-
-  ```py
-  class UnionFind:
-    def __init__(self, n):
-        self.par = [i for i in range(n)]
-
-    def find(self, x):
-        p = self.par[x]
-        while p != self.par[p]:
-            p = self.par[p]
-        return p
-
-    def union(self, x1, x2):
-        p1, p2 = self.find(x1), self.find(x2)
-        self.par[p1] = p2 # make the parent of node1 the parent of node2
-
-  class Solution:
-    def findRedundantConnection(self, edges: List[List[int]]) -> List[int]:
-        uf = UnionFind(len(edges) + 1) # +1 because the nodes are 1-indexed
-        for node1, node2 in edges:
-            # If the parent of the 2 nodes are the same, then we found a cycle and this is the redundant connection
-            if uf.find(node1) == uf.find(node2):
-                return [node1, node2]
-            # else, union the nodes together to make a tree
-            uf.union(node1, node2)
-  ```
-
-- Solution 1: Union Find by **rank**
-
-  - Time complexity: `O(nlogn)`
-  - Steps:
-    1. We start with nodes that are not connected to any other nodes, and the rank of each node is `1` -> size of the starting tree.
-       ![redundant-connection](./img/redundant-connection-4.png)
-    2. we will go through each edge and `union` (connecting) the nodes together in the shape of a `tree` if they don't have the same parent.
-       - If the parent of the 2 nodes are the same, then we found a cycle.
-       - If the parent of the 2 nodes are not the same, then we `union` the nodes together and update:
-         - the rank of the parent node as the size of the tree will increase by `1`.
-           ![redundant-connection](./img/redundant-connection-5.png)
-         - The parent of the node1 as the parent of the `node2`.
-           ![redundant-connection](./img/redundant-connection-6.png)
-    3. repeat step 2 until we find a cycle in the graph.
-       ![redundant-connection](./img/redundant-connection-7.png)
-       ![redundant-connection](./img/redundant-connection-8.png)
-
-  ```py
-  def findRedundantConnection(edges):
-      # Create a parent array to keep track of the parent of each node
-      parent = [i for i in range(len(edges) + 1)]
-      # Create a rank array to keep track of the rank of each node
-      rank = [1 for i in range(len(edges) + 1)]
-
-      def find(node):
-          p = parent[node] # going up the parent of the node
-          # If the parent of the node is itself, then we found the Top parent
-          while p != parent[p]:
-              parent[p] = parent[parent[p]] # path compression to make the tree flat -> O(logn)
-              p = parent[p]
-          return p
-
-      # Union the nodes together if they don't have the same parent
-      def union(node1, node2):
-          p1, p2 = find(node1), find(node2)
-
-          # If the parent of the 2 nodes are the same, then we found a cycle
-          if p1 == p2:
-              return False
-
-          # check the rank of the 2 nodes to see which one is the parent and update the rank of the parent
-          if rank[p1] > rank[p2]:
-              parent[p2] = p1
-              rank[p1] += rank[p2]
-          else:
-              parent[p1] = p2
-              rank[p2] += rank[p1]
-
-          return True
-
-      for node1, node2 in edges:
-          # If the parent of the 2 nodes are the same, then we found a cycle
-          if not union(node1, node2):
-              return [node1, node2]
-  ```
-
----
-
-## Accounts Merge
-
-problem: [Here](https://leetcode.com/problems/accounts-merge/)
-
-- Explanation:
-
-  - first string will be the `name` of the account, and the rest of the strings will be the `emails` of the account.
-    - The problem is that they might be multiple accounts that belong to the same person (same name), and we want to merge them together.
-    - We will know that 2 accounts belong to the same person if they have at least 1 email in common.
-  - So eventually, we want to merge (union) all the accounts that belong to the same person together, and return the result in the form of a list of lists.
-  - So this is a **Graph** problem and can be solved using `union find`.
-    - After connecting all the nodes together, we will have a graph that looks like this:
-      ![accounts-merge](./img/accounts-merge-1.png)
-    - We will go through each node and do a `DFS` to find all the nodes that belong to the same person and append them to a list.
-    - We will also keep track of the emails that we have visited so that we don't visit the same email twice.
-    - We will also sort the emails in the list so that we can return the result in the correct order.
-
-- Time and space complexity:
-
-  - Time: `O(nlogn)` where `n` is the number of accounts
-  - Space: `O(n)`
-
-- Solution 1: without Rank ✅
-
-  ```py
-  class UnionFind:
-    def __init__(self, n):
-        self.par = [i for i in range(n)]
-
-    def find(self, x):
-        p = self.par[x]
-        while p != self.par[p]:
-            p = self.par[p]
-        return p
-
-    def union(self, x1, x2):
-        p1, p2 = self.find(x1), self.find(x2)
-        self.par[p1] = p2 # make the parent of node1 the parent of node2
-
-  class Solution:
-    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
-        uf = UnionFind(len(accounts))
-        emailToAcc = {} # email -> index of acc
-
-        # 1. Loop through the accounts and union the accounts that have the same email
-        for i, acc in enumerate(accounts):
-            # Loop through the emails of the account and union them together if they don't have the same parent
-            for email in acc[1:]:
-                if email in emailToAcc:
-                    uf.union(i, emailToAcc[email])
-                else:
-                    emailToAcc[email] = i # add the email to the emailToAcc map
-
-        # 2. Loop through the accounts and group the emails of the same account together (same parent)
-        emailGroup = defaultdict(list) # index of acc -> list of emails
-        for email, i in emailToAcc.items():
-            p = uf.find(i)
-            emailGroup[p].append(email) # add the email to the emailGroup map
-
-        # 3. Loop through the emailGroup and return the result
-        res = []
-        for i, emails in emailGroup.items():
-            name = accounts[i][0]
-            res.append([name] + sorted(emails)) # array concat
-        return res
-  ```
-
-- Solution 2: with Rank
-
-  ```py
-  class UnionFind:
-    def __init__(self, n):
-        self.par = [i for i in range(n)]
-        self.rank = [1] * n
-
-    def find(self, x):
-        while x != self.par[x]:
-            self.par[x] = self.par[self.par[x]]
-            x = self.par[x]
-        return x
-
-    def union(self, x1, x2):
-        p1, p2 = self.find(x1), self.find(x2)
-        if p1 == p2:
-            return False
-        if self.rank[p1] > self.rank[p2]:
-            self.par[p2] = p1
-            self.rank[p1] += self.rank[p2]
-        else:
-            self.par[p1] = p2
-            self.rank[p2] += self.rank[p1]
-        return True
-
-  class Solution:
-    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
-        uf = UnionFind(len(accounts))
-        emailToAcc = {} # email -> index of acc
-
-        for i, a in enumerate(accounts):
-            for e in a[1:]:
-                if e in emailToAcc:
-                    uf.union(i, emailToAcc[e])
-                else:
-                    emailToAcc[e] = i
-
-        emailGroup = defaultdict(list) # index of acc -> list of emails
-        for e, i in emailToAcc.items():
-            leader = uf.find(i)
-            emailGroup[leader].append(e)
-
-        res = []
-        for i, emails in emailGroup.items():
-            name = accounts[i][0]
-            res.append([name] + sorted(emailGroup[i])) # array concat
-        return res
-  ```
-
----
-
 ## Sort Items by Groups Respecting Dependencies
 
 problem: [Here](https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/)
@@ -2183,4 +1544,743 @@ def isEscapePossible(blocked: List[List[int]], source: List[int], target: List[i
     blocked = {(a[0], a[1]) for a in blocked}
     # Check if we can escape from start to destination, and vice versa
     return dfs(source, target, set(blocked)) and dfs(target, source, set(blocked))
+```
+
+---
+
+## Union Find
+
+## Redundant Connection
+
+In this problem, a tree is an undirected graph that is connected and has no cycles.
+
+You are given a graph that started as a tree with `n` nodes labeled from `1` to `n`, with one additional edge added. The added edge has two different vertices chosen from `1` to `n`, and was not an edge that already existed. The graph is represented as an array `edges` of length `n` where `edges[i] = [ai, bi]` indicates that there is an edge between nodes `ai` and `bi` in the graph.
+
+Return an edge that can be removed so that the resulting graph is a tree of `n` nodes. If there are multiple answers, return the answer that occurs last in the input.
+
+- Ex: `edges = [[1,2],[1,3],[2,3]]`
+
+  ![redundant-connection](./img/redundant-connection-1.jpg)
+
+  - Output: `[2,3]`
+
+![redundant-connection](./img/redundant-connection-2.png)
+
+- Explanation:
+
+  - The problem is called "Redundant Connection" because we want to find the edge that is `redundant` aka the edge that we can remove to make the graph a tree.
+  - We want to know what edge we can remove to make the graph a tree **(no cycles)**.
+  - We can solve it using `DFS`, but the time complexity will be `O(n^2)`.
+  - Instead, we can use **Union Find** to find the redundant connection.
+    - This is because we know that a tree is an undirected graph that is **connected** and has no cycles.
+    - So if we find a cycle in the graph, then we know that the edge that created the cycle is the **redundant connection**.
+    - `union find` algo will be used in 2 steps:
+      1. `union` the nodes together if they don't have the same parent -> **no cycle**
+         ![redundant-connection](./img/redundant-connection-3.png)
+      2. `find` the parent of each node and check if the parent of the 2 nodes are the same -> **cycle**
+
+- Solution 1: Union Find ✅
+
+  - explanation in solution 2
+  - Time complexity: `O(nlogn)`
+
+  ```py
+  class UnionFind:
+    def __init__(self, n):
+        self.par = [i for i in range(n)]
+
+    def find(self, x):
+        p = self.par[x]
+        while p != self.par[p]:
+            p = self.par[p]
+        return p
+
+    def union(self, x1, x2):
+        p1, p2 = self.find(x1), self.find(x2)
+        self.par[p1] = p2 # make the parent of node1 the parent of node2
+
+  class Solution:
+    def findRedundantConnection(self, edges: List[List[int]]) -> List[int]:
+        uf = UnionFind(len(edges) + 1) # +1 because the nodes are 1-indexed
+        for node1, node2 in edges:
+            # If the parent of the 2 nodes are the same, then we found a cycle and this is the redundant connection
+            if uf.find(node1) == uf.find(node2):
+                return [node1, node2]
+            # else, union the nodes together to make a tree
+            uf.union(node1, node2)
+  ```
+
+- Solution 1: Union Find by **rank**
+
+  - Time complexity: `O(nlogn)`
+  - Steps:
+    1. We start with nodes that are not connected to any other nodes, and the rank of each node is `1` -> size of the starting tree.
+       ![redundant-connection](./img/redundant-connection-4.png)
+    2. we will go through each edge and `union` (connecting) the nodes together in the shape of a `tree` if they don't have the same parent.
+       - If the parent of the 2 nodes are the same, then we found a cycle.
+       - If the parent of the 2 nodes are not the same, then we `union` the nodes together and update:
+         - the rank of the parent node as the size of the tree will increase by `1`.
+           ![redundant-connection](./img/redundant-connection-5.png)
+         - The parent of the node1 as the parent of the `node2`.
+           ![redundant-connection](./img/redundant-connection-6.png)
+    3. repeat step 2 until we find a cycle in the graph.
+       ![redundant-connection](./img/redundant-connection-7.png)
+       ![redundant-connection](./img/redundant-connection-8.png)
+
+  ```py
+  def findRedundantConnection(edges):
+      # Create a parent array to keep track of the parent of each node
+      parent = [i for i in range(len(edges) + 1)]
+      # Create a rank array to keep track of the rank of each node
+      rank = [1 for i in range(len(edges) + 1)]
+
+      def find(node):
+          p = parent[node] # going up the parent of the node
+          # If the parent of the node is itself, then we found the Top parent
+          while p != parent[p]:
+              parent[p] = parent[parent[p]] # path compression to make the tree flat -> O(logn)
+              p = parent[p]
+          return p
+
+      # Union the nodes together if they don't have the same parent
+      def union(node1, node2):
+          p1, p2 = find(node1), find(node2)
+
+          # If the parent of the 2 nodes are the same, then we found a cycle
+          if p1 == p2:
+              return False
+
+          # check the rank of the 2 nodes to see which one is the parent and update the rank of the parent
+          if rank[p1] > rank[p2]:
+              parent[p2] = p1
+              rank[p1] += rank[p2]
+          else:
+              parent[p1] = p2
+              rank[p2] += rank[p1]
+
+          return True
+
+      for node1, node2 in edges:
+          # If the parent of the 2 nodes are the same, then we found a cycle
+          if not union(node1, node2):
+              return [node1, node2]
+  ```
+
+---
+
+## Accounts Merge
+
+problem: [Here](https://leetcode.com/problems/accounts-merge/)
+
+- Explanation:
+
+  - first string will be the `name` of the account, and the rest of the strings will be the `emails` of the account.
+  - There may be multiple accounts with the same `name` or `email`, but they are actually different accounts. So to know if `2` accounts belong to the same person, we need to check if they have at least `1` `email` in common.
+    - Note that not because 2 accounts have the same `name`, they belong to the same person.
+  - So eventually, we want to merge (`union`) all the accounts that belong to the same person together, and return the result in the form of a list of lists.
+  - So this is a **Graph** problem and can be solved using `union find`.
+
+    - To make it a `graph` problem, we will create an `adjacency list` where the `key` is the `email` and the `value` is a list of `accounts indexes` that have that `email`.
+
+      ```py
+      {
+        "email1": [0, 1], # account 0 and 1 have email1
+        "email2": [0, 1],
+        "email3": [0],
+        "email4": [1],
+        "email5": [2], # account 2 has email5
+        "email6": [2],
+      }
+
+      # we don't use the account name as the key because there may be multiple accounts with the same name
+      ```
+
+    - After connecting all the nodes together, we will have a graph that looks like this:
+      ![accounts-merge](./img/accounts-merge-1.png)
+    - If we have different accounts `a1`, `a2`, `a3` and we want to merge them together, we can:
+      - `find` the `parent` of the `email` of `a1` and `a2` and `union` them together.
+      - `union(a1, a2)` and `union(a2, a3)`.
+
+- Time and space complexity:
+
+  - Time: `O(nlogn)` where `n` is the number of accounts
+  - Space: `O(n)`
+
+- Solution 1: without Rank ✅
+
+  ```py
+  class UnionFind:
+    def __init__(self, n):
+        self.par = [i for i in range(n)]
+
+    def find(self, x):
+        p = self.par[x]
+        while p != self.par[p]:
+            p = self.par[p]
+        return p
+
+    def union(self, x1, x2):
+        p1, p2 = self.find(x1), self.find(x2)
+        self.par[p1] = p2 # make the parent of node1 the parent of node2
+
+  class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        uf = UnionFind(len(accounts))
+        emailToAcc = {} # email -> index of acc
+
+        # 1. Loop through the accounts and union the accounts that have the same email
+        for i, acc in enumerate(accounts):
+            # Loop through the emails of the account and union them together if they don't have the same parent
+            for email in acc[1:]:
+                if email in emailToAcc:
+                    uf.union(i, emailToAcc[email])
+                else:
+                    emailToAcc[email] = i # add the email to the emailToAcc map
+
+        # 2. Loop through the accounts and group the emails of the same account together (same parent)
+        emailGroup = defaultdict(list) # index of acc -> list of emails
+        for email, i in emailToAcc.items():
+            p = uf.find(i)
+            emailGroup[p].append(email) # add the email to the emailGroup map
+
+        # 3. Loop through the emailGroup and return the result
+        res = []
+        for i, emails in emailGroup.items():
+            name = accounts[i][0]
+            res.append([name] + sorted(emails)) # array concat
+        return res
+  ```
+
+- Solution 2: with Rank
+
+  ```py
+  class UnionFind:
+    def __init__(self, n):
+        self.par = [i for i in range(n)]
+        self.rank = [1] * n
+
+    def find(self, x):
+        while x != self.par[x]:
+            self.par[x] = self.par[self.par[x]]
+            x = self.par[x]
+        return x
+
+    def union(self, x1, x2):
+        p1, p2 = self.find(x1), self.find(x2)
+        if p1 == p2:
+            return False
+        if self.rank[p1] > self.rank[p2]:
+            self.par[p2] = p1
+            self.rank[p1] += self.rank[p2]
+        else:
+            self.par[p1] = p2
+            self.rank[p2] += self.rank[p1]
+        return True
+
+  class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        uf = UnionFind(len(accounts))
+
+        emailToAcc = {} # email -> index of acc
+        for i, a in enumerate(accounts):
+            for e in a[1:]:
+                if e in emailToAcc:
+                    uf.union(i, emailToAcc[e])
+                else:
+                    emailToAcc[e] = i
+
+        emailGroup = defaultdict(list) # index of acc -> list of emails
+        for e, i in emailToAcc.items():
+            leader = uf.find(i)
+            emailGroup[leader].append(e)
+
+        # Format the result as required
+        res = []
+        for i, emails in emailGroup.items():
+            name = accounts[i][0]
+            res.append([name] + sorted(emailGroup[i])) # array concat
+        return res
+  ```
+
+---
+
+## Dijkstra Algorithm (Shortest Path)
+
+### Network Delay Time
+
+You are given a network of `n` nodes, labeled from `1` to `n`. You are also given `times`, a list of travel times as directed edges `times[i] = (ui, vi, wi)`, where `ui` is the source node, `vi` is the target node, and `wi` is the time it takes for a signal to travel from source to target.
+
+We will send a signal from a given node `k`. Return the time it takes for all the `n` nodes to receive the signal. If it is impossible for all the `n` nodes to receive the signal, return `-1`.
+
+- Ex: `times = [[2,1,1],[2,3,1],[3,4,1]], n = 4, k = 2`
+  ![network-delay-time](./img/network-delay-time-1.png)
+
+  - Output: `2`
+  - Explanation: The signal will take 1 minute to travel from node 2 to node 1, and 1 minute to travel from node 2 to node 3.
+    - Then, it will take 1 minute for all the nodes to receive the signal.
+
+- Verify the constraints:
+
+  - is the graph connected or disconnected? -> It can be disconnected, so account for that
+  - is the graph weighted or unweighted? -> weighted
+    - can the weights be negative? -> no (because it's a time)
+
+- Explanation:
+
+  - We use `Dijkstra's Algorithm` to find the shortest path from the source node to all other nodes.
+  - This is also a `BFS` algorithm, but we use a `Priority Queue` to keep track of the shortest path.
+    - `BFS` because we will go through the neighbors of the source node first, then the neighbors of the neighbors, and so on. -> **Layer by Layer**
+      ![network-delay-time](./img/network-delay-time-2.png)
+    - Here, we will use a `minHeap` to keep track of the shortest path.
+      - used to pop the node with the shortest distance from the source node and add its neighbors to the `minHeap` with their distance from the source node.
+        ![network-delay-time](./img/network-delay-time-3.png)
+        ![network-delay-time](./img/network-delay-time-6.png)
+  - Starting at the source node `k`, we loop through its neighbors and add them to the `minHeap` with their distance from the source node.
+    ![network-delay-time](./img/network-delay-time-4.png)
+    ![network-delay-time](./img/network-delay-time-5.png)
+
+- Time complexity: `O(ElogV)`
+  - `E` is the number of edges
+  - `V` is the number of vertices
+
+```py
+def networkDelayTime(times, n, k):
+    # Create a graph from the times (Adjacency List)
+    graph = collections.defaultdict(list)
+    # or graph = [[] for _ in range(n + 1)]
+    for u, v, w in times:
+        graph[u].append((v, w))
+
+    # Create a minHeap to keep track of the shortest path
+    minHeap = [(0, k)] # (path-distance, node) -> we start with the given node k
+
+    visit = set()
+    res = 0
+
+    while minHeap:
+      # get the node with the shortest distance from the source node
+      w1, n1 = heapq.heappop(minHeap) # w: weight, n: node
+
+      if n1 not in visit:
+        visit.add(n1)
+        res = max(res, w1) # max because we want the path to the farthest node (n-1) which indicate the biggest delay time
+
+        # Loop through the neighbors of the node
+        for n2, w2 in graph[n1]:
+          heapq.heappush(minHeap, (w1 + w2, n2))
+
+    return res if len(visit) == n else -1 # if len(visit) != n, then there is a node that we didn't visit
+```
+
+---
+
+### Path with Maximum Probability
+
+You are given an undirected weighted graph of `n` nodes `(0-indexed)`, represented by an edge list where `edges[i] = [a, b]` is an undirected edge connecting the nodes `a` and `b` with a probability of success of traversing that edge `succProb[i]`.
+
+Given two nodes `start` and `end`, find the path with the maximum probability of success to go from `start` to `end` and return its success probability.
+
+If there is no path from `start` to `end`, return `0`.
+
+- Ex: `n = 3, edges = [[0,1],[1,2],[0,2]], succProb = [0.5,0.5,0.2], start = 0, end = 2`
+
+  ![path-with-maximum-probability](./img/path-with-max-prop-1.png)
+
+  - Output: `0.25`
+  - Explanation: There are two paths from start to end, one having a probability of success = 0.2 and the other has 0.5 \* 0.5 = 0.25.
+
+- Explanation:
+
+  - Here, we want to find the path with the maximum probability of success to go from `start` to `end`. So we can use `Dijkstra's Algorithm` to find the shortest path from `start` to `end`, but instead of keeping track of the shortest path, we keep track of the path with the maximum probability of success aka "longest path".
+  - We will use a `Priority Queue` to keep track of the path with the maximum probability of success.
+    - Here we will usre a `max heap` to keep track of the path with the maximum probability of success.
+      - we will use the `max heap` to pop the node with the maximum probability of success from the source node and add its neighbors to the `Priority Queue` with their probability of success.
+        ![path-with-maximum-probability](./img/path-with-max-prop-2.png)
+        ![path-with-maximum-probability](./img/path-with-max-prop-3.png)
+    - Python doesn't have a `max heap`, so we will use a `min heap` and multiply the probability of success by `-1` to get the maximum probability of success.
+      - `heapq.heappush(minHeap, (-1 * w1 * w2, n2))`
+      - `heapq.heappop(minHeap)[0] * -1`
+
+- Time complexity: `O(E.log(V))`
+  - `E` is the number of edges (from generating the adjacency list), `V` is the number of vertices (`log(V)` because we use a `Priority Queue`)
+
+```py
+def maxProbability(n, edges, succProb, start, end):
+    # Create a graph from the edges
+    graph = collections.defaultdict(list)
+    for i in range(len(edges)):
+        src, dst = edges[i]
+        # Add the probability of success to the graph to the 2 sides of the edge
+        graph[src].append((dst, succProb[i]))
+        graph[dst].append((src, succProb[i]))
+
+
+    # Create a max heap to keep track of the path with the maximum probability of success
+    minHeap = [(-1, start)] # (path-probability, node)
+
+    visit = set()
+
+    while minHeap:
+      prob, cur = heapq.heappop(minHeap)
+      visit.add(cur)
+
+      if cur == end:
+        return prob * -1
+
+      for nei, edgeProb in graph[cur]:
+        if nei not in visit:
+          heapq.heappush(minHeap, (prob * edgeProb, nei))
+
+    # If there is no path from start to end
+    return 0
+```
+
+---
+
+### Swim in Rising Water
+
+You are given an `n x n` integer matrix `grid` where each value `grid[i][j]` represents the elevation at that point `(i, j)`.
+
+The rain starts to fall. At time `t`, the depth of the water everywhere is `t`. You can swim from a square to another 4-directionally adjacent square if and only if the elevation of both squares individually are at most `t`. You can swim infinite distances in zero time. Of course, you must stay within the boundaries of the grid during your swim.
+
+Return the least time until you can reach the bottom right square `(n - 1, n - 1)` if you start at the top left square `(0, 0)`.
+
+- Ex: `grid = [[0,2],[1,3]]`
+
+  ![swim-in-rising-water](./img/swim-in-rising-water-1.jpeg)
+
+  - Output: `3`
+  - Explanation:
+    - At time `t = 0`, you are in grid location `(0, 0)`.
+    - You cannot go anywhere else because 4-directionally adjacent neighbors have a higher elevation than t = 0.
+    - You cannot reach point `(1, 1)` until time `t = 3`.
+    - When the depth of water is `3`, we can swim anywhere inside the grid.
+
+- Explanation:
+  - We want to find the least time until we can reach the bottom right square `(n - 1, n - 1)` if we start at the top left square `(0, 0)`.
+  - Actually, we won't need to track time, we will track the `max-height` of the cells that we visited.
+  - We can try all the possible paths and return the minimum `max-height` of the cells that we visited. **But** this will take `O(4^n)` time. (Expontential time ⚠️ ❌)
+  - Instead, we can use `Dijkstra's Algorithm` to find the shortest path from the source node to the destination node. which will give us `O(E.log(V))` time.
+    - We will use a `min heap` to keep track of the cells with the minimum height.
+      - this is because we want to visit the cells with the minimum height first so that we can have the minimum `max-height` of the cells that we visited.
+        ![swim-in-rising-water](./img/swim-in-rising-water-2.png)
+    - Here, we don't have `weights` for the edges, so we will use the `max-height` of the current cell and the neighbor as the `weight` of the edge.
+      ![swim-in-rising-water](./img/swim-in-rising-water-3.png)
+      - `heapq.heappush(minHeap, (max(t, grid[nr][nc]), nr, nc))`
+      - `heapq.heappop(minHeap)[0]` -> the `max-height` of the cells that we visited
+
+```py
+def swimInWater(grid: List[List[int]]) -> int:
+    n = len(grid)
+    visit = set()
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+    # Create a min heap to keep track of the cells with the minimum height
+    minHeap = [(grid[0][0], 0, 0)] # (time/max-height, row, col)
+
+    visit.add((0, 0))
+
+    while minHeap:
+        t, r, c = heapq.heappop(minHeap)
+
+        # check if we reached the bottom right cell
+        if r == n - 1 and c == n - 1:
+            return t
+
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < n and 0 <= nc < n and (nr, nc) not in visit:
+                visit.add((nr, nc))
+                # Add the max height of the current cell and the neighbor to the minHeap
+                heapq.heappush(minHeap, (max(t, grid[nr][nc]), nr, nc))
+```
+
+---
+
+## Topological Sort
+
+### Course Schedule
+
+There are a total of `numCourses` courses you have to take, labeled from `0` to `numCourses - 1`. You are given an array `prerequisites` where `prerequisites[i] = [ai, bi]` indicates that you must take course `bi` first if you want to take course `ai`.
+
+For example, the pair `[0, 1]`, indicates that to take course `0` you have to first take course `1`. Return `true` if you can finish all courses. Otherwise, return `false`.
+
+- Ex: `numCourses = 2, prerequisites = [[1,0]]`
+  - Output: `true`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So it is possible.
+- Ex: `numCourses = 2, prerequisites = [[1,0],[0,1]]`
+
+  - Output: `false`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+
+- **Solution 1: `BFS / DFS`** (not the best solution ❌)
+
+  - To check if we can take any course, we need to check if there is a **cycle** or not in the graph.
+  - We create a graph from the prerequisites in the adjacency list format.
+    - This is because we want to know if for each node, can we reach the end node or not (finish all courses).
+      ![course-schedule](./img/course-schedule-3.png)
+    - We notice that our `base` cases are the nodes that don't have any prerequisites (no neighbours).
+      - To keep track of these nodes, **we use a `HashMap` with adjacency list**.
+        ![course-schedule](./img/course-schedule-4.png)
+  - Then we use `DFS` to check if there is a cycle or not.
+
+    - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
+      ![course-schedule](./img/course-schedule-5.png)
+    - To prevent running `DFS` on the same node twice, we remove its `value` from the `HashMap` after we run `DFS` on it and knowing that it can be completed **(because it now has no prerequisites)**, and then go back to the previous node and repeat the process.
+      ![course-schedule](./img/course-schedule-6.png)
+    - if all nodes can be completed, then we return `true`
+      ![course-schedule](./img/course-schedule-7.png)
+    - If there is a cycle, then we return `false`.
+      ![course-schedule](./img/course-schedule-1.png)
+      ![course-schedule](./img/course-schedule-2.png)
+      - A cycle is detected using a `visited` set .
+        ![course-schedule](./img/course-schedule-8.png)
+
+  - Time complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
+    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+  - Space complexity: `O(n^2)` = `O(numCourses^2)`
+    - This is because we may have a graph with `n` nodes and `n` edges.
+    - the adjacency list will have `n` nodes and each node will have `n` edges.
+
+  ```py
+  def canFinish(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List)
+      preMap = {i: [] for i in range(numCourses)}
+      # preMap = collections.defaultdict(list)
+      for course, pre in prerequisites:
+          preMap[course].append(pre)
+
+      # Create a set to keep track of the visited nodes
+      visited = set()
+
+      def dfs(node):
+          # Base case
+          if node in visited:
+              return False
+          if preMap[node] == []:
+              # means that the node has no prerequisites
+              return True
+
+          # 1. Add the node to the visited set
+          visited.add(node)
+
+          # 2. Loop through the prerequisites of the node
+          for pre in preMap[node]:
+              # Check if there is a cycle
+              if not dfs(pre):
+                  return False
+
+          # 3. Remove the node from the visited set
+          visited.remove(node)
+          # 4. Remove the node from the graph map
+          preMap[node] = []
+
+          return True
+
+      # we have to run dfs on all nodes to handle if the graph isn't connected so that we'd cover all nodes in the graph
+      for node in range(numCourses):
+          if dfs(node) == False:
+              return False
+
+      # Else
+      return True
+
+  # ----------------------------------------------------------------------------------------------
+
+  # BFS
+  def canFinish(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List)
+      preMap = {i: [] for i in range(numCourses)}
+      # preMap = collections.defaultdict(list)
+      for course, pre in prerequisites:
+          preMap[course].append(pre)
+
+      # Create a set to keep track of the visited nodes
+      visited = set()
+
+      # Create a queue to keep track of the nodes to visit
+      queue = deque()
+
+      for node in range(numCourses):
+          if preMap[node] == []:
+              # means that the node has no prerequisites
+              queue.append(node)
+
+      while queue:
+          node = queue.popleft()
+
+          if node in visited:
+              return False
+
+          visited.add(node)
+
+          for pre in preMap[node]:
+              queue.append(pre)
+
+          preMap[node] = []
+
+      # Else
+      return True
+  ```
+
+- **Solution 2: `Topological Sort`** (better solution ✅)
+
+  - This problem can also be solved using `Topological Sort` because we can use it to detect cycles in a graph (if there is a cycle, then we can't finish all courses).
+  - First, we need to build the `indegre` array.
+    - This is because we need to know which nodes have no prerequisites (no incoming edges).
+      ![course-schedule](./img/course-schedule-9.png)
+    - We can do that by looping through the prerequisites and incrementing the `indegree` of the node by `1`.
+      ![course-schedule](./img/course-schedule-10.png)
+  - Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)` = `O(n)`
+    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+  - Space complexity: `O(n^2)` = `O(numCourses^2)`
+    - This is because we may have a graph with `n` nodes and `n` edges.
+    - the adjacency list will have `n` nodes and each node will have `n` edges.
+
+  ```py
+  def canFinish(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List) & an indegree array
+      preMap = [[] for _ in range(numCourses)]
+      indegree = [0] * numCourses
+      for course, pre in prerequisites:
+          indegree[pre] += 1
+          preMap[course].append(pre)
+
+      # Create a stack to keep track of the nodes to visit
+      stack = []
+
+      for node in range(numCourses):
+          if indegree[node] == 0:
+              stack.append(node)
+
+      # Create a set to keep track of the visited nodes
+      count = 0 # or use a set() and check if len(set) == numCourses
+
+      while stack:
+          node = stack.pop()
+          count += 1 # increment the count of visited nodes
+
+          # Loop through the prerequisites of the node and decrement their indegree by 1 and add them to the stack if their indegree is 0
+          for pre in preMap[node]:
+              indegree[pre] -= 1
+              if indegree[pre] == 0:
+                  stack.append(pre)
+
+      return count == numCourses
+  ```
+
+---
+
+### Course Schedule II
+
+Same as above, but return the order of the courses to take.
+
+- Ex: `numCourses = 2, prerequisites = [[1,0]]`
+
+  - Output: `[0,1]`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is `[0,1]`.
+
+- Explanation:
+
+  - We use the same approach as above, with a preMap to create a graph from the prerequisites.
+    ![course-schedule-ii](./img/course-schedule-ii-1.png)
+  - We use `DFS` to check if there is a cycle or not.
+    - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
+      ![course-schedule-ii](./img/course-schedule-ii-2.png)
+    - To prevent running `DFS` on the same node twice, we remove it from the `HashMap` after we run `DFS` on it and knowing that it can be completed, and then go back to the previous node and repeat the process.
+      ![course-schedule-ii](./img/course-schedule-ii-3.png)
+      ![course-schedule-ii](./img/course-schedule-ii-4.png)
+      ![course-schedule-ii](./img/course-schedule-ii-5.png)
+    - if all nodes can be completed, then we return `true`
+      ![course-schedule-ii](./img/course-schedule-ii-6.png)
+    - If there is a cycle, then we return `false`.
+      - A cycle is detected using a `visited` set .
+
+- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
+  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+
+```py
+def findOrder(numCourses, prerequisites):
+    # Create a graph from the prerequisites (Adjacency List)
+    preMap = {course: [] for course in range(numCourses)}
+    for course, pre in prerequisites:
+        preMap[course].append(pre)
+
+    # Create sets to keep track of the visited nodes and potential cycles
+    visited, cycleSet = set(), set()
+
+    # Create a output to keep track of the order of the courses
+    output = []
+
+    def dfs(node):
+        # Base case
+        if node in cycle:
+            return False # because there is a cycle
+        if node in visited:
+            return True # so that we don't stop the algotithm
+
+        # Add the node to the cycle set
+        cycleSet.add(node)
+
+        # Loop through the prerequisites of the node
+        for pre in preMap[node]:
+            # Check if there is a cycle
+            if not dfs(pre):
+                return False # Terminate the algorithm
+
+        # Remove the node from the cycle set
+        cycleSet.remove(node)
+
+        # Finally add the node to the visited set
+        visited.add(node)
+
+        # Add the node to the output after visiting all its prerequisites
+        output.append(node)
+        return True
+
+    for course in range(numCourses):
+        if dfs(course) == False:
+            return []
+
+    # Else
+    return output
+```
+
+---
+
+### Course Schedule IV
+
+The difference here is that we need to return a `boolean` array of size `numCourses` where `res[i]` is `true` if we can finish the course `i` and `false` otherwise.
+
+- Ex: `numCourses = 2, prerequisites = [[1,0],[0,1]]`
+
+  - Output: `[false,true]`
+  - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0, and to take course 0 you should also have finished course 1. So it is impossible.
+
+```py
+# TODO: watch video
+def checkIfPrerequisite(numCourses, prerequisites, queries):
+    # Create a graph from the prerequisites (Adjacency List)
+    adj = defaultdict(list)
+    for prereq, crs in prerequisites:
+        adj[crs].append(prereq)
+    
+    prereqMap = {} # crs -> set of prereqs
+    res = []
+
+    def dfs(crs):
+      if crs not in prereqMap:
+        prereqMap[crs] = set()
+        for prereq in adj[crs]:
+          prereqMap[crs] |= dfs(prereq)
+
+      prereqMap[crs].add(crs)
+      return prereqMap[crs] # boolean array
+
+    for crs in range(numCourses):
+      dfs(crs)
+
+    for u, v in queries:
+      res.append(u in prereqMap[v]) # check if u is in the prereqMap of v
+
+    return res
 ```

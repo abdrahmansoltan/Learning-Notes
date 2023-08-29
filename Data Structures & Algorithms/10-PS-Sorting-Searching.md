@@ -4,6 +4,7 @@
   - [Notes](#notes)
   - [Searching](#searching)
     - [Binary Search](#binary-search)
+    - [Search Insert Position](#search-insert-position)
     - [Find first and last position of element in sorted array](#find-first-and-last-position-of-element-in-sorted-array)
     - [Search a 2D Matrix](#search-a-2d-matrix)
     - [Koko Eating Bananas](#koko-eating-bananas)
@@ -16,11 +17,17 @@
   - [Sorting](#sorting)
     - [Insertion Sort List](#insertion-sort-list)
     - [Largest Number](#largest-number)
-    - [Merge Intervals](#merge-intervals)
-    - [Non-overlapping Intervals](#non-overlapping-intervals)
     - [Sort colors](#sort-colors)
     - [Median of Two Sorted Arrays](#median-of-two-sorted-arrays)
-    - [Squares of a Sorted Array](#squares-of-a-sorted-array)
+  - [Cyclic Sort Pattern](#cyclic-sort-pattern)
+    - [Cyclic Sort](#cyclic-sort)
+    - [Missing Number](#missing-number)
+    - [First Missing Positive](#first-missing-positive)
+    - [Find the Duplicate Number](#find-the-duplicate-number)
+    - [Find All Duplicates in an Array](#find-all-duplicates-in-an-array)
+    - [Number of Good Pairs](#number-of-good-pairs)
+    - [Find the Corrupt Pair](#find-the-corrupt-pair)
+    - [Kth Missing Positive Number](#kth-missing-positive-number)
 
 ---
 
@@ -41,6 +48,7 @@ def binary_search(arr, target):
 
     while l <= r:
         mid = (l + r) // 2
+        # or: mid = l + (r - l) // 2
 
         if arr[mid] == target:
             return mid
@@ -55,6 +63,36 @@ def binary_search(arr, target):
 > Interview question: what if `left` and `right` values are in the upper limit of the `32` bit integer? so adding them will result in an **"overflow"**
 >
 > - Answer: we can instead get the `mid` value by using `mid = left + (right - left) // 2`
+
+---
+
+### Search Insert Position
+
+Given a sorted array of distinct integers and a `target` value, return the `index` if the `target` is found. If not, return the `index` where it would be if it were inserted in order.
+
+- Ex:
+
+  - `nums = [1, 3, 5, 6], target = 5 --> 2`
+  - `nums = [1, 3, 5, 6], target = 2 --> 1`
+  - `nums = [1, 3, 5, 6], target = 7 --> 4`
+
+```py
+def searchInsert(nums, target):
+    l, r = 0, len(nums) - 1
+
+    while l <= r:
+        m = l + (r - l) // 2
+
+        if nums[m] == target:
+            return m
+        elif nums[m] < target:
+            l = m + 1
+        else:
+            r = m - 1
+
+    # if the target value is not found in the array, then the left pointer will be pointing to the index where the target value should be inserted
+    return l
+```
 
 ---
 
@@ -268,8 +306,8 @@ def minEatingSpeed(piles, h):
 Given two crystal balls that will break if dropped from high enough distance, determine the exact spot in which it will break in the most optimized way.
 
 To understand the problem, let us assume the crystal ball will break if dropped from a height of `8` meters. So, if we drop from `1` meter, the ball will not `break(0)`. If dropped from height of `2` meter, again the ball will not `break(0)`. We keep on doing it. When dropped from `8` meters, the ball will `break(1)`. If we list all 0s and 1s in an array, it will look like below:
-  
-  `[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, ...]`
+
+`[0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, ...]`
 
 So, basically, we have to find the index of the first `1` in the array.
 
@@ -585,93 +623,6 @@ def largestNumber(nums):
 
 ---
 
-### Merge Intervals
-
-Given an array of intervals where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
-
-- Ex:
-
-  - `intervals = [[1, 3], [2, 6], [8, 10], [15, 18]] --> [[1, 6], [8, 10], [15, 18]]`
-    ![merge intervals](./img/merge-intervals-1.png)
-
-- Explanation:
-  - We can sort the intervals by the `start` time
-  - Then we can check if the current interval overlaps with the previous interval
-    - If there is no overlap, then we can add the current interval to the merged intervals
-    - If there is overlap, then we can merge the current interval with the previous interval
-
-```py
-def merge(intervals):
-    # sort the intervals by the start time
-    intervals.sort(key=lambda x: x[0])
-
-    merged = []
-    for interval in intervals:
-        # check if interval does not overlap with the previous one
-        if not merged or merged[-1][1] < interval[0]:
-            merged.append(interval)
-        else:
-            # otherwise, there is overlap, so we merge the current and previous interval (which is the last interval in the `merged` list)
-            merged[-1][1] = max(merged[-1][1], interval[1])
-
-    return merged
-
-# another way
-
-def merge(intervals):
-    intervals.sort(key=lambda x: x[0])
-
-    res = [intervals[0]]
-    for interval in intervals[1:]:
-        lastEnd = res[-1][1]
-
-        # check if start of current interval is less than or equal to the end of the last interval
-        if interval[0] <= lastEnd:
-            res[-1][1] = max(lastEnd, interval[1])
-        else:
-            res.append(interval)
-
-    return res
-```
-
----
-
-### Non-overlapping Intervals
-
-Given an array of intervals `intervals` where `intervals[i] = [starti, endi]`, return the **minimum** number of intervals you need to remove to make the rest of the intervals non-overlapping.
-
-- Ex:
-
-  - `intervals = [[1, 2], [2, 3], [3, 4], [1, 3]] --> 1`
-  - Explanation: [1, 3] can be removed and the rest of intervals are non-overlapping.
-
-- Explanation:
-  - We can sort the intervals by the `start` time
-  - Then we can check if the current interval overlaps with the previous interval
-    - If there is no overlap, then we can add the current interval to the merged intervals
-    - If there is overlap, then we can merge the current interval with the previous interval
-
-```py
-def eraseOverlapIntervals(intervals):
-    # sort the intervals by the start time
-    intervals.sort(key=lambda x: x[0])
-
-    res = 0
-    prevEnd = intervals[0][1]
-    for start, end in intervals[1:]:
-        # overlap
-        if start < prevEnd:
-            res += 1
-            prevEnd = min(prevEnd, end) # remove the interval with the larger end time
-        # no overlap
-        else:
-            prevEnd = end
-
-    return res
-```
-
----
-
 ### Sort colors
 
 Given an array `nums` with `n` objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with the colors in the order red, white, and blue.
@@ -689,6 +640,7 @@ Given an array `nums` with `n` objects colored red, white, or blue, sort them **
 - Solution 1: Bucket sort
 
   ```py
+  # O(n) time and O(n) space
   def sortColors(nums):
       # count the number of 0s, 1s, and 2s
       buckets = [0] * (1+max(nums))
@@ -704,28 +656,37 @@ Given an array `nums` with `n` objects colored red, white, or blue, sort them **
               buckets[j] -= 1
   ```
 
-- Solution 2: 3-way partitioning **(not fully understood ❌)**
+- Solution 2: (Two pointers) ✅
+
+  - We will use 3 pointers: `2 pointers` to keep track of the `low` and `high` indices of the array, and `i pointer` to iterate through the array
+  - while iterating, we will move the `0s` to the `left` side of the array **(before `low`)**, and the `2s` to the `right` side of the array **(after `high`)**
+    ![sort colors](./img/sort-colors-1.webp)
 
   ```py
+  # O(n) time and O(1) space
   def sortColors(nums):
-      # 3-way partitioning
-      low, mid, high = 0, 0, len(nums)-1
+      low, high = 0, len(nums) - 1
+      i = 0
 
-      while mid <= high:
-          if nums[mid] == 0:
-              nums[low], nums[mid] = nums[mid], nums[low]
+      while i <= high:
+          if nums[i] == 0:
+              # if nums[i] == 0, then we swap it with the element at the beginning of the array
+              nums[i], nums[low] = nums[low], nums[i]
               low += 1
-              mid += 1
-          elif nums[mid] == 1:
-              mid += 1
-          else:
-              nums[mid], nums[high] = nums[high], nums[mid]
+              i += 1
+          elif nums[i] == 2:
+              # if nums[i] == 2, then we swap it with the element at the end of the array
+              nums[i], nums[high] = nums[high], nums[i]
               high -= 1
+          else:
+              # if nums[i] == 1, then we don't need to swap just move to the next element
+              i += 1
   ```
 
 - Solution 3: using `minHeap`
 
   ```py
+  # O(nlog(n)) time and O(n) space
   def sortColors(nums):
       heap = []
       for num in nums:
@@ -753,6 +714,8 @@ Given two sorted arrays `nums1` and `nums2` of size `m` and `n` respectively, re
   - Here It requires solving it with `O(log(n+m))`, so we can't just merge the two arrays and find the median as we would do in `O(n+m)`
   - To do so, we can use the **binary search** algorithm
     - We will have 2 partitions, one in each array, and the `median` will be the average of the max of the left partition and the min of the right partition
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-11.jpeg)
+      ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-12.png)
       - if the total length of the two arrays is **odd**, then the median will be the middle element
         ![median of 2 sorted arrays](./img/median-of-2-sorted-arr-1.png)
       - if the total length of the two arrays is **even**, then the median will be the average of the middle 2 elements
@@ -811,7 +774,7 @@ def findMedianSortedArrays(nums1, nums2):
         Bleft = B[j] if j >= 0 else float('-inf')
         Bright = B[j + 1] if (j + 1) < len(B) else float('inf')
 
-        # check if the left partition is correct
+        # if the left partition is correct
         if Aleft <= Bright and Bleft <= Aright:
             # check if the total length is odd or even
             if total % 2:
@@ -833,43 +796,311 @@ def findMedianSortedArrays(nums1, nums2):
 
 ---
 
-### Squares of a Sorted Array
+## Cyclic Sort Pattern
 
-Given an integer array `nums` sorted in **non-decreasing** order, return an array of **the squares of each number sorted in non-decreasing order**.
+- This pattern describes an interesting approach to deal with problems involving arrays containing numbers in a given range.
 
-- EX: `[-4,-1,0,3,10] --> [0,1,9,16,100]`
+### Cyclic Sort
+
+We are given an array containing `n` objects. Each object, when created, was assigned a unique number from the range `1` to `n` based on their creation sequence. This means that the object with sequence number `3` was created just before the object with sequence number `4`.
+
+Write a function to sort the objects in-place on their creation sequence number in `O(n)` and without any extra space. For simplicity, let’s assume we are passed an integer array containing only the sequence numbers, though each number is actually an object.
+
+- Ex:
+
+  - `nums = [3, 1, 5, 4, 2] --> [1, 2, 3, 4, 5]`
 
 - Explanation:
-  - We can solve it normally in `O(nlogn)` time by squaring each element and then sorting the array
-  - But we can do better in `O(n)` time by using **2 pointers**
-    ![sort squares](./img/sort-squares.jpg)
-    - This is done by using 2 pointers, one at the start of the array and one at the end of the array
-    - this is because the array is sorted in **non-decreasing** order so we can get the largest element by comparing the absolute values of the 2 pointers (both sides)
-    - we can then square the largest element and add it to the result array using the index of the responding pointer
+  - We can use **cyclic sort** to sort the array **in-place**
+  - We will iterate through the array and swap the current element with the element at the correct index
+    - The correct index is the index of the current element minus `1`
+    - For example: if the current element is `3`, then the correct index is `3 - 1 = 2`
+      ![cyclic sort](./img/cyclic-sort-1.png)
+    - We will keep swapping until the current element is at the correct index
+      ![cyclic sort](./img/cyclic-sort-2.png)
+    - If the current element is already at the correct index, then we will move to the next element
+      ![cyclic sort](./img/cyclic-sort-3.png)
 
 ```py
-def sortedSquares(nums):
-    l, r = 0, len(nums) - 1
-    result = [0] * len(nums)
-    # set the index of the result array
-    index = len(nums) - 1
-
-    # loop until the left pointer is greater than the right pointer
-    while l <= r:
-        left_abs, right_abs = abs(nums[l]), abs(nums[r])
-
-        # check if the left absolute value is greater than the right absolute value and change the result array accordingly
-        if left_abs > right_abs:
-            result[index] = left_abs ** 2
-            l += 1
+def cyclicSort(nums):
+    i = 0
+    while i < len(nums):
+        # get the correct index
+        j = nums[i] - 1
+        # if the current element is not at the correct index
+        if nums[i] != nums[j]:
+            # swap the current element with the element at the correct index
+            nums[i], nums[j] = nums[j], nums[i]
         else:
-            result[index] = right_abs ** 2
-            r -= 1
+            # move to the next element
+            i += 1
 
-        # move the index pointer to the left
-        index -= 1
-
-    return result
+    return nums
 ```
 
 ---
+
+### Missing Number
+
+Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, return the only number in the range that is missing from the array.
+
+- Follow up: Could you implement a solution using only `O(1)` extra space complexity and `O(n)` runtime complexity?
+
+- EX:
+
+  - Input: `nums = [3,0,1]`
+  - Output: `2`
+  - Explanation: `n = 3` since there are `3` numbers, so all numbers are in the range `[0,3]`. `2` is the missing number in the range since it does not appear in `nums`.
+
+- Explanation:
+
+  - we can use a similar strategy as discussed in `Cyclic Sort` to place the numbers on their correct `index`. Once we have every number in its correct place, we can iterate the array to find the `index` which does not have the correct number, and that `index` will be our missing number.
+  - note here that numbers are ranged from `0` to `n`, and not from `1` to `n`. This means that the first index will have the number `0`, the second index will have the number `1`, and so on.
+
+- **Solution 1:** using cyclic sort -> `O(n)` time and `O(1)` space ✅
+
+  ```py
+  def missingNumber(nums):
+      i = 0
+      while i < len(nums):
+          # get the correct index
+          j = nums[i]
+          # if element is positive and the current element is not at the correct index
+          if nums[i] < len(nums) and nums[i] != nums[j]:
+              # swap the current element with the element at the correct index
+              nums[i], nums[j] = nums[j], nums[i]
+          else:
+              # move to the next element
+              i += 1
+
+      # find the first missing positive integer
+      for i in range(len(nums)):
+          if nums[i] != i:
+              return i
+
+      return len(nums) # Worst case
+  ```
+
+- **Solution 2:** using HashSet -> `O(n)` time and `O(n)` space ❌
+
+  ```py
+  def missingNumber(nums):
+      seen = set(nums)
+      for i in range(len(nums) + 1):
+          if i not in seen:
+              return i
+  ```
+
+- **Solution 3:** using `sum` function -> `O(n)` time and `O(1)` space
+
+  ```py
+  def missingNumber(nums):
+    # Calculate the expected sum of the range [0, n]
+    n = len(nums)
+    expected_sum = n * (n + 1) // 2
+
+    # Calculate the actual sum of the elements in the array
+    actual_sum = sum(nums)
+
+    # Return the difference between the expected sum and the actual sum
+    return expected_sum - actual_sum
+  ```
+
+---
+
+### First Missing Positive
+
+Given an unsorted integer array `nums`, find the smallest missing positive integer. You must implement an algorithm that runs in `O(n)` time and uses constant extra space.
+
+- Ex:
+
+  - `nums = [1, 2, 0] --> 3`
+  - explanation: the numbers in the range `[1, 2]` are all in the array, so the smallest missing positive integer is `3`
+
+- Explanation:
+
+  - The trick here is that we want to solve it in `O(n)` time and `constant` space, and not `O(nlog(n))` time and `O(n)` space using sorting
+  - We can use **cyclic sort** to find the smallest missing positive integer which takes `O(n)` time and `constant` space
+    - After sorting the array, we will iterate through the array and find the first missing positive integer
+  - Another approach is to use a `hashset` to store all the numbers in the array, then we can iterate through the numbers starting from `1` and check if the number is in the `hashset`
+    - This will take `O(n)` time and `O(n)` space
+
+```py
+def firstMissingPositive(nums):
+    i = 0
+    while i < len(nums):
+        # get the correct index
+        j = nums[i] - 1
+        # if element is positive and the current element is not at the correct index
+        if nums[i] > 0 and nums[i] <= len(nums) and nums[i] != nums[j]:
+            # swap the current element with the element at the correct index
+            nums[i], nums[j] = nums[j], nums[i]
+        else:
+            # move to the next element
+            i += 1
+
+    # find the first missing positive integer
+    for i in range(len(nums)):
+        if nums[i] != i + 1:
+            return i + 1
+
+    return len(nums) + 1 # Worst case
+```
+
+---
+
+### Find the Duplicate Number
+
+Problem is solved also in the [Fast and Slow Pointers Pattern](./5-PS-Arrays.md#find-the-duplicate-number)
+
+```py
+def findDuplicate(nums):
+    i = 0
+    while i < len(nums):
+        # get the correct index
+        j = nums[i] - 1
+        # if element is positive and the current element is not at the correct index
+        if nums[i] > 0 and nums[i] <= len(nums) and nums[i] != nums[j]:
+            # swap the current element with the element at the correct index
+            nums[i], nums[j] = nums[j], nums[i]
+        else:
+            # move to the next element
+            i += 1
+
+    # find the first duplicate number
+    for i in range(len(nums)):
+        if nums[i] != i + 1:
+            return nums[i]
+
+    return -1
+```
+
+---
+
+### Find All Duplicates in an Array
+
+Given an integer array `nums` of length `n` where all the integers of `nums` are in the range `[1, n]` and each integer appears once or twice, return an array of all the integers that appears twice.
+
+You must write an algorithm that runs in `O(n)` time and uses only constant extra space.
+
+- Ex:
+
+  - `nums = [4, 3, 2, 7, 8, 2, 3, 1] --> [2, 3]`
+
+```py
+def findDuplicates(nums):
+    i = 0
+    while i < len(nums):
+        j = nums[i] - 1
+        if nums[i] > 0 and nums[i] <= len(nums) and nums[i] != nums[j]:
+            nums[i], nums[j] = nums[j], nums[i]
+        else:
+            i += 1
+
+    res = []
+    for i in range(len(nums)):
+        if nums[i] != i + 1:
+            res.append(nums[i])
+
+    return res
+```
+
+---
+
+### Number of Good Pairs
+
+Given an array of integers `nums`. A pair `(i, j)` is called good if `nums[i] == nums[j]` and `i < j`.
+
+Return the number of good pairs.
+
+- Ex:
+
+  - `nums = [1, 2, 3, 1, 1, 3] --> 4`
+
+```py
+def numIdenticalPairs(nums):
+    count = 0
+    for i in range(len(nums)):
+        for j in range(i + 1, len(nums)):
+            if nums[i] == nums[j]:
+                count += 1
+
+    return count
+```
+
+---
+
+### Find the Corrupt Pair
+
+We are given an unsorted array containing ‘n’ numbers taken from the range 1 to ‘n’. The array originally contained all the numbers from 1 to ‘n’, but due to a data error, one of the numbers got duplicated which also resulted in one number going missing. Find both these numbers.
+
+- Ex:
+  - `nums = [3, 1, 2, 5, 2] --> [2, 4]`
+  - because `2` is duplicated and `4` is missing
+
+```py
+def find_corrupt_numbers(nums):
+    i = 0
+    while i < len(nums):
+        j = nums[i] - 1
+        if nums[i] != nums[j]:
+            nums[i], nums[j] = nums[j], nums[i]
+        else:
+            i += 1
+
+    for i in range(len(nums)):
+        if nums[i] != i + 1:
+            return [nums[i], i + 1]
+
+    return [-1, -1]
+```
+
+---
+
+### Kth Missing Positive Number
+
+Given an array `arr` of positive integers sorted in a strictly increasing order, and an integer `k`.
+
+Find the `kth` positive integer that is missing from this array.
+
+- Ex:
+
+  - `arr = [2, 3, 4, 7, 11], k = 5 --> 9`
+  - Explanation: The missing positive integers are `[1, 5, 6, 8, 9, 10, 12, 13, ...]`. The `5th` missing positive integer is `9`.
+
+- Explanation:
+
+  - The idea is to use **cyclic sort** to sort the array in-place, but we will also keep track of the missing numbers in a `set` because we need to find the `kth` missing number
+  - After sorting the array, we will iterate through the array and find the missing numbers
+  - Then we will iterate through the missing numbers and find the `kth` missing number
+
+- Time complexity: `O(n + k)`
+- Space complexity: `O(k)`
+
+```py
+def findKthPositive(arr, k):
+    i = 0
+    while i < len(arr):
+        j = arr[i] - 1
+        # check if index is out of range and if the current element is not at the correct index
+        if arr[i] > 0 and arr[i] <= len(arr) and arr[i] != arr[j]:
+            arr[i], arr[j] = arr[j], arr[i]
+        else:
+            i += 1
+
+    missing = []
+    extraNumbers = set()
+    for i in range(len(arr)):
+        if arr[i] != i + 1:
+            missing.append(i + 1)
+            extraNumbers.add(arr[i])
+
+    # add the remaining missing numbers
+    i = len(arr) + 1
+    while len(missing) < k:
+        if i not in extraNumbers:
+            missing.append(i)
+        i += 1
+
+    return missing[k - 1]
+```

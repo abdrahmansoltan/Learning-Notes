@@ -2,12 +2,14 @@
 
 - [INDEX](#index)
   - [Functional Components](#functional-components)
+  - [React Hooks](#react-hooks)
+    - [Hooks Rules](#hooks-rules)
   - [State](#state)
     - [`useState` Hook](#usestate-hook)
+      - [Initializing state](#initializing-state)
       - [changing state of type `object`](#changing-state-of-type-object)
       - [Functional state updates](#functional-state-updates)
   - [Refs](#refs)
-    - [The Reference object](#the-reference-object)
     - [`useRef`](#useref)
       - [Why use it ?](#why-use-it-)
     - [`useRef` Implementation (How to use it)](#useref-implementation-how-to-use-it)
@@ -16,7 +18,10 @@
     - [`useEffect`](#useeffect)
     - [`useEffect` dependency array](#useeffect-dependency-array)
     - [`useEffect` cleanup function](#useeffect-cleanup-function)
-  - [useReducer()](#usereducer)
+  - [useReducer](#usereducer)
+    - [`useReducer` vs `useState`](#usereducer-vs-usestate)
+    - [Reducer function](#reducer-function)
+    - [How `useReducer` works](#how-usereducer-works)
     - [Action generator functions](#action-generator-functions)
     - [Not recommended ways of using reducer function](#not-recommended-ways-of-using-reducer-function)
     - [reducer function with Immer](#reducer-function-with-immer)
@@ -26,18 +31,28 @@
     - [context setup](#context-setup)
     - [`useContext` Hook](#usecontext-hook)
     - [Context Limitations](#context-limitations)
-  - [Hooks Rules](#hooks-rules)
   - [Custom Hooks](#custom-hooks)
     - [Custom hook for form input (`useInput`)](#custom-hook-for-form-input-useinput)
+    - [Custom hook for keyboard events (`useKeyPress`)](#custom-hook-for-keyboard-events-usekeypress)
     - [Custom hook for context](#custom-hook-for-context)
 
 ---
 
 ## Functional Components
 
-here each time the state change the entire function get called and rerendered unlike in `class components` where only the `render()` method was called
+Here, each time the state change the entire function get called and rerendered unlike in `class components` where only the `render()` method was called
 
-React functional components are **Pure Functions** which depend on the component's props
+- React functional components are **Pure Functions**
+  - given the same props (input), a component instance should always render the same `JSX` (output)
+- Render logic must produce **no side effects** (no interactions with the outside world)
+  - no network requests `HTTP requests`
+  - No `timers`
+  - no `DOM` manipulation (no direct access to the `DOM` API)
+  - no `props` updates -> as it will mutate objects/variable outside the function scope
+  - no `state` updates -> as it will create infinite loop
+- **Side effects are allowed in `event-handler functions`**
+
+  - There's also a way to do side effects in functional components using `useEffect` hook
 
 - We use `hooks` to create impure functions as they generate side-effects
 
@@ -60,6 +75,51 @@ React functional components are **Pure Functions** which depend on the component
 
 ---
 
+## React Hooks
+
+- They're special build-in functions that allow us to "Hook" into React internal features like:
+  - creating and accessing `state` from `Fiber` tree
+  - registering `side-effects` in `Fiber` tree
+  - Manual `DOM` selection and manipulation
+- They start with the word `use`, to differentiate them from other functions
+  ![rules](./img/hooks.png)
+- We can compose multiple hooks together to create a [custom hook](#custom-hooks), which enable easy reuse of stateful (non-visual) logic between components
+- React contains a lot of built-in hooks
+  ![hooks](./img/hooks-1.png)
+
+---
+
+### Hooks Rules
+
+- RULES:
+  ![rules](./img/hooks-2.png)
+
+  - ✅ Call Hooks from React function components.
+  - ✅ Call Hooks from custom Hooks
+  - ✅ Call Hooks in a component that its name is uppercase
+  - ❌ Don't call hooks conditionally
+
+    ```jsx
+    // ❌ not calling hook directly in the component
+    if (condition) {
+      useEffect(() => {}); // Don't call hooks conditionally
+    }
+
+    // ✅ calling hook directly in the component
+    useEffect(() => {
+      if (condition) {
+      }
+    });
+    ```
+
+- Hooks rely on **call order**
+  ![rules](./img/hooks-3.png)
+  - if we conditionally call a hook, it will break the call order (nodes references) in the `Linked List` of hooks and will cause bugs
+    ![rules](./img/hooks-4.png)
+  - By maintaining the order of the hooks, React can associate each hook with a specific state variable and correctly update it when the hook is called again. Also this makes developers not required to name their hooks
+
+---
+
 ## State
 
 [reference](https://reactjs.org/docs/faq-state.html#gatsby-focus-wrapper)
@@ -77,8 +137,6 @@ React functional components are **Pure Functions** which depend on the component
     // ✅
     setPerson({ ...person, name: 'Jesse Hall' });
     ```
-
-> By default, React 18 uses a technique called **"auto-batching"** to group `state` updates that occur within the same event-loop into a single update. This means that if you call the state-update function multiple times in a short period of time, **React will only perform a single re-render for all of the updates**
 
 ---
 
@@ -139,6 +197,46 @@ function FavoriteColor() {
 
 ---
 
+#### Initializing state
+
+When you want to initialize the state with a value in the initial render, we have some options:
+
+1. **Initializing state using a callback function (Lazy initialization)** (recommended)
+
+   - This is the recommended way to initialize state because it avoids duplicating the initial state in the `useState` call and in the `render` method.
+   - the function must be pure and has no arguments
+   - Only called on the initial render
+   - This is useful when the `initialState` is expensive to compute or when the `state` is dependent on props.
+
+   ```jsx
+   const [state, setState] = useState(() => {
+     const initialState = someExpensiveComputation(props);
+     return initialState;
+   });
+   ```
+
+2. **Initializing state with a lazy initial state** (not recommended)
+
+   - This is an alternative to the `useState` callback function.
+   - It's not recommended because it's not supported by the `React DevTools` and makes it difficult to inspect the `state` inside the `DevTools`.
+
+     ```jsx
+     const [state, setState] = useState(someExpensiveComputation(props));
+     ```
+
+3. **Initializing state in `useEffect` hook**
+
+   - This is an alternative to the `useState` callback function.
+
+     ```jsx
+     useEffect(() => {
+       const initialState = someExpensiveComputation(props);
+       setState(initialState);
+     }, [props]);
+     ```
+
+---
+
 #### changing state of type `object`
 
 when we have a state with type `object`, when we update any of the state-object properties, make sure to use the previous state using the spread operator:
@@ -187,78 +285,60 @@ This way of dealing with state is called: **"Derived State"**, which is that val
 
 [reference](https://blog.logrocket.com/complete-guide-react-refs/)
 
-- **Allow us to access DOM properties directly, which makes us have "uncontrolled inputs"**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
-- can be very useful when dealing with different frameworks like `react + JQuery` or `react + Angular`
+It's a box (object) with a `mutable` property (`.current`) that is persisted across renders, unlike normal variables that are re-created at each render
 
-> Note: `refs` are escape hatches for React developers, and we should try to avoid using them if possible.
+- Used when:
+
+  - Creating a `variable` that stays the same between renders (e.g. `previous state`, `counter`, `setTimeout ID`, etc.)
+  - Selecting and storing a DOM node/element
 
 - You can gain access to the actual HTML element by creating a React reference and passing it to the element itself.
 
   - This way, at any time in the lifecycle of the component, we can access the actual HTML element at `buttonRef.current`
 
-  ```js
-  import React, { useRef } from 'react';
-  const ActionButton = ({ label, action }) => {
-    const buttonRef = useRef(null);
-    return (
-      <button onClick={action} ref={buttonRef}>
-        {label}
-      </button>
-    );
-  };
-  export default ActionButton;
-  ```
+- `state` vs `refs`
+  ![state vs refs](./img/state-vs-refs.png)
 
----
-
-### The Reference object
-
-the variable you use `useRef` with will become a frozen object with a **`current`** property which contains the referenced element
+- Notes:
+  - updating `refs` doesn't trigger re-render
+  - Refs are for data that is not rendered (not part of the `JSX`) like `event-handlers` or `effects`. (Otherwise, just use `state`)
+  - Don't read or write `refs` in render logic (like `state`), instead we do this inside `event-handlers` or `useEffect`
+  - `refs` are escape hatches for React developers, and we should try to avoid using them if possible.
 
 ---
 
 ### `useRef`
 
-It allows a component to get a reference to a DOM nodes/elements that it creates.
+- **Allow us to access DOM properties directly, which makes us have "uncontrolled inputs"**. Normally, React uses `state` to update the data on the screen by re-rendering the component for us. But there are certain situations where you need to deal with the DOM properties directly, and that’s where refs come in.
 
-- It can be used to access a DOM nodes/elements directly **with a preserved value**
-- most of the time it's used with DOM elements, but it can hold a reference to any value
-
-- It can be used to store a mutable value that does not cause a re-render when updated.
-
-  - **It doesn't trigger re-render**
-  - It allows you to persist values between renders.
-
-- **usually used For:**
+- usually used For:
 
   - **form-input**
   - Accessing DOM elements
 
-    - used when you need to have programmatic access to a DOM node like:
+    - form input or an element that you want to focus on it.
+    - getting the dimensions of an element (`height`, `width`)
 
-      - a form input or an element that you want to focus on
-      - getting the dimensions of an element (`height`, `width`)
+      ```jsx
+      const [height, setHeight] = useState(0);
+      const refContainer = useRef(null);
 
-        ```jsx
-        const [height, setHeight] = useState(0);
-        const refContainer = useRef(null);
+      useEffect(() => {
+        setHeight(refContainer.current.getBoundingClientRect().height); // getBoundingClientRect() returns the size of an element and its position relative to the viewport (window)
+      }, []);
 
-        useEffect(() => {
-          setHeight(refContainer.current.getBoundingClientRect().height); // getBoundingClientRect() returns the size of an element and its position relative to the viewport (window)
-        }, []);
+      return (
+        <div ref={refContainer}>
+          <h1>hello world</h1>
+        </div>
+      );
+      ```
 
-        return (
-          <div ref={refContainer}>
-            <h1>hello world</h1>
-          </div>
-        );
-        ```
+    - getting the scroll position of an element (`scrollTop`, `scrollLeft`)
 
-      - getting the scroll position of an element (`scrollTop`, `scrollLeft`)
+  - **Doing a functionality in each render except initial render**
 
-  - Doing a functionality in each render except initial render
-
-    ```js
+    ```jsx
     const [value, setValue] = useState(0);
     const refContainer = useRef(null);
     const isMounted = useRef(false);
@@ -281,11 +361,8 @@ It allows a component to get a reference to a DOM nodes/elements that it creates
 
 If we tried to count how many times our application renders using the `useState` Hook, we would be caught in an infinite loop since this Hook itself causes a re-render.
 
-> **ref**: is like I have one value that I need to refer to the exact same thing across all renders, so that different renders have access to one exact version of the state
->
-> **useRef** make sure we get same thing each render
-
-To avoid this, we can use the `useRef` Hook.
+- `ref`: is like I have one value that I need to refer to the exact same thing across all renders, so that different renders have access to one exact version of the state
+- `useRef` make sure we get same thing each render
 
 ---
 
@@ -295,45 +372,46 @@ To avoid this, we can use the `useRef` Hook.
 2. Assign the `ref` to a JSX element as a prop called `ref`
 3. Access that DOM element with `ref.current`
 
-   - **Note:** before accessing the DOM element properties inside `ref.current`, Always check if the element is visible:
-
-     ```js
-     if (!inputElement.current) {
-       return;
-     }
-     // ... continue handler
-     ```
-
-```js
+```jsx
 // Using useRef to focus the input
 
 import { useRef } from 'react';
 
-function App() {
-  const inputElement = useRef();
+const ActionButton = ({ label, action }) => {
+  const buttonRef = useRef(null);
 
-  const focusInput = () => {
-    inputElement.current.focus();
-  };
+  useEffect(() => {
+    buttonRef.current.focus();
+  }, []);
 
   return (
-    <>
-      <input type='text' ref={inputElement} />
-      <button onClick={focusInput}>Focus Input</button>
-    </>
+    <button onClick={action} ref={buttonRef}>
+      {label}
+    </button>
   );
-}
+};
+export default ActionButton;
 ```
 
-- **Note**: You can also access form-inputs with `useState`:
+- **Notes**:
 
-  ```jsx
-  handleChange(e) {
-    setState(e.target.value);
-  }
+  - You can also access form-inputs with `useState`:
 
-  <input type="text" value={state} onChange={handleChange} />
-  ```
+    ```jsx
+    handleChange(e) {
+      setState(e.target.value);
+    }
+
+    <input type="text" value={state} onChange={handleChange} />
+    ```
+
+  - Before accessing the DOM element properties inside `ref.current`, Always check if the element is rendered or not, as it might not be rendered in the initial render
+
+    ```jsx
+    if (!inputElement.current) {
+      return;
+    }
+    ```
 
 ---
 
@@ -345,7 +423,7 @@ function App() {
 
 - when changing the state => the **whole function-component** `rerenders`.
 - Data fetching(`HTTP requests`), subscriptions, or manually changing the DOM from React components. We call these operations `side effects` (or `effects` for short) because they can affect other components and **can’t be done during rendering.**
-  - so such `sideEffects` shouldn't go directly inside the component-function as it will create bugs
+- so such `sideEffects` shouldn't go directly inside the component-function as it will create bugs
 - The Effect Hook, `useEffect()`, adds the ability to perform side effects from a function component. It serves the same purpose as `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount` in React classes, but unified into a single API
 
 > **Side-Effects**: Tasks that must happen outside of the component-evaluation and render-cycle, as they might block rendering (ex: HTTP request)
@@ -373,12 +451,13 @@ It's a function from React used to run code **(always)** when a component is ini
 
 - by default it runs after re-render unless dependency-array is utilized
 - When you call `useEffect`, you’re telling React to run your `effect` function after flushing changes to the `DOM`. Effects are declared inside the component so they have access to its props and state. By default, React runs the effects after every render — including the first render.
-
+- By using `useEffect`, we're enabling a **Synchronization Mechanism** between the `DOM` and the `state` of the component
+  ![useEffect](./img/useEffect-1.png)
 - it happens after all other functions and state
   ![useEffect-callback](./img/react-useeffect-callback-3.svg)
 - we can have multiple `useEffect()`(Effects) in the component for different state fields
 
-**use cases:**
+- **use cases:**
 
 - making a request on page load
 - adding event listener on page load
@@ -407,59 +486,74 @@ It's a function from React used to run code **(always)** when a component is ini
 
 ### `useEffect` dependency array
 
-![dependency array](./img/useEffect-dependency.png)
+![dependency array](./img/useEffect-dependency-0.png)
+
+- The 3 possible values of the dependency array:
+  ![dependency array](./img/useEffect-dependency.png)
+
+- **empty array**: (no dependencies) the effect will only run once, after the initial render
+- **no array**: (no dependencies) the effect will run after every render
+- **array with dependencies**: the effect will run when the dependencies change
 
 **Notes:**
 
 - when using a piece of state inside `useEffect` body, it will reference the initial state and not use the updated state on each render unless you add this piece of state to the dependency array
 
-  - this is because at each render, a new piece of state is created and added to memory and the `useEffect` won't be called again (unless you add this piece of state to the dependency array), so it will have reference to the old state value
-    ![dependency array](./img/useEffect-dependency-1.png)
-  - This bug/issue is common when using `useEffect` and it's called **"Stale Variable References"**
-    - > usually `create-react-app` includes ESLint rule to help you find this when using empty array as a dependency array
+- this is because at each render, a new piece of state is created and added to memory and the `useEffect` won't be called again (unless you add this piece of state to the dependency array), so it will have reference to the old state value
+  ![dependency array](./img/useEffect-dependency-1.png)
+- This bug/issue is common when using `useEffect` and it's called **"Stale Variable References"**
+
+  - > usually `create-react-app` includes ESLint rule to help you find this when using empty array as a dependency array
 
 - When using a piece of state in the dependency array, each render will result creation of a new callback function in the `useEffect` body. That's why it will now has an updated reference to the piece of state
 - the (render infinite loop) can happen if you put a function that changes the state (ex: `fetchBooks`) in the dependency array, as this function will be re-created at each render which will cause calling it again which changes the state and so on
-  - to fix this, we use [useCallback](./06-performance.md#usecallback)
+- to fix this, we use [useCallback](./6-performance.md#usecallback)
 
 ---
 
 ### `useEffect` cleanup function
 
-- it saves applications from unwanted behaviors like memory leaks by cleaning up effects. In doing so, we can optimize our application’s performance.
-- it allows us to tidy up our code before our component unmounts. When our code runs and reruns for every render, useEffect also cleans up after itself using the cleanup function.
+It's a function that runs before the next time the `useEffect` callback function runs
 
+- We need a cleanup function whenever we have a side effect that needs to be cleaned up before the next time the effect runs. (side effect that keeps happening after each render or unmounting the component). EX:
+- remove event listeners
+- cancel `API` subscriptions
+- cancel `HTTP` requests
+- stop timers
+- it saves applications from unwanted behaviors like memory leaks by cleaning up effects. In doing so, we can optimize our application’s performance.
 - The `useEffect` Hook is built in a way that we can return a function inside it
   ![useEffect-cleanup](./img/useEffect-cleanup.png)
 
-  - this `return function` is where the cleanup happens.
+- this `return function` is where the cleanup happens.
 
-    ```js
-    useEffect(() => {
-      effect;
-      return () => {
-        cleanup;
-      };
-    }, [dep]);
-    ```
+  ```js
+  useEffect(() => {
+    effect;
+    return () => {
+      cleanup;
+    };
+  }, [dep]);
+  ```
 
 - when the `cleanup` function is called?
   ![useEffect-cleanup](./img/useEffect-cleanup-1.png)
 
-  - the `cleanup` function runs **before** every new side effect function execution and before the component is removed.
-  - it does not run before the first side effect function execution. But thereafter, it will run before every next side effect function execution.
-  - **Note:** the `cleanup` function will only be called if the `useEffect` callback function will be called again (when there's something in the dependency array or no array what so ever)
+- the `cleanup` function runs **before** every new side effect function execution and before the component is removed.
+- it does not run before the first side effect function execution. But thereafter, it will run before every next side effect function execution.
+- **Note:** the `cleanup` function will only be called if the `useEffect` callback function will be called again (when there's something in the dependency array or no array what so ever)
 
 - The cleanup function prevents memory leaks and removes some unnecessary and unwanted behaviors.
 
-  - ex: event listeners, because we want to stop listening to events when re-rendering or we will have a new event listener created on each render and we would have multiple listeners which is BAD
-    ![useEffect-cleanup](./img/useEffect-cleanup-2.png)
+- ex: event listeners, because we want to stop listening to events when re-rendering or we will have a new event listener created on each render and we would have multiple listeners which is **BAD**
+  ![useEffect-cleanup](./img/useEffect-cleanup-2.png)
 
-- **Note:** `useEffect` cb-function can't be `async` because it can't return a promise, as it only returns the cleanup function
+- **Notes:**
+
+- `useEffect` callback-function can't be `async` because it can't return a `promise`, as it only returns the cleanup function
 
   - but the execution code inside the cb-function can contain async-functions
 
-  ```js
+  ```jsx
   useEffect(async () => {}, []); // ❌
 
   // ---------------------------------------- //
@@ -470,62 +564,83 @@ It's a function from React used to run code **(always)** when a component is ini
   }, []);
   ```
 
+- How does the cleanup function remembers the variables from the `useEffect` callback function?
+  - it's because of `closures` in `JavaScript`
+
 ---
 
-## useReducer()
+## useReducer
 
-It's an alternative to `useState`. Accepts a reducer of type `(state, action) => newState`, and **returns** the current state paired with a `dispatch` method.
+It's a more advanced and complex hook that helps us to manage state in a more complex way than `useState`
 
-![useReducer](./img/reducer.PNG)
-
-- in `useState()` the state management logic takes a good part of the component body.
-
-- That's a problem because the React component in nature should contain the logic that calculates the output. But the state management logic is a different concern that should be managed in a separate place. Otherwise, you get a mix of state management and rendering logic in one place, and that's difficult to read, maintain, and test! as the order of depending states may differ and cause wrong action!
-
-- `useReducer()` does so by extracting the state management out of the component.
+- It accepts a `reducer` function of type `(state, action) => newState`, and **returns** the current state paired with a `dispatch` method.
 
 - Use-Cases :
-  ![useReducer](./img/useReducer-1.png)
 
-- When you have states that belongs together
-- if you have a state updates (is set) that depend on other state.
-- If you find yourself keeping track of multiple pieces of state that rely on complex logic
-  ![useReducer](./img/useReducer-3.png)
-
-- It's similar to `useState()` as the hook returns an `array of 2 items`: the `current state` and the `dispatch function`.
-  ![useReducer](./img/useReducer-2.png)
-- `reducer function` can be outside the component as it doesn't use any items from the component, it only uses **items rendered by react**
-
----
+  - When you have states that belongs together
+  - if you have a state updates (is set) that depend on other state.
+  - If you find yourself keeping track of multiple pieces of state that rely on complex logic
+    ![useReducer](./img/useReducer-3.png)
 
 ![useReducer](./img/useReducer.PNG)
 ![useReducer](./img/useReducer-4.png)
 ![useReducer](./img/useReducer-5.png)
 
-- **Reducer function** It's just a function that **returns** the shape of the data we want to store. It contains your custom state logic(different scenarios).
+---
+
+### `useReducer` vs `useState`
+
+![useState-vs-useReducer](./img/useState-vs-useReducer-1.png)
+![useReducer](./img/useReducer-1.png)
+
+- in `useState()`:
+
+  - the state management logic takes a good part of the component body.
+  - each state update is independent of the other state updates. this will result multiple calls to the `setState()` function for each state update.
+  - That's a problem because the React component in nature should contain the logic that calculates the output. But the state management logic is a different concern that should be managed in a separate place. Otherwise, you get a mix of state management and rendering logic in one place, and that's difficult to read, maintain, and test! as the order of depending states may differ and cause wrong action!
+
+- `useReducer()`:
+  ![useReducer](./img/reducer-0.png)
+
+  - Does so by extracting the state management out of the component.
+  - It enables us to manage the state in a more complex way than `useState()`
+  - It makes updating multiple states that depend on each other easier.
+    - we do this by changing all related states in one place (in the same `action`) in the `reducer function`
+
+- When to use `useReducer` instead of `useState`?
+  ![useReducer](./img/useState-vs-useReducer-2.png)
+
+---
+
+### Reducer function
+
+**reducer function:** It's a **pure function** that takes the `previous state` and an `action`, and returns the `next state`.
+
+- It's similar to `useState()` as the hook returns an `array of 2 items`: the `current state` and the `dispatch function`.
+  ![useReducer](./img/useReducer-2.png)
+
+- `reducer function` can be outside the component as it doesn't use any items from the component, it only uses **items rendered by react**
+
+- It's just a function that **returns** the shape of the data we want to store. It contains your custom state logic(different scenarios).
   ![useReducer](./img/useReducer-6.png)
   ![useReducer](./img/useReducer-7.png)
 
-- after executing the scenario-code, you must return a new state object
+  - After executing the scenario-code, you must return a new state object
   - if nothing returned from the reducer function, the state will be `undefined`
 
-```js
-// reducer function: takes 2 values and "reduces" them down to one value
-(accumulatedValue, nextItem) => nextAccumulatedValue
+---
 
+### How `useReducer` works
 
-// in our case (useReducer), the 2 values provided to a reducer are:
-  // - the current state
-  // - an action that (may) update the state
-  (state, action) => newState
-```
+![useReducer](./img/useReducer-8.png)
 
 - **`initialState`** can be a simple value but generally will contain an **object** as it's for more complex state.
 - **`dispatch`** : is what we call in order to update the state --> it's like `setState()`
   - it will call the `reducer function` for us with `argument = action-object`
+  - it can be passed to child components as a `prop` to update the parent `state` from there
 - **`action`** is an **object** that tells the reducer how to change the state.
   ![action](./img/action-1.png)
-  - It must contain a **type** property
+  - It should contain a **type** property, to follow the convention of how to tell the reducer what it needs to do
     ![action](./img/action-2.png)
     - It's to tell the reducer function how the state should be updated
     - The React community has come up with this convention on how to tell the reducer what it needs to do (React doesn't treat these action objects any differently)
@@ -533,30 +648,34 @@ It's an alternative to `useState`. Accepts a reducer of type `(state, action) =>
   - for action types, we should follow this:
     ![action](./img/action-3.png)
 - Finally: when state is updated the component gets rerendered just like in `useState()`
+  ![useReducer](./img/reducer2.svg)
 
-![useReducer](./img/reducer2.svg)
+- **Diagram of the whole process:**
+  ![useReducer](./img/useReducer-9.png)
 
-```js
-import { useReducer } from 'react';
+- Ex:
 
-// reducer function can be here outside the component as it doesn't use any items from the component, it only uses items rendered by react
-const [state, dispatch] = useReducer(reducer, initialState);
+  ```jsx
+  import { useReducer } from 'react';
 
-function reducer(state, action) {
-  let newState;
-  switch (action.type) {
-    case 'increase':
-      newState = { counter: state.counter + 1 };
-      break;
-    case 'decrease':
-      newState = { counter: state.counter - 1 };
-      break;
-    default:
-      throw new Error(`unhandled type of ${action.type} in Reducer`);
+  // reducer function can be here outside the component as it doesn't use any items from the component, it only uses items rendered by react
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  function reducer(state, action) {
+    let newState;
+    switch (action.type) {
+      case 'increase':
+        newState = { counter: state.counter + 1 };
+        break;
+      case 'decrease':
+        newState = { counter: state.counter - 1 };
+        break;
+      default:
+        throw new Error(`unhandled type of ${action.type} in Reducer`);
+    }
+    return newState; // by default if no action matched
   }
-  return newState; // by default if no action matched
-}
-```
+  ```
 
 ---
 
@@ -773,43 +892,19 @@ function Component5() {
 
 ---
 
-## Hooks Rules
-
-![rules](./img/hooks.png)
-![rules](./img/rules.PNG)
-
-- ✅ Call Hooks from React function components.
-- ✅ Call Hooks from custom Hooks
-- ✅ Call Hooks in a component that its name is uppercase
-- ❌ Don't call hooks conditionally
-
-```js
-// ❌ not calling hook directly in the component
-if (condition) {
-  useEffect(() => {}); // Don't call hooks conditionally
-}
-
-// ✅ calling hook directly in the component
-useEffect(() => {
-  if (condition) {
-  }
-});
-```
-
----
-
 ## Custom Hooks
 
-![custom hooks](./img/custom-hooks.png)
+![custom hooks](./img/custom-hooks-0.png)
 
-- When you have component logic that needs to be used by multiple components, we can extract that logic to a custom Hook
-  - they're reusable functions.
-    ![custom hooks](./img/custom-hooks-1.png)
-- Custom Hooks must start with "`use`" keyword. Example: `useFetch`
+- When you have component logic that needs to be used by multiple components, we can extract that logic to a custom Hook -> (reusable functions)
+  ![custom hooks](./img/custom-hooks-1.png)
+- Custom Hooks must start with "`use`" keyword, to tell React that it's a `hook`
+  - Example: `useFetch`
+- It's common to return `object` or `array` from custom hooks, as they're reusable functions and we don't know what the user wants to do with the returned value
 
 - Example:
 
-  ```js
+  ```jsx
   // in useBreedList.js
   import { useState, useEffect } from 'react';
 
@@ -849,7 +944,7 @@ useEffect(() => {
 
 Oftentimes, you will create an application with some type of form in it. For example, if you integrate authentication in your application, users will have to fill in the form to sign in. You can get the value that the user inputs in the field with vanilla JavaScript and the `getElementById` method, but a simpler method with hooks can also be used. Let's see how to create a useInput hook to get the value of the inputs in our form!
 
-```js
+```jsx
 // useInput.js
 import { useState } from 'react';
 
@@ -895,6 +990,37 @@ const SignInForm = () => {
   );
 };
 export default Form;
+```
+
+---
+
+### Custom hook for keyboard events (`useKeyPress`)
+
+```jsx
+// useKeyPress.js
+import { useState, useEffect } from 'react';
+
+export function useKeyPress(key, action) {
+  useEffect(() => {
+    function callback(e) {
+      if (e.code.toLowerCase() === key.toLowerCase()) {
+        action();
+      }
+    }
+
+    document.addEventListener('keydown', callback);
+
+    // Cleanup function
+    return () => {
+      document.removeEventListener('keydown', callback);
+    };
+  }, [action, key]);
+}
+
+// Using it
+useKeyPress('Escape', () => {
+  console.log('Escape key pressed');
+});
 ```
 
 ---

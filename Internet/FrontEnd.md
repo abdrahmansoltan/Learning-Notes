@@ -11,9 +11,13 @@
       - [HTTPS](#https)
   - [Performance](#performance)
     - [Minify / Minimize files](#minify--minimize-files)
-    - [Minify tools](#minify-tools)
       - [Minimize images](#minimize-images)
     - [Critical Render Path](#critical-render-path)
+    - [Code Splitting](#code-splitting)
+    - [Tree Shaking](#tree-shaking)
+    - [Avoid blocking main thread](#avoid-blocking-main-thread)
+    - [Avoid memory leaks](#avoid-memory-leaks)
+    - [Avoid multiple re-rendering](#avoid-multiple-re-rendering)
     - [Rollup Visualizer](#rollup-visualizer)
   - [Gulp.js](#gulpjs)
     - [Gulp vs Webpack](#gulp-vs-webpack)
@@ -116,10 +120,10 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 - `Minify`: It's the process of removing all unnecessary characters from the source code without changing its functionality.
 - `Minimize`: It's the process of reducing the size of the file by changing the format of the file.
 
-### Minify tools
+- **Minify tools**
 
-- usually done in frameworks automatically to minify the javascript and css files into one file in the build phase to reduce the size/number of the files and the number of requests
-- used in `webpack`, `gulp`, `rollup`, `parcel`, etc.
+  - usually done in frameworks automatically to minify the javascript and css files into one file in the build phase to reduce the size/number of the files and the number of requests
+  - used in `webpack`, `gulp`, `rollup`, `parcel`, etc.
 
 #### Minimize images
 
@@ -179,6 +183,60 @@ It's a step in the [rendering process in the browser](#web-browsers) where the b
         color: red;
       }
       ```
+
+- How to measure the performance of the `js` part in the critical render path?
+
+  - We can use the `Performance` API to measure the performance of the `js` part in the critical render path
+
+    ```js
+    // add this code in the "onload" event listener of the "window" object
+    const t0 = performance.now();
+    // code to be measured
+    const t1 = performance.now();
+    console.log(`Call to doSomething took ${t1 - t0} milliseconds.`);
+    ```
+
+  - We can also use the browser `devtools` to measure the performance of the `js` part in the critical render path
+
+    ![performance](./img/performance-1.png)
+
+    - The `yellow` part is the `js` scripting part, it includes the **(parsing, compiling, executing)** parts
+    - most of this time is from compiling and executing the code
+      - for `compiling`, we can use "Ahead of Time `AOT`" compilation to reduce the time needed to compile the code instead of using "Just in Time `JIT`" compilation, like `Angular` does
+
+---
+
+### Code Splitting
+
+It's the process of splitting the code into smaller **chunks** to reduce the size of the files and the **number of requests**
+
+![code splitting](./img/code-splitting-1.png)
+![code splitting](./img/code-splitting-2.png)
+
+- It's also called **"Progressive bootstrapping"** or **"Lazy loading"**
+- It reduces the **execution time** of the code by loading only the required code for the current page instead of loading all the code at once
+- It's done using `webpack`, `rollup`, `parcel`, etc.
+  ![code splitting](./img/code-splitting-3.jpeg)
+- Types:
+  1. **Route-based code splitting**: splitting the code based on the routes
+  2. **Component-based code splitting**: splitting the code based on the components
+  3. **Dynamic code splitting**: splitting the code based on the user's actions
+
+---
+
+### Tree Shaking
+
+---
+
+### Avoid blocking main thread
+
+---
+
+### Avoid memory leaks
+
+---
+
+### Avoid multiple re-rendering
 
 ---
 

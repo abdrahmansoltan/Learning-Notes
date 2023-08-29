@@ -56,6 +56,7 @@
     - [Linear(sequential) Search](#linearsequential-search)
     - [Binary Search](#binary-search)
       - [How it works](#how-it-works)
+    - [Binary search on Monotonic Functions](#binary-search-on-monotonic-functions)
   - [Graph Traversals](#graph-traversals)
     - [Breadth First Search/Traversal BFS](#breadth-first-searchtraversal-bfs)
       - [BFS Implementation](#bfs-implementation)
@@ -72,10 +73,17 @@
       - [How Bellman-Ford Algorithm works](#how-bellman-ford-algorithm-works)
   - [Topological Sort](#topological-sort)
     - [Implementing Topological Sort](#implementing-topological-sort)
+      - [Using Khan's algorithm (iterative)](#using-khans-algorithm-iterative)
+      - [Using DFS (recursive)](#using-dfs-recursive)
   - [Union Find](#union-find)
+  - [Two Heaps Technique](#two-heaps-technique)
+  - [Backtracking](#backtracking)
+    - [Subsets](#subsets)
+    - [Combinations](#combinations)
+    - [Permutations](#permutations)
   - [Matrix graph](#matrix-graph)
     - [Matrix DFS](#matrix-dfs)
-      - [Matrix BFS](#matrix-bfs)
+    - [Matrix BFS](#matrix-bfs)
   - [Least recently used (LRU)](#least-recently-used-lru)
 
 ---
@@ -1526,6 +1534,62 @@ def binary_search_iterative(nums, target):
 
 ---
 
+### Binary search on Monotonic Functions
+
+- A monotonic function is a function that is either entirely non-increasing or non-decreasing.
+  - `f(x) = x * 2` is a monotonic function
+  - `f(x) = x^2` is not a monotonic function
+    - ex: `f(0.5) = 0.25` and `f(1) = 1` so it's not monotonic
+- It can be used with binary search to find the minimum or maximum value of a function in a given interval.
+
+  ```py
+  def binary_search(f, low, high, target):
+    while low <= high:
+      mid = (low + high) // 2
+      if f(mid) == target:
+        return mid
+      elif f(mid) < target:
+        low = mid + 1
+      else:
+        high = mid - 1
+    return -1
+  ```
+
+- A common pattern is to be given a monotonic boolean function `f(x)` and you're given range of values `(l <= x <= r)`
+
+  ```py
+  x = 0 # f(x) = false
+  x = 1 # f(x) = false
+  x = 2 # f(x) = false
+  x = 3 # f(x) = true
+  x = 4 # f(x) = true
+  ```
+
+- When given a `monotonic increasing` boolean function, a common task is to find the greatest value of `x` that returns `false` or the lowest value of `x` that returns `true`.
+
+  - The easiest way to explain how this works is through pre. Below is pseud o-code that tries to find the lowest value of x that returns true in a **monotonic increasing boolean function**:
+
+    ```py
+    def binarySearchMin(lo, hi, target, f):
+      l = lo
+      r = hi
+      res = -1
+
+      while l <= r:
+        mid = (l + r) // 2
+        val = f(mid)
+
+        if val:
+          res = mid
+          r = mid - 1 # check if there's a lower value that returns true
+        else:
+          l = mid + 1
+
+      return res
+    ```
+
+---
+
 ## Graph Traversals
 
 it means going through each item in the list, like checking for something on each item in a `tree` --> **(visiting every node O(n))**
@@ -1702,25 +1766,9 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
 - used to determine whether a path exists between two nodes or if a node exists
 - also used with graphs
 
-![BFS](./img/dfs0.png)
-![BFS](./img/dfs.png)
+![DFS](./img/dfs.png)
 
-- Graph DFS
-
-  ```py
-  def dfs(graph, node):
-    visited = []
-    stack = [node]
-
-    while stack:
-      current = stack.pop()
-
-      # prevent visiting the same node twice
-      if current not in visited:
-        visited.append(current)
-        stack += graph[current]
-    return visited
-  ```
+---
 
 #### PreOrder DFS traversal
 
@@ -1729,6 +1777,7 @@ Here, we visit the `root` node first, then the sub-trees at its children nodes, 
 ![preorder](./img/preorder.png)
 
 ```py
+# Recursive
 def preOrderDFS(root):
   if root is None:
     return
@@ -1736,7 +1785,26 @@ def preOrderDFS(root):
   print(root.value)
   preOrderDFS(root.left)
   preOrderDFS(root.right)
+
+# ----------------------------------------------
+
+# Iterative
+def preOrderDFS(root):
+  if not root:
+    return
+
+  stack = [root]
+  while stack:
+    curr = stack.pop()
+    print(curr.value)
+
+    if curr.right:
+      stack.append(curr.right)
+    if curr.left:
+      stack.append(curr.left)
 ```
+
+---
 
 #### PostOrder DFS traversal
 
@@ -1747,6 +1815,7 @@ Here, we visit the `left` node first, then the `right` node, then the `root` nod
 ![postorder](./img/postorder.png)
 
 ```py
+# Recursive
 def postOrderDFS(root):
   if root is None:
     return
@@ -1754,6 +1823,32 @@ def postOrderDFS(root):
   postOrderDFS(root.left)
   postOrderDFS(root.right)
   print(root.value)
+
+# ----------------------------------------------
+
+# Iterative
+def postOrderDFS(root):
+  if root is None:
+    return
+
+  stack = [root]
+  visited = [False]
+
+  while stack:
+    curr, is_visited = stack.pop(), visited.pop()
+
+    if curr:
+      if is_visited:
+        print(curr.value)
+      else:
+        stack.append(curr)
+        visited.append(True)
+
+        stack.append(curr.right)
+        visited.append(False)
+
+        stack.append(curr.left)
+        visited.append(False)
 ```
 
 #### InOrder DFS traversal
@@ -1815,45 +1910,37 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
 
 #### How Dijkstra's Algorithm works
 
-- Each segment has a travel time in minutes. You’ll use Dijkstra’s algorithm to go from start to finish in the shortest possible time.
+- Each segment has a travel time in minutes **(weight)**. You’ll use Dijkstra’s algorithm to go from start to finish in the shortest possible time.
   ![Dijkstra-algorithm](./img/dijkstra-1.png)
 - Cost of a node is how long it takes to get to that node from the start.
-- If you ran breadth-first search on this graph, you’d get this shortest path.
-  ![Dijkstra-algorithm](./img/dijkstra-2.png)
-
-  - But that path takes 7 minutes. Let’s see if you can ind a path that takes less time!
 
 - EX: Trading for a piano
 
   - In this graph, the nodes are all the items Rama can trade for. he weights on the edges are the amount of money he would have to pay to make the trade
     ![piano example](./img/piano-example-1.png)
+  - First, we need to track 2 things: (`cost` for each node, and the `parent` node for each node)
     ![piano example](./img/piano-example-2.png)
     ![piano example](./img/piano-example-3.png)
   - **Steps:**
 
     1. Find the **cheapest** node: pick the node with the smallest known distance to visit first
-
-       - This is the node you can get to in the least amount of time.
-
     2. Update the costs of the neighbors of this node (Figure out how long it takes to get to its neighbors).
        ![piano example](./img/piano-example-4.png)
        ![piano example](./img/piano-example-5.png)
-       ![piano example](./img/piano-example-6.png)
+
+       - if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
+         ![piano example](./img/piano-example-6.png)
 
        - for each neighboring node, we calculate the distance by summing the total edges that lead to the node we're checking from the starting node
-       - Mark the node as processed.
-         - we do this to avoid calculating the same node more than once
+       - Mark the node as processed to avoid calculating the same node more than once
 
     3. Repeat until you've done this for every node in the graph.
        ![piano example](./img/piano-example-7.png)
     4. Calculate the final path.
        ![piano example](./img/piano-example-8.png)
 
-       - if the new total distance to a node is less than the previous total, we store the new shorter distance for that node
-       - We can get the piano even cheaper by trading the drum set for the piano instead. So the cheapest set of trades will cost us `$35`.
-         ![piano example](./img/piano-example-9.png)
-
 - **Notes:**
+  - We only use Dijkstra’s algorithm when we have **weighted edges**. and if it's not weighted, we can use `BFS`
   - Dijkstra’s algorithm only works with **directed acyclic graphs**, called `DAGs` for short.
     - because undirected graphs can have cycles, which can lead to infinite loops or double-counting
   - We can't use Dijkstra’s algorithm if we have **negative-weighted edges**.
@@ -1877,54 +1964,42 @@ It's one of the most famous and widely used algorithms around. It finds (the **s
      ![Dijkstra-algorithm](./img/dijkstra-4.png)
   2. We find the node with the lowest cost (cheapest node) and we add it to the `visited` list and examine all its neighbors
   3. We will use `Min Heap` to get the node with the lowest cost
-  4. We then calculate the cost to reach each of those neighbors. If it's cheaper to get to a neighbor through the current node, we update the cost and the parent.
+  4. We then calculate the cost to reach each of those neighbors.
      ![Dijkstra-algorithm](./img/dijkstra-5.png)
-  5. Add the node to the `visited` list update the `unvisited` list and repeat the process until we've visited every node in the graph.
-     ![Dijkstra-algorithm](./img/dijkstra-6.png)
 
 ```py
-def dijkstra(graph, start):
-  # initialize the distance to all nodes to infinity
-  distances = {node: float("inf") for node in graph}
-  # set the distance to the starting node to 0
-  distances[start] = 0
+def shortestPath(edges, n, src):
+  adj = {}
+  for i in range(1, n + 1):
+    adj[i] = [] # initialize the adjacency list
 
-  # initialize the unvisited set
-  unvisited = set(graph.keys())
+  # s = src, d = dst, w = weight
+  for s, d, w in edges:
+    adj[s].append((d, w)) # add the destination and weight to the adjacency list
 
-  # initialize the previous vertex dict
-  previous_vertices = {node: None for node in graph}
+  shortest = {} # to store the shortest path to each node
+  min_heap = [(0, src)] # to get the node with the lowest cost
 
-  while len(unvisited) > 0:
-    # select the unvisited node with the smallest distance
-    current_node = min(unvisited, key=lambda node: distances[node])
+  while minHeap:
+    w1, n1 = heapq.heappop(min_heap) # get the node with the lowest cost
+    if n1 in shortest: # if we already processed this node, continue
+      continue
+    shortest[n1] = w1 # add the node to the shortest path
 
-    # break if the smallest distance among the unvisited nodes is infinity
-    if distances[current_node] == float("inf"):
-      break # means that we can't reach any other node from the starting node
+    # loop through the neighbors of the node
+    for n2, w2 in adj[n1]:
+      if n2 not in shortest:
+        heapq.heappush(min_heap, (w1 + w2, n2)) # add the node to the min heap with the new cost
 
-    # remove the current node from the unvisited set
-    unvisited.remove(current_node)
-
-    # go through each neighbor of the current node
-    for neighbor, weight in graph[current_node].items():
-      # calculate the distance to the neighbor through the current node
-      distance = distances[current_node] + weight
-
-      # update the distance if the new distance is shorter than the existing distance to the neighbor
-      if distance < distances[neighbor]:
-        distances[neighbor] = distance
-        # set the current node as the previous vertex of the neighbor
-        previous_vertices[neighbor] = current_node
-
-  return distances, previous_vertices
+  return shortest
 ```
 
-- Time complexity: `O(V^2)`, where `V` is the number of vertices in the graph
-  - because we're going through each node in the graph and for each node, we're going through each of its neighbors
-  - > You might think that it will be `O(E.V)`, where `E` is the number of edges in the graph, but `E` can be as large as `V^2`, so `O(E.V)` is actually `O(V^3)`, also we don't visit each edge more than once, so it's `O(V^2)`
-  - If we use `min heap` to get the node with the lowest cost, then the time complexity will be `O(E.log(V))`, where `E` is the number of edges in the graph and `V` is the number of vertices in the graph
-    - because we're going through each node in the graph and for each node, we're going through each of its neighbors, and we're using `min heap` to get the node with the lowest cost, so it will take `log(V)` time to get the node with the lowest cost
+![Dijkstra-algorithm](./img/dijkstra-8.png)
+
+- Space complexity: `O(E)` -> `O(V^2)`, where `E` is the number of edges in the graph and `V` is the number of vertices in the graph
+  - because we're storing the cost and parent for each node in the `min heap`
+- Time complexity: `O(E.log(E))` -> `O(E.log(V^2))`, as we pop from the `min heap` `E` times and each time we're doing `log(E)` operations
+  - `O(E.log(V^2))` -> `O(E.2log(V))` -> `O(E.log(V))`
 
 ---
 
@@ -2027,6 +2102,10 @@ There are two common implementations of topological sort:
    - Here, we fill the ordering from the end of the list to the beginning
    - the recursive implementation is a **PostOrder DFS** traversal, meaning that we assign the order of the nodes after we've visited all of their children/neighbors (as they don't need to be visited in a specific order)
 
+---
+
+#### Using Khan's algorithm (iterative)
+
 - We can construct a topological sort using **Khan's algorithm**:
   ![khan-algorithm](./img/khan-algorithm.png)
 
@@ -2046,7 +2125,7 @@ There are two common implementations of topological sort:
 
 - Topological sort is not unique, there can be multiple valid topological sorts for a graph and all of them are correct.
 - Topological sort algorithm is not the most efficient algorithm,
-- it runs in `O(V + E)` time, where
+- it runs in `O(V + E)` time, where:
 
   - `V` is the number of vertices
   - `E` is the number of edges in the graph.
@@ -2096,14 +2175,421 @@ def topological_sort(graph):
 
 ---
 
+#### Using DFS (recursive)
+
+- Here, we use **PostOrder DFS** traversal, meaning that we assign the order of the nodes after we've visited all of their children/neighbors (as they don't need to be visited in a specific order)
+- when reaching the base-case (leaf node), we add the node to the result
+- after finishing, we will have the nodes in a reverse order, so we reverse the result to get the correct order
+  ![top sort](./img/top-sort-15.png)
+
+- Time complexity: `O(V + E)`, where `V` is the number of vertices and `E` is the number of edges
+
+```py
+def topological_sort(graph):
+    result = []
+    visited = set()
+
+
+    def dfs(node):
+        if node in visited:
+            return
+
+        visited.add(node)
+
+        for neighbor in node.neighbors:
+            dfs(neighbor)
+
+        result.append(node)
+
+    for node in graph.nodes:
+        dfs(node)
+
+    return result[::-1]
+
+# OR
+
+def topological_sort(edges, n):
+    result = []
+    visited = set()
+    adj = {}
+
+    # Build the adjacency list
+    for i in range(1, n + 1):
+        adj[i] = []
+    for src, dst in edges:
+        adj[src].append(dst)
+
+    for i in range(1, n + 1):
+        dfs(i, adj, visited, result)
+    return result[::-1]
+
+def dfs(node, adj, visited, result):
+    if node in visited:
+        return
+    visited.add(node)
+    for neighbor in adj[node]:
+        dfs(neighbor, adj, visited, result)
+    result.append(node)
+```
+
+---
+
 ## Union Find
 
 It's a data structure that keeps track of elements which are split into one or more disjoint sets.
 
 The Union Find data structure allows us to **detect a cycle in an undirected graph** by iterating over just its edges. (Instead of doing the full `O(V+E)` search. This way we get an `O(E)` complexity).
 
+- It's used in trees, and graphs
+- It can deal with **disjoint sets** (sets that have no elements in common) -> Disconnect components in a graph
+  ![union-find](./img/union-find-1.png)
+- It works as a **Forest of Trees**
+  ![union-find](./img/union-find-2.png)
+  - Each node is a tree, and each tree is a set
+  - Each node has a parent node, except the root node (we can say that it's its own parent node)
+  - Each node has a `rank`, which is the number of edges from the node to the furthest leaf node
 - Each node starts off as its own separate set, as we iterate over the edges, we will **union** the nodes together if they are not already in the same set.
-- if we find an edge where both nodes are in the same set, then we have found a cycle.
+  - We `union` them by making the parent of one node the parent of the other node.
+    ![union-find](./img/union-find-3.png)
+  - We usually `union` by `rank`(which is the `height` of the tree), we make the shorter tree a child of the taller tree.
+    ![union-find](./img/union-find-4.png)
+- Used to detect cycles in undirected graphs, instead of using `DFS` or `BFS` which takes `O(V+E)` time, we can use `Union Find` which takes `O(E)` time.
+  - It's done by iterating over the edges, and `union` the nodes together if they are not already in the same set.
+  - If we find an edge where both nodes are in the same set, then we have found a cycle.
+    - This is because we will be trying to connect 2 `nodes` that are already connected, which means that there is a cycle.
+
+```py
+class UnionFind:
+    def __init__(self, n):
+        self.parent = {}
+        self.rank = {}
+
+        # start from 1, because we will be using 0 as a special value
+        for i in range(1, n + 1):
+            self.parent[i] = i # each node is its own parent
+            self.rank[i] = 0 # rank is the number of edges from the node to the furthest leaf node
+
+    def find(self, n):
+        # if the node is its own parent, then it's the root node
+        if self.parent[n] == n:
+            return n
+        else:
+            # recursively find the parent of the parent of the parent of the node
+            return self.find(self.parent[n])
+
+    def union(self, n1, n2):
+        # find the parent of each node
+        p1 = self.find(n1)
+        p2 = self.find(n2)
+
+        # if the parents are the same, then they are already connected
+        if p1 == p2:
+            return False
+
+        # if the rank of the first node is greater than the rank of the second node, then make the second node the child of the first node
+        if self.rank[p1] > self.rank[p2]:
+            self.parent[p2] = p1
+        # if the rank of the second node is greater than the rank of the first node, then make the first node the child of the second node
+        elif self.rank[p1] < self.rank[p2]:
+            self.parent[p1] = p2
+        # if the ranks are equal, then make one node the child of the other node, and increment the rank of the new parent node
+        else:
+            self.parent[p2] = p1
+            self.rank[p1] += 1
+
+        return True
+```
+
+---
+
+## Two Heaps Technique
+
+It's a technique that uses 2 heaps to solve problems. It's used to find the **median** of a list of numbers.
+
+- It's used in problems where data is not given upfront, but instead, it's given incrementally in a **stream of data**.
+  - The naive approach is to sort the list of numbers and then find the median, but it takes `O(n.log(n))` time.
+  - Instead, we can use `Two Heaps` to find the median in `O(log(n))` time.
+- It's based on the fact that we can divide a list of numbers into 2 halves, the `left` half and the `right` half, and the `median` is the middle number of the list.
+- We can use 2 `heaps` to keep track of the `left` half and the `right` half of the list.
+  ![two heaps](./img/two-heaps-1.png)
+  - `left` heap will be a `max heap` that contains the `left` half of the list (smaller numbers)
+  - `right` heap will be a `min heap` that contains the `right` half of the list (larger numbers)
+- Now, Each time we insert an element, we need to maintain the balance between the 2 heaps, so that the `median` is always the root of the `left` heap.
+
+  ```py
+  len(leftHeap) <= len(rightHeap) + 1
+  ```
+
+  - If the `left` heap has more elements than the `right` heap, then the `median` is the root of the `left` heap.
+  - If the `right` heap has more elements than the `left` heap, then the `median` is the root of the `right` heap.
+  - If the `left` heap and the `right` heap have the same number of elements, then the `median` is the average of the roots of the 2 heaps.
+
+- To select which heap to insert the next number into, we compare the number with the `median`:
+
+  ```py
+  if num <= median:
+    # insert into left heap
+  else:
+    # insert into right heap
+  ```
+
+  - If the number is smaller than the `median`, then we insert it into the `left` heap
+  - If the number is larger than the `median`, then we insert it into the `right` heap
+  - If the number is equal to the `median`, then we insert it into the `left` heap
+    ![two heaps](./img/two-heaps-2.png)
+    ![two heaps](./img/two-heaps-3.png)
+    ![two heaps](./img/two-heaps-4.png)
+
+- Now, to get the `median` value:
+  - if the total number of elements is `odd`, then the `median` is the `root` of the `left` heap
+    ![two heaps](./img/two-heaps-5.png)
+  - if the total number of elements is `even`, then the `median` is the average of the `roots` of the 2 heaps
+    ![two heaps](./img/two-heaps-6.png)
+
+```py
+class Median:
+    def __init__(self):
+        self.leftHeap = [] # max heap
+        self.rightHeap = [] # min heap
+
+    def insert(self, num):
+        # if the left heap is empty or the number is smaller than the root of the left heap, then insert it into the left heap
+        if len(self.leftHeap) == 0 or num <= -self.leftHeap[0]:
+            heappush(self.leftHeap, -num)
+        # otherwise, insert it into the right heap
+        else:
+            heappush(self.rightHeap, num)
+
+        # balance the heaps
+        if len(self.leftHeap) > len(self.rightHeap) + 1:
+            heappush(self.rightHeap, -heappop(self.leftHeap))
+        elif len(self.rightHeap) > len(self.leftHeap) + 1:
+            heappush(self.leftHeap, -heappop(self.rightHeap))
+
+    def getMedian(self):
+        # odd number of elements
+        if len(self.leftHeap) > len(self.rightHeap):
+            return -self.leftHeap[0]
+        elif len(self.rightHeap) > len(self.leftHeap):
+            return self.rightHeap[0]
+        # even number of elements
+        else:
+            return (-self.leftHeap[0] + self.rightHeap[0]) / 2
+```
+
+---
+
+## Backtracking
+
+It's a technique that uses recursion to try all possible solutions to a problem until we find a solution that works.
+
+- It's used to solve problems that have multiple solutions, and we need to find all of them. EX:
+
+  - Subsets
+  - Combinations
+  - Permutations
+
+- **How Backtracking works**
+  ![backtracking](./img/backtracking-1.png)
+  - It works by creating a **decision tree** of all the possible solutions, and then we traverse the tree to find the solutions that work.
+  - We start by making a decision, then we make another decision, and so on until we reach a solution.
+    - we do so using `recursion` algorithm like `DFS`
+  - If we reach a point where we can't make any more decisions, then we **backtrack** to the previous decision and try another decision.
+    - we do so by `backtracking` to the previous decision and trying another decision
+
+---
+
+### Subsets
+
+**Subset** is a set that contains all the elements of another set, and it can also contain none of the elements of that set.
+
+- Subsets are unique, meaning that we can't have 2 subsets that are the same like `[1, 2]` and `[2, 1]`
+  - This would be called **Permutations**
+- To create the decision tree, we will iterate over the elements of the set and make a decision whether to include the element in the subset or not. Then we will make another decision, and so on until we reach a solution.
+  ![backtracking](./img/backtracking-2.png)
+- The result will be the leaf nodes of the decision tree.
+  ![backtracking](./img/backtracking-3.png)
+
+  - The number of subsets is `2^n`, where `n` is the number of elements in the set. This is because each element has `2` choices, either to include it in the subset or not.
+  - So, the time complexity is `O(n * 2^n)`
+  - Space complexity is `O(n)`
+
+- Code:
+
+  ```py
+  def subsets(nums):
+      subsets = []
+      curSet = []
+      helper(0, nums, curSet, subsets)
+      return subsets
+
+  def helper(i, nums, curSet, subsets):
+      # base case
+      if i == len(nums):
+          subsets.append(curSet[:])
+          return
+
+      # include the current element
+      helper(i + 1, nums, curSet + [nums[i]], subsets)
+      # exclude the current element
+      helper(i + 1, nums, curSet, subsets)
+  ```
+
+- If the problem says that the `nums` has no duplicates **(not distinct)**, then we should do some steps before we start the recursion:
+
+  - sort the `nums` array
+  - skip the duplicates when we're iterating over the `nums` array
+
+  ```py
+  def subsets(nums):
+      subsets = []
+      curSet = []
+      nums.sort()
+      helper(0, nums, curSet, subsets)
+      return subsets
+
+  def helper(i, nums, curSet, subsets):
+      # base case
+      if i == len(nums):
+          subsets.append(curSet[:])
+          return
+
+      # include the current element
+      helper(i + 1, nums, curSet + [nums[i]], subsets)
+
+      # skip the duplicates
+      while i + 1 < len(nums) and nums[i] == nums[i + 1]:
+          i += 1
+
+      # exclude the current element
+      helper(i + 1, nums, curSet, subsets)
+  ```
+
+---
+
+### Combinations
+
+**Combination** is a set of elements where the order doesn't matter.
+
+- Usually when we want combinations, we want them to be of a specific size `k` and not all the possible combinations.
+- There're 2 implementations:
+
+1. Get all the subsets, then stop when we reach the subsets of size `k`
+   ![backtracking](./img/backtracking-4.png)
+
+   - Time complexity: `O(k * 2^n)` -> `O(2^n)`
+   - Space complexity: `O(n)`
+   - The issue here is that we're creating all the subsets, which is not necessary (like the empty subsets for not including any element)
+
+   ```py
+    def combinations(n, k):
+      combs = []
+      helper(1, [], combs, n, k)
+      return combs
+
+    def helper(i, curComb, combs, n, k):
+      # base cases
+      if len(curComb) == k:
+        combs.append(curComb[:])
+        return
+
+      if i > n:
+        return
+
+      # include the current element
+      helper(i + 1, curComb + [i], combs, n, k)
+      # exclude the current element
+      helper(i + 1, curComb, combs, n, k)
+
+   ```
+
+2. More efficient implementation:
+   - using `looping` to create the decision tree by iterating over the elements of the set and make a decision whether to include the element in the subset or not. Then we will make another decision, and so on until we reach a solution.
+     ![backtracking](./img/backtracking-5.png)
+   - Time complexity: `O(k * c(n, k))` -> `O(c(n, k))`
+   - Space complexity: `O(n)`
+
+```py
+def combinations(n, k):
+    combs = []
+    helper(1, [], combs, n, k)
+    return combs
+
+def helper(i, curComb, combs, n, k):
+    # base cases
+    if len(curComb) == k:
+        combs.append(curComb[:])
+        return
+
+    if i > n:
+        return
+
+    for j in range(i, n + 1):
+        # include the current element in the current combination
+        curComb.append(j)
+        helper(j + 1, curComb, combs, n, k)
+        # exclude the current element for future iterations
+        curComb.pop()
+
+        # or
+        # helper(j + 1, curComb + [j], combs, n, k)
+```
+
+---
+
+### Permutations
+
+**Permutation** is a set of elements where the order does matter. (It's a combination with a specific order)
+
+- As the order matters, so we can't have 2 permutations that are the same like `[1, 2]` and `[2, 1]`, this will limit the number of permutations to `n!`
+  ![backtracking](./img/backtracking-6.png)
+
+- Recursive implementation:
+
+  - Time complexity: `O(n^2 * n!)` -> `O(n!)`
+    - `n^2` is the time complexity of `curPerm[:j] + [nums[i]] + curPerm[j:]` (inserting at a specific index in a list)
+    - `n!` is the number of permutations
+  - Space complexity: `O(n)`
+
+  ```py
+  def permutations(nums):
+      return helper(0, nums)
+
+  def helper(i, nums):
+      # base case
+      if i == len(nums):
+          return [[]] # return an empty permutation
+
+      resPerm = []
+      for perm in helper(i + 1, nums):
+          # insert the current element in all the possible positions of the permutations
+          for j in range(len(perm) + 1):
+              resPerm.append(perm[:j] + [nums[i]] + perm[j:])
+
+      return resPerm
+  ```
+
+- Iterative implementation:
+
+  - Same time and space complexity as the recursive implementation
+  - simpler implementation
+
+  ```py
+  def permutations(nums):
+      perms = [[]]
+      for num in nums:
+          nextPerms = []
+          for perm in perms:
+              # insert the current element in all the possible positions of the permutations
+              for j in range(len(perm) + 1):
+                  nextPerms.append(perm[:j] + [num] + perm[j:])
+
+          perms = nextPerms
+
+      return perms
+  ```
+
+  ![backtracking](./img/backtracking-7.png)
 
 ---
 
@@ -2156,7 +2642,7 @@ When dealing with matrix, we can use `DFS` to traverse the matrix for many types
 
 ---
 
-#### Matrix BFS
+### Matrix BFS
 
 When dealing with matrix, we can use `BFS` to traverse the matrix for many types of problems especially when we need to **find the shortest path**
 

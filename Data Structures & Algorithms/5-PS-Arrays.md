@@ -6,26 +6,49 @@
   - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
   - [Two pointers](#two-pointers)
     - [Two Sum II](#two-sum-ii)
-    - [Three Sum](#three-sum)
+    - [Three Sum (Triplet Sum to Zero)](#three-sum-triplet-sum-to-zero)
+    - [3Sum Closest](#3sum-closest)
+    - [3Sum Smaller](#3sum-smaller)
     - [4 Sum](#4-sum)
-    - [Continuous SubArray Sum](#continuous-subarray-sum)
     - [Pair with Target Sum](#pair-with-target-sum)
     - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
+    - [Remove Duplicates from Sorted Array II](#remove-duplicates-from-sorted-array-ii)
     - [Container with most water](#container-with-most-water)
+    - [Squares of a Sorted Array](#squares-of-a-sorted-array)
+    - [Shortest Unsorted Continuous Subarray](#shortest-unsorted-continuous-subarray)
   - [Sliding Window](#sliding-window)
     - [Average of All Contiguous Subarrays of Size K](#average-of-all-contiguous-subarrays-of-size-k)
     - [Minimum Size Subarray Sum](#minimum-size-subarray-sum)
+    - [Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold](#number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold)
     - [Fruit Into Baskets](#fruit-into-baskets)
     - [Longest Subarray of 1's After Deleting One Element](#longest-subarray-of-1s-after-deleting-one-element)
     - [Max Consecutive Ones III](#max-consecutive-ones-iii)
     - [Sliding Window Maximum](#sliding-window-maximum)
-  - [Product of Array Except Self](#product-of-array-except-self)
+  - [Prefix / Prefix Sum](#prefix--prefix-sum)
+    - [Range Sum Query - Immutable](#range-sum-query---immutable)
+    - [Range Sum Query 2D - Immutable](#range-sum-query-2d---immutable)
+    - [Product of Array Except Self](#product-of-array-except-self)
+    - [Continuous SubArray Sum](#continuous-subarray-sum)
+    - [Subarray Sum Equals K](#subarray-sum-equals-k)
+    - [Find Pivot Index](#find-pivot-index)
+  - [Kadane's Algorithm](#kadanes-algorithm)
+    - [Maximum Subarray](#maximum-subarray)
+    - [Maximum Sum Circular Subarray](#maximum-sum-circular-subarray)
+    - [Longest Turbulent Subarray](#longest-turbulent-subarray)
+  - [Fast and Slow Pointers](#fast-and-slow-pointers)
+    - [Find the Duplicate Number](#find-the-duplicate-number)
   - [Trapping Rain Water](#trapping-rain-water)
     - [Solution 1: Extra memory used (O(n) space)](#solution-1-extra-memory-used-on-space)
     - [Solution 2: Two pointers Less memory used (O(1) space)](#solution-2-two-pointers-less-memory-used-o1-space)
-  - [Interval scheduling problems (overlapping intervals)](#interval-scheduling-problems-overlapping-intervals)
+  - [Merge Intervals Pattern](#merge-intervals-pattern)
+    - [Merge Intervals](#merge-intervals)
+    - [Insert Interval](#insert-interval)
+    - [Interval List Intersections](#interval-list-intersections)
+    - [Non-overlapping Intervals](#non-overlapping-intervals)
     - [Meeting Rooms](#meeting-rooms)
     - [Meeting Rooms II](#meeting-rooms-ii)
+    - [Maximum CPU Load](#maximum-cpu-load)
+    - [Employee Free Time](#employee-free-time)
   - [2D Array ( Matrix )](#2d-array--matrix-)
     - [Rotate Image](#rotate-image)
     - [Create a Spiral Matrix](#create-a-spiral-matrix)
@@ -121,6 +144,9 @@ def chunk(arr, size):
 
 ## Two pointers
 
+- Notes:
+  - for `N sum` problems (2sum, 3sum, 4sum, etc...) we can use a `helper` function for searching to make the code cleaner
+
 ### Two Sum II
 
 Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be `numbers[index1]` and `numbers[index2]` where `1 <= index1 < index2 <= numbers.length`.
@@ -147,7 +173,7 @@ def two_sum(numbers, target):
 
 ---
 
-### Three Sum
+### Three Sum (Triplet Sum to Zero)
 
 Given an array `nums` of n integers, are there elements a, b, c in `nums` such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 
@@ -155,12 +181,48 @@ Given an array `nums` of n integers, are there elements a, b, c in `nums` such t
 - **Steps:**
   ![3sum](./img/3sum.png)
 
-- Method 1:
+  - sort the input array first. Use two pointers to find the third element that sums to `zero`, instead of iterating over all possible pairs of elements.
+  - Avoid generating duplicate triplets by skipping over duplicates in the input array and avoiding identical pairs of `(i, j, k)` values.
+    - or we can use a `set` to avoid duplicates
 
-  - sort the input array first. Use two pointers to find the third element that sums to zero, instead of iterating over all possible pairs of elements. Avoid generating duplicate triplets by skipping over duplicates in the input array and avoiding identical pairs of i, `j`, `k` values.
+```py
+# Time: O(n.log(n)) + O(n^2) = O(n^2)
+def three_sum(nums):
+    nums.sort()
+    result = []
+
+    for i in range(len(nums)):
+        # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+        if i > 0 and nums[i] == nums[i-1]:
+            continue
+
+        # set left and right pointers to find the other two values
+        left, right = i+1, len(nums)-1
+        while left < right:
+            total = nums[i] + nums[left] + nums[right]
+            # if the sum is less than zero, move the left pointer to the right to get a larger value
+            if total < 0:
+                left += 1
+            # if the sum is greater than zero, move the right pointer to the left to get a smaller value
+            elif total > 0:
+                right -= 1
+            # otherwise, we have found the triplet
+            else:
+                result.append([nums[i], nums[left], nums[right]])
+                # move both pointers to the middle to see if we have more triplets
+                left += 1
+                right -= 1
+                # skip duplicates
+                while left < right and nums[left] == nums[left-1]:
+                    left += 1
+                while left < right and nums[right] == nums[right+1]:
+                    right -= 1
+    return result
+```
+
+- **Modification:** using a `helper` function
 
   ```py
-  # Time: O(nlog(n)) + O(n^2) = O(n^2)
   def three_sum(nums):
       nums.sort()
       result = []
@@ -170,63 +232,114 @@ Given an array `nums` of n integers, are there elements a, b, c in `nums` such t
           if i > 0 and nums[i] == nums[i-1]:
               continue
 
-          # set left and right pointers to find the other two values
-          left, right = i+1, len(nums)-1
-          while left < right:
-              total = nums[i] + nums[left] + nums[right]
-              # if the sum is less than zero, move the left pointer to the right to get a larger value
-              if total < 0:
-                  left += 1
-              # if the sum is greater than zero, move the right pointer to the left to get a smaller value
-              elif total > 0:
-                  right -= 1
-              # otherwise, we have found the triplet
-              else:
-                  result.append([nums[i], nums[left], nums[right]])
-                  # move both pointers to the middle to see if we have more triplets
-                  left += 1
-                  right -= 1
-                  # skip duplicates
-                  while left < right and nums[left] == nums[left-1]:
-                      left += 1
-                  while left < right and nums[right] == nums[right+1]:
-                      right -= 1
+          # find all pairs that sum to -nums[i]
+          find_two_sum(nums, -nums[i], i+1, result)
+
       return result
+
+  def find_two_sum(nums, target, left, result):
+      right = len(nums) - 1
+
+      while left < right:
+          total = nums[left] + nums[right]
+          if total < target:
+              left += 1
+          elif total > target:
+              right -= 1
+          else:
+              result.append([-target, nums[left], nums[right]])
+              left += 1
+              right -= 1
+              # skip duplicates
+              while left < right and nums[left] == nums[left-1]:
+                  left += 1
+              while left < right and nums[right] == nums[right+1]:
+                  right -= 1
   ```
 
-- Method 2:
+---
 
-  - use three pointers to iterate through the array. Fix `i` at the start and use `j` and `k` to find a pair of elements that sum to the negation of the value at index `i`. Move `j` and `k` towards each other until they meet or the sum is greater than or equal to zero. Add the triplet to a set to remove duplicates. Move `i` to the next unique value and repeat the process.
+### 3Sum Closest
 
-  ```py
-  # Time: O(nlog(n)) + O(n^2) = O(n^2)
-  def three_sum(nums):
-      result = set()
-      nums.sort()
+Given an array `nums` of `n` integers and an integer `target`, find three integers in `nums` such that the sum is **closest** to `target`. Return the sum of the three integers.
 
-      for i in range(len(nums)):
-          # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
-          if i > 0 and nums[i] == nums[i-1]:
-              continue
+You may assume that each input would have exactly one solution.
 
-          # set left and right pointers to find the other two values
-          left, right = i+1, len(nums)-1
-          while left < right:
-              total = nums[i] + nums[left] + nums[right]
-              # if the sum is less than zero, move the left pointer to the right to get a larger value
-              if total < 0:
-                  left += 1
-              # if the sum is greater than zero, move the right pointer to the left to get a smaller value
-              elif total > 0:
-                  right -= 1
-              # otherwise, we have found the triplet
-              else:
-                  result.add((nums[i], nums[left], nums[right]))
-                  # move both pointers to the middle to see if we have more triplets
-                  left += 1
-                  right -= 1
-      return result
-  ```
+- EX: `nums = [-1, 2, 1, -4], target = 1` --> `2` because `(-1 + 2 + 1) = 2`
+
+- Explanation:
+
+  - it's very similar to the [3Sum](#three-sum-triplet-sum-to-zero) problem, but instead of checking if the `sum` is equal to `zero`, we check if the `sum` is equal to the `target`
+  - also, we need to keep track of the `closest` value to the `target` and update it if we find a closer value
+
+    - to do that, we can use the `abs()` function to get the absolute value of the difference between the `sum` and the `target`
+
+      ```py
+      if abs(total - target) < abs(closest - target):
+                  closest = total
+      ```
+
+```py
+# Time: O(n^2)
+def three_sum_closest(nums, target):
+    nums.sort()
+    closest = float('inf')
+
+    for i in range(len(nums)):
+        if i > 0 and nums[i] == nums[i-1]:
+            continue
+
+        left, right = i+1, len(nums)-1
+        while left < right:
+            total = nums[i] + nums[left] + nums[right]
+            if total < target:
+                left += 1
+            elif total > target:
+                right -= 1
+            else:
+                return total
+
+            # update the closest value
+            if abs(total - target) < abs(closest - target):
+                closest = total
+    return closest
+```
+
+---
+
+### 3Sum Smaller
+
+Given an array `nums` of `n` integers and an integer `target`, find the number of index triplets `i`, `j`, `k` with `0 <= i < j < k < n` that satisfy the condition `nums[i] + nums[j] + nums[k] < target`.
+
+- EX: `nums = [-2, 0, 1, 3], target = 2` --> `2`
+
+  - because `(-2 + 0 + 1) < 2` and `(-2 + 0 + 3) < 2`
+
+- Explanation:
+
+  - it's very similar to the [3Sum](#three-sum-triplet-sum-to-zero) problem, but instead of checking if the `sum` is equal to `zero`, we check if the `sum` is less than the `target`
+  - also, we need to keep track of the `count` of the triplets that satisfy the condition
+
+```py
+# Time: O(n^2)
+def three_sum_smaller(nums, target):
+    nums.sort()
+    count = 0
+
+    for i in range(len(nums)):
+        if i > 0 and nums[i] == nums[i-1]:
+            continue
+
+        left, right = i+1, len(nums)-1
+        while left < right:
+            total = nums[i] + nums[left] + nums[right]
+            if total < target:
+                count += right - left
+                left += 1
+            else:
+                right -= 1
+    return count
+```
 
 ---
 
@@ -243,8 +356,6 @@ You may return the answer in **any order**.
 - EX: `nums = [1, 0, -1, 0, -2, 2], target = 0` --> `[[-2, -1, 1, 2], [-2, 0, 0, 2], [-1, 0, 0, 1]]`
 
 - **Steps:**
-  ![4sum](./img/4sum)
-
   - Sort the array
   - Loop through the array
     - If the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
@@ -297,74 +408,11 @@ def four_sum(nums, target):
 
 ---
 
-### Continuous SubArray Sum
-
-Given an integer array `nums` and an integer `k`, return `true` if `nums` has a continuous subarray of size at least two whose elements sum up to a multiple of `k`, or `false` otherwise.
-
-An integer `x` is a multiple of `k` if there exists an integer `n` such that `x = n * k`. `0` is **always** a multiple of `k`.
-
-- EX: `nums = [23, 2, 4, 6, 7], k = 6` --> `true` because `[2, 4]` is a continuous subarray of size 2 and sums up to 6 which is a multiple of 6.
-
-- the brute force solution is to loop through the array and check every possible subarray, but that would be O(n^2) time complexity
-- But we can solve it in O(n) time complexity using a dictionary to store the `remainder` and its ending `index`:
-  - If the `remainder` is in the dictionary, check if the difference between the current index and the index of the `remainder` is greater than 1
-    ![continuous-subarray-sum](./img/continuous-subarray-sum.png)
-    - if so, return `True` as we have found a continuous subarray of size at least two whose elements sum up to a multiple of `k`
-    - because if the remainder is in the dictionary, that means we have seen it before, and the difference between the current index and the index of the `remainder` is the size of the subarray **because the sum of the elements between the two indices is a multiple of `k`**
-    - and if the difference is greater than 1, that means there is at least one element between the two indices, and the sum of the elements between the two indices is a multiple of `k`
-  - If the `remainder` is not in the dictionary, add it to the dictionary
-    - If the `remainder` is not in the dictionary, that means we have not seen it before, so we add it to the dictionary
-  - > **Note:** We initialize the dictionary with `0: -1` because the sum of the first element is 0 and the size of the subarray must be at least 2 and if the first element is a multiple of `k`, we will get index as 0 and 0 - (-1) = 1 which is not greater than 1, so we need to initialize the dictionary with `0: -1` to avoid this case
-
-```py
-def check_subarray_sum(nums, k):
-    # Create a dictionary to store the remainder and its index
-    remaindersDict = {0: -1} # Initialize the dictionary with 0: -1 because the sum of the first element is 0 and the size of the subarray must be at least 2
-    total = 0
-
-    for i in range(len(nums)):
-        total += nums[i]
-        # If k is not 0, get the remainder of the sum by dividing by k
-        if k != 0:
-            remainder = total % k
-        # If the remainder is in the dictionary, check if the difference between the current index and the index of the remainder is greater than 1 -> len(subarray) >= 2
-        if remainder not in remaindersDict:
-            # If the remainder is not in the dictionary, add it to the dictionary
-            remaindersDict[remainder] = i
-        elif i - remaindersDict[remainder] > 1:
-            return True
-
-    return False
-```
-
----
-
 ### Pair with Target Sum
 
 Given an array of sorted numbers and a target sum, find a pair in the array whose sum is equal to the given target.
 
-- EX: `arr = [1, 2, 3, 4, 6], target = 6` --> `[1, 3]` because `1 + 3 = 6`
-
-- Explanation:
-  - the thing here is to make use of the fact that the **array is sorted**
-  - So, one solution would be to use a `binary search` to find the second number -> `O(nlog(n))`, but we can do better
-  - The best solution would be to use a **two pointers** pattern to check for all the elements in the array -> `O(n)`
-
-```py
-def pair_with_targetsum(arr, target_sum):
-    left = 0
-    right = len(arr) - 1
-
-    while left < right:
-        if arr[left] + arr[right] == target_sum:
-            return [left, right]
-        elif arr[left] + arr[right] < target_sum:
-            left += 1
-        else:
-            right -= 1
-    # If the target was not found, return [-1, -1]
-    return [-1, -1]
-```
+Same as [Two Sum II](#two-sum-ii)
 
 ---
 
@@ -395,6 +443,49 @@ def removeDuplicates(nums):
     for i in range(1, len(nums)):
         # if the current element is not equal to the last unique element, increment the last unique index and then update the last unique element
         if nums[i] != nums[last_unique]:
+            last_unique += 1
+            nums[last_unique] = nums[i]
+
+    # return the length of the array
+    return last_unique + 1
+```
+
+---
+
+### Remove Duplicates from Sorted Array II
+
+Given a sorted array `nums`, remove the duplicates **in-place** such that duplicates appeared at most **twice** and return the new length.
+
+return the new length.
+
+- Ex:
+
+  - `nums = [1,1,1,2,2,3]` -> `5` -> `(nums = [1,1,2,2,3,_,_])`
+
+- Explanation:
+  - we can use a **two pointers** pattern
+  - we can use the first pointer to keep track of the `last unique` element in the array, and the second pointer to iterate over the array and check if the current element is equal to the last unique element
+    - if it is, then we increment the `count` of the current element
+    - if it is not, then we reset the `count` of the current element to `1`
+  - if the count is less than or equal to `2`, then we increment the `last unique` index **and then** update the `last unique` element
+
+```py
+def removeDuplicates(nums):
+    if len(nums) == 0: return 0
+
+    last_unique = 0
+    count = 1 # count of the current element
+
+    for i in range(1, len(nums)):
+        # if the current element is equal to the last unique element, increment the count
+        if nums[i] == nums[last_unique]:
+            count += 1
+        # if the current element is not equal to the last unique element, reset the count to 1
+        else:
+            count = 1
+
+        # if the count is less than or equal to 2, increment the last unique index and then update the last unique element
+        if count <= 2:
             last_unique += 1
             nums[last_unique] = nums[i]
 
@@ -449,6 +540,103 @@ def max_area(height):
         else:
             right -= 1
     return max_area
+```
+
+---
+
+### Squares of a Sorted Array
+
+Given an integer array `nums` sorted in **non-decreasing** order, return an array of **the squares of each number sorted in non-decreasing order**.
+
+- EX: `[-4,-1,0,3,10] --> [0,1,9,16,100]`
+
+- Explanation:
+  - We can solve it normally in `O(nlogn)` time by squaring each element and then sorting the array
+  - But we can do better in `O(n)` time by using **2 pointers**
+    ![sort squares](./img/sort-squares.jpg)
+    - This is done by using 2 pointers, one at the start of the array and one at the end of the array
+    - Since the numbers at both the ends can give us the largest square, an alternate approach could be to use two pointers starting at both the ends of the input array. At any step, whichever pointer gives us the bigger square we add it to the result array and move to the next/previous number according to the pointer.
+      - this is because the array is sorted in **non-decreasing** order so we can get the largest element by comparing the absolute values of the 2 pointers (both sides)
+    - we can then square the largest element and add it to the result array using the index of the responding pointer
+
+```py
+def sortedSquares(nums):
+    l, r = 0, len(nums) - 1
+    result = [0] * len(nums)
+    # set the index of the result array
+    index = len(nums) - 1
+
+    # loop until the left pointer is greater than the right pointer
+    while l <= r:
+        left_abs, right_abs = abs(nums[l]), abs(nums[r])
+
+        # check if the left absolute value is greater than the right absolute value and change the result array accordingly
+        if left_abs > right_abs:
+            result[index] = left_abs ** 2
+            l += 1
+        else:
+            result[index] = right_abs ** 2
+            r -= 1
+
+        # move the index pointer to the left
+        index -= 1
+
+    return result
+```
+
+---
+
+### Shortest Unsorted Continuous Subarray
+
+Given an integer array `nums`, you need to find one **continuous subarray** that if you only sort this subarray in ascending order, then the whole array will be sorted in ascending order.
+
+Return the **shortest** such subarray and output its length.
+
+- EX: `nums = [2,6,4,8,10,9,15]` --> `5`
+
+  - because the subarray `[6,4,8,10,9]` needs to be sorted in ascending order to make the whole array sorted in ascending order.
+
+- Explanation
+  ![shortest unsorted continuous subarray](./img/shortest-unsorted-continuous-subarray-1.png)
+  - We know, once an array is sorted, the smallest element is at the beginning and the largest element is at the end of the array.
+    - So if we start from the beginning of the array to find the first element which is out of sorting order i.e., (which is **smaller than its previous element**), and similarly from the end of array to find the first element (which is **bigger than its previous element**)
+    - will sorting the subarray between these two numbers result in the whole array being sorted?
+      - No, because there could be some intermediate numbers that are bigger than the number in the beginning of the array and smaller than the number at the end of the array.
+      - We will need to include all such intermediate numbers while trying to find the smallest subarray to be sorted.
+      - we do so by getting the `min` and `max` of the subarray
+        - then we extend the subarray to include any number which is bigger than the minimum of the subarray
+        - and extend the subarray to include any number which is smaller than the maximum of the subarray
+        - this way we can include all the numbers that are out of sorting order
+  - Time complexity: `O(n)`
+
+```py
+def find_unsorted_subarray(nums):
+    # find the first number out of sorting order from the beginning
+    i = 0
+    while i < len(nums) - 1 and nums[i] <= nums[i+1]:
+        i += 1
+
+    # if the array is already sorted
+    if i == len(nums) - 1:
+        return 0
+
+    # find the first number out of sorting order from the end
+    j = len(nums) - 1
+    while j > 0 and nums[j] >= nums[j-1]:
+        j -= 1
+
+    # find the maximum and minimum of the subarray
+    subarray_max = max(nums[i:j+1])
+    subarray_min = min(nums[i:j+1])
+
+    # extend the subarray to include any number which is bigger than the minimum of the subarray
+    while i > 0 and nums[i-1] > subarray_min:
+        i -= 1
+    # extend the subarray to include any number which is smaller than the maximum of the subarray
+    while j < len(nums) - 1 and nums[j+1] < subarray_max:
+        j += 1
+
+    return j - i + 1
 ```
 
 ---
@@ -516,6 +704,30 @@ def min_sub_array_len(target, nums):
 
 - Time complexity: `O(n + n) = O(n)` because the outer `for` loop runs for all elements and the inner `while` loop processes each element **only once**, therefore the time complexity of the algorithm will be `O(n+n)` which is asymptotically equivalent to `O(n)`.
   - It's not `O(n^2)` because the inner `while` loop will process each element **only once**.
+
+---
+
+### Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold
+
+Given an array of integers `arr` and two integers `k` and `threshold`. Return the number of sub-arrays of size `k` and average greater than or equal to `threshold`.
+
+```py
+def num_of_subarrays(arr, k, threshold):
+    result = 0
+    windowSum = 0
+    windowStart = 0
+
+    for windowEnd in range(len(arr)):
+        windowSum += arr[windowEnd]
+
+        if windowEnd >= k - 1:
+            if windowSum / k >= threshold:
+                result += 1
+            windowSum -= arr[windowStart]
+            windowStart += 1
+
+    return result
+```
 
 ---
 
@@ -652,7 +864,79 @@ def max_sliding_window(nums, k):
 
 ---
 
-## Product of Array Except Self
+## Prefix / Prefix Sum
+
+It's based on that the `prefix` of an array is the sum of the starting window of the array (first element to the current element). and then we can get the sum of any subarray by subtracting the prefix of the element before the start of the subarray from the prefix of the last element of the subarray.
+
+- In English: an array where each `index` is the **sum** of all elements from `0` up to and including that `index` in the original array.
+
+![prefix-sum](./img/prefix-sum-1.png)
+
+- To calculate the prefix sum for a given range `[i, j]`, we can use the following formula: `prefix[j] - prefix[i-1]`
+- It must start from the **beginning** of the array, and it must be continuous.
+
+### Range Sum Query - Immutable
+
+Given an integer array `nums`, find the sum of the elements between indices `left` and `right` inclusive, where `(left <= right)`
+
+- EX: `['NumArray', 'sumRange', 'sumRange', 'sumRange'], [[[1, 2, 3, 4, 5]], [0, 2], [2, 4], [0, 4]]` --> `[null, 6, 12, 15]`
+
+- Explanation:
+  - This is a **prefix sum** problem, we can use a `prefix` array to store the sum of the first `i` elements of the array, and then we can get the sum of any `subarray` by subtracting the `prefix` of the element before the `start` of the subarray (`left`) from the `prefix` of the last element of the subarray (`right`).
+  - We do this because we want to remove the sum of the elements before the `start` of the subarray from the sum of the elements before the `end` of the subarray, so we can get the sum of the subarray.
+    - We do it by subtracting the `prefix` of the element before the `start` of the subarray from the `prefix` of the last element of the subarray.
+    - because the `prefix` of the element before the `start` of the subarray contains the sum of the elements before the `start` of the subarray, and the `prefix` of the last element of the subarray contains the sum of the elements before the `end` of the subarray.
+      ![prefix-sum](./img/range-sum-query-0.png)
+
+```py
+class NumArray:
+    def __init__(self, nums):
+        # we add an extra element to the prefix array to make it easier to calculate the sum of the first element
+        self.prefix = [0] * (len(nums) + 1)
+        for i in range(len(nums)):
+            self.prefix[i+1] = self.prefix[i] + nums[i]
+
+    def sumRange(self, left, right):
+        return self.prefix[right+1] - self.prefix[left]
+```
+
+---
+
+### Range Sum Query 2D - Immutable
+
+Given a 2D matrix `matrix`, handle multiple queries of the following type:
+
+- Calculate the sum of the elements of `matrix` inside the rectangle defined by its **upper left corner** `(row1, col1)` and **lower right corner** `(row2, col2)`.
+- Implement the NumMatrix class:
+
+  - `NumMatrix(int[][] matrix)` Initializes the object with the integer matrix `matrix`.
+  - `int sumRegion(int row1, int col1, int row2, int col2)` Returns the sum of the elements of `matrix` inside the rectangle defined by its **upper left corner** `(row1, col1)` and **lower right corner** `(row2, col2)`.
+
+![prefix-sum-2d](./img/range-sum-query-1.jpeg)
+![prefix-sum-2d](./img/range-sum-query-2.png)
+![prefix-sum-2d](./img/range-sum-query-3.png)
+
+```py
+class NumMatrix:
+    def __init__(self, matrix):
+        if not matrix or not matrix[0]: return
+        self.prefix = [[0] * (len(matrix[0]) + 1) for _ in range(len(matrix) + 1)]
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                self.prefix[i+1][j+1] = self.prefix[i+1][j] + self.prefix[i][j+1] - self.prefix[i][j] + matrix[i][j]
+
+    def sumRegion(self, row1, col1, row2, col2):
+        top_left = self.prefix[row1][col1]
+        top_right = self.prefix[row1][col2+1]
+        bottom_left = self.prefix[row2+1][col1]
+        bottom_right = self.prefix[row2+1][col2+1]
+
+        return bottom_right - bottom_left - top_right + top_left
+```
+
+---
+
+### Product of Array Except Self
 
 Given an integer array `nums`, return an array `answer` such that `answer[i]` is equal to the product of all the elements of `nums` except `nums[i]`.
 
@@ -725,6 +1009,306 @@ def product_except_self(nums):
 
     return result
 ```
+
+---
+
+### Continuous SubArray Sum
+
+Given an integer array `nums` and an integer `k`, return `true` if `nums` has a continuous subarray of size at least two whose elements sum up to a multiple of `k`, or `false` otherwise.
+
+An integer `x` is a multiple of `k` if there exists an integer `n` such that `x = n * k`. `0` is **always** a multiple of `k`.
+
+- EX: `nums = [23, 2, 4, 6, 7], k = 6` --> `true` because `[2, 4]` is a continuous subarray of size 2 and sums up to 6 which is a multiple of 6.
+
+- Explanation
+  - the brute force solution is to loop through the array and check every possible subarray, but that would be `O(n^2)` time complexity
+  - But we can solve it in `O(n)` time complexity using a **prefix sum** and a dictionary to store the `remainder` and its ending `index`:
+    - Here, we want to use `prefix sum` because we want to know the sum of the elements between two indices **(range sum)**
+      - range sum = `prefix_sum[j] - prefix_sum[i-1]`
+    - The `remainder` will be the indicator of whether the sum of the elements between two indices is a multiple of `k`
+      - If the `remainder` is in the dictionary, that means we have seen it before, and the difference between the current index and the index of the `remainder` is the size of the subarray **because the sum of the elements between the two indices is a multiple of `k`**
+      - and if the difference is greater than 1, that means there is at least one element between the two indices, and the sum of the elements between the two indices is a multiple of `k`
+    - If the `remainder` is in the dictionary, check if the difference between the current index and the index of the `remainder` is greater than `1`
+      ![continuous-subarray-sum](./img/continuous-subarray-sum.png)
+      - if so, return `True`
+    - If the `remainder` is not in the dictionary, that means we have not seen it before, so we add it to the dictionary
+    - **Note:** We initialize the dictionary with `0: -1` because the sum of the first element is 0 and the size of the subarray must be at least `2` and if the first element is a multiple of `k`, we will get index as `0` and `0 - (-1) = 1` which is not greater than `1`, so we need to initialize the dictionary with `0: -1` to avoid this case
+      - So this will ensure that we won't return `true` if the first element is a multiple of `k`
+
+```py
+def check_subarray_sum(nums, k):
+    # Create a dictionary to store the remainder and its index
+    remaindersDict = {0: -1} # Initialize the dictionary with 0: -1 because the sum of the first element is 0 and the size of the subarray must be at least 2
+    total = 0
+
+    for i in range(len(nums)):
+        total += nums[i]
+        # If k is not 0, get the remainder of the sum by dividing by k
+        if k != 0:
+            remainder = total % k
+        # If the remainder is in the dictionary, check if the difference between the current index and the index of the remainder is greater than 1 -> len(subarray) >= 2
+        if remainder not in remaindersDict:
+            # If the remainder is not in the dictionary, add it to the dictionary
+            remaindersDict[remainder] = i
+        elif i - remaindersDict[remainder] > 1:
+            return True
+
+    return False
+```
+
+---
+
+### Subarray Sum Equals K
+
+Given an array of integers `nums` and an integer `k`, return the total number of continuous subarrays whose sum equals to `k`.
+
+- EX: `nums = [1, 1, 1], k = 2` --> `2` because `[1, 1]` and `[1, 1]` are the only two subarrays whose sum equals to `k`
+
+- Explanation
+  - we use `prefix sum` technique to solve this problem in `O(n)` time complexity
+  - we create a dictionary to store the `prefix sum` and its `count`
+    - we initialize the dictionary with `0: 1` because the sum of the first element is 0 and the size of the subarray must be at least `1`
+  - We use formula `sum - k` to get the value we want to remove from the subarray's sum to get a sum of `k`
+    ![subarray-sum-equals-k](./img/subarray-sum-equals-k-1.png)
+    - If the difference between the sum and `k` is in the dictionary, add the frequency of the difference to the count, because that means we have seen the difference before, and the difference between the current index and the index of the difference is the size of the subarray **because the sum of the elements between the two indices is `k`**
+      - and if the difference is greater than `1`, that means there is at least one element between the two indices, and the sum of the elements between the two indices is `k`
+    - If the sum is not in the dictionary, add it to the dictionary
+
+```py
+def subarray_sum(nums, k):
+    count = 0
+    sum = 0
+    # Create a dictionary to store the prefix sum and its count
+    dic = {0: 1} # Initialize the dictionary with 0: 1 because the sum of the first element is 0 and the size of the subarray must be at least 1
+
+    for i in range(len(nums)):
+        sum += nums[i]
+        # If the difference between the sum and k is in the dictionary, add the frequency of the difference to the count
+        if sum - k in dic:
+            count += dic[sum - k]
+        # If the sum is not in the dictionary, add it to the dictionary
+        dic[sum] = dic.get(sum, 0) + 1
+
+    return count
+```
+
+---
+
+### Find Pivot Index
+
+Given an array of integers `nums`, calculate the **pivot index** of this array.
+
+```py
+def pivot_index(nums):
+    total = sum(nums)
+    left_sum = 0
+
+    for i in range(len(nums)):
+        right_sum = total - left_sum - nums[i]
+        if left_sum == right_sum:
+            return i
+        # Add the current element to the left sum
+        left_sum += nums[i]
+
+    return -1
+```
+
+---
+
+## Kadane's Algorithm
+
+Kadane's algorithm is used to find the **maximum sum** of a contiguous subarray within an array of numbers in `O(n)` time.
+
+![kadane's-algorithm](./img/kadane-algorithm.png)
+
+- It's based on the idea that a positive contiguous segment (`max_ending_here`) is added to the previous contiguous segment (`max_so_far`) only if the previous contiguous segment is `positive`. Otherwise, it is better to start a new contiguous segment from the current element because adding the current element to the previous contiguous segment will only decrease the sum.
+- It's very common to `sliding window` and `2 pointers` problems.
+
+### Maximum Subarray
+
+Given an integer array `nums`, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
+
+- EX: `nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]` --> `6`
+
+  - Explanation: `[4, -1, 2, 1]` has the largest sum = `6`
+
+- **Explanation:**
+  - Instead of using nested loops, we can use Kadane's algorithm to find the maximum sum of a contiguous subarray within an array of numbers in `O(n)` time.
+  - We can use a variable `max_sum` to store the maximum sum of the subarray, and another variable `current_sum` to store the current sum of the subarray.
+  - We iterate over the array and do the following:
+    - If the `current_sum` is less than `0`, we reset it to `0` **because we don't want to add a negative number to the next element in the array**.
+    - We then add the current element to the `current_sum`.
+    - We then check if the `current_sum` is greater than the `max_sum`, and if it is, we set the `max_sum` to the `current_sum`.
+
+```py
+def max_subarray(nums):
+    max_sum = nums[0]
+    current_sum = 0
+
+    for num in nums:
+        if current_sum < 0:
+            current_sum = 0
+        current_sum += num
+        max_sum = max(max_sum, current_sum)
+
+    return max_sum
+```
+
+---
+
+### Maximum Sum Circular Subarray
+
+> Watch neetcode'∂s video ⚠️
+
+Given a circular integer array `nums` of length `n`, return the maximum possible sum of a non-empty subarray of `nums`.
+
+A circular array means the end of the array connects to the beginning of the array. Formally, the next element of `nums[i]` is `nums[(i + 1) % n]` and the previous element of `nums[i]` is `nums[(i - 1 + n) % n]`.
+
+- EX: `nums = [1, -2, 3, -2]` --> `3`
+
+  - Explanation: `[3]` has the maximum sum `3`
+
+- **Explanation:**
+  - Same as the previous problem, but we need to consider the case where the maximum sum is circular.
+    ![maximum-sum-circular-subarray](./img/maximum-sum-circular-subarray.png)
+  - This is done by finding the `minimum` sum of a subarray and subtracting it from the total sum of the array.
+    - The minimum sum of a subarray is found by using Kadane's algorithm on the negative of the array.
+    - It's used to find the maximum sum of a subarray that wraps around the array.
+
+```py
+def maxSubarraySumCircular(nums):
+    max_sum = nums[0]
+    min_sum = nums[0]
+    current_max = 0
+    current_min = 0
+    total_sum = 0
+
+    for num in nums:
+        current_max = max(current_max + num, num)
+        max_sum = max(max_sum, current_max)
+
+        current_min = min(current_min + num, num)
+        min_sum = min(min_sum, current_min)
+
+        total_sum += num
+
+    if total_sum == min_sum:
+        return max_sum
+
+    return max(max_sum, total_sum - min_sum)
+```
+
+---
+
+### Longest Turbulent Subarray
+
+> Watch neetcode'∂s video ⚠️
+
+Given an integer array `arr`, return the length of a maximum size turbulent subarray of `arr`.
+
+> A subarray is **turbulent** if the comparison sign flips between each adjacent pair of elements in the subarray.
+> More formally, a subarray `[arr[i], arr[i + 1], ..., arr[j]]` of `arr` is said to be turbulent if and only if:
+>
+> - For `i <= k < j`: `arr[k] > arr[k + 1]` when `k` is odd, and `arr[k] < arr[k + 1]` when `k` is even.
+> - Or, for `i <= k < j`: `arr[k] > arr[k + 1]` when `k` is even, and `arr[k] < arr[k + 1]` when `k` is odd.
+
+- EX: `arr = [9, 4, 2, 10, 7, 8, 8, 1, 9]` --> `5`
+
+  - Explanation: `[4, 2, 10, 7, 8]` is the longest turbulent subarray.
+
+- **Explanation:**
+  - We can use Kadane's algorithm to find the longest turbulent subarray.
+  - We can use two pointers `l` and `r` to keep track of the start and end of the subarray.
+  - We can use a variable `res` to keep track of the longest turbulent subarray.
+  - We can use a variable `prev` to keep track of the previous comparison sign.
+    - If the previous comparison sign is `>` and the current comparison sign is `<`, we increment `r` and update `res`. because the subarray is still turbulent.
+    - If the previous comparison sign is `<` and the current comparison sign is `>`, we increment `r` and update `res`. because the subarray is still turbulent.
+    - If the previous comparison sign is `>` and the current comparison sign is `>`, we reset `l` and `r` to `r - 1` because the subarray is no longer turbulent.
+
+```py
+def maxTurbulenceSize(arr):
+    l, r = 0, 1
+    res, prev = 1, ""
+
+    while r < len(arr):
+        if arr[r - 1] > arr[r] and prev != ">":
+            res = max(res, r - l + 1)
+            r += 1
+            prev = ">"
+        elif arr[r - 1] < arr[r] and prev != "<":
+            res = max(res, r - l + 1)
+            r += 1
+            prev = "<"
+        else:
+            r = r + 1 if arr[r - 1] == arr[r] else r
+            l = r - 1
+            prev = ""
+
+    return res
+```
+
+---
+
+## Fast and Slow Pointers
+
+### Find the Duplicate Number
+
+Given an array of integers `nums` containing `n + 1` integers where each integer is in the range `[1, n]` inclusive.
+
+There is only **one repeated number** in `nums`, return this repeated number.
+
+- You must solve the problem **without** modifying the array `nums` and uses only constant extra space.
+
+- EX:
+
+  - Input: `nums = [1,3,4,2,2]`
+  - Output: `2`
+
+- **Solution 1:** using HashMap **(not what the problem wants)** -> `O(n)` time and `O(n)` space
+
+  ```py
+  def findDuplicate(nums):
+      # Create a dictionary to store the presence of each number
+      presence = {}
+      for num in nums:
+          if num in presence:
+              return num
+          presence[num] = True
+  ```
+
+- **Solution 2:** using **Floyd's Cycle Detection** -> `O(n)` time and `O(1)` space ✅
+
+  - To solve this problem without using space, we can use Floyd's Cycle Detection algorithm. This algorithm is used to detect cycles in a `linked list`.
+    - It works by using two pointers, a `slow` pointer and a `fast` pointer. The `slow` pointer moves one step at a time, while the `fast` pointer moves two steps at a time.
+    - If the two pointers ever meet, it means that there is a cycle in the linked list. Otherwise, if the `fast` pointer reaches the end of the linked list, it means that there is no cycle in the linked list.
+  - **Explanation**
+    1. We need to find the **intersection point** of the two runners, because it is the duplicate number that we are looking for.
+       ![find duplicate num](./img/find-duplicate-num.png)
+       - We start both runners at the beginning of the linked list and keep moving them until they meet. The fast runner will move two steps at a time, while the slow runner will move one step at a time.
+    2. Once the two runners meet, we know that there is a cycle in the linked list. We then need to find the "entrance" to the cycle, which is the duplicate number that we are looking for.
+       ![find duplicate num](./img/find-duplicate-num-1.png)
+       - We start a new pointer at the beginning of the linked list and move it one step at a time. We also move the slow runner one step at a time. When the two runners meet, we have found the "entrance" to the cycle, which is the duplicate number that we are looking for.
+
+  ```py
+  def findDuplicate(nums):
+      # Find the intersection point of the two runners
+      slow = fast = 0
+      while True:
+          slow = nums[slow] # move 1 step
+          fast = nums[nums[fast]] # move 2 steps
+          if slow == fast:
+              break # found the intersection point
+
+      # Find the "entrance" to the cycle
+      slow2 = 0
+      while slow2 != fast:
+          slow2 = nums[slow2] # move 1 step
+          fast = nums[fast] # move 1 step
+
+      return slow2
+  ```
+
+- **Solution 3:** using **cyclic sort**, [here](./10-PS-Sorting-Searching.md#find-the-duplicate-number)
 
 ---
 
@@ -852,7 +1436,198 @@ def trap(height):
 
 ---
 
-## Interval scheduling problems (overlapping intervals)
+## Merge Intervals Pattern
+
+It's a pattern that can be used to solve problems that involve overlapping intervals, where we need to find the overlapping intervals or merge them.
+
+- if we have 2 intervals `a` and `b`, there are 6 different ways they can relate to each other:
+  ![merge intervals](./img/merge-intervals-0.png)
+
+### Merge Intervals
+
+Given an array of intervals where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+
+![merge intervals](./img/merge-intervals-2.svg)
+
+- Ex:
+
+  - `intervals = [[1, 3], [2, 6], [8, 10], [15, 18]] --> [[1, 6], [8, 10], [15, 18]]`
+    ![merge intervals](./img/merge-intervals-1.png)
+
+- Explanation:
+
+  - goal is to merge the overlapping intervals like this:
+    ![merge intervals](./img/merge-intervals-3.svg)
+  - We can sort the intervals by the `start` time
+  - Then we can check if the current interval overlaps with the previous interval
+
+    - If there is **no overlap**, then we can add the current interval to the merged intervals
+    - If there is **overlap**, then we can merge the current interval with the previous interval
+
+      ```py
+      c.start = a.start
+      c.end = max(a.end, b.end)
+      ```
+
+```py
+def merge(intervals):
+    # sort the intervals by the start time
+    intervals.sort(key=lambda x: x[0])
+
+    merged = []
+    for interval in intervals:
+        # check if interval does not overlap with the previous one
+        if not merged or merged[-1][1] < interval[0]:
+            merged.append(interval)
+        else:
+            # otherwise, there is overlap, so we merge the current and previous interval (which is the last interval in the `merged` list)
+            merged[-1][1] = max(merged[-1][1], interval[1])
+
+    return merged
+
+
+# -----------------------------another way-----------------------------
+
+def merge(intervals):
+    intervals.sort(key=lambda x: x[0])
+
+    res = [intervals[0]]
+    for interval in intervals[1:]:
+        lastEnd = res[-1][1]
+
+        # check if start of current interval is less than or equal to the end of the last interval
+        if interval[0] <= lastEnd:
+            res[-1][1] = max(lastEnd, interval[1])
+        else:
+            res.append(interval)
+
+    return res
+```
+
+---
+
+### Insert Interval
+
+Given a set of `non-overlapping` intervals, insert a new interval into the intervals. such that the intervals are still sorted. and no overlapping intervals exist. (merge if necessary)
+
+- Ex:
+
+  - input: `intervals = [[1, 3], [6, 9]], newInterval = [2, 5]`
+  - output: `[[1, 5], [6, 9]]`
+
+- Explanation:
+  - We need to first find the position of the new interval in the intervals (we need to skip the intervals that come before the new interval)
+  - Once we find the position of the new interval, we can merge it with the intervals that overlap with it
+  - Finally, we can add the new interval to the merged intervals and add the rest of the intervals that come after the new interval
+
+```py
+def insert(intervals, newInterval):
+    merged = []
+    i = 0
+
+    # add all the intervals that come before the new interval
+    while i < len(intervals) and intervals[i][1] < newInterval[0]:
+        merged.append(intervals[i])
+        i += 1
+
+    # merge all the intervals that overlap with the new interval
+    while i < len(intervals) and intervals[i][0] <= newInterval[1]:
+        newInterval[0] = min(newInterval[0], intervals[i][0])
+        newInterval[1] = max(newInterval[1], intervals[i][1])
+        i += 1
+
+    # add the new interval
+    merged.append(newInterval)
+
+    # add all the intervals that come after the new interval
+    while i < len(intervals):
+        merged.append(intervals[i])
+        i += 1
+
+    return merged
+```
+
+---
+
+### Interval List Intersections
+
+Given two lists of `closed` intervals, each list of intervals is pairwise disjoint and in sorted order. Return the intersection of these two interval lists.
+
+The intersection of two closed intervals is a set of real numbers that are either empty or represented as a closed interval. For example, the intersection of `[1, 3]` and `[2, 4]` is `[2, 3]`.
+
+![interval list intersections](./img/interval-list-intersections-1.png)
+
+- Ex:
+
+  - input: `firstList = [[0, 2], [5, 10], [13, 23], [24, 25]], secondList = [[1, 5], [8, 12], [15, 24], [25, 26]]`
+  - output: `[[1, 2], [5, 5], [8, 10], [15, 23], [24, 24], [25, 25]]`
+
+```py
+# O(n + m) time and O(n + m) space
+def intervalIntersection(firstList, secondList):
+    res = []
+    i, j = 0, 0
+    start, end = 0, 1
+
+    while i < len(firstList) and j < len(secondList):
+        # check if the intervals overlap
+        if (
+          firstList[i][start] <= secondList[j][end] and
+          firstList[i][end] >= secondList[j][start]
+        ):
+            # get the intersection
+            intersection = [
+              max(firstList[i][start], secondList[j][start]),
+              min(firstList[i][end], secondList[j][end])
+            ]
+            res.append(intersection)
+
+        # move to the next interval that comes first
+        if firstList[i][end] < secondList[j][end]:
+            i += 1
+        else:
+            j += 1
+
+    return res
+```
+
+---
+
+### Non-overlapping Intervals
+
+Given an array of intervals `intervals` where `intervals[i] = [starti, endi]`, return the **minimum** number of intervals you need to remove to make the rest of the intervals non-overlapping.
+
+- Ex:
+
+  - `intervals = [[1, 2], [2, 3], [3, 4], [1, 3]] --> 1`
+  - Explanation: [1, 3] can be removed and the rest of intervals are non-overlapping.
+
+- Explanation:
+  - We can sort the intervals by the `start` time
+  - Then we can check if the current interval overlaps with the previous interval
+    - If there is no overlap, then we can add the current interval to the merged intervals
+    - If there is overlap, then we can merge the current interval with the previous interval
+
+```py
+def eraseOverlapIntervals(intervals):
+    # sort the intervals by the start time
+    intervals.sort(key=lambda x: x[0])
+
+    res = 0
+    prevEnd = intervals[0][1]
+    for start, end in intervals[1:]:
+        # overlap
+        if start < prevEnd:
+            res += 1
+            prevEnd = min(prevEnd, end) # remove the interval with the larger end time
+        # no overlap
+        else:
+            prevEnd = end
+
+    return res
+```
+
+---
 
 ### Meeting Rooms
 
@@ -865,19 +1640,15 @@ Given an array of meeting time intervals `intervals` where `intervals[i] = [star
 - **Steps**:
 
   1. Sort the intervals **by the start time**
-  2. Loop through the sorted intervals and check if the end time of the current interval is greater than the start time of the next interval. If it is, then return `false`.
-     - check if a meeting starts before the previous meeting ends. we will only need to check the end time of the previous meeting and the start time of the current meeting. and not compare with all the previous meetings. because the meetings are sorted by the start time. (meaning that if the current meeting starts after the previous meeting ends, then it will start after all the previous meetings end and also the all upcoming meetings will start after the current meeting ends) so no need to compare with all the previous meetings.
-       ![meeting rooms](./img/meeting-rooms-2.png)
+  2. Loop through the sorted intervals and check if the `end` time of the `current` interval is greater than the `start` time of the `next` interval. If it is, then return `false`.
+     ![meeting rooms](./img/meeting-rooms-2.png)
   3. If the loop finishes, return `true`.
 
 ```py
-"""
-Definition of Interval:
 class Interval(object):
     def __init__(self, start, end):
         self.start = start
         self.end = end
-"""
 
 def canAttendMeetings(intervals):
     # sort the intervals by the start time
@@ -897,53 +1668,186 @@ def canAttendMeetings(intervals):
 
 ### Meeting Rooms II
 
-Given an array of meeting time intervals `intervals` where `intervals[i] = [starti, endi]`, return the minimum number of conference rooms required.
+Given an array of meeting time intervals `intervals` where `intervals[i] = [starti, endi]`, return the **minimum** number of conference rooms required to hold all
+the meetings.
 
-- EX: `intervals = [[0,30],[5,10],[15,20]]` --> `2`
-  ![meeting rooms](./img/meeting-rooms-1.png)
+- EX: `intervals = [[4,5], [2,3], [2,4], [3,5]]` --> `2`
+  ![meeting rooms](./img/meeting-rooms-1.svg)
 
-- Steps:
+- Explanation:
 
-  1. use two arrays to keep track of the start times and end times separately.
+  - We need to find the overlapping meetings, and keep track of the mutual exclusiveness of the overlapping meetings.
+
+- **Solution 1: using `pointers`**
+
+  1. use two arrays to keep track of the `start` times and `end` times separately.
   2. then sort the two arrays and use two pointers to iterate over them.
-  3. We start with the first start time and the first end time. If the start time is less than the end time, we need to allocate a new room and move the start pointer forward. If the start time is greater than or equal to the end time, we can reuse the room and move both pointers forward.
+  3. We start with the first `start` time and the first `end` time. If the `start` time is less than the `end` time, we need to allocate a new room and move the `start` pointer forward.
 
-     - we iterate over the start times array and compare each start time with the current end time. If the start time is less than the end time, we need to allocate a new room and move the start pointer forward.
-     - If the start time is greater than or equal to the end time, we can reuse the room and move both pointers forward
+     - we iterate over the `start` times array and compare each `start` time with the current `end` time. If the `start` time is less than the `end` time, we need to allocate a new room and move the `start` pointer forward.
+     - If the `start` time is greater than or equal to the `end` time, we can reuse the room and move both pointers forward
 
   4. Finally, we return the number of rooms allocated, which represents the minimum number of meeting rooms required to schedule all the meetings.
 
+  ```py
+  class Interval(object):
+      def __init__(self, start, end):
+          self.start = start
+          self.end = end
+
+  def minMeetingRooms(intervals):
+      if not intervals:
+          return 0
+
+      # initialize two arrays to keep track of the start times and end times
+      start_times = sorted([interval.start for interval in intervals])
+      end_times = sorted([interval.end for interval in intervals])
+
+      # initialize two pointers to iterate over the start and end times
+      start_ptr = end_ptr = 0
+      num_rooms = 0
+
+      while start_ptr < len(start_times):
+          # check if the start time is less than the end time
+          if start_times[start_ptr] < end_times[end_ptr]:
+              num_rooms += 1
+          else:
+              end_ptr += 1
+
+          start_ptr += 1
+
+      return num_rooms
+  ```
+
+- **Solution 2: using `minHeap`**
+
+  1. Sort all the meetings on their `start` time.
+  2. Create a `minHeap` to store all the active meetings. This min-heap will also be used to find the active meeting with the **smallest** `end` time.
+  3. Since the `minHeap` contains all the active meetings, so before scheduling `m1` we can remove all meetings from the heap that have ended before `m1`, i.e., remove all meetings from the `heap` that have an `end` time smaller than or equal to the `start` time of `m1`.
+  4. The `heap` will always have all the overlapping meetings, so we will need rooms for all of them. Keep a counter to remember the maximum size of the heap at any time which will be the minimum number of rooms needed.
+
+  ```py
+  def minMeetingRooms(intervals):
+      if not intervals:
+          return 0
+
+      # sort the intervals by the start time
+      intervals.sort(key=lambda x: x.start)
+
+      # initialize a minHeap to store the active meetings
+      minHeap = []
+      # add the first meeting to the minHeap
+      heapq.heappush(minHeap, intervals[0].end)
+
+      # loop through the remaining meetings
+      for i in range(1, len(intervals)):
+          # check if the start time of the current meeting is greater than or equal to the end time of the meeting at the top of the minHeap
+          if intervals[i].start >= minHeap[0]:
+              # remove the meeting at the top of the minHeap
+              heapq.heappop(minHeap)
+
+          # add the current meeting to the minHeap
+          heapq.heappush(minHeap, intervals[i].end)
+
+      # the size of the minHeap at the end will be the minimum number of rooms needed
+      return len(minHeap)
+  ```
+
+---
+
+### Maximum CPU Load
+
+We are given a list of Jobs. Each job has a Start time, an End time, and a CPU load when it is running. Our goal is to find the **maximum CPU load** at any time if all the jobs are running on the same machine.
+
+- EX: `jobs = [[1,4,3], [2,5,4], [7,9,6]]` --> `7`
+  - explanation: Since `[1,4,3]` and `[2,5,4]` overlap, their maximum CPU load `(3+4=7)` will be when both the jobs are running at the same time i.e., during the time interval `(2,4)`.
+
 ```py
-"""
-Definition of Interval:
-class Interval(object):
+class Job:
+    def __init__(self, start, end, cpu_load):
+        self.start = start
+        self.end = end
+        self.cpu_load = cpu_load
+
+def find_max_cpu_load(jobs):
+    # sort the jobs by the start time
+    jobs.sort(key=lambda x: x.start)
+
+    max_cpu_load = 0
+    current_cpu_load = 0
+    minHeap = []
+
+    for job in jobs:
+        # remove all the jobs that have ended
+        while len(minHeap) > 0 and job.start >= minHeap[0].end:
+            current_cpu_load -= minHeap[0].cpu_load
+            heapq.heappop(minHeap)
+
+        # add the current job to the minHeap
+        heapq.heappush(minHeap, job)
+        current_cpu_load += job.cpu_load
+        max_cpu_load = max(max_cpu_load, current_cpu_load)
+
+    return max_cpu_load
+```
+
+---
+
+### Employee Free Time
+
+For ‘K’ employees, we are given a list of intervals representing the working hours of each employee. Our goal is to find out if there is a free interval that is common to all employees. You can assume that each list of employee working hours is **sorted** on the `start` time.
+
+- EX: `schedule = [[[1,3], [9,12]], [[2,4]], [[6,8]]]` --> `[[4,6], [8,9]]`
+
+  - Explanation: All employees are free between `[4,6]` and `[8,9]`.
+    ![employee free time](./img/employee-free-time.svg)
+
+- Explanation:
+
+  - We are given the intervals of working hours for each employee in a sorted order. So, a brute force solution could be to search for a common interval every time for all employees. If we don’t find a common interval, we can move on to the next interval of the employee with the smallest start time.
+  - A better approach is to use a `minHeap`
+    - We take the `first` interval of each employee and add it to a `minHeap`. This `minHeap` can always be used to find the interval with the smallest start time.
+    - Once we have the interval with the smallest `start` time, we can then compare it with the next smallest `start` time interval (again from the `minHeap`) to find the `common interval (gap)`.
+    - Whenever we take an interval out of the `minHeap`, we can insert the next interval of the same employee to the `minHeap`.
+      - This means that we need to know which interval belongs to which employee.
+
+```py
+class Interval:
     def __init__(self, start, end):
         self.start = start
         self.end = end
-"""
 
-def minMeetingRooms(intervals):
-    if not intervals:
-        return 0
+def find_employee_free_time(schedule):
+    # initialize a minHeap to store the intervals
+    minHeap = []
 
-    # initialize two arrays to keep track of the start times and end times
-    start_times = sorted([interval.start for interval in intervals])
-    end_times = sorted([interval.end for interval in intervals])
+    # add the first interval of each employee to the minHeap
+    for i in range(len(schedule)):
+        heapq.heappush(minHeap, (schedule[i][0].start, schedule[i][0].end, i, 0)) # (start, end, employee, index)
 
-    # initialize two pointers to iterate over the start and end times
-    start_ptr = end_ptr = 0
-    num_rooms = 0
+    # initialize a variable to keep track of the previous interval
+    previous_interval = minHeap[0]
+    # initialize a list to store the free intervals
+    free_time = []
 
-    while start_ptr < len(start_times):
-        # check if the start time is less than the end time
-        if start_times[start_ptr] < end_times[end_ptr]:
-            num_rooms += 1
-        else:
-            end_ptr += 1
+    while minHeap:
+        # get the interval at the top of the minHeap
+        start, end, employee, index = heapq.heappop(minHeap)
 
-        start_ptr += 1
+        # check if the previous interval is not overlapping with the current interval
+        if previous_interval.end < start:
+            free_time.append(Interval(previous_interval.end, start))
+            previous_interval = Interval(start, end)
+        # otherwise, the previous interval is overlapping with the current interval, check if the current interval ends after the previous interval
+        elif previous_interval.end < end:
+            previous_interval = Interval(previous_interval.start, end)
 
-    return num_rooms
+        # check if the current employee has more intervals
+        if index + 1 < len(schedule[employee]):
+            # add the next interval of the current employee to the minHeap
+            heapq.heappush(minHeap, (schedule[employee][index + 1].start, schedule[employee][index + 1].end, employee, index + 1))
+
+    return free_time
 ```
 
 ---

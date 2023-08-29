@@ -22,7 +22,7 @@
     - [Length of Last Word](#length-of-last-word)
   - [2 Pointers String Problems](#2-pointers-string-problems)
     - [Is Subsequence](#is-subsequence)
-  - [Backspace String Compare](#backspace-string-compare)
+    - [Backspace String Compare](#backspace-string-compare)
 
 ---
 
@@ -792,7 +792,7 @@ def isSubsequence(s, t):
 
 ---
 
-## Backspace String Compare
+### Backspace String Compare
 
 Given two strings `s` and `t`, return `true` if they are equal when both are typed into empty text editors. `'#'` means a backspace character.
 
@@ -801,6 +801,7 @@ Given two strings `s` and `t`, return `true` if they are equal when both are typ
   - Explanation: Both `s` and `t` become `"ac"`.
 
 - Solution 1: Time: `O(n)`, Space: `O(s + t)` = `O(n)`
+  ![backspace-string-compare](./img/backspace-string-compare-1.png)
 
   ```py
   def backspaceCompare(s, t):
@@ -817,43 +818,49 @@ Given two strings `s` and `t`, return `true` if they are equal when both are typ
       return buildString(s) == buildString(t)
   ```
 
-- Solution 2: Time: `O(n)`, Space: `O(1)` ✅
+- Solution 2: Time: `O(m + n)` => `O(n), Space:`O(1)` ✅
+  ![backspace-string-compare](./img/backspace-string-compare-2.png)
 
-  - Here, we want to improve the space complexity instead of having 2 arrays to store the final strings, we can use **two pointers** to iterate over the strings backwards and check if the current character is a backspace character
+  - we can use **two pointers** to iterate over the strings backwards and check if the current character is a backspace character
   - To do this we will have to iterate the strings **in reversed order**
-  - we can use the first pointer to keep track of the current character in `s`
-  - and the second pointer to keep track of the current character in `t`
+    - We can have separate pointers, pointing to the **last element** of the given strings. We can start comparing the characters pointed out by both the pointers to see if the strings are equal.
+    - If, at any stage, the character pointed out by any of the pointers is a backspace (`#`), we will skip and apply the backspace until we have a valid character available for comparison.
 
   ```py
   def backspaceCompare(s, t):
       i, j = len(s)-1, len(t)-1
       while i >= 0 or j >= 0:
-          # helper function to find the next valid character in the string
-          def nextValidChar(s, i):
-              backspaceCount = 0
-              while i >= 0:
-                  # if we have a backspace character, increment the backspaceCount (so that if we encountered another backspace character, we would have to increment the backspaceCount again)
-                  if s[i] == '#':
-                      backspaceCount += 1
-                  elif backspaceCount > 0:
-                      backspaceCount -= 1
-                  else:
-                      break
-                  i -= 1
-              return i
-
           i = nextValidChar(s, i)
           j = nextValidChar(t, j)
 
+          # if we have reached the end of both strings, return True
+          if i < 0 and j < 0:
+              return True
           # if we have reached the end of one of the strings, return False
-          if i < 0 and j >= 0 or i >= 0 and j < 0:
+          elif i < 0 or j < 0:
               return False
-          # if the current characters are not equal, return False
-          if i >= 0 and j >= 0 and s[i] != t[j]:
+
+          # check if the current characters are equal
+          if s[i] != t[j]:
               return False
 
           i -= 1
           j -= 1
 
       return True
+
+  def nextValidChar(s, i):
+      backspaceCount = 0
+      while i >= 0:
+          # if we have a backspace character, increment the backspaceCount (so that if we encountered another backspace character, we would have to increment the backspaceCount again)
+          if s[i] == '#':
+              backspaceCount += 1
+          elif backspaceCount > 0:
+              backspaceCount -= 1
+          else:
+              # if we have a valid character, return its index
+              break
+          i -= 1 # move to the next character
+
+      return i
   ```

@@ -10,6 +10,7 @@
     - [Network Model](#network-model)
     - [Relational Model](#relational-model)
   - [Relational Databases](#relational-databases)
+    - [Schema Diagram](#schema-diagram)
     - [Columns / Rows](#columns--rows)
     - [Relationships between tables](#relationships-between-tables)
     - [Keys](#keys)
@@ -117,6 +118,20 @@ This model is based on the **relational algebra** and is the most widely used da
 ---
 
 ## Relational Databases
+
+### Schema Diagram
+
+When working with many tables, it can be helpful to create a schema diagram to visualize the relationships between tables. We do this using **Schema Designer** software.
+
+![schema-diagram](./img/schema-designer.png)
+
+- [dbdiagram.io](https://dbdiagram.io/home)
+- [drawsql.app](https://drawsql.app/)
+- [sqldbm.com](https://sqldbm.com/Home/)
+- [quickdatabasediagrams.com](https://www.quickdatabasediagrams.com/)
+- [ondras](https://ondras.zarovi.cz/sql/demo/)
+
+---
 
 ### Columns / Rows
 

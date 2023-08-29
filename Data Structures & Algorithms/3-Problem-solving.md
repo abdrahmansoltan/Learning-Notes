@@ -558,6 +558,36 @@ def min_partitions(n):
 
 ## Bit manipulation
 
+```py
+# AND
+1 & 1 = 1
+
+# OR
+1 | 0 = 1
+
+# XOR
+1 ^ 0 = 1
+1 ^ 1 = 0
+
+# NOT
+~1 = 0
+
+# Bit shifting
+1 << 1 = 10 # shift left
+10 >> 1 = 1 # shift right
+```
+
+- Count number of bits in a number
+
+  ```py
+  def count_bits(n):
+      count = 0
+      while n:
+          count += n & 1 # check if the last bit is 1
+          n >>= 1 # shift the number to the right by 1 bit
+      return count
+  ```
+
 ### Reverse Bits
 
 Reverse bits of a given 32 bits unsigned integer.

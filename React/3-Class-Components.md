@@ -1,9 +1,10 @@
 # INDEX
 
 - [INDEX](#index)
-  - [class component](#class-component)
-  - [Component Constructor](#component-constructor)
-    - [Props in the Constructor](#props-in-the-constructor)
+  - [Class component](#class-component)
+    - [Class Component Constructor Function](#class-component-constructor-function)
+    - [Class Component Fields](#class-component-fields)
+  - [Props](#props)
   - [State](#state)
     - [`setState()` Setting (Mutating) the state](#setstate-setting-mutating-the-state)
       - [Mutating State (the safe way)](#mutating-state-the-safe-way)
@@ -12,22 +13,27 @@
   - [Context.Consumer](#contextconsumer)
   - [`this` keyword](#this-keyword)
   - [component LifeCycles](#component-lifecycles)
-    - [Order of Execution](#order-of-execution)
+    - [LifeCycles order of execution](#lifecycles-order-of-execution)
   - [Error Boundaries](#error-boundaries)
 
 ---
 
-## class component
+## Class component
 
-- Before React 16.8, Class components were the only way to track state and lifecycle on a React component. Function components were considered "state-less".
+Before React `16.8`, Class components were the only way to track `state` and `lifecycles` on a React component. Function components were considered "state-less".
 
-- we inherit from the `component` **parent-Class** in order to use the `props` => `extends React.Component`
-- The component also requires a `render()` method, this method returns HTML.
+- Class components are ES6 classes that extend from `React.Component`
+  - we inherit from the `component` **parent-Class** in order to use the `props` => `extends React.Component`
+- Every class component requires a `render()` method, this method returns `JSX`.
 
-```js
-import { Component } from 'react';
+```jsx
+import React from 'react';
 
-class Welcome extends Component {
+class Welcome extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
     return <h1>Hello, {this.props.name}</h1>;
   }
@@ -36,17 +42,66 @@ class Welcome extends Component {
 
 ---
 
-## Component Constructor
+### Class Component Constructor Function
 
-- The `constructor function` is where you initiate the component's properties.
+The `constructor function` is where you initiate the component's properties.
 
-If you want something to only be declared once, Declare it in the constructor function
+- The `constructor function` is called when the component is initiated
+- If you want something to only be declared once, Declare it in the constructor function
+- things to declare in the constructor function:
 
-### Props in the Constructor
+  - `state` property
+  - `props` property
+  - `bind` the methods
 
-- If your component has a constructor function, the props should always be passed to the constructor and also to the React.Component via the `super()` method.
+---
 
-```js
+### Class Component Fields
+
+`Class fields` are a new syntax which allows you to declare properties on a class without using a constructor function.
+
+- usecases:
+
+  - `state` property
+
+    ```jsx
+    class Car extends React.Component {
+      state = { color: 'red' };
+      render() {
+        return <h2>I am a {this.state.color} Car!</h2>;
+      }
+    }
+
+    // Instead of:
+    class Car extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = { color: 'red' };
+      }
+      render() {
+        return <h2>I am a {this.state.color} Car!</h2>;
+      }
+    }
+    ```
+
+  - `static` properties
+
+    ```jsx
+    class Car extends React.Component {
+      static defaultProps = { color: 'red' };
+      render() {
+        return <h2>I am a {this.props.color} Car!</h2>;
+      }
+    }
+    ```
+
+---
+
+## Props
+
+- If your component has a `constructor function`, the props should always be passed to the constructor and also to the React.Component via the `super()` method.
+
+```jsx
 class Car extends React.Component {
   constructor(props) {
     super(props); // gives the props to the React.component parent class so that it(react) handles them
@@ -63,7 +118,7 @@ ReactDOM.render(<Car model='Mustang' />, document.getElementById('root'));
 
 ## State
 
-In React, State is an instance attribute on a component
+In React, `State` is an `instance attribute` on a component
 
 - In React, component properties should be kept in an **object** called `state`, since you'll want to keep track of several keys/values
 - `state` in class-component is **Always** an `object` but in functional-component it is any type
@@ -73,7 +128,7 @@ In React, State is an instance attribute on a component
     - you must call `super(props)` at the start of constructor, which registers your class as a React component
 - To access the state -> `this.state`
 
-```js
+```jsx
 import { component } from 'react';
 
 class Car extends React.Component {
@@ -106,7 +161,7 @@ You should never mutate the state directly, instead use the `this.setState()` me
 - `setState` Callback Form
   ![setState-callback](./img/setState-callback.png)
 
-  ```js
+  ```jsx
   // BAD
   const updatedStateValue = () => {
     return this.state.stateName + 1;
@@ -132,7 +187,35 @@ Mutable vs Immutable State Updates
 > reason for not mutating state [here](./01-React.md#interview-questions)
 
 - The safest way to update state is to make a copy of it, and then call `this.setState()` with the new copy
-  - This pattern is a good habit to get-into for React apps and required for using **Redux**
+
+  ```jsx
+  // BAD ❌
+  this.setState({
+    counter: this.state.counter + this.props.increment
+  });
+  // GOOD ✅
+  this.setState((state, props) => ({
+    counter: state.counter + props.increment
+  }));
+  ```
+
+- This pattern is a good habit to get-into for React apps and required for using **Redux**
+- Also here, we don't have to worry about taking a copy of the state, since we are not mutating it
+
+  ```jsx
+  // BAD ❌
+  this.setState({
+    ...this.state,
+    isLoading: true
+  });
+
+  // GOOD ✅
+  this.setState({
+    isLoading: true
+  });
+  ```
+
+---
 
 #### Callbacks in `setState()`
 
@@ -144,7 +227,7 @@ since `setState` works in an **asynchronous** way. That means after calling `set
 
 - Consider the example:
 
-  ```js
+  ```jsx
   // WRONG
   changeTitle: function changeTitle (event) {
     this.setState({ title: event.target.value });
@@ -161,7 +244,7 @@ since `setState` works in an **asynchronous** way. That means after calling `set
 
 - In this case callback is useful:
 
-  ```js
+  ```jsx
   // CORRECT
   changeTitle: function changeTitle (event) {
     this.setState({ title: event.target.value }, function() {
@@ -216,7 +299,7 @@ when using handler methods and inside it you want to access property of the comp
 
    - > it's done using the [Public class fields](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes/Public_class_fields#public_instance_fields)
 
-   ```js
+   ```jsx
    // This syntax ensures `this` is bound within handleClick.
      handleClick = () => {
        console.log('this is:', this);
@@ -230,23 +313,23 @@ when using handler methods and inside it you want to access property of the comp
      }
    ```
 
-2. bind the method:
+2. `bind` the method:
 
-   1. inline
+   1. inline (in the `JSX`)
 
       - not recommended, as the function will be defined on each call to the `render()` method when the state changes, and this will impact the performance specially if this inline handler is in a elements-looping context
 
-      ```html
-      <div onClick="{this.handleClick.bind(this)}"></div>
+      ```jsx
+      <div onClick='{this.handleClick.bind(this)}'></div>
       ```
 
-   2. in the constructor:
+   2. in the `constructor function` ✅:
 
       - pros:
         - only need to bind once
         - more performant
 
-      ```js
+      ```jsx
       constructor(props){
         super(props);
         this.handlerIndexClick = this.handleIndexClick.bind(this);
@@ -266,25 +349,25 @@ Every component comes with methods that allow developers to update app state and
 
 - We have 3 different life cycles in general:
 
-  - Mounting
-  - Updating
-  - Unmounting
+  - **Mounting**
+  - **Updating (Re-rendering)**
+  - **Unmounting**
 
 - **NOTE**: THERE ISN'T LIFE CYCLES FOR FUNCTIONAL COMPONENTS ONLY SIMULATING THE ONES IN CLASS COMPONENTS
 
   ![alt](./img/lifeCycle.PNG)
 
-- **componentDidMount()**:
+- `componentDidMount()`:
 
   - runs after the component is mounted (after rendered to DOM (after `render()` method))
   - This is a good place to load any data via AJAX or set up subscriptions/timers
     - The recommendation from the react team is to load via AJAX requests here and not in the constructor
   - calling `setState()` here will trigger **re-render**, so be cautious
 
-- **componentDidUpdate()**:
+- `componentDidUpdate()`:
 
   - things that causes update:
-    - new props
+    - new `props`
     - `setState()`
     - `forceUpdate()`
   - It's a suitable place to implement any side effect operations, ex:
@@ -293,20 +376,22 @@ Every component comes with methods that allow developers to update app state and
     - updating the Dom for uncontrolled components
   - This method is called after every render occurs, So you can do a comparison between the previous and current `props` and `state`
 
-    ```js
-    componentDidUpdate(prevProps, PrevState){
-      // you can call setState here as well if needed!
-    }
-    ```
+    - It takes 2 arguments: `prevProps` & `prevState`
 
-- **componentWillUnmount()**:
+      ```jsx
+      componentDidUpdate(prevProps, PrevState){
+        // you can call setState here as well if needed!
+      }
+      ```
+
+- `componentWillUnmount()`:
 
   - it runs right before unmounting(destroying) of component
   - good place to remove eventListeners & clearing timers
 
 - Ex:
 
-  ```js
+  ```jsx
   // example with the lifecycle & updating the state
   class Clock extends React.Component {
     constructor(props) {
@@ -343,7 +428,7 @@ Every component comes with methods that allow developers to update app state and
 
 ---
 
-### Order of Execution
+### LifeCycles order of execution
 
 LifeCycles methods diagram with order execution of component's methods
 ![alt](./img/lifeCycle2.PNG)
@@ -363,7 +448,7 @@ Error Boundaries basically provide some sort of boundaries or checks on errors, 
 - **must be used in class-components**
 - Error boundaries work like a JavaScript `catch {} block`, but for components.
 
-```js
+```jsx
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);

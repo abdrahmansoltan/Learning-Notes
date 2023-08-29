@@ -67,8 +67,8 @@
     - [Array-based representation of Binary Heap](#array-based-representation-of-binary-heap)
     - [Implementing a Priority queue with a Heap](#implementing-a-priority-queue-with-a-heap)
     - [Python `heapq` module](#python-heapq-module)
-  - [Tries](#tries)
-    - [Tries Implementation](#tries-implementation)
+  - [Tries (Prefix Trees)](#tries-prefix-trees)
+    - [Trie Implementation](#trie-implementation)
     - [Hybrid Tries](#hybrid-tries)
 
 ---
@@ -1790,16 +1790,19 @@ Python provides a `heapq` module that implements a priority queue using a binary
 
 ---
 
-## Tries
+## Tries (Prefix Trees)
 
 It's a special type of tree, where each node is a letter (character), and each node can have multiple children
 
+> It's called `prefix tree` because each node represents a prefix of a word, and each path from the root to the leaf node represents a word
+
 It's a specialized tree used in **searching** most often with text, in most cases it can outperform `binary search trees`, `hash-tables` and others
 
-> Enabling this sort of suggest-as-you-type feature requires a fast, in-memory index. These indexes can use several different kinds of data structures depending on what kind of queries they need to answer. The data structure we commonly use when we need to find entries that match a prefix string is known as a `trie` (pronounced "tree" or "try"). The name comes from the word **"re`trie`val"**, which indicates that this structure is designed for search and retrieval operations, specifically searching for things that match a prefix string.
-
+- It's similar to a `Hash set` but it's more efficient when it comes to looking up prefixes of words
 - It's often used to store words, as each node is a letter, and each node can have multiple children
 
+  - Each node represents a prefix of a word (letter) and it can have up to `26` children (`26` letters in the alphabet), that's why it's better to use `hash tables` to store `children` of nodes if the number of `children` is large
+  - Also for each node, we can store a `boolean` value to indicate if the node is the **end** of a word or not
   - each sequence of letters from the root to the leaf node represents a word
     ![Tries](./img/tries-1.png)
     ![Trie](./img/binary-trie.png)
@@ -1813,10 +1816,9 @@ It's a specialized tree used in **searching** most often with text, in most case
   - Solving word games
 
 - it's used to tell if a (word or a part of a word) exists in a body of text
-- it usually has a start point which is empty and then letters are added below it
-- it has a lookup **`O(length of word)`**
+- it has a lookup time complexity of -> **`O(length of word)`**
 
-### Tries Implementation
+### Trie Implementation
 
 - when using it for looking up words, Don't look up each prefix from the root, instead build on the previous results (calls) by:
 
@@ -1863,6 +1865,7 @@ class Trie:
             current = node
         return current.endOfWord # return True if the endOfWord is True
 
+    # ----------------------- Not Important ------------------------- #
     def delete(self, word):
         self.deleteRecursively(self.root, word, 0)
 

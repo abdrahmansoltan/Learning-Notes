@@ -10,10 +10,12 @@
     - [Valid Parenthesis String](#valid-parenthesis-string)
     - [Minimum Remove to Make Valid Parentheses](#minimum-remove-to-make-valid-parentheses)
     - [Minimum Add to Make Parentheses Valid](#minimum-add-to-make-parentheses-valid)
-    - [Next Greater Element I](#next-greater-element-i)
+    - [Tag Validator](#tag-validator)
+  - [Monotonic Stack Technique](#monotonic-stack-technique)
+    - [Next Greater Element](#next-greater-element)
     - [Next Greater Element II](#next-greater-element-ii)
     - [Daily Temperatures](#daily-temperatures)
-    - [Tag Validator](#tag-validator)
+  - [Maximum Frequency Stack](#maximum-frequency-stack)
 
 ---
 
@@ -266,7 +268,119 @@ def minAddToMakeValid(s):
 
 ---
 
-### Next Greater Element I
+### Tag Validator
+
+Given a string `code` representing a **valid** code snippet, implement a function `tag_validator` to parse the HTML code and return whether it is **valid**.
+
+- EX: `code = "<DIV>This is the first line <![CDATA[<div>]]></DIV>"` --> `true`
+  - Explanation:
+    - The code is wrapped in a closed tag : `<DIV>`.
+    - There is no leading or trailing whitespace.
+    - The four tags ( `<DIV>`, `<![CDATA[`, `</DIV>` and `]]>`) are nested correctly.
+
+```py
+def tag_validator(code):
+    stack = []
+    i = 0
+
+    while i < len(code):
+        # check if the current tag is a closing tag
+        if i > 0 and stack[-1] == '<':
+            # get the tag name
+            j = code.find('>', i)
+            tag = code[i+1:j]
+            # check if the tag name is valid
+            if not tag.isupper() or len(tag) < 1 or len(tag) > 9:
+                return False
+            # check if the tag is the same as the last opening tag
+            if not stack or stack.pop() != tag:
+                return False
+            i = j
+        # check if the current tag is an opening tag
+        elif code.startswith('<![CDATA[', i):
+            # check if the stack is empty or the last element in the stack is not an opening tag
+            if not stack or stack[-1] != '<':
+                return False
+            # get the index of the closing tag
+            j = code.find(']]>', i)
+            # check if the closing tag exists
+            if j < 0:
+                return False
+            i = j + 3
+        # check if the current tag is an opening tag
+        elif code.startswith('</', i):
+            # get the index of the closing tag
+            j = code.find('>', i)
+            # get the tag name
+            tag = code[i+2:j]
+            # check if the tag name is valid
+            if not tag.isupper() or len(tag) < 1 or len(tag) > 9:
+                return False
+            # check if the stack is empty or the last element in the stack is not an opening tag
+            if not stack or stack.pop() != tag:
+                return False
+            i = j
+        # check if the current tag is an opening tag
+        elif code.startswith('<', i):
+            # get the index of the closing tag
+            j = code.find('>', i)
+            # get the tag name
+            tag = code[i+1:j]
+            # check if the tag name is valid
+            if not tag.isupper() or len(tag) < 1 or len(tag) > 9:
+                return False
+            # add the tag to the stack
+            stack.append(tag)
+            i = j
+        else:
+            i += 1
+
+    return not stack
+```
+
+---
+
+## Monotonic Stack Technique
+
+It's a stack that is either **strictly increasing** or **strictly decreasing**.
+
+- The Monotonic Stacks technique is a useful technique that can be used in the following scenarios:
+
+  - First element greater than an element, after (to the right of) it in the array - **(Monotonically Decreasing Stack)**.
+  - First element greater than an element, before (to the left of) it in the array - **(Monotonically Decreasing Stack)**.
+  - First element less than an element, after (to the right of) it in the array - **(Monotonically Increasing Stack)**.
+  - First element less than an element, before (to the left of) it in the array - **(Monotonically Increasing Stack)**.
+
+  ```py
+  # EX of a Monotonically Increasing Stack
+  arr = [5, 1, 7, 3, 0, 10, 2]
+
+  # for arr[3]:
+  # first element less than arr[3] after it in the array is arr[5] = 2
+  # first element less than arr[3] before it in the array is arr[1] = 1
+  # first element greater than arr[3] after it in the array is arr[2] = 7
+  # first element greater than arr[3] before it in the array is arr[0] = 5
+  ```
+
+  - instead of scanning the array to find the next greater/smaller element `O(n^2)`, we can use a monotonic stack to find it in `O(n)` time.
+
+- Example of `monotonic decreasing stack`:
+
+  ```py
+  # bottom --> [5, 4, 4, 2, 1] <-- top
+
+  # 1.) bottom --> [5, 4, 4, 2, 1]: 1 is less than 3: pop() it!
+  # 2.) bottom --> [5, 4, 4, 2]: 2 is less than 3: pop() it!
+  # 3.) bottom --> [5, 4, 4]: 4 is not less than 3: push(3) onto the stack!
+  # 4.) bottom --> [5, 4, 4, 3]: Done! :)
+  ```
+
+- It's used as a technique to solve problems that involve **finding the next greater/smaller element** in an array.
+  - A simple solution to these problems is to sort and return the first / last `k` elements in the collections, but that would take `O(nlogn)` time.
+  - Using a monotonic stack, we can solve these problems in `O(N log(k))` time and `O(k)` space.
+- This technique is also used with a `heap` to solve problems that involve **finding the next greater/smaller element** in an array.
+
+### Next Greater Element
 
 You are given two arrays (without duplicates) `nums1` and `nums2` where `nums1`’s elements are subset of `nums2`. Find all the next greater numbers for `nums1`'s elements in the corresponding places of `nums2`.
 
@@ -355,13 +469,27 @@ Given a list of daily temperatures `T`, return a list such that, for each day in
 - Steps:
   ![daily temperatures](./img/daily-temperatures.jpg)
 
+  - For each day, we need to find how many days we need to wait until a warmer temperature.
+  - We use a **monotonic decreasing stack** to store the indices of the days that we have not found the next warmer day for them (days that are colder than the current day).
+    - `mono-decreasing stack`: a stack that is sorted in a decreasing order (last element is the smallest element in the stack).
+  - Then we get number of days we need to wait until a warmer temperature by subtracting the current day index from the top element of the stack (which is the index of the next warmer day).
+
+  ![daily temperatures](./img/daily-temperatures-1.png)
+  ![daily temperatures](./img/daily-temperatures-2.png)
+  ![daily temperatures](./img/daily-temperatures-3.png)
+  ![daily temperatures](./img/daily-temperatures-4.png)
+  ![daily temperatures](./img/daily-temperatures-5.png)
+  ![daily temperatures](./img/daily-temperatures-6.png)
+  ![daily temperatures](./img/daily-temperatures-7.png)
+  ![daily temperatures](./img/daily-temperatures-8.png)
+
 ```py
 def daily_temperatures(temperatures):
     res = [0] * len(temperatures)
     stack = []
 
     for i, t in enumerate(temperatures):
-      while stack and temperatures[stack[-1]] < t:
+      while stack and t > temperatures[stack[-1]]:
           idx = stack.pop()
           res[idx] = i - idx
       stack.append(i)
@@ -371,74 +499,52 @@ def daily_temperatures(temperatures):
 
 ---
 
-### Tag Validator
+## Maximum Frequency Stack
 
-Given a string `code` representing a **valid** code snippet, implement a function `tag_validator` to parse the HTML code and return whether it is **valid**.
+Implement `FreqStack`, a class which simulates the operation of a stack-like data structure.
 
-- EX: `code = "<DIV>This is the first line <![CDATA[<div>]]></DIV>"` --> `true`
-  - Explanation:
-    - The code is wrapped in a closed tag : `<DIV>`.
-    - There is no leading or trailing whitespace.
-    - The four tags ( `<DIV>`, `<![CDATA[`, `</DIV>` and `]]>`) are nested correctly.
+`FreqStack` has two functions:
+
+1. `push(int x)`, which pushes an integer `x` onto the stack.
+2. `pop()`, which removes and returns the most frequent element in the stack.
+
+- If there is a tie for most frequent element, the element closest to the top of the stack is removed and returned.
+
+- EX:
+
+  - `push(5)`, `push(7)`, `push(5)`, `push(7)`, `push(4)`, `push(5)`, `pop()`, `pop()`, `pop()`, `pop()` --> `[5, 7, 5, 4]`
+
+- Explanation:
+  - Although this is a "max frequency" problem, we won't use a `MaxHeap` because we may have elements with the same frequency, and we need to pop the element that is closest to the top of the stack. **So we will use a `Stack`**
+  - We need to keep track of the frequency of each element, so we use a `hash map` to store the frequency of each element.
+    - `freq = {5: 3, 7: 2, 4: 1}`
+  - We also need to keep track of the elements with the same frequency, so we use a `hash map` to store the elements with the same frequency in a `list`.
+    - `group = {1: [4], 2: [7], 3: [5]}`
+    - It's like `Bucket Sort` where the key is the frequency and the value is the list of elements with the same frequency.
+      ![maximum frequency stack](./img/max-freq-stack-1.png)
+  - We also need to keep track of the maximum frequency, so we use a `maxfreq` variable to store the maximum frequency.
 
 ```py
-def tag_validator(code):
-    stack = []
-    i = 0
+class FreqStack:
+    def __init__(self):
+        self.freq = {}
+        self.maxfreq = 0
+        self.stacks = {} # dictionary of stacks
 
-    while i < len(code):
-        # check if the current tag is a closing tag
-        if i > 0 and stack[-1] == '<':
-            # get the tag name
-            j = code.find('>', i)
-            tag = code[i+1:j]
-            # check if the tag name is valid
-            if not tag.isupper() or len(tag) < 1 or len(tag) > 9:
-                return False
-            # check if the tag is the same as the last opening tag
-            if not stack or stack.pop() != tag:
-                return False
-            i = j
-        # check if the current tag is an opening tag
-        elif code.startswith('<![CDATA[', i):
-            # check if the stack is empty or the last element in the stack is not an opening tag
-            if not stack or stack[-1] != '<':
-                return False
-            # get the index of the closing tag
-            j = code.find(']]>', i)
-            # check if the closing tag exists
-            if j < 0:
-                return False
-            i = j + 3
-        # check if the current tag is an opening tag
-        elif code.startswith('</', i):
-            # get the index of the closing tag
-            j = code.find('>', i)
-            # get the tag name
-            tag = code[i+2:j]
-            # check if the tag name is valid
-            if not tag.isupper() or len(tag) < 1 or len(tag) > 9:
-                return False
-            # check if the stack is empty or the last element in the stack is not an opening tag
-            if not stack or stack.pop() != tag:
-                return False
-            i = j
-        # check if the current tag is an opening tag
-        elif code.startswith('<', i):
-            # get the index of the closing tag
-            j = code.find('>', i)
-            # get the tag name
-            tag = code[i+1:j]
-            # check if the tag name is valid
-            if not tag.isupper() or len(tag) < 1 or len(tag) > 9:
-                return False
-            # add the tag to the stack
-            stack.append(tag)
-            i = j
-        else:
-            i += 1
+    def push(self, val):
+        f = self.freq.get(val, 0) + 1
+        self.freq[val] = f # update the frequency of the element
 
-    return not stack
+        if f > self.maxfreq:
+            self.maxfreq = f
+            self.stacks[self.maxfreq] = [] # create a new stack for the new maxfreq
+        self.stacks[f].append(val)
+
+    def pop(self):
+        val = self.stacks[self.maxfreq].pop() # pop the element with the maxfreq
+        self.freq[val] -= 1 # update the frequency of the element
+        if not self.stacks[self.maxfreq]: # if the stack is empty
+            self.maxfreq -= 1 # decrement the maxfreq
+
+        return val
 ```
-
----

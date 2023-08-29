@@ -85,4 +85,10 @@
   - Answer: the reason is that in any time if the `state` object has some additional features been added, so that the updated state will be handled
 
 - What happens if you used a context in the `useContext()` inside a component that is not wrapped with that context-provider ?
+
   - Answer: It will return the initial(default) value of that context value, as the provider is the one responsible for updating the context object value
+
+- What is `$$typeof` property in React elements?
+  - Answer: It's a property that is used to check if the object is a React element or not, as it's value is equal to `Symbol.for('react.element')`
+  - It's used to protect against `XSS` attacks, as if we have a string that is equal to `Symbol.for('react.element')` and we pass it to a component that accepts a React element, it will be rendered as a React element and not a string, and by using `$$typeof` we can check if the object is a React element or not
+    - This is because `Symbol` data-type is unique and can't be duplicated, so we can't send it as a `JSON` object and then parse it to a React element

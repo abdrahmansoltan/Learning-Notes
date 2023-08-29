@@ -17,6 +17,7 @@
   - [Coin Change II](#coin-change-ii)
   - [Student Attendance Record II](#student-attendance-record-ii)
   - [Unique Paths](#unique-paths)
+  - [Maximum Profit in Job Scheduling](#maximum-profit-in-job-scheduling)
 
 ---
 
@@ -116,7 +117,7 @@ Return the minimum cost to reach the top of the floor.
     - the step before the top step and will also have default value of `0` which is the minimum cost to reach the top step
   - We can then loop through the array and calculate the minimum cost to reach each step
     - The minimum cost to reach the current step is equal to `the minimum cost to reach the previous step + the cost of the current step`.
-    ![min cost stairs](./img/min-cost-climbing-stairs-1.webp)
+      ![min cost stairs](./img/min-cost-climbing-stairs-1.webp)
     - We can then return the **minimum between the last two elements** in the array which indicates the minimum cost to reach the top step
 
   ```py
@@ -135,7 +136,7 @@ Return the minimum cost to reach the top of the floor.
 
       # Return the minimum between the last two elements in the array
       return min(dp[-1], dp[-2])
-  
+
   # Optimizing space complexity
   def minCostClimbingStairs(cost: List[int]) -> int:
       # Set the first two elements in the array to the cost of the first two steps
@@ -546,6 +547,7 @@ The knight continues moving until it has made exactly `k` moves or has moved off
     - and so on until we get all the possible paths with possible probabilities.
 
 - Explanation:
+
   - This is a `DP` problem, because we will be optimizing the process of generating all the possible paths.
   - We will use a `dp` matrix to store the probability of the knight remaining on the board for each cell.
     - Here we use a `3D` matrix because we need to store the probability of the knight remaining on the board for each cell for each move. **(we need to store the probability of the knight remaining on the board for each cell for each move because the knight can move to `8` different cells)**
@@ -565,7 +567,7 @@ def knightProbability(n: int, k: int, row: int, column: int) -> float:
     dp = [[[0] * n for _ in range(n)] for _ in range(k + 1)]
     # startPoint -> [possible moves]
     directions = [
-        (2,1), (1,2), (-1,2), (-2,1), 
+        (2,1), (1,2), (-1,2), (-2,1),
         (-2,-1), (-1,-2), (1,-2), (2,-1)
     ]
 
@@ -991,15 +993,38 @@ A robot is located at the top-left corner of a `m x n` grid. Given the two integ
     - `dp[i][j - 1]` -> number of unique paths to reach the cell on the left of the current cell.
   - Time and space complexity: `O(mn)`, where `m` is the number of rows and `n` is the number of columns.
 
-```py
-def uniquePaths(m: int, n: int) -> int:
-    # Create a dp matrix to store the number of unique paths for each cell
-    dp = [[1] * n for _ in range(m)]
+- dp top-down solution
 
-    for r in range(1, m):
-        for c in range(1, n):
-            # number of unique paths to reach the cell at rth row and cth column
-            dp[r][c] = dp[r - 1][c] + dp[r][c - 1]
+  ```py
+  def uniquePaths(m: int, n: int) -> int:
+      # Create a dp matrix to store the number of unique paths for each cell
+      dp = [[1] * n for _ in range(m)]
 
-    return dp[-1][-1]
-```
+      for r in range(1, m):
+          for c in range(1, n):
+              # number of unique paths to reach the cell at rth row and cth column
+              dp[r][c] = dp[r - 1][c] + dp[r][c - 1]
+
+      return dp[-1][-1]
+  ```
+
+- dp memoization solution
+
+  ```py
+  def uniquePaths(m: int, n: int) -> int:
+      memo = {}
+      def dfs(r, c):
+          if r == 0 or c == 0:
+              return 1
+          if (r, c) in memo:
+              return memo[(r, c)]
+          memo[(r, c)] = dfs(r - 1, c) + dfs(r, c - 1)
+          return memo[(r, c)]
+      return dfs(m - 1, n - 1)
+  ```
+
+---
+
+## Maximum Profit in Job Scheduling
+
+---

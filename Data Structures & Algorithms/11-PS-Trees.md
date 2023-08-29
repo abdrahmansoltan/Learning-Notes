@@ -4,6 +4,7 @@
   - [Notes](#notes)
   - [General Tree Questions](#general-tree-questions)
     - [Count Complete Tree Nodes](#count-complete-tree-nodes)
+    - [Level Width](#level-width)
     - [Path Sum](#path-sum)
     - [Symmetric Tree](#symmetric-tree)
     - [Same Tree](#same-tree)
@@ -16,8 +17,15 @@
     - [Validate Binary Search Tree](#validate-binary-search-tree)
     - [Binary Tree Inorder Traversal](#binary-tree-inorder-traversal)
     - [Binary Tree Postorder Traversal](#binary-tree-postorder-traversal)
-    - [Maximum Depth of Binary Tree](#maximum-depth-of-binary-tree)
+    - [Binary Search Tree Iterator](#binary-search-tree-iterator)
     - [Binary Tree Level Order Traversal](#binary-tree-level-order-traversal)
+    - [Binary Tree Level Order Traversal II](#binary-tree-level-order-traversal-ii)
+    - [Average of Levels in Binary Tree](#average-of-levels-in-binary-tree)
+    - [Minimum Depth of Binary Tree](#minimum-depth-of-binary-tree)
+    - [Maximum Depth of Binary Tree](#maximum-depth-of-binary-tree)
+    - [Level Order Successor](#level-order-successor)
+    - [Populating Next Right Pointers in Each Node ( Connect Level Order Siblings )](#populating-next-right-pointers-in-each-node--connect-level-order-siblings-)
+    - [Populating Next Right Pointers in Each Node II](#populating-next-right-pointers-in-each-node-ii)
     - [Check Completeness of a Binary Tree](#check-completeness-of-a-binary-tree)
     - [Binary Tree Zigzag Level Order Traversal](#binary-tree-zigzag-level-order-traversal)
     - [Sum of Left Leaves](#sum-of-left-leaves)
@@ -53,6 +61,7 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
   - Output: `6`
 
 - Explanation:
+
   - tree is complete when all levels are filled except the last level
   - The brute force solution is to traverse the tree and count the number of nodes. But this solution is not efficient because it takes `O(n)` time to traverse the tree.
   - We're given that the tree is a **complete** binary tree, which means that the tree is **perfectly balanced**. This means that the left subtree and the right subtree of the root node have the same height.
@@ -149,7 +158,7 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
      if not node:
          return 0
      return 1 + get_height(node.left)
-        
+
      if not root:
          return 0
      left_height = get_height(root.left)
@@ -158,6 +167,7 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
          return (2 ** left_height) - 1 + self.countNodes(root.right) + 1
      else:
          return (2 ** right_height) - 1 + self.countNodes(root.left) + 1
+  ```
 
 ---
 
@@ -804,96 +814,38 @@ Given the `root` of a binary tree, return the postorder traversal of its nodes' 
 
 ---
 
-### Maximum Depth of Binary Tree
+### Binary Search Tree Iterator
 
-Given the `root` of a binary tree, return its maximum depth.
+Implement the `BSTIterator` class that represents an iterator over the **in-order traversal** of a binary search tree (BST):
 
-A binary tree's **maximum depth** is the number of nodes along the longest path from the root node down to the farthest leaf node.
-
+- `BSTIterator(TreeNode root)` Initializes an object of the `BSTIterator` class. The `root` of the BST is given as part of the constructor. The pointer should be initialized to a non-existent number smaller than any element in the BST.
+- `boolean hasNext()` Returns `true` if there exists a number in the traversal to the right of the pointer, otherwise returns `false`.
+- `int next()` Moves the pointer to the right, then returns the number at the pointer.
+  - Notice that by initializing the pointer to a non-existent smallest number, the first call to `next()` will return the smallest element in the BST.
 - Explanation:
-  - We will use **recursive DFS** to solve this problem
-    ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree.png)
-- Time complexity: `O(n)` where `n` is the number of nodes in the tree
-  - best case: `O(log(n))` if the tree is balanced
-  - worst case: `O(n)` if the tree is not balanced
+  - The intuitive solution is to use **Inorder traversal** to traverse the tree and store the values in an array **(in the constructor)**, then we can use the array to implement the `next()` and `hasNext()` functions.
+    - But this solution will take `O(n)` space and `O(n)` time to construct the array
+    - We want to use `O(h)` space and `O(1)` time to implement the `next()` and `hasNext()` functions, So we will use **Iterative DFS** to solve this problem
+      - We use `iterative DFS` instead of `recursive DFS` because it's simpler to implement here as we won't add all the nodes to the stack at once, we will only add the nodes that we need to visit next
 
 ```py
-def maxDepth(root):
-    # if the root is None, return 0
-    if root is None:
-        return 0
+class BSTIterator:
+    def __init__(self, root):
+        self.stack = []
+        self.cur = root
 
-    # recursively call the function with the root's left node and the root's right node
-    left = maxDepth(root.left)
-    right = maxDepth(root.right)
+    def next(self):
+        while self.cur:
+            self.stack.append(self.cur)
+            self.cur = self.cur.left # in-order traversal
 
-    # return the maximum depth of the tree
-    return max(left, right) + 1
+        node = self.stack.pop() # (left-most node)
+        self.cur = node.right # move to the right node
+        return node.val
 
-# same solution with tail recursion (Better)
-def maxDepth(root, depth=0):
-    # if the root is None, return 0
-    if root is None:
-        return depth
-
-    # recursively call the function with the root's left node and the root's right node
-    left = maxDepth(root.left, depth + 1)
-    right = maxDepth(root.right, depth + 1)
-
-    # return the maximum depth of the tree
-    return max(left, right)
+    def hasNext(self):
+        return self.stack or self.cur # if the stack is not empty or the cur is not None
 ```
-
-- **Other solutions without recursion**
-
-  - **Solution 1:** using `BFS` + `queue` -> **level-order traversal**
-    ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree-1.png)
-
-    ```py
-    def maxDepth(root):
-        if root is None:
-            return 0
-
-        level = 0
-        q = deque([root])
-
-        # while the queue is not empty
-        while queue:
-            # loop through the queue to add the children of each node to the queue (BFS) + update level when finished
-            for i in range(len(queue)):
-                # pop the first node in the queue
-                node = q.popleft()
-                if node.left:
-                  q.append(node.left)
-                if node.right:
-                  q.append(node.right)
-            # increment the level by 1
-            level += 1
-
-        return level
-    ```
-
-  - **Solution 2:** using `DFS` + `stack`
-
-    ```py
-    def maxDepth(root):
-        if root is None:
-            return 0
-
-        level = 0
-        stack = [(root, 1)] # (node, level)
-
-        # while the stack is not empty
-        while stack:
-            # pop the first node in the stack
-            node, level = stack.pop()
-            if node.left:
-                stack.append((node.left, level + 1))
-            if node.right:
-                stack.append((node.right, level + 1))
-
-        return level
-    ```
 
 ---
 
@@ -910,6 +862,10 @@ Given the `root` of a binary tree, return the level order traversal of its nodes
 - Explanation
   - We can use a **Breadth-First Search** to traverse the tree level by level and add the values of the nodes to an array.
   - We can use a `queue` to store the nodes of each level, and a `level` array to store the values of the nodes of each level.
+    ![level order traversal](./img/level-order-traversal-2.png)
+    ![level order traversal](./img/level-order-traversal-3.png)
+    ![level order traversal](./img/level-order-traversal-4.png)
+    ![level order traversal](./img/level-order-traversal-5.png)
   - We can use a `while` loop to traverse the tree level by level and a `for` loop to traverse the nodes of each level.
     - We can use a `deque` to store the nodes of each level.
 
@@ -941,6 +897,324 @@ def levelOrder(root):
         result.append(level)
 
     return result
+```
+
+---
+
+### Binary Tree Level Order Traversal II
+
+Given the `root` of a binary tree, return the **bottom-up** level order traversal of its nodes' values. (i.e., from left to right, level by level from leaf to root).
+
+- Ex:
+  ![level order traversal](./img/level-order-traversal-6.jpeg)
+
+  - Input: `root = [3,9,20,null,null,15,7]`
+  - Output: `[[15,7],[9,20],[3]]`
+
+- Explanation:
+  - It's the same as the previous problem, but we need to reverse the result array at the end.
+  - We can use a `queue` to store the nodes of each level and a `result` array to store the values of the nodes of each level.
+  - we will append the level array to the result queue from the left instead of the right
+
+```py
+def levelOrderBottom(root):
+    if root is None:
+        return []
+
+    result = deque()
+    q = deque([root])
+
+    # while the queue is not empty
+    while q:
+        # create an array to store the nodes of the current level
+        level = []
+        # loop through the queue
+        for i in range(len(q)):
+            # pop the first node in the queue
+            node = q.popleft()
+            # add the node's value to the level array
+            level.append(node.value)
+            # add the node's children to the queue
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+        # add the level array to the result array
+        result.appendleft(level)
+
+    return result
+```
+
+---
+
+### Average of Levels in Binary Tree
+
+Given the `root` of a binary tree, return the average value of the nodes on each level in the form of an array. Answers within `10^-5` of the actual answer will be accepted.
+
+- Ex:
+  ![average of levels in binary tree](./img/average-of-levels-in-binary-tree-1.png)
+  - Input: `root = [1, 2, 3, 4, 5, 6, 7]`
+  - Output: `[1, 2.5, 5.5]`
+
+```py
+def averageOfLevels(root):
+    if root is None:
+        return []
+
+    result = []
+    q = deque([root])
+
+    # while the queue is not empty
+    while q:
+        # create an array to store the nodes of the current level
+        level = []
+        # loop through the queue
+        for i in range(len(q)):
+            # pop the first node in the queue
+            node = q.popleft()
+            # add the node's value to the level array
+            level.append(node.value)
+            # add the node's children to the queue
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+        # add the average of the level array to the result array
+        result.append(sum(level) / len(level))
+
+    return result
+```
+
+---
+
+### Minimum Depth of Binary Tree
+
+Given a binary tree, find its minimum depth.
+
+The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+
+- Ex:
+  ![minimum depth of binary tree](./img/minimum-depth-of-binary-tree-1.png)
+
+- Explanation:
+  - Here, we can use `BFS` or `DFS` to traverse the tree level by level and return the level when we reach a leaf node.
+    - `BFS` is better because it will return the minimum depth faster than `DFS` because it will traverse the tree level by level
+    - `DFS` will traverse the tree until it reaches a `leaf` node, then it will **backtrack** to the `root` node and traverse the tree again until it reaches another `leaf` node and so on, each time it reaches a `leaf` node, it will compare the current level with the minimum level and update the minimum level if the current level is less than the minimum level.
+
+```py
+def minDepth(root):
+    if root is None:
+        return 0
+
+    level = 0
+    q = deque([root])
+
+    # while the queue is not empty
+    while q:
+        # increment the level by 1
+        level += 1
+        # loop through the queue
+        for i in range(len(q)):
+            # pop the first node in the queue
+            node = q.popleft()
+            # if the node is a leaf node, return the level
+            if not node.left and not node.right:
+                return level
+            # add the node's children to the queue
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+```
+
+---
+
+### Maximum Depth of Binary Tree
+
+Given the `root` of a binary tree, return its maximum depth.
+
+A binary tree's **maximum depth** is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+- Explanation:
+
+  - We can use `BFS` or `DFS` to traverse the tree level by level and return the level when we reach a leaf node.
+    - `BFS` is better because it will return the maximum depth faster than `DFS` because it will traverse the tree level by level
+    - `DFS` will traverse the tree until it reaches a `leaf` node, then it will **backtrack** to the `root` node and traverse the tree again until it reaches another `leaf` node and so on, each time it reaches a `leaf` node, it will compare the current level with the maximum level and update the maximum level if the current level is greater than the maximum level.
+      ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree.png)
+
+- Time complexity: `O(n)` where `n` is the number of nodes in the tree
+
+  - best case: `O(log(n))` if the tree is balanced
+  - worst case: `O(n)` if the tree is not balanced
+
+- **Solution 1:** using recursive `DFS`
+
+  ```py
+  def maxDepth(root):
+      # if the root is None, return 0
+      if root is None:
+          return 0
+
+      # recursively call the function with the root's left node and the root's right node
+      left = maxDepth(root.left)
+      right = maxDepth(root.right)
+
+      # return the maximum depth of the tree
+      return max(left, right) + 1
+
+  # ----------------------------------------------------------
+
+  # same solution with tail recursion (Better) ✅
+  def maxDepth(root, depth=0):
+      # if the root is None, return 0
+      if root is None:
+          return depth
+
+      # recursively call the function with the root's left node and the root's right node
+      left = maxDepth(root.left, depth + 1)
+      right = maxDepth(root.right, depth + 1)
+
+      # return the maximum depth of the tree
+      return max(left, right)
+  ```
+
+- **Solution 2:** using `BFS` + `queue` -> **level-order traversal**
+  ![max-depth-of-binary-tree](./img/max-depth-of-binary-tree-1.png)
+
+  ```py
+  def maxDepth(root):
+      if root is None:
+          return 0
+
+      level = 0
+      q = deque([root])
+
+      # while the queue is not empty
+      while queue:
+          # loop through the queue to add the children of each node to the queue (BFS) + update level when finished
+          for i in range(len(queue)):
+              # pop the first node in the queue
+              node = q.popleft()
+              if node.left:
+                q.append(node.left)
+              if node.right:
+                q.append(node.right)
+          # increment the level by 1
+          level += 1
+
+      return level
+  ```
+
+- **Solution 3:** using `DFS` + `stack`
+
+  ```py
+  def maxDepth(root):
+      if root is None:
+          return 0
+
+      level = 0
+      stack = [(root, 1)] # (node, level)
+
+      # while the stack is not empty
+      while stack:
+          # pop the first node in the stack
+          node, level = stack.pop()
+          if node.left:
+              stack.append((node.left, level + 1))
+          if node.right:
+              stack.append((node.right, level + 1))
+
+      return level
+  ```
+
+---
+
+### Level Order Successor
+
+Given a binary tree and a node, find the level order successor of the given node in the tree. The level order successor is the node that appears right after the given node in the level order traversal.
+
+- Ex:
+  ![level order successor](./img/level-order-successor-1.png)
+  - Input: `root = [1, 2, 3, 4, 5], key = 3`
+  - Output: `4`
+
+```py
+def levelOrderSuccessor(root, key):
+    if root is None:
+        return None
+
+    q = deque([root])
+
+    while q:
+        for i in range(len(q)):
+            node = q.popleft()
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+            # if we found the key, return the first node in the queue
+            if node.value == key:
+                return q[0].value if q else None
+```
+
+---
+
+### Populating Next Right Pointers in Each Node ( Connect Level Order Siblings )
+
+// TODO: Watch the video
+
+You are given a **perfect binary tree** where all leaves are on the same level, and every parent has two children. The binary tree has the following definition:
+
+- EX:
+  ![connect level order siblings](./img/connect-level-order-siblings-1.png)
+
+  - Input: `root = [1, 2, 3, 4, 5, 6, 7]`
+  - Output: `[1, #, 2, 3, #, 4, 5, 6, 7, #]`
+
+- Explanation:
+  - We can use `BFS` to traverse the tree level by level and connect the nodes of each level.
+  - We can use a `for` loop to traverse the nodes of each level and connect them.
+    - We can use a `prev` variable to store the previous node and connect it to the current node.
+
+```py
+def connect(root):
+    if root is None:
+        return None
+
+    q = deque([root])
+    while q:
+        prev = None
+        for i in range(len(q)):
+            node = q.popleft()
+            if prev:
+                prev.next = node
+            prev = node
+
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+    return root
+```
+
+---
+
+### Populating Next Right Pointers in Each Node II
+
+Same as the previous problem, but the tree is not a **perfect binary tree**.
+
+- Ex:
+  ![connect level order siblings](./img/connect-level-order-siblings-2.png)
+
+  - Input: `root = [1, 2, 3, 4, 5, null, 7]`
+  - Output: `[1, #, 2, 3, #, 4, 5, 7, #]`
+
+```py
+# Same solution as the previous problem
 ```
 
 ---
@@ -1036,7 +1310,7 @@ Given the `root` of a binary tree, return the zigzag level order traversal of it
     2. use a double-ended queue (deque) to store the nodes of each level
     3. reverse the odd levels after adding them to the result array
 
-- **Solution 1** `DFS` + Iterative + `deque`
+- **Solution 1** `BFS` + Iterative + `deque`
 
   ```py
   def zigzagLevelOrder(root):

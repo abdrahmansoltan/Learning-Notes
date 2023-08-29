@@ -172,8 +172,27 @@ Functional components cannot leverage the performance improvements and render op
 
 - If you want React to treat a functional component as a pure component, you’ll have to convert the functional component to a class component that extends `React.PureComponent`.
 
-  ```js
+  ```jsx
   class PercentageStat extends React.PureComponent {}
+  ```
+
+  - It's a replacement for `shouldComponentUpdate()` method in class components
+
+    ```jsx
+    shouldComponentUpdate(nextProps, nextState) {
+      return (
+        this.props.value !== nextProps.value ||
+        this.props.max !== nextProps.max
+      );
+    }
+    ```
+
+- Now with new version of React, we can use `React.memo()` to memoize the functional component and make it behave like a pure component
+
+  ```jsx
+  const PercentageStat = React.memo(() => {
+    // ...
+  });
   ```
 
 ---

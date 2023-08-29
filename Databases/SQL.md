@@ -51,6 +51,9 @@
   - [Subqueries](#subqueries)
     - [SubQuery Types / Usecases](#subquery-types--usecases)
     - [SubQueries vs Joins](#subqueries-vs-joins)
+  - [Validating Data](#validating-data)
+    - [Row Level Validation](#row-level-validation)
+    - [Where to apply the validation?](#where-to-apply-the-validation)
   - [Interviews Questions](#interviews-questions)
 
 ---
@@ -407,7 +410,7 @@ You should always be aware of the possibility of NULL values in your database. S
 
 #### `Null` Coalescing
 
-- `COALESCE` : is a function used to return the first non-NULL value in a list
+- `COALESCE` : is a function used to return the first `non-NULL` value in a list
 
   ```sql
   SELECT COALESCE(NULL, 'Dan', 'John'); -- Dan
@@ -417,6 +420,13 @@ You should always be aware of the possibility of NULL values in your database. S
 
   ```sql
   SELECT COALESCE(name, 'Unknown') FROM worlds;
+  ```
+
+- It's also used for checking when inserting data into a table.
+
+  ```sql
+  INSERT INTO worlds (name, sighting_date)
+  VALUES (COALESCE('Dan', 'Unknown'), '2021-01-10');
   ```
 
 ---
@@ -1187,6 +1197,108 @@ CREATE INDEX <index_name> ON <table_name> (<column_name>);
 - `Joins`
   - are used when you need to filter the data based on a condition that is in the same table.
   - can only return a row set (multiple rows)
+
+---
+
+## Validating Data
+
+It's important to validate the data before inserting it into the database to avoid errors and to make sure that the data is correct.
+
+Validation can be done in 2 ways:
+
+1. When creating the table (Constraints)
+2. After creating the table (Trigger)
+
+- **Constraints** : are used to validate the data **before** inserting it into the database. EX:
+  - `NOT NULL`
+  - `UNIQUE`
+  - `PRIMARY KEY`
+  - `FOREIGN KEY`
+  - `CHECK`
+  - `DEFAULT`
+  - `INDEX`
+  - `EXCLUSION`
+  - `TRIGGER`
+  - `RULE`
+  - `CREATE ASSERTION`
+  - `CREATE DOMAIN`
+- **Triggers** : are used to validate the data **after** inserting it into the database. EX:
+
+  - `ALTER TABLE`
+  - `BEFORE INSERT`
+  - `AFTER INSERT`
+  - `BEFORE UPDATE`
+  - `AFTER UPDATE`
+  - `BEFORE DELETE`
+  - `AFTER DELETE`
+
+### Row Level Validation
+
+![validation](./img/sql-validation-1.png)
+
+- Before inserting the data into the database:
+
+  - we can validate it using `CHECK` constraint.
+
+    ```sql
+    CREATE TABLE <table_name> (
+      <column_name> <data_type> <constraint> CHECK (<condition>),
+      <column_name> <data_type> <constraint> CHECK (<condition>),
+    )
+
+    -- Example
+    CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(50) NOT NULL UNIQUE,
+      -- check the length of the password
+      password VARCHAR(255) NOT NULL CHECK (LENGTH(password) >= 8),
+      -- checks between 2 columns
+      start_date DATE NOT NULL,
+      end_date DATE NOT NULL CHECK (end_date > start_date),
+    );
+    ```
+
+  - We can validate it using a `Constraint Trigger` that will run before inserting the data into the database.
+
+    ```sql
+    CREATE TABLE <table_name> (
+      <column_name> <data_type> <constraint>,
+      <column_name> <data_type> <constraint>,
+    )
+
+    -- Example
+    CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(50) NOT NULL UNIQUE,
+      email VARCHAR(255) NOT NULL UNIQUE
+      SET Default 'user@mail.com',
+      password VARCHAR(255) NOT NULL,
+
+    );
+    ```
+
+- After inserting the data into the database, we can validate it using `TRIGGER`.
+
+  ```sql
+  ALTER TABLE <table_name>
+  ADD CONSTRAINT <constraint_name> <constraint_type> (<column_name>);
+
+  -- Example
+  ALTER TABLE users
+  ADD CONSTRAINT users_username_unique UNIQUE (username);
+  -- or
+  ADD UNIQUE (username);
+  ```
+
+---
+
+### Where to apply the validation?
+
+Where to apply the validation (`user-side` or `server-side` or `database-side`) depends on the type of validation.
+
+- We should spread the validation between the 3 sides to make sure that the data is valid.
+- Web-server vs Database validation
+  ![validation](./img/sql-validation-2.png)
 
 ---
 
