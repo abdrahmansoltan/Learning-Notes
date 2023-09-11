@@ -1526,11 +1526,44 @@ def binary_search_iterative(nums, target):
     ```
 
 - **Notes**:
+
   - An unsuccessful search occurs if we reached the end of array where: `start = middle = end`, so we won't be able to continue as the next step would result this: `low high`, as the interval `[low,high]` is empty
     - so we need to create an edge case to prevent infinite loop
   - making a copy of half the list would already take `O(n)` time, negating the whole benefit of the binary search algorithm.
   - when we get the middle element, we use: `mid = (low + high) // 2`, Actually this can lead to an **integer overflow**. Imagine that `low` and `high` are very large numbers. Adding them up will cause an integer overflow.
+
     - A better way is to compute `mid` as `mid = low + (high - low) // 2`. Dividing `high - low` before adding `low` avoids the integer overflow.
+
+    ```py
+    # might cause integer overflow
+    mid = (low + high) // 2
+
+    # to avoid integer overflow ✅
+    mid = low + (high - low) // 2
+    ```
+
+  - If the problem says that "we don’t know if it’s sorted in ascending or descending order", then we should handle the 2 cases:
+
+    ```py
+    def binary_search(nums, target):
+      l, r = 0, len(nums) - 1
+      isAscending = nums[l] < nums[r]
+      while l <= r:
+        midIdx = (l + r) // 2
+        if nums[midIdx] == target:
+          return midIdx
+
+        if isAscending:
+          if nums[midIdx] > target:
+            r = midIdx - 1
+          else:
+            l = midIdx + 1
+        else:
+          if nums[midIdx] < target:
+            r = midIdx - 1
+          else:
+            l = midIdx + 1
+    ```
 
 ---
 
@@ -2414,7 +2447,7 @@ It's a technique that uses recursion to try all possible solutions to a problem 
   - So, the time complexity is `O(n * 2^n)`
   - Space complexity is `O(n)`
 
-- Code:
+- Recursive Code:
 
   ```py
   def subsets(nums):
@@ -2433,6 +2466,17 @@ It's a technique that uses recursion to try all possible solutions to a problem 
       helper(i + 1, nums, curSet + [nums[i]], subsets)
       # exclude the current element
       helper(i + 1, nums, curSet, subsets)
+  ```
+
+- Iterative Code:
+
+  ```py
+  def subsets(nums):
+      subsets = [[]]
+      for num in nums:
+          for i in range(len(subsets)):
+              subsets.append(subsets[i] + [num])
+      return subsets
   ```
 
 - If the problem says that the `nums` has no duplicates **(not distinct)**, then we should do some steps before we start the recursion:
@@ -2541,8 +2585,18 @@ def helper(i, curComb, combs, n, k):
 
 **Permutation** is a set of elements where the order does matter. (It's a combination with a specific order)
 
+- `Permutation` is defined as the re-arranging of the elements of the set. For example, `{1, 2, 3}` has the following six permutations:
+
+  - `{1, 2, 3}`
+  - `{1, 3, 2}`
+  - `{2, 1, 3}`
+  - `{2, 3, 1}`
+  - `{3, 1, 2}`
+  - `{3, 2, 1}`
+
 - As the order matters, so we can't have 2 permutations that are the same like `[1, 2]` and `[2, 1]`, this will limit the number of permutations to `n!`
   ![backtracking](./img/backtracking-6.png)
+- If a set has ‘n’ distinct elements it will have `n!` permutations.
 
 - Recursive implementation:
 

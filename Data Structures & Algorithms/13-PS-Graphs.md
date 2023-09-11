@@ -29,10 +29,13 @@
     - [Network Delay Time](#network-delay-time)
     - [Path with Maximum Probability](#path-with-maximum-probability)
     - [Swim in Rising Water](#swim-in-rising-water)
-  - [Topological Sort](#topological-sort)
+  - [Topological Sort Technique](#topological-sort-technique)
     - [Course Schedule](#course-schedule)
     - [Course Schedule II](#course-schedule-ii)
     - [Course Schedule IV](#course-schedule-iv)
+    - [Alien Dictionary](#alien-dictionary)
+    - [Sequence Reconstruction](#sequence-reconstruction)
+    - [Minimum Height Trees](#minimum-height-trees)
 
 ---
 
@@ -1996,7 +1999,25 @@ def swimInWater(grid: List[List[int]]) -> int:
 
 ---
 
-## Topological Sort
+## Topological Sort Technique
+
+It's used to find a linear ordering of elements that have dependencies on each other.
+
+- fundamental concepts:
+  - **source** -> a node that has no incoming edges and has only outgoing edges.
+  - **sink** -> a node that has only incoming edges and no outgoing edges.
+  - **cycle** -> a set of nodes that are connected in a way that there is no start or end node.
+- `BFS` approach (indegree)
+  ![topological-sort](./img/topological-sort-1.png)
+  - We start with all the `sources` and in a stepwise fashion, do the following:
+    - Add all the `sources` to a `queue`.
+    - Remove one `source` from the `queue` at a time and do the following:
+      - Add the `source` to the sorted list.
+      - Decrement the `indegree` of all the `children` of the `source` by `1`.
+      - If the `indegree` of a `child` becomes `0`, add it to the `queue` to be processed next.
+    - Repeat the above steps until the `queue` is empty.
+
+---
 
 ### Course Schedule
 
@@ -2140,7 +2161,7 @@ For example, the pair `[0, 1]`, indicates that to take course `0` you have to fi
   def canFinish(numCourses, prerequisites):
       # Create a graph from the prerequisites (Adjacency List) & an indegree array
       preMap = [[] for _ in range(numCourses)]
-      indegree = [0] * numCourses
+      indegree = [0] * numCourses # or [0 for _ in range(numCourses)]
       for course, pre in prerequisites:
           indegree[pre] += 1
           preMap[course].append(pre)
@@ -2179,11 +2200,12 @@ Same as above, but return the order of the courses to take.
   - Output: `[0,1]`
   - Explanation: There are a total of 2 courses to take. To take course 1 you should have finished course 0. So the correct course order is `[0,1]`.
 
-- Explanation:
+- **Solution 1: `DFS`**
 
   - We use the same approach as above, with a preMap to create a graph from the prerequisites.
     ![course-schedule-ii](./img/course-schedule-ii-1.png)
   - We use `DFS` to check if there is a cycle or not.
+
     - we run it from `[0 : n-1]` nodes, and we check if we can reach the end node or not by running `DFS` on its prequisites in the `HashMap`.
       ![course-schedule-ii](./img/course-schedule-ii-2.png)
     - To prevent running `DFS` on the same node twice, we remove it from the `HashMap` after we run `DFS` on it and knowing that it can be completed, and then go back to the previous node and repeat the process.
@@ -2195,55 +2217,92 @@ Same as above, but return the order of the courses to take.
     - If there is a cycle, then we return `false`.
       - A cycle is detected using a `visited` set .
 
-- Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
-  - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
+  - Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
+    - This is because we may visit all nodes (`V`) and edges (`E`) in the graph.
 
-```py
-def findOrder(numCourses, prerequisites):
-    # Create a graph from the prerequisites (Adjacency List)
-    preMap = {course: [] for course in range(numCourses)}
-    for course, pre in prerequisites:
-        preMap[course].append(pre)
+  ```py
+  def findOrder(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List)
+      preMap = {course: [] for course in range(numCourses)}
+      for course, pre in prerequisites:
+          preMap[course].append(pre)
 
-    # Create sets to keep track of the visited nodes and potential cycles
-    visited, cycleSet = set(), set()
+      # Create sets to keep track of the visited nodes and potential cycles
+      visited, cycleSet = set(), set()
 
-    # Create a output to keep track of the order of the courses
-    output = []
+      # Create a output to keep track of the order of the courses
+      output = []
 
-    def dfs(node):
-        # Base case
-        if node in cycle:
-            return False # because there is a cycle
-        if node in visited:
-            return True # so that we don't stop the algotithm
+      def dfs(node):
+          # Base case
+          if node in cycle:
+              return False # because there is a cycle
+          if node in visited:
+              return True # so that we don't stop the algotithm
 
-        # Add the node to the cycle set
-        cycleSet.add(node)
+          # Add the node to the cycle set
+          cycleSet.add(node)
 
-        # Loop through the prerequisites of the node
-        for pre in preMap[node]:
-            # Check if there is a cycle
-            if not dfs(pre):
-                return False # Terminate the algorithm
+          # Loop through the prerequisites of the node
+          for pre in preMap[node]:
+              # Check if there is a cycle
+              if not dfs(pre):
+                  return False # Terminate the algorithm
 
-        # Remove the node from the cycle set
-        cycleSet.remove(node)
+          # Remove the node from the cycle set
+          cycleSet.remove(node)
 
-        # Finally add the node to the visited set
-        visited.add(node)
+          # Finally add the node to the visited set
+          visited.add(node)
 
-        # Add the node to the output after visiting all its prerequisites
-        output.append(node)
-        return True
+          # Add the node to the output after visiting all its prerequisites
+          output.append(node)
+          return True
 
-    for course in range(numCourses):
-        if dfs(course) == False:
-            return []
+      for course in range(numCourses):
+          if dfs(course) == False:
+              return []
 
-    # Else
-    return output
-```
+      # Else
+      return output
+  ```
+
+- **Solution 2: indegree** (better solution ✅)
+
+  - Time and Space Complexity: `O(V+E)` = `O(numCourses + prerequisites)`
+
+  ```py
+  def findOrder(numCourses, prerequisites):
+      # Create a graph from the prerequisites (Adjacency List) & an indegree array
+      preMap = [[] for _ in range(numCourses)]
+      indegree = [0 for _ in range(numCourses)]
+      for course, pre in prerequisites:
+          indegree[course] += 1
+          preMap[pre].append(course)
+
+      # Create a stack to keep track of the nodes to visit
+      stack = []
+
+      # Add all the sources to the stack
+      for course in range(numCourses):
+          if indegree[course] == 0:
+              stack.append(course)
+
+      # Create a set to keep track of the visited nodes
+      output = []
+
+      while stack:
+          course = stack.pop()
+          output.append(course)
+
+          # Loop through the prerequisites of the node and decrement their indegree by 1 and add them to the stack if their indegree is 0
+          for pre in preMap[course]:
+              indegree[pre] -= 1
+              if indegree[pre] == 0:
+                  stack.append(pre)
+
+      return output if len(output) == numCourses else []
+  ```
 
 ---
 
@@ -2263,7 +2322,7 @@ def checkIfPrerequisite(numCourses, prerequisites, queries):
     adj = defaultdict(list)
     for prereq, crs in prerequisites:
         adj[crs].append(prereq)
-    
+
     prereqMap = {} # crs -> set of prereqs
     res = []
 
@@ -2283,4 +2342,188 @@ def checkIfPrerequisite(numCourses, prerequisites, queries):
       res.append(u in prereqMap[v]) # check if u is in the prereqMap of v
 
     return res
+```
+
+---
+
+### Alien Dictionary
+
+There is a new alien language that uses the English alphabet. However, the order among the letters is unknown to you.
+
+You are given a list of strings `words` from the alien language's dictionary, where the strings in `words` are sorted lexicographically by the rules of this new language.
+
+Find the correct order of characters in the alien language.
+
+- EX:
+  - Input: `words = ["ba", "bc", "ac", "cab"]`
+  - Output: `"bac"`
+  - Explanation:
+    - Given that the words are sorted lexicographically by the rules of the alien language, from the given words we can conclude the following ordering among its characters:
+      - from `"ba"` and `"bc"`, we can conclude that `'a' comes before 'c'`.
+      - from `"bc"` and `"ac"`, we can conclude that `'b' comes before 'a'`.
+      - The first letter is `"b"`, and the second letter is `"a"`, and the third letter is `"c"".
+        - Therefore, `"bac"` is the correct order.
+
+```py
+def alienOrder(words):
+    if len(words) == 0 return ""
+
+    adj = {}
+    indegree = {}
+    for w in words:
+        for char in w:
+            adj[char] = []
+            indegree[char] = 0
+
+    # Build the graph
+    for i in range(len(words) - 1):
+        w1, w2 = words[i], words[i + 1]
+        # find ordering of characters from w1 and w2
+        for j in range(min(len(w1), len(w2))):
+            parent, child = w1[j], w2[j]
+            if parent != child: # if the characters are different
+                # put the child in the parent's adjacency list
+                adj[parent].append(child)
+                indegree[child] += 1
+                break # Only the first different character between the 2 words will help us find the order
+
+    # Topological Sort
+    queue = deque()
+    for char in indegree:
+        if indegree[char] == 0:
+            queue.append(char)
+
+    sortedOrder = []
+    while queue:
+        char = queue.popleft()
+        sortedOrder.append(char)
+
+        for child in adj[char]:
+            indegree[child] -= 1
+            if indegree[child] == 0:
+                queue.append(child)
+
+    return "".join(sortedOrder) if len(sortedOrder) == len(indegree) else ""
+```
+
+---
+
+### Sequence Reconstruction
+
+Given a sequence `originalSeq` and an array of sequences, write a method to find if `originalSeq` can be uniquely reconstructed from the array of sequences.
+
+- EX:
+  - Input: `originalSeq = [1,2,3,4], sequences = [[1,2],[2,3],[3,4]]`
+  - Output: `true`
+  - Explanation:
+    - The sequences `[1,2], [2,3], and [3,4]` can uniquely reconstruct `originalSeq = [1,2,3,4]`. in other words, all the given sequences uniquely define the order of numbers in the `originalSeq`.
+
+```py
+def canConstruct(originalSeq, sequences):
+    if len(originalSeq) <= 0:
+        return False
+
+    # Build the graph
+    adj = {}
+    indegree = {}
+    for seq in sequences:
+        for num in seq:
+            adj[num] = []
+            indegree[num] = 0
+
+    # Build the graph
+    for seq in sequences:
+        for i in range(len(seq) - 1):
+            parent, child = seq[i], seq[i + 1]
+            adj[parent].append(child)
+            indegree[child] += 1
+
+    # Topological Sort
+    queue = deque()
+    for num in indegree:
+        if indegree[num] == 0:
+            queue.append(num)
+
+    sortedOrder = []
+    while queue:
+        if len(queue) > 1:
+            return False # because more than 1 source means that there is more than one way to reconstruct the sequence
+
+        # check if the next number in the original sequence is the same as the next number in the sorted order
+        if originalSeq[len(sortedOrder)] != queue[0]:
+            return False # because the next number in the original sequence doesn't match the next number in the sorted order
+
+        num = queue.popleft()
+        sortedOrder.append(num)
+
+        for child in adj[num]:
+            indegree[child] -= 1
+            if indegree[child] == 0:
+                queue.append(child)
+
+    return len(sortedOrder) == len(originalSeq)
+```
+
+---
+
+### Minimum Height Trees
+
+A tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.
+
+Given a tree of `n` nodes `labelled` from `0` to `n - 1`, and an array of `n - 1` `edges` where `edges[i] = [ai, bi]` indicates that there is an undirected edge between the two nodes `ai` and `bi` in the tree, you can choose any node of the tree as the root. When you select a node `x` as the root, the result tree has height `h`. Among all possible rooted trees, those with minimum height (i.e. `min(h)`) are called minimum height trees (MHTs).
+
+Return a list of all MHTs' root labels. You can return the answer in any order.
+
+- Ex: `n = 4, edges = [[1,0],[1,2],[1,3]]`
+
+  ![min-height-trees](./img/min-height-trees-1.jpeg)
+
+  - Output: `[1]`
+  - Explanation: As shown, the height of the tree is 1 when the root is the node with label 1 which is the only MHT.
+
+- Explanation
+  - From the above examples, wee can see that any `leaf` node (node with only one edge) can't give us the minimum height tree (`MHT`) because its adjacent node will always give a `MHT` with a smaller height.
+  - All the adjacent nodes will consider the `leaf` node as a subtree
+    - Suppose we have a tree with root ‘M’ and height ‘5’. Now, if we take another node, say ‘P’, and make the ‘M’ tree as its subtree, then the height of the overall tree with root ‘P’ will be ‘6’ (=5+1). Now, this whole tree can be considered a graph, where ‘P’ is a leaf as it has only one edge (connection with ‘M’). This clearly shows that the leaf node (‘P’) gives us a tree of height ‘6’ whereas its adjacent non-leaf node (‘M’) gives us a tree with smaller height ‘5’ - since ‘P’ will be a child of ‘M’.
+  - So, since `leaf` nodes can't give us the `MHT`, we can remove them from the graph and their `edges` too
+    - once we remove the leaves, we will have new leaves, so we can remove them too and repeat the process until we have only `1` or `2` nodes left **(which will be the answer and the roots for the `MHT`)**
+  - We can use `Topological Sort` -> any node with only one edge (indegree = 1) will be a `leaf` node (`source` node)
+    - we will remove and repeat unlil we have only `1` or `2` nodes left in the graph
+
+```py
+def findMinHeightTrees(n, edges):
+    if n <= 0:
+        return []
+    if n == 1:
+        return [0]
+
+    # Build the graph
+    adj = {i: [] for i in range(n)}
+    indegree = {i: 0 for i in range(n)}
+    for src, dst in edges:
+        adj[src].append(dst)
+        adj[dst].append(src)
+        indegree[src] += 1
+        indegree[dst] += 1
+
+    # Topological Sort
+    queue = deque()
+    for node in indegree:
+        if indegree[node] == 1: # because we want to start from the leaves
+            queue.append(node)
+
+    minHeightTrees = []
+    while queue:
+        minHeightTrees = []
+        levelSize = len(queue)
+        for _ in range(levelSize):
+            node = queue.popleft()
+            minHeightTrees.append(node)
+
+            for child in adj[node]:
+                indegree[child] -= 1
+                if indegree[child] == 1:
+                    queue.append(child)
+
+    return minHeightTrees
 ```

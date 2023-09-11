@@ -6,6 +6,7 @@
     - [Declarative vs imperative](#declarative-vs-imperative)
     - [Multi-page application](#multi-page-application)
     - [Single-page application (SPA)](#single-page-application-spa)
+    - [What to choose with React: ( CSR or SSR )](#what-to-choose-with-react--csr-or-ssr-)
     - [Function components vs class components](#function-components-vs-class-components)
   - [installation](#installation)
     - [Create React App installation](#create-react-app-installation)
@@ -46,6 +47,7 @@
     - [How React handles events](#how-react-handles-events)
     - [Synthetic Events](#synthetic-events)
   - [State](#state)
+    - [State management](#state-management)
     - [State vs Props](#state-vs-props)
     - [State Batch Updates](#state-batch-updates)
     - [Async \& Derived State](#async--derived-state)
@@ -72,6 +74,8 @@
     - [Virtual DOM vs Real DOM](#virtual-dom-vs-real-dom)
       - [How does it work?](#how-does-it-work)
   - [Environmental Variables](#environmental-variables)
+  - [Professional React Development](#professional-react-development)
+    - [React Project Structure](#react-project-structure)
 
 ---
 
@@ -140,6 +144,20 @@ React is based on these concepts:
 - The browser downloads the entire app data when you visit SPA web applications. Thus, you can browse through different parts of the app seamlessly and the page won’t reload every time you click on something.
 
 - This is because a single page application executes the logic in the browser, instead of a server. It does so with JavaScript frameworks that can lift this heavy data on the client-side. JavaScript also enables an SPA to reload only those parts of the app that a user requests for, not the entire app. As a result, SPAs are known to deliver fast and efficient performance.
+
+---
+
+### What to choose with React: ( CSR or SSR )
+
+- The standard way of building a React apps was to build single-page applications (SPAs) that run in the browser. This is called `Client-Side Rendering (CSR)`. But there's another way to build React apps, which is `Server-Side Rendering (SSR)`
+
+- The React team recently started to recommend using `Server-Side Rendering (SSR)` for most use cases, and only using `Client-Side Rendering (CSR)` when you have a good reason to do so.
+
+  - `Server-Side Rendering (SSR)` is the process of rendering your React components on the server-side, before sending them to the client. This means that the HTML is generated on the server-side instead of the client-side. This is the traditional way of building web applications.
+
+- Here is a comparison between `CSR` and `SSR` for React applications:
+
+  ![CSR vs SSR](./img/csr-ssr.png)
 
 ---
 
@@ -360,6 +378,8 @@ It's a declarative syntax extension to JavaScript that allows us to write `HTML`
 
 ## Styling and CSS
 
+![styling](./img/styling-1.png)
+
 There're many ways to style react components:
 
 1. Inline style -> `style={{color: "red"}}`
@@ -454,7 +474,7 @@ There are two different ways of using CSS Modules in a React application.
 
    - more info [here](https://medium.com/nulogy/how-to-use-css-modules-with-create-react-app-9e44bec2b5c2)
 
-2. This option only requires that you name and import your CSS files differently.
+2. Name and import your CSS files differently.
 
    - you must give the css-file this format : `[name].module.css`
    - This lets React and Webpack know that we are using CSS Modules.
@@ -467,9 +487,8 @@ There are two different ways of using CSS Modules in a React application.
    }
    ```
 
-   ```js
+   ```jsx
    // in button.component.jsx
-
    import styles from "./Button.module.css"; // Import styles object from the css file
 
    const Button = () => {
@@ -481,21 +500,62 @@ There are two different ways of using CSS Modules in a React application.
    <button class="Button_error_ax7yz">Error Button</button>;
    ```
 
-**Notes**:
+- **Notes**:
 
-- we use `className` word instead of `class` because in Javascript, `class` word is reserved for ES6 Classes
-- There's a gotcha (tradeoff) when using css-modules, which is that it doesn't affect **elements selectors**
+  - When writing classes names in the `module.css` file, use `camelCase` instead of `kebab-case` as it will be converted to `camelCase` in the `styles` object
+  - if you used the same `module.css` file in different components, the hashed class names will be different in each component. So don't worry about the class names being the same in different components
+  - There's a gotcha (tradeoff) when using css-modules, which is that it doesn't affect `elements selectors, So you shouldn't use them in css-modules`
 
-  ```css
-  /* this won't be namespaced */
-  ul li {
-    font-style: italic;
+    ```css
+    /* this won't be namespaced */
+    ul li {
+      font-style: italic;
+    }
+
+    /* solution mix them with classes */
+    .list li {
+      font-style: italic;
+    }
+    ```
+
+  - To make a global style, you can use `:global` selector
+
+    ```css
+    :global (.btn) {
+      color: red;
+    }
+    ```
+
+    - now, we can use it without importing it in any component
+
+      ```jsx
+      const Button = () => {
+        return <button className='btn'>Error Button</button>;
+      };
+      ```
+
+- To easily import css modules files, use this vs-code snippet:
+
+  ```json
+  "ImportCSSModules": {
+    "prefix": "csm",
+    "scope": "javascript,typescript,typescriptreact",
+    "body": [
+      "import styles from './${TM_FILENAME_BASE}.module.css';",
+      "$1"
+    ],
+    "description": "Import CSS Modules as `styles`"
   }
+  ```
 
-  /* solution */
-  .list li {
-    font-style: italic;
-  }
+  - Then add it to your `keybindings.json` file (File -> Preferences -> Keyboard Shortcuts -> Open Keyboard Shortcuts (JSON))
+
+- When we have a `prop` that is used to select the css modules class, we can use `template literals` to add classes dynamically
+
+  ```jsx
+  const Button = ({ type }) => {
+    return <button className={`${styles.btn} ${styles[`btn--${type}`]}`}>Error Button</button>; // class: btn--primary
+  };
   ```
 
 ---
@@ -979,19 +1039,32 @@ React uses **Synthetic Events** which is a cross-browser **wrapper around the br
 
 - State allows us to update the component's `view` by re-rendering it with the new data
   ![state](./img/state.png)
+
 - Mechanism of `state` in React
   ![state](./img/state-3.png)
   ![state](./img/state-4.png)
-- When and where to use `state` in React
-  ![state](./img/state-5.png)
-- `Application (global) state` vs `Component state`
+
+- [Functional components state](./2-Hooks.md#state)
+- [Class components state](./3-Class-Components.md#state)
+
+---
+
+### State management
+
+- Types of `state` in React
   ![state](./img/state-1.png)
+  `state domain` is important when choosing where/what to store the state
 
   - `Application State` is the state that is shared between components, and it's usually stored in the `App` component and passed down to the other components as `props`
     ![state](./img/state-2.png)
 
-- [Functional components state](./2-Hooks.md#state)
-- [Class components state](./3-Class-Components.md#state)
+- When and where to use `state` in React
+  ![state](./img/state-5.png)
+- State management tools and options
+  ![state](./img/state-6.png)
+  ![state](./img/state-7.png)
+
+---
 
 ### State vs Props
 
@@ -1332,3 +1405,43 @@ in `.env` file:
 - [Docs](https://create-react-app.dev/docs/adding-custom-environment-variables/#adding-development-environment-variables-in-env)
 
 ---
+
+## Professional React Development
+
+### React Project Structure
+
+- Features based structure
+
+  ```sh
+  src
+  ├── features
+  │   ├── cart
+  │   │   ├── Cart.jsx # component
+  │   │   ├── CartItem.jsx
+  │   │   ├── CartItem.module.css
+  │   │   ├── Cart.module.css # styles for the whole feature
+  │   │   ├── CartSlice.js # redux slice
+  │   │   └── index.js # exports the component
+  │   ├── products
+  │   │   ├── Product.jsx
+  │   │   ├── Product.module.css
+  │   │   ├── ProductSlice.js
+  │   │   └── index.js
+  │   └── index.js
+  ├── ui # reusable components or components that are used in multiple features
+  │   ├── Home.jsx
+  │   ├── Button.jsx
+  │   ├── Button.module.css
+  │   ├── Input.jsx
+  │   ├── Input.module.css
+  │   ├── Modal.jsx
+  │   ├── Modal.module.css
+  ├── utils # reusable functions
+  │   ├── api.js
+  │   └── helpers.js
+  ├── App.css
+  ├── App.jsx
+  ├── App.test.js
+  ├── index.css
+  ├── index.js # entry point
+  ```

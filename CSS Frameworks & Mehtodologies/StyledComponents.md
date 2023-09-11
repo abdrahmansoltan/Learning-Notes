@@ -6,8 +6,9 @@
     - [Installation and Configuration](#installation-and-configuration)
   - [Extending Styles](#extending-styles)
   - [Props in Styled Components](#props-in-styled-components)
-    - [The "as" Polymorphic Prop](#the-as-polymorphic-prop)
+    - [The `"as"` Polymorphic Prop](#the-as-polymorphic-prop)
   - [Attributes in Styled Components](#attributes-in-styled-components)
+  - [Themes](#themes)
   - [Animation](#animation)
   - [Global Styling](#global-styling)
   - [Other cases](#other-cases)
@@ -179,9 +180,9 @@ function Contact() {
 
 ---
 
-### The "as" Polymorphic Prop
+### The `"as"` Polymorphic Prop
 
-- With the `as` polymorphic prop, you can swap the end element that gets rendered. One use case is (when you inherit styles), for example, you’d prefer a `div` to a `section` for a reusable styled-component, you can pass the as prop to your styled component with the value of your preferred element, like so:
+- With the `as` prop, you can swap the end element that gets rendered. One use case is (when you inherit styles), for example, you’d prefer a `div` to a `section` for a reusable styled-component, you can pass the as prop to your styled component with the value of your preferred element, like so:
 
   ```jsx
   function Home() {
@@ -238,6 +239,34 @@ An extended syntax lets us manage props using the `attrs` constructor.
 
 ---
 
+## Themes
+
+- We can use the `ThemeProvider` component to pass down the theme to all styled components anywhere in the component tree.
+
+- It's used to provide css-variable-like values to styled-components
+
+  ```js
+  import { ThemeProvider } from 'styled-components';
+
+  const theme = {
+    main: 'mediumseagreen',
+    secondary: 'palevioletred'
+  };
+
+  function App() {
+    return (
+      <ThemeProvider theme={theme}>
+        <Routes />
+      </ThemeProvider>
+    );
+  }
+  ```
+
+- It's not used anymore because we can use the native css variables (custom properties) instead
+  - To do so, we define the variables in the `:root` selector in the [global styles](#global-styling)
+
+---
+
 ## Animation
 
 Styled components have a **keyframes** helper that assists with constructing (reusable) animation keyframes. The advantage here is that the keyframes will be detached from the styled components and can be exported and reused wherever needed.
@@ -270,6 +299,9 @@ const Toast = styled.div`
 We have a helper function — `createGlobalStyle` — whose sole reason for existence is global styling.
 
 - One thing we can use `createGlobalStyle` for is to **normalize the CSS**:
+- We add it to the root of our application, and it will be available to all components in the application.
+
+  - **It's not a wrapper component, it's a component that injects styles into the DOM.**
 
   ```js
   import { createGlobalStyle } from 'styled-components';
@@ -290,6 +322,7 @@ We have a helper function — `createGlobalStyle` — whose sole reason for exis
   ```
 
 - Styles created with `createGlobalStyle` do not accept any children.
+- It enables us to use props in our global styles. This is a feature that is not available in CSS.
 - `createGlobalStyle` injects styles but does not render any actual elements. If you look at the last example closely, you’ll notice we didn’t specify any `HTML` element to render. This is cool because we might not actually need the element. After all, we’re concerned with global styles. We are targeting selectors at large, not specific elements.
 
 ---

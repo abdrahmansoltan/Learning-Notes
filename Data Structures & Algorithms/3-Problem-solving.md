@@ -28,8 +28,6 @@
     - [Power of Two](#power-of-two)
     - [Pow(x, n)](#powx-n)
     - [Partitioning Into Minimum Number Of Deci-Binary Numbers](#partitioning-into-minimum-number-of-deci-binary-numbers)
-  - [Bit manipulation](#bit-manipulation)
-    - [Reverse Bits](#reverse-bits)
 
 ---
 
@@ -552,80 +550,6 @@ def min_partitions(n):
 
     # return the largest digit in the list
     return max(nums)
-```
-
----
-
-## Bit manipulation
-
-```py
-# AND
-1 & 1 = 1
-
-# OR
-1 | 0 = 1
-
-# XOR
-1 ^ 0 = 1
-1 ^ 1 = 0
-
-# NOT
-~1 = 0
-
-# Bit shifting
-1 << 1 = 10 # shift left
-10 >> 1 = 1 # shift right
-```
-
-- Count number of bits in a number
-
-  ```py
-  def count_bits(n):
-      count = 0
-      while n:
-          count += n & 1 # check if the last bit is 1
-          n >>= 1 # shift the number to the right by 1 bit
-      return count
-  ```
-
-### Reverse Bits
-
-Reverse bits of a given 32 bits unsigned integer.
-
-- Ex:
-
-  - Input: `n = 00000010100101000001111010011100`
-  - Output: `964176192 (00111001011110000010100101000000)`
-  - Explanation: The input binary string `00000010100101000001111010011100` represents the unsigned integer `43261596`, so return `964176192` which its binary representation is `00111001011110000010100101000000`.
-
-- Explanation:
-  ![reverse bits](./img/reverse-bits.png)
-  - We can use the **bitwise AND** operator to get the last bit of the number
-    - `n & 1` -> This will give us the last bit of the number
-      - Ex: `n = 5` -> `n & 1` -> `101 & 001` -> `001`
-  - We can then shift the number to the right by 1 bit
-    - `n >> 1` -> This will shift the number to the right by 1 bit
-      - Ex: `n = 5` -> `n >> 1` -> `101 >> 1` -> `10`
-  - We can then shift the result to the left by 1 bit
-    - `result << 1` -> This will shift the result to the left by 1 bit
-      - Ex: `result = 0` -> `result << 1` -> `0 << 1` -> `0`
-  - Finally, we can add the last bit to the result
-    - `result | (n & 1)` -> This will add the last bit to the result
-      - Ex: `result = 0` -> `result | (n & 1)` -> `0 | (101 & 001)` -> `0 | 001` -> `1`
-
-```py
-def reverseBits(n):
-    result = 0
-
-    for _ in range(32):
-        # shift the result to the left by 1 bit
-        result = result << 1
-        # add the last bit to the result
-        result = result | (n & 1)
-        # shift the number to the right by 1 bit
-        n = n >> 1
-
-    return result
 ```
 
 ---

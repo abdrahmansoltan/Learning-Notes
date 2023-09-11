@@ -8,6 +8,7 @@
   - [Restore IP Addresses](#restore-ip-addresses)
   - [Permutations](#permutations)
   - [Permutations II](#permutations-ii)
+  - [Letter Case Permutation](#letter-case-permutation)
   - [Combinations](#combinations)
   - [Subsets](#subsets)
   - [Subsets II](#subsets-ii)
@@ -205,43 +206,74 @@ Given an array `nums` of distinct integers, return all the possible permutations
 - Ex: `nums = [1, 2, 3]`
 
   - Output: `[[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]`
+  - explanation: `permutation` is defined as the **re-arrengement** of the elements of the array. So, `[1,2,3]` and `[2,1,3]` are different permutations.
 
-- Explanation:
+- Solution 1: **Recursive + Backtracking**
 
-  - We can use **Decision Tree** to solve this problem.
-  - For each element, we can either choose to include it in the permutation or not include it in the permutation.
-    ![permutations](./img/permutations-1.png)
-    - if we choose to include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
-    - if we choose to not include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
-      ![permutations](./img/permutations-2.png)
-  - We can do so by dividing the problem into subproblems by removing the element and getting the permutations of the remaining elements until we have no more elements left.
-    ![permutations](./img/permutations-5.png)
-    ![permutations](./img/permutations-6.png)
-  - Then we can go up the tree and add the element back to the permutation and remove the next element and get the permutations of the remaining elements.
-    ![permutations](./img/permutations-7.png)
-    ![permutations](./img/permutations-3.png)
-  - When we have no more elements left, we can append the current permutation to the result list.
-    ![permutations](./img/permutations-8.png)
+  - Explanation:
 
-  ![permutations](./img/permutations-4.png)
+    - We can use **Decision Tree** to solve this problem.
+    - For each element, we can either choose to include it in the permutation or not include it in the permutation.
+      ![permutations](./img/permutations-1.png)
+      - if we choose to include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
+      - if we choose to not include it in the permutation, we can then choose to include the next element in the permutation or not include the next element in the permutation.
+        ![permutations](./img/permutations-2.png)
+    - We can do so by dividing the problem into subproblems by removing the element and getting the permutations of the remaining elements until we have no more elements left.
+      ![permutations](./img/permutations-5.png)
+      ![permutations](./img/permutations-6.png)
+    - Then we can go up the tree and add the element back to the permutation and remove the next element and get the permutations of the remaining elements.
+      ![permutations](./img/permutations-7.png)
+      ![permutations](./img/permutations-3.png)
+    - When we have no more elements left, we can append the current permutation to the result list.
+      ![permutations](./img/permutations-8.png)
 
-```py
-def permute(nums):
-    res = []
+    ![permutations](./img/permutations-4.png)
 
-    def backtrack(nums, cur):
-        # base case
-        if not nums:
-            res.append(cur)
-            return
+  ```py
+  def permute(nums):
+      res = []
 
-        # loop through the nums and remove the current element and get the permutations of the remaining elements
-        for i in range(len(nums)):
-            backtrack(nums[:i] + nums[i+1:], cur + [nums[i]])
+      def backtrack(nums, cur):
+          # base case
+          if not nums:
+              res.append(cur)
+              return
 
-    backtrack(nums, [])
-    return res
-```
+          # loop through the nums and remove the current element and get the permutations of the remaining elements
+          for i in range(len(nums)):
+              backtrack(nums[:i] + nums[i+1:], cur + [nums[i]])
+
+      backtrack(nums, [])
+      return res
+  ```
+
+- **Solution 2: Iterative**
+
+  - Explanation:
+
+    - We can follow `BFS` approach to solve this problem.
+      1. We can start with an empty permutation `[]` and then add each element to the permutation.
+      2. When adding the next element to the permutation:
+      - we can add it to all the existing permutations
+      - we should add it to all possible positions in the permutation
+        ![permutations](./img/permutations-9.png)
+
+  - Time complexity: `O(n * n!)` -> `O(n!)` because we are generating all the permutations and `O(n)` because we are looping through the array.
+
+  ```py
+  def permute(nums):
+      res = [[]]
+
+      for num in nums:
+          new_res = []
+          for perm in res:
+              # add the current element to all possible positions in the permutation
+              for i in range(len(perm)+1):
+                  new_res.append(perm[:i] + [num] + perm[i:])
+          res = new_res
+
+      return res
+  ```
 
 ---
 
@@ -318,6 +350,51 @@ Given a collection of numbers, `nums`, that might contain duplicates, return all
 
 ---
 
+## Letter Case Permutation
+
+Given a string `s`, we can transform every letter individually to be lowercase or uppercase to create another string. Return a list of all possible strings we could create. You can return the output in **any order**.
+
+- Ex: `s = "a1b2"`
+
+  - Output: `["a1b2", "a1B2", "A1b2", "A1B2"]`
+
+- **Recursive solution**
+
+  ```py
+  def letterCasePermutation(s):
+      res = []
+      def backtrack(i, cur):
+          # base case
+          if i == len(s):
+              res.append(cur)
+              return
+          # include the current character in the permutation
+          backtrack(i+1, cur + s[i])
+          # include the current character in the permutation after converting it to uppercase or lowercase
+          if s[i].isalpha():
+              backtrack(i+1, cur + s[i].swapcase())
+      backtrack(0, '')
+      return res
+  ```
+
+- **Iterative solution**
+  ![letterCasePermutation](./img/letterCasePermutation.png)
+
+  ```py
+  def letterCasePermutation(s):
+      res = [s] # start with the original string
+      for i in range(len(s)):
+          if s[i].isalpha():
+              # loop through the result list and add the current character to the permutation after converting it to uppercase or lowercase
+              for j in range(len(res)):
+                  char = res[j][i]
+                  res.append(res[j][:i] + char.swapcase() + res[j][i+1:])
+
+      return res
+  ```
+
+---
+
 ## Combinations
 
 Given two integers `n` and `k`, return all possible combinations of `k` numbers out of the range `[1, n]`.
@@ -373,43 +450,71 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
 
   - Output: `[[], [1], [2], [3], [1,2], [1,3], [2,3], [1,2,3]]`
 
-- Explanation:
+- **Recursion DFS solution**
 
-  - We can use **Decision Tree** to solve this problem.
-    - For each element, we can either choose to include it in the subset or not include it in the subset.
-      ![subsets](./img/subsets-1.png)
-      - if we choose to include it in the subset, we can then **choose to include the next element in the subset or not**.
-      - if we choose to not include it in the subset, we can then choose to include the next element in the subset or not include the next element in the subset.
+  - Explanation:
 
-  ![subsets](./img/subsets-2.png)
+    - We can use **Decision Tree** to solve this problem.
+      - For each element, we can either choose to include it in the subset or not include it in the subset.
+        ![subsets](./img/subsets-1.png)
+        - if we choose to include it in the subset, we can then **choose to include the next element in the subset or not**.
+        - if we choose to not include it in the subset, we can then choose to include the next element in the subset or not include the next element in the subset.
 
-- Steps:
+    ![subsets](./img/subsets-2.png)
 
-  - We can use a helper function `dfs` to build the subsets.
-  - We can then use a `for` loop to iterate through the array and call the helper function.
-  - We can then return the result list.
-  - Time complexity: `O(2^n)` because we are making 2 decisions for each element in the array.
+  - Steps:
 
-- Time complexity: `O(n * 2^n)`
+    - We can use a helper function `dfs` to build the subsets.
+    - We can then use a `for` loop to iterate through the array and call the helper function.
+    - We can then return the result list.
+    - Time complexity: `O(2^n)` because we are making 2 decisions for each element in the array.
 
-```py
-def subsets(nums):
-    res = []
+  - Time complexity: `O(n * 2^n)`
 
-    def dfs(i, cur):
-        # base case
-        if i == len(nums):
-            res.append(cur)
-            return
+  ```py
+  def subsets(nums):
+      res = []
 
-        # decision to include the current element in the subset
-        dfs(i+1, cur + [nums[i]])
-        # decision to not include the current element in the subset
-        dfs(i+1, cur)
+      def dfs(i, cur):
+          # base case
+          if i == len(nums):
+              res.append(cur)
+              return
 
-    dfs(0, [])
-    return res
-```
+          # decision to include the current element in the subset
+          dfs(i+1, cur + [nums[i]])
+          # decision to not include the current element in the subset
+          dfs(i+1, cur)
+
+      dfs(0, [])
+      return res
+  ```
+
+- **Iterative Bfs solution**
+
+  - Explanation:
+
+    - We can start with an empty subset and then add each element to the subset.
+    - Example: `[1, 5, 3]`
+      ![subsets](./img/subsets-3.png)
+      1. We start with an empty subset `[]`
+      2. We add the first number `1` to all the existing subsets to create new subsets -> `[[], [1]]`
+      3. We add the second number `5` to all the existing subsets to create new subsets -> `[[], [1], [5], [1,5]]`
+      4. We add the third number `3` to all the existing subsets to create new subsets -> `[[], [1], [5], [1,5], [3], [1,3], [5,3], [1,5,3]]`
+
+  - Time complexity: `O(2^n)`, because we are making 2 decisions for each element in the array.
+  - Space complexity: `O(2^n)`, because we are creating 2^n subsets.
+
+  ```py
+  def subsets(nums):
+      res = [[]]
+
+      for num in nums:
+          for i in range(len(res)):
+              res.append(res[i] + [num])
+
+      return res
+  ```
 
 ---
 
@@ -423,40 +528,69 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
 
   - Output: `[[], [1], [1,2], [1,2,2], [2], [2,2]]`
 
-- Explanation:
-  - Difference between this problem and the previous problem is that this problem contains duplicates.
-    ![subsets II](./img/subsets-II-1.png)
-  - To avoid duplicates, we can sort the array first. then we can **skip** the current element if it is the same as the previous element (by checking `nums[i] == nums[i+1]` and that the next-index is not out of bounds) and then we can skip the current element. by `i += 1`.
-    - We **only skip it for the second decision**, for example, if we are at the first decision which to include/exclude `2` in the subset, we can't skip it because we need to make sure that we include `2` in the subset. So we add it to the left subtree.
-      ![subsets II](./img/subsets-II-2.png)
-    - But if we include it in the right subtree, we will have duplicates. So we need to skip it (by moving the index to the next element)
-      ![subsets II](./img/subsets-II-3.png)
-      ![subsets II](./img/subsets-II-4.png)
+- **Recursive DFS Solution**
 
-```py
-def subsetsWithDup(nums):
-    res = []
-    nums.sort()
+  - Explanation:
+    - Difference between this problem and the previous problem is that this problem contains duplicates.
+      ![subsets II](./img/subsets-II-1.png)
+    - To avoid duplicates, we can sort the array first. then we can **skip** the current element if it is the same as the previous element (by checking `nums[i] == nums[i+1]` and that the next-index is not out of bounds) and then we can skip the current element. by `i += 1`.
+      - We **only skip it for the second decision**, for example, if we are at the first decision which to include/exclude `2` in the subset, we can't skip it because we need to make sure that we include `2` in the subset. So we add it to the left subtree.
+        ![subsets II](./img/subsets-II-2.png)
+      - But if we include it in the right subtree, we will have duplicates. So we need to skip it (by moving the index to the next element)
+        ![subsets II](./img/subsets-II-3.png)
+        ![subsets II](./img/subsets-II-4.png)
 
-    def dfs(i, cur):
-        # base case
-        if i == len(nums):
-            res.append(cur)
-            return
+  ```py
+  def subsetsWithDup(nums):
+      res = []
+      nums.sort()
 
-        # include the current element in the subset
-        dfs(i+1, cur + [nums[i]])
+      def dfs(i, cur):
+          # base case
+          if i == len(nums):
+              res.append(cur)
+              return
 
-        # skip the current element if it is the same as the next element
-        while i+1 < len(nums) and nums[i] == nums[i+1]:
-          i += 1
+          # include the current element in the subset
+          dfs(i+1, cur + [nums[i]])
 
-        # not include the current element in the subset
-        dfs(i+1, cur)
+          # skip the current element if it is the same as the next element
+          while i+1 < len(nums) and nums[i] == nums[i+1]:
+            i += 1
 
-    dfs(0, [])
-    return res
-```
+          # not include the current element in the subset
+          dfs(i+1, cur)
+
+      dfs(0, [])
+      return res
+  ```
+
+- **Iterative BFS Solution**
+
+  - Explanation
+
+    - The same approach as the previous problem, but we need to check if the current element is the same as the previous element. If it is, we can skip it.
+    - To do so, first we need to sort the array. This will ensure that all duplicate numbers are next to each other
+    - Following the same approach as the previous problem, we can start with an empty subset and then add each element to the subset, But whenever we are about to process duplicate elements, we only add the duplicate element to the right subtree (subset that we created in previous step)
+      ![subsets II](./img/subsets-II-5.png)
+
+  ```py
+  def subsetsWithDup(nums):
+      res = [[]]
+      nums.sort()
+      startIdx, endIdx = 0, 0
+
+      for i in range(len(nums)):
+          startIdx = 0
+          if i > 0 and nums[i] == nums[i-1]:
+              startIdx = endIdx + 1
+          endIdx = len(res) - 1
+
+          for j in range(startIdx, endIdx+1):
+              res.append(res[j] + [nums[i]])
+
+      return res
+  ```
 
 ---
 

@@ -2,7 +2,12 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
-  - [Unbounded KnapSack (Revisit again)](#unbounded-knapsack-revisit-again)
+  - [0 or 1 Knapsack Pattern](#0-or-1-knapsack-pattern)
+    - [0/1 Knapsack](#01-knapsack)
+    - [Unbounded KnapSack (Revisit again)](#unbounded-knapsack-revisit-again)
+    - [Partition Equal Subset Sum](#partition-equal-subset-sum)
+    - [Partition Array Into Two Arrays to Minimize Sum Difference](#partition-array-into-two-arrays-to-minimize-sum-difference)
+    - [Target Sum](#target-sum)
   - [Min Cost Climbing Stairs](#min-cost-climbing-stairs)
   - [Climbing Stairs](#climbing-stairs)
   - [Best Time to Buy and Sell Stock](#best-time-to-buy-and-sell-stock)
@@ -12,7 +17,6 @@
   - [Best Time to Buy and Sell Stock with Cooldown](#best-time-to-buy-and-sell-stock-with-cooldown)
   - [Knight Probability in Chessboard](#knight-probability-in-chessboard)
   - [Knight Dialer](#knight-dialer)
-  - [Partition Equal Subset Sum](#partition-equal-subset-sum)
   - [Coin Change](#coin-change)
   - [Coin Change II](#coin-change-ii)
   - [Student Attendance Record II](#student-attendance-record-ii)
@@ -34,7 +38,118 @@
 
 ---
 
-## Unbounded KnapSack (Revisit again)
+## 0 or 1 Knapsack Pattern
+
+In this pattern, when solving the problem with a brute-force recursive solution, we will find that we're solving the same problem repeatedly.
+
+- We use **memoization** to store the results of the subproblems and use them to solve the main problem.
+
+### 0/1 Knapsack
+
+Given two integer arrays `profit` and `weight` of length `n`, we need to find a subset of these items which will give us maximum profit such that their cumulative weight is not more than a given number `capacity`. Each item can only be selected once, which means either we put an item in the knapsack or we skip it.
+
+- EX:
+
+  - Input: `items = ['apple', 'orange', 'banana', 'melon'], profit = [4, 5, 3, 7], weight = [2, 3, 1, 4], capacity = 5`
+  - Output: `10`
+  - Explanation: `banana + melon` is the best combination as it gives us the maximum profit.
+    - apple + orange (total weight 5) -> profit = 9
+    - apple + banana (total weight 3) -> profit = 7
+    - orange + banana (total weight 4) -> profit = 8
+    - banana + melon (total weight 5) -> profit = **10** ✅
+
+- **Solution 1: Top-down approach (memoization)**
+
+  - Basic brute-force solution is to try all combinations of the given items to choose the subset of items with the maximum profit and a weight that doesn't exceed `capacity`.
+    ![0/1 knapsack](./img/0-1-knapsack-1.svg)
+    - Time complexity: `O(2^n)` -> `O(2^4)`
+    - Space complexity: `O(n)` -> recursion stack
+  - We will notice that we're solving the same subproblems repeatedly, so we can use **memoization** to store the results of the subproblems and use them to solve the main problem.
+    ![0/1 knapsack](./img/0-1-knapsack-2.png)
+    - since we have 2 changing values (`capacity` and `index`), we will use a `2D` array to store the results of the subproblems.
+    - Time complexity: `O(n * c)`
+      - we will not have more than `n * c` subproblems because we have `n` items and `c` capacity in the `dp` array.
+    - Space complexity: `O(n * c)` -> memoization array
+
+  ```py
+  def knapsack(profit: List[int], weight: List[int], capacity: int) -> int:
+      n = len(profit)
+      dp = [[-1] * (capacity + 1) for _ in range(n)] # dp[i][c] -> max profit for the first i items and capacity c
+
+      def dfs(index, capacity):
+          if index >= n or capacity <= 0:
+              return 0
+
+          if dp[index][capacity] != -1:
+              return dp[index][capacity]
+
+          profit1, profit2 = 0, 0
+
+          # include the current item
+          if capacity >= weight[index]:
+              profit1 = profit[index] + dfs(index + 1, capacity - weight[index])
+
+          # exclude the current item
+          profit2 = dfs(index + 1, capacity)
+
+          dp[index][capacity] = max(profit1, profit2)
+          return dp[index][capacity]
+
+      return dfs(0, capacity)
+  ```
+
+- **Solution 2: Bottom-up approach** ✅
+
+  - Here, we start at the bottom and try to reach the top.
+  - We can create a `dp` array of size `n` to store the maximum profit for each item.
+    - the last element in the array will be the maximum profit for all the items.
+  - We can then loop through the array and calculate the maximum profit for each item.
+
+    - We have 2 options:
+      ![0/1 knapsack](./img/0-1-knapsack-8.svg)
+      1. Include the current item -> `dp[i-1][c - weight[i]] + profit[i]`
+         - if we include an item, we jump to the remaining profit to find more items that can fit in the remaining capacity.
+      2. Exclude the current item -> `dp[i-1][c]`
+         - if we skip an item, we take the profit from the remaining items.
+    - The maximum profit for the current item is equal to `the maximum profit for the previous item + the profit of the current item`.
+
+      ```py
+      dp[i][c] = max(dp[i-1][c - weight[i]] + profit[i], dp[i-1][c])
+      ```
+
+  ![0/1 knapsack](./img/0-1-knapsack-3.png)
+  ![0/1 knapsack](./img/0-1-knapsack-4.png)
+  ![0/1 knapsack](./img/0-1-knapsack-5.png)
+  ![0/1 knapsack](./img/0-1-knapsack-6.png)
+  ![0/1 knapsack](./img/0-1-knapsack-7.png)
+
+  - Time complexity: `O(n * c)`
+  - Space complexity: `O(c)` -> `dp` array
+
+  ```py
+  def knapsack(profit: List[int], weight: List[int], capacity: int) -> int:
+      n = len(profit)
+      dp = [[0] * (capacity + 1) for _ in range(n)] # dp[i][c] -> max profit for the first i items and capacity c
+
+      # Fill the first row
+      for c in range(capacity + 1):
+          if c >= weight[0]:
+              dp[0][c] = profit[0]
+
+      for i in range(1, n):
+          for c in range(1, capacity + 1):
+              profit1, profit2 = 0, 0
+              if c >= weight[i]:
+                  profit1 = profit[i] + dp[i - 1][c - weight[i]]
+              profit2 = dp[i - 1][c]
+              dp[i][c] = max(profit1, profit2)
+
+      return dp[-1][-1]
+  ```
+
+---
+
+### Unbounded KnapSack (Revisit again)
 
 Given a list of `n` items, and a backpack with a limited capacity, return the maximum total profit that can be contained in the backpack. The i-th item's profit is `profit[i]` and its weight is `weight[i]`.
 
@@ -63,6 +178,223 @@ def unboundedKnapsack(capacity: int, profit: List[int], weight: List[int]) -> in
             dp[i][c] = max(profit1, profit2)
 
     return dp[-1][-1]
+```
+
+---
+
+### Partition Equal Subset Sum
+
+Given a non-empty array `nums` containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
+
+- Ex:
+
+  - Input: `nums = [1,5,11,5]`
+  - Output: `true`
+  - Explanation: The array can be partitioned as `[1, 5, 5]` and `[11]`.
+
+- **Solution 1: Top-down approach (memoization)**
+
+  - we want to divide the array into two subsets with equal sum (sum of elements in both subsets is equal).
+    - For example, if the array is `[1, 5, 11, 5]`:
+      - The sum of elements in the array is `22`.
+      - The required sum of elements in each subset is `11`.
+      - we can divide the array into two subsets with sum `11`:
+        - `[1, 5, 5]` -> sum = `11`
+        - `[11]` -> sum = `11`
+      - So the `target` will be `sum(nums) // 2` -> `11` for a path in the decision tree to be valid.
+        ![equal-subset-sum](./img/equal-subset-sum-1.png)
+  - we can solve this problem using **dynamic programming**.
+
+    - we will divide the subsetting logic into smaller decisions each time we make a new decision (**with updated `target` and `index`**)
+      ![equal-subset-sum](./img/equal-subset-sum-2.png)
+
+  - We will use a `dfs()` function to traverse the decision tree.
+    - The function will take the current `index` and the current `target` as arguments.
+    - If the current target is `0`, then we have a valid path.
+    - If the current target is less than `0` or the current index is greater than or equal to the length of the array, then we don't have a valid path.
+    - If the current index and target are in the `memo` dictionary, then we return the value in the dictionary.
+    - Otherwise, we will call the function with the current index + 1 and the current target - the number at the current index **(because we are trying to find a subset with sum equal to the target)**.
+    - We will also call the function with the current index + 1 and the current target **(because we are trying to find a subset with sum equal to the target)**.
+    - We will return `True` if any of the two calls return `True`, otherwise we will return `False`.
+
+  ```py
+  def canPartition(nums: List[int]) -> bool:
+      total = sum(nums)
+      # If the sum of elements in the array is odd, then we can't divide the array into two subsets with equal sum
+      if total % 2 != 0:
+          return False
+
+      memo = {} # key=(index, target), value=canPartition
+
+      def dfs(index, target):
+          if target == 0:
+              # Means that we have a subset branch with sum equal to target
+              return True
+          if index >= len(nums) or target < 0:
+              return False
+
+          if (index, target) in memo:
+              return memo[(index, target)]
+
+          memo[(index, target)] = dfs(index + 1, target - nums[index]) or dfs(index + 1, target)
+          return memo[(index, target)]
+
+      return dfs(0, total // 2)
+  ```
+
+- **Solution 2: Bottom-up approach** ✅
+
+  - Here, we want to find if we can make all possible sums with every subset. This means `dp[i][s]` will be `true` if we can make the sum `s` from the first `i` numbers.
+  - We will have 2 options: include or exclude the current number.
+
+    - if either options is `true`, then `dp[i][s]` will be `true`.
+      ![equal-subset-sum](./img/equal-subset-sum-3.png)
+      ![equal-subset-sum](./img/equal-subset-sum-4.png)
+      ![equal-subset-sum](./img/equal-subset-sum-5.png)
+      ![equal-subset-sum](./img/equal-subset-sum-6.png)
+      ![equal-subset-sum](./img/equal-subset-sum-7.png)
+      ![equal-subset-sum](./img/equal-subset-sum-8.png)
+
+  - Time complexity: `O(n * s)`
+
+  ```py
+  def canPartition(nums: List[int]) -> bool:
+      total = sum(nums)
+      # If the sum of elements in the array is odd, then we can't divide the array into two subsets with equal sum
+      if total % 2 != 0:
+          return False
+
+      n = len(nums)
+      target = total // 2
+      dp = [[False] * (target + 1) for _ in range(n)]
+
+      # Fill the first column
+      for i in range(n):
+          dp[i][0] = True
+
+      # Fill the first row
+      for s in range(1, target + 1):
+          if s == nums[0]:
+              dp[0][s] = True
+
+      for i in range(1, n):
+          for s in range(1, target + 1):
+              if dp[i - 1][s]:
+                  dp[i][s] = True
+              elif s >= nums[i]:
+                  dp[i][s] = dp[i - 1][s - nums[i]]
+
+      return dp[-1][-1]
+  ```
+
+---
+
+### Partition Array Into Two Arrays to Minimize Sum Difference
+
+// TODO: not working, need to fix it
+
+You are given an integer array `nums` of `2 * n` integers, You need to partition `nums` into two arrays of length `n` to minimize the absolute difference of the sum of the two arrays.
+
+To partition `nums`, put each element of `nums` into one of the two arrays.
+
+Return _the minimum possible absolute difference_ of the sum of the two arrays.
+
+- Ex:
+
+  - Input: `nums = [3,9,7,3]`
+    ![partition array](./img/partition-array-into-two-arrays-to-minimize-sum-difference-1.png)
+  - Output: `2`
+  - Explanation: One optimal partition is `[3,9]` and `[7,3]`.
+    - The absolute difference between the sums of the arrays is `|3+9 - (7+3)| = |12 - 10| = 2`.
+
+- Explanation
+
+  - if we have 2 subsets `s1` and `s2`, then we can try adding each element either in `s1` or `s2` in order to find the combination that gives the minimum sum difference between the two subsets.
+
+    ```py
+    for each number 'i'
+      add number 'i' to 's1' and recursively process the remaining numbers
+      add number 'i' to 's2' and recursively process the remaining numbers
+    return the minimum absolute difference of the above two sets
+    ```
+
+- **Solution 1: Top-down approach (memoization)**
+
+  - We can use **memoization** to store the results of the subproblems and use them to solve the main problem.
+  - We will use a `dfs()` function to traverse the decision tree.
+    - The function will take the current `index` and the current `sum1` as arguments.
+    - If the current index is equal to the length of the array, then we have a valid path.
+    - If the current index is greater than the length of the array, then we don't have a valid path.
+    - If the current index and sum1 are in the `memo` dictionary, then we return the value in the dictionary.
+    - Otherwise, we will call the function with the current index + 1 and the current sum1 + the number at the current index.
+    - We will also call the function with the current index + 1 and the current sum1.
+    - We will return the minimum absolute difference between the two calls.
+
+  ```py
+  def minimumDifference(nums: List[int]) -> int:
+      n = len(nums)
+      memo = {} # key=(index, sum1), value=minimumDifference
+
+      def dfs(index, sum1, sum2):
+          if index == n:
+              # Means that we have a subset branch with sum equal to target
+              return abs(sum1 - sum2)
+          if index > n:
+              return float('inf')
+
+          if (index, sum1) in memo:
+              return memo[(index, sum1)]
+
+          diff_1 = dfs(index + 1, sum1 + nums[index], sum2)
+          diff_2 = dfs(index + 1, sum1, sum2 + nums[index])
+
+          memo[(index, sum1)] = min(diff_1, diff_2)
+          return memo[(index, sum1)]
+
+      return dfs(0, 0, 0)
+  ```
+
+---
+
+### Target Sum
+
+You are given an integer array `nums` and an integer `target`. You want to build an **expression** out of nums by adding one of the symbols `'+'` and `'-'` before each integer in nums and then concatenate all the integers.
+
+For example, if `nums = [2, 1]`, you can add a `'+'` before `2` and a `'-'` before `1` and concatenate them to build the expression `"+2-1"`.
+
+Return the number of different **expressions** that you can build, which evaluates to `target`.
+
+- Ex:
+
+  - Input: `nums = [1,1,1,1,1], target = 3`
+  - Output: `5`
+  - Explanation: There are 5 ways to assign symbols to make the sum of nums be target 3.
+    - `+1 +1 +1 +1 +1 = 3`
+    - `+1 +1 +1 -1 -1 = 3`
+    - `+1 +1 -1 +1 -1 = 3`
+    - `+1 -1 +1 +1 -1 = 3`
+    - `-1 +1 +1 +1 +1 = 3`
+
+```py
+def findTargetSumWays(nums: List[int], target: int) -> int:
+    memo = {} # key=(index, sum), value=number of ways
+
+    def dfs(index, sum):
+        if index == len(nums):
+            if sum == target:
+                return 1
+            return 0
+
+        if (index, sum) in memo:
+            return memo[(index, sum)]
+
+        subset1 = dfs(index + 1, sum + nums[index])
+        subset2 = dfs(index + 1, sum - nums[index])
+
+        memo[(index, sum)] = subset1 + subset2
+        return memo[(index, sum)]
+
+    return dfs(0, 0)
 ```
 
 ---
@@ -665,68 +997,6 @@ def knightDialer(n: int) -> int:
                 dp[r][c] += dp[r - 1][neighbor]
 
     return sum(dp[-1]) % (10 ** 9 + 7)
-```
-
----
-
-## Partition Equal Subset Sum
-
-Given a non-empty array `nums` containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
-
-- Ex:
-
-  - Input: `nums = [1,5,11,5]`
-  - Output: `true`
-  - Explanation: The array can be partitioned as `[1, 5, 5]` and `[11]`.
-
-- Explanation:
-
-  - we want to divide the array into two subsets with equal sum (sum of elements in both subsets is equal).
-    - For example, if the array is `[1, 5, 11, 5]`:
-      - The sum of elements in the array is `22`.
-      - The required sum of elements in each subset is `11`.
-      - we can divide the array into two subsets with sum `11`:
-        - `[1, 5, 5]` -> sum = `11`
-        - `[11]` -> sum = `11`
-      - So the `target` will be `sum(nums) // 2` -> `11` for a path in the decision tree to be valid.
-        ![equal-subset-sum](./img/equal-subset-sum-1.png)
-  - we can solve this problem using **dynamic programming**.
-
-    - we will divide the subsetting logic into smaller decisions each time we make a new decision (**with updated `target` and `index`**)
-      ![equal-subset-sum](./img/equal-subset-sum-2.png)
-
-  - We will use a `dfs()` function to traverse the decision tree.
-    - The function will take the current `index` and the current `target` as arguments.
-    - If the current target is `0`, then we have a valid path.
-    - If the current target is less than `0` or the current index is greater than or equal to the length of the array, then we don't have a valid path.
-    - If the current index and target are in the `memo` dictionary, then we return the value in the dictionary.
-    - Otherwise, we will call the function with the current index + 1 and the current target - the number at the current index **(because we are trying to find a subset with sum equal to the target)**.
-    - We will also call the function with the current index + 1 and the current target **(because we are trying to find a subset with sum equal to the target)**.
-    - We will return `True` if any of the two calls return `True`, otherwise we will return `False`.
-
-```py
-def canPartition(nums: List[int]) -> bool:
-    total = sum(nums)
-    # If the sum of elements in the array is odd, then we can't divide the array into two subsets with equal sum
-    if total % 2 != 0:
-        return False
-
-    memo = {} # key=(index, target), value=canPartition
-
-    def dfs(index, target):
-        if target == 0:
-            # Means that we have a subset branch with sum equal to target
-            return True
-        if index >= len(nums) or target < 0:
-            return False
-
-        if (index, target) in memo:
-            return memo[(index, target)]
-
-        memo[(index, target)] = dfs(index + 1, target - nums[index]) or dfs(index + 1, target)
-        return memo[(index, target)]
-
-    return dfs(0, total // 2)
 ```
 
 ---

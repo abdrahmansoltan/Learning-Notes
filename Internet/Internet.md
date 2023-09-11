@@ -46,7 +46,7 @@
 
 ### OSI Model
 
-It's a standard that defines the steps of the network
+**Open System Interconnection (OSI)**: : It's a standard that defines the steps of the network communication between two systems.
 
 ![OSI Model](./img/osi-model.png)
 
@@ -72,23 +72,29 @@ When entering a website, the data goes through all the layers of the OSI model l
     JRPKJSDFDAADSFHDUASFHADJSHFDSALFGUEAHGFJDSEANFJADHUFHEUFGAESYBFGHES
    ```
 
-3. **Session layer** -> It's the layer that creates and manages the connection between the client and the server
+3. **Session layer** -> It's the layer that creates and manages (opens / closes) the connection between the client and the server
 
    - It's possible to directly work with this layer to handle the connection (as a frontend developer)
 
-4. **Transport layer** -> It's the layer that splits the data into `packets` and sends them to the server
+4. **Transport layer** -> It's the layer that is responsible for the **End to End** connection between devices (Making sure that the actual communication happens after the connection is established in the `session` layer)
 
+   - It splits the data into `packets` and sends them to the server
    - this is done in the `TCP` protocol (it's a protocol that ensures that the data is sent and received correctly)
    - the size of the `TCP` packet (segment) is `64kb` (it's the maximum size of the packet) and sometimes it's less than that based on the network speed and the size of the data
 
-5. **Network layer** -> It's the layer that adds the `ip` address to the `packet` and sends it to the server
+5. **Network layer** -> It's the layer that is responsible for the communication between **inter & intra** networks (it's the layer that connects the `local` network to the `internet`)
 
-6. **Data link layer** -> It's the layer that adds the `mac` address to the `packet` and sends it to the server
+   - It adds the `ip` address to the `packet` and sends it to the server
 
-   - `mac` address is the address of the device (it's unique for each device)
+6. **Data-link layer** -> It's the layer that facilitates the communication between the **devices in the same network**.
 
-7. **Physical layer** -> It's the layer that sends the `packet` to the server using the `cable`
+   - It connects the `switch` to the `router` using the `mac` address
+     - `mac` address is the address of the device (it's unique for each device)
+   - It adds the `mac` address to the `packet` and sends it to the server
 
+7. **Physical layer** -> It's the layer that is responsible for transferring `bits` of data over the network using the `cable`.
+
+   - It sends the `packet` to the server using the `cable`
    - At this stage the data is in this form:
      ![packet](./img/osi-model-1.png) 1. `http data` -> from the `application` layer 2. `tcp segment` -> from the `transport` layer 3. `ip packet` -> from the `network` layer 4. `Ethernet frame` -> from the `data link` layer
    - The cable is made of `copper` or `fiber` (fiber is faster than copper)

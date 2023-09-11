@@ -15,9 +15,9 @@
     - [`useRef` Implementation (How to use it)](#useref-implementation-how-to-use-it)
   - [Effect Hook](#effect-hook)
     - [You might not need an Effect](#you-might-not-need-an-effect)
-    - [`useEffect`](#useeffect)
-    - [`useEffect` dependency array](#useeffect-dependency-array)
-    - [`useEffect` cleanup function](#useeffect-cleanup-function)
+    - [useEffect](#useeffect)
+    - [useEffect dependency array](#useeffect-dependency-array)
+    - [useEffect cleanup function](#useeffect-cleanup-function)
   - [useReducer](#usereducer)
     - [`useReducer` vs `useState`](#usereducer-vs-usestate)
     - [Reducer function](#reducer-function)
@@ -26,10 +26,10 @@
     - [Not recommended ways of using reducer function](#not-recommended-ways-of-using-reducer-function)
     - [reducer function with Immer](#reducer-function-with-immer)
   - [Context API](#context-api)
-    - [Prop drilling](#prop-drilling)
     - [Solution for Prop drilling: (context)](#solution-for-prop-drilling-context)
     - [context setup](#context-setup)
     - [`useContext` Hook](#usecontext-hook)
+    - [Mixing context with `useReducer`](#mixing-context-with-usereducer)
     - [Context Limitations](#context-limitations)
   - [Custom Hooks](#custom-hooks)
     - [Custom hook for form input (`useInput`)](#custom-hook-for-form-input-useinput)
@@ -112,7 +112,7 @@ Here, each time the state change the entire function get called and rerendered u
     });
     ```
 
-- Hooks rely on **call order**
+- Hooks rely on **call order** (must be called before any return statement).
   ![rules](./img/hooks-3.png)
   - if we conditionally call a hook, it will break the call order (nodes references) in the `Linked List` of hooks and will cause bugs
     ![rules](./img/hooks-4.png)
@@ -437,13 +437,14 @@ export default ActionButton;
 
 > More [Here](https://react.dev/learn/you-might-not-need-an-effect)
 
-`useEffect` is used most of the time for **fetching data**, and this process is now replaced by: (`libraries`, `react query`, `rtk query`, `swr` of `next.js`)
-
+- When not to use an effect:
+  ![effect](./img/effect.png)
+- `useEffect` is used most of the time for **fetching data**, and this process is now replaced by: (`libraries`, `react query`, `rtk query`, `swr` of `next.js`)
 - by using these alternatives, we can use less `useEffect`
 
 ---
 
-### `useEffect`
+### useEffect
 
 It's a function from React used to run code **(always)** when a component is initially **rendered** and **(sometimes)** when it's re-rendered
 
@@ -484,16 +485,19 @@ It's a function from React used to run code **(always)** when a component is ini
 
 ---
 
-### `useEffect` dependency array
+### useEffect dependency array
 
 ![dependency array](./img/useEffect-dependency-0.png)
 
 - The 3 possible values of the dependency array:
   ![dependency array](./img/useEffect-dependency.png)
 
-- **empty array**: (no dependencies) the effect will only run once, after the initial render
-- **no array**: (no dependencies) the effect will run after every render
-- **array with dependencies**: the effect will run when the dependencies change
+  - **empty array**: (no dependencies) the effect will only run once, after the initial render
+  - **no array**: (no dependencies) the effect will run after every render
+  - **array with dependencies**: the effect will run when the dependencies change
+
+- `useEffect` dependency array rules:
+  ![dependency array](./img/useEffect-dependency-2.png)
 
 **Notes:**
 
@@ -511,7 +515,7 @@ It's a function from React used to run code **(always)** when a component is ini
 
 ---
 
-### `useEffect` cleanup function
+### useEffect cleanup function
 
 It's a function that runs before the next time the `useEffect` callback function runs
 
@@ -628,6 +632,18 @@ It's a more advanced and complex hook that helps us to manage state in a more co
   - After executing the scenario-code, you must return a new state object
   - if nothing returned from the reducer function, the state will be `undefined`
 
+- As `reducer` function is a pure function, it should not contain any side-effects like `HTTP requests`, `timers`, `DOM` manipulation, etc. To do so, we can use `useEffect` hook inside the component and within the `useEffect` callback function, we can call the `dispatch` function to update the state.
+
+  ```jsx
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/users')
+      .then(res => res.json())
+      .then(data => {
+        dispatch({ type: 'FETCH_USERS', payload: data });
+      });
+  }, []);
+  ```
+
 ---
 
 ### How `useReducer` works
@@ -724,14 +740,15 @@ Context provides a way to pass data through the component tree without having to
 - `context` is primarily used when some data needs to be accessible by many components at different nesting levels.
   - > Make sure to apply it sparingly because **it makes component reuse more difficult**
 - **Notes:**
+
   - context is not a replacement for Props
   - context is not a replacement for Redux (Redux is all about organization of data)
 
-### Prop drilling
-
-`Prop drilling` is basically a situation when the same data is being sent at almost every level due to requirements in the final level.
-
-![Prop drilling](./img/drilling.png)
+- **Prop Drilling**: It's basically a situation when the same data ( `state` ) is being sent at almost every level due to requirements in the final level.
+  ![Prop drilling](./img/drilling.png)
+  - To solve this, we have 2 options:
+    - [Component Composition](./1-React.md#react-component-composition)
+    - [Context API](#solution-for-prop-drilling-context)
 
 ---
 
@@ -739,15 +756,9 @@ Context provides a way to pass data through the component tree without having to
 
 Context provides a way to pass data through the component tree without having to pass `props` down manually at every level. and most of the component passing the props don't need the props-data and they just act as **"Traffic Components"**
 
-- without context
+![context](./img/context.png)
 
-  ![context](./img/context.PNG)
-
-- with context
-
-  ![context](./img/with-context.PNG)
-
-- React Context is a way to manage state globally.
+- It's a way to manage state globally.
   - it stores data in a external object so that it can be accessed globally.
 - Context is designed to share data that can be considered `global` for a tree of React components, such as the current authenticated user, theme, or preferred language.
 - It's sometimes used instead of `Redux` by a lot of users
@@ -759,6 +770,7 @@ Context provides a way to pass data through the component tree without having to
 1. **Create the context**
    - when creating a `context`, we will have access to 2 components: `context.provider` & `context.consumer` functions
      ![context](./img/context-1.png)
+   - It starts with a capital letter as it's actually a `component`
 2. **Specify (Provide) the data that will be shared**
    ![context](./img/context-2.png)
    ![context](./img/context-3.png)
@@ -781,7 +793,7 @@ Context provides a way to pass data through the component tree without having to
 
 - In order to use the Context in a child component, we need to access it using the useContext Hook.
 
-```js
+```jsx
 import { useState, createContext, useContext } from 'react';
 
 function Component5() {
@@ -875,6 +887,48 @@ function Component5() {
     );
   }
   ```
+
+- Notes:
+  - usually, we use a custom hook to access the context, instead of using the `useContext` hook directly in the component, and it's usually defined in the same file as the context component
+    - More [Here](#custom-hook-for-context)
+
+---
+
+### Mixing context with `useReducer`
+
+It's common to use `useReducer` with `context` to manage the state of the context, instead of using multiple `useState` hooks
+
+```jsx
+// in CitiesContext.js
+import { useReducer, createContext } from 'react';
+
+// Reducer Logic
+const initialState = {
+  cities: [],
+  selectedCity: null,
+  isLoading: true
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'cities/loaded':
+      return { ...state, isLoading: false, cities: action.payload };
+    case 'cities/selected':
+      return { ...state, selectedCity: action.payload };
+    default:
+      return state;
+  }
+};
+
+// Context Logic
+export const CitiesContext = createContext();
+
+export const CitiesProvider = ({ children }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  return <CitiesContext.Provider value={{ state, dispatch }}>{children}</CitiesContext.Provider>;
+};
+```
 
 ---
 
@@ -1034,7 +1088,12 @@ import { useContext } from 'react';
 import BooksContext from '../context/books';
 
 function useBooksContext() {
-  return useContext(BooksContext);
+  context = useContext(BooksContext);
+  if (context === undefined) {
+    throw new Error('useBooksContext must be used within a BooksProvider');
+  }
+
+  return context;
 }
 
 export default useBooksContext;

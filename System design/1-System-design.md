@@ -2,15 +2,24 @@
 
 - [INDEX](#index)
   - [System Design](#system-design)
+    - [Goal of system design](#goal-of-system-design)
+    - [System design core principles](#system-design-core-principles)
     - [Important concepts](#important-concepts)
   - [Browser / Client](#browser--client)
   - [DNS](#dns)
   - [CDN](#cdn)
   - [Web Server](#web-server)
   - [Load Balancer](#load-balancer)
+    - [Load balancer distribution strategies](#load-balancer-distribution-strategies)
     - [Session Persistence](#session-persistence)
+  - [Proxies](#proxies)
+    - [Forward Proxy](#forward-proxy)
+    - [Reverse Proxy](#reverse-proxy)
+  - [Clustering](#clustering)
   - [Data Source](#data-source)
     - [Database](#database)
+      - [CAP Theorem](#cap-theorem)
+    - [ACID \& BASE](#acid--base)
     - [Caching Service](#caching-service)
     - [Data Hose](#data-hose)
     - [Data Warehouse](#data-warehouse)
@@ -19,6 +28,10 @@
     - [Job server](#job-server)
     - [Job Queue](#job-queue)
   - [Services](#services)
+  - [Networking](#networking)
+    - [OSI Model](#osi-model)
+    - [TCP/IP](#tcpip)
+    - [UDP](#udp)
   - [System Design Interview](#system-design-interview)
   - [System Design Questions](#system-design-questions)
 
@@ -32,9 +45,37 @@
 
 - It's a process of defining the architecture, modules, interfaces, and data for a system to satisfy specified requirements.
 
+### Goal of system design
+
+As you go up in seniority, you'll be expected to be able to design systems that are **scalable**, **reliable**, **highly available**, **secure**, **maintainable**, etc.
+
+- When you're junior, mid-level, or early senior, you'll usually interact with **Low-level** code. like: **"Business logic"**, **"Application logic"**, **"Database"**, **"CI/CD"**, **"Dockers"**, **"Kubernetes"**, etc.
+- But when you're senior, you'll usually interact with **High-level** code. like: **"System design"**, **"Architecture"**, **"Data modeling"**, **"Microservices"**, **"Scalability"**, **"Reliability"**, **"High availability"**, **"Security"**, **"Maintainability"**, etc.
+
+---
+
+### System design core principles
+
+- **Availability**: the system should be available all the time.
+  ![Availability](./img/availability-1.png)
+  ![Availability](./img/availability-2.png)
+
+  - Usually we use **"The nines of availability"** to measure the availability of a system.
+    ![Availability](./img/availability-3.png)
+
+- **Reliability**: the system should be reliable. (no data loss or crashes)
+  ![Reliability](./img/reliability-1.png)
+  ![Reliability](./img/reliability-2.png)
+  - Usually we want to figure out if the system is reliable to perform its functionality without errors.
+    - we do this by reducing the amount of errors. Or increasing the mean time between failures (`MTBF`).
+
+---
+
 ### Important concepts
 
 - **Latency**: the time it takes for a request to go from the client to the server and back.
+- **Single point of failure**: a component that if it fails, the entire system will fail.
+  ![Single point of failure](./img/single-point-of-failure.png)
 
 ---
 
@@ -110,7 +151,6 @@
     - Note that, we just duplicate the server (including the Application logic) and **without the database**.
       ![Web Server](./img/web-server-5.png)
 - When horizontal scaling, we need to use a **Load Balancer** to distribute the traffic between the servers.
-  ![Web Server](./img/web-server-6.png)
 
 ---
 
@@ -123,9 +163,27 @@
 - So, we need something to **evenly-distribute** the traffic between the servers. and that's the **Load Balancer**.
   - It acts as the **"Entry point"** for the system.
   - It knows if a server is down or not. and it can **redirect** the traffic to another server.
-- Distribution strategies:
-  - **Round Robin**: it sends the request to the next server in the list.
+- Usually to prevent breaking the entire system if the **Load Balancer** is down, we use a redundant backup load balancer
+  ![Load Balancer](./img/load-balancer-8.png)
+
+### Load balancer distribution strategies
+
+- **Round Robin**:
+  - it sends the request evenly to the next server in the list.
     ![Load Balancer](./img/load-balancer-2.webp)
+  - The problem here is that servers are independent of each other and they have no knowledge of the other servers.
+    ![Load Balancer](./img/load-balancer-4.png)
+    - This is an issue because often the servers have different resources and capabilities. So, it's not a good idea to send the same amount of traffic to each server.
+- **Weighted Round Robin**:
+  - Here, we assign a `weight` to each server. and the `weight` is based on the server's resources and capabilities ( The higher the number, the higher the resources ).
+    ![Load Balancer](./img/load-balancer-5.png)
+- **Least Connections**:
+  - It sends the request to the server that has the least connections.
+  - It depends on `sessions` or how many requests are being processed by the server. and it's usually used for **long-lived connections**. like: `WebSockets`, `HTTP Streaming`, etc.
+    ![Load Balancer](./img/load-balancer-6.png)
+    ![Load Balancer](./img/load-balancer-7.png)
+
+---
 
 ### Session Persistence
 
@@ -140,6 +198,67 @@
 
 ---
 
+## Proxies
+
+**Proxy** is a server that acts as a middleman between the client and the server.
+
+### Forward Proxy
+
+- It sets between the `client` and the `internet`, and it's not part of the system.
+  ![Proxy](./img/proxy-1.png)
+  - It communicates between:
+    - `client` and `proxy`
+    - `proxy` and `internet`
+  - This way the client won't directly access the internet. instead, it will access it through the proxy.
+- It's on the `client` side. and it's usually used for security reasons.
+- The proxy can:
+  - hide the `client` IP address ( client's details ) from the `internet`.
+  - modify the request before sending it to the `internet`.
+  - block certain websites.
+
+---
+
+### Reverse Proxy
+
+- It sets between the `server` and the `internet`, and it's part of the system.
+  ![Proxy](./img/proxy-2.png)
+
+- It acts as an **entry point** to the system.
+  - It receives the request from the `internet` before it reaches the `server`. and then it forwards the request to the `server`.
+- It can:
+  - hide the `server` details from the `internet`. as the `internet` will only see the `proxy` IP address.
+- It's very similar to the **Load Balancer**. but, it's not the same.
+  - **Load Balancer** is used to distribute the traffic between the servers.
+    - > in fact, many **Load Balancers** are also **Reverse Proxies**. like: `Nginx`, `HAProxy`, etc.
+  - **Reverse Proxy** is used to hide the `server` details from the `internet`.
+    - when using a **Reverse Proxy** also as a **Load Balancer**, we get best of both worlds. as we get the **Load Balancer** functionality and the **Reverse Proxy** functionality like:
+      - caching.
+      - compression.
+
+---
+
+## Clustering
+
+**Clustering** is a technique to increase the amount of servers. It's where you have multiple servers that are aware of each other and work together as a complete unit for some objective.
+
+- In `load balancing`, The servers are independent of each other and they have no knowledge of the other servers.
+  ![Clustering](./img/clustering-1.png)
+- `clustering` doesn't replace `load balancing`. instead, Here the servers are aware of each other and they work together as a complete unit for some objective.
+  ![Clustering](./img/clustering-2.png)
+  - Each of the servers in the cluster is called a `node`.
+    - The `nodes` don't share the same resources. instead, each `node` has its own resources and they're identical.
+  - in the system, the `cluster` is treated as a single server.
+  - In `cluster`, there's a leader node that is responsible for:
+    ![Clustering](./img/clustering-3.png)
+    - receiving the requests.
+    - distributing the requests between the nodes.
+    - etc.
+- `clustering` is used to increase the **reliability** and **availability** of the system. as if one of the nodes is down, the other nodes will handle the requests.
+- it's used with `load balancing` to increase the performance and the reliability of the system.
+  ![Clustering](./img/clustering-4.png)
+
+---
+
 ## Data Source
 
 ### Database
@@ -150,6 +269,56 @@
   - This is the process which usually takes the most time. as it's the process of reading/writing data.
     ![Database](./img/database-1.png)
 - Usually the data requested by the client is regional or common and not specific to a single user. So, we can use **Caching** to increase the performance.
+
+---
+
+#### CAP Theorem
+
+**CAP Theorem** is a theorem for designing databases in distributed systems. It states that it's impossible for a distributed system to simultaneously provide more than 2 out of 3 of the following guarantees:
+![CAP Theorem](./img/database-3.png)
+
+- **Consistency**: all nodes see the same data at the same time.
+  ![CAP Theorem](./img/database-4.png)
+  - This is usually achieved by updating several nodes before allowing further reads. in order to make sure that all nodes have the same data.
+    ![CAP Theorem](./img/database-5.png)
+  - So, no reads are allowed until all nodes are updated.
+    ![CAP Theorem](./img/database-6.png)
+    ![CAP Theorem](./img/database-7.png)
+- **Availability**: a guarantee that every request receives a response about whether it succeeded or failed.
+- **Partition tolerance**: the system continues to operate despite arbitrary message loss or failure of part of the system.
+  - in a system, if a point is down, then we have a **partition**. and if the system can still operate, then it's **partition tolerant**.
+  - For example, if a db is partitioned from other dbs, then it should still be able to operate even if it's partitioned and has **stale data** and the data is not guaranteed to be updated.
+    ![CAP Theorem](./img/database-8.png)
+  - If the system is not partition tolerant, then it won't be able to operate if a point is down ( will give error ).
+
+System can be categorized into 2 categories:
+
+- **CP**: Consistency and Partition tolerance.
+  - It's usually used in **"Relational Databases"**. like: `MySQL`, `PostgreSQL`, etc.
+  - It's usually used in **"Single Region"**. as it's not partition tolerant.
+- **AP**: Availability and Partition tolerance.
+  - It's usually used in **"NoSQL Databases"**. like: `MongoDB`, `Cassandra`, etc.
+  - It's usually used in **"Multi Region"**. as it's partition tolerant.
+- **CA**: Consistency and Availability.
+  - It's usually used in **"Single Region / Point"**. as it's not partition tolerant.
+    - It can't be in distributed systems.
+  - It's usually used in **"Databases"**. like: `Redis`, `Memcached`, etc.
+
+---
+
+### ACID & BASE
+
+- **ACID** is a set of properties of **database transactions**. It's a way to make sure that the data is consistent.
+
+  - **Atomic** -> a transaction is either **all or nothing**. (either all the operations are done, or none of them are done).
+  - **Consistent** -> a transaction must be consistent. (it can't break the rules of the database).
+  - **Isolated** -> a transaction must be isolated. (it can't be affected by other transactions).
+  - **Durable** -> a transaction must be durable. (it can't be lost).
+
+- **BASE** is a set of properties of **database transactions**. It's a way to make sure that the data is consistent. (it's the opposite of `ACID`)
+  - **Basically Available** -> the system guarantees availability.
+  - **Soft state** -> the state of the system may change over time. (it's not guaranteed to be consistent).
+  - **Eventual consistency** -> the system will eventually become consistent once it stops receiving input.
 
 ---
 
@@ -249,6 +418,54 @@
   ![Services](./img/services-2.png)
 - Example of a system that uses the 2 services:
   ![Services](./img/services-3.png)
+
+---
+
+## Networking
+
+- `TCP/IP` model is specific for the internet
+- `OSI` model is for any communication between 2 computers( systems ).
+
+### OSI Model
+
+As long as 2 computers are communicating, We can use the `OSI` model to abstract the communication process.
+
+[More Here](../Internet/Internet.md#osi-model)
+
+---
+
+### TCP/IP
+
+**Transmission Control Protocol / Internet Protocol** is a **protocol** that is used to **communicate** between **computers**.
+
+- It consists of 2 protocols:
+
+  - **TCP**: it's a **connection-oriented** protocol. It's used to **send** and **receive** data between 2 computers. It's **reliable** and **ordered**.
+    - It has error-checking mechanism. (it checks if the data is received completely or not).
+  - **IP**: it's a **connectionless** protocol. It's used to **send** and **receive** data between 2 computers. It's **unreliable** and **unordered**.
+
+- How it works:
+  ![TCP/IP](./img/tcp-ip-1.png)
+  1. The `client` generates a `ISN` (Initial Sequence Number) and sends it to the `server`.
+  2. The `server` generates a `ISN` and sends it to the `client`.
+  3. Now, both the `client` and the `server` have a `ISN`. and they can start sending data to each other.
+  4. The `client` sends a `SYN` (Synchronize ISN) to the `server`. Then the `server` sends a `SYN-ACK` (Synchronize ISN - Acknowledgement) to the `client` to let it know that it received the `SYN`.
+  5. The process continues until the `client` and the `server` each time increase the `ISN` by `1` until they reach the `ISN` that they received from the other side.
+
+---
+
+### UDP
+
+**User Datagram Protocol** is a **connection-less** protocol. (it's like yelling "HI!" and assume that the other side heard it and keep sending data like that anyway)
+
+![UDP](./img/udp-1.png)
+
+- It's much faster than `TCP`. as it doesn't have the error-checking mechanism. (it doesn't check if the data is received completely or not).
+- **connection-less** means that it doesn't establish a connection between the `client` and the `server`. instead, it just sends the data to the `server` and assumes that the `server` received it.
+  - This make it doesn't consume much resources. as it doesn't have to establish a connection.
+- It's used in cases where we don't care about the data loss. like: `VoIP`, `Video Streaming`, `Online Gaming`, etc.
+  - This is because if there's a data loss, it will get corrected in the next data packet anyway. (as it's a stream of data).
+- So, we use `UDP` when we care about the speed and consistency. and we use `TCP` when we care about the reliability ( data loss ) and order.
 
 ---
 

@@ -5,12 +5,19 @@
   - [Searching](#searching)
     - [Binary Search](#binary-search)
     - [Search Insert Position](#search-insert-position)
+    - [Find Smallest Letter Greater Than Target](#find-smallest-letter-greater-than-target)
     - [Find first and last position of element in sorted array](#find-first-and-last-position-of-element-in-sorted-array)
+    - [Search in a Sorted Infinite Array](#search-in-a-sorted-infinite-array)
+    - [Minimum Difference Element](#minimum-difference-element)
+    - [Peak Index in a Mountain Array ( Bitonic Array Maximum )](#peak-index-in-a-mountain-array--bitonic-array-maximum-)
+    - [Search Bitonic Array](#search-bitonic-array)
     - [Search a 2D Matrix](#search-a-2d-matrix)
     - [Koko Eating Bananas](#koko-eating-bananas)
     - [Two Crystal Balls Problem](#two-crystal-balls-problem)
     - [Search in Rotated Sorted Array](#search-in-rotated-sorted-array)
     - [Find Minimum in Rotated Sorted Array](#find-minimum-in-rotated-sorted-array)
+    - [Rotation count](#rotation-count)
+    - [Search in Rotated Sorted Array II](#search-in-rotated-sorted-array-ii)
     - [Time Based Key-Value Store](#time-based-key-value-store)
     - [Single Element in a Sorted Array](#single-element-in-a-sorted-array)
     - [Find First and Last Position of Element in Sorted Array](#find-first-and-last-position-of-element-in-sorted-array-1)
@@ -96,6 +103,38 @@ def searchInsert(nums, target):
 
 ---
 
+### Find Smallest Letter Greater Than Target
+
+Given a characters array `letters` that is sorted in non-decreasing order and a character `target`, return the smallest character in the array that is larger than `target`. Note that the letters wrap around.
+
+- EX:
+
+  - `letters = ['c', 'f', 'j'], target = 'a' --> 'c'`
+
+- Explanation
+  - The array is considered to be circular, so if the `target` value is greater than the last value in the array, then we will return the first value in the array
+  - The other difference is that we have to find the next bigger letter which is greater than the `target` value, so we can't just return the `target` value if it is in the array.
+    - Instead we will ignore the case where `target == letters[m]` and we will keep searching the `right` side of the array by updating the `left` pointer to `m + 1`
+  - If the `target` value is not in the array, then the `left` pointer will be pointing to the index where the `target` value should be inserted
+
+```py
+def nextGreatestLetter(letters, target):
+    l, r = 0, len(letters) - 1
+
+    while l <= r:
+        m = l + (r - l) // 2
+
+        if letters[m] <= target:
+            l = m + 1
+        else:
+            r = m - 1
+
+    # if the target value is not found in the array, then the left pointer will be pointing to the index where the target value should be inserted
+    return letters[l % len(letters)]
+```
+
+---
+
 ### Find first and last position of element in sorted array
 
 Given an array of integers `nums` sorted in ascending order, find the starting and ending position of a given `target` value. If `target` is not found in the array, return `[-1, -1]`.
@@ -169,6 +208,171 @@ Given an array of integers `nums` sorted in ascending order, find the starting a
 
       return [search(True), search(False)]
   ```
+
+---
+
+### Search in a Sorted Infinite Array
+
+Given an infinite sorted array (or an array with unknown size), find if a given number `key` is present in the array. Write a function to return the index of the `key` if it is present in the array, otherwise return `-1`.
+
+- Ex:
+
+  - `arr = [1, 3, 8, 10, 15], key = 15 --> 4`
+  - `arr = [1, 3, 8, 10, 15], key = 200 --> -1`
+
+- Explanation
+
+  - The only issue with this problem is that we don't know the size of the array, so we can't use **binary search** to find the `key` value
+  - To handle this, we will first find the proper bounds of the array where we can perform a binary search
+    - This is done by using `start = 0` and `end = 1`, then we will keep doubling the `end` value until we find the bounds
+      ![search-infinite-array](./img/search-infinite-array-1.png)
+  - Once we have a searchable bounds, we can perform a binary search to find the `key` value
+
+- Time Complexity: `O(log(n))`
+- Space Complexity: `O(1)`
+
+```py
+def search_in_infinite_array(arr, key):
+    start, end = 0, 1
+
+    # find the bounds
+    while arr[end] < key:
+        newStart = end + 1 # Temp
+        end += (end - start + 1) * 2
+        start = newStart
+
+    return binary_search(arr, key, start, end)
+
+def binary_search(arr, key, start, end):
+    while start <= end:
+        mid = start + (end - start) // 2
+
+        if arr[mid] == key:
+            return mid
+        elif arr[mid] < key:
+            start = mid + 1
+        else:
+            end = mid - 1
+
+    return -1
+```
+
+---
+
+### Minimum Difference Element
+
+Given an array of numbers sorted in ascending order, find the element in the array that has the minimum difference with the given `key`.
+
+- Ex:
+
+  - `arr = [4, 6, 10], key = 7 --> 6`
+
+```py
+def search_min_diff_element(arr, key):
+    l, r = 0, len(arr) - 1
+
+    while l <= r:
+        m = l + (r - l) // 2
+
+        if arr[m] == key:
+            return arr[m]
+        elif arr[m] < key:
+            l = m + 1
+        else:
+            r = m - 1
+
+    # if the key value is not found in the array, then the left pointer will be pointing to the index where the key value should be inserted
+    return arr[l]
+```
+
+---
+
+### Peak Index in a Mountain Array ( Bitonic Array Maximum )
+
+- Let's call an array `arr` a **mountain** if the following properties hold:
+  - `arr.length >= 3`
+  - There exists some `i` with `0 < i < arr.length - 1` such that:
+    - `arr[0] < arr[1] < ... arr[i-1] < arr[i]`
+    - `arr[i] > arr[i+1] > ... > arr[arr.length - 1]`
+
+Given an integer array `arr` that is guaranteed to be a **mountain**, return any `i` such that `arr[0] < arr[1] < ... arr[i - 1] < arr[i] > arr[i + 1] > ... > arr[arr.length - 1]`.
+![peak index](./img/peak-index.jpeg)
+
+You must write an algorithm that runs in `O(log(n))` time.
+
+- Explanation
+
+  - Here, the array is not sorted, but we can still use **binary search** to find the peak index
+  - what we will use to compare is the `mid` value and the `mid + 1` and `mid - 1` values
+    - if the `mid` value is greater than the `mid + 1` and `mid - 1` values, then we found the peak index
+    - if the `mid` value is less than the `mid + 1` value, then we will search the right side of the array
+    - if the `mid` value is less than the `mid - 1` value, then we will search the left side of the array
+
+- Ex:
+
+  - `arr = [0, 1, 0] --> 1`
+  - `arr = [0, 10, 5, 2] --> 1`
+
+```py
+def peakIndexInMountainArray(arr):
+    l, r = 0, len(arr) - 1
+
+    while l <= r:
+        m = l + (r - l) // 2
+
+        if arr[m] > arr[m + 1] and arr[m] > arr[m - 1]:
+            return m
+        elif arr[m] < arr[m + 1]:
+            l = m + 1
+        else:
+            r = m - 1
+```
+
+---
+
+### Search Bitonic Array
+
+Given a Bitonic array, find if a given ‘key’ is present in it. An array is considered bitonic if it is monotonically increasing and then monotonically decreasing. Monotonically increasing or decreasing means that for any index `i` in the array `arr[i] != arr[i+1]`.
+
+- Ex:
+
+  - `arr = [1, 3, 8, 4, 3], key = 4 --> 3`
+
+```py
+def search_bitonic_array(arr, key):
+    maxIndex = find_max(arr)
+    keyIndex = binary_search(arr, key, 0, maxIndex)
+    if keyIndex != -1:
+        return keyIndex
+    # if the key is not found in the left of the maxIndex, then we can search the right side of the maxIndex
+    return binary_search(arr, key, maxIndex + 1, len(arr) - 1)
+
+def find_max(arr):
+    l, r = 0, len(arr) - 1
+
+    while l < r:
+        m = l + (r - l) // 2
+
+        if arr[m] > arr[m + 1]:
+            r = m
+        else:
+            l = m + 1
+
+    return l
+
+def binary_search(arr, key, start, end):
+    while start <= end:
+        mid = start + (end - start) // 2
+
+        if arr[mid] == key:
+            return mid
+        elif arr[mid] < key:
+            start = mid + 1
+        else:
+            end = mid - 1
+
+    return -1
+```
 
 ---
 
@@ -347,19 +551,22 @@ You are given an integer array `nums` sorted in ascending order, and an integer 
 
 - Ex:
 
-  - `nums = [4, 5, 6, 7, 0, 1, 2], target = 0 --> 4`
+  - `nums = [10, 15, 1, 3, 8], target = 15 --> 1`
+    ![search rotated array](./img/search-rotated-arr-3.png)
   - `nums = [4, 5, 6, 7, 0, 1, 2], target = 3 --> -1`
 
 - Steps:
   - We can use **binary search** to find the target value
-  - We can check if the `mid` value is equal to the `target` value
   - Also we will chack if the left/right side of the `mid` value is sorted (we have 2 sorted halves in the array after the rotation)
     ![search rotated array](./img/search-rotated-arr-1.png)
   - to choose which side to search in, we can check if the `mid` value is greater than the `left` value or less than the `right` value
     ![search rotated array](./img/search-rotated-arr-2.png)
+  - Then we try to find the target value in the correct sorted side
+    ![search rotated array](./img/search-rotated-arr-4.png)
     - If the `left` side is sorted, then we can check if the `target` value is in the `left` side
     - If the `right` side is sorted, then we can check if the `target` value is in the `right` side
     - If the `target` value is not in the left/right side, then we can set `left = mid + 1` or `right = mid - 1`
+  - Since there are no duplicates in the given array, it is always easy to skip one part of the array in each iteration. However, if there are duplicates, it is not always possible to know which part is sorted.
 
 ```py
 def search(nums, target):
@@ -421,6 +628,83 @@ def findMin(nums):
             r = mid - 1
 
     return curMin
+```
+
+---
+
+### Rotation count
+
+Given an array of numbers which is sorted in ascending order and also rotated by some arbitrary number, find the rotation count.
+
+- Ex:
+
+  - `arr = [10, 15, 1, 3, 8] --> 2`
+    ![rotation count](./img/rotation-count-1.png)
+
+```py
+def count_rotations(arr):
+    l, r = 0, len(arr) - 1
+
+    while l <= r:
+        mid = (l + r) // 2
+
+        # check if the mid value is the smallest value
+        if mid < r and arr[mid] > arr[mid + 1]:
+            return mid + 1
+        # check if the mid value is the smallest value
+        if mid > l and arr[mid - 1] > arr[mid]:
+            return mid
+
+        # left side is sorted
+        if arr[l] < arr[mid]:
+            l = mid + 1
+        # right side is sorted
+        else:
+            r = mid - 1
+
+    return 0 # the array has not been rotated
+```
+
+---
+
+### Search in Rotated Sorted Array II
+
+Same as the previous problem, but the array can contain duplicates
+
+Given the array `nums` after the rotation and an integer `target`, return `true` if `target` is in `nums`, or `false` if it is not in `nums`.
+
+- Ex:
+
+  - `nums = [2, 5, 6, 0, 0, 1, 2], target = 0 --> True`
+  - `nums = [2, 5, 6, 0, 0, 1, 2], target = 3 --> False`
+
+```py
+def search(nums, target):
+    l, r = 0, len(nums) - 1
+
+    while l <= r:
+        mid = (l + r) // 2
+        if nums[mid] == target:
+            return True
+
+        # left side is sorted
+        if nums[l] < nums[mid]:
+            # check if the target is in the left side
+            if nums[l] <= target <= nums[mid]:
+                r = mid - 1
+            else:
+                l = mid + 1
+        # left side is sorted
+        elif nums[l] > nums[mid]:
+            if nums[mid] <= target <= nums[r]:
+                l = mid + 1
+            else:
+                r = mid - 1
+        # if nums[l] == nums[mid] ⚠️
+        else:
+            l += 1 # we can't determine which side is sorted, so we can just skip the first value and if we found the target value, then we can return True as the array contains duplicates
+
+    return False
 ```
 
 ---
@@ -897,7 +1181,7 @@ Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, ret
   def missingNumber(nums):
     # Calculate the expected sum of the range [0, n]
     n = len(nums)
-    expected_sum = n * (n + 1) // 2
+    expected_sum = sum(range(n + 1))
 
     # Calculate the actual sum of the elements in the array
     actual_sum = sum(nums)

@@ -4,6 +4,7 @@
   - [Remove Element](#remove-element)
   - [Replace Elements with Greatest Element on Right Side](#replace-elements-with-greatest-element-on-right-side)
   - [Array chunk (split array into smaller chunks)](#array-chunk-split-array-into-smaller-chunks)
+  - [Minimum Absolute Difference](#minimum-absolute-difference)
   - [Two pointers](#two-pointers)
     - [Two Sum II](#two-sum-ii)
     - [Three Sum (Triplet Sum to Zero)](#three-sum-triplet-sum-to-zero)
@@ -138,6 +139,37 @@ def chunk(arr, size):
     if subarray:
         result.append(subarray)
     return result
+```
+
+---
+
+## Minimum Absolute Difference
+
+Given an array of distinct integers `arr`, find all pairs of elements with the minimum absolute difference of any two elements. Return a list of pairs in ascending order(with respect to pairs), each pair `[a, b]` follows
+
+- `a, b` are from `arr`
+- `a < b`
+- `b - a` equals to the minimum absolute difference of any two elements in `arr`
+
+- Ex:
+
+  - `arr = [4, 2, 1, 3], --> [[1, 2], [2, 3], [3, 4]]`
+
+```py
+def minimumAbsDifference(arr):
+    arr.sort()
+    minDiff = float('inf')
+    res = []
+
+    for i in range(1, len(arr)):
+        diff = arr[i] - arr[i - 1]
+        if diff < minDiff:
+            minDiff = diff
+            res = [[arr[i - 1], arr[i]]] # start over
+        elif diff == minDiff:
+            res.append([arr[i - 1], arr[i]]) # add to the result
+
+    return res
 ```
 
 ---

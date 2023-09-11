@@ -6,6 +6,12 @@
     - [Count Complete Tree Nodes](#count-complete-tree-nodes)
     - [Level Width](#level-width)
     - [Path Sum](#path-sum)
+    - [Path Sum II](#path-sum-ii)
+    - [Path Sum III](#path-sum-iii)
+    - [Binary Tree Paths](#binary-tree-paths)
+    - [Sum Root to Leaf Numbers](#sum-root-to-leaf-numbers)
+    - [Diameter of Binary Tree](#diameter-of-binary-tree)
+    - [Binary Tree Maximum Path Sum](#binary-tree-maximum-path-sum)
     - [Symmetric Tree](#symmetric-tree)
     - [Same Tree](#same-tree)
     - [Lowest Common Ancestor of a Binary Tree](#lowest-common-ancestor-of-a-binary-tree)
@@ -26,14 +32,17 @@
     - [Level Order Successor](#level-order-successor)
     - [Populating Next Right Pointers in Each Node ( Connect Level Order Siblings )](#populating-next-right-pointers-in-each-node--connect-level-order-siblings-)
     - [Populating Next Right Pointers in Each Node II](#populating-next-right-pointers-in-each-node-ii)
+    - [Connect All Level Order Siblings](#connect-all-level-order-siblings)
+    - [Binary Tree Right Side View](#binary-tree-right-side-view)
     - [Check Completeness of a Binary Tree](#check-completeness-of-a-binary-tree)
     - [Binary Tree Zigzag Level Order Traversal](#binary-tree-zigzag-level-order-traversal)
     - [Sum of Left Leaves](#sum-of-left-leaves)
-    - [Diameter of Binary Tree](#diameter-of-binary-tree)
     - [Minimum Absolute Difference in BST](#minimum-absolute-difference-in-bst)
     - [Invert Binary Tree](#invert-binary-tree)
     - [Kth Smallest Element in a BST](#kth-smallest-element-in-a-bst)
     - [Lowest Common Ancestor of a Binary Search Tree](#lowest-common-ancestor-of-a-binary-search-tree)
+    - [Unique Binary Search Trees](#unique-binary-search-trees)
+    - [Unique Binary Search Trees II](#unique-binary-search-trees-ii)
   - [Tries](#tries)
     - [Implement Trie (Prefix Tree)](#implement-trie-prefix-tree)
 
@@ -250,7 +259,7 @@ Given the `root` of a binary tree and an integer `targetSum`, return `true` if t
 
   - We can use a **Depth-First Search** to traverse the tree and keep track of the current sum of the path from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we return `True`. Otherwise, we return `False`.
 
-- Solution 1: by subtracting the current node's value from the target sum
+- Solution 1: by **subtracting** the current node's value from the target sum
 
   ```py
   def hasPathSum(root, targetSum):
@@ -265,7 +274,7 @@ Given the `root` of a binary tree and an integer `targetSum`, return `true` if t
       return hasPathSum(root.left, targetSum) or hasPathSum(root.right, targetSum)
   ```
 
-- Solution 2: by adding the current node's value to the current sum
+- Solution 2: by **adding** the current node's value to the current sum
 
   ```py
   def hasPathSum(root, targetSum):
@@ -282,6 +291,229 @@ Given the `root` of a binary tree and an integer `targetSum`, return `true` if t
 
       return dfs(root, 0)
   ```
+
+- Time complexity: `O(n)` where `n` is the number of nodes in the tree
+- Space complexity: `O(h)` where `h` is the height of the tree, this space is used by the recursion stack
+
+---
+
+### Path Sum II
+
+Given the `root` of a binary tree and an integer `targetSum`, return all **root-to-leaf** paths where each path's sum equals `targetSum`.
+
+- EX:
+  ![path sum II](./img/path-sum-ii-1.jpeg)
+  - Input: `root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22`
+  - Output: `[[5,4,11,2],[5,8,4,5]]`
+
+```py
+def pathSum(root, targetSum):
+    def dfs(node, curSum, path):
+        if node is None:
+            return
+
+        curSum += node.val
+        path.append(node.val)
+
+        # if the root is a leaf node, check if the current sum is equal to the target sum
+        if not node.left and not node.right and curSum == targetSum:
+            result.append(path[:])
+
+        dfs(node.left, curSum, path)
+        dfs(node.right, curSum, path)
+        path.pop()
+
+    result = []
+    dfs(root, 0, [])
+    return result
+```
+
+---
+
+### Path Sum III
+
+Given the `root` of a binary tree and an integer `targetSum`, return the number of paths where the sum of the values along the path equals `targetSum`.
+
+The path does not need to start or end at the root or a leaf, but it must go downwards (i.e., traveling only from parent nodes to child nodes).
+![path sum III](./img/path-sum-iii-1.jpeg)
+
+- Explanation:
+
+  - We can use `DFS`
+  - we will keep track of the current `path` passed to every recursive call
+  - when traversing we will:
+    - add the current node to the path
+    - calculate sums of all sub-paths ending with the current node
+      - if the sum is equal to the target sum, we will increment the `pathCount` by `1`
+    - remove the current node from the path and backtrack
+
+- Time complexity: `O(n^2)` where `n` is the number of nodes in the tree, this is because we traverse each node once and for each node, we traverse all the nodes in the path (worst case)
+  - if tree is `balanced`, then the time complexity will be `O(nlog(n))` (best case)
+- Space complexity: `O(N)` where `N` is the number of nodes in the tree, this space is used by the recursion stack
+
+```py
+def pathSum(root, targetSum):
+    def dfs(node, path):
+        if node is None:
+            return 0
+
+        path.append(node.val)
+        pathCount, pathSum = 0, 0
+        for i in range(len(path) - 1, -1, -1):
+            pathSum += path[i]
+            if pathSum == targetSum:
+                pathCount += 1
+
+        pathCount += dfs(node.left, path)
+        pathCount += dfs(node.right, path)
+
+        path.pop() # backtrack
+
+        return pathCount
+
+    return dfs(root, [])
+```
+
+---
+
+### Binary Tree Paths
+
+Given the `root` of a binary tree, return all **root-to-leaf** paths in any order.
+
+- Trick here, is that we want to return the result in this format: `["1->2->5", "1->3"]`
+
+```py
+def binaryTreePaths(root):
+    def dfs(node, path):
+        if node is None:
+            return
+
+        path += str(node.val)
+
+        # if the root is a leaf node, add the path to the result
+        if not node.left and not node.right:
+            result.append(path)
+
+        dfs(node.left, path + '->')
+        dfs(node.right, path + '->')
+
+    result = []
+    dfs(root, '')
+    return result
+```
+
+---
+
+### Sum Root to Leaf Numbers
+
+Given the `root` of a binary tree containing digits from `0-9` only, each root-to-leaf path could represent a number.
+
+An example is the root-to-leaf path `1->2->3` which represents the number `123`.
+
+Return the total sum of all root-to-leaf numbers.
+
+- EX:
+  ![sum root to leaf numbers](./img/sum-root-to-leaf-numbers-1.jpeg)
+  - Input: `root = [1,2,3]`
+  - Output: `25`
+  - Explanation:
+    - The root-to-leaf path `1->2` represents the number `12`.
+    - The root-to-leaf path `1->3` represents the number `13`.
+    - Therefore, sum = 12 + 13 = `25`.
+
+```py
+def sumNumbers(root):
+    def dfs(node, curSum):
+        if node is None:
+            return 0
+
+        curSum = (curSum * 10) + node.val
+
+        # if the root is a leaf node, add the current sum to the result
+        if not node.left and not node.right:
+            return curSum
+
+        return dfs(node.left, curSum) + dfs(node.right, curSum)
+
+    return dfs(root, 0)
+```
+
+---
+
+### Diameter of Binary Tree
+
+Given the `root` of a binary tree, return the length of the **diameter** of the tree.
+
+The diameter of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the `root`.
+![diameter of binary tree](./img/diameter-of-binary-tree-1.png)
+
+- **Explanation**
+  - To solve this, we can use a **Depth First Search** to traverse the tree and keep track of the **diameter** of the tree
+  - we do so by calculating the diameter for each node recursively and then return the maximum diameter
+  - to calculate the diameter of a node, we need to calculate the **height** of the left subtree and the **height** of the right subtree and then add them together
+    ![diameter of binary tree](./img/diameter-of-binary-tree-2.png)
+    - the **height** of a subtree is the number of edges between the root node and the farthest leaf node
+    - `diameter` = `left_height` + `right_height`
+    - we add them because the diameter of a node is the longest path between any two nodes in a tree and this path may or may not pass through the `root` (see picture)
+      ![diameter of binary tree](./img/diameter-of-binary-tree-3.webp)
+- So, the approach for solving this problem is to calculate the `height` of each node's `left` and `right` subtrees and find the maximum `sum` of heights for any node. This `sum` represents the longest path that passes through that node. We can do this recursively for each node in the tree and keep track of the maximum diameter found so far.
+
+```py
+def diameterOfBinaryTree(root):
+    # create a variable to store the diameter of the tree
+    diameter = 0
+
+    # create a function that accepts a root node and returns the height of the tree
+    def height(root):
+        # if the root is None, return 0
+        if root is None:
+            return 0
+
+        # recursively call the function with the root's left node and the root's right node
+        left = height(root.left)
+        right = height(root.right)
+
+        # update the diameter of the tree
+        diameter = max(diameter, left + right)
+
+        # return the height of the tree (1 for the current node)
+        return max(left, right) + 1
+
+    height(root)
+    return diameter
+```
+
+---
+
+### Binary Tree Maximum Path Sum
+
+Given the `root` of a binary tree, return the maximum **path sum** of any path.
+
+- EX:
+  ![binary tree maximum path sum](./img/binary-tree-maximum-path-sum-1.jpeg)
+  - Input: `root = [-10,9,20,null,null,15,7]`
+  - Output: `42`
+  - Explanation: The optimal path is `15 -> 20 -> 7` with a path sum of `15 + 20 + 7 = 42`.
+
+```py
+def maxPathSum(root):
+    def dfs(node):
+        if node is None:
+            return 0
+
+        # recursively call the function with the root's left node and the root's right node
+        leftSum = max(0, dfs(node.left))
+        rightSum = max(0, dfs(node.right))
+
+        # update the maximum path sum
+        maxSum = max(maxSum, leftSum + rightSum + node.val)
+
+        return max(leftSum, rightSum) + node.val
+
+    maxSum = float('-inf')
+    dfs(root)
+    return maxSum
+```
 
 ---
 
@@ -1219,6 +1451,78 @@ Same as the previous problem, but the tree is not a **perfect binary tree**.
 
 ---
 
+### Connect All Level Order Siblings
+
+// TODO: Watch the video or explanation
+
+Given a binary tree, connect each node with its level order successor. The last node of each level should point to the first node of the next level.
+
+![connect all level order siblings](./img/connect-all-level-order-siblings-1.png)
+
+- Explanation:
+  - It's a mix between [Level Order Successor](#level-order-successor) and [Populating Next Right Pointers in Each Node](#populating-next-right-pointers-in-each-node--connect-level-order-siblings)
+
+```py
+def connect(root):
+    if root is None:
+        return None
+
+    q = deque([root])
+    curr, prev = None, None
+    while q:
+      currentNode = q.popleft()
+      if prev:
+        prev.next = currentNode
+      prev = currentNode # update prev
+
+      if currentNode.left:
+        q.append(currentNode.left)
+      if currentNode.right:
+        q.append(currentNode.right)
+```
+
+---
+
+### Binary Tree Right Side View
+
+Given the `root` of a binary tree, imagine yourself standing on the **right side** of it, return the values of the nodes you can see ordered from top to bottom.
+
+- Ex:
+  ![binary tree right side view](./img/binary-tree-right-side-view-1.jpeg)
+
+  - Input: `root = [1, 2, 3, null, 5, null, 4]`
+  - Output: `[1, 3, 4]`
+
+- Explanation:
+  - The trick here is to add the **last node** of each level to the result array.
+  - to do so, we need to store the **level size** before looping through the nodes of each level.
+
+```py
+def rightSideView(root):
+    if root is None:
+        return []
+
+    result = []
+    q = deque([root])
+
+    while q:
+        levelSize = len(q) # Must store the level size before looping through the nodes of each level ⚠️
+        for i in range(levelSize):
+            node = q.popleft()
+            # if we reached the last node in the current level, add its value to the result array
+            if i == levelSize - 1:
+                result.append(node.value)
+
+            if node.left:
+                q.append(node.left)
+            if node.right:
+                q.append(node.right)
+
+    return result
+```
+
+---
+
 ### Check Completeness of a Binary Tree
 
 Given the `root` of a binary tree, determine if it is a **complete binary tree**. In a **complete binary tree**, every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between `1` and `2h` nodes inclusive at the last level `h`.
@@ -1424,51 +1728,6 @@ Given the `root` of a binary tree, return the sum of all left leaves.
 
 ---
 
-### Diameter of Binary Tree
-
-Given the `root` of a binary tree, return the length of the **diameter** of the tree.
-
-The diameter of a binary tree is the **length** of the longest path between any two nodes in a tree. This path may or may not pass through the `root`.
-![diameter of binary tree](./img/diameter-of-binary-tree-1.png)
-
-- **Explanation**
-  - To solve this, we can use a **Depth First Search** to traverse the tree and keep track of the **diameter** of the tree
-  - we do so by calculating the diameter for each node recursively and then return the maximum diameter
-  - to calculate the diameter of a node, we need to calculate the **height** of the left subtree and the **height** of the right subtree and then add them together
-    ![diameter of binary tree](./img/diameter-of-binary-tree-2.png)
-    - the **height** of a subtree is the number of edges between the root node and the farthest leaf node
-    - `diameter` = `left_height` + `right_height`
-    - we add them because the diameter of a node is the longest path between any two nodes in a tree and this path may or may not pass through the `root` (see picture)
-      ![diameter of binary tree](./img/diameter-of-binary-tree-3.webp)
-- So, the approach for solving this problem is to calculate the `height` of each node's `left` and `right` subtrees and find the maximum `sum` of heights for any node. This `sum` represents the longest path that passes through that node. We can do this recursively for each node in the tree and keep track of the maximum diameter found so far.
-
-```py
-def diameterOfBinaryTree(root):
-    # create a variable to store the diameter of the tree
-    diameter = 0
-
-    # create a function that accepts a root node and returns the height of the tree
-    def height(root):
-        # if the root is None, return 0
-        if root is None:
-            return 0
-
-        # recursively call the function with the root's left node and the root's right node
-        left = height(root.left)
-        right = height(root.right)
-
-        # update the diameter of the tree
-        diameter = max(diameter, left + right)
-
-        # return the height of the tree (1 for the current node)
-        return max(left, right) + 1
-
-    height(root)
-    return diameter
-```
-
----
-
 ### Minimum Absolute Difference in BST
 
 Given the `root` of a Binary Search Tree (BST), return the minimum absolute difference between the values of any two different nodes in the tree.
@@ -1652,6 +1911,125 @@ def lowestCommonAncestor(root, p, q):
       # else return the current node -> it's the lowest common ancestor
       else:
         return cur
+```
+
+---
+
+### Unique Binary Search Trees
+
+Given an integer `n`, return the number of structurally unique **BST's** (binary search trees) which has exactly `n` nodes of unique values from `1` to `n`.
+
+- Ex:
+  ![unique binary search trees](./img/unique-binary-search-trees-1.jpeg)
+
+  - Input: `n = 3`
+  - Output: `5`
+
+- Explanation
+
+  - We can use `DP` to solve this problem
+  - We have subproblems that we can solve and use their solutions to solve the main problem
+    - for each `root` node, we can calculate the number of unique BST's that can be created from the nodes in its `left` subtree and the nodes in its `right` subtree
+    - then we can multiply the number of unique BST's in the `left` subtree with the number of unique BST's in the `right` subtree to get the total number of unique BST's that can be created from the nodes in the left subtree and the nodes in the right subtree
+      ![unique binary search trees](./img/unique-binary-search-trees-2.png)
+  - We do this for every `root` node and add the total number of unique BST's to the `result` array
+  - Ex: to calculate the number for `root=4`, we need to calculate the number of unique BST's for `root=1`, `root=2`, `root=3` and `root=5` and then multiply them together -> **(Subproblems -> DP)**
+
+    ```py
+    # 0 nodes = 1 tree
+    # 1 node = 1 tree
+    # 2 nodes = 2 trees
+    # 3 nodes = 5 trees
+    # 4 nodes = 14 trees
+
+    numTree(4) = numTree(0) * numTree(3) + # because we have 4 nodes (1 node in the left subtree and 3 nodes in the right subtree)
+                 numTree(1) * numTree(2) + # because we have 4 nodes (2 nodes in the left subtree and 2 nodes in the right subtree)
+                 numTree(2) * numTree(1) + # because we have 4 nodes (3 nodes in the left subtree and 1 node in the right subtree)
+                 numTree(3) * numTree(0)  # because we have 4 nodes (4 nodes in the left subtree and 0 nodes in the right subtree)
+    ```
+
+- Time complexity: `O(n^2)`, Space complexity: `O(n)`
+
+  - We have `n` subproblems and each subproblem takes `O(n)` time to solve
+  - We can use a `DP` array to store the solutions of the subproblems
+
+```py
+def numTrees(n):
+    # create a DP array to store the solutions of the subproblems
+    dp = [0] * (n + 1) # numTree
+    # set the first two values to 1
+    dp[0] = dp[1] = 1
+
+    # loop through the numbers from 2 to n
+    for i in range(2, n + 1):
+        # loop through the numbers from 1 to i
+        for j in range(1, i + 1):
+            # calculate the number of unique BST's for each root node
+            dp[i] += dp[j - 1] * dp[i - j] # See the explanation above
+
+    return dp[n]
+```
+
+---
+
+### Unique Binary Search Trees II
+
+Given an integer `n`, return all the structurally unique **BST's** (binary search trees), which has exactly `n` nodes of unique values from `1` to `n`. Return the answer in **any order**.
+
+- Ex:
+  ![unique binary search trees](./img/unique-binary-search-trees-1.jpeg)
+
+  - Input: `n = 3`
+  - Output: `[[1,null,3,2],[3,2,null,1],[3,1,null,null,2],[2,1,3],[1,null,2,null,3]]`
+
+- Explanation
+
+  - Here, we want to create all the unique BST's that can be created from the numbers from `1` to `n`
+  - instead of using recursion to build tree from each `root`
+  - we can divide the problem into **subproblems** and use `DP` to solve it
+    - for example starting from `1`:
+      ![unique binary search trees](./img/unique-binary-search-trees-3.png)
+      - Then we focus on the `right` subtree of `1`:
+        ![unique binary search trees](./img/unique-binary-search-trees-4.png)
+        ![unique binary search trees](./img/unique-binary-search-trees-5.png)
+    - We do this for every `root` node and add the total number of unique BST's to the `result` array
+    - We will notice a repeated work when generating the subtree, and that's where we can use `DP caching`
+
+- Time complexity: `4^n` for `input = 4`
+  - because we have `n` subproblems and each subproblem takes `O(n)` time to solve
+
+```py
+def generateTrees(n):
+    dp = {}
+    def generate(left, right):
+        if left == right:
+            return [TreeNode(left)] # return a tree with one node
+        # when array is empty, return None
+        if left > right:
+            return [None] # because leaf nodes are None and not []
+        if (left, right) in dp:
+            return dp[(left, right)]
+        
+        res = []
+        for val in range(left, right + 1):
+            # recursively call the function with the left and right subtrees
+            leftSubtrees = generate(left, val - 1)
+            rightSubtrees = generate(val + 1, right)
+            
+            # loop through the left and right subtrees to get all the possible combinations
+            for leftSubtree in leftSubtrees:
+                for rightSubtree in rightSubtrees:
+                    # create a new tree with the current value as the root node
+                    root = TreeNode(val)
+                    root.left = leftSubtree
+                    root.right = rightSubtree
+                    # add the tree to the result array
+                    res.append(root)
+
+        dp[(left, right)] = res
+        return res
+
+    return generate(1, n)
 ```
 
 ---
