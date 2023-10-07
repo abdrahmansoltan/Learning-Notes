@@ -15,6 +15,7 @@
   - [Responsive Design](#responsive-design)
     - [Customize breakpoints](#customize-breakpoints)
   - [Element states and transitions](#element-states-and-transitions)
+  - [Usefull Tailwind classes](#usefull-tailwind-classes)
 
 ---
 
@@ -308,6 +309,8 @@ It's used to inline any existing utility classes into your own custom CSS.
 - To add transitions to the element, you can use the `transition` utility class:
 
   - format -> `transition-{{property}}-{{duration}}`
+    - only transition `color` -> `transition-colors`
+    - only transition `transform` -> `transition-transform`
 
   ```html
   <button class="bg-blue-500 hover:bg-blue-700 transition-colors duration-500">Button</button>
@@ -316,3 +319,10 @@ It's used to inline any existing utility classes into your own custom CSS.
     Button
   </button>
   ```
+
+---
+
+## Usefull Tailwind classes
+
+- `container` -> to center the content and add a `max-width` to it
+- `mx-auto` -> to center the content

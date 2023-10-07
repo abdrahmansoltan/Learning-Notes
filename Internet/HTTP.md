@@ -7,11 +7,10 @@
       - [Why we need HTTP/3](#why-we-need-http3)
       - [What Is QUIC](#what-is-quic)
   - [URL `universal resource locator`](#url-universal-resource-locator)
-  - [Request / Response](#request--response)
-    - [HTTP Request Methods](#http-request-methods)
-      - [Content methods](#content-methods)
-      - [Information-getter methods](#information-getter-methods)
-    - [HTTP status messages](#http-status-messages)
+  - [HTTP Request Methods](#http-request-methods)
+    - [Content methods](#content-methods)
+    - [Information-getter methods](#information-getter-methods)
+  - [HTTP status messages](#http-status-messages)
   - [HTTP headers](#http-headers)
     - [Cookies](#cookies)
     - [Security](#security)
@@ -116,14 +115,12 @@ It is a human-readable address, describing exactly where on the web and in what 
 
 ---
 
-## Request / Response
-
-### HTTP Request Methods
+## HTTP Request Methods
 
 - HTTP request is an action to be performed on a resource identified by a given Request-`URL`
 - **HTTP method**, sometimes referred to as an HTTP `verb`, indicates the action that the HTTP request expects from the queried server.
 
-#### Content methods
+### Content methods
 
 ![HTTP method](./img/get.PNG)
 ![HTTP method](./img/post.PNG)
@@ -131,11 +128,30 @@ It is a human-readable address, describing exactly where on the web and in what 
 ![HTTP method](./img/patch.PNG)
 ![HTTP method](./img/del.PNG)
 
+- `GET` vs `POST`
+
+  - `GET`:
+    - **retrieve** data from the server
+    - it can be used to send small amounts of data to the server using the query string (in the URL)
+    - it doesn't have a request `body`, it only has `headers`
+    - Sending data through the query string is **not secure** and should be avoided
+    - requests can be cached and bookmarked -> `Proxy`
+      - this is because `GET` requests are **idempotent** (multiple identical requests have the same effect as one single request)
+    - limited amount of data can be sent
+  - `POST`:
+    - **send** data to the server
+    - it can be used to send large amounts of data to the server using the request `body`
+    - more secure than `GET` because the data is not visible in the URL
+    - requests are never cached and cannot be bookmarked -> `No Proxy`
+    - unlimited amount of data can be sent and bigger `payload` size
+
 - `PUT` vs `PATCH`
   - `PUT`: **replace** a source in collection
   - `PATCH`: **modify** a source in collection
 
-#### Information-getter methods
+---
+
+### Information-getter methods
 
 - methods that get information from the server without really touching the content
 - The `HEAD` request method is useful in recovering meta-data that is written according to the headers, without transferring the entire content. The technique is commonly used when testing hypertext links for accessibility, validity, and recent modification.
@@ -146,7 +162,7 @@ It is a human-readable address, describing exactly where on the web and in what 
 
 ---
 
-### HTTP status messages
+## HTTP status messages
 
 HTTP status codes are **3-digit codes** most often used to indicate whether an HTTP request has been successfully completed. Status codes are broken into the following 5 blocks:
 

@@ -1,6 +1,7 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Git vs Github](#git-vs-github)
   - [configuration](#configuration)
   - [Github workflow](#github-workflow)
   - [Working With Remotes](#working-with-remotes)
@@ -22,6 +23,13 @@
     - [Contributing to Open source projects](#contributing-to-open-source-projects)
   - [Notes](#notes)
     - [Github shortcuts](#github-shortcuts)
+
+---
+
+## Git vs Github
+
+- `Git` is a **Version Control System** (VCS) that allows us to track the history of our project and collaborate with others.
+- `Github` is a **Hosting Service** that hosts Git-repositories in the cloud and makes it easier to collaborate with other people.
 
 ---
 

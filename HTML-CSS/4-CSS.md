@@ -1229,7 +1229,6 @@ It is used to specify the components of a flexible length (`flex-grow`, `flex-sh
 - `flex-grow`
 
   - Determines how much of the available space inside the flex container the item should take up.
-    ![flex-grow](./img/flex-grow.jpg.gz)
 
     ```css
     .item {

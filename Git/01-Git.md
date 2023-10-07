@@ -1,16 +1,17 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Version Control System (VCS)](#version-control-system-vcs)
   - [Git](#git)
     - [Advantages of distributed version control](#advantages-of-distributed-version-control)
-  - [Git Architecture: Three Trees (Git workflow)](#git-architecture-three-trees-git-workflow)
+  - [Git Repository (Git workflow)](#git-repository-git-workflow)
   - [Diff](#diff)
     - [Compare changes across branches](#compare-changes-across-branches)
     - [Compare changes across commits](#compare-changes-across-commits)
-  - [commit message](#commit-message)
-    - [Writing a commit message guidelines](#writing-a-commit-message-guidelines)
+  - [Commits](#commits)
+    - [Commits guidelines](#commits-guidelines)
     - [Hash values (SHA-1)](#hash-values-sha-1)
-    - [The HEAD pointer](#the-head-pointer)
+    - [The `HEAD` pointer](#the-head-pointer)
       - [Referencing commits (`^` , `~`)](#referencing-commits---)
     - [Commit metadata](#commit-metadata)
   - [Branches](#branches)
@@ -57,13 +58,21 @@
 
 ---
 
+## Version Control System (VCS)
+
+**Version Control System** is a software that tracks and manages changes to files over time.
+
+- It allows us to revisit early versions of the files, compare changes between changes, and revert back to earlier versions of a file or a set of files (undo things).
+
+---
+
 ## Git
 
 Git is software that keeps track of changes that you make to files and directories. And it's especially good at keeping track of text changes.
 
 > Git cheatsheet: [link](https://cs.fyi/guide/git-cheatsheet)
 
-- Git is referred to as a version control system or **VCS**
+- Git is referred to as a **version control system (VCS)**
 - they're also called source code management tools or **SCM**
 - Git is **distributed version control**. Different users each maintain their own repositories instead of working from a central repository, and the changes are stored as sets or patches, and we're focused on tracking `changes`, not the versions of the documents.
 - At its core, Git is like a **key-value store**
@@ -83,16 +92,16 @@ Git is software that keeps track of changes that you make to files and directori
 
 ---
 
-## Git Architecture: Three Trees (Git workflow)
+## Git Repository (Git workflow)
 
-- Requirements for the Architecture:
-  - Track everything (title, content, metadata, ....)
-    - & must not change the content of tracked files
+**Git Repository** is a collection of files and folders (Workspace) that are tracked by Git. And it's stored in a special `.git` directory.
+
+- Requirements for the **Git-Architecture**:
+  - Track everything (title, content, metadata, ....) and must not change the content of tracked files
   - OS independent
-  - Unique ID (each git-object has unique id)
+  - Unique `ID` (each git-object has unique id)
   - Track History
 
-![alt](./img/3_trees.png)
 ![alt](./img/trees.gif)
 
 - **working directory**, which contains changes that may not be tracked by Git yet
@@ -129,7 +138,7 @@ The results showing the difference between the different versions of the file ar
 
 ---
 
-## commit message
+## Commits
 
 **commit** is a code-snapshot or checkpoint in your local repo
 
@@ -139,12 +148,12 @@ The results showing the difference between the different versions of the file ar
 
 ---
 
-### Writing a commit message guidelines
+### Commits guidelines
 
+- Atomic commits: each commit should focus on a **single thing**
+  - this makes it much easier to undo changes later on, and makes your code easier to review.
 - write a short single line summary of what the changes are (less than 50 characters).
-- optionally followed by a blank line and a more complete description
-- keep each line to less than 72 characters
-- write your commit messages in present tense, not past tense, as the commit message is meant to label the changes. It's a label for what's inside.
+- write your commit messages in **present tense**, not past tense, as the commit message is meant to label the changes ( It's a label for what's inside ).
 - clear and descriptive (explain what it does not why/how)
 - develop shorthand for your organization ex `"[css,js]"`, `"bugfix"`,`"#38405"` as issue number
 
@@ -165,7 +174,7 @@ The results showing the difference between the different versions of the file ar
 
 ---
 
-### The HEAD pointer
+### The `HEAD` pointer
 
 > **It's a pointer to the latest commit on the current Branch**
 >

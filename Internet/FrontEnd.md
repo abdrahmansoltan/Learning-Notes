@@ -4,11 +4,6 @@
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
-  - [Progressive Web Apps PWA](#progressive-web-apps-pwa)
-    - [PWA Components](#pwa-components)
-      - [Manifest](#manifest)
-      - [Service Workers](#service-workers)
-      - [HTTPS](#https)
   - [Performance](#performance)
     - [Minify / Minimize files](#minify--minimize-files)
       - [Minimize images](#minimize-images)
@@ -19,9 +14,21 @@
     - [Avoid memory leaks](#avoid-memory-leaks)
     - [Avoid multiple re-rendering](#avoid-multiple-re-rendering)
     - [Rollup Visualizer](#rollup-visualizer)
+  - [Progressive Web Apps PWA](#progressive-web-apps-pwa)
+    - [Manifest](#manifest)
+    - [Service Workers](#service-workers)
+      - [How to create service worker](#how-to-create-service-worker)
+    - [HTTPS](#https)
+  - [SSR vs CSR](#ssr-vs-csr)
+    - [SSR: Server Side Rendering](#ssr-server-side-rendering)
+    - [CSR: Client Side Rendering](#csr-client-side-rendering)
+    - [Progressive Rendering](#progressive-rendering)
   - [Gulp.js](#gulpjs)
     - [Gulp vs Webpack](#gulp-vs-webpack)
   - [Pug.js](#pugjs)
+  - [Web Vitals and Performance Score](#web-vitals-and-performance-score)
+    - [Web Vitals](#web-vitals)
+    - [LightHouse](#lighthouse)
   - [SEO](#seo)
 
 ---
@@ -61,53 +68,6 @@ The four basic steps include:
 4. The final step is to **paint** the screen, wherein the render tree is traversed, and the renderer’s `paint()` method is invoked, which paints each node on the screen using the UI backend layer.
 
 > **NOTE**: every browser has its own unique rendering engine. So naturally, every browser has its own way of interpreting web pages on a user’s screen. Here’s where a challenge arises for web developers regarding the cross-browser compatibility of their website.
-
----
-
-## Progressive Web Apps PWA
-
-It's a term used to describe a set of features and APIs in the browser
-
-PWAs are better than the mobile web and offer a much faster, reliable and engaging experience. If implemented well, they offer an integrated/immersive mobile experience
-
-![pwa](./img/pwa.png)
-
-- It's a term used to describe a set of features and APIs in the browser
-- Progressive Web Apps are user experiences that have the reach of the web, and are:
-
-  - reliable
-  - fast
-  - engaging
-
-- Guide to install a PWA:
-  - [What does it take to be installable?](https://web.dev/install-criteria/)
-
-### PWA Components
-
-![pwa](./img/pwa2.png)
-
-#### Manifest
-
-- It defines how the application is displayed to the user and how it gets launched. All metadata related to the app is also defined here — starting URL, full and short name, link icons, splash screen and so on.
-
-- creating manifest -> [making app installable](https://web.dev/install-criteria/)
-
-#### Service Workers
-
-- It's a Javascript file that runs in the background Asynchronously (separate from our code and can run in a separate thread in the background)
-- Service workers **enable offline work mode**, background syncs and **push notifications**. **Caching** and **storage APIs** available to service works allow pre-caching of content. As defined on Google developer, a service worker is a script that your browser runs in the background, separate from a web page, opening the door to features that don’t need a web page or user interaction.
-  ![service worker](./img/serviceworker.PNG)
-- Limitations:
-  - unable to access the DOM
-  - limited browser supports
-- caching ![caching](./img/caching.PNG)
-- How to create service worker:
-  - option 1: manually
-  - option 2: using [Workbox](https://developer.chrome.com/docs/workbox/) which is usually added to PWA plugins
-
-#### HTTPS
-
-- For security and preventing hackers from seeing your requests
 
 ---
 
@@ -248,6 +208,190 @@ Tool to Visualize and analyze your Rollup bundle to see which modules are taking
 
 ---
 
+## Progressive Web Apps PWA
+
+It's a term used to describe a set of features and APIs in the browser that allow us to create a web application that can be installed on the user's device and can work offline.
+
+- Native mobile apps have all its files downloaded to the device and can work offline, By using PWA, we can make our web app work offline and installable on the user's device **(Behave like a native mobile app)**
+
+PWAs are better than the mobile web and offer a much faster, reliable and engaging experience. If implemented well, they offer an integrated/immersive mobile experience
+
+![pwa](./img/pwa.png)
+
+- It's a term used to describe a set of features and APIs in the browser
+- Progressive Web Apps are user experiences that have the reach of the web, and are:
+
+  - reliable
+  - fast
+  - engaging
+
+- **PWA Components:**
+  ![pwa](./img/pwa2.png)
+
+  1. Manifest
+  2. Service Workers
+  3. HTTPS
+
+- You can access the PWA components in the browser's `devtools` -> `Application` tab
+
+  ![pwa](./img/pwa3.png)
+
+- Guide to install a PWA:
+  - [What does it take to be installable?](https://web.dev/install-criteria/)
+
+---
+
+### Manifest
+
+- It defines how the application is displayed to the user and how it gets launched. All **metadata** related to the app is also defined here — starting URL, full and short name, link icons, splash screen and so on.
+- It's a `JSON` file that contains the metadata of the app
+
+  ```json
+  {
+    "name": "My App",
+    "short_name": "My App",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#fff",
+    "theme_color": "#3f51b5",
+    "icons": [
+      {
+        "src": "images/icons/icon-128x128.png",
+        "sizes": "128x128",
+        "type": "image/png"
+      },
+      {
+        "src": "images/icons/icon-192x192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "images/icons/icon-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  ```
+
+- creating manifest -> [making app installable](https://web.dev/install-criteria/)
+
+---
+
+### Service Workers
+
+- It's a **Javascript script file that runs in the background** Asynchronously (separate from our code and can run in a separate thread in the background)
+- It acts as a **proxy server** that sits between web applications, the browser, and the network (when available)
+  ![service worker](./img/serviceworker.png)
+- It's used for features that don't need a web page or user interaction like:
+  - **Offline work mode**
+  - **Background syncs**
+  - **Push notifications**
+  - **Caching**
+  - **Storage APIs**
+  - **Pre-caching of content**
+- As defined on Google developer, a service worker is a script that your browser runs in the background, separate from a web page, opening the door to features that don’t need a web page or user interaction.
+- The `service-worker.js` file is created in the `build` phase and it's usually located in the `build` folder
+  - it's not created manually as it's a complicated process and it's usually created using `Workbox` library
+- Limitations:
+  - unable to access the DOM
+  - limited browser supports (not an issue anymore)
+- It caches the files / data in the browser's `Cache API` to make the app work offline
+  ![caching](./img/caching.png)
+  ![caching](./img/caching-1.png)
+
+#### How to create service worker
+
+- option 1: manually
+- option 2: using [Workbox](https://developer.chrome.com/docs/workbox/) which is usually added to PWA plugins
+- option 3: in the build phase using `webpack`, `rollup`, `parcel`, etc.
+
+  ```json
+  // package.json
+  {
+    "scripts": {
+      "build": "webpack --config webpack.config.js"
+      // or
+      // "build": "react-scripts build && sw-precache --config=sw-precache-config.js"
+    }
+  }
+  ```
+
+  ```js
+  // webpack.config.js
+  const { GenerateSW } = require('workbox-webpack-plugin');
+  module.exports = {
+    // ...
+    plugins: [new GenerateSW()]
+  };
+  ```
+
+---
+
+### HTTPS
+
+- For security and preventing hackers from seeing your requests
+
+---
+
+## SSR vs CSR
+
+### SSR: Server Side Rendering
+
+- The server renders the HTML code and sends it to the client, and the client renders the HTML code and display UI content with little or no activity
+  - Once any activity happens, the client sends a request to the server to get the new HTML code and the server renders the HTML code and sends it to the client, and the client renders the HTML code and display UI content with little or no activity
+    ![SSR](./img/SSR.png)
+    - Here, there's no loading states for the data to be rendered as the server is responsible for rendering the HTML code and sending it to the client, so the end-user will have a better experience as the UI content will be displayed faster even though the data is not rendered yet or the functionality is not working yet
+- The browser always asks for the entire HTML page from the server even if only a small part of the page is changed
+  > When CSS and Javascript were created and used in the web, the web was designed to be a **document**. So, the browser was designed to ask for the entire HTML page from the server even if only a small part of the page is changed. This is why the server is responsible for rendering the HTML code and sending it to the client
+- Ex: `Next.js` framework uses SSR by default, `WordPress`
+
+- Pros
+
+  - Static sites are `SEO` friendly
+  - faster initial loading time
+
+- Drawbacks:
+
+  - It's slower than `CSR` as the server is responsible for rendering the HTML code and sending it to the client
+  - Full page reloads
+  - It's not suitable for applications that need a lot of user interaction
+    - Ex: `Facebook` is not using SSR as it needs a lot of user interaction
+
+- if you want to use `SSR` in `React` apps, you need to:
+  1. render the view on the server -> `ReactDOMServer.renderToString()`
+  2. hydrate the view on the client, which means that the client will take over the rendered HTML code from the server and continue from there by attaching event listeners and so on -> `ReactDOM.hydrate()`
+- more [here](../Nextjs/1-Nextjs.md#server-side-rendering-ssr)
+
+---
+
+### CSR: Client Side Rendering
+
+- As the web evolved, the web became more like an **application** than a document. So, the browser was designed to ask for only the data from the server and the client is responsible for rendering the HTML code and displaying the UI content -> **Single Page Application SPA**
+- For any activity, the client sends a request to the server to get the data and the server sends the data to the client and the client renders the HTML DOM corresponding to the data and display UI content
+  ![CSR](./img/CSR.png)
+  - We will have **loading states** for the data to be rendered
+  - No need to render the entire HTML page and reload the page
+- Pros:
+  - Rich interactivity as the client is responsible for rendering the HTML code and displaying the UI content
+  - faster than `SSR` as the server is responsible for sending the data only
+- Drawbacks:
+  - It's not `SEO` friendly as the server sends the HTML code without the data and the search engine can't see the data
+    - Ex: `Google` can't see the data in `React` apps
+  - longer initial loading time as the client is responsible for rendering the HTML code and displaying the UI content
+
+---
+
+### Progressive Rendering
+
+It's a technique that allows web content to be displayed as soon as possible. It's often achieved by splitting the rendering work and running it in multiple frames or processes.
+![progressive rendering](./img/progressive-rendering.png)
+
+- It's a solution for the problem of the long initial loading time in `CSR`, as it allows the browser to render the HTML code and display the UI content as soon as possible
+- it's based on: **"render as needed"** -> "render as quickly as possible"
+
+---
+
 ## Gulp.js
 
 A toolkit (**Task Runner**) to automate & enhance your workflow to automate slow, repetitive workflows and compose them into efficient build pipelines.
@@ -282,6 +426,30 @@ It's a **template engine** designed to render HTML in server-side technologies s
 > A template engine is a program which is responsible for compiling a template (that can be written using any one of a number of languages) into HTML. The template engine will normally receive data from an external source, which it will inject into the template it’s compiling.
 
 - It's another way for writing HTML code with ability to write **HTML components**
+
+---
+
+## Web Vitals and Performance Score
+
+### Web Vitals
+
+They are a set of metrics that Google uses to measure the performance of a website. They are a subset of the Core Web Vitals, which are a set of metrics that Google uses to measure the performance of a website.
+
+- **Largest Contentful Paint (LCP)**: measures loading performance. To provide a good user experience, LCP should occur within 2.5 seconds of when the page first starts loading.
+- **First Input Delay (FID)**: measures interactivity. To provide a good user experience, pages should have a FID of less than 100 milliseconds.
+- **Cumulative Layout Shift (CLS)**: measures visual stability. To provide a good user experience, pages should maintain a CLS of less than 0.1.
+- **Total Blocking Time (TBT)**: measures responsiveness. To provide a good user experience, pages should have a TBT of less than 300 milliseconds.
+- **Time to First Byte (TTFB)**: measures the time from the start of the initial navigation until the browser receives the first byte of the response.
+
+---
+
+### LightHouse
+
+It's a tool to measure the performance of the website and give it a score
+
+- It's a tool that runs a series of audits against a web page, and then generates a report on how well the page did.
+- It's available as a Chrome extension, a web page, a Node module, and a Chrome `DevTools` audit.
+- It also gives score for the **PWA** components
 
 ---
 

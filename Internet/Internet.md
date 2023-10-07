@@ -7,6 +7,7 @@
     - [What is Internet](#what-is-internet)
     - [How internet works](#how-internet-works)
   - [Important Concepts](#important-concepts)
+    - [Client / Server](#client--server)
     - [IP address](#ip-address)
     - [Packet](#packet)
     - [ISP](#isp)
@@ -17,6 +18,8 @@
       - [DNS Records (not important 🚫)](#dns-records-not-important-)
       - [Hosting](#hosting)
     - [SSL / TLS](#ssl--tls)
+  - [Application Protocols](#application-protocols)
+    - [HTTP](#http)
   - [SSH](#ssh)
     - [How It Works](#how-it-works)
     - [Different Encryption Techniques](#different-encryption-techniques)
@@ -149,6 +152,17 @@ The internet works by connecting devices and systems together through a series o
 
 ## Important Concepts
 
+### Client / Server
+
+- **Client**: is a device that requests data from a server.
+  - it's not only a browser, it can be a mobile app, a desktop app, another server, ...
+- **Server**: is a device that provides data to clients (responds to requests from clients)
+  - it's not only a server, it can be a database, a file, another client, ...
+
+They communicate using [Application Protocols](#application-protocols)
+
+---
+
 ### IP address
 
 Internet Protocol addresses are unique identifiers assigned to every device connected to a network.
@@ -175,6 +189,7 @@ It's a small piece of data that is sent over the internet.
   3. then throwing them into the shared network (the cloud)
 
 - A packet has two parts:
+  ![packet](./img/packet.png)
   - `header` contains information that helps the packet get to its destination, including the `length` of the packet, its `source` and destination
   - `checksum value` that helps the recipient detect if a packet was damaged in transit.
 - transmission speed of packets depend on bandwidth as packet consists of `bytes`
@@ -240,6 +255,7 @@ A key difference between TCP and UDP is **speed**, as `TCP` is comparatively slo
   ![DNS](./img/dns.png)
 
 - `TLD`: top level domain -> `.com`
+- `path`: `/about` -> it's the path to the page after the domain
 - Modern web browsers are designed by default to **cache** `DNS` records for a set amount of time after they’re first requested.
   ![DNS Cashing](./img/dns2.png)
 
@@ -280,6 +296,21 @@ It's a protocol used to **encrypt** data being transmitted over the internet. It
   - `Encryption`: is the process of encoding data so that only the intended recipient can read it. It's used to protect data from being intercepted by malicious parties.
     - `Public key`: is a long string of characters that is used to **encrypt** data. It is included in the certificate and is publicly available.
     - `Private key`: is a long string of characters that is used to **decrypt** data. It is kept secret and is only known to the owner of the certificate.
+
+---
+
+## Application Protocols
+
+Usually, the client and the server communicate using **Remote Procedure Call (RPC)** or **Representational State Transfer (REST)**.
+
+- **Remote Procedure Call (RPC)**: is a protocol that allows a computer program to execute a subroutine or procedure on another computer without the programmer needing to explicitly code the details for this remote interaction.
+- Most of the application-protocols are built on top of `TCP/IP` protocol
+
+### HTTP
+
+is a (request / response) protocol that governs the communication between clients and servers on the internet. It's used to transfer data between clients and servers.
+
+- more here -> [HTTP](./HTTP.md)
 
 ---
 

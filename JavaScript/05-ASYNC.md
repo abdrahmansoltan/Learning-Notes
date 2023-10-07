@@ -1261,7 +1261,7 @@ let promise = fetch(url, [options]);
 
 - Without `options`, this is a simple `GET` request, downloading the contents of the url.
 
-- **fetch()**: doesn't has Execution context like other functions as it's a "facade" function (not from JavaScript)
+- **fetch()**: doesn't have Execution context like other functions as it's a "facade" function (not from JavaScript)
 - The browser starts the request right away and returns a promise that the calling code should use to get the result.
 
   - **fetch()**: returns a **promise object** which has 3 properties:

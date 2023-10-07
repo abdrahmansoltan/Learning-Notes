@@ -43,6 +43,7 @@
     - [Lowest Common Ancestor of a Binary Search Tree](#lowest-common-ancestor-of-a-binary-search-tree)
     - [Unique Binary Search Trees](#unique-binary-search-trees)
     - [Unique Binary Search Trees II](#unique-binary-search-trees-ii)
+    - [Serialize and Deserialize BST](#serialize-and-deserialize-bst)
   - [Tries](#tries)
     - [Implement Trie (Prefix Tree)](#implement-trie-prefix-tree)
 
@@ -970,7 +971,7 @@ Given the `root` of a binary tree, return the inorder traversal of its nodes' va
 
       # while the stack is not empty or the cur is not None
       while stack or cur:
-          # 1. loop through the left nodes of the cur and add them to the stack
+          # 1. loop through the left nodes of the cur and add them to the stack until we reach a leaf node (None)
           while cur:
               stack.append(cur)
               cur = cur.left
@@ -2009,13 +2010,13 @@ def generateTrees(n):
             return [None] # because leaf nodes are None and not []
         if (left, right) in dp:
             return dp[(left, right)]
-        
+
         res = []
         for val in range(left, right + 1):
             # recursively call the function with the left and right subtrees
             leftSubtrees = generate(left, val - 1)
             rightSubtrees = generate(val + 1, right)
-            
+
             # loop through the left and right subtrees to get all the possible combinations
             for leftSubtree in leftSubtrees:
                 for rightSubtree in rightSubtrees:
@@ -2030,6 +2031,76 @@ def generateTrees(n):
         return res
 
     return generate(1, n)
+```
+
+---
+
+### Serialize and Deserialize BST
+
+Serialization is the process of converting a data structure or object into a sequence of bits so that it can be stored in a file or memory buffer, or transmitted across a network connection link to be reconstructed later in the same or another computer environment.
+
+Design an algorithm to serialize and deserialize a **binary search tree**. There is no restriction on how your serialization/deserialization algorithm should work. You need to ensure that a binary search tree can be serialized to a string, and this string can be deserialized to the original tree structure.
+
+- EX:
+
+  - Input: `root = [2,1,3]`
+  - Output: `[2,1,3]`
+  - Explanation:
+    - The original BST was `[2,1,3]`, serialized into `"2 1 3"` string format.
+    - The deserialized BST was `[2,1,3]`, which is the same as the original BST.
+
+- Explanation:
+  - We can use `DFS` to traverse the tree and serialize it into a string
+  - Then we can deserialize the string back into a tree
+  - We can use `preorder` traversal to serialize the tree into a string
+    - We can use a `stack` to store the nodes of the tree
+    - We can use a `queue` to store the values of the nodes in the tree
+    - We can use a `#` to indicate a `None` node
+    - We can use a `,` to separate the values of the nodes
+    - We can use a `space` to separate the nodes
+    - Ex: `[2,1,3]` -> `2 1 3` -> `2,1,3`
+
+```py
+def serialize(root):
+    if root is None:
+        return ''
+
+    tree = []
+    queue = deque([root])
+
+    while queue:
+        node = queue.popleft()
+        if node:
+            tree.append(str(node.value)) # convert the value to a string
+            queue.append(node.left)
+            queue.append(node.right)
+        else:
+            tree.append('#') # add a # to indicate a None node
+
+    return ' '.join(tree) # join the values with a space
+
+def deserialize(data):
+    if data == '':
+        return None
+
+    tree = data.split(' ') # split the string into an array
+    root = TreeNode(int(tree[0])) # create the root node
+    queue = deque([root])
+    i = 1 # start from the second node to skip the root node
+
+    while queue:
+        node = queue.popleft()
+        if tree[i] != '#':
+            node.left = TreeNode(int(tree[i]))
+            queue.append(node.left)
+        i += 1
+
+        if tree[i] != '#':
+            node.right = TreeNode(int(tree[i]))
+            queue.append(node.right)
+        i += 1
+
+    return root
 ```
 
 ---

@@ -63,6 +63,7 @@ There are several reasons why we use databases instead of Excel spreadsheets:
   ![RDB](./img/rdb-1.png)
 - `NoSQL (Document Model)` : can take a few different forms and are used for large sets of distributed data (like for use in micro service architectures).
 
+  - Useful for **Scalling**.
   - MongoDB [Document store]
   - Elasticsearch [Document store]
 

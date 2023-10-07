@@ -14,7 +14,6 @@
   - [`this` keyword](#this-keyword)
   - [component LifeCycles](#component-lifecycles)
     - [LifeCycles order of execution](#lifecycles-order-of-execution)
-  - [Error Boundaries](#error-boundaries)
 
 ---
 
@@ -437,49 +436,5 @@ LifeCycles methods diagram with order execution of component's methods
 2. `render()` method
 3. `componentDid...` methods -> (setting the new state)
 4. rerender using `render()` method again
-
----
-
-## Error Boundaries
-
-Error Boundaries basically provide some sort of boundaries or checks on errors, They are React components that are used to handle JavaScript errors in their `child component tree`.
-
-- Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed. Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
-- **must be used in class-components**
-- Error boundaries work like a JavaScript `catch {} block`, but for components.
-
-```jsx
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    logErrorToMyService(error, errorInfo);
-    // You can also log the error to an error reporting service
-    // console.error(error, errorInfo)
-  }
-
-  render() {
-    if (this.state.hasError) {
-      // You can render any custom fallback UI
-      return <h1>Something went wrong.</h1>;
-    }
-
-    return this.props.children;
-  }
-}
-
-// Then you can use it as a regular component:
-<ErrorBoundary>
-  <MyWidget />
-</ErrorBoundary>;
-```
 
 ---

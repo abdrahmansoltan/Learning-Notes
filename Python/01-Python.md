@@ -6,6 +6,7 @@
     - [The Style Guide](#the-style-guide)
   - [Data Types](#data-types)
   - [Operators](#operators)
+    - [Bitwise Operators](#bitwise-operators)
   - [Conditional Flow](#conditional-flow)
     - [Conditional Expressions](#conditional-expressions)
   - [Loops](#loops)
@@ -95,6 +96,8 @@ One of the oldest PEPs is **PEP 8**, which instructs Python programmers on how t
 ## Data Types
 
 A **Type** is a classification of data that tells the computer possible values for that type and the operations that can be performed on it
+
+Python has a number of built-in types, including integers, floating-point numbers, Booleans, sequences (such as strings, lists, tuples, and ranges), and dictionaries, as well as classes, instances, and exceptions. **All instances of these types are objects**.
 
 > In Python, everything is an object, and every object has a type
 
@@ -240,6 +243,65 @@ A **Type** is a classification of data that tells the computer possible values f
   - returns True if two variables are the same object-reference **in memory**
   - don't use it with immutable objects
   - In most programming situations, the equivalence tests `==` and `!=` are the appropriate operators; use of `is` and `is not` should be reserved for situations in which it is necessary to detect true **"aliasing"**.
+
+---
+
+### Bitwise Operators
+
+They are used to manipulate `bits` of numbers at the **binary** level.
+
+- **AND** -> `&`
+
+  - `1 & 1 = 1`
+  - `1 & 0 = 0`
+  - `0 & 1 = 0`
+  - `0 & 0 = 0`
+
+- **OR** -> `|`
+
+  - `1 | 1 = 1`
+  - `1 | 0 = 1`
+  - `0 | 1 = 1`
+  - `0 | 0 = 0`
+
+- **XOR** -> `^`
+
+  - `1 ^ 1 = 0`
+  - `1 ^ 0 = 1`
+  - `0 ^ 1 = 1`
+  - `0 ^ 0 = 0`
+
+- **NOT** -> `~`
+
+  - `~1 = 0`
+  - `~0 = 1`
+
+- **Left Shift** -> `<<` -> it shifts the bits to the left by the number of bits specified and adds `0s` to the end (right side)
+
+  - `x << y` -> `x * 2^y`
+  - `5 << 1` -> `5 * 2^1` -> `10`
+  - `5 << 2` -> `5 * 2^2` -> `20`
+
+- **Right Shift** -> `>>` -> it shifts the bits to the right by the number of bits specified and adds `0s` to the beginning (left side)
+
+  - `x >> y` -> `x / 2^y`
+  - `5 >> 1` -> `5 / 2^1` -> `2`
+  - `5 >> 2` -> `5 / 2^2` -> `1`
+
+- **Bitwise Operators Precedence**:
+
+  - `~` -> `<<` -> `>>` -> `&` -> `^` -> `|`
+
+- **Parity of a number**: it's the number of `1s` in the binary representation of that number
+
+  - number of `1s` is **odd** -> parity is `1`
+  - number of `1s` is **even** -> parity is `0`
+
+  ```py
+  # 5 -> 101 -> 2 1s -> parity is 0
+  # 6 -> 110 -> 2 1s -> parity is 0
+  # 7 -> 111 -> 3 1s -> parity is 1
+  ```
 
 ---
 

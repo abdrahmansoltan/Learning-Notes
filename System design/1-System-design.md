@@ -9,29 +9,26 @@
   - [DNS](#dns)
   - [CDN](#cdn)
   - [Web Server](#web-server)
-  - [Load Balancer](#load-balancer)
-    - [Load balancer distribution strategies](#load-balancer-distribution-strategies)
-    - [Session Persistence](#session-persistence)
   - [Proxies](#proxies)
     - [Forward Proxy](#forward-proxy)
     - [Reverse Proxy](#reverse-proxy)
+  - [Load Balancer](#load-balancer)
+    - [Load balancer distribution strategies](#load-balancer-distribution-strategies)
+    - [Consistent Hashing](#consistent-hashing)
+    - [Session Persistence](#session-persistence)
   - [Clustering](#clustering)
   - [Data Source](#data-source)
-    - [Database](#database)
-      - [CAP Theorem](#cap-theorem)
-    - [ACID \& BASE](#acid--base)
-    - [Caching Service](#caching-service)
-    - [Data Hose](#data-hose)
-    - [Data Warehouse](#data-warehouse)
-    - [Cloud Storage](#cloud-storage)
   - [Jobs](#jobs)
     - [Job server](#job-server)
     - [Job Queue](#job-queue)
   - [Services](#services)
+  - [Monitoring](#monitoring)
   - [Networking](#networking)
     - [OSI Model](#osi-model)
     - [TCP/IP](#tcpip)
     - [UDP](#udp)
+    - [Public vs Private IP](#public-vs-private-ip)
+    - [Ports](#ports)
   - [System Design Interview](#system-design-interview)
   - [System Design Questions](#system-design-questions)
 
@@ -44,11 +41,32 @@
 ![System Design](./img/system-design-1.png)
 
 - It's a process of defining the architecture, modules, interfaces, and data for a system to satisfy specified requirements.
+- It's mainly about 3 things:
+
+  - **Move Data**: how to move data from one place to another
+    - in the same server -> `RAM` to `CPU`
+    - in different servers -> `Client` to `Server`
+  - **Store Data**: how to store data
+    - in the same server -> `RAM` to `Disk`
+    - in different servers -> `Database` to `Caching Service`
+    - in the cloud -> `Database` to `Cloud Storage`
+  - **Process Data**: how to process & transform data
+
+- Bad design choices are hard to change later. so, we need to make sure that we make the right design choices from the beginning.
+  - Ex: choosing the wrong database, means that we'll have to change the entire system later by:
+    - changing the database
+    - migrating the data to the new database
+    - changing the code to work with the new database
+    - etc.
+
+---
 
 ### Goal of system design
 
 As you go up in seniority, you'll be expected to be able to design systems that are **scalable**, **reliable**, **highly available**, **secure**, **maintainable**, etc.
 
+- Usually, we won't have the prefect solution, but we need to figure out which option is the best. by trading off between the different options.
+  - > So system design is not about memorizing some facts. instead, it's about the **Thought process** by analyzing what improvements can be made and sacrifices can be made to make the system better.
 - When you're junior, mid-level, or early senior, you'll usually interact with **Low-level** code. like: **"Business logic"**, **"Application logic"**, **"Database"**, **"CI/CD"**, **"Dockers"**, **"Kubernetes"**, etc.
 - But when you're senior, you'll usually interact with **High-level** code. like: **"System design"**, **"Architecture"**, **"Data modeling"**, **"Microservices"**, **"Scalability"**, **"Reliability"**, **"High availability"**, **"Security"**, **"Maintainability"**, etc.
 
@@ -62,20 +80,42 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
   - Usually we use **"The nines of availability"** to measure the availability of a system.
     ![Availability](./img/availability-3.png)
+  - When we reduce the `down time`, we increase the `availability`.
+    - downtime `1% -> 0.1%` -> availability `99% -> 99.9%`
+    - downtime `0.1% -> 0.01%` -> availability `99.9% -> 99.99%`
+    - downtime `0.01% -> 0.001%` -> availability `99.99% -> 99.999%`
 
 - **Reliability**: the system should be reliable. (no data loss or crashes)
   ![Reliability](./img/reliability-1.png)
   ![Reliability](./img/reliability-2.png)
+
   - Usually we want to figure out if the system is reliable to perform its functionality without errors.
     - we do this by reducing the amount of errors. Or increasing the mean time between failures (`MTBF`).
+
+- **Service level objective (SLO)**: is a target value or range of values for a service level that is measured by a service level indicator. (it's a way to measure the availability and reliability of a system).
+- **Service level indicator (SLI)**: is a **measure** of **reliability** and **availability** of a system. (it's a way to measure the availability and reliability of a system).
+  - Ex: `CPU`, `RAM`, `Disk`, `Network`, etc.
+- **Service level agreement (SLA)**: is a **commitment** between a **service provider** and a **client**. (it's a way to measure the availability and reliability of a system).
+  - It's usually a **contract** between the **service provider** and the **client**. (it's a way to measure the availability and reliability of a system).
 
 ---
 
 ### Important concepts
 
 - **Latency**: the time it takes for a request to go from the client to the server and back.
+  - it can be caused by: `network`, `server`, `database`, `caching service`, etc.
 - **Single point of failure**: a component that if it fails, the entire system will fail.
   ![Single point of failure](./img/single-point-of-failure.png)
+- **Fault tolerance**: the ability of a system to continue operating even if there's a failure in one of its components.
+  - It's related to **Reliability**
+- **Redundancy**: having multiple components that do the same thing. (having a backup component).
+  - It's related to **Reliability**
+- **Throughput**: the amount of operations or data that can be processed (handle) in a period of time.
+  - ex:
+    - how many users can the system handle in second (`requests per second`).
+    - how many queries can the database handle in second (`queries per second`).
+    - data transfer rate (`bits per second`).
+  - It's related to **Scalability**
 
 ---
 
@@ -100,7 +140,7 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
 - usually a website has multiple servers, and each server has a different IP address. So, when a user types a domain name in the browser, the browser sends a request to the DNS server to get the IP address of the server that has the website.
 - IP address from the DNS has multiple formats:
-  - `IPv4`: 4 numbers separated by dots.
+  - `IPv4`: 4 numbers separated by dots. each number has max of `255` numbers.
     - `69.63.176.13`
   - `IPv6`: 8 groups of 4 hexadecimal digits separated by colons.
     - `2001:0db8:85a3:0000:0000:8a2e:0370:7334`
@@ -111,8 +151,9 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
 ## CDN
 
-**CDN** is a **Content Delivery Network**. It's a network of servers that distributes the content to the client. It also stores the content in the cache.
+**CDN** is a **Content Delivery Network**. It's a network of servers that distributes the content to the client. It's a way that we can cache data closer to the client so that we don't have to send requests across the world.
 
+- It's goal is to bring the content closer to the client.
 - It holds the files that you want to serve to the client, to prevent the client from requesting the files from the server directly in case the files are already cached in the CDN.
 - It uses **"Edge servers"** to store the files. and it uses **"Load Balancer"** to distribute the traffic between the servers.
 
@@ -154,17 +195,84 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
 ---
 
+## Proxies
+
+**Proxy** is a server that acts as a middleman between the client and the server.
+
+- It **abstracts** one side from the other. so, the client won't know about the server, and the server won't know about the client.
+
+### Forward Proxy
+
+- It sets between the `client` and the `internet`, and it's not part of the system.
+  ![Proxy](./img/proxy-1.png)
+  - It communicates between:
+    - `client` and `proxy`
+    - `proxy` and `internet`
+  - This way the client won't directly access the internet. instead, it will access it through the proxy.
+- It's on the `client` side. and it's usually used for security reasons.
+- The proxy can:
+  - **hide** the `client` IP address ( client's details ) from the `internet`.
+  - modify the request before sending it to the `internet`.
+  - block certain websites.
+
+---
+
+### Reverse Proxy
+
+- It sets between the `server` and the `internet`, and it's part of the system.
+  ![Proxy](./img/proxy-2.png)
+
+- It acts as an **entry point** to the system.
+  - It receives the request from the `internet` before it reaches the `server`. and then it forwards the request to the `server`.
+- It can:
+  - **hide** the `server` details from the `internet`. as the `internet` will only see the `proxy` IP address.
+- It's very similar to the **Load Balancer**. but, it's not the same.
+  - **Load Balancer** is used to distribute the traffic between the servers.
+    - > in fact, many **Load Balancers** are also **Reverse Proxies**. like: `Nginx`, `HAProxy`, etc.
+  - **Reverse Proxy** is used to hide the `server` details from the `internet`.
+    - when using a **Reverse Proxy** also as a **Load Balancer**, we get best of both worlds. as we get the **Load Balancer** functionality and the **Reverse Proxy** functionality like:
+      - caching.
+      - compression.
+
+---
+
 ## Load Balancer
 
 **Load Balancer** is a **server** that **distributes** the **traffic** between the **servers**.
 
+- It's a type of **Reverse Proxy**. as it's used to hide the `server` details from the `internet` and distribute the traffic between the servers.
+  ![Load Balancer](./img/load-balancer-0.png)
 - Without it, we don't know which server to send the request to. and it may result in overloading a server.
   ![Load Balancer](./img/load-balancer-1.png)
 - So, we need something to **evenly-distribute** the traffic between the servers. and that's the **Load Balancer**.
+
   - It acts as the **"Entry point"** for the system.
   - It knows if a server is down or not. and it can **redirect** the traffic to another server.
+
+- Also, it's used to **horizontal scale** the system. as we can add more servers and the **Load Balancer** will distribute the traffic between them.
 - Usually to prevent breaking the entire system if the **Load Balancer** is down, we use a redundant backup load balancer
   ![Load Balancer](./img/load-balancer-8.png)
+
+- There's multiple types of **Load Balancers**:
+
+  - **Layer 4 Load Balancer**: it's a **TCP Load Balancer**. it's used to distribute the traffic based on the `IP address` and the `port number`.
+    - It's faster than the **Layer 7 Load Balancer**. as it doesn't need to look at the `URL` and the `HTTP headers` and only looks at the `IP address` and the `port number`.
+  - **Layer 7 Load Balancer**: it's an **Application layer (HTTP Load Balancer)**. it's used to distribute the traffic based on the `URL` and the `HTTP headers`.
+    - It's more advanced than the **Layer 4 Load Balancer**. as it can distribute the traffic based on the `URL` and the `HTTP headers`.
+      - it establishes connections using the `URL` and the `HTTP headers`. So it's more expensive.
+    - It's usually used for **HTTP** and **HTTPS** traffic.
+    - It's slower than the **Layer 4 Load Balancer**. as it needs to look at the `URL` and the `HTTP headers` and not only the `IP address` and the `port number`.
+    - It just **forwards** the request to the server. So it's cheap.
+
+- Most common **Load Balancers** are:
+  - `Nginx` -> Open source (free)
+  - `HAProxy`
+  - `F5`
+  - `AWS ELB`
+  - `Azure Load Balancer`
+  - `Google Cloud Load Balancer`
+
+---
 
 ### Load balancer distribution strategies
 
@@ -185,9 +293,27 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
 ---
 
+### Consistent Hashing
+
+**Consistent Hashing** is a way to distribute the traffic based on the `URL` or the `IP address`.
+
+![Load Balancer](./img/conssistent-hashing-1.png)
+
+- This way, we can send the traffic to the same server. and it's usually used for servers with `caching` or `in-memory caching`.
+- Hashing Algorithm
+  ![Load Balancer](./img/conssistent-hashing-2.png)
+
+---
+
 ### Session Persistence
 
 **Session Persistence** is a way to keep the `session` on the same server.
+
+- Usually when using a distribution strategy like **Round Robin**:
+
+  - if we use `REST` API, then it's not a problem. as the `REST` API is **stateless**. so, the server doesn't need to remember the previous request.
+  - but, if we have a **stateful** `session` or the server has in-memory caching (ex: `Redis`), then it's a problem. as the server needs to remember the previous request.
+    - That's where **Session Persistence** or **Consistent Hashing** comes in.
 
 - if a client sends a request to a server, and the server sends back a response with a `session` cookie. then, the client sends another request to another server, the server won't have the `session` cookie. and it will create a new `session` for the client.
 - To solve this problem, we can use **"Sticky Session"**. which is a way to keep the `session` on the same server. **(maintain persistent connection between the client and the server)**.
@@ -195,45 +321,6 @@ As you go up in seniority, you'll be expected to be able to design systems that 
     ![Load Balancer](./img/load-balancer-3.png)
 - if the server (that has the `session` cookie) is down, the **Load Balancer** will redirect the client to another server. and the new server will create a new `session` for the client. or it can re-catch the `session` from the (client / load balancer).
   ![Load Balancer](./img/load-balancer-4.png)
-
----
-
-## Proxies
-
-**Proxy** is a server that acts as a middleman between the client and the server.
-
-### Forward Proxy
-
-- It sets between the `client` and the `internet`, and it's not part of the system.
-  ![Proxy](./img/proxy-1.png)
-  - It communicates between:
-    - `client` and `proxy`
-    - `proxy` and `internet`
-  - This way the client won't directly access the internet. instead, it will access it through the proxy.
-- It's on the `client` side. and it's usually used for security reasons.
-- The proxy can:
-  - hide the `client` IP address ( client's details ) from the `internet`.
-  - modify the request before sending it to the `internet`.
-  - block certain websites.
-
----
-
-### Reverse Proxy
-
-- It sets between the `server` and the `internet`, and it's part of the system.
-  ![Proxy](./img/proxy-2.png)
-
-- It acts as an **entry point** to the system.
-  - It receives the request from the `internet` before it reaches the `server`. and then it forwards the request to the `server`.
-- It can:
-  - hide the `server` details from the `internet`. as the `internet` will only see the `proxy` IP address.
-- It's very similar to the **Load Balancer**. but, it's not the same.
-  - **Load Balancer** is used to distribute the traffic between the servers.
-    - > in fact, many **Load Balancers** are also **Reverse Proxies**. like: `Nginx`, `HAProxy`, etc.
-  - **Reverse Proxy** is used to hide the `server` details from the `internet`.
-    - when using a **Reverse Proxy** also as a **Load Balancer**, we get best of both worlds. as we get the **Load Balancer** functionality and the **Reverse Proxy** functionality like:
-      - caching.
-      - compression.
 
 ---
 
@@ -261,105 +348,7 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
 ## Data Source
 
-### Database
-
-**Database** is a **software** that **stores** and **manages** the **data**.
-
-- It communicates with the Application/Business logic in the Web Server.
-  - This is the process which usually takes the most time. as it's the process of reading/writing data.
-    ![Database](./img/database-1.png)
-- Usually the data requested by the client is regional or common and not specific to a single user. So, we can use **Caching** to increase the performance.
-
----
-
-#### CAP Theorem
-
-**CAP Theorem** is a theorem for designing databases in distributed systems. It states that it's impossible for a distributed system to simultaneously provide more than 2 out of 3 of the following guarantees:
-![CAP Theorem](./img/database-3.png)
-
-- **Consistency**: all nodes see the same data at the same time.
-  ![CAP Theorem](./img/database-4.png)
-  - This is usually achieved by updating several nodes before allowing further reads. in order to make sure that all nodes have the same data.
-    ![CAP Theorem](./img/database-5.png)
-  - So, no reads are allowed until all nodes are updated.
-    ![CAP Theorem](./img/database-6.png)
-    ![CAP Theorem](./img/database-7.png)
-- **Availability**: a guarantee that every request receives a response about whether it succeeded or failed.
-- **Partition tolerance**: the system continues to operate despite arbitrary message loss or failure of part of the system.
-  - in a system, if a point is down, then we have a **partition**. and if the system can still operate, then it's **partition tolerant**.
-  - For example, if a db is partitioned from other dbs, then it should still be able to operate even if it's partitioned and has **stale data** and the data is not guaranteed to be updated.
-    ![CAP Theorem](./img/database-8.png)
-  - If the system is not partition tolerant, then it won't be able to operate if a point is down ( will give error ).
-
-System can be categorized into 2 categories:
-
-- **CP**: Consistency and Partition tolerance.
-  - It's usually used in **"Relational Databases"**. like: `MySQL`, `PostgreSQL`, etc.
-  - It's usually used in **"Single Region"**. as it's not partition tolerant.
-- **AP**: Availability and Partition tolerance.
-  - It's usually used in **"NoSQL Databases"**. like: `MongoDB`, `Cassandra`, etc.
-  - It's usually used in **"Multi Region"**. as it's partition tolerant.
-- **CA**: Consistency and Availability.
-  - It's usually used in **"Single Region / Point"**. as it's not partition tolerant.
-    - It can't be in distributed systems.
-  - It's usually used in **"Databases"**. like: `Redis`, `Memcached`, etc.
-
----
-
-### ACID & BASE
-
-- **ACID** is a set of properties of **database transactions**. It's a way to make sure that the data is consistent.
-
-  - **Atomic** -> a transaction is either **all or nothing**. (either all the operations are done, or none of them are done).
-  - **Consistent** -> a transaction must be consistent. (it can't break the rules of the database).
-  - **Isolated** -> a transaction must be isolated. (it can't be affected by other transactions).
-  - **Durable** -> a transaction must be durable. (it can't be lost).
-
-- **BASE** is a set of properties of **database transactions**. It's a way to make sure that the data is consistent. (it's the opposite of `ACID`)
-  - **Basically Available** -> the system guarantees availability.
-  - **Soft state** -> the state of the system may change over time. (it's not guaranteed to be consistent).
-  - **Eventual consistency** -> the system will eventually become consistent once it stops receiving input.
-
----
-
-### Caching Service
-
-**Caching Service** is a service that stores the data in the memory.
-![Database](./img/database-2.png)
-
-- `Database` and `Caching Service` both store data. but, `Database` stores the data in the disk, while `Caching Service` stores the data in the memory.
-- `caching service` prioritize **speed** over **data storage**. so, it stores the data in the memory. and it's usually used for **read** operations.
-  - **It stores much less data, but retrieves it much faster**.
-- How it works:
-  - After the `web server` gets the request from the `client`, it checks if the data is in the `caching service` or not.
-  - if the data is in the `caching service`, it will send it back to the `web server`.
-  - if the data is not in the `caching service`, it will get it from the `database`, and then it will send it back to the `web server` then process the data and format it, and then send it back to the `client`. and **concurrently** it will store the data in the `caching service`.
-
----
-
-### Data Hose
-
-**Data Hose** is a service that receives the raw data from the (`web server` / `client`) and then it processes ( massages ) the data and then it sends it to the `data warehouse`.
-
-![Data Hose](./img/data-hose-1.png)
-
-- It's like a **pipe** which is a **middleman** between the `web server` and the `data warehouse`.
-- Ex: `Kafka`, `Kinesis`, etc.
-
----
-
-### Data Warehouse
-
-**Data Warehouse** is a service that **stores** the **data**.
-
----
-
-### Cloud Storage
-
-**Cloud Storage** is a service that stores the data in the cloud.
-
-- It's like a `database`, but it's not a `database`. as it's not a `database` that is installed on a server. instead, it's a `database` that is installed on the cloud.
-- Ex: `Amazon S3`, `Google Cloud Storage`, etc.
+[Here](./4-Data.md)
 
 ---
 
@@ -396,6 +385,18 @@ System can be categorized into 2 categories:
 
 **Job Queue** is a way to **queue** the **jobs**. (way to know how job servers should execute the jobs).
 
+> It's also known as **"Message Queue"**
+
+- When we have a large number of application events in a fast-paced that the `server` can't handle. we can use a `job queue` to queue the jobs. and then the `job server` will execute the jobs later.
+- This would enable us to scale the system. as we can make us handle more requests by queueing the jobs so that the server can handle them later.
+- Most popular `job queues` are:
+  - `RabbitMQ` ✅
+  - `Kafka` ✅
+  - `Redis` ✅
+  - `Amazon SQS`
+  - `Google Cloud Pub/Sub`
+  - `Azure Service Bus`
+
 ---
 
 ## Services
@@ -421,6 +422,19 @@ System can be categorized into 2 categories:
 
 ---
 
+## Monitoring
+
+**Monitoring** is a way to monitor the system. It's a way to know if the system is working properly or not.
+
+![Monitoring](./img/monitoring-1.png)
+
+- It's usually done by seeing the **logs**. and it's usually done by a **monitoring service**.
+- We can use the `logs` to create **Metrics** and **Alerts**.
+  - **Metrics** are a way to measure the system. (like: `CPU`, `RAM`, `Disk`, `Network`, etc).
+  - **Alerts** are a way to notify the system admin if there's a problem in the system. (like: `CPU` is high, `RAM` is high, `Disk` is full, low metrics (below the threshold), etc).
+
+---
+
 ## Networking
 
 - `TCP/IP` model is specific for the internet
@@ -440,17 +454,32 @@ As long as 2 computers are communicating, We can use the `OSI` model to abstract
 
 - It consists of 2 protocols:
 
-  - **TCP**: it's a **connection-oriented** protocol. It's used to **send** and **receive** data between 2 computers. It's **reliable** and **ordered**.
-    - It has error-checking mechanism. (it checks if the data is received completely or not).
-  - **IP**: it's a **connectionless** protocol. It's used to **send** and **receive** data between 2 computers. It's **unreliable** and **unordered**.
+  - **TCP**: it's a **connection-oriented** protocol. It's used to **send** and **receive** data between 2 computers. It's **reliable** and **ordered** but it's **slow**.
 
-- How it works:
-  ![TCP/IP](./img/tcp-ip-1.png)
-  1. The `client` generates a `ISN` (Initial Sequence Number) and sends it to the `server`.
-  2. The `server` generates a `ISN` and sends it to the `client`.
-  3. Now, both the `client` and the `server` have a `ISN`. and they can start sending data to each other.
-  4. The `client` sends a `SYN` (Synchronize ISN) to the `server`. Then the `server` sends a `SYN-ACK` (Synchronize ISN - Acknowledgement) to the `client` to let it know that it received the `SYN`.
-  5. The process continues until the `client` and the `server` each time increase the `ISN` by `1` until they reach the `ISN` that they received from the other side.
+    - It has error-checking mechanism. (it checks if the data is received completely or not).
+
+  - **IP**: it's a **connectionless** protocol. It's used to **send** and **receive** data between 2 computers. It's **unreliable** and **unordered**.
+    - `IPv4` -> it's `32` bits. (it has `4` bytes). each byte has max of `255` numbers
+      - `256.256.256.256` -> `4` billion addresses.
+    - `IPv6` -> it's `128` bits. (it has `16` bytes). each byte has max of `255` numbers
+      - it's used to solve the problem of `IPv4` addresses running out. as `IPv4` has only `4` billion addresses. and `IPv6` has `340` undecillion addresses.
+
+- **How it works:**
+
+  - It depends on **"Handshake"** to establish a connection between the `client` and the `server`. it's called: **"3-way handshake"**.
+    ![TCP/IP](./img/tcp-ip-2.png)
+
+    - The `client` sends a `SYN` (Synchronize) to the `server`. Then the `server` sends a `SYN-ACK` (Synchronize - Acknowledgement) to the `client` to let it know that it received the `SYN`. Then the `client` sends an `ACK` (Acknowledgement) to the `server` to let it know that it received the `SYN-ACK`.
+      ![TCP/IP](./img/tcp-ip-3.png)
+    - The process continues until the `client` and the `server` each time increase the `ISN` by `1` until they reach the `ISN` that they received from the other side.
+
+  - Steps:
+    ![TCP/IP](./img/tcp-ip-1.png)
+    1. The `client` generates a `ISN` (Initial Sequence Number) and sends it to the `server`.
+    2. The `server` generates a `ISN` and sends it to the `client`.
+    3. Now, both the `client` and the `server` have a `ISN`. and they can start sending data to each other.
+    4. The `client` sends a `SYN` (Synchronize ISN) to the `server`. Then the `server` sends a `SYN-ACK` (Synchronize ISN - Acknowledgement) to the `client` to let it know that it received the `SYN`.
+    5. The process continues until the `client` and the `server` each time increase the `ISN` by `1` until they reach the `ISN` that they received from the other side.
 
 ---
 
@@ -461,11 +490,32 @@ As long as 2 computers are communicating, We can use the `OSI` model to abstract
 ![UDP](./img/udp-1.png)
 
 - It's much faster than `TCP`. as it doesn't have the error-checking mechanism. (it doesn't check if the data is received completely or not).
-- **connection-less** means that it doesn't establish a connection between the `client` and the `server`. instead, it just sends the data to the `server` and assumes that the `server` received it.
+- It's **connection-less** means that it doesn't establish a connection between the `client` and the `server`. instead, it just sends the data to the `server` and assumes that the `server` received it.
   - This make it doesn't consume much resources. as it doesn't have to establish a connection.
 - It's used in cases where we don't care about the data loss. like: `VoIP`, `Video Streaming`, `Online Gaming`, etc.
   - This is because if there's a data loss, it will get corrected in the next data packet anyway. (as it's a stream of data).
 - So, we use `UDP` when we care about the speed and consistency. and we use `TCP` when we care about the reliability ( data loss ) and order.
+
+---
+
+### Public vs Private IP
+
+- **Public IP** is an IP address that is **public** and **unique**. (it's the IP address that is used to communicate with the internet).
+
+  - Ex: `Router`, `Load Balancer`, `Server`, etc.
+
+- **Private IP** is an IP address that is **private** and **not unique**. (it's the IP address that is used to communicate with the local network).
+
+---
+
+### Ports
+
+**Port** is a **communication endpoint**. It's a way to identify a specific process to which an **Internet message** or **request** is to be forwarded when it arrives at a server.
+
+- The default port for `HTTP` is `80`.
+- The default port for `HTTPS` is `443`.
+  - That's why when we type `https://www.google.com` in the browser, it will send a request to `https://www.google.com:443`.
+- We can't have multiple applications listening on the same port. as the port is used to identify the application.
 
 ---
 

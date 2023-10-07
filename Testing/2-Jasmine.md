@@ -59,7 +59,7 @@
 
 - configurations for a basic Jasmine configuration -> [jasmine.json](../1-Backend%20Development%20with%20Node.js/Configuring%20Jasmine/jasmine.json)
 
-- In the `tsconfig.json` file, add "`spec`" to the list of folders that we want to exclude as it doesn't has `ts` files it it
+- In the `tsconfig.json` file, add "`spec`" to the list of folders that we want to exclude as it doesn't have `ts` files it it
 
   ```json
     "exclude": ["node_modules", "./dist", "spec"]

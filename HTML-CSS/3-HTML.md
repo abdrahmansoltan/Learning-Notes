@@ -363,9 +363,21 @@ Why do we need to tell the browser what our HTML elements represent?
   </fieldset>
   ```
 
-- `<button>` element is used to submit a form
+- `<button>` element is used to **( submit or reset )** a form.
 
   - Every `<button>` element inside a form works as a Submit button by default. Sometimes you don't want this. To disable the default Submit behavior, you can add **type="button"** to the `<button>`. This tells the browser that the `<button>` should not submit the form.
+
+    ```html
+    <!-- submit button -->
+    <button type="submit">Submit</button>
+
+    <!-- reset button (resets the form to its initial state) -->
+    <button type="reset">Reset</button>
+
+    <!-- button without default behavior -->
+    <button type="button">Click me</button>
+    ```
+
   - You can also use an `<input>` element with type="submit" instead of a `<button>` element. The input looks and behaves just like a `<button>`. Instead of using a `<label>` element to describe the `<input>`, use the value attribute instead.
 
     ```html
@@ -376,12 +388,13 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ### Autofill Forms
 
-Autofill can help with re-entering data. You enter your address once. From now on, your browser will offer you the option to fill in the same address for other forms automatically.
+**Autofill** can help with re-entering data. You enter your address once. From now on, your browser will offer you the option to fill in the same address for other forms automatically.
 
+- It works with the **Password Manager** in your browser. The Password Manager stores your passwords and other data, such as addresses, credit card numbers, and so on.
 - Use sensible attribute values
   - Browsers can identify the data type by looking at the **attributes** of a form control.
   - Do you have a field where users should enter their email address? Use email as a value for the name, id, and type attribute. Three hints for the browser that this is an email field.
-- use The `autocomplete` attribute
+- It's done using the `autocomplete` attribute
 
   ```html
   <input type="text" name="name" id="name" autocomplete="name" />
