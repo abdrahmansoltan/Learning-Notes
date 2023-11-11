@@ -2,10 +2,10 @@
 
 - [INDEX](#index)
   - [OOP](#oop)
-    - [Object-Oriented Design Principles](#object-oriented-design-principles)
-      - [Modularity Principle](#modularity-principle)
-      - [Abstraction Principle](#abstraction-principle)
-      - [Encapsulation Principle](#encapsulation-principle)
+  - [Object-Oriented Design Principles](#object-oriented-design-principles)
+    - [Modularity Principle](#modularity-principle)
+    - [Abstraction Principle](#abstraction-principle)
+    - [Encapsulation Principle](#encapsulation-principle)
   - [Classes](#classes)
     - [The `self` Identifier](#the-self-identifier)
     - [Constructor](#constructor)
@@ -27,17 +27,19 @@ The main “actors” in the object-oriented paradigm are called objects. Each o
 
 ![instance](./img/oop-instance.png)
 
-### Object-Oriented Design Principles
+---
+
+## Object-Oriented Design Principles
 
 ![oop principles](./img/oop-principles.png)
 
-#### Modularity Principle
+### Modularity Principle
 
 - Modern software systems typically consist of several different components that must interact correctly in order for the entire system to work properly. Keeping these interactions straight requires that these different components be well organized.
 - Modularity refers to an organizing principle in which different components of a software system are divided into separate functional units (modules).
 - This is particularly relevant in a study of **data structures**, which can typically be designed with sufficient abstraction and generality to be reused in many applications.
 
-#### Abstraction Principle
+### Abstraction Principle
 
 - The notion of abstraction is to distill a complicated system down to its most fundamental parts. Typically, describing the parts of a system involves naming them and explaining their functionality.
 - Applying the abstraction paradigm to the design of data structures gives rise to abstract data types (**ADTs**).
@@ -47,7 +49,7 @@ The main “actors” in the object-oriented paradigm are called objects. Each o
   - > The description of this as “duck typing” comes from an adage attributed to poet James Whitcomb Riley, stating that “when I see a bird that walks like a duck and swims like a duck and quacks like a duck, I call that bird a duck.”
 - Python supports abstract data types using a mechanism known as an **abstract base class (ABC)**. An abstract base class cannot be instantiated (i.e., you cannot directly create an instance of that class), but it defines one or more common methods that all implementations of the abstraction must have. An ABC is realized by one or more concrete classes that inherit from the abstract base class while providing implementations for those method declared by the `ABC`.
 
-#### Encapsulation Principle
+### Encapsulation Principle
 
 - Different components of a software system should not reveal the internal details of their respective implementations.
 - One of the main advantages of encapsulation is that it gives one programmer freedom to implement the details of a component, without concern that other programmers will be writing code that intricately depends on those internal decisions.
@@ -73,8 +75,9 @@ The main “actors” in the object-oriented paradigm are called objects. Each o
 
 Each instance from a class must maintain its own properties & methods. Therefore, each instance stores its own instance variables to reflect its current state.
 
-> **`self`** identifies the instance upon which a method is invoked
+> **`self`** identifies the **created instance** upon which a method is invoked
 
+- It initializes an empty object that refers to the newly created instance, and which is passed as the first parameter to the `__init__` method.
 - when using a class-method that is called with one parameter, for example, as my `card.charge(200)`. The `self` parameter is not passed explicitly by the programmer when invoking a method. Instead, the interpreter automatically binds the instance upon which the method is invoked to the `self` parameter.
 
 ---
@@ -120,6 +123,38 @@ class Person:
 
 > When a binary operator is applied to two instances of different types, as in **3 \* "love me"** , Python gives deference to the class of the left operand. In this example, it would effectively check if the int class provides a sufficient definition for how to multiply an instance by a string, via the `__mul__` method. However, if that class does not implement such a behavior, Python checks the class definition for the right-hand operand, in the form of a special method named `__rmul__` (i.e., “right multiply”). This provides a way for a new user-defined class to support mixed operations that involve an instance of an existing class (given that the existing class would presumably not have defined a behavior involving this new class).
 
+```py
+class Person:
+    def __init__(self, first_name, last_name, age):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.age = age
+
+    # overloading the + operator to add the ages of two people
+    def __add__(self, other):
+        return self.age + other.age
+
+    # overloading the * operator to multiply the ages of two people
+    def __mul__(self, other):
+        return self.age * other.age
+
+    # overloading the str() function to return the full name of a person
+    def __str__(self):
+        return f'Person({self.first_name},{self.last_name},{self.age})'
+
+    # overloading the repr() function to return the full name of a person
+    def __repr__(self):
+        return f'Person({self.first_name},{self.last_name},{self.age})'
+
+    john = Person('John', 'Sam', 36)
+    john2 = Person('John', 'Sam', 36)
+
+    print(john + john2) # 72
+    print(john * john2) # 1296
+    print(str(john)) # Person(John,Sam,36)
+    print(repr(john)) # Person(John,Sam,36)
+```
+
 ---
 
 ### Class Methods
@@ -129,7 +164,7 @@ class Person:
   - Methods that modify the state of an object are known as **mutators**.
   - Methods that return information about the state of an object are known as **accessors**.
 
-- Adding a method: `get_full_name()` method is used to return string
+- **Instance Method**
 
   ```py
   class Person:
@@ -146,8 +181,43 @@ class Person:
   ```
 
 - **Class Method**
-  - here we use the decorator **"`@`"**
+
+  - here we use the decorator `@classmethod` to define a class method that is invoked on the class rather than on an instance of the class
     ![class-methods](./img/class-methods.png)
+  - it uses the `cls` identifier (`class` is a reserved keyword in Python)
+  - It's usually used to instantiate a class from a string
+  - To solve the problem of "The chicken or the egg" -> "How to create an instance of a class from a string if we don't have an instance of the class yet?"
+    - We can use a `class method` to create an instance of a class from a string
+    - Then we can use that instance to create other instances of the class
+    - Python knows the order of execution of the code when it sees **`@classmethod` decorator**
+
+  ```py
+  class Person:
+      def __init__(self, first_name, last_name, age):
+          self.first_name = first_name
+          self.last_name = last_name
+          self.age = age
+
+      def get_full_name(self):
+          return f'Person({self.first_name},{self.last_name},{self.age})'
+
+      @classmethod
+      def from_string(cls, string):
+          first_name, last_name, age = string.split(',')
+          return cls(first_name, last_name, age)
+
+      john = Person('John', 'Sam', 36)
+      print(john.get_full_name())
+
+      john2 = Person.from_string('John,Sam,36')
+      print(john2.get_full_name())
+  ```
+
+- Difference between `instance method` and `class method`
+  - `instance method` is invoked on an instance of the class
+  - `class method` is invoked on the class itself
+  - `instance method` takes `self` as the first parameter (because it refers to the instance itself)
+  - `class method` takes `cls` as the first parameter (because it refers to the class itself)
 
 ---
 

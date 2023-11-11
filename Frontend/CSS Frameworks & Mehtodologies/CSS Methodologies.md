@@ -4,7 +4,11 @@
   - [CSS Methodologies](#css-methodologies)
   - [Object-Oriented CSS (OOCSS)](#object-oriented-css-oocss)
     - [OOCSS Example](#oocss-example)
-  - [Block Element Modifier BEM](#block-element-modifier-bem)
+  - [Block Element Modifier (BEM)](#block-element-modifier-bem)
+    - [Block](#block)
+    - [Element](#element)
+    - [Modifier](#modifier)
+    - [BEM file structure](#bem-file-structure)
     - [BEM Notes](#bem-notes)
   - [Scalable and Modular Architecture for CSS (SMACSS)](#scalable-and-modular-architecture-for-css-smacss)
     - [SMACSS Categories](#smacss-categories)
@@ -122,67 +126,168 @@ One goal of the OOCSS methodology is to reduce duplication of the same propertie
 
 ---
 
-## Block Element Modifier BEM
+## Block Element Modifier (BEM)
 
-BEM stands for Block Element Modifier. It is a naming convention (**CSS class-naming system**) for classes in HTML and CSS. The idea behind BEM is to differentiate CSS classes that fulfill different roles. This is done by naming CSS classes in a way that indicates their role. It provides a rather strict way to arrange your CSS classes into independent modules.
+**BEM** stands for **"Block Element Modifier"**. It is a naming convention (**CSS class-naming system**) for classes in HTML and CSS.
 
-BEM gives everyone on a project a declarative syntax that they can share so that they’re on the same page.
+The idea behind it is to divide the user interface into independent blocks. This is done by differentiating CSS classes that fulfill different roles. This is done by naming CSS classes in a way that indicates their role. It provides a rather strict way to arrange your CSS classes into independent modules.
 
 > BEM complements **OOCSS** because OOCSS doesn’t impose any particular class-naming convention.
+
+![BEM](./img/bem.png)
 
 ```css
 .block {
 }
+
 .block__element {
 }
+
 .block--modifier {
 }
+
 .block__element--modifier {
 }
 ```
 
-![bem](./img/bem2.PNG)
-![BEM](./img/bem.PNG)
 ![bem](./img/bem.jpg)
 
-- **Block**: The sole root of the component, represents an object in your website. It is an independent (stand alone entity and meaningful on its own), modular UI component. A block may be composed of multiple HTML elements, or even multiple blocks. For example:
-  - a person
-  - a login form
-  - a menu
-  - a search form
-- **Element**: is a component within the block that performs a particular function. and it has no standalone meaning and is semantically tied to its block. It should only make sense in the context of its block. For example:
-  - a hand
-  - a login button
-  - a menu item
-  - a search input field
-- **Modifier**: is how we represent the variations of a block (a flag orn a block or element used to change appearance and/or behavior). For example:
+### Block
 
-  - a tall/short person
-  - a condensed login form (e.g. we’re hiding the labels in one version)
-  - a menu modified to look differently for a footer or sitemap
-  - a search input field with a particular button style
-  - A modifier can't be used alone
-
-- also you can use `helper class` which is used when you have an item that is used many times but in one place of its use we want to add a css-property to it 'like margin-right-small'
+- Describes its purpose ("What is it?" — `menu` or `button`), not its state ("What does it look like?" — `red` or `big`).
 
   ```html
-  <a href="#" class="btn btn--full margin-right-sm">click here!</a>
+  <!-- Correct. The `error` block is semantically meaningful -->
+  <div class="error"></div>
+
+  <!-- Incorrect. It describes the appearance -->
+  <div class="red-text"></div>
   ```
 
-  ```css
-  /* HELPER/SETTINGS CLASSES */
+- It is an independent (stand alone entity and meaningful on its own), modular UI component.
+- A block may be composed of multiple HTML elements, or even multiple blocks.
+  - Blocks can be nested in each other.
+- You also shouldn't use CSS `tag` or `ID` selectors when using BEM.
 
-  .margin-right-sm {
-    margin-right: 1.6rem !important;
-  }
+---
 
-  .margin-bottom-md {
-    margin-bottom: 4.8rem !important;
-  }
+### Element
 
-  .center-text {
-    text-align: center;
-  }
+- is a component within the block that performs a particular function. and it has no standalone meaning and is semantically tied to its block. It should only make sense in the context of its block.
+
+  ```html
+  <!-- `search-form` block -->
+  <form class="search-form">
+    <!-- `input` element in the `search-form` block -->
+    <input class="search-form__input" />
+
+    <!-- `button` element in the `search-form` block -->
+    <button class="search-form__button">Search</button>
+  </form>
+  ```
+
+- **Nesting:** Elements can be nested inside each other. An element is always part of a block, not another element. This means that element names can't define a hierarchy such as `block__elem1__elem2`
+
+  ```html
+  <!-- Correct ✅ -->
+  <form class="search-form">
+    <div class="search-form__content">
+      <input class="search-form__input" />
+
+      <button class="search-form__button">Search</button>
+    </div>
+  </form>
+
+  <!-- Incorrect ❌ -->
+  <form class="search-form">
+    <div class="search-form__content">
+      <!-- Recommended: `search-form__input` or `search-form__content-input` -->
+      <input class="search-form__content__input" />
+
+      <!-- Recommended: `search-form__button` or `search-form__content-button` -->
+      <button class="search-form__content__button">Search</button>
+    </div>
+  </form>
+  ```
+
+- **Membership:** An element is always part of a block, and you shouldn't use it separately from the block.
+
+  ```html
+  <!-- Correct ✅ -->
+  <form class="search-form">
+    <input class="search-form__input" />
+  </form>
+
+  <!-- Incorrect ❌ -->
+  <form class="search-form"></form>
+  <input class="search-form__input" />
+  ```
+
+- **Optionality:** An element is an optional block component. Not all blocks have elements.
+
+---
+
+### Modifier
+
+- It's an entity that defines the appearance, state, or behavior of a block or element.
+
+  - appearance -> (what size? or which theme)
+  - state -> (How does it look in a particular state? Is it hidden? Is it expanded? Is it marked as important?)
+  - behavior -> (How does it behave? Is it interactive? Is it draggable? Is it droppable?)
+
+- Types of modifiers:
+
+  - **Boolean:** used when only the presence or absence of a feature is important, and the value is irrelevant. if a boolean modifier is present, its value is assumed to be `true`.
+
+    ```html
+    <!-- Correct ✅ -->
+    <button class="button button--disabled">...</button>
+    <!-- Incorrect ❌ -->
+    <button class="button button--disabled-true">...</button>
+    ```
+
+  - **Key-value:** used when the modifier value is important. The value can be anything: a number, a string, a color, a boolean, etc.
+
+    - Structure:
+      - `block-name--modifier-name_modifier-value`
+      - `block-name__element-name--modifier-name_modifier-value`
+
+    ```html
+    <!-- Correct ✅ -->
+    <button class="button button--size_large">...</button>
+    <!-- Incorrect ❌ -->
+    <button class="button button--large">...</button>
+    ```
+
+- A modifier can't be used alone
+
+  - It can't be used in isolation from the block or element that it modifies. It should change the appearance, state, or behavior of the block or element, not replace it.
+
+---
+
+### BEM file structure
+
+- **BEM** is a naming convention, not a file structure. You can use it with any file structure you like. but if you want to adopt the **component-approach** also in the file structure, you can apply it like this:
+
+  - A single block corresponds to a single file/directory, and named like the block. (e.g. `header/`).
+  - Names of element directories/files are prefixed with double underscore (`__`) (e.g. `header/__logo/`).
+  - Names of modifier directories/files are prefixed with single underscore (`_`) (e.g. `header/_color/`).
+
+- EX:
+
+  ```sh
+  # File structure
+  ├── header/
+  │   ├── header.css
+  │   ├── __logo/
+  │   │   ├── header__logo.css
+  │   │   ├── header__logo.png
+  │   │   └──
+  │   └── _color/
+  │       ├── header_color_red.css
+  │       ├── header_color_green.css
+  │
+  └──
   ```
 
 ---
@@ -210,6 +315,11 @@ BEM gives everyone on a project a declarative syntax that they can share so that
     color: red;
   }
   ```
+
+- **Should I create a block or an element?**
+
+  - Create a block if a section of code might be reused and works on its own.
+  - Create an element if a section of code is tied to a parent block and can’t be used on its own.
 
 - **Sass and BEM**: For those of you writing Sass and enjoy nesting as a way of scoping styles, you can still author in a nested format, but get CSS that isn’t nested, with `@at-root`
 

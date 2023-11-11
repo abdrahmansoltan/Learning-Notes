@@ -845,17 +845,18 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
 
 - EX: `validate(root) --> True`
 - Explanation:
+
   - The first solution that comes into mind is to check the `right` & `left` children of each node and check if they're less than or greater than the root node
     - but that's not enough because the right child of the root node might be less than the root node, but it's greater than the left child of the root node.
       ![validate bst](./img/validate-bst-1.png)
-  - So we can't just check the neighbors and children one time and we have to check the whole tree for each node -> `O(n^2)` **BAD!**
-- **Solution** is to use ranges for each point:
-  ![validate bst](./img/validate-bst-2.png)
+    - So we can't just check the neighbors and children one time and we have to check the whole tree for each node -> `O(n^2)` **BAD! ❌**
+  - **Solution** is to use ranges for each point ✅:
+    ![validate bst](./img/validate-bst-2.png)
 
-  - root node should be in the range of `(-inf, inf)`
-    - we use infinity because we don't know the values of the nodes in the tree
-  - left child of the root node should be in the range of `(-inf, root.value)`
-  - right child of the root node should be in the range of `(root.value, inf)`
+    - root node should be in the range of `(-inf, inf)`
+      - we use infinity because we don't know the values of the nodes in the tree
+    - left child of the root node should be in the range of `(-inf, root.value)`
+    - right child of the root node should be in the range of `(root.value, inf)`
 
 - **Solution 1:** Using `min` and `max` ranges
 

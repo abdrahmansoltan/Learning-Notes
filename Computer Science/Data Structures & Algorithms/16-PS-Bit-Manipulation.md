@@ -13,6 +13,7 @@
     - [Implement multiplication without arithmetic operators](#implement-multiplication-without-arithmetic-operators)
     - [Complement of Base 10 Integer](#complement-of-base-10-integer)
     - [Flipping an Image](#flipping-an-image)
+    - [Shuffle the Array](#shuffle-the-array)
 
 ---
 
@@ -474,5 +475,58 @@ def flipAndInvertImage(image):
 
     return image
 ```
+
+---
+
+### Shuffle the Array
+
+Given the array `nums` consisting of `2n` elements in the form `[x1,x2,...,xn,y1,y2,...,yn]`.
+
+Return the array in the form `[x1,y1,x2,y2,...,xn,yn]`.
+
+- EX: `nums = [2,5,1,3,4,7], n = 3` --> `[2,3,5,4,1,7]`
+
+- Solution 1: using extra memory
+
+  ```py
+  def shuffle(nums, n):
+      result = []
+      for i in range(n):
+          result.append(nums[i])
+          result.append(nums[i+n])
+      return result
+  ```
+
+- Solution 2: without using extra memory (in-place) ✅
+
+  - This is done using `Bit Manipulation` and `Division`
+
+  - We know that upper bound of the numbers in the array is `32 bits`, so we can have the `x` and `y` elements in the same element in the array by using `OR` operator
+    ![shuffle the array](./img/shuffle-the-array-1.png)
+  - To extract the `x` and `y` elements, we can use `AND` operator
+  - Then we can shift the `x` and `y` elements to the right by `n` bits to get the original elements
+
+    - To do so, we iterate over the array **in reverse order** and extract the `x` and `y` elements
+      ![shuffle the array](./img/shuffle-the-array-2.png)
+
+    ```py
+    def shuffle(nums, n):
+        for i in range(n):
+            nums[i] = nums[i] << 10 # shift the x element to the left by 10 bits
+            nums[i] |= nums[i+n] # OR the x element with the y element (Store x and y in the same element)
+
+        # Iterate over the array in reverse order and extract the x and y elements
+        j = 2*n - 1 # index of the last element in the array
+        for i in range(n-1, -1, -1):
+            y = nums[i] & (2**10 - 1) # extract the y element by ANDing the number with 2^10 - 1
+            # we use 2^10 - 1 to get the last 10 bits of the number -> 1023
+            x = nums[i] >> 10 # extract the x element by shifting the number to the right by 10 bits
+
+            nums[j] = y
+            nums[j-1] = x
+            j -= 2
+
+        return nums
+    ```
 
 ---

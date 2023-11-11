@@ -2,7 +2,6 @@
 
 - [INDEX](#index)
   - [Intro](#intro)
-  - [Programming Fundamentals](#programming-fundamentals)
   - [Computer Science](#computer-science)
     - [CS Fundamentals](#cs-fundamentals)
     - [Object Oriented Programming](#object-oriented-programming)
@@ -41,28 +40,13 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ---
 
-## Programming Fundamentals
-
-- [Programming-foundation-Fundamentals](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/01_Programming%20Foundations%20Fundamentals/Notes.md)
-
-- [Programming-foundations-Beyond-fundamentals](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/02_Programming%20Foundations%20Beyond%20the%20Fundamentals/Notes.md)
-
-- [Object-Oriented Design OOP](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/03_Programming%20Foundations%20Object-Oriented%20Design/Notes.md)
-
-- [Data Structures](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/04_Programming%20Foundations%20Data%20Structures/Notes.md)
-
-- [Algorithms](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/05_Programming%20Foundations%20Algorithms/Notes.md)
-
-- [Design Patterns](https://github.com/abdrahmansoltan/LinkedIn-Learning/blob/main/06_Programming%20Foundations%20Design%20Patterns/Notes.md)
-
----
-
 ## Computer Science
 
 ### CS Fundamentals
 
 - [CS Fundamentals](./Computer%20Science/CS%20Fundamentals/1-CS.md)
 - [Computer Architecture](./Computer%20Science/CS%20Fundamentals/2-Computer-architecture.md)
+- [Programming-foundation-Fundamentals](./Computer%20Science/CS%20Fundamentals/3-Programming-Foundations.md)
 
 ### Object Oriented Programming
 

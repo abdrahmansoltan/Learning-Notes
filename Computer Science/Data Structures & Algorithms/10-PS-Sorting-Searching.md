@@ -21,6 +21,7 @@
     - [Time Based Key-Value Store](#time-based-key-value-store)
     - [Single Element in a Sorted Array](#single-element-in-a-sorted-array)
     - [Find First and Last Position of Element in Sorted Array](#find-first-and-last-position-of-element-in-sorted-array-1)
+    - [Arranging Coins](#arranging-coins)
   - [Sorting](#sorting)
     - [Insertion Sort List](#insertion-sort-list)
     - [Largest Number](#largest-number)
@@ -839,6 +840,68 @@ def searchRange(nums, target):
 
 ---
 
+### Arranging Coins
+
+You have a total of `n` coins that you want to form in a staircase shape, where every `k`-th row must have exactly `k` coins.
+
+Given `n`, find the total number of **full** staircase rows that can be formed.
+
+- EX: `n = 5` -> `2` rows
+  ![arranging coins](./img/arranging-coins.jpeg)
+
+- Solution 1: brute force
+
+  - we can loop through the rows and subtract the number of coins in each row from `n` until `n` is less than `0`
+  - then return the number of rows
+    - if `n` is `0` then return the number of rows, else return the number of rows - 1, because we subtracted the number of coins in the last row from `n` and it became less than `0`
+  - time-complexity: `O(n)`, space-complexity: `O(1)`
+
+  ```py
+  def arrange_coins(n):
+      for i in range(1, n + 1):
+          n -= i
+          if n < 0:
+              # means that the last row was incomplete
+              return i - 1
+      return n
+  ```
+
+- Solution 2: using binary search ✅
+
+  - we can use binary search to find the number of rows
+    - Note: it's super hard to come up with this solution in an interview, because it requires a lot of math **(Gauss's formula)**
+  - we can use the fact that the number of coins in each row is an **arithmetic progression** with a difference of `1` -> (Gauss's formula)
+    - `[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]` ->
+      - We can get its sum by adding each element `(O(n))`
+      - **OR**, we can use the **Gauss's formula** for the sum of an arithmetic progression `(O(1))`
+        - `sum = (n * (n + 1)) / 2`
+  - so we can use the formula for the sum of an arithmetic progression to find the number of coins in `k` rows
+    - `sum = (k * (k + 1)) / 2`
+  - then we can use binary search to find the number of rows
+    - For example, `[1, 2, 3, 4, 5]` -> binary search gives us the middle element `3` which is the number of rows
+    - Then we use the formula to find the number of coins in `3` rows -> `sum = (3 * (3 + 1)) / 2 = 6`, Then we check if the number of coins in `3` rows is enough to build a staircase of `5` coins by checking if `sum == n`
+      - Then we compare the number of coins in `3` rows with `n` -> `6 > 5` -> so we need to search in the left half of the array
+  - time-complexity: `O(log n)`, space-complexity: `O(1)`
+
+  ```py
+  def arrange_coins(n):
+      left = 0
+      right = n
+      while left <= right:
+          mid = (left + right) // 2
+          numOfCoins = mid * (mid + 1) // 2
+
+          if numOfCoins == n:
+              return mid
+          elif numOfCoins < n:
+              left = mid + 1
+          else:
+              right = mid - 1
+      return right
+  ```
+
+---
+
 ## Sorting
 
 ### Insertion Sort List
@@ -945,6 +1008,7 @@ Given an array `nums` with `n` objects colored red, white, or blue, sort them **
   - We will use 3 pointers: `2 pointers` to keep track of the `low` and `high` indices of the array, and `i pointer` to iterate through the array
   - while iterating, we will move the `0s` to the `left` side of the array **(before `low`)**, and the `2s` to the `right` side of the array **(after `high`)**
     ![sort colors](./img/sort-colors-1.webp)
+
 - Note: if we don't know the range of the numbers in the array, then we can use the 3-way partitioning algorithm to sort the array in-place using a `pivot` value and 2 pointers and check if the current value is less than the `pivot` value or greater than the `pivot` value or equal to the `pivot` value
 
   ```py

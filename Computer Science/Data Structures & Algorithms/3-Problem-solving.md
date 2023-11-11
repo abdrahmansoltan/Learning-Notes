@@ -19,15 +19,12 @@
       - [Test fail situations](#test-fail-situations)
       - [Testing order](#testing-order)
     - [Debugging](#debugging)
+  - [Template for solving problems in interviews](#template-for-solving-problems-in-interviews)
   - [Notes](#notes)
   - [Creating Shapes](#creating-shapes)
     - [Steps shape](#steps-shape)
     - [Pyramid](#pyramid)
     - [Pascal's Triangle](#pascals-triangle)
-  - [Numbers \& Math](#numbers--math)
-    - [Power of Two](#power-of-two)
-    - [Pow(x, n)](#powx-n)
-    - [Partitioning Into Minimum Number Of Deci-Binary Numbers](#partitioning-into-minimum-number-of-deci-binary-numbers)
 
 ---
 
@@ -134,9 +131,8 @@ In this pattern, we consider a **contiguous** window or subset of elements while
 
 #### Monotonic decreasing stack
 
-![monotonic-decreasing-stack](./img/monotonic-decreasing-stack-1.png)
-
 It's a stack that is always sorted in a decreasing order, so the top of the stack is always the smallest element in the stack
+![monotonic-decreasing-stack](./img/monotonic-decreasing-stack-1.png)
 
 - usually used in problems that require finding the next greater/smaller element in an array
   ![monotonic-decreasing-stack](./img/monotonic-decreasing-stack-2.png)
@@ -160,7 +156,7 @@ This pattern involves dividing a dataset into smaller chunks and then repeating 
   1. Figure out a simple case as the base case
   2. Figure out how to reduce your problem and get to the base case
 
-- Divide and conquer algorithms are often recursive algorithms, To solve a problem using `D&C`, we need to:
+- Divide and conquer algorithms are often recursive algorithms, we need to:
 
   1. Divide (decrease) the problem into a number of subproblems that are smaller instances of the same problem until it becomes the base case.
   2. Conquer the subproblems by solving them recursively. If they are small enough, solve the subproblems as base cases.
@@ -179,12 +175,12 @@ This pattern involves dividing a dataset into smaller chunks and then repeating 
 
 #### Combination & Permutation (تباديل و توافيق)
 
-- **Permutation**: is a way of selecting items from a collection, such that the order of selection does matter (because we are arranging items, not selecting them).
+- **Permutation**: is a way of selecting items from a collection, such that the **order of selection matters** (because we are arranging items, not selecting them).
   - EX:
     - factorial: `n! = n * (n-1) * (n-2) * ... * 1` -> permutation of `n` items
     - if we have 3 letters `a`, `b`, `c`, then the permutations are:
       - `abc`, `acb`, `bac`, `bca`, `cab`, `cba`
-- **Combination**: is a way of selecting items from a collection, such that the order of selection does not matter (because we are selecting items, not arranging them).
+- **Combination**: is a way of selecting items from a collection, such that the **order of selection does not matter** (because we are selecting items, not arranging them).
   - EX:
     - if we have 3 letters `a`, `b`, `c`, then the combinations are:
       - `abc`, `acb`, `bac`, `bca`, `cab`, `cba`
@@ -258,6 +254,44 @@ The dependencies among the classes and functions of a program induce a hierarchy
 The simplest debugging technique consists of using `print` statements to track the values of variables during the execution of the program. A problem with this approach is that eventually the print statements need to be removed or commented out, so they are not executed when the software is finally released.
 
 A better approach is to run the program within a **debugger**, which is a specialized environment for controlling and monitoring the execution of a program. The basic functionality provided by a debugger is the insertion of breakpoints within the code. When the program is executed within the debugger, it stops at each breakpoint. While the program is stopped, the current value of variables can be inspected.
+
+---
+
+## Template for solving problems in interviews
+
+```py
+# solution.py
+import unittest
+
+class Solution:
+    def function_name(self, input):
+        # code here
+        return
+
+class TestSolution(unittest.TestCase):
+    def test_function_name(self):
+        sol = Solution()
+
+        # Test cases:
+        arr = [1, 2, 3, 4, 5]
+        arr2 = [1, 2, 3]
+        arr3 = [4, 5]
+
+        # Checking if the function returns the correct output
+        # self.assertEqual(sol.function_name(input), output)
+        self.assertEqual(sol.function_name(arr), 5)
+        self.assertEqual(sol.function_name(arr2), 3)
+        self.assertEqual(sol.function_name(arr3), 5)
+
+# Run the tests
+unittest.main()
+```
+
+- Run the tests:
+
+  ```bash
+  python3 solution.py
+  ```
 
 ---
 
@@ -411,145 +445,6 @@ def generate(numRows):
         res.append(newRow)
 
     return res
-```
-
----
-
-## Numbers & Math
-
-### Power of Two
-
-Given an integer `n`, return `true` if it is a power of two. Otherwise, return `false`.
-An integer `n` is a power of two, if there exists an integer `x` such that `n == 2^x`.
-
-- Solution 1: using loop (reusable for any number and not just `2`)
-
-  ```py
-  # O(log n)
-  def is_power_of_two(n):
-      if n == 0:
-          return False
-
-      while n > 1:
-          if n % 2 != 0:
-            return False
-          n //= 2
-
-      return True
-  ```
-
-- Solution 2: using bitwise operators
-
-  ![power of two](./img/power-of-two-1.jpg)
-
-  - We can check this by using the **bitwise AND** operator between `n` and `n - 1`
-  - This is because `n` and `n - 1` will have all the same bits as `n`, except for the rightmost `1` in `n`, **so all the bits in `n` and `n - 1` will be different**
-    ![power of two](./img/power-of-two-2.png)
-
-  ```py
-  # O(1)
-  def is_power_of_two(n):
-      return n > 0 and n & (n - 1) == 0
-  ```
-
----
-
-### Pow(x, n)
-
-Implement `pow(x, n)`, which calculates `x` raised to the power `n` (i.e., `x^n`).
-
-- Explanation:
-
-  - instead of looping and multiplying `x` by itself `n` times, we can use **Divide & conquer** to reduce the number of multiplications
-    - `x^n = x^(n/2) * x^(n/2) * x^(n%2)`
-    - `x^10` = `x^5 * x^5`
-      - `x^5` = `x^2 * x^2 * x`
-        - `x^2` = `x * x`
-          - `x^1` = `x`
-            - `x^0` = `1`
-
-- Time complexity: `O(log n)`
-
-```py
-def my_pow(x, n):
-    if n == 0:
-        return 1
-
-    if n > 0:
-        partial = my_pow(x, n // 2)
-        if n % 2 == 0:
-            return partial * partial
-        else:
-            return partial * partial * x
-    else:
-        partial = my_pow(x, -n // 2)
-        if n % 2 == 0:
-            return 1 / (partial * partial)
-        else:
-            return 1 / (partial * partial * x)
-
-# ---------------------------OR------------------------------
-
-def my_pow(x, n):
-    def helper(x, n):
-      if x == 0: return 0 # base case
-      if n == 0: return 1 # base case
-
-      res = helper(x, n // 2)
-      return res * res * x if n % 2 else res * res
-
-    return helper(x, n) if n >= 0 else 1 / helper(x, -n)
-```
-
----
-
-### Partitioning Into Minimum Number Of Deci-Binary Numbers
-
-A decimal number is called **deci-binary** if each of its digits is either `0` or `1` without any leading zeros. For example, `101` and `1100` are **deci-binary**, while `112` and `3001` are not.
-
-Given a string `n` that represents a positive decimal integer, return the **minimum** number of positive **deci-binary** numbers needed so that they sum up to `n`.
-
-- EX:
-
-  - Input: `n = "32"`
-    - Output: `3`
-    - Explanation: `10 + 11 + 11 = 32`
-  - Input: `n = "82734"`
-  - Output: `8`
-
-- Explanation:
-
-  - If each deci-binary number has no higher than a `1` in the each position, then it will take at least `x` numbers to sum up to `n`, where `x` is the largest digit in `n`
-  - This means that the largest character in any position in `n` will determine how many deci-binary numbers must be added together to obtain `n`.
-    ![minimum-deci-bi](./img/minimum-deci-bi-1.png)
-    ![minimum-deci-bi](./img/minimum-deci-bi-2.png)
-
-  ```py
-  # 82734 - 11111 = 71623
-  # 71623 - 11111 = 60512
-  # 60512 - 10111 = 50401
-  # 50401 - 10101 = 40300
-  # 40300 - 10100 = 30200
-  # 30200 - 10100 = 20100
-  # 20100 - 10100 = 10000
-  # 10000 - 10000 = 0
-
-  # -> 8 times
-
-  # 42 - 1111 = 37
-  # 37 - 1111 = 26
-  # 26 - 1111 = 15
-  # 15 - 1111 = 4
-  # 4 - 1111 = -7 (stop)
-  ```
-
-```py
-def min_partitions(n):
-    # convert the string to a list of integers
-    nums = [int(num) for num in n]
-
-    # return the largest digit in the list
-    return max(nums)
 ```
 
 ---

@@ -2,14 +2,16 @@
 
 - [INDEX](#index)
   - [PostCss](#postcss)
-    - [The Value and Limitations of Preprocessors](#the-value-and-limitations-of-preprocessors)
-    - [What is PostCSS ?](#what-is-postcss-)
     - [Why PostCSS ?](#why-postcss-)
+    - [How PostCSS is used in projects](#how-postcss-is-used-in-projects)
   - [Installation](#installation)
     - [Enabling and Disabling Source Maps](#enabling-and-disabling-source-maps)
     - [Automatically Build when Source Files Change](#automatically-build-when-source-files-change)
   - [PostCSS Configuration File](#postcss-configuration-file)
   - [PostCSS plugins](#postcss-plugins)
+  - [Using PostCSS](#using-postcss)
+    - [Example of using PostCSS to add features to CSS](#example-of-using-postcss-to-add-features-to-css)
+    - [Example of using PostCSS to optimize CSS after pre-processing](#example-of-using-postcss-to-optimize-css-after-pre-processing)
 
 ---
 
@@ -18,21 +20,6 @@
 It's a **tool for transforming CSS with JavaScript** (tool that you can configure with plugins to transform the output of your CSS)
 
 ![postcss](./img/postcss.png)
-
-### The Value and Limitations of Preprocessors
-
-Most CSS developers are familiar with preprocessors. Tools including `Sass`, `Less`, and `Stylus` introduced concepts such as file partials, nesting, variables, and mixins. Some features are gradually appearing in native CSS, but a preprocessor is still useful for managing large codebases and maintaining style and coding consistency.
-
-- It may be difficult to imagine life without a CSS preprocessor, but there are downsides:
-  - **Preprocessors are not extendable or limitable**.
-    - Most preprocessors are a black box which provide you a specific set of supported features. It may be possible to write custom functions, but functionality beyond the scope of that tool is remains impossible — such as inlining an SVG as a background image.
-    - Similarly, you can’t stop developers using options you’d rather avoid such as @extend or deep nesting. Linting can help, but it won’t stop the preprocessor compiling a valid file.
-  - **Preprocessors provide their own syntax**
-    - Preprocessor code may resemble CSS, but no browser can parse the file natively. The syntax is different and, if your tool changes or is unavailable, your code will require updates to make it usable.
-
----
-
-### What is PostCSS ?
 
 Despite what its name seems to imply, it is not a post-processor (nor is it a pre-processor), but rather it is a transpiler to turn PostCSS-specific (or PostCSS plugin-specific, to be more precise) syntax into vanilla CSS so that it can be understood by the browser.
 
@@ -62,15 +49,76 @@ Despite what its name seems to imply, it is not a post-processor (nor is it a pr
 
 ---
 
+### How PostCSS is used in projects
+
+- It can be applied by a `npm` or `yarn` script
+
+  ```json
+  "scripts": {
+    "postcss": "postcss src/style.css --dir public"
+  }
+  ```
+
+- It can be used with a task runner like `Gulp` or `Grunt`
+
+  ```js
+  // Gulpfile.js
+  const gulp = require('gulp');
+  const postcss = require('gulp-postcss');
+
+  gulp.task('css', function () {
+    return gulp.src('./src/*.css').pipe(postcss()).pipe(gulp.dest('./dest'));
+  });
+  ```
+
+- It can be used in the **build** step of a bundler like `Webpack` or `Rollup`
+
+  ```js
+  // webpack.config.js
+  module.exports = {
+    module: {
+      rules: [
+        {
+          // Apply PostCSS plugins to CSS files in production with other loaders
+          test: /\.css$/i,
+          use: ['style-loader', 'css-loader', 'postcss-loader']
+        }
+      ]
+    }
+  };
+  ```
+
+- It can be built-in in a framework like `tailwindcss`
+
+  ```js
+  // tailwind.config.js
+  module.exports = {
+    purge: ['./src/**/*.html', './src/**/*.js'],
+    darkMode: false, // or 'media' or 'class'
+    theme: {
+      extend: {}
+    },
+    variants: {
+      extend: {}
+    },
+    plugins: []
+  };
+  ```
+
+It's common to use it with per-processor like `Sass`, and not as a replacement for it. by making `Sass` handles the pre-processing and `PostCSS` handles the optimization and post-processing.
+
+---
+
 ## Installation
 
-PostCSS requires **Node.js**, but here we demonstrate how to install and run PostCSS from any folder — even those that aren’t Node.js projects. You can also use PostCSS from webpack, Parcel, Gulp.js, and other tools, but we’ll stick to the command line.
+PostCSS requires `Node.js`, but here we demonstrate how to install and run PostCSS from any folder — even those that aren’t Node.js projects. You can also use PostCSS from webpack, Parcel, Gulp.js, and other tools, but we’ll stick to the command line.
 
 ```sh
-npm install -g postcss-cli
+npm install postcss # Install PostCSS itself
 
-# Installing PostCSS Plugin
-npm install -g postcss-import
+npm install postcss-cli # PostCSS CLI tool is used to run PostCSS from the command line
+
+npm install postcss-import # PostCSS plugin to inline @import rules content
 ```
 
 - To test this plugin, open or create a new project folder, then create a `src` subfolder for your source files. Create a `main.css` file to load all partials:
@@ -101,7 +149,17 @@ npm install -g postcss-import
   postcss ./src/main.css --use postcss-import --use autoprefixer --output ./styles.css
   ```
 
-  - AutoPrefixer uses the browserlist module to determine which browser prefixes to add.
+  - `AutoPrefixer` uses the browserlist module to determine which browser prefixes to add. It will result in the following code being added to `styles.css`:
+
+    ```css
+    body {
+      display: flex;
+      -webkit-box-pack: center;
+      justify-content: center;
+      -webkit-box-align: center;
+      align-items: center;
+    }
+    ```
 
 ---
 
@@ -195,10 +253,103 @@ You can find plugins here [postcss.parts](https://www.postcss.parts/)
   };
 
   // ------------------------------OR------------------------------
-  
+
   // if using Vite or Webpack (uses ES6 modules instead of CommonJS)
   import nesting from 'postcss-nesting';
   export default {
     plugins: [nesting()]
   };
+  ```
+
+---
+
+## Using PostCSS
+
+### Example of using PostCSS to add features to CSS
+
+- Configuring postcss to have the following plugins: `postcss-import`, `autoprefixer`, `postcss-nested`, `postcss-custom-properties`
+
+  ```js
+  // postcss.config.js
+  module.exports = {
+    plugins: [
+      require('postcss-import'),
+      require('autoprefixer'),
+      require('postcss-nested'),
+      require('postcss-custom-properties')
+    ]
+  };
+  ```
+
+- Using `@import` feature
+
+  ```scss
+  // src/main.css
+  @import 'base';
+  @import 'components';
+  @import 'utilities';
+  ```
+
+- Adding `build:css` script to `package.json` file, which will apply `postcss` to `main.css` file and output the result to `public/build/styles.css` file
+
+  ```json
+  // package.json
+  {
+    "scripts": {
+      "build:css": "postcss src/main.css -o public/build/styles.css"
+    }
+  }
+  ```
+
+- Using the final built css file in `index.html` file
+
+  ```html
+  <!-- public/index.html -->
+  <link rel="stylesheet" href="build/styles.css" />
+  ```
+
+---
+
+### Example of using PostCSS to optimize CSS after pre-processing
+
+- installing `cssnano` and `purgecss` plugins
+
+  - `cssnano` -> which is used to minify the css file
+  - `purgecss` -> which is used to remove unused css styles
+
+  ```sh
+  npm install cssnano @fullhuman/postcss-purgecss
+  ```
+
+- Configuring postcss to have the plugins
+
+  ```js
+  // postcss.config.js
+  module.exports = {
+    plugins: [
+      require('cssnano'),
+      require('@fullhuman/postcss-purgecss')({
+        content: ['./public/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
+        defaultExtractor: content => content.match(/[\w-/:]+(?<!:)/g) || []
+      })
+    ]
+  };
+  ```
+
+- Adding `build:css` script to `package.json` file, which will apply `postcss` to `main.css` file and output the result to `public/build/styles.css` file
+
+  ```json
+  // package.json
+  {
+    "scripts": {
+      "build:css": "postcss src/main.css -o public/build/styles.css"
+    }
+  }
+  ```
+
+- Using the final built css file in `index.html` file
+
+  ```html
+  <!-- public/index.html -->
+  <link rel="stylesheet" href="build/styles.css" />
   ```

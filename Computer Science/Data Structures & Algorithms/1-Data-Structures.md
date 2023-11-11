@@ -2,29 +2,21 @@
 
 - [INDEX](#index)
   - [Data Structures](#data-structures)
-    - [storing data in the Memory](#storing-data-in-the-memory)
-  - [Operations on data structures](#operations-on-data-structures)
-    - [Insertion](#insertion)
-    - [Deletion](#deletion)
-    - [Traversal](#traversal)
-    - [Searching](#searching)
-    - [Sorting](#sorting)
+    - [Storing data in the Memory](#storing-data-in-the-memory)
+    - [Operations on data structures](#operations-on-data-structures)
   - [Arrays](#arrays)
     - [Static Array](#static-array)
       - [Downside of static array](#downside-of-static-array)
     - [Dynamic Array](#dynamic-array)
       - [How it works with capacity ?](#how-it-works-with-capacity-)
-        - [The capacity problem](#the-capacity-problem)
-        - [Solution: Efficient Dynamic Arrays](#solution-efficient-dynamic-arrays)
-      - [Implementing a Dynamic Array](#implementing-a-dynamic-array)
-      - [Geometric Increase in Capacity and Arithmetic Progression](#geometric-increase-in-capacity-and-arithmetic-progression)
+      - [Geometric Increase in Capacity and Arithmetic Progression (NOT important ⚠️)](#geometric-increase-in-capacity-and-arithmetic-progression-not-important-️)
+    - [Implementing a Dynamic Array](#implementing-a-dynamic-array)
     - [Referential Arrays](#referential-arrays)
     - [Compact Arrays](#compact-arrays)
-    - [Arrays big O](#arrays-big-o)
+    - [Arrays Big O](#arrays-big-o)
     - [Array Notes](#array-notes)
   - [Linked lists](#linked-lists)
     - [Singly linked list](#singly-linked-list)
-      - [Singly linked list operations](#singly-linked-list-operations)
     - [Linked List Traversal](#linked-list-traversal)
     - [Circular linked list](#circular-linked-list)
     - [Doubly linked list](#doubly-linked-list)
@@ -38,7 +30,7 @@
     - [Collision](#collision)
       - [Drawbacks of bad hash functions](#drawbacks-of-bad-hash-functions)
     - [Hash table implementation](#hash-table-implementation)
-      - [Time complexity of HashMap](#time-complexity-of-hashmap)
+    - [Time complexity of HashMap](#time-complexity-of-hashmap)
   - [Stacks and Queues](#stacks-and-queues)
     - [Stacks](#stacks)
       - [Call Stack](#call-stack)
@@ -49,7 +41,7 @@
       - [Implementing a Queue using single linked-list](#implementing-a-queue-using-single-linked-list)
       - [Double-ended Queue (Deque)](#double-ended-queue-deque)
   - [Graphs](#graphs)
-    - [How to store graphs](#how-to-store-graphs)
+    - [How to store and represent graphs](#how-to-store-and-represent-graphs)
     - [Graphs implementation](#graphs-implementation)
   - [Trees](#trees)
     - [Tree Implementation](#tree-implementation)
@@ -62,7 +54,6 @@
   - [Priority Queue](#priority-queue)
     - [Implementation of Priority Queue](#implementation-of-priority-queue)
     - [Binary Heap](#binary-heap)
-      - [Binary heap efficiency \& performance](#binary-heap-efficiency--performance)
     - [Binary heap methods](#binary-heap-methods)
     - [Array-based representation of Binary Heap](#array-based-representation-of-binary-heap)
     - [Implementing a Priority queue with a Heap](#implementing-a-priority-queue-with-a-heap)
@@ -75,17 +66,15 @@
 
 ## Data Structures
 
-it's a collection of values (can have relationships between them) which is being manipulated by steps of processes (**Algorithms**)
+it's a collection of value **stored in memory** that can be manipulated by a set of operations (**Algorithms**). It's a systematic way of organizing and accessing data
 
-> Or: It's a systematic way of organizing and accessing data
+> They're ways to organize information with **optimal runtime complexity** for different operations or optimal business logic for the case
 
-They're ways to organize information with **optimal runtime complexity** for different operations
-
-- Most programming languages have built-in data structures, but in interviews, you may still be asked about **"inferior"** data structures like queues and linked lists.
+- Most programming languages have built-in data structures, but in interviews, you may still be asked about **"inferior"** data structures like `queues` and `linked lists`.
 
   - this is done by using the built-in data structures and getting the same result
     - ex: to add to queue -> use array equivalent: `array.insert()`
-  - also if we want to make a class to the data-structure, we can use the built-in data-structure to make it
+  - also if we want to make a class to the data-structure, we can use the built-in data-structure to make it **(Polymorphism)**
     - ex: to make a queue class -> use array to make it and remove some unwanted array-methods
       ![ds-class](./img/ds-class.png)
 
@@ -96,85 +85,91 @@ They're ways to organize information with **optimal runtime complexity** for dif
   - **Non-Linear** -> data is not organized sequentially
     - ex: `tree`, `graph`
 
-### storing data in the Memory
+---
+
+### Storing data in the Memory
 
 ![memory](./img/memory.png)
 
 Each data type has a number of bits associated with it and that needs to get stored in the system and **the system allocates data storage and then the CPU reads from that storage**
 
-A computer system will have a huge number of **bytes** of memory (`1 byte` = `8 bits`), and each byte has a unique **memory address**. The memory address is a number that the CPU uses to access a specific `byte` of memory.
+A computer system will have a huge number of **bytes** of memory (`1 byte` = `8 bits`), and each byte has a unique **memory address**.
 
-> Usually numbers are stored in **32 bits (4 bytes) or 64 bits (8 bytes)**
+- **Memory address** is a unique number that identifies the location of a byte in memory
+- Usually numbers are stored in **32 bits (4 bytes) or 64 bits (8 bytes)**
+  - `integers` are stored in as a **32-bit** value, so it takes 4 (8-bits) locations (blocks)
+    ![blocks](./img/memoryBlocks.png)
+- computer hardware is designed, in theory, so that any byte of the main memory can be efficiently accessed based upon its memory address. In this sense, we say that a computer’s main memory performs as **random access memory (RAM)**.
 
-To keep track of what information is stored in what `byte`, the computer uses an abstraction known as a memory address. In effect, each byte of memory is associated with a unique number that serves as its address (more formally, the binary representation of the number serves as the address).
-
-> computer hardware is designed, in theory, so that any byte of the main memory can be efficiently accessed based upon its memory address. In this sense, we say that a computer’s main memory performs as **random access memory (RAM)**.
->
-> - That is, it is just as easy to retrieve byte `#8675309` as it is to retrieve byte `#309`
-> - what allows an arbitrary cell of the array to be accessed in constant time based on its index. Is: if one knows the memory address at which an array starts (e.g., `2146`), the number of bytes per element (e.g., `2` for a Unicode character), and a desired index within the array, the appropriate memory address can be computed using the calculation, **`start + cellSize * index`**. By this formula, the cell at index `0` begins precisely at the start of the array, the cell at index `1` begins precisely cellSize bytes beyond the start of the array, and so on.
->   - As an example, cell `4` begins at memory location `2146+2*4 = 2154`.
-> - we say that any individual byte of memory can be stored or retrieved in `O(1)` time.
-
-- for example: **integers** are stored in as a **32-bit** value, so it takes 4 (8-bits) locations (blocks)
-  ![blocks](./img/memoryBlocks.png)
-
-- **Note**: A reference to the `None` object can be used as an element of the list to represent an empty location in the array (doesn't exist in the data-structure).
+  - it is just as easy to retrieve byte `#8675309` as it is to retrieve byte `#309`
+  - Array elements can be quickly accessed (constant time) by using the formula `start + cellSize * index`, where "start" is the memory address, "cellSize" is the bytes per element, and "index" is the desired element's position.
+    - Ex: cell `4` begins at memory location `2146+2*4 = 2154`.
 
 ---
 
-## Operations on data structures
+### Operations on data structures
 
-### Insertion
-
-inserting element into the data-structure
-
-### Deletion
-
-deleting element from the data-structure
-
-### Traversal
-
-access each data-item **only once** so that it can be processed
-
-### Searching
-
-find the location of data-item in a data-structure if it exists
-
-### Sorting
-
-sort data-items in the data-structure to be ordered (next to each other in memory in order)
+- Insertion
+- Deletion
+- Traversal -> accessing each data-item **only once** so that it can be processed
+- Searching / Accessing
+- Sorting -> sort data-items in the data-structure to be ordered (next to each other in memory in order)
+- Updating
+- Merging
 
 ---
 
 ## Arrays
 
 Arrays are stored **contiguously in memory**, which means that all elements of the array are stored next to each other in memory **(Sequence)**. This is why we can access any element of an array in constant time, as long as we know the index of that element.
-![arrays](./img/arrays.png)
 
-```js
-// this is not an array, it's a list
-let array = [1, 2, 3, 4, 5];
+- Contiguous vs Non-contiguous memory allocation
 
-// these are arrays
-let array = new ArrayList(5); // Array with 5 elements
-let array = new Unit16Array(5); // Array with 5 elements of 16 bits each
-```
+  - Contiguous memory is a sequence of addresses that are next to each other in memory
+    ![contiguous memory](./img/contiguous-momory-allocation.jpeg)
+  - Non-contiguous memory is a sequence of addresses that are not next to each other in memory
+    ![non-contiguous memory](./img/non-contiguous-momory-allocation.jpeg)
 
-- Note that the addresses in the picture are not real addresses, they are just used to illustrate the concept of contiguous memory. also they are incremented by `4` as each **number** element is `4 bytes` (32 bits)
+- Note that the addresses in the image below are not real addresses, they are just used to illustrate the concept of contiguous memory. also they are incremented by `4` as each **number** element is `4 bytes` (32 bits)
+  ![arrays](./img/arrays.png)
+
   - This will differ if storing **ASCII** characters as each character is `1 byte` (8 bits)
     ![arrays](./img/arrays-1.png)
   - If storing **Unicode** characters as each character is `2 bytes` (16 bits)
+
+- Different programming languages have different definitions of Array and Lists, for example, Javascript has `Array` and `List` as different data structures, while Python has `List` only and it's a dynamic array
+
+  ```js
+  // ------------------------------------ Javascript ------------------------------------ //
+
+  // this is not an array, it's a list
+  let array = [1, 2, 3, 4, 5];
+
+  // these are arrays
+  let array = new ArrayList(5); // Array with 5 elements
+  let array = new Unit16Array(5); // Array with 5 elements of 16 bits each
+  ```
+
+  ```py
+  # ------------------------------------ Python ------------------------------------ #
+
+  # this is a list
+  array = [1, 2, 3, 4, 5]
+
+  # this is an array
+  array = array.array('I', [1, 2, 3, 4, 5]) # Array with 5 elements of 32 bits each
+  ```
 
 ---
 
 ### Static Array
 
-**static** -> fixed size declared at initiation
+**static** -> fixed size declared at initiation and can't be changed
 
-- When creating a low-level array in a computer system, the precise size of that array must be explicitly declared in order for the system to properly allocate a consecutive piece of memory for its storage
-- Because the system might dedicate neighboring memory locations to store other data, the capacity of an array cannot trivially be increased by expanding into subsequent cells. In the context of representing a Python `tuple` or `str` instance, this constraint is no problem. Instances of those classes are immutable, so the correct size for an underlying array can be fixed when the object is instantiated.
-- Each cell of an array must use the same number of bytes. This requirement is what allows an arbitrary cell of the array to be accessed in constant time based on its index. In particular, if one knows the memory address at which an array starts, the number of bytes per element (e.g., `2` for a Unicode character), and a desired index within the array, the appropriate memory address can be computed using this calculation:
-  - Formula: **`memory_address = start + cellSize * index`**
+- A low-level array requires an explicitly declared size for proper memory allocation.
+- Expanding the capacity of an array is not straightforward because neighboring memory is allocated for other data. However, this limitation doesn't affect Python tuple or str instances, as they are immutable, allowing a fixed array size at instantiation.
+- Array cells must have a consistent byte size, enabling constant-time access by index. Given the starting memory address, bytes per element, and desired index, you can compute the memory address efficiently.
+  - Formula: `memory_address = start + cellSize * index`
     - By this formula, the cell at index `0` begins precisely at the start of the array, the cell at index `1` begins precisely `cellSize` bytes beyond the start of the array, and so on. As an example, cell `4` begins at memory location `2146+2 * 4 = 2146+8 = 2154`
 
 #### Downside of static array
@@ -186,33 +181,34 @@ The downside of this approach is that the size of the array must be specified in
   ![array full](./img/arrays-full.png)
   - This operation takes `O(n)` time, where `n` is the current number of items. In addition, if the array becomes overfull, it will be necessary to create a new, smaller array and copy the items again. Once again, this operation takes `O(n)` time.
     ![array full](./img/arrays-full-1.png)
-- It may not need the extra capacity, and it may be wasteful to reserve memory that is never used. On the other hand, You may also fill the array again and it becomes overfull, it will be necessary to create a new, smaller array and copy the items again. Once again, this operation takes `O(n)` time.
+- Reserving extra memory can be wasteful if not needed, but an overfull array may require creating a smaller array and copying items, which takes O(n) time.
 
-> So specifying the size of the array in advance is a good workaround, but it's not a perfect solution. [Linked lists](#linked-lists) provide a more flexible alternative. As **with linked lists, the items can be anywhere in memory**.
+So specifying the size of the array in advance is a good workaround, but it's not a perfect solution. [Linked lists](#linked-lists) provide a more flexible alternative. As **with linked lists, the items can be anywhere in memory**.
 
 ---
 
 ### Dynamic Array
 
-**dynamic** -> can change size after initiation based on the need
+A dynamic array maintains an underlying array with greater capacity than its current length, allowing easy appending of new elements to the list.
 
-> **Dynamic array** is that a list instance maintains an underlying array that often has greater capacity than the current length of the list.
->
-> - This extra capacity makes it easy to append a new element to the list by using the next available cell of the array.
+> **dynamic** -> can change size after initiation based on the need
 
-- this is where languages differ in allocating (managing) memory, as language like `c++` requires to have static array and to change it you need to redeclare another array with the new size which will be in **different memory location**
-- language like `python` and `javascript` are dynamic and it automatically manages memory for us
-  - Python’s `list` class presents a more interesting abstraction. Although a list has a particular `length` when constructed, the class allows us to add elements to the list, with no apparent limit on the overall capacity of the list. To provide this abstraction, Python relies on an algorithmic sleight of hand known as a **dynamic array**.
-- If a user continues to append elements to a list, Any reserved capacity will eventually be exhausted. In that case, the Array-class requests a new, larger array from the system, and initializes the new array so that its prefix matches that of the existing smaller array.
-  - > At that point in time, the old array is no longer needed, so it is reclaimed by the system.
-  - We rely on a function named `getSizeOf()` that is available from the sys module. This function reports the number of bytes that are being used to store an object in Python. For a list, it reports the number of bytes devoted to the array and other instance variables of the list, but not any space devoted to elements referenced by the list.
-  - Because a list is a referential structure, the result of `getSizeOf` for a list instance only includes the size for representing its primary structure; it does not account for memory used by the objects that are elements of the list.
+- this is where languages differ in allocating (managing) memory:
+
+  - language like `c++` requires to have static array and to change it you need to redeclare another array with the new size which will be in **different memory location**
+  - language like `python` and `javascript` are dynamic and it automatically manages memory for us
+    - `Python`'s `list` class offers an intriguing abstraction. While it has a specific length at construction, it allows adding elements without an apparent capacity limit, achieved through a technique called a `dynamic array`.
+
+- When a user keeps appending elements to a list and exhausts the reserved capacity, the Array-class requests a new, larger array from the system. It initializes the new array with a matching prefix to the existing smaller array. The old array is then reclaimed by the system as it's no longer needed.
+
+  - In `Python`, the `sys` module provides a `getSizeOf()` function, which reports the number of `bytes` used to store an object. For a list, it reports the bytes allocated for the array and other instance variables but not the space for the elements referenced by the list.
+    - Note: Because a list is a referential structure, the result of `getSizeOf()` for a list instance only includes the size for representing its primary structure; it does not account for memory used by the objects that are elements of the list.
+
+---
 
 #### How it works with capacity ?
 
-##### The capacity problem
-
-- When specifying the capacity of the new array, we don't do so by adding `1` to the capacity as this will result in creating array and copy elements each time we want to insert one more element
+- **The capacity problem**: When specifying the capacity of the new array to copy the old array into, it must be large enough to hold all the old elements. Adding just `1` element to the capacity for each new element is inefficient, as it would require creating and copying the array repeatedly.
 
   - Ex: We have array of length `3` and we increase it like this:
     - `insertions = (4+5+6+...+N)` --> `O(N^2)` -> **Time series**
@@ -222,25 +218,35 @@ The downside of this approach is that the size of the array must be specified in
       ![dynamic-array](./img/dynamic-array-2.png)
       ![dynamic-array](./img/dynamic-array-3.png)
 
-##### Solution: Efficient Dynamic Arrays
+- **Solution: Efficient Dynamic Arrays**
 
-> **Goal:** We want to reduce the number of **resizes** which reduces the number of **insertions** as well
+  > **Goal:** We want to reduce the number of **resizes** which reduces the number of **insertions** as well
 
-- Suggestions:
+  - Suggestions:
 
-  1. Increase the capacity by a constant amount `C` each time a resize occurs
-     - `insertions = (4+9+14+...+N)` --> `O(N^2)`
-  2. Increase the capacity by a constant factor `F` each time a resize occurs --> **This is the best solution**
-     - `insertions = (4+8+16+...+N)` --> `O(2N)` --> `O(N)`
-       - Notice that it's dominated by the last term `N` as `2` is a constant
-     - `space` --> `O(2N)` --> `O(N)`
+    1. Increase the `capacity` by a constant amount `C` each time a resize occurs
 
-- As soon as the first element is inserted into the list, we detect a change in the underlying size of the structure. In particular, we see the number of bytes jump from 72 to 104, an increase of exactly `32 bytes`. Usually, we run on a `64-bit` machine architecture, meaning that each memory address is a `64-bit` number (i.e., `8 bytes`). We speculate that the increase of `32 bytes` reflects the allocation of an underlying array capable of storing four object references. This hypothesis is consistent with the fact that we do not see any underlying change in the memory usage after inserting the second, third, or fourth element into the list.
-  - `32 bytes = 4 \* 8 bytes(64bits)` --> `4` objects references
+       - `insertions = (4+9+14+...+N)` --> `O(N^2)`
+
+    2. Increase the capacity by a constant factor `F` each time a resize occurs --> **This is the best solution** ✅ as it reduces the number of **resizes** and **insertions** as well
+
+       - `insertions = (4+8+16+...+N)` --> `O(2N)` --> `O(N)`
+       - `space` --> `O(2N)` --> `O(N)`
 
 ---
 
-#### Implementing a Dynamic Array
+#### Geometric Increase in Capacity and Arithmetic Progression (NOT important ⚠️)
+
+- When choosing the geometric base, there exists a tradeoff between run-time efficiency and memory usage. With a base of `2` (i.e., doubling the array capacity), if the last insertion causes a resize event, the array essentially ends up twice as large as it needs to be. If we instead increase the array by only `25%` of its current size (i.e., a geometric base of `1.25`), we do not risk wasting as much memory in the end, but there will be more intermediate resize events along the way.
+- > The key to the performance is that the amount of additional space is proportional to the current size of the array
+- To avoid reserving too much space at once, it might be tempting to implement a dynamic array with a strategy in which a constant number of additional cells are reserved each time an array is resized. Unfortunately, the overall performance of such a strategy is significantly worse. At an extreme, an increase of only one cell causes each append operation to resize the array, leading to a familiar `1+ 2+ 3+ ··· + n` summation and `Ω(n^2)` overall cost. Using increases of `2 or 3` at a time is slightly better, as portrayed in Figure 5.13, but the overall cost remains **quadratic**.
+  ![dynamic-array](./img/dynamic-array1.png)
+
+> look more into the **Amortized Analysis of Dynamic Arrays** in page 197 ("D&A in python" book)
+
+---
+
+### Implementing a Dynamic Array
 
 steps:
 
@@ -252,34 +258,29 @@ steps:
 4. Insert the new element in the new array.
 5. (Not shown): is the future garbage collection of the old array
 
-> We may notice that the total running time of n append operations is **`O(n)`**, as an (append operation) causes an overflow and a doubling of capacity. which means -> Copying the old elements (n) to the new array
-
-#### Geometric Increase in Capacity and Arithmetic Progression
-
-- When choosing the geometric base, there exists a tradeoff between run-time efficiency and memory usage. With a base of `2` (i.e., doubling the array capacity), if the last insertion causes a resize event, the array essentially ends up twice as large as it needs to be. If we instead increase the array by only `25%` of its current size (i.e., a geometric base of `1.25`), we do not risk wasting as much memory in the end, but there will be more intermediate resize events along the way.
-- > The key to the performance is that the amount of additional space is proportional to the current size of the array
-- To avoid reserving too much space at once, it might be tempting to implement a dynamic array with a strategy in which a constant number of additional cells are reserved each time an array is resized. Unfortunately, the overall performance of such a strategy is significantly worse. At an extreme, an increase of only one cell causes each append operation to resize the array, leading to a familiar `1+ 2+ 3+ ··· + n` summation and `Ω(n^2)` overall cost. Using increases of `2 or 3` at a time is slightly better, as portrayed in Figure 5.13, but the overall cost remains **quadratic**.
-  ![dynamic-array](./img/dynamic-array1.png)
-
-> look more into the **Amortized Analysis of Dynamic Arrays** in page 197 ("D&A in python" book)
+> We may notice that the total running time of `n` append operations is **`O(n)`**, as an (append operation) causes an overflow and a doubling of capacity. which means -> Copying the old elements (n) to the new array
 
 ---
 
 ### Referential Arrays
 
-- Arrays and tuples use another way to keep a byte-reference for each item to randomly access it quickly as each item naturally has different lengths
+- Arrays use another way to keep a byte-reference for each item to randomly access it quickly as each item naturally has different lengths
 
-  - Python represents a list or tuple instance using an internal storage mechanism of an array of **object references**. At the lowest level, what is stored is a consecutive sequence of memory addresses at which the elements of the sequence reside. A high-level diagram of such a list
+  - Python uses an internal storage mechanism for `lists` and `tuples`, consisting of an array of **object references**. At the lowest level, it stores a sequence of memory addresses where the elements reside.
     ![referential-arrays](./img/refrential-arrays.png)
-  - Although the relative size of the individual elements may vary, the number of bits used to store the memory address of each element is fixed (e.g., **64-bits per address**). In this way, Python can support constant-time access to a list or tuple element based on its index
-  - Empty elements can be referenced to as **`None`** object.
+  - Although the relative size of the individual elements may vary, the number of bits used to store the memory address of each element is fixed (e.g., **64-bits per address**). In this way, Python can support constant-time access to a list or tuple element based on its `index`
+  - Empty elements can be referenced to as `None` object.
 
-- Lists and tuples are referential structures, which means that a single instance can have multiple references to the same object as elements. This also means that a single object can be an element in multiple lists as they simply store references. When slicing a list, the resulting new list instance still references the same elements as the original list.
+- Lists are referential structures, allowing a single instance to have multiple references to the same object as elements. This means a single object can be in multiple lists since lists store references.
   ![referential-arrays](./img/refrential-arrays3.png)
-- it is a common practice in Python to initialize an array of integers using a syntax such as `counters = [0] * 8`. This syntax produces a list of length eight, with all eight elements being the value zero. Technically, all eight cells of the list reference the same object
-  ![referential-arrays](./img/refrential-arrays1.png)
-- the `extend()` command is used to add all elements from one list to the end of another list. **The extended list does not receive copies of those elements, it receives references to those elements (shallow copy)**
-  ![referential-arrays](./img/refrential-arrays2.png)
+
+  - Slicing a list results in a new list that still references the same elements as the original.
+
+- Notes for referential arrays in `python`:
+  - it is a common practice to initialize an array of integers using a syntax such as `counters = [0] * 8`. This syntax produces a list of length eight, with all eight elements being the value zero. Technically, all eight cells of the list reference the same object
+    ![referential-arrays](./img/refrential-arrays1.png)
+  - the `extend()` command is used to add all elements from one list to the end of another list. **The extended list does not receive copies of those elements, it receives references to those elements (shallow copy)**
+    ![referential-arrays](./img/refrential-arrays2.png)
 
 ---
 
@@ -290,41 +291,42 @@ steps:
   - Ex: if we want to store `integers` in the array, we know that each integer is `4 bytes` (32 bits), so we can store the first integer in the first `4 bytes` and the second integer in the next `4 bytes` and so on
   - Ex: if we want to store `floats` in the array, we know that each float is `8 bytes` (64 bits), so we can store the first float in the first `8 bytes` and the second float in the next `8 bytes` and so on
 - it has an advantage when we're concerned about the memory usage, as we don't need to store a byte-reference for each item
-- it has a fixed size, and it's not flexible like dynamic arrays, and it's not used in python as python is a dynamic language
+- it has a fixed size, and it's not flexible like dynamic arrays, and **it's not used in `python`** as python is a dynamic language. It's used in `c++` and `java` as they are static languages
+
+  ```c++
+  // ------------------------------------ C++ ------------------------------------ //
+  int array[5]; // array of 5 integers
+  float array[5]; // array of 5 floats
+  ```
 
 ---
 
-### Arrays big O
-
-> `tuples` are more memory efficient than `lists` because they are **immutable**
+### Arrays Big O
 
 ![arrays](./img/arrays2.png)
 ![arrays](./img/arrays3.png)
 
 > always remember if we iterated over items in array -> **O(n)**
 
-- Arrays are faster at reads because they provide **random access** instead of **sequential access**
+- Arrays are faster at **"reads"** because they provide **random access** instead of **sequential access**
 - **Finding an Element in Array:** You have 3 options:
 
-  1. If you know where it’s located, use the index. -> **O(1)**
-  2. If you don’t know where it’s located and your data is sorted, you can use algorithms to optimize your search, such as Binary Search. -> **O(log n)**
-  3. If you don’t know where it’s located and your data is not sorted, you will need to search through every element in the array and check if the current element is the element you are looking for -> **O(n) or O(n log n)**
+  1. If you know where it’s located, use the index -> `O(1)`
+  2. If you don’t know where it’s located and your data is sorted, you can use algorithms to optimize your search, such as `Binary Search` -> `O(log n)`
+  3. If you don’t know where it’s located and your data is not sorted, you will need to search through every element in the array and check if the current element is the element you are looking for -> `O(n)` or `O(n log n)`
 
 - `lookup` & `push/append`(inserting from the end) are **O(1)**, as they doesn't iterate over other items in the array
-  - there's a small possibility in **dynamic arrays**, that appending(pushing) element will create a new array which iterate over the array items to make them in the new memory location (exhibits **amortized** constant-time behavior)
-    - > **Amortized** -> the average time taken to perform an operation, considering all possible scenarios (we don't frequently double the array)
+  - In dynamic arrays, there's a slight chance that appending an element could trigger the creation of a new array, requiring the iteration of array items to move them to the new memory location, demonstrating **amortized** constant-time behavior.
+    - the running time is proportional to the **length of the other list**, and amortized because the underlying array for the first list may be resized to accommodate the additional elements.
+    - > **Amortized** -> the average time taken to perform an operation, considering all possible scenarios
     - we can further improve the practical execution time by using a **list comprehension** syntax to build up the temporary list, rather than by repeated calls to append.
 - `inserting` (in the beginning / any location other that the end) or `deleting` (`unshift`) are **O(n-i) -> O(n)**, as they change the locations(indices) of other array items and we then have to **iterate** over all/some of them to change their address in memory and their new index
-- **Extending a List**: Python provides a method named `extend` that is used to add all elements of one list to the end of a second list.
-  - In practice, the `extend` method is preferable to repeated calls to `append` because the constant factors hidden in the asymptotic analysis are significantly smaller.
-    - **Advantages of `extend()` instead of `append()`:**
+- **Extending a List**: Python provides a method named `extend()` that is used to add all elements of one list to the end of a second list.
+  - In practice, the `extend()` method is preferable to repeated calls to `append()` because the constant factors hidden in the asymptotic analysis are significantly smaller.
+    - **Advantages of `extend()` instead of `append()` (Not important ⚠️)**
       1. there is always some advantage to using an appropriate Python method, because those methods are often implemented natively in a compiled language (rather than as interpreted Python code).
       2. Second, there is less overhead to a single function call that accomplishes all the work, versus many individual function calls.
-      3. Finally, increased efficiency of `extend` comes from the fact that the resulting size of the updated list can be calculated in advance. If the second data set is quite large, there is some risk that the underlying dynamic array might be resized multiple times when using repeated calls to `append`. With a single call to `extend`, at most one resize operation will be performed.
-  - the running time is proportional to the **length of the other list**, and amortized because the underlying array for the first list may be resized to accommodate the additional elements.
-- **Best practices for constructing new lists**:
-  - `List comprehension` syntax is significantly faster than building the list by repeatedly `appending` elements in a `for` loop.
-  - it is a common Python idiom to initialize a list of constant values using the `multiplication` operator, as in `[0] * n` to produce a list of length `n` with all values equal to zero.
+      3. Finally, increased efficiency of `extend()` comes from the fact that the resulting size of the updated list can be calculated in advance. If the second data set is quite large, there is some risk that the underlying dynamic array might be resized multiple times when using repeated calls to `append)_`. With a single call to `extend()`, at most one resize operation will be performed.
 
 ---
 
@@ -332,20 +334,18 @@ steps:
 
 - Arrays are classified as **Homogeneous Data Structures** because they store elements of the same type.
   - once you define the type of values that your array will store, all its elements must be of that same type. You can’t "mix" different types of data.
-- A Python **string** embedded as an array of characters in the computer’s memory. We assume that each **Unicode character of the string requires two bytes** of memory
+- A Python **string** embedded as an array of characters in the computer’s memory. We assume that each **Unicode character of the string requires two `bytes`** of memory
 - when you want to do an operation on a **string**, think of it as an array, by converting it to array then do what you want
 
   ```py
-  # Avoid this:
+  # Avoid this ❌
   letters = ''
   for c in document:
     if c.isalpha():
       letters += c # BAD O(n^2)
 
-  # Do this: O(n  +  n) = O(2n) = O(n)
+  # Do this: O(n  +  n) = O(2n) = O(n) ✅
   letters = ''.join([c for c in document if c.isalpha()])
-  # or using generator function:
-  letters = ''.join(c for c in document if c.isalpha())
   ```
 
 - `tuples` are typically more memory efficient than `lists` because they are **immutable**
@@ -357,123 +357,170 @@ steps:
   data = [c[0] for c in range(r)]
   ```
 
+- **Best practices for constructing new lists**:
+
+  - `List comprehension` syntax is significantly faster than building the list by repeatedly `appending` elements in a `for` loop.
+  - it is a common `Python` idiom to initialize a list of constant values using the `multiplication` operator, as in `[0] * n` to produce a list of length `n` with all values equal to zero.
+
 ---
 
 ## Linked lists
 
 It's a data structure that contains a `head`, `tail` and `length` properties and consist of **nodes** and each node has a `value` and a `pointer` to another node or `null`
 
-- It relies on a lightweight object known as a **node**.
+- It relies on a lightweight object known as a **node** that has a `value` and a `pointer` to another node or `null`.
+
   - Each node maintains a reference to its element and one or more references to neighboring nodes in order to collectively represent the linear structure of the sequence.
 
-It doesn't have a predetermined fixed size, It uses space proportionally to its current number of elements. It's a **dynamic data structure**.
+- It's a **dynamic data structure** -> It doesn't have a predetermined fixed size, It uses space proportionally to its current number of elements.
 
-- It's an excellent alterative to arrays when insertion and deletion at the beginning are frequently required
-- It's a bunch of random memory addresses that are **linked together**
+  - It's a bunch of random memory addresses that are **linked together**
+
+- It's an excellent alterative to arrays when `insertion` and `deletion` at the beginning are frequently required
+- First node is called `head`, and last node is called `tail`
+- linked lists are called **null-terminated**, which signified the tail node as it points to `null`
+
+---
 
 ### Singly linked list
 
 ![linked-list](./img/linked-list0.png)
 
-It's based on **nodes** that have a `value` and a `pointer` to another node or `null`
-
 - **single-linked** list contains a set of nodes, each node has 2 elements:
-  - data to store
-  - pointer to the next node
-- first node is called **head**, and last node is called **tail**
-- linked lists are called **null-terminated**, which signified the tail node as it points to `null`
 
-#### Singly linked list operations
+  - data to store -> `value`
+  - pointer to the next node -> `next`
 
-- Remove element
-  - removing from start is **O(1)** as we only need to change the `head` pointer
-  - removing from end is **O(n)** as we need to traverse the whole list to get to the node previous to the `tail` node.
-    - > To solve this, we use **doubly linked list** which has a pointer to the previous node
-- If we want to access to a node with a specific `index`, we will have to traverse the list and **manually count each `.next` operation** until we reach wanted node.
+- **Singly linked list operations**
 
-  ```py
-  # Get the index'th node in the linked list.
-  def get(self, index):
-    if index < 0 or index >= self.length:
-      return None
-    counter = 0
-    cur = self.head
-    while counter != index:
-      cur = cur.next
-      counter += 1
-    return cur
-  ```
+  - **Accessing element**
 
-- `removeAt(index)`:
+    - If we want to access to a node with a specific `index`, we will have to traverse the list and **manually count each `.next` operation** until we reach wanted node.
 
-  - we need to keep track of the previous node, so we can update the `.next` pointer of the previous node to point to the next node
-  - we need to keep track of the current node, so we can return the value of the node that was removed
-  - we need to keep track of the next node, so we can update the `.next` pointer of the current node to point to the next node
+    ```py
+    # Get the index'th node in the linked list.
+    def get(self, index):
+      if index < 0 or index >= self.length:
+        return None
 
-  ```py
-  def removeAt(self, index):
-    counter = 0
-    current = self.head
-    previous = None # to keep track of the previous node so we can update the .next pointer of the previous node to point to the next node
+      counter = 0
+      cur = self.head
+      while counter != index and cur:
+        cur = cur.next
+        counter += 1
+      return cur
+    ```
 
-    # if list is empty
-    if !current:
-      return None
-    # if index is out of range
-    if index < 0 or index >= self.length:
-      return None
-    # if index is the head
-    if index == 0:
+  - **Remove element from start or end**
+
+    - removing first node is `O(1)` as we only need to change the `head` pointer
+    - removing last node is `O(n)` as we need to traverse the whole list to get to the last node
+      - > To solve this, we use **doubly linked list** which has a pointer to the previous node
+
+    ```py
+    # Remove the first node in the linked list.
+    def pop(self):
+      if !self.head:
+        return None
+
+      current = self.head
       self.head = self.head.next
+      self.length -= 1
+      return current
+
+    # Remove the last node in the linked list.
+    def removeLast(self):
+      if !self.head:
+        return None
+
+      # traverse to the last node
+      current = self.head
+      while current.next:
+        previous = current
+        current = current.next
+
+      previous.next = None
+      this.tail = previous
+      self.length -= 1
+      return current
+    ```
+
+  - **Remove element at specific index**
+
+    - removing element at specific index is `O(n)` as we need to traverse the whole list to get to the wanted node
+    - We need to keep track of:
+      - ( previous & next ) nodes, so we can update the `.next` pointer of the previous node to point to the next node
+      - current node, so we can return the value of the node that was removed
+
+    ```py
+    def removeAt(self, index):
+      counter = 0
+      current = self.head
+      previous = None # to keep track of the previous node so we can update the `.next` pointer of the previous node to point to the next node
+
+      # if list is empty
+      if !current:
+        return None
+      # if index is out of range
+      if index < 0 or index >= self.length:
+        return None
+      # if index is the head
+      if index == 0:
+        self.head = self.head.next
+        return self.head
+
+      # traverse the list until we reach the wanted node or the end of the list
+      while counter != index and current:
+        previous = current
+        current = current.next
+        counter += 1
+
+      # if we reached the end of the list
+      if !current:
+        return None
+
+      # if we reached the wanted node
+      previous.next = current.next # update the `.next` pointer of the previous node to point to the next node
+      self.length -= 1
+      return current
+    ```
+
+    - When deleting a node, The 2 neighbors of the node that we want to delete, will point to each other, so the node will be reclaimed by the system and deleted from the memory (because there's no reference to it anymore)
+      ![linked-list](./img/linked-list-remove.png)
+
+  - **Inserting element**
+
+    - We track the `previous`, `current`, and `next` nodes to update their `.next` pointers accordingly.
+
+    ```py
+    def insertAt(self, index, value):
+      newNode = Node(value)  # create a new node with the value passed to the function and next pointer set to None
+      counter = 0
+      current = self.head
+      previous = None
+
+      # if list is empty
+      if !current:
+        self.head = newNode
+        return self.head
+      # if index is out of range
+      if index < 0 or index >= self.length:
+        return None
+      # if index is the head
+      if index == 0:
+        newNode.next = self.head
+        self.head = newNode
+        return self.head
+
+      while counter != index:
+        previous = current
+        current = current.next
+        counter += 1
+      previous.next = newNode
+      newNode.next = current
+      self.length += 1
       return self.head
-
-    while counter != index:
-      previous = current
-      current = current.next
-      counter += 1
-    previous.next = current.next
-    self.length -= 1
-    return current
-  ```
-
-- `insertAt(index)`: we need to keep track of the previous node, so we can update the `.next` pointer of the previous node to point to the new node
-
-  - we need to keep track of the current node, so we can update the `.next` pointer of the new node to point to the current node
-  - we need to keep track of the next node, so we can update the `.next` pointer of the current node to point to the next node
-
-  ```py
-  def insertAt(self, index, value):
-    newNode = Node(value)  # create a new node with the value passed to the function and next pointer set to None
-    counter = 0
-    current = self.head
-    previous = None
-
-    # if list is empty
-    if !current:
-      self.head = newNode
-      return self.head
-    # if index is out of range
-    if index < 0 or index >= self.length:
-      return None
-    # if index is the head
-    if index == 0:
-      newNode.next = self.head
-      self.head = newNode
-      return self.head
-
-    while counter != index:
-      previous = current
-      current = current.next
-      counter += 1
-    previous.next = newNode
-    newNode.next = current
-    self.length += 1
-    return self.head
-  ```
-
-  > - when **inserting**, we can make use of the already existed methods: `push` and `unshift`:
-  > - if the index is the same as the length, **push** a new node to the end of the list
-  > - if the index is `0`, **unshift** a new node to the start of the list
+    ```
 
 ---
 
@@ -496,6 +543,11 @@ def traverse(self):
 Here, the `tail` of the list points to the `head` instead of pointing to `null`
 ![circular linked list](./img/circular-linked-list-1.png)
 
+- **Advantages of circular linked list**
+
+  - Any node can be a starting point. We can traverse the whole list by starting from any point. We just need to stop when the first visited node is visited again.
+  - Useful for implementation of `queue`. Unlike this implementation, we don’t need to maintain two pointers for front and rear if we use circular linked list. We can maintain a pointer to the last inserted node and front can always be obtained as next of last.
+
 ---
 
 ### Doubly linked list
@@ -504,43 +556,41 @@ It's almost identical to `singly-linked-list`, except every node has another poi
 
 ![linked-list](./img/link-list3.png)
 
-- Downside here compared to the `singly-linked-list` is that we have to hold a little bit more memory to take advantage of the more flexibility that the `double-linked-list` provides --> (Tradeoff)
-- When deleting a node, The 2 neighbors of the node that we want to delete, will point to each other, so the node will be reclaimed by the system and deleted from the memory.
+- **Downside** here compared to the `singly-linked-list` is that we have to hold a little bit more memory to take advantage of the more flexibility that the `double-linked-list` provides --> (Tradeoff)
 - it can be traversed both from the front and the back easily
 - `.pop()` here is easer as we have access to the node previous to the `tail`
 - `.Get(index)` here we can use the same technique as in `singly-linked-list` or we can leverage the `previous` pointer here, as we can see if the wanted `index` is more closer to the `head` or `tail` **(we know this by comparing the index to the half of the length of the linked-list)**, and then go from there
 
-  ```js
-  get(index) {
-    if(index < 0 || index >= this.length) return null;
-    if(index <= this.length/2) {
-      let counter = 0;
-      let current  = this.head;
-      while(counter !== index) {
-        current = current.next;
-        counter++;
-      }
-      return current;
-    }
-    else {
-      let count = this.length - 1;
-      let current  = this.tail;
-      while(counter !== index) {
-        current = current.prev;
-        counter--;
-      }
-      return current;
-    }
-  }
+  ```py
+  def get(self, index):
+    if index < 0 or index >= self.length:
+      return None
+
+    if index <= self.length/2:
+      # traverse from the head
+      counter = 0
+      current = self.head
+      while counter != index:
+        current = current.next
+        counter += 1
+      return current
+    else:
+      # traverse from the tail
+      counter = self.length - 1
+      current = self.tail
+      while counter != index:
+        current = current.prev
+        counter -= 1
+      return current
   ```
 
 ---
 
 ## Arrays vs linked lists
 
-![linked-list vs Array](./img/linked-list-vs-array.png)
-
 ### Differences
+
+![linked-list vs Array](./img/linked-list-vs-array.png)
 
 - **Size**
   - data can only be stored in contiguous blocks of memory in an array, its size cannot be altered at runtime due to the risk of overwriting other data.
@@ -549,6 +599,11 @@ It's almost identical to `singly-linked-list`, except every node has another poi
   - For static arrays, the size of the array is fixed, and the memory is allocated at `compile time`.
   - For dynamic arrays, the size of the array is not fixed, and the memory is allocated at `runtime`.
   - For linked lists, the size of the list is not fixed, and the memory is allocated at `runtime`.
+- **Access**
+  - Arrays store elements in contiguous memory locations, resulting in easily calculable addresses for the elements stored and this allows faster access to an element at a specific index.
+    ![array](./img/array-access.png)
+  - Linked lists are less rigid in their storage structure and elements are usually not stored in contiguous locations, hence they need to be stored with additional tags giving a reference to the next element.
+    ![linked-list](./img/linked-list-access.png)
 - **Memory efficiency**
   - For the same number of elements, linked lists use more memory as a reference to the next node is also stored along with the data. However, size flexibility in linked lists may make them use less memory overall
 - **Dependency**
@@ -605,35 +660,34 @@ The main idea of a hash table is that it maps keys to values by taking a `bucket
 
 Here we have **Key/value pairs**
 
-> In order to look-up values by key, we need a way to convert keys into valid array indices
+- In order to look-up values by key, we need a way to convert keys into valid memory addresses. This is where **hash functions** come in.
+  ![hash-function](./img/hashFunction.png)
 
-![hash-function](./img/hashFunction.png)
-
-- Arrays and lists map straight to memory, but hash tables are smarter. hey use a hash function to intelligently figure out where to store elements.
-  - array like a data structure where keys (integers) can be used directly as an index to store values. However, in cases where the keys are large and cannot be used directly as an index, you should use **hashing**.
+- Arrays and lists map straight to memory, but hash tables are smarter. They use a hash function to intelligently figure out where to store elements.
+  - array like a data structure where `keys` (`integers`) can be used directly as an index to store values. However, in cases where the keys are large and cannot be used directly as an index, you should use **hashing**.
 - Hash tables are great for:
   1. creating a mapping from one thing to another
   2. looking something up
-- Hash tables are not good for:
-  1. storing -> `O(nlog(n))`
 - **Use cases:**
+
   - create a mapping from one thing to another thing
     - In technical terminology, we’d say that a hash function “maps strings to numbers.”
   - look-ups
   - Modeling relationships from one thing to another thing
   - prevent duplicate entries (Filtering out duplicates)
-  - Caching/memorizing data instead of making your server do work
-    - When you visit a website, your browser stores some of the contents on your computer. The next time you visit the site, your browser can load the page without having to send another request to the server.
-    - The browser uses a hash function to map the URL to a location in your computer’s memory. If the browser has already stored the page, it can retrieve the contents from memory. Otherwise, it will send a request to the server.
-    - > **Caching** is a common way to make things faster. All big websites use caching. And that data is cached in a hash!
   - DNS resolution
     - `Google.com` -> `74.125.239.133`
+  - Caching/memorizing data instead of making your server do work
+
+    - When you visit a website, your browser stores webpage content on your computer, allowing future visits to load the page from memory using a hash function. If not stored, the browser sends a server request.
+
+    > **Caching** is a common way to make things faster. All big websites use caching. And that data is cached in a hash!
 
 ---
 
 ### Hash function
 
-The goal of hash function is to **convert** a **key** to an **index** in the array.
+The goal of hash function is to **convert** a `key` to an `index` in the array.
 
 - the resulted hash-value is converted to **index-biased** which is pointer to where the value of the `key` is in the memory
   - this is great for accessing values of a hash-table as we only give it a `key` and it gets the value from the location immediately -> `O(1)`
@@ -643,71 +697,77 @@ The goal of hash function is to **convert** a **key** to an **index** in the arr
 
 - Simple example of a hash function:
 
-  ```js
+  ```py
   def hash(self, key):
       index = 0
       for char in key:
           index += ord(char)
       return index % self.size
+
+  hash('hello') # 532 % 10 = 2
   ```
 
 #### Good Hash functions
 
-To achieve a good hashing mechanism, It is important to have a good hash function with the following basic requirements:
-
-1. **Easy to compute:**
+1. **Makes use of all info provided by `key`:**
+   - The hash function should make use of all the characters of the key that are significant in determining the value.
 2. **Uniform distribution:**
-   ![good hash function](./img/good-hash-function.png)
-3. **Less collisions:**
-
-A bad hash function groups values together and produces a lot of **collisions**.
-![bad hash function](./img/bad-hash-function-1.png)
+   - The hash function should map the possible inputs as evenly as possible over the output range. This is called a uniform distribution.
+     ![good hash function](./img/good-hash-function.png)
+3. **Less collisions**
+   - A bad hash function groups values together and produces a lot of **collisions**.
+     ![bad hash function](./img/bad-hash-function-1.png)
 
 ---
 
 ### Collision
 
-with enough data and limited memory, sometimes keys are hashed to the same value (2 keys have been assigned the same memory slot) so they have the same address in memory(**memory-space**) as there's no concept of ordering keys(indexes), which causes collision
+with enough data and limited memory, sometimes `keys` are hashed to the same `value` (2 keys have been assigned the same memory slot) so they have the same address in memory(**memory-space**) as there's no concept of ordering keys(indexes), which causes collision
 
-- There're many ways to deal with this problem, but the most common one is **separate chaining** which is storing the values in a data-structure like (array or **linked-list**) at the same index
-  ![hash-collision](./img/hash-collision.png)
-- when we have a collision **(worst case)**, the performance becomes **O(n/k) -> O(n)**, where `n` is the number of elements(entries) in the hash-table and `k` is the number of slots in the hash-table
-  - > **Note:** `k` is usually a constant, so we can ignore it and say that the time complexity is `O(n)` which is the same as the time complexity of a linked-list
+- when we have a collision **(worst case)**, the performance becomes `O(n/k) -> O(n)`, where `n` is the number of elements(entries) in the hash-table and `k` is the number of slots in the hash-table
 
-> Note: Irrespective of how good a hash function is, collisions are bound to occur. Therefore, to maintain the performance of a hash table, it is important to manage collisions through various collision resolution techniques. Assume that you’ll get the average case performance: constant time.
+Irrespective of how good a hash function is, collisions are bound to occur. Therefore, to maintain the performance of a hash table, it is important to manage collisions through various collision resolution techniques. Assume that you’ll get the average case performance: **constant time**.
 
 - There're many strategies for dealing with collisions:
 
   1. **separate chaining (open hashing)**: (most common)
      ![separate chaining](./img/hash-collision2.png)
      - at each index in our array we store values using more sophisticated data-structure like (array or linked-list)
-     - this allows us to store multiple key-value pairs at the same index
+       ![hash-collision](./img/hash-collision.png)
   2. **linear probing ("Open Addressing" or "Closed Hashing")**:
      ![linear probing](./img/hash-collision3.png)
      ![linear probing](./img/hash-collision4.jpg)
+
      - In `open addressing`, entry records are stored directly in the array instead of linked lists. When inserting a new entry, the hashed index is computed and the array is checked from that index onwards. If the slot at the hashed index is empty, the entry is inserted there. Otherwise, it follows a probe sequence until an empty slot is found.
        - when we find a collision, we search through the array to find the next empty slot
        - it requires that the `load factor` be kept less than `1`.
        - When searching for an entry, the array is scanned in the same sequence until either the target element is found or an unused slot is found. This indicates that there is no such key in the table.
-     - > The name `"open addressing"` refers to the fact that the location or address of the item is not determined by its hash value.
+
+     > The name `"open addressing"` refers to the fact that the location or address of the item is not determined by its hash value.
+
      - also here, we may improve the **time complexity**, but we might also accidentally increase the **space complexity** as a tradeoff by creating an object and storing values inside it in the memory
      - also this may result in a `O(n)` time complexity in the worst case, as we may have to search through the entire array to find an empty slot
+
   3. **Rehashing**: (most common)
+
      - When the `load factor` of the hash table increases, the hash table is rehashed (i.e., the `size` of the table is increased approximately by a factor of `2` and the table is rehashed -> like **dynamic arrays**).
-     - > **Note:** The load factor is the ratio of the number of elements in the hash table to the size of the hash table.
+
   4. **double hashing**: Similar to linear probing, but instead of using a constant "skip" value, we use a second hash function to determine the next index to check.
   5. **quadratic probing**: Similar to `linear probing`, but instead of using a constant "skip" value, we use a quadratic function to determine the next index to check.
 
 - To avoid collisions, we want to distribute our values evenly throughout, So we need:
+
   - A low **load factor**
-    - Load factor measures how many empty slots remain in your hash table.
-    - Load factor is defined as `(m/n)` where:
+
+    > **load factor** is the ratio of the number of elements in the hash table to the size of the hash table.
+
+    - It measures how many empty slots remain in your hash table.
+    - It is defined as `(m/n)` where:
       - `n` is the total size of the hash table
       - `m` is the total number of slots (preferred number of entries that can be inserted before an increment in the size of the underlying data structure is required).
-      - > Hash tables use an array for storage, so you count the number of occupied slots in an array. For example, this hash table has a load factor of `2/5`, or `0.4`. ![load factor](./img/hash-table-load-factor.png)
+      - Hash tables use an array for storage, so you count the number of occupied slots in an array. For example, this hash table has a load factor of `2/5`, or `0.4`. ![load factor](./img/hash-table-load-factor.png)
     - Note: Having a load factor greater than `1` means you have more items than slots in your array. Once the load factor starts to grow, you need to add more slots to your hash table. his is called **resizing**.
       - With a lower load factor, you’ll have fewer collisions, and your table will perform better. **A good rule of thumb is, resize when your load factor is greater than `0.7`**.
-  - A good hash function
 
 ---
 
@@ -747,11 +807,6 @@ class HashTable:
         index = self._hash(key)
 
         # Open addressing
-        if not self.keyMap[index]:
-            self.keyMap[index] = []
-        self.keyMap[index].append([key, value])
-
-        # Or: Linear probing
         if self.keyMap[index] is None:
             self.keyMap[index] = [key, value]
         else:
@@ -759,6 +814,11 @@ class HashTable:
             while self.keyMap[index] is not None:
                 index += 1
             self.keyMap[index] = [key, value]
+
+        # Or: Linear probing
+        if self.keyMap[index] is not None:
+            index += 1
+        self.keyMap[index] = [key, value]
 
     def get(self, key):
         index = self._hash(key)
@@ -775,9 +835,9 @@ class HashTable:
         # returns all the values in the hash table
 ```
 
-#### Time complexity of HashMap
+### Time complexity of HashMap
 
-- Insertion: `O(1)`
+- Insertion: `O(1)*` (if no collision), `O(n)` (if collision)
 - Deletion: `O(1)`
 - Access: `O(1)`
 
@@ -794,7 +854,7 @@ They made us limit the operations we can do on other data structures like `lists
 
 ### Stacks
 
-A stack is a collection of objects that are inserted and removed according to the **last-in, first-out (LIFO)** principle.
+A stack is a collection of elements that are inserted and removed according to the **last-in, first-out (LIFO)** principle.
 
 - In a `LIFO` data structure, the newest element added to the queue will be processed first.
 
@@ -803,8 +863,6 @@ A stack is a collection of objects that are inserted and removed according to th
   - programming languages when calling functions in the **call stack**
   - some commands like: `undo`
   - Internet Web browsers store the addresses of recently visited sites in a stack. Each time a user visits a new site, that site’s address is “pushed” onto the stack of addresses. The browser then allows the user to “pop” back to previously visited sites using the “back” button
-
-- `peek` --> is to view the top most plate
 
 ---
 
@@ -816,7 +874,7 @@ It is what a program uses to keep track of method/function calls.
 
   - Each method call creates its own stack frame, taking up space on the call stack.
     - That's important because it can impact the space complexity of an algorithm. Especially when we use **recursion**
-    - The entire call stack takes up `O(n)` space even though our method itself doesn't create any data structures!
+    - The entire call stack takes up `O(n)` space even though our method itself doesn't create any data structures!, because each method call creates its own stack frame, taking up space on the call stack.
   - A stack frame usually stores:
     - local variables
     - method arguments
@@ -824,7 +882,7 @@ It is what a program uses to keep track of method/function calls.
 
 - **procedure call stack**:
 
-  - The call stack is a stack data structure maintained inside computers and ran by the operating system. It stores information about when the active procedures and functions call each other, and how they pass parameters to each other.
+  - The call stack is a `stack` data structure maintained inside computers and ran by the operating system. It stores information about when the active procedures and functions call each other, and how they pass parameters to each other.
     ![procedure call stack](./img/procedure-call-stack-1.png)
     ![procedure call stack](./img/procedure-call-stack-2.png)
   - Ex: when `procedure 1` calls `procedure 2`, `procedure 2` is pushed onto the stack. and so on when `3` calls `2`, ..., When `procedure 2` returns, it is popped off the stack and `procedure 1` resumes execution.
@@ -850,7 +908,7 @@ It is what a program uses to keep track of method/function calls.
   ![call-stack](./img/call-stack-5.png)
   ![call-stack](./img/call-stack-6.png)
 
-> **Note:** Using the stack is convenient, but there's a cost: saving all that info can take up a lot of memory. Each of those function calls takes up some memory, and when your stack is too tall, that means your computer is saving information for many function calls. At that point, you have two options:
+> **Note:** Using a stack is convenient but comes at a memory cost. Each function call consumes memory, and when the stack is too tall, your computer stores information for many calls. In such a situation, you have two options:
 >
 > - You can rewrite your code to use a loop instead.
 > - You can use something called [tail recursion](./2-Algorithms.md#eliminating-tail-recursion). That's an advanced recursion topic. It's also only supported by some languages, not all.
@@ -871,18 +929,17 @@ stacks can be implemented using **Arrays(lists)** or **linked-lists**, as:
 
 - we can use the **"Adapter Pattern"**
 
-  - > The "Adapter design pattern" modifies an existing class so that its methods match those of a related class or interface. This is done by defining a new class that contains an instance of the existing class as a hidden field, and implementing each method of the new class using methods of this hidden instance variable. This creates a new class that performs some of the same functions as the existing class, but repackaged in a more convenient way.
-  - always when using the **"Adapter Pattern"**, try to remember the different Error-type-raised from different data-structures, as a `List` would raise an `IndexError` if the list is empty; so we need to raise another Error-type if the stack is empty
+  > The "Adapter design pattern" aligns an existing class with the methods of a related class or interface by creating a new class that uses the existing class as a hidden field. This offers similar functionality in a more convenient format.
+
+  - Always when using the **"Adapter Pattern"**, try to remember the different Error-type-raised from different data-structures, as a `List` would raise an `IndexError` if the list is empty; so we need to raise another Error-type if the stack is empty
 
     ```py
-    if self.is empty( ):
-      raise Empty( 'Stack is empty' )
+    if self.is_empty():
+      raise Empty('Stack is empty')
     ```
 
-- `arrays` allow for **cache locality** which is faster when accessing its items in memory because they're right next to each other
+- `Arrays / Lists` allow for **cache locality** which is faster when accessing its items in memory because they're right next to each other, unlike `linked lists` which are scattered in the memory (slower access)
   ![stacks](./img/stacks1.png)
-- `linked-list`, but note that it has its items scattered all over memory, so it will be slower that `array`
-  - also remember that `.pop()` in `singly-linked-list` is `O(n)` and not `O(1)` like in `doubly-linked-list`, so if you will implement a stack using linked-list, do it with `doubly-linked-list`
 
 ```py
 class ArrayStack:
@@ -919,8 +976,6 @@ By implementing a stack using linked-list, we get all of the stack methods in co
 class LinkedStack:
   #-------------------------- nested _Node class --------------------------
   class _Node:
-    __slots__ = '_element', '_next' # streamline memory usage
-
     def __init__(self, element, next): # initialize node's fields
       self._element = element # reference to user's element
       self._next = next # reference to next node
@@ -949,10 +1004,10 @@ class LinkedStack:
   def pop(self):
     if self.is_empty():
       raise Empty('Stack is empty')
-    answer = self._head._element
+    data = self._head._element
     self._head = self._head._next # bypass the former top node
     self._size -= 1
-    return answer
+    return data
 ```
 
 ---
@@ -973,33 +1028,8 @@ it's based on **FIFO** (first in - first out)
 
 - `enqueue` --> is to add to the queue (push)
 - `denqueue` --> is to remove first item from queue (pop)
-- creating `Queues` from `arrays` is really bad, as you will shift the other elements (O(n))
-- You would never want to build a queue with an `array`, as `arrays` have indexes associated with them, so if we removed first item then we now need to shift the indexes over --> **O(n)**,
-- **so we should build `queues` with `linked-lists`**, as we just change the `head` --> **O(1)**
-
-  ```py
-  class Queue:
-    def __init__(self):
-      self.queue = DoublyLinkedList()
-
-    def enqueue(self, value):
-      self.queue.append(value)
-
-    def dequeue(self):
-      return self.queue.pop(0)
-
-    def peek(self):
-      return self.queue[0]
-
-    def is_empty(self):
-      return len(self.queue) == 0
-
-    def __len__(self):
-      return len(self.queue)
-
-    def __str__(self):
-      return str(self.queue)
-  ```
+- creating `Queues` from `arrays` is really bad, as `arrays` have indexes associated with them, so if we removed first item then we now need to shift the indexes over --> `O(n)`,
+- **so we should build `queues` with `linked-lists`**, as we just change the `head` --> `O(1)`
 
 - Queues Drawbacks:
 
@@ -1007,9 +1037,33 @@ it's based on **FIFO** (first in - first out)
     - searching for an item
     - deleting an item
     - randomly accessing an item
-  - The implementation above is straightforward but is inefficient in some cases. With the movement of the `start (head)` pointer, more and more space is wasted. And it will be unacceptable when we only have a space limitation.
-    - A more efficient way is to avoid calling `pop(0)` and use a variable to keep track of the `start (head)` pointer. This way, we can use the space more efficiently. Also instead replace the dequeued element with `None` and move the `start (head)` pointer to the next element. This way, we don’t have to move the elements in the array. But we have to check if the `start (head)` pointer is at the end of the array and move it to the beginning of the array.
-      - This is called: **circular queue**.
+  - The implementation below is straightforward but is inefficient in some cases. With the movement of the `start (head)` pointer, more and more space is wasted. And it will be unacceptable when we only have a space limitation.
+
+    ```py
+    class Queue:
+      def __init__(self):
+        self.queue = DoublyLinkedList()
+
+      def enqueue(self, value):
+        self.queue.append(value)
+
+      def dequeue(self):
+        return self.queue.pop(0)
+
+      def peek(self):
+        return self.queue[0]
+
+      def is_empty(self):
+        return len(self.queue) == 0
+
+      def __len__(self):
+        return len(self.queue)
+
+      def __str__(self):
+        return str(self.queue)
+    ```
+
+    - To improve efficiency, avoid `pop(0)` and use a pointer to track the `start (head)` position. Replace the dequeued element with `None` and move the pointer to the next element, eliminating the need to shift elements. Ensure to reset the pointer to the array's beginning when needed. This is called: **circular queue**.
 
 #### Circular Queue
 
@@ -1032,14 +1086,14 @@ class MyCircularQueue:
     if self.isFull():
       return False
     self.queue[self.tail] = value
-    self.tail = (self.tail + 1) % self.maxSize
+    self.tail = (self.tail + 1) % self.maxSize # circular increment of the tail
     return True
 
   def dequeue(self) -> bool:
     if self.isEmpty():
       return False
     self.queue[self.head] = None
-    self.head = (self.head + 1) % self.maxSize
+    self.head = (self.head + 1) % self.maxSize # circular increment of the head
     return True
 
   def Front(self) -> int:
@@ -1108,8 +1162,8 @@ class Queue:
   ```py
   from collections import deque
   queue = deque([1, 2, 3])
-  queue.append(4)
-  queue.popleft()
+  queue.append(4) # add to the right -> [1, 2, 3, 4]
+  queue.popleft() # remove from the left -> [2, 3, 4]
   ```
 
 ---
@@ -1126,9 +1180,8 @@ They're nodes (vertices) connected via "Edges"
 
   - **Directed** and **undirected** graphs:
     ![graphs](./img/graphs-direction.png)
-    - directions assigned to distances between nodes
+    - `Directed` -> (graph that goes in one direction): If you made a twitter follow to someone; you follow him, but he doesn't automatically follow you
     - `Undirected` -> If you made a facebook friend-request to someone; you become his friend and he becomes your friend
-    - `directed` -> (graph that goes in one direction): If you made a twitter follow to someone; you follow him, but he doesn't automatically follow you
   - **Complete** and **incomplete** graphs:
     ![graphs](./img/graphs-complete.jpeg)
     - `complete` -> all nodes are connected to each other
@@ -1137,7 +1190,9 @@ They're nodes (vertices) connected via "Edges"
     - values assigned to distances between nodes
   - **cyclic** and **Acyclic**
 
-### How to store graphs
+---
+
+### How to store and represent graphs
 
 ![graphs-matrix-vs-list](./img/graphs-matrix-vs-list.png)
 
@@ -1152,12 +1207,13 @@ They're nodes (vertices) connected via "Edges"
   - Here:
     - we use `hash-table` to store the edges with the vertex as the key and the edges as the value array
       ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
-    - or we can use `array` to store the edges with the vertex as the index and the edges as the value array
-      ![graphs-adjacency-list](./img/graphs-adjacency-list-1.png)
+    - Or we can use `array` to store the edges with the vertex as the index and the edges as the value array
       - this is more space-efficient than using `hash-table` as we don't have to store the keys as the `indices` are the keys
-  - Here it's more space-efficient, as it's `O(n + e)` space complexity
-    - This is because we only have to store the values for the edges that actually exist in an array for each node
+        ![graphs-adjacency-list](./img/graphs-adjacency-list-1.png)
+  - Here it's more space-efficient, as it's `O(n + e)` space complexity. This is because we only have to store the values for the edges that actually exist in an array for each node
   - it's the most used, as most data in real-world tends to lend itself to sparser and/or larger graphs
+
+---
 
 ### Graphs implementation
 
@@ -1166,6 +1222,36 @@ They're nodes (vertices) connected via "Edges"
 - Adding an Edge:
   ![adding an edge](./img/graphs-edge1.png)
   ![adding an edge](./img/graphs-edge2.png)
+
+```py
+class Graph:
+  def __init__(self):
+    self.numberOfNodes = 0
+    self.adjacentList = {}
+
+  def addVertex(self, node):
+    self.adjacentList[node] = []
+    self.numberOfNodes += 1
+
+  def addEdge(self, node1, node2):
+    # undirected Graph
+    self.adjacentList[node1].append(node2) # add node2 to node1's list
+    self.adjacentList[node2].append(node1) # add node1 to node2's list
+
+# Using it
+myGraph = Graph()
+myGraph.addVertex('0')
+myGraph.addVertex('1')
+myGraph.addVertex('2')
+
+myGraph.addEdge('0', '1')
+myGraph.addEdge('0', '2')
+myGraph.addEdge('1', '2')
+
+# 0 --> 1, 2
+# 1 --> 0, 2
+# 2 --> 0, 1
+```
 
 ---
 
@@ -1178,32 +1264,41 @@ It's a special type of graph, where no edges point back to the root node (no cyc
 ![trees](./img/trees1.png)
 ![trees](./img/trees.png)
 
-- They have **Hierarchical (non-linear) Data-structures** structure unlike other data-structures which are **Linear Data-structures**
-  - "Hierarchical" means that some objects are **above** and some are **below** others.
+- They have **Hierarchical (non-linear) structure** unlike other data-structures which are **Linear structure**
+  > "Hierarchical" means that some objects are **above** and some are **below** others.
 - If a tree has `N` vertices(nodes) than the number of edges is always one less than the number of nodes(vertices) i.e `N-1`.
   - If it has more than `N-1` edges it is called a `graph` not a `tree`.
 - Other important concepts to understand are:
 
   - `depth` of a node is the number of edges from the desired `node` to the `root`.
+
     - Or: the number of ancestors a node has.
       - It's one plus the depth of its parent -> `1 + depth(parent(current_node))`
-    - Time complexity: `O(d + 1)` -> `O(n)` where `d` is the depth of the node
     - depth of the root node is `0`
+    - Time complexity: `O(d + 1)` -> `O(n)` where `d` is the depth of the node
+
+      ```py
+      def depth(node):
+        if node is None:
+          return -1
+        return 1 + depth(node.parent)
+      ```
+
   - `height` of a node is the maximum number of edges from the desired `node` to the `leaf`.
 
     - So, height of a tree is the number of edges from the `root` to the furthest `leaf`.
     - height of a leaf node is `0`
 
-    ```py
-    def height(node):
-      if node is None:
-        return -1
-      left_height = height(node.left)
-      right_height = height(node.right)
-      return 1 + max(left_height, right_height)
-    ```
-
     - Time complexity: `O(c + 1)` -> `O(n)` where `c` is the number of children of the node
+
+      ```py
+      def height(node):
+        if node is None:
+          return -1
+        left_height = height(node.left)
+        right_height = height(node.right)
+        return 1 + max(left_height, right_height)
+      ```
 
   - `leaves` are the last nodes on a tree. They are nodes without children. Like real trees, we have the `root`, `branches`, and finally the `leaves`.
 
@@ -1213,9 +1308,8 @@ It's a special type of graph, where no edges point back to the root node (no cyc
   - AI
   - computer File Systems (folders/files)
 - `nodes`
-  - can only point to their children (child node can't point to it;s parent or it's siblings)
+  - can only point to their children (child node can't point to it;s parent or it's siblings) -> don't have to reference their parent
   - each node must have only one parent node
-  - don't have to reference their parent
 
 ---
 
@@ -1226,16 +1320,15 @@ It's a special type of graph, where no edges point back to the root node (no cyc
 - `trees` can be implemented using `arrays` or `lists` or `objects`
 - Traverse a tree using `BFS` or `DFS`
   - **`BFS` Steps:**
-    - create a queue (this can be an array) and a variable to store the values of nodes visited
-    - place the root node in the queue
-    - loop as long as there is anything in the queue
-      - dequeue a node from the queue and push the value of the node into the variable that stores the nodes
-      - if there are children on the node dequeued - add them to the queue
+    - create a `queue` (this can be an array) and a variable to store the values of nodes visited
+    - place the `root` node in the `queue`
+    - loop as long as there is anything in the `queue`
+      - dequeue a node from the `queue` and push the value of the node into the variable that stores the nodes
+      - if there are children on the node dequeued - add them to the `queue`
     - return the variable that stores the values
   - **`DFS` Steps:**
-    - create a stack (this can be an array) and a variable to store the values of nodes visited
-    - create a variable to store the values of nodes visited
-    - store the root of the BST in a variable called current
+    - create a `stack` (this can be an array) and a variable to store the values of nodes visited
+    - store the `root` of the `BST` in a variable called `current`
     - write a helper function which accepts a node
       - push the value of the node to the variable that stores the values
       - if there are children on the node dequeued - add them to the queue
@@ -1253,7 +1346,7 @@ class Node:
   def remove_child(self, child_node):
     self.children = [child for child in self.children if child is not child_node]
 
-# -------------------------------------------------------------
+# ----------------------------------------------------------------------------------------- #
 
 class Tree:
   def __init__(self, root_node=None):
@@ -1284,8 +1377,6 @@ class Tree:
 
 ### Binary Tree
 
-![binary-tree](img/binary-tree.webp)
-
 - It's an ordered tree with the following properties:
   - Each `node` can only have either `0`, `1` or `2` child-nodes
   - Each child can have only one parent
@@ -1295,6 +1386,8 @@ class Tree:
   1. **value**
   2. pointer to the **left** side of the tree
   3. pointer to the **right** side of the tree
+
+---
 
 #### Array-based Binary Tree
 
@@ -1326,13 +1419,13 @@ An alternative representation of a binary tree is to have a single array `A` of 
 - **Full Binary Tree**: A Binary Tree is full if every `node` has `0` or `2` children. Following are examples of a full binary tree.
 
   ```sh
-          18
-        /    \
-      15      20
-      / \
-      40 50
-      / \
-      30 50
+           18
+         /    \
+       15      20
+      /  \
+     40   50
+    / \
+  30   50
   ```
 
 - **Complete Binary Tree**: A Binary Tree is complete Binary Tree if all levels are completely filled **except possibly the last level** and the last level has all keys as left as possible.
@@ -1344,7 +1437,7 @@ An alternative representation of a binary tree is to have a single array `A` of 
       /   \       /  \
     40     5    100   40
    / \    /
-  8  7   9
+  8   7  9
   ```
 
 - **Perfect Binary Tree**: A Binary tree is Perfect Binary Tree in which all internal nodes have two children and all leaves are at same level.
@@ -1360,13 +1453,13 @@ An alternative representation of a binary tree is to have a single array `A` of 
   - this type is really efficient and desirable as they have 2 interesting properties:
     1. The number of total `nodes` on each level **doubles** as we move down the tree.
     2. The number of `nodes` on the last level is equal to (the sum of the number of nodes on all the other levels **plus** `1`), which means that **"half of our nodes are on the last level"**
-       - this is very useful as it can enable us to avoid visiting every `node` if the `node` we're looking for is at the very bottom-level --> this introduces the **"O(log N)"** notation
+       - this is very useful as it can enable us to avoid visiting every `node` if the `node` we're looking for is at the very bottom-level --> this introduces the `O(log n)` notation
 
 ---
 
 #### Binary Search Tree (BST)
 
-![BST](./img/bst.png)
+![binary-tree](img/binary-tree.webp)
 
 **Binary Search Tree (BST)** is an extension of Binary tree with some added constraints / rules:
 
@@ -1375,7 +1468,9 @@ An alternative representation of a binary tree is to have a single array `A` of 
   - Every parent node has **at most** 2 children
   - value of the left child is always less than the parent node
   - value of the right child is always greater than the parent node
-    - this means if I keep going to the right, the number or the value of the node constantly increases
+  - Differences to a Binary Tree:
+    - Binary Tree doesn't have any rules on how to order values
+    - Binary Tree can have more than 2 children
 
 - It's somehow similar to `Quick Sort` algorithm, where we have a `pivot` point and all the values to the left of the `pivot` are less than the `pivot` and all the values to the right of the `pivot` are greater than the `pivot`
 
@@ -1395,7 +1490,7 @@ An alternative representation of a binary tree is to have a single array `A` of 
       - selecting another **root** node and reorder the tree
       - Algorithms which balance an unbalanced-trees, like : `AVL Tree`, `Red Black Tree`
   - no `O(1)` operations like in `hash-tables`
-  - removing elements is a bit tricky, as we need keep track to a reference to the **parentNode**, so that we know whet the deleted node is replaced with
+  - removing elements is a bit tricky, as we need keep track to a reference to the **parentNode**, so that we know what the deleted node is replaced with
 
 - **Notes:**
 
@@ -1408,16 +1503,12 @@ An alternative representation of a binary tree is to have a single array `A` of 
   - Binary Search Tree is sometimes called **Ordered** or **Sorted** Binary Tree.
     - it keeps its values in sorted order, so that lookup and other operations can use the principle of binary search
     - This is why it's sometimes used instead of sorted arrays:
-      - > binary search trees provide more flexibility, in that we can always **insert/delete a node in `O(log(n))` time**, but searching for an element in a sorted array takes `O(log(n))` time in the average case and `O(n)` in the worst case.
-
-- Class Construction
-  ![BST class](./img/bst1.png)
+      > binary search trees provide more flexibility, in that we can always **insert/delete a node in `O(log(n))` time**, but searching for an element in a sorted array takes `O(log(n))` time in the average case and `O(n)` in the worst case.
 
 - **Finding a node (lookup):**
   ![BST insertion](./img/bst-finding.png)
 
   ```py
-  # BST
   def search(root, target):
     if not root:
       return False
@@ -1478,10 +1569,10 @@ An alternative representation of a binary tree is to have a single array `A` of 
       # case 3: two children
       else:
         # find the minimum value in the right subtree because it's the next largest value in the tree
-        # copy that value to the current node
-        # then recursively delete the minimum value in the right subtree
         min_val = find_min(root.right)
+        # copy that value to the current node
         root.val = min_val
+        # then recursively delete the minimum value in the right subtree
         root.right = remove(root.right, min_val)
 
     return root
@@ -1575,20 +1666,18 @@ It's a more efficient data structure for presenting Priority-queue.
     ![binary-heap](./img/binary-heap.png)
   - Every parent node has **at most** 2 children
 
-- Time complexity:
+- **Time complexity:**
 
   - it has a **`O(n)`** for lookup as it's less ordered than Binary-trees; so it turns to looping in a linked list or array to find a value
   - it has a **`O(log(n))`** for inserting/removing
 
 - It's used in:
+
   - Implementing [Priority Queues](#priority-queue)
   - used with **Graph-traversal** Algorithms
 
-#### Binary heap efficiency & performance
-
-Heap's efficiency comes from the structural property requirement that **it must be "complete"**
-
-![binary-heap](./img/heap-1.png)
+- Heap's efficiency comes from the structural property requirement that **it must be "complete"**
+  ![binary-heap](./img/heap-1.png)
 
 - Heap of height `h` is "complete" if its levels have the maximum number of nodes possible
 

@@ -9,6 +9,7 @@
   - [Array Permutation](#array-permutation)
     - [Build Array from Permutation](#build-array-from-permutation)
     - [Next Permutation](#next-permutation)
+    - [Compute a random permutation](#compute-a-random-permutation)
   - [Two pointers](#two-pointers)
     - [Two Sum II](#two-sum-ii)
     - [Three Sum (Triplet Sum to Zero)](#three-sum-triplet-sum-to-zero)
@@ -62,6 +63,7 @@
     - [Return elements of Spiral Matrix](#return-elements-of-spiral-matrix)
     - [Valid Tic-Tac-Toe State](#valid-tic-tac-toe-state)
     - [Pascal's Triangle](#pascals-triangle)
+    - [Valid Sudoku](#valid-sudoku)
 
 ---
 
@@ -285,6 +287,38 @@ def nextPermutation(nums):
 
     # reverse the numbers to the right of nums[i−1] including itself
     nums[i:] = nums[i:][::-1]
+```
+
+---
+
+### Compute a random permutation
+
+Given an integer `n`, return a random permutation of `[0, 1, ..., n - 1]`.
+
+- Ex:
+
+  - `n = 3` -> `[1, 0, 2]` or `[2, 1, 0]` or `[0, 2, 1]`
+
+- Explanation:
+  - Generating random permutation is not as straightforward as it seems. The naive approach is to generate a random number and check if it is already in the permutation. If it is, then we discard it and generate another random number.
+    - We can use a `hash table` to check if a number is already in the permutation. However, this approach is not efficient because it can take a long time to generate a random permutation.
+  - A better approach is to use the **Fisher-Yates shuffle** algorithm. The idea is to iterate over the array and swap each element with a random element to its right. This algorithm is efficient because it generates a random permutation in `O(n)` time and `O(1)` space.
+  - The algorithm works as follows:
+    - Iterate over the array from left to right.
+    - For each element, generate a random number between the current index and the last index.
+    - Swap the current element with the element at the random index.
+
+```py
+import random
+
+def computeRandomPermutation(n):
+    permutation = list(range(n)) # [0, 1, ..., n - 1]
+    for i in range(n):
+        # generate a random index between i and n - 1
+        rand = random.randint(i, n - 1)
+        # swap the current element with the element at the random index
+        permutation[i], permutation[rand] = permutation[rand], permutation[i]
+    return permutation
 ```
 
 ---
@@ -2084,6 +2118,7 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
 
     - perform a matrix transpose and then reverse each row of the resulting matrix.
     - **Transpose**: swap the elements of the matrix across the diagonal.
+      ![rotate image](./img/rotate-matrix-0.png)
 
       - This is done by iterating through the matrix and swapping the element at index `[i]` `[j]` with the element at index `[j]` `[i]`.
 
@@ -2101,8 +2136,8 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
         for j in range(i):
             matrix[i][j], matrix[j][i] = matrix[j][i], matrix[i][j]
     # Reverse each row
-    for i in range(len(matrix)):
-        matrix[i].reverse()
+    for row in matrix:
+        row.reverse()
   ```
 
 - **Solution 2:** using 4 pointers -> `l`, `r`, `t`, `b`
@@ -2118,7 +2153,10 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
     - That's where we use the `for` loop to iterate over the current cycle. and the `i` variable to keep track of the current element in the cycle.
       - use the picture above as a reference to know how `i` is changed for each point. Ex:
         - top left -> `matrix[top][left + i]` instead of `matrix[top][left]`
-  - Also, note that we move points starting from `bottom-left` so that we only use one temporary variable to store the `top-left` element for later.
+  - Instead of moving points starting from `top-left`, which will make us need 3 temporary variables to store the elements at the four corners of the matrix.
+    ![rotate matrix](./img/rotate-matrix-4.png)
+    - we can move the pointers starting from `top-right` and move them in a anti-clockwise direction.
+      ![rotate matrix](./img/rotate-matrix-5.png)
 
   ```py
   def rotate(matrix):
@@ -2126,7 +2164,7 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
     l,r = 0, len(matrix) - 1
 
     while l < r:
-        # loop through the current depth of the matrix
+        # loop through the current depth (layer) of the matrix
         for i in range(r - l):
             top, bottom = l, r
             # Temporarily save the top-left element for later
@@ -2281,3 +2319,68 @@ def hasWon(board, player):
 // TODO: solve it
 
 ---
+
+### Valid Sudoku
+
+Determine if a `9 x 9` Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+- Each row must contain the digits `1-9` without repetition.
+- Each column must contain the digits `1-9` without repetition.
+- Each of the nine `3 x 3` sub-boxes of the grid must contain the digits `1-9` without repetition.
+
+Note:
+
+- A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+- Only the filled cells need to be validated according to the mentioned rules.
+
+- Ex:
+
+  ```py
+  # Input
+  board = [
+      ["5","3",".",".","7",".",".",".","."],
+      ["6",".",".","1","9","5",".",".","."],
+      [".","9","8",".",".",".",".","6","."],
+      ["8",".",".",".","6",".",".",".","3"],
+      ["4",".",".","8",".","3",".",".","1"],
+      ["7",".",".",".","2",".",".",".","6"],
+      [".","6",".",".",".",".","2","8","."],
+      [".",".",".","4","1","9",".",".","5"],
+      [".",".",".",".","8",".",".","7","9"]
+  ]
+
+  # Output: true
+  ```
+
+- Explanation:
+  - We can see that each row, column, and 3x3 sub-boxes of the Sudoku grid contains all the digits from 1 to 9 without repetition.
+  - We can use a hash map to keep track of the digits that have been seen in each row, column, and sub-boxes.
+  - We can use the formula `box_index = (row / 3) * 3 + columns / 3` to get the index of the sub-boxes.
+  - We can iterate over the board and check if the current digit has been seen before in the current row, column, or sub-boxes.
+    - If the current digit has been seen before, then the board is not valid.
+
+```py
+def isValidSudoku(board):
+    cols = collections.defaultdict(set)
+    rows = collections.defaultdict(set)
+    squares = collections.defaultdict(set)  # key = (r /3, c /3)
+
+    # or without defaultdict
+    # cols = {i: set() for i in range(9)}
+
+    for r in range(9):
+        for c in range(9):
+            if board[r][c] == ".":
+                continue
+            if (
+                board[r][c] in rows[r]
+                or board[r][c] in cols[c]
+                or board[r][c] in squares[(r // 3, c // 3)]
+            ):
+                return False
+            cols[c].add(board[r][c])
+            rows[r].add(board[r][c])
+            squares[(r // 3, c // 3)].add(board[r][c])
+
+    return True
+```

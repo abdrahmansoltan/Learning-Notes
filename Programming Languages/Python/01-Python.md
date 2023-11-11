@@ -9,12 +9,14 @@
     - [Bitwise Operators](#bitwise-operators)
   - [Conditional Flow](#conditional-flow)
     - [Conditional Expressions](#conditional-expressions)
+    - [`match` Expression (Python 3.10)](#match-expression-python-310)
   - [Loops](#loops)
     - [while loop](#while-loop)
     - [for loop](#for-loop)
   - [Iterators and Generators](#iterators-and-generators)
     - [Iterator](#iterator)
     - [Iterable](#iterable)
+    - [Iterator methods](#iterator-methods)
     - [Generators](#generators)
   - [Functions](#functions)
     - [Built-in Functions](#built-in-functions)
@@ -52,14 +54,16 @@
   - [Dictionary](#dictionary)
     - [Iterating over Dictionaries](#iterating-over-dictionaries)
     - [Dictionary methods](#dictionary-methods)
+    - [Dictionary Unpacking](#dictionary-unpacking)
   - [Errors / Exceptions](#errors--exceptions)
     - [Raising exceptions](#raising-exceptions)
     - [Catching Exceptions](#catching-exceptions)
       - [try / except](#try--except)
     - [Exception Handling](#exception-handling)
-  - [Modules](#modules)
+  - [Type annotations](#type-annotations)
+  - [Modules / Packages](#modules--packages)
     - [Importing Modules](#importing-modules)
-      - [loading the module](#loading-the-module)
+    - [loading the module](#loading-the-module)
     - [Modules Types](#modules-types)
       - [Built-in Modules -\> Python standard library](#built-in-modules---python-standard-library)
       - [custom Modules](#custom-modules)
@@ -78,6 +82,16 @@ Python is an **interpreted language**. Commands are executed through a piece of 
 ### Running Python
 
 ![running-python](./img/running-python.png)
+
+- To run a Python program, you must first have the Python **interpreter** installed on your computer. Then you use it to execute your program by typing the following command at the command line:
+
+  ```sh
+  python program.py
+  ```
+
+  - What this does is tell the Python interpreter to execute the program contained in the file `program.py` which converts the program into **bytecode** (zeros and ones) that is then executed by the Python **virtual machine**.
+
+---
 
 ### The Style Guide
 
@@ -320,12 +334,47 @@ param = n if n >= 0 else −n
 
 ---
 
+### `match` Expression (Python 3.10)
+
+It's a new feature in Python `3.10`, it's a new way to write `if-elif-else` statements. It's similar to `switch` statement in other languages.
+
+```py
+match expression:
+  case pattern1:
+    # do something
+  case pattern2:
+    # do something
+  case _: # default case
+    # do something
+
+# Example:
+n = 2
+match n:
+  case 1:
+    print("one")
+  case 2:
+    print("two")
+  case 3:
+    print("three")
+  case _:
+    print("something else")
+```
+
+- Note: No need to use `break` keyword, it's automatically added
+
+---
+
 ## Loops
 
 Python supports two types of loops: `while` and `for` loops.
 
 - **while loop** : allows for repeated execution of a block of code as long as a condition is true.
 - **for loop** : provides a more convenient way to iterate over a (sequence of values).
+- There're statements that you can use to control the flow of a loop:
+  - `break` -> to exit the loop
+    > **Note:** `return` is stronger than `break`, it exits the function and not only the loop
+  - `continue` -> to skip the current iteration and continue to the next one
+  - `pass` -> to do nothing
 
 ### while loop
 
@@ -365,8 +414,18 @@ def range(start, stop=None, step=1):
   print(i, value)
   ```
 
-- `for else` -> loop that can have an optional (else block), the else part is executed if the items in the sequence used in for loop exhausts
+- `for else` -> loop that can have an optional (`else` block), the else part is executed if the items in the sequence used in for loop exhausts. (it can also be used with `while` loop)
+
   - else block is not executed (ignored) if you **break** from the loop
+
+    ```py
+    for i in range(5):
+      print(i)
+      if i == 3:
+        break
+    else:
+      print("for loop is finished")
+    ```
 
 > **Note**: we can use a `for` loop in cases for which a `while` loop does not apply, such as when iterating through a collection, such as a `set`, that does not support any direct form of indexing.
 
@@ -424,10 +483,53 @@ An **iterable** is an object, obj, that produces an iterator via the syntax `ite
 
 ---
 
+### Iterator methods
+
+- `next()`
+
+  - returns the next item from the iterator
+
+  ```py
+  i = iter([1, 2, 3])
+  print(next(i)) # 1
+  print(next(i)) # 2
+  print(next(i)) # 3
+  print(next(i)) # StopIteration
+  ```
+
+- `map()`
+
+  - returns an iterator that applies function to every item of iterable, yielding the results
+
+  ```py
+  def square(x):
+    return x * x
+
+  for val in map(square, range(1, 5)):
+    print(val, end=' ') # 1 4 9 16
+  ```
+
+- `filter()`
+
+  - returns an iterator that includes only those items for which the function returns a true value
+
+  ```py
+  def is_even(x):
+    return x % 2 == 0
+
+  for val in filter(is_even, range(1, 5)):
+    print(val, end=' ') # 2 4
+  ```
+
+---
+
 ### Generators
 
-- The most convenient technique for creating iterators in Python is through the use of generators
 - A **generator** is implemented with a syntax that is very similar to a function, but instead of returning values, a yield statement is executed to indicate each element of the series.
+
+- It's used to **save memory**, because it doesn't store all the values in memory, it generates them on the fly
+
+> The most convenient technique for creating iterators in Python is through the use of generators
 
 ```py
 def factors(n): # traditional function that computes factors
@@ -618,8 +720,6 @@ def scale(data, factor):
 
 > in every scope, a `NameError` will be raised if no such definitions are found. The process of determining the value associated with an identifier is known as **"name resolution"**.
 
----
-
 ### Scope Types (Namespaces)
 
 ![scope types](./img/scope-types.png)
@@ -641,15 +741,23 @@ def scale(data, factor):
   `local` -> `enclosing` -> `global` -> `build-in`
   ![scope types](./img/scope-types2.png)
 
+---
+
 ### Scope Notes
 
-- in **functional-scope** you can't access **global** variables
+- in **functional-scope** you can't modify/write **global** variables
 
-  - to access global variable inside a function --> use **"`global`"** word
+  - to do so global variable inside a function --> use `global` word
 
     ```py
     b = 20
 
+    # This won't work ❌
+    def f():
+      b = 5 # local variable
+      print(b) # 5
+
+    # This will work ✅
     def f():
       global b
       b = 5 # now you can access & change global variables
@@ -871,6 +979,21 @@ It's like **destructuring**
 
 ![List Unpacking](./img/list-unpacking.png)
 ![List Unpacking](./img/list-unpacking2.png)
+
+- It's usually used when passing parameters to a function
+
+  ```py
+  def sum(a, b, c):
+    return a + b + c
+
+  nums = [1, 2, 3]
+
+  # Not recommended
+  print(sum(nums[0], nums[1], nums[2]))  # 6
+
+  # Recommended (unpacking)
+  print(sum(*nums))  # 6
+  ```
 
 ---
 
@@ -1245,8 +1368,6 @@ print(f'{val:11.3f}')
 
 ## List of lists (2D Array) Matrix
 
-![2d-array](./img/2d-array.png)
-
 - be aware of **shallow-copying**
 
 ### Position Neighbors
@@ -1304,7 +1425,7 @@ They return something that iterable (NOT a list)
     ```py
     word = "ssdfdfsdsf"
     count = {}
-    for char in word):
+    for char in word:
       count[char] = 1 + count.get(char,0)
       # this is instead of this:
       # if not count[char]: count[char] = 0
@@ -1321,6 +1442,22 @@ They return something that iterable (NOT a list)
 
 ---
 
+### Dictionary Unpacking
+
+- Similar to [List Unpacking](#list-unpacking), we can unpack a dictionary into a series of identifiers using the `**` operator
+
+  - It maps the keys of the dictionary to the identifiers, and the values of the dictionary to the values of the identifiers
+
+  ```py
+  def func(a, b, c):
+    print(a, b, c)
+
+  d = {'a': 1, 'b': 2, 'c': 3}
+  func(**d)  # 1 2 3
+  ```
+
+---
+
 ## Errors / Exceptions
 
 **Exceptions** are unexpected events that occur during the execution of a program. An exception might result from a logical error or an unanticipated situation. In Python, exceptions (also known as **errors**) are objects that are **raised** (or **thrown**) by code that encounters an unexpected circumstance.
@@ -1330,20 +1467,20 @@ They return something that iterable (NOT a list)
 - Python includes a rich hierarchy of exception classes that designate various categories of errors
   ![errors](./img/errors.png)
 
-| Class               | Description                                                    |
-| ------------------- | -------------------------------------------------------------- |
-| `Exception`         | A base class for most error types                              |
-| `AttributeError`    | Raised by syntax `obj.foo`, if `obj` has no member named `foo` |
-| `EOFError`          | Raised if “end of file” reached for console or file input      |
-| `IOError`           | Raised upon failure of I/O operation (e.g., opening file)      |
-| `IndexError`        | Raised if index to sequence is out of bounds                   |
-| `KeyError`          | Raised if nonexistent key requested for set or dictionary      |
-| `KeyboardInterrupt` | Raised if user types `ctrl-C` while program is executing       |
-| `NameError`         | Raised if nonexistent identifier used                          |
-| `StopIteration`     | Raised by `next(iterator)` if no element                       |
-| `TypeError`         | Raised when wrong type of parameter is sent to a function      |
-| `ValueError`        | Raised when parameter has invalid value (e.g., `sqrt(−5)`)     |
-| `ZeroDivisionError` | Raised when any division operator used with `0` as divisor     |
+| Class               | Description                                                              |
+| ------------------- | ------------------------------------------------------------------------ |
+| `Exception`         | A base class for most error types                                        |
+| `AttributeError`    | Raised by syntax `obj.foo`, if `obj` has no member named `foo`           |
+| `EOFError`          | Raised if “end of file” reached for console or file input                |
+| `IOError`           | Raised upon failure of I/O operation (e.g., opening file)                |
+| `IndexError`        | Raised if index to sequence is out of bounds                             |
+| `KeyError`          | Raised if nonexistent key requested for set or dictionary                |
+| `KeyboardInterrupt` | Raised if user types `ctrl-C` while program is executing                 |
+| `NameError`         | Raised if nonexistent identifier used                                    |
+| `StopIteration`     | Raised by `next(iterator)` if no element                                 |
+| `TypeError`         | Raised when wrong type of parameter is sent to a function                |
+| `ValueError`        | Raised when parameter has invalid value. e.g. `sqrt(−5)` or `int("cat")` |
+| `ZeroDivisionError` | Raised when any division operator used with `0` as divisor               |
 
 ### Raising exceptions
 
@@ -1446,6 +1583,40 @@ It's best used when there is reason to believe that the exceptional case is rela
       print( Invalid response )
   ```
 
+- Note: Notice that the **lines flow order** matters when handling exertions:
+
+  - Here, the `ValueError` will be handled first, before the assignment to `x` is attempted. So, `x` will be undefined if a `ValueError` occurs. which will lead to `NameError`
+
+    ```py
+    try:
+      x = int(input("Enter a number: "))
+    except ValueError:
+      print("That was not a valid number")
+
+    print(x) # NameError: name 'x' is not defined
+    ```
+
+  - But here, we use the variable `x` before the `ValueError` is handled, so it will be defined
+
+    ```py
+    try:
+      x = int(input("Enter a number: "))
+      print(x)
+    except ValueError:
+      print("That was not a valid number")
+    ```
+
+- Excepting without a specific error
+
+  - You can except without a specific error, but it's not recommended as it will catch all errors, even the ones you didn't expect **(Bad practice)**
+
+    ```py
+    try:
+      x = int(input("Enter a number: "))
+    except:
+      print("That was not a valid number")
+    ```
+
 - a **`finally`** clause, with a body of code that will always be executed in the standard or exceptional cases, even when an uncaught or re-raised exception occurs.
   - That block is typically used for critical cleanup work, such as closing an open file.
 
@@ -1454,7 +1625,7 @@ It's best used when there is reason to believe that the exceptional case is rela
 ### Exception Handling
 
 - Exception handling is particularly useful when working with `user input`, or when `reading from or writing to files`, because such interactions are inherently less predictable.
-- The keyword, **`pass`**, is a statement that does nothing, yet it can serve syntactically as a body of a control structure. In this way, we quietly catch the exception, thereby allowing the surrounding while loop to continue.
+- The keyword, `pass`, is a statement that does nothing, yet it can serve syntactically as a body of a control structure. In this way, we quietly catch the exception, thereby allowing the surrounding while loop to continue.
 
   ```py
   except (ValueError, EOFError):
@@ -1463,7 +1634,42 @@ It's best used when there is reason to believe that the exceptional case is rela
 
 ---
 
-## Modules
+## Type annotations
+
+Python is a **dynamically typed language**, which means that the type of a variable is **inferred** from its value at runtime. This is in contrast to statically typed languages, such as Java, where the type of a variable is declared explicitly in the source code.
+
+- We can use **Type Hinting** to specify the type of a variable, function parameter, or function return value. This is done by adding a colon after the variable name, followed by the type, as in:
+
+  ```py
+  # variable
+  x: int = 5
+
+  # function
+  def add(a: int, b: int) -> int:
+    return a + b
+
+  # class
+  class Person:
+    name: str
+    age: int
+
+    def __init__(self, name: str, age: int):
+      self.name = name
+      self.age = age
+  ```
+
+- Note: Type annotations are not enforced by the Python interpreter. They are simply hints to the programmer and tools such as linters and type checkers.
+
+  - So, you can still assign a value of a different type to a variable that has a type annotation. The following code will run without any errors:
+
+    ```py
+    x: int = 5
+    x = "hello"
+    ```
+
+---
+
+## Modules / Packages
 
 ![modules](./img/modules.png)
 
@@ -1477,6 +1683,8 @@ Beyond the built-in definitions, the standard Python distribution includes perha
 
   ```py
   from math import pi, sqrt # adds both "pi" and "sqrt", as defined in the math module, into the current namespace
+
+  from random import randint, choice # adds both "randint" and "choice", as defined in the random module, into the current namespace
   ```
 
 - If there are many definitions from the same module to be imported, an `asterisk (*)` may be used as a wild card, as in:
@@ -1495,7 +1703,9 @@ Beyond the built-in definitions, the standard Python distribution includes perha
 
   - Modules are also **first-class objects** in Python. Once imported, individual definitions from the module can be accessed using a fully-qualified name, such as `math.pi` or `math.sqrt(2)`.
 
-#### loading the module
+---
+
+### loading the module
 
 - It is worth noting that top-level commands with the module source code are executed when the module is first imported, almost as if the module were its own script.
 - There is a special construct for embedding commands within the module that will be executed if the module is directly invoked as a script, but not when the module is imported from another script. Such commands should be placed in a body of a conditional statement of the following form:
@@ -1612,6 +1822,33 @@ Beyond the built-in definitions, the standard Python distribution includes perha
     ![immutable](./img/immutable_objects.png)
   - Python interpreter already maintains what are known as **"reference counts"** for each object; this count is used in part to determine if an object can be garbage collected.
 
-```
+- We can pass parameters when running a python file using `sys` module
 
-```
+  ```sh
+  python3 myscript.py arg1 arg2 arg3
+  ```
+
+  ```py
+  # sys.argv is a list of arguments passed to the python script
+  # sys.argv[0] is the name of the script itself
+  # sys.argv[1] is the first argument
+  # sys.argv[2] is the second argument
+
+  # argv -> argument vector
+  ```
+
+  - There's a library called `argparse` that is used to parse arguments passed to the script
+
+    ```py
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("echo", help="echo the string you use here")
+    args = parser.parse_args()
+    print(args.echo)
+    ```
+
+    ```sh
+    python3 prog.py --help
+    usage: prog.py [-h] echo
+    ```

@@ -135,6 +135,9 @@
 
 `Getters`/`setters` can be used as wrappers over “real” property values to **gain more control** over operations with them.
 
+- Why using getters/setters ?
+  - Perform operations on the attribute before setting the attribute or returning it
+  - check the value before setting the attribute or returning it
 - One of the great uses of **accessors** is that they allow to take control over a “regular” data property at any moment by replacing it with a `getter` and a `setter` and tweak its behavior.
 
 ```js

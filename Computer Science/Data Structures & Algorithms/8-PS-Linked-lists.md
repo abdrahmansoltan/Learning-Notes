@@ -11,6 +11,7 @@
     - [Reorder List](#reorder-list)
     - [Maximum Twin Sum of a Linked List](#maximum-twin-sum-of-a-linked-list)
   - [Singly Linked List](#singly-linked-list)
+    - [Remove Linked List Elements](#remove-linked-list-elements)
     - [Reverse a Linked List](#reverse-a-linked-list)
     - [Reverse Linked List II (Reverse a sub-list)](#reverse-linked-list-ii-reverse-a-sub-list)
     - [Reverse Nodes in k-Group](#reverse-nodes-in-k-group)
@@ -377,6 +378,33 @@ def maxTwinSum(self, head: ListNode) -> int:
 
 ## Singly Linked List
 
+### Remove Linked List Elements
+
+Given the `head` of a linked list and an integer `val`, remove all the nodes of the linked list that has `Node.val == val`, and return the new head.
+
+- EX:
+  ![remove-linked-list-elements](./img/remove-linked-list-elements-1.jpeg)
+  - input: `1 -> 2 -> 6 -> 3 -> 4 -> 5 -> 6`, `val = 6`
+  - output: `1 -> 2 -> 3 -> 4 -> 5`
+
+```py
+def removeElements(self, head: ListNode, val: int) -> ListNode:
+    # create a dummy node pointing to head to avoid edge case of inserting to empty list
+    dummy = ListNode(0, head)
+    # create a pointer to the dummy node
+    curr = dummy
+
+    while curr and curr.next:
+        if curr.next.val == val:
+            curr.next = curr.next.next
+        else:
+            curr = curr.next
+    # return the next node of the dummy node (head)
+    return dummy.next
+```
+
+---
+
 ### Reverse a Linked List
 
 Write a function that accepts a linked list and reverses it in place.
@@ -586,6 +614,7 @@ Given the `head` of a linked list, rotate the list to the right by `k` places.
 
 - EX:
   ![rotate-list](./img/rotate-list-1.jpeg)
+
   - input: `1 -> 2 -> 3 -> 4 -> 5`, `k = 2`
   - output: `4 -> 5 -> 1 -> 2 -> 3`
 
@@ -649,7 +678,7 @@ def middle_point(head):
         slow = slow.next
         fast = fast.next.next
     return slow
-````
+```
 
 ---
 

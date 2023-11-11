@@ -783,7 +783,7 @@ Given a string `s` consisting of some words separated by some number of spaces, 
   - `s = "Hello World"` -> `5`
   - `s = "   fly me   to   the moon  "` -> `4`
 
-- Solution 1: slow
+- Solution 1: slow & extra memory ❌
 
   ```py
   def lengthOfLastWord(s):
@@ -794,6 +794,11 @@ Given a string `s` consisting of some words separated by some number of spaces, 
   ```
 
 - Solution 2: fast & less memory ✅
+
+  - Instead of wasting time and iterating over the entire string, we can iterate over the string **backwards** and return the length of the first word we encounter
+    - This is done by initializing a variable to keep track of the `length` of the last word and iterating over the string backwards until we reach the end of the last word (empty space)
+  - pay attention to an edge case where the string does not end with an empty space (One word string)
+    - In this case, we will have to return the length of the last word anyway after we have iterated over the entire string
 
   ```py
   def lengthOfLastWord(s):
@@ -807,7 +812,8 @@ Given a string `s` consisting of some words separated by some number of spaces, 
           # if we have not reached the end of the last word, increment the length
           elif s[i] != ' ':
               length += 1
-      # return the length of the last word
+
+      # return the length of the last word if the string does not end with an empty space (One word string)
       return length
   ```
 
