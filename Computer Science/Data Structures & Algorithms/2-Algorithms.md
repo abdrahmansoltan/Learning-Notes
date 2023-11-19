@@ -106,11 +106,17 @@ It's a set of instructions to solve a problem/perform a task
 
 > It tells us **How well/fast a problem is solved**, it's the language we use to telling (how the runtime of an algorithm grows as the inputs grow)
 
-- Big O doesn't tell you the speed in **seconds**. Big O notation lets you compare the number of operations. It tells you how fast the algorithm grows.
-  - we don't use seconds because:
+- **Big O** doesn't tell you the speed in **seconds**. Big O notation lets you compare the **number of operations**. It tells you how fast the algorithm grows.
+  - we don't use `seconds` because:
     - different machines will record different times for the same algorithm
     - the same machine will record different times for the same algorithm if it runs at different times of the day
-    - to study the running time of an algorithm, we need to fully implement it (which takes time specially for complex algorithms and large inputs)
+  - We don't use `steps / num of operations` because:
+    - different operations take different amounts of time
+    - same operation can be implemented to take different amounts of time, e.g. `for loop` vs `while loop`
+    - we want to talk about the **growth rate** of an algorithm, not the **speed** of the algorithm
+
+> So, to study the running time of an algorithm, we need to know the **growth rate** of the number of operations in the algorithm as the input size grows, and not the actual number of operations for a specific input size.
+
 - `O(n)` -> `n` is the number of operations an algorithm will make
 - `O(log(n))` -> `log(n)` is the number of operations an algorithm will make
 - `O(n^2)` -> `n^2` is the number of operations an algorithm will make
@@ -122,6 +128,10 @@ It's a set of instructions to solve a problem/perform a task
 > - to have a benchmark on how our code performs
 > - useful for discussing trade-offs between different approaches
 > - when code slows down or crashes, identifying parts of the code that are inefficient can help us find pain-points in our apps
+
+- You might think that we don't need to care about Big O because computers are fast, but that's not true. because of 2 reasons:
+  1. Computers are fast, but they're not infinitely fast.
+  2. Data is getting bigger and bigger, so we need to care about Big O. And as the amount of data we're working with continues to grow, it's important to write code that can handle larger and larger inputs.
 
 ---
 
@@ -238,7 +248,7 @@ It's a way to describe the behavior of a function as the input size `n` gets arb
     sum = 0
     while n > 0:
       sum += n % 10
-      n //= 10 # O(log n) because we're dividing n by 10 in each iteration
+      n //= 10 # O(log n) because we're dividing n by 10 in each iteration (reduce the size of the problem by 10 in each iteration)
     return sum
   ```
 
@@ -326,11 +336,21 @@ def sqrt_helper(n, min, max):
     step2() # O(b)
    ```
 
-2. Drop constants -> [example](#polynomials)
+2. Nested steps get multiplied
+
+   ```py
+   # O(a * b)
+   def something():
+    for i in arr1: # O(a)
+      for j in arr2: # O(b)
+        print(i, j)
+   ```
+
+3. Drop constants -> [example](#polynomials)
 
    - because we're looking for how things scale roughly. is it `linear`, `quadratic`, etc.
 
-3. Different inputs -> Different variables
+4. Different inputs -> Different variables
 
    - 2 different arrays with different lengths (`a`, `b`) can't have same `n`
 
@@ -349,7 +369,7 @@ def sqrt_helper(n, min, max):
          print(i, j)
    ```
 
-4. Drop non-dominant terms
+5. Drop non-dominant terms
 
    - `O(n + n^2) -> O(n^2)`
    - `O(2^n + 3^n) -> O(3^n)` -> `O(n)` -> because `3^n` is bigger than `2^n`
@@ -516,32 +536,52 @@ This is called **Factorial Time** or **oh no!**
     - for example, here we use javascript which has `length` property (not method) to each string, so it's a simple lookup --> `O(1)`
 
 - slicing `arr[0:j+1]`, also uses `O(j + 1)` time, as it constructs a new list instance for storage.
+- Something that is (iterative or recursive) and reduces the size of the problem set by `1` each time is linear `O(n)`, and something that is (iterative or recursive) and reduces the size of the problem set by `2 or 3 or 4` each time is logarithmic `O(log n)`
+
+  - Example of summing the digits of a number:
+
+    ```py
+    # O(log n)
+    def sumDigits(n):
+      sum = 0
+      while n > 0:
+        sum += n % 10
+        n //= 10 # O(log n) because we're dividing n by 10 in each iteration (reduce the size of the problem by 10 in each iteration)
+      return sum
+    ```
+
+  - Example of computing the factorial of a number:
+
+    ```py
+    # O(n)
+    def factorial(n):
+      if n == 1:
+        return 1
+      else:
+        return n * factorial(n-1) # O(n) because we're reducing the size of the problem by 1 in each iteration
+    ```
 
 ---
 
 ## Recursion
 
-> **Recursion** is a technique by which a function makes one or more calls to itself during execution, or by which a data structure relies upon **smaller** instances of the very same type of structure in its representation.
+**Recursion** is a technique by which a function makes one or more calls to itself during execution, or by which a data structure relies upon **smaller** instances of the very same type of structure in its representation.
 
-It's not actually an Algorithm, it's more of a concept that we use in our Algorithms
+It's not actually an Algorithm, it's more of a concept that we use in our Algorithms to solve problems by **taking a problem and reducing it to smaller versions of itself**.
+
+> When you want to solve a problem using recursion, Always think this way: _"How can I solve this problem if I had a smaller version of the same problem?"_
 
 - it's used Everywhere; mostly in:
-  - `traversing`
-    - ex: `DOM-traversing` and (`document.getElementById`)
-  - `nested operations`
-    - ex: Object-traversal like ->`JSON.parse()` and `JSON.stringify()`
-  - `file systems`
-- **Advantages:**
 
-  - DRY
-  - Readability
+  - traversing -> `DOM-traversing` and (`document.getElementById`)
+  - nested operations -> Object-traversal like ->`JSON.parse()` and `JSON.stringify()`
+  - file systems
 
 - Ex: looking for a key in boxes:
-  - looping
+  - **Iterative approach**:
     ![recursion-vs-loops](./img/recursion-vs-loops-1.png)
-  - recursion
+  - **Recursive approach**: (it's more readable)
     ![recursion-vs-loops](./img/recursion-vs-loops-2.png)
-  - Both approaches have the same time complexity, but recursion is more readable
   - **Note:** There's no performance gain in using recursion over looping. In fact recursion is slower than looping in most cases.
     - This is because **recursion uses more memory than looping**, as each recursive call adds a new stack frame to the call stack, which can lead to stack overflow if the recursion is too deep.
 
@@ -982,6 +1022,7 @@ def bubble_sort(arr):
 It's a sorting algorithm where we **select** the smallest element and put it in the first position, then select the next smallest element and put it in the second position, and so on.
 
 - it works by scanning a list of items for the smallest element and then swapping that element for the one in the first position
+  - We take each element and compare it with all the other elements in the array, and the other element is smaller, we swap them.
 - also one of the simplest but not efficient either
   - the first operation takes `n` steps, the second takes `n-1` steps, and so on, until the last operation takes `1` step -> `n + (n-1) + (n-2) + ... + 1` -> `O(n^2)`
 - **steps:**
@@ -1005,6 +1046,16 @@ def selection_sort(arr):
     if min_index != i:
       arr[i], arr[min_index] = arr[min_index], arr[i]
   return arr
+
+# ----------------------------------------------- or -----------------------------------------------
+
+def selection_sort(arr):
+  suffix_start = 0
+  while suffix_start != len(arr):
+    for i in range(suffix_start, len(arr)):
+      if arr[i] < arr[suffix_start]:
+        arr[suffix_start], arr[i] = arr[i], arr[suffix_start]
+    suffix_start += 1
 
 # ----------------------------------------------- or -----------------------------------------------
 
@@ -1096,6 +1147,7 @@ It's all about continually **splitting** the array into halves until you have ar
 - The "conquer" part is done by **Two pointers** (one for each array) or **slicing** and a `while` loop
 
 - it's one of the most efficient ways to sort lists
+  > We can notice that the number of comparisons is smaller than the number of swaps in `bubble sort` and `selection sort`, so it's more efficient
 - one downside is that it has a bigger space-complexity: **space-complexity of `O(n)`** unlike most sorting algorithms which has `O(1)`
   - this is due to storing the divided lists in memory
   - so we use it if we have enough memory

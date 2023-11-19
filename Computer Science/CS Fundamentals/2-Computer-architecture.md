@@ -15,11 +15,31 @@
 It's the science and art of selecting and interconnecting hardware components to create computers that meet functional, performance and cost goals.
 
 - It's the design of the hardware components of a computer system.
+- Computers are machines that process data and do a program:
+
+  - **fixed program**: it's a program that can't be changed, do only one task and it's not flexible (e.g. calculator)
+  - **stored program**: it's a program that can be changed, do multiple tasks and it's flexible by storing and executing instructions (e.g. computer)
 
 - Components:
+  ![Computer architecture](./img/computer-architecture.png)
+
   - `Disk`
-  - `RAM`
+    - It stores **persisted** data
+  - `RAM (memory))`
+    - It stores **volatile** data and instructions that the `CPU` needs to execute
   - `CPU`
+    - It's the brain of the computer, it executes instructions and has a `program counter` that points to the next instruction to execute in `RAM`
+  - `ALU (Arithmetic Logic Unit)`
+    - It's a part of the `CPU` that performs arithmetic and logic operations
+
+- The computer takes a sequence of instructions from `RAM` and executes them one by one (in order) and can do predefined primitive instructions:
+
+  - Arithmetic and logic operations
+  - Data movement operations
+  - Control operations
+  - Input and output operations
+
+  > So, any computable problem can be solved by a computer by breaking it down into primitive instructions and **if computed in one language, it can be computed in any other language**
 
 ---
 

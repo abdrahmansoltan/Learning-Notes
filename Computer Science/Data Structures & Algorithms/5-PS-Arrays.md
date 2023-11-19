@@ -59,8 +59,8 @@
     - [Employee Free Time](#employee-free-time)
   - [2D Array ( Matrix )](#2d-array--matrix-)
     - [Rotate Image](#rotate-image)
-    - [Create a Spiral Matrix](#create-a-spiral-matrix)
-    - [Return elements of Spiral Matrix](#return-elements-of-spiral-matrix)
+    - [Spiral Matrix](#spiral-matrix)
+    - [Spiral Matrix II](#spiral-matrix-ii)
     - [Valid Tic-Tac-Toe State](#valid-tic-tac-toe-state)
     - [Pascal's Triangle](#pascals-triangle)
     - [Valid Sudoku](#valid-sudoku)
@@ -2187,7 +2187,88 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
 
 ---
 
-### Create a Spiral Matrix
+### Spiral Matrix
+
+Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
+
+- EX: `[[1, 2, 3], [4, 5, 6], [7, 8, 9]] --> [1, 2, 3, 6, 9, 8, 7, 4, 5]`
+  ![spiral matrix](./img/spiral-matrix-1.jpg)
+
+![spiral matrix](./img/spiral-matrix-2.jpg)
+
+- Explanation:
+
+  - The idea here, is to keep track of the `top`, `bottom`, `left`, and `right` **boundaries** of the current cycle.
+  - We start by moving the `top` pointer from left to right, then we when we reach the end of the row, we move the `right` pointer down by one row, then we move the `bottom` pointer from right to left, then we move the `left` pointer up by one row.
+    - So we check the boundaries of the current cycle, and move the pointers accordingly.
+    - if the `top` pointer is less than or equal to the `bottom` pointer, and the `left` pointer is less than or equal to the `right` pointer, then we can continue to the next cycle **(inner layer)**.
+  - We keep doing this until the `top` pointer is greater than the `bottom` pointer, or the `left` pointer is greater than the `right` pointer. which means that we have reached the end of the matrix.
+
+- **Solution 1**: using `pop()`
+
+  - Time: O(n^2) | Space: O(n)
+    - Because we are using `pop(0)` to remove the first element of each row, which takes O(n) time. and we are doing this for each row, which makes the time complexity O(n^2)
+
+  ```py
+  def spiral_matrix(matrix):
+      result = []
+      while matrix:
+          # add the first row to the result
+          result += matrix.pop(0)
+          # add the last element of each row to the result
+          for row in matrix:
+              if row: result.append(row.pop())
+          # add the last row to the result in reverse order
+          if matrix:
+              result += matrix.pop()[::-1]
+          # add the first element of each row to the result in reverse order
+          for row in matrix[::-1]:
+              if row: result.append(row.pop(0))
+      return result
+  ```
+
+- **Solution 2**: using pointers ✅
+
+  - Time: O(n) | Space: O(n)
+
+  ```py
+  def spiral_matrix(matrix):
+      result = []
+      # initialize the pointers to point to the leftmost and rightmost columns and the topmost and bottommost rows
+      left, right = 0, len(matrix[0]) - 1
+      top, bottom = 0, len(matrix) - 1
+
+      while left <= right and top <= bottom:
+          # move the left pointer from left to right
+          for i in range(left, right + 1):
+              result.append(matrix[top][i])
+          top += 1
+
+          # move the bottom pointer from top to bottom
+          for i in range(top, bottom + 1):
+              result.append(matrix[i][right])
+          right -= 1
+
+          # move the right pointer from right to left
+          if top <= bottom:
+              for i in range(right, left - 1, -1):
+                  result.append(matrix[bottom][i])
+              bottom -= 1
+
+          # move the top pointer from bottom to top
+          if left <= right:
+              for i in range(bottom, top - 1, -1):
+                  result.append(matrix[i][left])
+              left += 1
+
+      return result
+  ```
+
+> **Note:** Both solutions are valid, but you need to ask the interviewer if you are allowed to modify the matrix or not. If you are allowed to modify the matrix, then you can use the first solution, otherwise you can use the second solution.
+
+---
+
+### Spiral Matrix II
 
 Given a positive integer n, generate an n x n matrix filled with elements from 1 to n^2 in spiral order.
 
@@ -2228,35 +2309,6 @@ def spiral_matrix(n):
         start += 1
 
     return matrix
-```
-
----
-
-### Return elements of Spiral Matrix
-
-Given a matrix of m x n elements (m rows, n columns), return all elements of the matrix in spiral order.
-
-![spiral matrix](./img/spiral-matrix-1.jpg)
-![spiral matrix](./img/spiral-matrix-2.jpg)
-
-- EX: `[[1, 2, 3], [4, 5, 6], [7, 8, 9]] --> [1, 2, 3, 6, 9, 8, 7, 4, 5]`
-
-```py
-def spiral_matrix(matrix):
-    result = []
-    while matrix:
-        # add the first row to the result
-        result += matrix.pop(0)
-        # add the last element of each row to the result
-        for row in matrix:
-            if row: result.append(row.pop())
-        # add the last row to the result in reverse order
-        if matrix:
-            result += matrix.pop()[::-1]
-        # add the first element of each row to the result in reverse order
-        for row in matrix[::-1]:
-            if row: result.append(row.pop(0))
-    return result
 ```
 
 ---
@@ -2353,17 +2405,18 @@ Note:
   ```
 
 - Explanation:
-  - We can see that each row, column, and 3x3 sub-boxes of the Sudoku grid contains all the digits from 1 to 9 without repetition.
-  - We can use a hash map to keep track of the digits that have been seen in each row, column, and sub-boxes.
+  - There's no algorithm optimization in this problem, we just need to check if the board is valid or not using clear code.
+  - We can see that each row, column, and `3x3` sub-boxes of the Sudoku grid contains all the digits from `1` to `9` without repetition.
+  - We can use a `hash map` to keep track of the digits that have been seen in each `row`, `column`, and `sub-boxes`.
   - We can use the formula `box_index = (row / 3) * 3 + columns / 3` to get the index of the sub-boxes.
   - We can iterate over the board and check if the current digit has been seen before in the current row, column, or sub-boxes.
     - If the current digit has been seen before, then the board is not valid.
 
 ```py
 def isValidSudoku(board):
-    cols = collections.defaultdict(set)
-    rows = collections.defaultdict(set)
-    squares = collections.defaultdict(set)  # key = (r /3, c /3)
+    cols = collections.defaultdict(set) # key = col, value = set of digits
+    rows = collections.defaultdict(set) # key = row, value = set of digits
+    squares = collections.defaultdict(set)  # key = (r /3, c /3), value = set of digits
 
     # or without defaultdict
     # cols = {i: set() for i in range(9)}
@@ -2373,11 +2426,13 @@ def isValidSudoku(board):
             if board[r][c] == ".":
                 continue
             if (
-                board[r][c] in rows[r]
-                or board[r][c] in cols[c]
-                or board[r][c] in squares[(r // 3, c // 3)]
+                board[r][c] in rows[r] or
+                board[r][c] in cols[c] or
+                board[r][c] in squares[(r // 3, c // 3)]
             ):
-                return False
+                return False # means that the board is not valid because the current digit has been seen before
+
+            # add the current digit to the set of digits of the current row, column, and sub-boxes
             cols[c].add(board[r][c])
             rows[r].add(board[r][c])
             squares[(r // 3, c // 3)].add(board[r][c])

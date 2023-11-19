@@ -73,9 +73,9 @@ The main “actors” in the object-oriented paradigm are called objects. Each o
 
 ### The `self` Identifier
 
-Each instance from a class must maintain its own properties & methods. Therefore, each instance stores its own instance variables to reflect its current state.
+> Each instance from a class must maintain its own properties & methods. Therefore, each instance stores its own instance variables to reflect its current state.
 
-> **`self`** identifies the **created instance** upon which a method is invoked
+`self` identifies the **created instance** upon which a method is invoked. (It's a placeholder for the instance itself)
 
 - It initializes an empty object that refers to the newly created instance, and which is passed as the first parameter to the `__init__` method.
 - when using a class-method that is called with one parameter, for example, as my `card.charge(200)`. The `self` parameter is not passed explicitly by the programmer when invoking a method. Instead, the interpreter automatically binds the instance upon which the method is invoked to the `self` parameter.
@@ -117,11 +117,13 @@ class Person:
 
 ![Operator and Function Overloading in Custom Python Classes](./img/Operator-and-Function-Overloading-in-Custom-Python-Classes_Watermarked.webp)
 
-- If you’ve used the `+` or `*` operator on a `str` object in Python, you must have noticed its different behavior when compared to `int` or `float` objects:
-- You might have wondered how the same built-in operator or function shows different behavior for objects of different classes. This is called `operator overloading` or `function overloading` respectively.
-- By default, the `+` operator is undefined for a new class. However, the author of a class may provide a definition using a technique known as operator overloading. This is done by implementing a specially named method. In particular, the `+` operator is overloaded by implementing a method named `"__add__"` , which takes the right-hand operand as a parameter and which returns the result of the expression. That is, the syntax, `a+b`, is converted to a method call on object a of the form, "a.`__add__`(b)".
+- When using `+` or `*` with a `str` in Python, you'll notice different behavior versus `int` or `float`.
 
-> When a binary operator is applied to two instances of different types, as in **3 \* "love me"** , Python gives deference to the class of the left operand. In this example, it would effectively check if the int class provides a sufficient definition for how to multiply an instance by a string, via the `__mul__` method. However, if that class does not implement such a behavior, Python checks the class definition for the right-hand operand, in the form of a special method named `__rmul__` (i.e., “right multiply”). This provides a way for a new user-defined class to support mixed operations that involve an instance of an existing class (given that the existing class would presumably not have defined a behavior involving this new class).
+- Different behavior for operators on various classes is called **operator overloading** or **function overloading**.
+- The `+` operator is undefined for a new class but can be defined using **operator overloading**.
+- To overload `+`, implement a method named `__add__` taking the right-hand operand, returning the result like `a+b` converts to `a.__add__(b)`.
+
+> Python prioritizes the left operand's class for a binary operator **between different types**, checking `__mul__` method for the left operand's class first, and if not defined, it examines `__rmul__` for the right operand's class, enabling mixed operations between user-defined and existing classes.
 
 ```py
 class Person:
@@ -134,7 +136,7 @@ class Person:
     def __add__(self, other):
         return self.age + other.age
 
-    # overloading the * operator to multiply the ages of two people
+    # overloading the * operator to multiply the ages of two people (objects)
     def __mul__(self, other):
         return self.age * other.age
 
@@ -154,6 +156,36 @@ class Person:
     print(str(john)) # Person(John,Sam,36)
     print(repr(john)) # Person(John,Sam,36)
 ```
+
+- `__str__` is used to return a string representation of an object
+
+  - It's because if we try to print an object, it will return the memory address of that object
+  - So we use `__str__` to return a string representation of an object
+
+  ```py
+  # Without __str__
+  class Person1:
+      def __init__(self, first_name, last_name, age):
+          self.first_name = first_name
+          self.last_name = last_name
+          self.age = age
+
+  person1 = Person1('John', 'Sam', 36)
+  print(person1) # <__main__.Person1 object at 0x0000020B0F2F4D30>
+
+  # ----------------------------------------------------------
+
+  # With __str__
+  class Person2:
+      def __init__(self, first_name, last_name, age):
+          # ...
+
+      def __str__(self):
+          return f'Person({self.first_name},{self.last_name},{self.age})'
+
+  person2 = Person2('John', 'Sam', 36)
+  print(person2) # Person(John,Sam,36)
+  ```
 
 ---
 
@@ -245,6 +277,7 @@ It's a way to hide the data and the methods that operate on data from the outsid
 - in `c++`, `java`, this concept is more loaded with **hiding** things from outsiders
 
   - but `python` has another philosophy: **trust other programmers**
+    - Python is not good at hiding things from other programmers (data and methods)
     - Python does not support formal access control, but names beginning with a single underscore (`_`) are conventionally akin to **protected**, while names beginning with a double underscore (`__`) (other than special methods) are akin to **private**.
 
 - Using the underscore `_` symbol
@@ -281,9 +314,10 @@ A natural way to organize various structural components of a software package is
 - This allows a new class to be defined based upon an existing class as the starting point.
 - In object-oriented terminology, the existing class is typically described as the **base class**, **parent class**, or **superclass**, while the newly defined class is known as the **subclass** or **child class**.
 - There are two ways in which a subclass can differentiate itself from its superclass. A subclass may specialize an existing behavior by providing a new implementation that overrides an existing method. A subclass may also extend its superclass by providing brand new methods.
-- EX:
-  ![inheritance](./img/oop-inheritance.png)
-- The mechanism for calling the inherited constructor relies on the syntax, `super()`
+  - if the child class doesn't have a `__init__` method, it will inherit the `__init__` method from the parent class
+  - EX:
+    ![inheritance](./img/oop-inheritance.png)
+- The mechanism for calling the inherited constructor relies on the syntax, `super()`, if the subclass overrides the constructor of the superclass or adds additional parameters to the constructor of the superclass.
   ![inheritance](./img/oop-inheritance2.png)
   - it calls the `__init__` method that was inherited from the superclass
 - To access inherited properties and methods, we use the `super()` function -> `super().method_name()`

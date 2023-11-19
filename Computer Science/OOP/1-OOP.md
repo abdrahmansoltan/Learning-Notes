@@ -17,15 +17,25 @@
 ## Object Oriented Programming (OOP)
 
 - **Object** is a self-contained entity that consists of both data and procedures to manipulate the data.
+
   - it combine variables and functions into a single unit.
   - it makes it easier to understand how a program works and to maintain it.
 
 - In an object-oriented-program, rather than describing a sequence of steps to follow, we define a set of self-contained-objects that interact with each other.
   - Each object is responsible for its own data and behaviour.
+- Objects are a **data abstraction** that captures 2 things:
+
+  - **Internal representation** -> (what is the data representation of the object)
+    - It hides the internal details of an object from the outside through `data attributes`
+  - **Interface** -> (what operations can be performed on the object's data)
+    - It hides the implementation details of an object from the outside, but exposes the behaviour of an object to the outside through `methods`
+
+- When we create a `Class` that has a defined `data representation` and `interface`, we can create `Objects` from that class knowing that they will have the same `data representation` and `interface`. (Code reusability)
 
 - Advantages of OOP:
+
   - **Modularity**: it makes it easier to build, maintain and debug software applications.
-  - **Reuseability**: it makes it easier to reuse code in different parts of the application.
+  - **Reusability**: it makes it easier to reuse code in different parts of the application.
   - **Extensibility**: it makes it easier to extend the application without breaking the existing code.
 
 - `"Class"` is a blueprint (template) for creating objects.

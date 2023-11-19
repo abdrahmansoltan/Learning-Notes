@@ -5,10 +5,10 @@
   - [programming language](#programming-language)
   - [convert source code to machine code](#convert-source-code-to-machine-code)
   - [IDE](#ide)
-  - [running python on CLI](#running-python-on-cli)
   - [operators](#operators)
-  - [variables \& datatypes](#variables--datatypes)
-  - [conditional](#conditional)
+  - [Data types](#data-types)
+  - [Variables](#variables)
+  - [conditionals](#conditionals)
   - [function](#function)
   - [collections](#collections)
   - [using external code](#using-external-code)
@@ -26,7 +26,7 @@
 
 ## what is programming?
 
-Programming is the process of converting ideas into instructions that a computer can understand and execute. These instructions are specific and sequential. You can think of it like a recipe.
+Programming is the process of converting ideas into instructions that a computer can understand and execute. These instructions are specific and sequential.
 
 - **Bug** is when something unexpected happens
 - **crash** is when your program stops early or freezes
@@ -72,11 +72,11 @@ what compilers do. They take your high level programming language and turn it in
 
 what computer interpreters do: they process your source code each times its run, line by line, and it's up to the other user to have the needed interpreter available on their machine.
 
-- languages like C, C++, and Objective-C are known as compiled languages,
+- languages like `C`, `C++`, and `Objective-C` are known as compiled languages,
 
-- whereas PHP and JavaScript are known as interpretive languages.
+- whereas `PHP` and `JavaScript` are known as interpretive languages.
 
-- Java, C# and Python use the combination approach.
+- `Java`, `C#` and `Python` use the combination approach.
 
 ---
 
@@ -84,33 +84,66 @@ what computer interpreters do: they process your source code each times its run,
 
 integrated development environments
 
-## running python on CLI
-
-- enter python >> python3 python-file
-- exit python >> exit() or ctrl+d
-- enter python >> python3
+- It's a software application that provides a set of tools to help developers write and test their code.
+- It's not responsible for converting your code into machine code. That's the job of the `compiler` or `interpreter`.
+  - `IDE` is just a tool that helps you write your code and test it out.
 
 ---
 
 ## operators
 
-- Arethmatic operators: + - \* / ...
+- Arithmetic operators: (`+`, `-`, `*`, `/`, `%`, `**`, `//`)
 
-## variables & datatypes
+---
+
+## Data types
 
 data types: allows us to put our variable in a particular category so that the computer knows how much space to give us in its memory.
 
-variable names should contain only letters, numbers, and underscores. And even though numbers are allowed, the name shouldn't start with a number.
+- Programs manipulate `data objects`
 
-## conditional
+  - Objects have a `type` that defines the kinds of things programs can do to them
+  - Objects are:
+    - **Scalar** - indivisible (can't be divided) -> `int`, `float`, `bool`, `None`
+    - **Non-scalar** - have internal structure that can be accessed -> `str`, `list`, `dict`, `set`
+  - We can convert object of one type to another:
+
+    - This is called **type casting**
+
+    ```py
+    int(3.14) # 3
+    float(3) # 3.0
+    str(3.14) # '3.14'
+    ```
+
+---
+
+## Variables
+
+The main purpose of variables is to store data in memory **for later use**.
+
+- **variable** is a name that refers to a value in memory.
+- variable names should contain only letters, numbers, and underscores. And even though numbers are allowed, the name shouldn't start with a number.
+
+---
+
+## conditionals
 
 statements that are grouped together this way in programming. It's called a **block**.
+
+---
 
 ## function
 
 A function is a block of code packaged together with a name.
 
-void function : don't return a value after the function executes
+- It's used to **abstract** away a piece of code that we want to use repeatedly, and to **decompose** a complex problem into smaller problems that are easier to solve.
+
+  > **Abstraction** is the process of hiding complexity from users
+  >
+  > **Decomposition** is the process of breaking a complex problem into smaller problems (mini programs/modules)
+
+- `void` function : don't return a value after the function executes
 
 ---
 
@@ -162,6 +195,17 @@ The most basic type of shared code in Python is called a **module**.
 ## debugging
 
 The process of identifying and fixing bugs
+
+- **Defensive programming**: It's a programming practice that anticipates and protects against potential errors that could cause a program to crash. This is done by:
+
+  - **Testing & Validation**: comparing the `output` of your program to the `expected output`.
+  - **Debugging**: finding and fixing bugs in your code by inspecting events leading up to the bug.
+
+- One way to write defensive code is to use `modules` (functions) that are designed to help you write code that's less likely to have bugs. These modules are known as **assertions**.
+
+  - **assertions** are statements that assert, or state, that something is true. They're used to check that the state of your code is what you expect it to be, and if not, they'll throw an error telling you that something's wrong.
+
+> More on testing here [Testing](../../Testing/1-Testing.md)
 
 ---
 

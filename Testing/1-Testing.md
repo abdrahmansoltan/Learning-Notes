@@ -9,6 +9,9 @@
     - [BDD vs TDD](#bdd-vs-tdd)
       - [Behavior Driven Development (BDD)](#behavior-driven-development-bdd)
       - [Test-Driven Development (TDD)](#test-driven-development-tdd)
+    - [Glass-box vs Black-box Testing](#glass-box-vs-black-box-testing)
+      - [Glass-box Testing](#glass-box-testing)
+      - [Black-box Testing](#black-box-testing)
     - [Test Design Best Practices](#test-design-best-practices)
     - [Testing Setup](#testing-setup)
   - [Suites and Specs](#suites-and-specs)
@@ -115,6 +118,29 @@ expect(true).toBe(true);
   - makes code easy to refactor & leads to higher quality tests and implementation code
 
   > Refactor here is for the code-implementation to find more optimized solution, and **not refactor the test**
+
+---
+
+### Glass-box vs Black-box Testing
+
+It's a way to describe the level of knowledge that the tester has about the system being tested.
+
+- It indicate the level of test coverage.
+
+#### Glass-box Testing
+
+- The tester has access to the **source code** and can see how the system works.
+  - This allows the tester to write tests that cover all possible paths through the code.
+- It's called `path-complete` if it covers all possible paths through the code.
+- It's also known as **white-box testing**.
+- Drawback: it's time-consuming and expensive.
+
+#### Black-box Testing
+
+- The tester has no access to the source code and can only test the system through the specifications of the system / features.
+- It's also known as **functional testing**. as it tests the functionality of the system.
+- It's usually tested through **End-to-End testing** (UI testing).
+- Drawback: it's not path-complete (no guarantee that all paths are covered)
 
 ---
 
