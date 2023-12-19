@@ -19,9 +19,8 @@
     - [How hoisting works ?](#how-hoisting-works-)
   - [Functional Programming](#functional-programming)
     - [currying \& partial Application](#currying--partial-application)
-    - [Currying](#currying)
-    - [Partial Application](#partial-application)
-      - [Why do we usually make a partial function?](#why-do-we-usually-make-a-partial-function)
+      - [Currying](#currying)
+      - [Partial Application](#partial-application)
     - [Closure](#closure)
       - [Function returning Functions](#function-returning-functions)
       - [Closure Benefits](#closure-benefits)
@@ -421,12 +420,11 @@ Before the code is executed, the JavaScript engine goes through the code and doe
 
 > These 2 concepts use **Closures**
 
-### Currying
+#### Currying
 
-Currying is a transformation of functions that translates a function from callable as `f(a, b, c)` into callable as `f(a)(b)(c)`. **Currying doesn’t call a function. It just transforms it.**
+It's the process of converting a function that takes multiple arguments into a function that takes them one at a time.
 
-- Currying allows us to easily get partials.
-- It is translating a function that takes multiple arguments into a sequence of **single-argument-functions**, each accepting one argument.
+- Currying allows us to easily get `partials`, which are functions that already have some of the parameters of the original function using `closures`.
 
 ```js
 function curry(f) {
@@ -452,19 +450,17 @@ alert(curriedSum(1)(2)); // 3
   - The currying requires the function to have a fixed number of arguments.
   - A function that uses rest parameters, such as `f(...args)`, can’t be curried this way.
 
----
-
-### Partial Application
+#### Partial Application
 
 It's the process of applying a function to some of its arguments. The partially applied function gets returned for later use
 
 > see it's use in [`bind` section](#examples-of-higher-order-functions-call-apply-bind)
 
-- It depends on [Closure](#closure) concept
 - it's creating a new outer-function that calls our multi-argument function with the argument, and the multi-argument function stored conveniently in the **Backpack**
 
   ```js
   const multiply = (a, b) => a * b;
+
   function prefillFunction(fn, prefilledValue) {
     const inner = liveInput => {
       const output = fn(liveInput, prefilledValue);
@@ -523,15 +519,13 @@ It's the process of applying a function to some of its arguments. The partially 
   user.sayNow('Hello'); // [10:00] John: Hello!
   ```
 
-  - Also there’s a ready [\_.partial](https://lodash.com/docs#partial) implementation from **lodash** library.
+  - Also there’s a ready [`_.partial`](https://lodash.com/docs#partial) implementation from **lodash** library.
 
----
+- **Why do we usually make a partial function?**
 
-#### Why do we usually make a partial function?
-
-- The benefit is that we can create an independent function with a readable name (`double`, `triple`). We can use it and not provide the first argument every time as it’s fixed with `bind`.
-- In other cases, **partial application** is useful when we have a very generic function and want a less universal variant of it for convenience.
-  - For instance, we have a function `send(from, to, text)`. Then, inside a user object we may want to use a partial variant of it: `sendTo(to, text)` that sends from the current user.
+  - The benefit is that we can create an independent function with a readable name (`double`, `triple`). We can use it and not provide the first argument every time as it’s fixed with `bind`.
+  - In other cases, **partial application** is useful when we have a very generic function and want a less universal variant of it for convenience.
+    - For instance, we have a function `send(from, to, text)`. Then, inside a user object we may want to use a partial variant of it: `sendTo(to, text)` that sends from the current user.
 
 ---
 

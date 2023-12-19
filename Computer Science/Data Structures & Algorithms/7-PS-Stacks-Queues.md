@@ -2,9 +2,8 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
-  - [Queue](#queue)
-    - [Queue using two stacks](#queue-using-two-stacks)
   - [Stacks](#stacks)
+    - [Queue using two stacks](#queue-using-two-stacks)
     - [Implement Stack using Queues](#implement-stack-using-queues)
     - [Valid Parentheses](#valid-parentheses)
     - [Valid Parenthesis String](#valid-parenthesis-string)
@@ -28,9 +27,13 @@
 
 ---
 
-## Queue
+## Stacks
 
 ### Queue using two stacks
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=7ArHz8jPglw) | Use one stack for adding elements and the other stack for removing elements. When we want to `add` an element, we just push it to the first stack. When we want to `remove` an element, we move all elements from the first stack to the second stack **(if the second stack is empty)**, then pop the top element from the second stack. |
 
 Implement a queue data structure using two stacks. Do not create an array inside of the 'Queue' class. Queue should implement the methods 'add', 'remove', and 'peek'. Adding to the queue should store an element until it is removed.
 
@@ -51,7 +54,13 @@ Implement a queue data structure using two stacks. Do not create an array inside
 
   - When we want to `add` an element, we just push it to the first stack.
   - When we want to `remove` an element, we move all elements from the first stack to the second stack, then pop the top element from the second stack.
+    - This is done **ONLY** if the second stack is empty.
   - When we want to `peek` an element, we move all elements from the first stack to the second stack, then peek the top element of the second stack.
+    - This is done **ONLY** if the second stack is empty.
+  - Time Complexity:
+    - `add`: `O(1)`
+    - `remove`: `O(n)`
+    - `peek`: `O(n)`
 
 ```py
 class Queue:
@@ -82,9 +91,11 @@ class Queue:
 
 ---
 
-## Stacks
-
 ### Implement Stack using Queues
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=rW4vm0-DLYc) | Use one queue, and each time we want to `push` an element, we add it to the queue, then we move all elements from the queue to the queue **(except the last element)**, so that it becomes the first element in the queue. When we want to `pop` an element, we just `pop` the top element from the queue. |
 
 ```py
 class MyStack:
@@ -112,6 +123,10 @@ class MyStack:
 
 ### Valid Parentheses
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=WTzjTskDFMg) | Use a stack to store the opening brackets, and each time we encounter a closing bracket, we check if the top element of the stack is the same as the current bracket. If it is, then we pop it off the stack. If it isn't, or if the stack is empty, then we return `false`. |
+
 Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
 
 - An input string is valid if:
@@ -123,8 +138,9 @@ Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'
 - EX: `s = "([)]"` --> `false`
 
 - Explanation:
-  - Each time we encounter an `opening` bracket, we push it onto the stack.
-  - Each time we encounter a `closing` bracket, we check if the top element of the stack is the corresponding opening bracket.
+  - Each time we encounter an `opening` bracket, we push its corresponding `closing` bracket to the stack.
+    - `opening` brackets: `'('`, `'['`, `'{'` --> `closing` brackets: `')'`, `']'`, `'}'`
+  - Each time we encounter a `closing` bracket, we check if the top element of the stack is the same as the current bracket.
     - If it is, then we pop it off the stack. If it isn't, or if the stack is empty, then we return `false`.
 
 ```py
@@ -147,10 +163,99 @@ def isValid(s):
 
 ### Valid Parenthesis String
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=QhPdNS143Qg) | Use **two counters** `min` and `max` to keep track of the minimum and maximum number of opening brackets that we need to balance the closing brackets. Each time we encounter an `opening` bracket, we increment both counters. Each time we encounter a `closing` bracket, we decrement both counters. Each time we encounter a `star`, we increment the `max` counter and decrement the `min` counter. |
+
 Same as [Valid Parentheses](#valid-parentheses) but here we have a third type of brackets `*` which can be used as a `left`, `right` or `empty` bracket.
 
 - EX: `s = "(*))"` --> `true`
 - EX: `s = "(*))"` --> `true`
+
+- **Solution 1**: Using `min` and `max` counters (Greedy) ✅
+
+  - We use two counters `min` and `max` to keep track of the minimum and maximum number of opening brackets that we need to balance the closing brackets.
+  - Each time we encounter an `opening` bracket, we increment both counters.
+    - Because we need to add one `closing` bracket to balance the `opening` bracket.
+  - Each time we encounter a `closing` bracket, we decrement both counters.
+    - Because we have found a matching `closing` bracket.
+  - Each time we encounter a `star`, we increment the `max` counter and decrement the `min` counter.
+    - Because we can use the `star` as an `empty` string or as a `opening` bracket or as an empty string.
+  - At the end, if the `min` counter is not equal to `0`, then we return `false`.
+    - Because we have more `closing` brackets than `opening` brackets.
+  - Otherwise, we return `true`.
+    - Because we have the same number of `opening` brackets and `closing` brackets.
+
+  ```py
+  def checkValidString(s):
+      leftMin = leftMax = 0
+
+      for char in s:
+          if char == '(':
+              leftMin += 1
+              leftMax += 1
+          elif char == ')':
+              leftMin -= 1
+              leftMax -= 1
+          else:
+              leftMin -= 1
+              leftMax += 1
+
+          if leftMax < 0:
+              return False
+
+          leftMin = max(leftMin, 0)
+
+      return leftMin == 0
+
+  ```
+
+- **Solution 2**: Using two stacks
+
+  - Use **two stacks**, one for the opening brackets and the other for the stars.
+  - Each time we encounter an `opening` bracket or a `star`, we push its index to the corresponding stack.
+  - Each time we encounter a `closing` bracket, we pop the top element from the opening brackets stack.
+    - If the opening brackets stack is empty, then we pop the top element from the stars stack.
+  - If the opening brackets stack is empty and the stars stack is empty, then we return `false`.
+  - If the opening brackets stack is not empty, then we pop the top element from the opening brackets stack.
+  - At the end, if the opening brackets stack is not empty, then we return `false`.
+  - Otherwise, we return `true`.
+
+  ```py
+  def checkValidString(s):
+      left_stack = []
+      star_stack = []
+
+      for i in range(len(s)):
+          if s[i] == '(':
+              left_stack.append(i)
+          elif s[i] == '*':
+              star_stack.append(i)
+          # if the current char is a right bracket
+          else:
+              # pop the top element from either the left_stack or the star_stack
+              if left_stack:
+                  left_stack.pop()
+              elif star_stack:
+                  star_stack.pop()
+              # if both stacks are empty, return False
+              else:
+                  return False
+
+      while left_stack and star_stack:
+          # if the top element of the left_stack is greater than the top element of the star_stack -> '*' is used as an empty string
+          if left_stack[-1] > star_stack[-1]:
+              return False
+          # pop the top element of the left_stack and star_stack
+          left_stack.pop()
+          star_stack.pop()
+
+      # if the left_stack is not empty -> there are more left brackets than right brackets
+      if left_stack:
+          return False
+
+      return True
+  ```
 
 ```py
 def checkValidString(s):

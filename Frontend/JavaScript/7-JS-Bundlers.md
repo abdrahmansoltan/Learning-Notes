@@ -9,6 +9,7 @@
       - [Module Map](#module-map)
       - [Dependency Resolution](#dependency-resolution)
       - [Packing](#packing)
+    - [Webpack \& Vite](#webpack--vite)
   - [Babel (`transpiling` \& `Polyfilling`)](#babel-transpiling--polyfilling)
     - [Transpiling code for new language features](#transpiling-code-for-new-language-features)
       - [Configuring Webpack to use Babel](#configuring-webpack-to-use-babel)
@@ -134,6 +135,13 @@ In the browser, there is no such thing as modules (kind of). But this means that
   - The next string of code is an **IIFE**, which means that when you run that code in the browser (or anywhere else), the function will run immediately. IIFE is another pattern for encapsulating scope, and is used here so we don’t pollute the global scope with our require and modules.
   - After this, we are defining a `module object` that the module can populate, and passing both functions into the factory, after which we return `module.exports`.
   - Lastly, we call `require(0)` to require the module with an id of `0`, which is our entry file.
+
+---
+
+### Webpack & Vite
+
+- [Webpack](../DEV/Modules%20&%20Bundlers.md#webpack)
+- [Vite](../DEV/Modules%20&%20Bundlers.md#vite)
 
 ---
 

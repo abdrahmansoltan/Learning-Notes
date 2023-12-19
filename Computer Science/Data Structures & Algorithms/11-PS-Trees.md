@@ -5,6 +5,7 @@
   - [General Tree Questions](#general-tree-questions)
     - [Count Complete Tree Nodes](#count-complete-tree-nodes)
     - [Level Width](#level-width)
+    - [Maximum Width of Binary Tree](#maximum-width-of-binary-tree)
     - [Path Sum](#path-sum)
     - [Path Sum II](#path-sum-ii)
     - [Path Sum III](#path-sum-iii)
@@ -18,7 +19,7 @@
     - [Vertical Order Traversal of a Binary Tree](#vertical-order-traversal-of-a-binary-tree)
     - [Flatten Binary Tree to Linked List](#flatten-binary-tree-to-linked-list)
   - [Binary Search Trees (BST)](#binary-search-trees-bst)
-    - [BST Insertion](#bst-insertion)
+    - [Insert into a Binary Search Tree](#insert-into-a-binary-search-tree)
     - [Delete Node in a BST](#delete-node-in-a-bst)
     - [Validate Binary Search Tree](#validate-binary-search-tree)
     - [Binary Tree Inorder Traversal](#binary-tree-inorder-traversal)
@@ -63,6 +64,10 @@
 
 ### Count Complete Tree Nodes
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=4wPlA_InnGY) | Use **DFS** to traverse the tree and count the number of nodes in the tree. We can use a **Bottom-Up Approach** to solve this problem. **OR** we can use the fact that the tree is **complete** to solve this problem. get the `height` of the tree (from the `left` side and the `right` side). if the height of the `left` subtree is equal to the height of the `right` subtree, then the tree is a **perfect binary tree** and we can calculate the number of nodes using the formula: `count = 2^(h-1) - 1`, else, call the function recursively on the `left` and `right` subtrees |
+
 Given the `root` of a **complete** binary tree, return the number of the nodes in the tree.
 
 - Ex:
@@ -70,25 +75,13 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
   - Input: `root = [1,2,3,4,5,6]`
   - Output: `6`
 
-- Explanation:
+- **Solution 1**: dfs (brute force) -> `O(n)`
 
-  - tree is complete when all levels are filled except the last level
-  - The brute force solution is to traverse the tree and count the number of nodes. But this solution is not efficient because it takes `O(n)` time to traverse the tree.
-  - We're given that the tree is a **complete** binary tree, which means that the tree is **perfectly balanced**. This means that the left subtree and the right subtree of the root node have the same height.
-    - So we can use this property to solve the problem and get a solution with `O(log(n))` time complexity.
-    - We can break the problem into 2 sections:
-      ![count-complete-tree-nodes](./img/count-complete-tree-nodes-1.png)
-      1. Count the number of nodes above the last level -> `2^(h-1) - 1` -> because with each level, the number of nodes doubles (1, 2, 4, 8, ...)
-         - To get `h`, we can traverse the left subtree and count the number of levels -> `O(log(n))`
-      2. Count the number of nodes in the last level -> `O(log(n))`
-         - in the last level, we know that the number of nodes is between `1` and `2^(h-1)`, so we can use a **Binary Search** to traverse the last level and count the number of nodes -> `O(log(n))`
-         - when using `binary search`, we need to know the `mid` node of the last level, so we can use the `h` that we got from the previous step to calculate the `mid` node -> `2^(h-1)`
-         - then we can use the `mid` node to check if the node exists or not:
-           - if `mid` is not `None`, then we know that the node exists and we can move to the **right subtree**
-           - if `mid` is `None`, then we know that the node doesn't exist and we can move to the **left subtree**
-         - we can keep doing this until we reach the last level and count the number of nodes -> `O(log(n))`
-
-- Bad solution: O(n) time complexity ❌
+  - we can use a **Depth-First Search** to traverse the tree and count the number of nodes in the tree
+  - we can use a **Bottom-Up Approach** to solve this problem.
+    - we start by checking if the root is `None`, if it is, then we return `0`
+    - otherwise, we recursively call the function on the left and right subtrees
+    - we then return the sum of the number of nodes in the left subtree, the number of nodes in the right subtree, and `1` for the current node
 
   ```py
   def countNodes(root):
@@ -99,89 +92,54 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
 
           return dfs(node.left) + dfs(node.right) + 1
 
-      # return the result of the function
       return dfs(root)
   ```
 
-- Good solution using Binary search: O(log(n)) time complexity ✅
+- **Solution 2**: using the fact that the tree is **complete** -> `O(n)`
+
+  - tree is complete when all levels are filled except the last level
+  - The brute force solution is to traverse the tree and count the number of nodes. But this solution is not efficient because it takes `O(n)` time to traverse the tree.
+  - We're given that the tree is a **complete** binary tree, which means that the tree is **perfectly balanced**. This means that the left subtree and the right subtree of the root node have the same height.
+    - So we can use this property to solve the problem and get a solution with `O(log(n))` time complexity.
+    - We can break the problem into 2 sections:
+      ![count-complete-tree-nodes](./img/count-complete-tree-nodes-1.png)
+      - get the height of the tree (from the left side and the right side)
+      - if the height of the left subtree is equal to the height of the right subtree, then the tree is a **perfect binary tree** and we can calculate the number of nodes using the formula:
+        - `count = 2^(h-1) - 1`
+      - if the height of the left subtree is not equal to the height of the right subtree, then the tree is not a **perfect binary tree** and we need to recursively call the function on the left and right subtrees
 
   ```py
   def countNodes(root):
-      # helper function to get the height of the tree
-      def getHeight(node):
-          height = 0
-          while node.left:
-              height += 1
-              node = node.left
-          return height
-
-      # helper function to check if the node exists or not
-      def exists(idx_to_find, height, node):
-          left = 0
-          right = (2 ** height) - 1
-          for _ in range(height):
-              mid = -(-(left + right) // 2) # use (-) to round up the result of the division
-              # check if the index is in the left or right subtree
-              if idx_to_find >= mid:
-                  node = node.right
-                  left = mid
-              else:
-                  node = node.left
-                  right = mid - 1
-
-          return node is not None
-
-      # if the root is None, return 0
       if root is None:
           return 0
 
       # get the height of the tree
-      height = getHeight(root)
+      leftHeight = getHeight(root, 'left')
+      rightHeight = getHeight(root, 'right')
 
-      # if the height of the tree is 0, return 1
-      if height == 0:
-          return 1
+      # if the height of the left subtree is equal to the height of the right subtree, then the tree is a perfect binary tree
+      if leftHeight == rightHeight:
+          return (2 ** leftHeight) - 1 # 2^(h-1) - 1
+      # else, call the function recursively on the left and right subtrees
+      else:
+          return countNodes(root.left) + countNodes(root.right) + 1
 
-      # get the number of nodes above the last level
-      upperCount = (2 ** height) - 1
-
-      # use binary search to get the number of nodes in the last level
-      left = 0
-      right = upperCount
-      while left < right:
-          mid = -(-(left + right) // 2)
-
-          # check if the node exists or not
-          if exists(mid, height, root):
-              left = mid # move to the right subtree
-          else:
-              right = mid - 1 # move to the left subtree
-
-      # return the total number of nodes
-      return upperCount + left + 1
-  ```
-
-- Another good solution -> using recursion
-
-  ```py
-  def get_height(node):
-     if not node:
-         return 0
-     return 1 + get_height(node.left)
-
-     if not root:
-         return 0
-     left_height = get_height(root.left)
-     right_height = get_height(root.right)
-     if left_height == right_height:
-         return (2 ** left_height) - 1 + self.countNodes(root.right) + 1
-     else:
-         return (2 ** right_height) - 1 + self.countNodes(root.left) + 1
+  # helper function to get the height of the tree
+  def getHeight(node, direction='left'):
+      height = 0
+      while node:
+          height += 1
+          node = node.left if direction == 'left' else node.right
+      return height
   ```
 
 ---
 
 ### Level Width
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=4wPlA_InnGY) | Use **BFS** to traverse the tree and keep track of the indices of the leftmost and rightmost non-null nodes. The width of the level is then calculated as the difference between the indices plus one. We can use a queue to store the nodes that we need to visit. We start by adding the root node to the queue along with its index, which we set to 0. We also initialize two variables, max_width and level_width, to 0. max_width will be used to store the maximum width we have seen so far, and level_width will be used to store the width of the current level. Then, we start the BFS loop. In each iteration of the loop, we first get the number of nodes in the current level by getting the size of the queue. We then loop through all the nodes in the current level and update the leftmost and rightmost indices as necessary. We also add the children of each node to the queue along with their indices, which we calculate based on the indices of their parent node. At the end of each level, we update the max_width variable with the level_width if it is greater than max_width. We then reset the level_width variable to 0 for the next level. Once we have processed all the nodes in the tree, we return the max_width variable as the answer. |
 
 Write a function that accepts a root node of a tree and return an array where each element is the width of the tree at each level.
 
@@ -251,7 +209,77 @@ def level_width(root):
 
 ---
 
+### Maximum Width of Binary Tree
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=FPzLE2L7uHs) | Use **BFS** to traverse the tree and keep track of the indices of the leftmost and rightmost non-null nodes. The width of the tree is then calculated as the maximum width among all levels. We can use a `queue` to store the nodes that we need to visit. We start by adding the root node to the queue as `(node, row, col)`. We also initialize two variables, `prevLevel` and `prevIdx` |
+
+Given the `root` of a binary tree, return the **maximum width** of the given tree.
+
+The **maximum width** of a tree is the maximum width among all levels.
+
+The **width** of one level is defined as the length between the end-nodes (the leftmost and rightmost non-null nodes), where the null nodes between the end-nodes are also counted into the length calculation.
+
+- Ex:
+  ![maximum width of binary tree](./img/maximum-width-of-binary-tree-1.jpeg)
+
+  - Input: `root = [1,3,2,5,3,null,9]`
+  - Output: `4`
+  - Explanation: The maximum width existing in the third level with the length `4` -> `(5,3,null,9)`.
+
+- Explanation
+
+  - The width of a level is calculated by getting the indices of the **leftmost and rightmost non-null nodes**. The width of the tree is then calculated as the maximum width among all levels.
+
+    ```py
+    width = rightmost_index - leftmost_index + 1
+    ```
+
+  - In order to get the indices of the nodes on each level, we need to represent each node by its index.
+    - We do this by presenting each node as fol;ows: `(node, row, col)`
+  - We will use `BFS` to go level-by-level and keep track of the indices of the nodes on each level.
+    - We will use a `queue` to store the nodes that we need to visit.
+    - We start by adding the root node to the queue.
+    - We also initialize two variables, `max_width` and `level_width`, to `0`.
+      - `max_width` -> max width of the tree
+      - `level_width` -> width of the current level
+    - Then, we start the `BFS` loop. In each iteration of the loop, we first get the number of nodes in the current level by getting the size of the queue. We then loop through all the nodes in the current level and update the `leftmost` and `rightmost` indices as necessary. We also add the children of each node to the queue along with their indices, which we calculate based on the indices of their parent node.
+    - At the end of each level, we update the `max_width` variable.
+
+```py
+def widthOfBinaryTree(root):
+    # create a queue to store the nodes that we need to visit
+    q = deque([(root, 0, 1)]) # (node, level, idx)
+    maxWidth = 0
+    prevLevel, prevIdx = 0, 1
+
+    while q:
+      node, level, idx = q.popleft()
+
+      # if we're in a new level, update the prevLevel and prevIdx
+      if level != prevLevel:
+        prevLevel, prevIdx = level, idx
+
+      # update the maxWidth
+      maxWidth = max(maxWidth, idx - prevIdx + 1)
+
+      # add the children of the node to the queue
+      if node.left:
+        q.append((node.left, level + 1, idx * 2))
+      if node.right:
+        q.append((node.right, level + 1, idx * 2 + 1))
+
+    return maxWidth
+```
+
+---
+
 ### Path Sum
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=LSKQyOz_P8I) | Use **DFS** to traverse the tree and keep track of the current sum of the path from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we return `True`. Otherwise, we return `False`. |
 
 Given the `root` of a binary tree and an integer `targetSum`, return `true` if the tree has a **root-to-leaf** path such that adding up all the values along the path equals `targetSum`.
 
@@ -260,38 +288,21 @@ Given the `root` of a binary tree and an integer `targetSum`, return `true` if t
 
   - We can use a **Depth-First Search** to traverse the tree and keep track of the current sum of the path from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we return `True`. Otherwise, we return `False`.
 
-- Solution 1: by **subtracting** the current node's value from the target sum
+```py
+def hasPathSum(root, targetSum):
+    def dfs(node, curSum):
+        if node is None:
+            return False
 
-  ```py
-  def hasPathSum(root, targetSum):
-      if root is None:
-          return False
+        curSum += node.val
+        # if the root is a leaf node, check if the current sum is equal to the target sum
+        if not node.left and not node.right:
+            return curSum == targetSum
 
-      # if the root is a leaf node, check if the current sum is equal to the target sum
-      if root.left is None and root.right is None:
-        return root.val == targetSum
+        return dfs(node.left, curSum) or dfs(node.right, curSum)
 
-      targetSum -= root.val
-      return hasPathSum(root.left, targetSum) or hasPathSum(root.right, targetSum)
-  ```
-
-- Solution 2: by **adding** the current node's value to the current sum
-
-  ```py
-  def hasPathSum(root, targetSum):
-      def dfs(node, curSum):
-          if node is None:
-              return False
-
-          curSum += node.val
-          # if the root is a leaf node, check if the current sum is equal to the target sum
-          if not node.left and not node.right:
-              return curSum == targetSum
-
-          return dfs(node.left, curSum) or dfs(node.right, curSum)
-
-      return dfs(root, 0)
-  ```
+    return dfs(root, 0)
+```
 
 - Time complexity: `O(n)` where `n` is the number of nodes in the tree
 - Space complexity: `O(h)` where `h` is the height of the tree, this space is used by the recursion stack
@@ -766,12 +777,26 @@ Given the `root` of a binary tree, flatten the tree into a "linked list":
   - When you're asked to find the **closest value** in a BST, you can use a **Breadth First Search** to traverse the tree
   - When you're asked to find the **closest value** in a BST, you can use a **Binary Search** to traverse the tree
 
-### BST Insertion
+### Insert into a Binary Search Tree
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Cpg8f79luEA) | Use **Depth-First Search** to traverse the tree uisng **Binary Search** to find the correct position to insert the new node. Start at the `root` and keep searching until you find the valid position (where `root` is `None`) and return the new node. |
 
 Write a function that accepts a root node of a BST and a value to insert into the tree. The function should return the root node of the BST after the insertion.
 
 - EX: `insert(root, 5) --> root`
   ![bst insertion](./img/bst-insertion-1.png)
+
+- Explanation:
+
+  - We can use a **Depth-First Search** to traverse the tree and use **Binary Search** to find the correct position to insert the new node.
+  - We start at the `root` and keep searching until we find the valid position (where `root` is `None`) and return the new node.
+  - Time complexity: `O(h)` where `h` is the height of the tree
+    - worst case: `O(n)` where `n` is the number of nodes in the tree if the tree is not balanced
+      ![unbalanced-search-tree](./img/unbalanced-search-tree.png)
+  - Space complexity: `O(h)` where `h` is the height of the tree
+    - extra space is used by the **recursion call stack**
 
 ```py
 def insert(root, value):
@@ -793,17 +818,37 @@ def insert(root, value):
 
 ### Delete Node in a BST
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=LFzAoJJt92M) | Use **Depth-First Search** to traverse the tree and find the node that we want to delete. Once we find the node, we can use a **Bottom-Up Approach** to delete the node, and we have multiple cases to consider: 1. If the node is a leaf node (has no childern), then we can simply delete the node by returning `None`. 2. If the node has only one child, then we can delete the node by returning its child. 3. If the node has two children, then we can delete the node by replacing its value with the value of its successor node (the smallest node in its right subtree) and then recursively call the function on the right subtree to delete the successor node. |
+
+Given the `root` of a binary search tree and a `key`, delete the node with the given `key` in the BST. Return the root of the binary search tree after deleting the given `key`. If the `key` does not exist in the BST, return the `root`.
+
+- EX: `deleteNode(root, 5) --> root`
+  ![delete node in a bst](./img/delete-node-in-a-bst-1.jpeg)
+
 - Explanation:
 
-  - We can use a **Depth-First Search** to traverse the tree and find the node that we want to delete.
+  - One solution that comes to mind is to keep a pointer to the parent node of the node that we want to delete. This way, we can easily delete the node by setting the parent's `left` or `right` child to the node's child.
+    - This seems easy, but it's not because we need to keep track of the parent node while traversing the tree.❌ **(use it when thinking loudly with the interviewer)**
+  - We can use a **Depth-First Search** to traverse the tree and find the node that we want to delete, and then replace it with its `successor` node.
   - Once we find the node, we can use a **Bottom-Up Approach** to delete the node, and we have multiple cases to consider:
     1. If the node is a leaf node (has no childern), then we can simply delete the node by returning `None`.
+       ![delete node in a bst](./img/delete-node-in-a-bst-2.png)
     2. If the node has only one child, then we can delete the node by returning its child.
-    3. If the node has two children, then we can delete the node by replacing its value with the value of its successor node (the smallest node in its right subtree) and then recursively call the function on the right subtree to delete the successor node.
+       ![delete node in a bst](./img/delete-node-in-a-bst-3.png)
+    3. If the node has two children, then we can delete the node by replacing its value with the value of its `successor` node **(the smallest node in its right subtree)** and then recursively call the function on the right subtree to delete the successor node.
+       ![delete node in a bst](./img/delete-node-in-a-bst-4.png)
+       - We call it again on the right subtree because the successor node can have a right subtree.
+  - Time complexity:
+    - Finding the node: `O(h)` where `h` is the height of the tree
+    - Deleting the node: `O(h)` where `h` is the height of the tree
+    - Total: `O(2h)` -> `O(h)`
+  - Space complexity: `O(h)` where `h` is the height of the tree
+    - extra space is used by the **recursion call stack**
 
 ```py
 def deleteNode(root, key):
-    # if the root is None, return None
     if root is None:
         return None
 
@@ -815,14 +860,11 @@ def deleteNode(root, key):
         root.right = deleteNode(root.right, key)
     # if the key is equal to the root's value, delete the key from the current node
     else:
-        # if the node is a leaf node (has no childern), then we can simply delete the node by returning None
-        if not root.left and not root.right:
-            return None
+        # if the node is a leaf node (has no childern), delete the node by returning None
+        if not root.left and not root.right: return None
         # if the node has only one child, then we can delete the node by returning its child
-        elif not root.left:
-            return root.right
-        elif not root.right:
-            return root.left
+        elif not root.left: return root.right
+        elif not root.right: return root.left
         # if the node has two children, then we can delete the node by replacing its value with the value of its successor node (the smallest node in its right subtree) and then recursively call the function on the right subtree to delete the successor node
         else:
             # find the successor node
@@ -841,16 +883,27 @@ def deleteNode(root, key):
 
 ### Validate Binary Search Tree
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=s6ATEkipzow) | Use (`min`, `max`) ranges for each node. The root node should be in the range of `(-inf, inf)`, check the left child of the root node and check if it's in the range of `(-inf, root.value)`, check the right child of the root node and check if it's in the range of `(root.value, inf)`. **OR** Use **In-Order Traversal** and check if the values are in ascending order. |
+
 Write a function that accepts a root node of a BST and returns `True` if the tree is a valid BST and `False` if it is not.
 
 - EX: `validate(root) --> True`
 - Explanation:
 
-  - The first solution that comes into mind is to check the `right` & `left` children of each node and check if they're less than or greater than the root node
+  - The first solution that comes into mind is to check the `right` & `left` children of each node and check if they're less than or greater than the `root` node
     - but that's not enough because the right child of the root node might be less than the root node, but it's greater than the left child of the root node.
       ![validate bst](./img/validate-bst-1.png)
     - So we can't just check the neighbors and children one time and we have to check the whole tree for each node -> `O(n^2)` **BAD! ❌**
-  - **Solution** is to use ranges for each point ✅:
+  - Instead, we can:
+    - Use **ranges** for each point ✅
+    - Or, use **In-Order Traversal** and check if the values are in ascending order ✅
+
+- **Solution 1:** Using `min` and `max` ranges
+
+  - create a function that accepts a `root` node, a `min` value and a `max` value
+  - Each node will have a `min` and `max` value that it should be in the range of
     ![validate bst](./img/validate-bst-2.png)
 
     - root node should be in the range of `(-inf, inf)`
@@ -858,10 +911,8 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
     - left child of the root node should be in the range of `(-inf, root.value)`
     - right child of the root node should be in the range of `(root.value, inf)`
 
-- **Solution 1:** Using `min` and `max` ranges
-
-  - **Steps:**
-    - create a function that accepts a `root` node, a `min` value and a `max` value
+  - Time complexity: `O(n)` where `n` is the number of nodes in the tree
+  - Space complexity: `O(h)` where `h` is the height of the tree
 
   ```py
   def isValidBST(root):
@@ -888,6 +939,8 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
     4. call the function with the `root` node
     5. loop through the array and check if the values are in ascending order
     6. if the values are in ascending order, return `True`
+  - Time complexity: `O(n)` where `n` is the number of nodes in the tree
+  - Space complexity: `O(n)` where `n` is the number of nodes in the tree
 
   ```py
   def validate(root):
@@ -2110,12 +2163,18 @@ def deserialize(data):
 
 ### Implement Trie (Prefix Tree)
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=oobqoCJlHA0) | Create a `TrieNode` class with a `children` property that stores the children of the node and a `isEndOfWord` property that indicates if the node is the end of a word. Create a `Trie` class with a `root` property that stores the root node of the trie. Implement the `insert` method that takes a word as input and inserts it into the trie. Implement the `search` method that takes a word as input and returns `True` if the word is in the trie and `False` if it's not. Implement the `startsWith` method that takes a prefix as input and returns `True` if the prefix is in the trie and `False` if it's not. |
+
 A **trie** (pronounced as "try") or **prefix tree** is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. There are various applications of this data structure, such as autocomplete and spellchecker.
 
-- Steps
-  - when inserting a word, we loop through each character in the word and check if the character is in the trie
-    - if the character is in the trie, we move to the next character until we reach the end of the word
-    - if the character is not in the trie, we add it to the trie by creating a node for that character
+- Explanation
+  - Create a `TrieNode` class with a `children` property that stores the children of the node and a `isEndOfWord` property that indicates if the node is the end of a word.
+  - when inserting a word, we loop through each character in the word and check if the character is in the `trie`
+    - if the character is in the `trie`, we move to the next character until we reach the end of the word
+    - if the character is not in the `trie`, we add it to the `trie` by creating a node for that character
+    - After adding all the characters of the word, we need to mark the end of the word by adding a `*` to the node or setting the `isEndOfWord` property to `True`
   - when adding all the characters of a word, we need to mark the last character as the end of the word by adding a `*` to the node
 
 ```py

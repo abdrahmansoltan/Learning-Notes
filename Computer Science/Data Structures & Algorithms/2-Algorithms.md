@@ -2,24 +2,19 @@
 
 - [INDEX](#index)
   - [Algorithm](#algorithm)
-  - [Algorithm Analysis (Big-Oh)](#algorithm-analysis-big-oh)
+  - [Algorithm Analysis (Big-O)](#algorithm-analysis-big-o)
     - [Elements of good code](#elements-of-good-code)
-    - [Average case vs Worst case](#average-case-vs-worst-case)
     - [Asymptotic Analysis](#asymptotic-analysis)
-      - [Asymptotic notation](#asymptotic-notation)
     - [Runtime Analysis](#runtime-analysis)
-    - [Determining Complexity](#determining-complexity)
       - [Time complexity](#time-complexity)
       - [Space complexity](#space-complexity)
-      - [Big O Rules](#big-o-rules)
-    - [O(n)](#on)
-      - [Polynomials](#polynomials)
-    - [O(1)](#o1)
-    - [O(n^2)](#on2)
-      - [Explaining O(n^2) for loops](#explaining-on2-for-loops)
-    - [O(log(n))](#ologn)
-    - [O(n log(n))](#on-logn)
-    - [O(!n)](#on-1)
+    - [Big O Rules](#big-o-rules)
+      - [O(n)](#on)
+      - [O(1)](#o1)
+      - [O(n^2)](#on2)
+      - [O(log(n))](#ologn)
+      - [O(n log(n))](#on-logn)
+      - [O(!n)](#on-1)
     - [Rules to improve Big o](#rules-to-improve-big-o)
     - [Notes](#notes)
   - [Recursion](#recursion)
@@ -29,7 +24,7 @@
     - [Big-O Runtime for Recursive Functions](#big-o-runtime-for-recursive-functions)
     - [Maximum Recursive Depth](#maximum-recursive-depth)
       - [When recursion goes wrong](#when-recursion-goes-wrong)
-    - [Eliminating Tail Recursion](#eliminating-tail-recursion)
+    - [Tail Recursion](#tail-recursion)
   - [Dynamic Programming](#dynamic-programming)
     - [Memoization](#memoization)
     - [Dynamic programming types](#dynamic-programming-types)
@@ -92,35 +87,30 @@
 
 It's a set of instructions to solve a problem/perform a task
 
-> or: It's a step-by-step procedure for performing some task in a finite amount of time
+> **Data structures are just saving memory, and Algorithms are just actions taken on that memory**
 
 - We use Big O to analyze the performance of an algorithm (how fast it is, how much memory it takes up, etc.)
-- It's not enough to know how long an algorithm takes to run—you need to know how the running time increases as the list size increases. hat’s where Big O notation comes in.
-- Algorithm speed isn’t measured in seconds, but in growth of the number of operations.
+- It's not enough to know how long an algorithm takes to run—you need to know how the running time increases as the input size increases. That’s where Big O notation comes in.
+- Algorithm speed isn’t measured in seconds, but in **growth of the number of operations**.
 
 ---
 
-## Algorithm Analysis (Big-Oh)
+## Algorithm Analysis (Big-O)
 
-**Big O:** It tells us how time scales with respect to some input variables
+**Big O:** It tells us how time scales with respect to some input size. (How well/fast a problem is solved)
 
-> It tells us **How well/fast a problem is solved**, it's the language we use to telling (how the runtime of an algorithm grows as the inputs grow)
-
-- **Big O** doesn't tell you the speed in **seconds**. Big O notation lets you compare the **number of operations**. It tells you how fast the algorithm grows.
+- **Big O** doesn't tell you the speed in **seconds**. Big O notation tells you how fast the algorithm grows.
   - we don't use `seconds` because:
     - different machines will record different times for the same algorithm
     - the same machine will record different times for the same algorithm if it runs at different times of the day
   - We don't use `steps / num of operations` because:
     - different operations take different amounts of time
     - same operation can be implemented to take different amounts of time, e.g. `for loop` vs `while loop`
-    - we want to talk about the **growth rate** of an algorithm, not the **speed** of the algorithm
+    - Experiments can be done only on a limited set of test inputs; hence, they leave out the running times of inputs not included in the experiment (and these inputs may be important)
 
 > So, to study the running time of an algorithm, we need to know the **growth rate** of the number of operations in the algorithm as the input size grows, and not the actual number of operations for a specific input size.
 
-- `O(n)` -> `n` is the number of operations an algorithm will make
-- `O(log(n))` -> `log(n)` is the number of operations an algorithm will make
-- `O(n^2)` -> `n^2` is the number of operations an algorithm will make
-- Many `Big O` times don't use `n` as it's just a variable and any letter will do, but it's still the number of operations an algorithm will make
+- Many `Big O` notations don't use `n` as it's just a variable and any letter will do, but it's still the number of operations an algorithm will make
   ![big o](./img/big-o-1.png)
 
 > Why we use it?
@@ -141,45 +131,35 @@ It's a set of instructions to solve a problem/perform a task
 
 - **scalable**
 
-  - **speed** --> CPU --> **Time complexity** --> **Big O**
-    - compare algorithms on which one is better in scale
-  - **memory** --> **space complexity**:
+  - **speed** --> CPU --> **Time complexity**
+    - compare algorithms on which one is better in scale (how fast it is)
+  - **memory** --> **space complexity**
     - heap --> store variable
       - most primitives(`booleans`, `numbers`, `undefined`, `null`) are constant space
         ![space-complexity](./img/space-complexity.png)
       - strings require `O(n)` space (`n` is the string length)
       - reference-types are generally `O(n)`, where `n` is the length(for arrays) or the number of keys(for objects)
         ![space-complexity](./img/space-complexity2.png)
-    - stack --> operations
-
----
-
-### Average case vs Worst case
-
-- **Average-case analysis** usually requires that we calculate expected running times based on a given input distribution, which usually involves sophisticated probability theory.
-  - Therefore, we usually characterize running times in terms of the worst case, as a function of the input size, `n`, of the algorithm.
-- **Worst-case analysis** is much easier than average-case analysis, as it requires only the ability to identify the worst-case input, which is often simple.
-  - Also, this approach typically leads to better algorithms. Making the standard of success for an algorithm to perform well in the worst case necessarily requires that it will do well on every input. That is, designing for the worst case leads to stronger algorithmic “muscles,”.
-
-> get more info about **Big Omega & Big Theta**
+    - stack --> operations (function calls, etc.)
+      - **call stack** is where your code is read and executed
+      - **stack overflow** happens when the call stack is too large
+      - **tail call optimization** is when the last line of a function is a function call, and the result of that function call is returned directly to the caller of the current function -> [Tail recursion](#tail-recursion)
 
 ---
 
 ### Asymptotic Analysis
 
 - In **algorithm analysis**, we focus on the **Growth Rate** of the running time as a function of the input size `n`, taking a “big-picture” approach. For example, it is often enough just to know that the running time of an algorithm grows proportionally to `n`.
-  - we characterize the running times of algorithms by using functions that map the size of the input (`n`), to values that correspond to the main factor that determines the growth rate in terms of `n`.
-  - This approach reflects that each basic step in a pseudo-code description or a high-level language implementation may correspond to a small number of primitive operations.
-- Thus, we can perform an analysis of an algorithm by estimating the **number of primitive operations** executed up to a constant factor, rather than getting bogged down in language-specific or hardware-specific analysis of the exact number of operations that execute on the computer.
 
----
+  - We use functions to show how the time taken by an algorithm changes based on the input size. Basically, we're interested in understanding how the number of operations in an algorithm grows as the input gets larger. This helps us figure out how efficient an algorithm is.
+  - Thus, we can perform an analysis of an algorithm by estimating the **number of primitive operations** executed up to a constant factor, rather than getting bogged down in language-specific or hardware-specific analysis of the exact number of operations that execute on the computer.
 
-#### Asymptotic notation
-
-It's a way to describe the behavior of a function as the input size `n` gets arbitrarily large. It's a way to describe the **rate of growth** of a function.
-
-- The running time of an algorithm depends on how long it takes a computer to run the lines of code of the algorithm—and that depends on the speed of the computer, the programming language, and the compiler that translates the program from the programming language into code that runs directly on the computer, among other factors.
-- To calculating the running time of an algorithm more carefully. We can use a combination of two ideas: **asymptotic analysis** and **asymptotic notation**.
+- The running time of an algorithm depends on how long it takes a computer to run the lines of code of the algorithm—and that depends on multiple factors like:
+  - the speed of the computer
+  - the programming language
+  - the compiler that translates the program from the programming language into code that runs directly on the computer
+  - among other factors.
+- To calculating the running time of an algorithm more carefully. We can follow these steps:
 
   1. we think about the running time of the algorithm as a **function of the size of its input**.
   2. we think about how fast a function grows with the input size. We call this the **"rate of growth"** of the running time.
@@ -190,57 +170,48 @@ It's a way to describe the behavior of a function as the input size `n` gets arb
 
 - By dropping the less significant terms and the constant coefficients, we can focus on the important part of an algorithm's running time: **its rate of growth**.
 - We use **asymptotic notation** in 3 forms:
-  - `big-O` notation
-  - `big-Theta` notation
-  - `big-Omega` notation.
+
+  - `big-Theta` notation (Average case)
+    - usually requires that we calculate expected running times based on a given input distribution, which usually involves sophisticated probability theory.
+      ![average-case](./img/average-case.png)
+  - `big-Omega` notation (Best case)
+    - is usually too optimistic to be useful, as it does not reflect what happens on average.
+      ![best-case](./img/best-case.png)
+  - `big-O` notation (Worst case)
+    - is much easier than average-case analysis, as it requires only the ability to identify the worst-case input, which is often simple.
+      ![worst-case](./img/worst-case.png)
+
+  > We usually characterize running times in terms of the worst case, as a function of the input size, `n`, of the algorithm.
 
 ---
 
 ### Runtime Analysis
 
-- This is done by measuring the performance (**number of steps / operations**) which varies between devices so we need something standard, instead of measuring time, but why is that?
-  - problem with time:
-    - different machines will record different times
-    - the same machine will record different times
-    - for fast algorithms, speed measurements may not be precise enough
-    - Experiments can be done only on a limited set of test inputs; hence, they leave out the running times of inputs not included in the experiment (and these inputs may be important)
-  - so instead of time, we count the number of simple operations the computer has to perform
-- When we talk about `big O`, we talk about the **"worst c ase scenario"**
-  - It's a reassurance that no matter what happens, the algorithm will never be slower than the `big O` we've calculated
+- This is done by measuring the performance (**number of steps / operations**) which varies between devices so we need something standard
+- When we talk about `big O`, we talk about the **"worst case scenario"** -> It's a reassurance that no matter what happens, the algorithm will never be slower than the `big O` we've calculated
 
 ![big-o](./img/big-o.png)
 
-> here we see when elements (input) increases, how much the algorithm slow down (how many operation do we need to do) ?
-
----
-
-### Determining Complexity
-
-> **Data structures are just saving memory, and Algorithms are just actions taken on that memory**
-
-![Determining Complexity](./img/determine-complexity.png)
+> Here we see when elements (input) increases, how much the algorithm slow down (how many operation we need to do)
 
 #### Time complexity
 
+![Determining Complexity](./img/determine-complexity.png)
 ![Determining Complexity](./img/determining-complexity-1.png)
 
 - Examples
 
   ```py
-  # O(a/b) -> O(a)
-  def div(a, b):
-    count = 0
-    sum = b
-    while sum <= a:
-      sum += b
-      count += 1
-    return count
+  # Time complexity -> O(1)
+  def test1(n):
+    for i in range(1000):
+      print(i * n) # O(1) because the number of operations is constant (doesn't change with the input size)
 
-  # Time complexity -> O(sqrt(n))
+  # Time complexity -> O(n)
   def sqrt(n):
     i = 1
     while i * i <= n:
-      i += 1
+      i += 1 # because we're reducing the size of the problem by 1 in each iteration
     return i - 1
 
   # Time complexity -> O(log n)
@@ -254,30 +225,33 @@ It's a way to describe the behavior of a function as the input size `n` gets arb
 
 - Hard Examples
 
-  ```py
-  # code prints all strings of length k where the characters are in sorted order O(k*26^k)
-  def printSortedStrings(remaining, prefix=""):
-    if remaining == 0:
-      if isInOrder(prefix):
-        print(prefix)
-    else:
-      for c in range(ord('a'), ord('z') + 1):
-        printSortedStrings(remaining - 1, prefix + chr(c))
-  # helper
-  def isInOrder(s):
-    for i in range(1, len(s)):
-      prev = s[i - 1]
-      curr = s[i]
-      if prev > curr:
-        return False
-    return True
-  ```
+  - Function that prints all strings of length `k` where the characters are in sorted order
 
-> **Note:** when you encounter a pattern `1 + 2 + 3 + ... + n` in a **nested `for` loop** (usually by reducing the inner loop by 1 in each iteration), it's usually `O(n^2)`
->
-> - to remember it. remember the **`Gauss formula` story (the kid who solved the problem in seconds)**, and that the formula is `n(n+1)/2` which is `O(n^2)`
->   - The story says that he wanted to sum numbers from `1` to `100`, so he wrote `1 + 2 + 3 + ... + 100` on the board, and then he realized that he can just write `100 + 1` and `99 + 2` and `98 + 3` and so on, and then he realized that he can just write `101` 100 times, and then he realized that he can just write `100 * 101` and then divide it by `2` to get the result, and that's how he solved the problem in seconds.
->   - So the formula is `(n+1) * n / 2` which is `O(n^2)` (because we have `n^2` in the formula)
+    ```py
+    # Time complexity -> O(n * 26^n)
+    def printSortedStrings(remaining, prefix=""):
+      if remaining == 0:
+        if isInOrder(prefix):
+          print(prefix)
+      else:
+        for c in range(ord('a'), ord('z') + 1):
+          printSortedStrings(remaining - 1, prefix + chr(c))
+    # helper
+    def isInOrder(s):
+      for i in range(1, len(s)):
+        prev = s[i - 1]
+        curr = s[i]
+        if prev > curr:
+          return False
+      return True
+    ```
+
+- **Notes:**
+
+  - when you encounter a pattern `1 + 2 + 3 + ... + n` in a **nested `for` loop** (usually by reducing the inner loop by 1 in each iteration), it's usually `O(n^2)`
+    - to remember it. remember the **`Gauss formula` story (the kid who solved the problem in seconds)**, and that the formula is `n(n+1)/2` which is `O(n^2)`
+    - The story says that he wanted to sum numbers from `1` to `100`, so he wrote `1 + 2 + 3 + ... + 100` on the board, and then he realized that he can just write `100 + 1` and `99 + 2` and `98 + 3` and so on, and then he realized that he can just write `101` 100 times, and then he realized that he can just write `100 * 101` and then divide it by `2` to get the result, and that's how he solved the problem in seconds.
+    - So the formula is `(n+1) * n / 2` which is `O(n^2)` (because we have `n^2` in the formula)
 
 ---
 
@@ -288,6 +262,7 @@ It's a way to describe the behavior of a function as the input size `n` gets arb
   - Assigning variables
   - Creating new data structures
   - function calls and allocations
+    - When we call a function, we push a new frame onto the **call stack**, which takes up some amount of memory. When we return from a function, we pop the frame off the stack, which also takes up some amount of memory.
 
 ```py
 # memory complexity -> O(1)
@@ -310,7 +285,7 @@ def sqrt(n):
 def sqrt_helper(n, min, max):
   if max < min:
     return -1
-  guess = (min + max) // 2
+  guess = (min + max) // 2 # O(log n) because we're calling the function recursively and reducing the size of the problem by 2 in each recursive call
   if guess * guess == n:
     return guess
   elif guess * guess < n:
@@ -319,13 +294,13 @@ def sqrt_helper(n, min, max):
     return sqrt_helper(n, min, guess - 1)
 ```
 
-- **Notes**
+- **Notes**:
   - when needing to create a bigger fixed array to insert new elements to a full fixed array, we use `O(n)` space complexity of the new array and not the sum of the two arrays
     - This is because we're not creating a new array in each iteration, we're just creating a new array once and then adding elements to it and then **deleting the old array**.
 
 ---
 
-#### Big O Rules
+### Big O Rules
 
 1. Different steps get added
 
@@ -346,7 +321,9 @@ def sqrt_helper(n, min, max):
         print(i, j)
    ```
 
-3. Drop constants -> [example](#polynomials)
+3. Drop constants
+
+   ![counting operations](./img/counting-operations2.png)
 
    - because we're looking for how things scale roughly. is it `linear`, `quadratic`, etc.
 
@@ -377,14 +354,14 @@ def sqrt_helper(n, min, max):
 
 ---
 
-### O(n)
+#### O(n)
 
 This is called **linear Time** Algorithm.
 
 Ex: looping on array using `for-loop`
 ![counting operations](./img/counting-operations.png)
 
-- we will simply count how many **primitive operations** are executed, and use this number t as a measure of the running time of the algorithm.
+- we will simply count how many **primitive operations** are executed, and use this number as a measure of the running time of the algorithm.
   - Ex of **primitive operations**: (They correspond to low-level instructions that take constant time to perform.)
     - assignment
     - comparison
@@ -393,94 +370,72 @@ Ex: looping on array using `for-loop`
     - entering and returning from a function
   - > Instead of trying to determine the specific execution time of an algorithm, we can simply count the number of primitive operations performed.
 - depending on what we count, the number of operations can be as slow as `2n` or as high as `5n+2`. But regardless of the exact number, the number of operations grows roughly proportionally with `n`
-  ![counting operations](./img/counting-operations2.png)
 
-#### Polynomials
+#### O(1)
 
-where `a0`,`a1`,...,`ad` are constants, called the **coefficients** of the polynomial, and `ad` != 0. Integer `d`, which indicates the highest power in the polynomial, is called the **degree** of the polynomial.
-
-![counting operations](./img/counting-operations3.png)
-
-- Constant almost never matters for simple search versus binary search, because O(log n) is so much faster than O(n) when your list gets big.
-
----
-
-### O(1)
-
-These are called **"Constant-Time Operations"**, we say that this function runs in `O(1)` time; that is, the running time of this function is independent of the length, `n` of the list.
+These are called **"Constant-Time Operations"**, we say that this function runs in `O(1)` time, meaning that running time of this function is independent of the length, `n` of the list.
 
 > `O(1)` is called constant time. It doesn’t mean **"instant / single operation"**. It means the time taken will stay the same, regardless of how big the input is **(constant number of operations)**.
 
-- Computer hardware supports constant-time access to an element based on its memory address. Therefore, we say that the expression `data[j]` is evaluated in `O(1)` time for a Python list.
-- The constant function characterizes the number of steps needed to do a **basic operation** on a computer, like adding two numbers, assigning a value to some variable, or comparing two numbers.
+- Computer hardware supports constant-time access to an element based on its memory address. Therefore, we say that the expression `data[j]` is evaluated in `O(1)` time for a `list` data structure.
+- The constant function characterizes the number of steps needed to do a **basic primitive operation** on a computer, like adding two numbers, assigning a value to some variable, or comparing two numbers.
 
-Ex:
+```py
+# O(1)
+def printFirst(arr):
+  print(arr[0])
 
-```js
-// O(1)
-function(arr){
-  console.log(arr[0]);
-}
-
-// O(2) -> also called O(1) as it's constant time
-function(arr){
-  console.log(arr[0]);
-  console.log(arr[1]);
-}
+# O(2) -> also called O(1) as it's constant time
+def printFirst(arr):
+  print(arr[0])
+  print(arr[1])
 ```
 
 ---
 
-### O(n^2)
+#### O(n^2)
 
-this is called **Quadratic Time**
-Ex: usually nested loops
+This is called **Quadratic Time**
 
-#### Explaining O(n^2) for loops
+- Explaining `O(n^2)` for loops
 
-Usually when we have nested loops, we always think of `O(n^2)`, but that's not always the case.
+  - Usually when we have nested loops, we always think of `O(n^2)`, but that's not always the case.
 
-- we don't always loop through the whole array in the inner loop, sometimes we loop through half of it or a quarter of it, etc.
-- so when we say that It's `O(n^2)`, we're talking about the worst case scenario, which is looping through the whole array in the inner loop.
-- Plus that the final number of operations will be **bounded by `n^2`** (the number of operations will never be more than `n^2`)
-  - `O(c * n^2) -> O(n^2)`
-    ![o(n^2)](./img/o-n2.png)
+  - we don't always loop through the whole array in the inner loop, sometimes we loop through half of it or a quarter of it, etc.
+  - so when we say that It's `O(n^2)`, we're talking about the worst case scenario, which is looping through the whole array in the inner loop.
+  - Plus that the final number of operations will be **bounded by `n^2`** (the number of operations will never be more than `n^2`)
+    - `O(c * n^2) -> O(n^2)`
+      ![o(n^2)](./img/o-n2.png)
 
----
+#### O(log(n))
 
-### O(log(n))
-
-**`O(log N)`** means that the choice of the next element on which to perform some sort of action is one of several possibilities and only one needs to be chosen --> **"Divide and conquer**
+**`O(log N)`** means that the choice of the next element on which to perform some action is one of several possibilities and only one needs to be chosen --> **Divide and conquer**
 
 - **Logarithms**
+  ![log](./img/log.png)
 
   - `log10(100)` is like asking:
-    ![log](./img/log.png)
     - how many `10s` do we need to multiply together to get `100`? - `10 * 10 = 100` --> `2`
     - or how many times we need to divide `100` by `10` to get `1`? - `100 / 10 / 10 = 1` --> `2`
 
 - The value `b` is known as the base of the logarithm. The most common base for the logarithm function in computer science is `2`
 
-  - as computers store integers in **binary**, and because a common operation in many algorithms is to repeatedly divide an input in half.
+  - as computers store integers in **binary**, and because a common operation in many algorithms is to repeatedly **divide an input in half**.
   - In fact, this base is so common that we will typically omit it from the notation when it is `2`. That is, for us:
 
     ```sh
     log(n) = log2(n)
     ```
 
-- In big O notation, we use the base `2` for the logarithm function, and we drop the base when it is `2`.
+> In (Big O) notation, we use the base `2` for the logarithm function, and we drop the base when it is `2`.
 
----
-
-### O(n log(n))
+#### O(n log(n))
 
 This function grows a little more rapidly than the `linear function O(n)` and a lot less rapidly than the `quadratic function O(n^2)`; therefore,
 
 - we would greatly prefer an algorithm with a running time that is proportional to `n log(n)`, than one with `quadratic` running time.
 
----
-
-### O(!n)
+#### O(!n)
 
 This is called **Factorial Time** or **oh no!**
 
@@ -499,23 +454,19 @@ This is called **Factorial Time** or **oh no!**
 1. worst case
    - always measure the worst case
    - Worst-case analysis is much easier than average-case analysis, as it requires only the ability to identify the worst-case input, which is often simple
-     - > An average-case analysis usually requires that we calculate expected running times based on a given input distribution, which usually involves sophisticated probability theory **(big-input data distribution)**. Therefore, for the remainder of this book, unless we specify otherwise, we will characterize running times in terms of the worst case, as a function of the input size `n` of the algorithm.
 2. remove constants
-   - `O(n/2 + 124)` will be `O(n+1)`
+   - `O(n/2 + 124)` will be `O(n)`
 3. different terms for inputs
 
-   ```js
-   function compressBoxesTwice(boxes, boxes2) {
-     boxes.forEach(function (boxes) {
-       console.log(boxes);
-     });
+   ```py
+    # O(n + m)
+    def compressBoxesTwice(boxes1, boxes2):
+      for box in boxes1:
+        print(box)
+      for box in boxes2:
+        print(box)
 
-     boxes2.forEach(function (boxes) {
-       console.log(boxes);
-     });
-   }
-
-   // result is O(n+m) and not O(n) as we have 2 different input lengths
+   # result is O(n+m) and not O(n) as we have 2 different input lengths
    ```
 
 4. drop non-dominant terms
@@ -534,6 +485,7 @@ This is called **Factorial Time** or **oh no!**
 
   - answer is: it depends on how the method (`.length) works here in this language
     - for example, here we use javascript which has `length` property (not method) to each string, so it's a simple lookup --> `O(1)`
+    - Other languages like `python` has a method called `len()` which loops through the string and counts the characters --> `O(n)`
 
 - slicing `arr[0:j+1]`, also uses `O(j + 1)` time, as it constructs a new list instance for storage.
 - Something that is (iterative or recursive) and reduces the size of the problem set by `1` each time is linear `O(n)`, and something that is (iterative or recursive) and reduces the size of the problem set by `2 or 3 or 4` each time is logarithmic `O(log n)`
@@ -625,10 +577,9 @@ When the execution of a function leads to a nested function call, the execution 
 
 - This process is used both in the standard case of one function calling a different function, or in the recursive case in which a function invokes itself. The key point is that there is a different activation record for each active call.
 - The handling of the suspending and resuming of the execution of functions is done by the **call stack**.
-- It can be a replacement for looping
-
 - When a function is called, the function is pushed to the top of the call stack.
-- When the function returns, the function is popped off the call stack.
+
+  - When the function returns, the function is popped off the call stack.
 
 - Ex: `factorial` function
 
@@ -703,14 +654,17 @@ def fib(n):
 
 ---
 
-### Eliminating Tail Recursion
-
-> By making our algorithm description exploit the repetitive structure in a recursive way, we can often avoid complex case analyses and nested loops. This approach can lead to more readable algorithm descriptions, while still being quite efficient.
+### Tail Recursion
 
 **Tail recursion** is a version of recursion impacts the final phase of a recursive function. In tail recursion, the recursive call is the last thing that happens in the function. This means that **the return value of the recursive call is returned as the return value of the function**, without any additional processing.
 
+> When a program runs, the call stack stores the function calls (that have started but not completed yet) in a stack data structure. Each function call is stored in a stack frame. When a function returns, its stack frame is removed from the call stack.
+>
+> The call stack is used to store local variables and parameters of each function call, and **what is left to do in the function**. When a function calls itself recursively, a new stack frame is created and pushed onto the call stack. When the function returns, the stack frame is popped off the call stack.
+
 - This is important because it means that the function does not have to wait for the recursive call to be resolved. It can return immediately with the recursive call, and the recursive call can be resolved later.
-- It results a much better space complexity, because we don't need to store the recursive calls in the call stack, we can just return the result of the recursive call and then return the final result of the function.
+
+  - This results a much better space complexity, because we don't need to store the recursive calls in the call stack, we can just return the result of the recursive call and then return the final result of the function.
 
   ```py
   # Normal recursion | Space complexity -> O(n)
@@ -736,10 +690,18 @@ def fib(n):
   - This is not a tail recursion because an additional multiplication is performed after the recursive call is completed.
 
     ```py
-    return n factorial(n−1)
+    return n * factorial(n−1)
     ```
 
-- Any tail recursion can be reimplemented non-recursively by enclosing the body in a loop for repetition, and replacing a recursive call with new parameters by a reassignment of the existing parameters to those values.
+  - To make this a tail recursion, we can pass the result of the recursive call to the function as a parameter (`accumulating parameter`) and multiply it by `n` before returning it.
+
+    ```py
+    return factorial(n−1, n * result)
+    ```
+
+So, a **tail-recursive function** is a function whose its calls are **tail-calls**, meaning that when we do recursion, there's no need to wait for the recursive call to be resolved before returning the final result **(nothing to do afterwards)**, because we're returning the result of the recursive call directly.
+
+- **Note**: Tail recursion shouldn't be used always, There're some cases where recursive functions can't be evaluated in a constant amount of space (like `Tree traversals`), so we need to use the normal recursion in these cases.
 
 ---
 
@@ -747,17 +709,13 @@ def fib(n):
 
 It's a technique to solve the problems by breaking it down into a collection of sub-problems, solving each of those sub-problems just once, and storing their solutions using a memory-based data structure (`array`, `map`, etc).
 
-> It's an optimization technique using `"caching"` ("Do you have something you can cache?")
+> It's an optimization technique using **"caching"**
 
 ![dynamic programming](./img/dynamic-programming.png)
-
-- It's a way to solve problems by breaking it down into a collection of sub-problems, solving each of those sub-problems just once and storing their solutions in case next sub-problem occurs.
 
 ### Memoization
 
 **Memoization**: is a specific kind of caching used to involves caching the **return value** of functions based on their parameters
-
-- What we memoize is the **return value** of the function based on its parameters which is usually calculated from something called **Reccurence Relation** (the relation between the current problem and the sub-problems)
 
 - Example of using memoization
 
@@ -775,7 +733,51 @@ It's a technique to solve the problems by breaking it down into a collection of 
           return result
   ```
 
-- it's better when using `Memoization` to save the cache in the local variable of the function instead of the global scope, you can do that in Javascript, using **closures**
+- it's better when using `Memoization` to save the cache in the local variable of the function instead of the global scope
+
+  - you can do that in Javascript, using `closures`
+
+    ```js
+    function fib() {
+      const cache = {};
+      return function (n) {
+        if (n in cache) {
+          return cache[n];
+        } else if (n < 2) {
+          return n;
+        } else {
+          const result = fib(n - 1) + fib(n - 2);
+          cache[n] = result;
+          return result;
+        }
+      };
+    }
+
+    const fibMemo = fib();
+    console.log(fibMemo(50)); // 12586269025
+    ```
+
+  - or using `classes` in Python
+
+    ```py
+    class Fib:
+      def __init__(self):
+        self.cache = {}
+
+      def fib(self, n):
+        if n in self.cache:
+          return self.cache[n]
+        elif n < 2:
+          return n
+        else:
+          result = self.fib(n - 1) + self.fib(n - 2)
+          self.cache[n] = result
+          return result
+
+    fib = Fib()
+    print(fib.fib(50)) # 12586269025
+    ```
+
 - What if I told you that you can reduce the time complexity of any complex operation to **`O(n)`** with using `Memoization` to reach the optimal solution, it's because we're saving the results of the sub-problems in the cache, so we don't need to solve them again, we just return the result from the cache. So it becomes linear time complexity.
   ![what if I told you](./img/what-if-i-told-you.png)
   ![memoization](./img/memoization.png)
@@ -798,7 +800,7 @@ We start with the **smaller pieces** and then build it up into the big picture -
 
 - It's the opposite of `Memoization` and `recursion`, because we start from the bottom **(base case)** and build it up to the top until we reach the final result.
   - the `bottom` (base case) is the smallest sub-problem that we already know the answer for it
-- It uses **tabulation** (storing the result of each sub-problem in an array or map) and **iteration** (looping) to solve the problem.
+- It uses **tabulation** (storing the result of each sub-problem in an array or map) and **iteration** (looping) on the array to calculate the result of the next sub-problem using the previous sub-problems.
 
 > `Bottom-up` solution usually has less code than the `top-down` solution (recursion), but it's harder to think of
 
@@ -894,9 +896,6 @@ We can use DP to improve problems that are solved using Divide and Conquer usual
 
 - usually the built-in sorting methods are different from language to another; for example, in `javascript`, it convert inputs to `strings` then sort them based on their **"character unicode"**
 
-  - usually for `Javascript` as it uses `ECMA` so it's standard and the browser(engine) is the one who decides which algorithms to use
-    - `Chrome`, `Mozilla`, ...
-
 - Sorting algorithms use the fact that a collection of a single element is always sorted, and then they build up the collection from there and making sure that the collection is sorted at each step
 - Sorting Algorithms
   ![elementary-sorting-algorithms](./img/sorting-algorithms.png)
@@ -917,9 +916,9 @@ A sorting algorithm is said to be **stable** if two objects with equal keys appe
 - **Unstable Sorting Algorithms**: does not maintain the relative order of records with equal keys (if the keys are equal, the order of the records may change)
   - Ex: `Quick Sort`, `Selection Sort`
 
-> When equal elements are indistinguishable, such as with integers, or more generally, any data where the entire element is the key, stability is not an issue. **Stability is also not an issue if all keys are different.**
+> Stability is not an issue if all keys are different.
 
-- Any given sorting algorithm which is not stable can be modified to be stable. There can be algorithm-specific ways to make it stable, but in general, **any comparison-based sorting algorithm which is not stable by nature can be modified to be stable by changing the key comparison operation** so that the comparison of two keys considers position as a factor for objects with equal keys.
+- Any comparison-based sorting algorithm which is not stable by nature can be modified to be stable by changing the key comparison operation. so that the comparison of two keys considers position as a factor for objects with equal keys.
 
 - Where stable sorting algorithms are useful?
 

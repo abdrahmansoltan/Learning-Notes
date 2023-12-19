@@ -13,8 +13,6 @@
   - [HTTP status messages](#http-status-messages)
   - [HTTP headers](#http-headers)
     - [Cookies](#cookies)
-    - [Security](#security)
-      - [Content Security Policy (CSP)](#content-security-policy-csp)
   - [HTTPS](#https)
     - [Handshake](#handshake)
     - [Enabling HTTPS on Your Servers](#enabling-https-on-your-servers)
@@ -190,49 +188,6 @@ if a client, or the server, or both, need information about the state of the oth
   <img src='./img/cookie3.PNG' width=48%>
 
 > so in summary: the web is stateless(each request is a new one) so we need cookies to persist data over time (on each request until we expire them)
-
----
-
-### Security
-
-#### Content Security Policy (CSP)
-
-**Content Security Policy (CSP)** is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks
-
-- Browsers that don't support it still work with servers that implement it, and vice versa: browsers that don't support CSP ignore it, functioning as usual, defaulting to the standard same-origin policy for web content. If the site doesn't offer the CSP header, browsers likewise use the standard same-origin policy.
-- To enable CSP, you need to configure your web server to return the `Content-Security-Policy` HTTP header.
-
-  - Alternatively, the `<meta>` element can be used to configure a policy, for example:
-
-    ```html
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src https://*; child-src 'none';"
-    />
-    ```
-
-- Configuring Content Security **Policy** involves adding the `Content-Security-Policy` HTTP header to a web page and giving it values to control what resources the user agent is allowed to load for that page.
-
-  - For example, a page that uploads and displays images could allow images from anywhere, but restrict a form action to a specific endpoint. A properly designed Content Security Policy helps protect a page against a cross-site scripting attack.
-
-- **Writing a policy**
-
-  - A policy is described using a series of policy directives, each of which describes the policy for a certain resource type or policy area.
-  - A policy needs to include a **default-src** or **script-src** directive to prevent inline scripts from running, as well as blocking the use of `eval()`.
-  - A policy needs to include a **default-src** or **style-src** directive to restrict inline styles from being applied from a `<style>` element or a `style attribute`.
-
-  ```js
-  // wants all content to come from the site's own origin (this excludes subdomains.)
-  Content-Security-Policy: default-src 'self'
-
-  // wants to allow content from a trusted domain and all its subdomains (it doesn't have to be the same domain that the CSP is set on.)
-  Content-Security-Policy: default-src 'self' example.com *.example.com
-
-  // wants to allow users of a web application to include images from any origin in their own content, but to restrict audio or video media to trusted providers, and all scripts only to a specific server that hosts trusted code.
-  Content-Security-Policy: default-src 'self'; img-src *; media-src example.org example.net; script-src userscripts.example.com
-  ```
-
-> For more info & examples -> [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 ---
 

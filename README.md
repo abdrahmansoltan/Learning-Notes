@@ -93,7 +93,7 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Frontend
 
-- [Frontend](./Frontend/Frontend.md)
+- [Frontend](./Frontend/General/Frontend.md)
 
 ### HTML & CSS
 

@@ -24,7 +24,6 @@
   - [Creating Shapes](#creating-shapes)
     - [Steps shape](#steps-shape)
     - [Pyramid](#pyramid)
-    - [Pascal's Triangle](#pascals-triangle)
 
 ---
 
@@ -422,29 +421,5 @@ Write a function that accepts a positive number N. The function should console l
       # Recursively call pyramid to print the next character in the current row
       pyramid(n, row, level + add)
   ```
-
----
-
-### Pascal's Triangle
-
-Given a non-negative integer `numRows`, generate the first `numRows` of Pascal's triangle.
-
-![alt](https://upload.wikimedia.org/wikipedia/commons/0/0d/PascalTriangleAnimated2.gif)
-
-- Explanation:
-  - The trick here, is to notice that each row is a list of the sum of the previous row's elements
-  - So, we can add `[1]` to the result list and then loop through the result list and add the sum of the previous row's elements to the result list
-  - We can do this until we reach the `numRows`
-
-```py
-def generate(numRows):
-    res = [[1]]
-    for i in range(1, numRows):
-        prevRow = res[-1]
-        newRow = [1] + [prevRow[j] + prevRow[j + 1] for j in range(len(prevRow) - 1)] + [1]
-        res.append(newRow)
-
-    return res
-```
 
 ---

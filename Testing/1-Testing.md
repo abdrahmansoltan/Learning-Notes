@@ -21,7 +21,7 @@
       - [Numerical Matchers](#numerical-matchers)
       - [Negating](#negating)
       - [Exceptions (error handling)](#exceptions-error-handling)
-      - [othermatchers](#othermatchers)
+      - [Other matchers](#other-matchers)
   - [Backend: Endpoint / API Testing (HTTP assertions)](#backend-endpoint--api-testing-http-assertions)
     - [Framework for Endpoint Testing](#framework-for-endpoint-testing)
   - [Testing Hooks](#testing-hooks)
@@ -208,7 +208,7 @@ It's a way to describe the level of knowledge that the tester has about the syst
 
 - expected value and expected message are optional
 
-#### othermatchers
+#### Other matchers
 
 - `.toContain(expected value)`
 - `.toMatch(expected value)`

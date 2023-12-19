@@ -2,9 +2,10 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
-  - [Multiply Strings](#multiply-strings)
-  - [Two Pointers](#two-pointers)
-    - [Valid Palindrome](#valid-palindrome)
+  - [String to Numbers Problems](#string-to-numbers-problems)
+    - [String to Integer (atoi)](#string-to-integer-atoi)
+    - [Integer to String](#integer-to-string)
+    - [Multiply Strings](#multiply-strings)
   - [Substring (Sliding Window)](#substring-sliding-window)
     - [Longest Substring Without Repeating Characters](#longest-substring-without-repeating-characters)
     - [Longest Substring with K Distinct Characters](#longest-substring-with-k-distinct-characters)
@@ -18,8 +19,8 @@
     - [Count Vowel Substrings of a String](#count-vowel-substrings-of-a-string)
     - [Longest Common Prefix](#longest-common-prefix)
   - [Reversing Problems](#reversing-problems)
+    - [Valid Palindrome](#valid-palindrome)
     - [Valid Palindrome II](#valid-palindrome-ii)
-    - [Reverse Integer](#reverse-integer)
     - [Length of Last Word](#length-of-last-word)
   - [2 Pointers String Problems](#2-pointers-string-problems)
     - [Is Subsequence](#is-subsequence)
@@ -33,6 +34,7 @@
   ![substring vs subsequence](./img/substring-vs-subsequence.png)
   - Substring: a contiguous sequence of characters within a string
   - Subsequence: a sequence that can be derived from another sequence by deleting some or no elements without changing the order of the remaining elements
+- In `string` problems, usually the brute-force solution uses `O(n)` space complexity, and the optimal solution uses `O(1)` space complexity, so we need to think of a way to solve the problem **without using extra space**
 - Verify the constraints:
   - Are all the characters in the string lowercase/uppercase?
   - Are there any leading or trailing whitespaces?
@@ -40,7 +42,140 @@
 
 ---
 
-## Multiply Strings
+## String to Numbers Problems
+
+### String to Integer (atoi)
+
+| Video Solution | Hint                                                                                                                                                                                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | We can perform the conversion digit by digit, by using a pointer to keep track of the current digit. We can use a variable `num` to keep track of the `number`. To add a digit to the number, we can multiply the current number by `10` and add the current digit to it. |
+
+Implement the `myAtoi(string s)` function, which converts a string to a 32-bit signed integer (similar to C/C++'s `atoi` function).
+
+- Requirements:
+
+  - ignore all leading whitespaces at the beginning of the string
+  - if the first non-whitespace character is not a digit or a sign (`+` or `-`), return `0`
+  - read in the next characters of the string until the next non-digit character or the end of the input is reached
+
+- EX:
+
+  - `s = "42"` -> `42`
+  - `s = "   -42"` -> `-42`
+  - `s = "4193 with words"` -> `4193`
+
+- Explanation:
+
+  - We can perform the conversion digit by digit, by using a pointer to keep track of the current digit
+  - We can use a variable `num` to keep track of the `number` to fill in the matrix with and a variable `sign` to keep track of the sign of the number
+    - To add a digit to the number, we can multiply the current number by `10` and add the current digit to it
+      - `55 = 5 * 10 + 5`
+  - We can use some string methods like:
+    - `str.isdigit()` to check if the current character is a digit
+    - `str.isspace()` to check if the current character is a whitespace
+
+- **Solution 1:** if using `int()` is allowed
+
+  ```py
+  def myAtoi(s):
+      i = 0
+      sign = 1
+
+      # Remove all leading whitespaces
+      while i < len(s) and s[i].isspace():
+          i += 1
+
+      # Check if the first non-whitespace character is not a digit or a sign (+ or -)
+      if i < len(s) and (s[i] in ('+', '-')):
+          sign = -1 if s[i] == '-' else 1
+          i += 1
+
+      # Read in the next characters of the string until the next non-digit character or the end of the input is reached
+      num = 0
+      while i < len(s) and s[i].isdigit():
+          num = num * 10 + int(s[i])
+          i += 1
+
+      return max(-2**31, min(sign * num, 2**31 - 1))
+  ```
+
+- **Solution 2:** if using `int()` is not allowed
+
+  - The trick here is to use the `ord()` function to convert the character to its ASCII value
+
+  ```py
+  def myAtoi(s):
+      i = 0
+      sign = 1
+
+      # Remove all leading whitespaces
+      while i < len(s) and s[i].isspace():
+          i += 1
+
+      # Check if the first non-whitespace character is not a digit or a sign (+ or -)
+      if i < len(s) and (s[i] in ('+', '-')):
+          sign = -1 if s[i] == '-' else 1
+          i += 1
+
+      # Read in the next characters of the string until the next non-digit character or the end of the input is reached
+      num = 0
+      while i < len(s) and s[i].isdigit():
+          num = num * 10 + ord(s[i]) - ord('0')
+          i += 1
+
+      return max(-2**31, min(sign * num, 2**31 - 1))
+  ```
+
+---
+
+### Integer to String
+
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                 |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Use `mod (%) 10` to get the last digit of the integer and `div (//) 10` to remove the last digit of the integer. As we can't use the `str()` function, we will use the `ord()` function to convert the digit to its ASCII value and add the `ASCII value of '0'` to it to get the digit as a string. |
+
+Given an integer `x`, return a string representing `x`.
+
+- EX:
+
+  - `x = 123` -> `"123"`
+  - `x = -123` -> `"-123"`
+
+- Explanation:
+
+  - Here, we can't loop over the integer `x` because we can't access the digits of an integer. Instead, we will use `mod (%) 10` to get the last digit of the integer and `div (//) 10` to remove the last digit of the integer
+
+    - `123 % 10 = 3` -> get the last digit
+    - `123 // 10 = 12` -> remove the last digit to get the remaining digits
+
+  - As we can't use the `str()` function, we will use the `ord()` function to convert the digit to its ASCII value and add the `ASCII value of '0'` to it to get the digit as a string which is the same as adding `'0'` to it
+    - `ord('0') = 48`
+    - `ord('1') = 49`
+    - `ord('2') = 50`
+    - `ord('3') = 51`
+    - `...`
+  - We will use the `sign` variable to keep track of the sign of the number
+
+```py
+def intToString(x):
+    sign = 1 if x >= 0 else -1
+    x = abs(x)
+    ans = ""
+
+    while x > 0:
+        ans += chr(x % 10 + ord('0'))
+        x //= 10
+
+    return ('-' if sign == -1 else '') + reversed(ans)
+```
+
+---
+
+### Multiply Strings
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=1vZswirL8Y8) | We can use the same approach as the previous problem, but instead of adding the elements to the result, we can fill the matrix with the elements from `1` to `n^2` in spiral order. We can use the same pointers to keep track of the `top`, `bottom`, `left`, and `right` boundaries of the current cycle. We can use a variable `num` to keep track of the `number` to fill in the matrix with. |
 
 Given two non-negative integers `num1` and `num2` represented as strings, return the product of `num1` and `num2`, also represented as a string.
 
@@ -59,8 +194,7 @@ Given two non-negative integers `num1` and `num2` represented as strings, return
 ```py
 def multiply(num1, num2):
     # Corner case
-    if "0" in (num1, num2):
-        return "0"
+    if "0" in (num1, num2): return "0"
 
     # Initialize a list to store the result
     result = [0] * (len(num1) + len(num2))
@@ -72,89 +206,21 @@ def multiply(num1, num2):
             # Calculate the product of the current digits
             product = int(num1[i]) * int(num2[j])
             # Calculate the index of the current digit in the result list
-            index = i + j
+            index = i + j + 1
             # Add the product to the current digit in the result list
-            result[index] += product
+            result[index] += product % 10
             # Add the carry to the digit on the left
-            result[index-1] += result[index] // 10
-            # Update the current digit
-            result[index] %= 10
+            result[index-1] += product // 10
 
     # Remove the leading zeros from the result list
-    while len(result) > 1 and result[0] == 0:
-        result.pop(0)
+    start = 0
+    while start < len(result) and result[start] == 0:
+        start += 1
 
     # Convert the result list to a string
-    return ''.join(map(str, result))
+    return ''.join(map(str, result[start:]))
     # or
-    # return ''.join(str(i) for i in result)
-```
-
----
-
-## Two Pointers
-
-### Valid Palindrome
-
-A palindrome is a word, phrase, number, or other sequence of characters which **reads the same backward or forward**. Allowances may be made for adjustments to capital letters, punctuation, and word dividers.
-
-- EX: `racecar`, `tacocat`, `madam`, `kayak`, `level`
-- Here's a possible approach to solve this problem:
-
-  1. Convert the string to lowercase to ignore any case differences.
-  2. Remove any non-alphanumeric characters from the string.
-
-     - > **Note:** numbers within the string will be considered alphanumeric.
-
-  3. Use two pointers to iterate through the string from both ends.
-  4. Compare the characters at each pointer position. If they are not equal, the string is not a palindrome. If they are equal, move both pointers towards the center of the string.
-  5. If the pointers meet in the middle of the string, the string is a palindrome.
-
-```py
-# using two pointers
-# helper
-def isAlphaNum(char):
-            # using ASCII values
-           return (ord('A') <= ord(char) <= ord('Z') or
-                   ord('a') <= ord(char) <= ord('z') or
-                   ord('0') <= ord(char) <= ord('9'))
-# or use the built-in isalnum() string-method
-
-def is_palindrome(s):
-  # First & last pointers
-  left, right = 0, len(s)-1
-
-  while left < right:
-    while left < right and not isAlphaNum(s[left]):
-      left += 1
-    while left < right and not isAlphaNum(s[right]):
-      right -= 1
-
-    if s[left].lower() != s[right].lower():
-      return False
-
-    left += 1
-    right -= 1
-
-  return True
-
-# --------------------------------------------------
-
-# Or (Extra space)
-newStr = ''
-for char in s:
-  if char.isalnum():
-    newStr += char.lower()
-
-return newStr == newStr[::-1]
-
-# --------------------------------------------------
-
-# Or using regular expressions
-import re
-def is_palindrome(s):
-  s = re.sub('[^a-z0-9]', '', s.lower()) # remove non-alphanumeric characters
-  return s == s[::-1]
+    # return ''.join(str(i) for i in result[start:])
 ```
 
 ---
@@ -162,6 +228,10 @@ def is_palindrome(s):
 ## Substring (Sliding Window)
 
 ### Longest Substring Without Repeating Characters
+
+| Video Solution                                                | Hint                                                                                                                                                                      |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=wiGpQwVHdE0) | Use **Sliding Window** and a `hash table` to keep track of the `last seen index` of each character in the window to prevent sliding inclemently until the window is valid |
 
 Given a string `s`, find the length of the **longest substring** without repeating characters.
 
@@ -207,6 +277,8 @@ Given a string `s`, find the length of the **longest substring** without repeati
 
 - Solution 2: `O(n)` ✅
 
+  - This is a faster solution because we don't need to slide the window to the right until the current character is not in the window, we can just update the left pointer to the `index of the last seen occurrence of the character + 1`
+
   ```py
   def lengthOfLongestSubstring(s):
       seen_chars = {} # char -> index of the last seen occurrence of the character
@@ -226,6 +298,10 @@ Given a string `s`, find the length of the **longest substring** without repeati
 ---
 
 ### Longest Substring with K Distinct Characters
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=V1gF8FCHz60) | Use **Sliding Window** and a `hash table` to keep track of the `count` of each character in the window and check if the window is valid (valid means that each new character in the window has maximum frequency of `k`) |
 
 Given a string `s`, find the length of the **longest substring** with **at most** `k` distinct characters.
 
@@ -276,6 +352,10 @@ def lengthOfLongestSubstringKDistinct(s, k):
 
 ### Longest Substring with At Least K Repeating Characters
 
+| Video Solution                                                | Hint |
+| ------------------------------------------------------------- | ---- |
+| [Video Solution](https://www.youtube.com/watch?v=5QpMpO2CAb0) | NA   |
+
 Given a string `s` and an integer `k`, return the length of the **longest substring** of `s` such that the frequency of each character in this substring is greater than or equal to `k`.
 
 - EX: `s = "aaabb", k = 3` -> `3` (substring: `"aaa"`)
@@ -302,6 +382,10 @@ Given a string `s` and an integer `k`, return the length of the **longest substr
 ---
 
 ### Longest Repeating Character Replacement
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=gqXU1UyA8pk) | Use **Sliding Window** and a `hash table` to keep track of the `count` of each character in the window and keep track of the `max character frequency` in the window to check if the window is valid (`windowSize - maxCharacterFrequency <= k`) |
 
 You are given a string `s` and an integer `k`. You can choose any character of the string and change it to any other uppercase English character. You can perform this operation at most `k` times.
 
@@ -719,7 +803,80 @@ def longestCommonPrefix(strs):
 
 ## Reversing Problems
 
+### Valid Palindrome
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=jJXJ16kPFWg) | Use **Two Pointers** to check if the string is a palindrome. We can use a pointer to iterate over the string from the `left` and another pointer to iterate over the string from the `right`. We can use a helper function to check if a character is alphanumeric and skip the character if it's not. We can use the built-in `isalnum()` string-method or use a function that checks the `ord()` range of the character |
+
+A palindrome is a word, phrase, number, or other sequence of characters which **reads the same backward or forward**. Allowances may be made for adjustments to capital letters, punctuation, and word dividers.
+
+- EX: `racecar`, `tacocat`, `madam`, `kayak`, `level`
+- Here's a possible approach to solve this problem:
+
+  1. Convert the string to lowercase to ignore any case differences.
+  2. Remove any non-alphanumeric characters from the string.
+
+     - > **Note:** numbers within the string will be considered alphanumeric.
+
+  3. Use two pointers to iterate through the string from both ends.
+  4. Compare the characters at each pointer position. If they are not equal, the string is not a palindrome. If they are equal, move both pointers towards the center of the string.
+  5. If the pointers meet in the middle of the string, the string is a palindrome.
+
+```py
+# using two pointers
+# helper
+def isAlphaNum(char):
+            # using ASCII values
+           return (ord('A') <= ord(char) <= ord('Z') or
+                   ord('a') <= ord(char) <= ord('z') or
+                   ord('0') <= ord(char) <= ord('9'))
+# or use the built-in isalnum() string-method
+
+def is_palindrome(s):
+  # First & last pointers
+  left, right = 0, len(s)-1
+
+  while left < right:
+    while left < right and not isAlphaNum(s[left]):
+      left += 1
+    while left < right and not isAlphaNum(s[right]):
+      right -= 1
+
+    if s[left].lower() != s[right].lower():
+      return False
+
+    left += 1
+    right -= 1
+
+  return True
+
+# --------------------------------------------------
+
+# Or (Extra space)
+newStr = ''
+for char in s:
+  if char.isalnum(): # using built-in string-method
+    newStr += char.lower()
+
+return newStr == newStr[::-1]
+
+# --------------------------------------------------
+
+# Or using regular expressions
+import re
+def is_palindrome(s):
+  s = re.sub('[^a-z0-9]', '', s.lower()) # remove non-alphanumeric characters
+  return s == s[::-1]
+```
+
+---
+
 ### Valid Palindrome II
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=JrxRYBwG6EI) | Use **Two Pointers** to check if the string is a palindrome. When encountering a mismatch, we can check if the string without the character at the `left` pointer is a palindrome **or** the string without the character at the `right` pointer is a palindrome. Use a helper function to check if a string is a palindrome. |
 
 Given a string `s`, return `true` if the `s` can be palindrome after deleting **at most one** character from it.
 
@@ -728,9 +885,28 @@ Given a string `s`, return `true` if the `s` can be palindrome after deleting **
   - Explanation: You could delete the character `'c'` to get the palindrome `"aba"`, which is `true`.
 
 - Explanation
+
   - Same as the previous problem, but we have to check if the string is a palindrome after deleting **at most one** character from it.
-  - to check which character to delete, we apply the same approach as the previous problem, but we check if the characters at the left and right pointers are equal,
-    - if not, we check if the string without the character at the left pointer is a palindrome or the string without the character at the right pointer is a palindrome
+
+    - The **Brute Force** approach would be to check if the string is a palindrome after deleting each character from it, but this would take `O(n^2)` time, we can do better.
+
+      ```py
+      def validPalindrome(s):
+          # helper function to check if a string is a palindrome
+          def isPalindrome(s):
+              return s == s[::-1]
+
+          # iterate over the string
+          for i in range(len(s)):
+              # check if the string is a palindrome after deleting the current character
+              if isPalindrome(s[:i] + s[i+1:]):
+                  return True
+
+          return False
+      ```
+
+  - to check which character to delete, we're sure that we have to delete a character that makes the string not a palindrome, so we can use a **two pointers** pattern to check for all the characters in the string
+    - if we found the 2 characters that not equal, we check if the string without the character at the `left` pointer is a palindrome **or** the string without the character at the `right` pointer is a palindrome
       ![valid palindrome 2](./img/valid-palindrome-2.png)
 
 ```py
@@ -743,7 +919,9 @@ def validPalindrome(s):
     while left < right:
         # if the characters at the left and right pointers are not equal, check if the string without the character at the left pointer is a palindrome or the string without the character at the right pointer is a palindrome
         if s[left] != s[right]:
-            return isPalindrome(s[left+1:right+1]) or isPalindrome(s[left:right])
+            skipLeft = s[left+1:right+1]
+            skipRight = s[left:right]
+            return isPalindrome(skipLeft) or isPalindrome(skipRight)
 
         left += 1
         right -= 1
@@ -753,28 +931,11 @@ def validPalindrome(s):
 
 ---
 
-### Reverse Integer
-
-1. Convert the integer to a string to access its individual digits.
-2. Reverse the string using a string slicing operation.
-3. Convert the reversed string back to an integer using the int() function.
-4. Handle potential overflow by checking whether the reversed integer is within the range of a 32-bit signed integer (-2^31 to 2^31-1).
-
-```py
-def reverse_integer(num):
-    sign = -1 if x < 0 else 1
-      s = str(x)[::-1] # reverse the string using slicing
-      # separate the sign from the rest of the reversed string before converting it to an integer if we have a negative sign at the end if the original integer (e.g. 123-)
-      rev = sign * int(s[:-1]) if s[-1] == '-' else sign * int(s)
-      if rev < -2147483648 or rev > 2147483647: # check for overflow
-          return 0
-      else:
-          return rev
-```
-
----
-
 ### Length of Last Word
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=KT9rltZTybQ) | Iterate over the string backwards and return the length of the first word we encounter. Pay attention to an edge case where the string does not end with an empty space (One word string). In this case, we will have to return the length of the last word anyway after we have iterated over the entire string. |
 
 Given a string `s` consisting of some words separated by some number of spaces, return the length of the **last** word in the string.
 
@@ -783,7 +944,7 @@ Given a string `s` consisting of some words separated by some number of spaces, 
   - `s = "Hello World"` -> `5`
   - `s = "   fly me   to   the moon  "` -> `4`
 
-- Solution 1: slow & extra memory ❌
+- **Solution 1**: slow & extra memory ❌
 
   ```py
   def lengthOfLastWord(s):
@@ -793,7 +954,7 @@ Given a string `s` consisting of some words separated by some number of spaces, 
       return len(words[-1]) if words else 0
   ```
 
-- Solution 2: fast & less memory ✅
+- **Solution 2**: fast & less memory ✅
 
   - Instead of wasting time and iterating over the entire string, we can iterate over the string **backwards** and return the length of the first word we encounter
     - This is done by initializing a variable to keep track of the `length` of the last word and iterating over the string backwards until we reach the end of the last word (empty space)
@@ -823,6 +984,10 @@ Given a string `s` consisting of some words separated by some number of spaces, 
 
 ### Is Subsequence
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=99RVfqklbCE) | Use a counter variable to keep track of the number of characters in `s` that are also in `t`. Use a pointer to iterate over `t` and check if the current character is equal to the current character in `s`. If so, increment the counter variable. If the counter variable is equal to the length of `s`, return `True`, as this means that we have found all the characters in `s` in `t`. |
+
 Given two strings `s` and `t`, return `true` if `s` is a **subsequence** of `t`, or `false` otherwise.
 
 - Ex:
@@ -832,6 +997,7 @@ Given two strings `s` and `t`, return `true` if `s` is a **subsequence** of `t`,
 
 - Explanation:
 
+  - As this is a subsequence problem, not a substring problem, we don't need to find the characters in `s` in the same order in `t`, we just need to find all the characters in `s` in `t` in any order.
   - Instead of using extra memory to store the characters of `s`, we can use a **two pointers** pattern to check for all the characters in `s` in `t`
     - we can use the first pointer to keep track of the current character in `s`
     - and the second pointer to iterate over `t` and check if the current character is equal to the current character in `s`
@@ -841,17 +1007,23 @@ Given two strings `s` and `t`, return `true` if `s` is a **subsequence** of `t`,
 
 ```py
 def isSubsequence(s, t):
-    i, j = 0, 0
-    while i < len(s) and j < len(t):
+    matchedChars = 0
+    for j in range(len(t)):
+        if matchedChars == len(s)-1:
+            break
         if s[i] == t[j]:
             i += 1
-        j += 1
-    return i == len(s)
+
+    return matchedChars == len(s)-1
 ```
 
 ---
 
 ### Backspace String Compare
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=k2qrymM_DOo) | Use a helper function to build the final string, the function Iterates over the string and checks if the current character is a backspace character. If so, `pop` the last character from the array. If not, append the current character to the array. Return the final string. Then compare the two strings using the helper function. |
 
 Given two strings `s` and `t`, return `true` if they are equal when both are typed into empty text editors. `'#'` means a backspace character.
 

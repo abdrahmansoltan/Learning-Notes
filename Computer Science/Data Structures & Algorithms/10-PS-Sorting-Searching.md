@@ -1,7 +1,6 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Notes](#notes)
   - [Searching](#searching)
     - [Binary Search](#binary-search)
     - [Search Insert Position](#search-insert-position)
@@ -39,16 +38,21 @@
 
 ---
 
-## Notes
-
----
-
 ## Searching
 
 - **Note:** In `binary search`, when we get the middle element, we use: `mid = (low + high) // 2`, Actually this can lead to an **integer overflow**. Imagine that `low` and `high` are very large numbers. Adding them up will cause an integer overflow.
   - A better way is to compute `mid` as `mid = low + (high - low) // 2`. Dividing `high - low` before adding `low` avoids the integer overflow.
 
 ### Binary Search
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=s4DPM8ct1pI) | Use two pointers `left` and `right` and loop through the array and check if the `mid` value is equal to the target value. If it is, then return the `mid` index. If it is not, then check if the `mid` value is less than the target value, then we can search the right side of the array. If it is not, then we can search the left side of the array. |
+
+- Explanation
+  - Bruteforce solution is to loop through the array and check if the current value is equal to the target value -> `O(n)`
+  - Instead, we can use **binary search** to find the target value -> `O(log n)` by eliminating half of the possibilities each time
+  - Time complexity is `O(log n)` because each time we're **eliminating at least half of the possibilities**
 
 ```py
 def binary_search(arr, target):
@@ -68,13 +72,17 @@ def binary_search(arr, target):
     return -1
 ```
 
-> Interview question: what if `left` and `right` values are in the upper limit of the `32` bit integer? so adding them will result in an **"overflow"**
+> **Interview question:** what if `left` and `right` values are in the upper limit of the `32` bit integer? so adding them will result in an **"overflow"**
 >
 > - Answer: we can instead get the `mid` value by using `mid = left + (right - left) // 2`
 
 ---
 
 ### Search Insert Position
+
+| Video Solution                                                | Hint                                                                                                                                                                                          |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=K-RYzDZkzCI) | Use **Binary search**, the trick here is that if the target value is not found in the array, then the `left` pointer will be pointing to the index where the target value should be inserted. |
 
 Given a sorted array of distinct integers and a `target` value, return the `index` if the `target` is found. If not, return the `index` where it would be if it were inserted in order.
 
@@ -105,6 +113,10 @@ def searchInsert(nums, target):
 ---
 
 ### Find Smallest Letter Greater Than Target
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=uFRTcMsd2Jw) | Use **Binary search**, the trick here is that we check if the `mid` value is **less than or equal** to the target value, then we will search the right side of the array. If it is not, then we will search the left side of the array. |
 
 Given a characters array `letters` that is sorted in non-decreasing order and a character `target`, return the smallest character in the array that is larger than `target`. Note that the letters wrap around.
 
@@ -906,12 +918,24 @@ Given `n`, find the total number of **full** staircase rows that can be formed.
 
 ### Insertion Sort List
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Kk6mXAzqX3Y) | Use a `dummy` node to keep track of the head of the sorted linked list. Then iterate through the original linked list and insert each node into the sorted linked list. To insert a node into the sorted linked list, we need to find the correct position to insert the node. We can do this by iterating through the sorted linked list and comparing the values. |
+
 Sort a linked list using insertion sort.
 
 - Ex:
 
   - `head = [4, 2, 1, 3] --> [1, 2, 3, 4]`
   - `head = [-1, 5, 3, 4, 0] --> [-1, 0, 3, 4, 5]`
+
+- Explanation
+  - Steps of insertion sort is as follows:
+    1. check if the current node is less than the previous node
+    2. if it is, then we need to insert the current node in the correct position, we do this by iterating through the sorted linked list and comparing the values
+    3. if it is not, then we move to the next node
+  - In order to avoid the edge case where the current node is less than the head node, we can use a `dummy` node to keep track of the head of the sorted linked list
+    ![insertion sort list](./img/insertion-sort-list-1.png)
 
 ```py
 def insertionSortList(head):
@@ -920,16 +944,14 @@ def insertionSortList(head):
 
     while cur:
         prev = dummy
-        # find the position to insert the current node
+        # find the position where the order is broken
         while prev.next and prev.next.val < cur.val:
             prev = prev.next
 
-        # insert the current node
+        # Insert the current node in the correct position
         nextNode = cur.next
         cur.next = prev.next
         prev.next = cur
-
-        # move to the next node
         cur = nextNode
 
     return dummy.next
@@ -938,6 +960,10 @@ def insertionSortList(head):
 ---
 
 ### Largest Number
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=WDx6Y4i4xJ8) | We can sort the numbers by comparing the first digit of each number. If the first digit of `a` is bigger than the first digit of `b`, then `a` should come before `b`. If the first digit of `a` is smaller than the first digit of `b`, then `b` should come before `a`. If the first digit of `a` is equal to the first digit of `b`, then we need to compare the second digit of each number. We can do this by converting the numbers to strings and comparing the strings. use `cmp_to_key` to convert the `compare` function to a `key` function. |
 
 Given a list of non-negative integers `nums`, arrange them such that they form the largest number.
 
@@ -958,21 +984,32 @@ Given a list of non-negative integers `nums`, arrange them such that they form t
 ```py
 def largestNumber(nums):
     def compare(x, y):
-        if int(str(x)+str(y)) > int(str(y)+str(x)):
-            return -1
+        # check if `xy` is greater than `yx`
+        # x = 30, y = 3 -> xy = 303, yx = 330 -> xy > yx
+        if int(x+y) > int(y+x):
+            return -1 # means that x should come before y (keep current order)
         else:
-            return 1
+            return 1 # means that y should come before x (swap order)
+
+    # convert the numbers to strings
+    for i in range(len(nums)):
+        nums[i] = str(nums[i])
+    # or nums = list(map(str, nums))
 
     # sort the numbers using the compare function
     nums = sorted(nums, key=cmp_to_key(compare))
-    return str(int(''.join(map(str, nums))))
+    return str(int(''.join(nums)))
 ```
 
 ---
 
 ### Sort colors (Dutch national flag problem)
 
-Given an array `nums` with `n` objects colored red, white, or blue, sort them **in-place** so that objects of the same color are adjacent, with the colors in the order red, white, and blue.
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=4xbWSRZHqac) | Use **Bucket sort** to sort the array in-place. We know that the array only contains 3 colors (represented by 0, 1, and 2) -> **Finite range**. after bucket sort, we can overwrite the original array with the sorted array, by iterating through the buckets and overwriting the original array with the sorted array. **OR** we can use **3-way partitioning** algorithm, where we use a `pivot` value and 2 pointers `left` and `right` to sort the array in-place. |
+
+Given an array `nums` with `n` objects colored **red, white, or blue**, sort them **in-place** so that objects of the same color are adjacent, with the colors in the order red, white, and blue.
 
 - Ex:
 
@@ -981,8 +1018,8 @@ Given an array `nums` with `n` objects colored red, white, or blue, sort them **
 - Explanation:
 
   - We know that the array only contains 3 colors: red, white, and blue (represented by 0, 1, and 2) -> **Finite range**
-    - So we can use `bucket sort` to sort the array in-place
-  - We can also use the 3-way partitioning algorithm to sort the array in-place
+    - So we can use **bucket sort** to sort the array in-place
+  - We can also use the **3-way partitioning** algorithm to sort the array in-place
 
 - Solution 1: Bucket sort
 
@@ -1008,6 +1045,8 @@ Given an array `nums` with `n` objects colored red, white, or blue, sort them **
   - We will use 3 pointers: `2 pointers` to keep track of the `low` and `high` indices of the array, and `i pointer` to iterate through the array
   - while iterating, we will move the `0s` to the `left` side of the array **(before `low`)**, and the `2s` to the `right` side of the array **(after `high`)**
     ![sort colors](./img/sort-colors-1.webp)
+
+    > This is similar to the `QuickSort` algorithm, where we use a `pivot` value and 2 pointers `left` and `right` to sort the array by moving the elements less than the `pivot` value to the left side of the array and the elements greater than the `pivot` value to the right side of the array
 
 - Note: if we don't know the range of the numbers in the array, then we can use the 3-way partitioning algorithm to sort the array in-place using a `pivot` value and 2 pointers and check if the current value is less than the `pivot` value or greater than the `pivot` value or equal to the `pivot` value
 
@@ -1151,6 +1190,10 @@ def findMedianSortedArrays(nums1, nums2):
 
 ### Cyclic Sort
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=1E1Vnq5EsYg) | We can use **cyclic sort** to sort the array **in-place**. We will iterate through the array and swap the current element with the element at the `correct index`. The `correct index` is the index of the current element minus `1`. For example: if the current element is `3`, then the correct index is `3 - 1 = 2`. We will keep swapping until the current element is at the correct index. If the current element is already at the correct index, then we will move to the next element. |
+
 We are given an array containing `n` objects. Each object, when created, was assigned a unique number from the range `1` to `n` based on their creation sequence. This means that the object with sequence number `3` was created just before the object with sequence number `4`.
 
 Write a function to sort the objects in-place on their creation sequence number in `O(n)` and without any extra space. For simplicity, let’s assume we are passed an integer array containing only the sequence numbers, though each number is actually an object.
@@ -1190,6 +1233,10 @@ def cyclicSort(nums):
 ---
 
 ### Missing Number
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=WnPLSRLSANE) | Use basic math to find the missing number. We can compare the expected sum of the range `[0, n]` with the actual sum of the elements in the array. The difference between the expected sum and the actual sum is the missing number. **OR** we can use **cyclic sort** to find the missing number by finding the first number that is not in its correct index. |
 
 Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, return the only number in the range that is missing from the array.
 
@@ -1240,7 +1287,7 @@ Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, ret
               return i
   ```
 
-- **Solution 3:** using `sum` function -> `O(n)` time and `O(1)` space
+- **Solution 3:** using `sum` function -> `O(n)` time and `O(1)` space ✅
 
   ```py
   def missingNumber(nums):
@@ -1258,6 +1305,10 @@ Given an array `nums` containing `n` distinct numbers in the range `[0, n]`, ret
 ---
 
 ### First Missing Positive
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=8g78yfzMlao) | Use **cyclic sort** to find the smallest missing positive integer. We can use the fact that the array only contains positive integers in the range `[1, n]`. So we can use **cyclic sort** to sort the array and find the first missing positive integer. **OR** we can use a `hashset` to store all the numbers in the array, then we can iterate through the numbers starting from `1` and check if the number is in the `hashset`. |
 
 Given an unsorted integer array `nums`, find the smallest missing positive integer. You must implement an algorithm that runs in `O(n)` time and uses constant extra space.
 

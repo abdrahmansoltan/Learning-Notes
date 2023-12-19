@@ -42,6 +42,10 @@
 
 ## Fibonacci Number
 
+| Video Solution                                                | Hint                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=dDokMfPpfu4) | Use **Recursion** to solve this problem. base case: `n < 2`, Use **Memoization** to improve the performance. |
+
 The Fibonacci sequence is a series of numbers where a number is the sum of the two preceding numbers. The sequence starts with `0, 1, 1, 2, 3, 5, 8, 13, 21, 34, ...`
 
 - EX: nth entry = `fib(4) --> 3`
@@ -58,7 +62,8 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 
 - Solution 1 - using recursion `O(2^n)` --> exponential time (BAD)
 
-  - `O(2^n)` because we're calling the function twice for each number in the sequence and doing this for each level(`n` levels)
+  - Time complexity: `O(2^n)` because we're calling the function twice for each number in the sequence and doing this for each level(`n` levels)
+  - Space complexity: `O(n)` because we're using `n` levels in the **call stack**
 
   ```py
   def fib(n):
@@ -71,6 +76,8 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 
 - **Memoization:** In the current implementation, the function recalculates the same values multiple times, which can be inefficient. We can use memoization to store the results of previous calculations and avoid redundant calculations.
   ![Fibonacci](./img/fibonacci-2.png)
+
+  - Time complexity: `O(n)` because we are only calculating each number once (we are only going through each level once) ✅
 
   ```py
   cache = {}
@@ -86,7 +93,7 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
           return result
   ```
 
-- using generic memoization function (useful for interviews)
+- using generic memoization function (useful for interviews) **(NOT IMPORTANT ❌)**
 
   ```py
   def slowFib(n):
@@ -133,6 +140,10 @@ def fib(n):
 
 ## Restore IP Addresses
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                               |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=61tN4YEdiTM) | Use **Backtracking** to solve this problem. base case: `number of dots == 4` and `index == len(s)`. Then check if the current string is a valid IP address. if it is, add it to the result list. if not, check other combinations. |
+
 Given a string s containing only digits, return all possible valid IP addresses that can be obtained from s. You can return them in any order.
 
 A valid IP address consists of exactly four integers, each integer is between `0` and `255`, separated by single dots and cannot have leading zeros. For example, `"0.1.2.201"` and `"192.168.1.1"` are valid IP addresses and `"0.011.255.245"`, `"192.168.1.312"` and `"
@@ -144,18 +155,20 @@ A valid IP address consists of exactly four integers, each integer is between `0
 - Explanation:
 
   - What we want to do is to just know **where to insert the dots**.
+  - Bruteforce solution is where we use **Backtracking** to solve this problem. ✅
   - We can use **Decision Tree** to solve this problem.
     - we can put the first `dot` after the first number, **or** after the second number, **or** after the third number.
       - this will result `3` possible combinations for each number
         ![restore-ip-addresses](./img/restore-ip-addresses-1.png)
       - for each of these combinations, We check if it's valid -> **(if the number is less than `256` or it doesn't start with `0`)**. If it's valid, we then can put the second `dot` after the second number **or** after the third number and so on.
         ![restore-ip-addresses](./img/restore-ip-addresses-2.png)
-        - The "doesn't start with `0` part is vague, because the problem says that we can't have **leading** zeros, so leading zero means that the number starts with `0` and not just contains `0` in the middle of the number.
+        - The "doesn't start with `0`" part is vague, because the problem says that we can't have **leading** zeros, so leading zero means that the number starts with `0` and not just contains `0` in the middle of the number.
           - Ex: `"01"` is not valid, but `"10"` is valid, `"0"` is valid, `"00"` is not valid.
           - So, we can check if `i == j` or `s[i] != '0'` to make sure that the number consists of only 1 number or that it doesn't start with `0`.
   - We can do this by using a helper function that will add the dots to the string. We can then use a `for` loop to iterate through the string and add the dots to the string. We can then use a helper function to check if the current string is a valid IP address. If it is, we can add it to the result list. We can then return the result list.
     - > To check if the IP is valid before adding it to the result list, we can check that we have `4` dots in the string and that the current index is equal to the length of the string.
-  - Time complexity: `O(3^4) = O(1)` because we are only checking 3 possible combinations for each number, and we have a total of 4 numbers (4 levels).
+  - Time complexity: `O(3^4) = O(1)` because we are only checking `3` possible combinations for each number, and we have a total of `4` numbers (`4` levels).
+  - Space complexity: call stack `O(4)` because we have `4` levels in the call stack.
 
 - Example with steps for explanation
   ![restore-ip-addresses](./img/restore-ip-addresses-3.png)
@@ -201,6 +214,10 @@ def restoreIpAddresses(s):
 
 ## Permutations
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=KukNnoN-SoY) | Use **Backtracking** to solve this problem. base case: `len(nums) == 0`. Then loop through the array and remove the current element and get the permutations of the remaining elements until we have no more elements left. |
+
 Given an array `nums` of distinct integers, return all the possible permutations. You can return the answer in **any order**.
 
 - Ex: `nums = [1, 2, 3]`
@@ -208,7 +225,7 @@ Given an array `nums` of distinct integers, return all the possible permutations
   - Output: `[[1,2,3], [1,3,2], [2,1,3], [2,3,1], [3,1,2], [3,2,1]]`
   - explanation: `permutation` is defined as the **re-arrengement** of the elements of the array. So, `[1,2,3]` and `[2,1,3]` are different permutations.
 
-- Solution 1: **Recursive + Backtracking**
+- Solution 1: **Recursive + Backtracking** ✅
 
   - Explanation:
 
@@ -228,6 +245,8 @@ Given an array `nums` of distinct integers, return all the possible permutations
       ![permutations](./img/permutations-8.png)
 
     ![permutations](./img/permutations-4.png)
+
+  - Time complexity: `O(n * n!)` -> `O(n!)` because we are generating all the permutations and `O(n)` because we are looping through the array.
 
   ```py
   def permute(nums):
@@ -278,6 +297,10 @@ Given an array `nums` of distinct integers, return all the possible permutations
 ---
 
 ## Permutations II
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=qhBVWf0YafA) | The trick here is to **sort** the array first. Then we can check if the current element is the same as the previous element. If it is, we can skip it. else we can use the same approach as the previous problem. **OR** we can use a **HashMap** to keep track of the elements that we have seen so far. |
 
 Given a collection of numbers, `nums`, that might contain duplicates, return all possible unique permutations in any order.
 

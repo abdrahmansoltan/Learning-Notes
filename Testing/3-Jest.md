@@ -1,6 +1,7 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Jest](#jest)
   - [Configuring](#configuring)
     - [Installation](#installation)
     - [Linting](#linting)
@@ -17,6 +18,16 @@
   - [Mock Testing](#mock-testing)
     - [Timer Mocks](#timer-mocks)
     - [HTTP Requests (axios)](#http-requests-axios)
+
+---
+
+## Jest
+
+It's a testing framework that is used to test javascript code. It's a complete and easy to set-up testing solution.
+
+- It works with any test runner and assertion library.
+- It finds the tests and executes them.
+  ![Jest](./img/jest-1.png)
 
 ---
 

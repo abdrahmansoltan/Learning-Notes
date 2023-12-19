@@ -70,6 +70,10 @@ while fast and fast.next:
 
 ### Linked List Cycle
 
+| Video Solution                                                | Hint                                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=gBTe7lFR3vc) | Use **fast and slow pointers** to detect if there's a cycle in the list. |
+
 Given `head`, the head of a linked list, determine if the linked list has a cycle in it.
 
 ![linked list cycle](./img/linked-list-cycle-0.png)
@@ -116,6 +120,10 @@ def hasCycle(self, head: ListNode) -> bool:
 
 ### Linked List Cycle Length
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=n6AMo1qFPlA) | Use **fast and slow pointers** to check if there's a cycle in the list. If there's a cycle, find the length of the cycle by starting from the meeting point and counting the number of nodes until you reach the meeting point again. |
+
 Given the `head` of a LinkedList with a cycle, find the length of the cycle.
 
 ```py
@@ -143,6 +151,10 @@ def calculateCycleLength(slow):
 
 ### Linked List Cycle II
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Yn5xqbK95Uw) | Use **fast and slow pointers** to check if there's a cycle in the list. If there's a cycle, Find the point where the cycle begins by starting from the head and the meeting point and traverse until they meet and return the node. |
+
 Given a linked list, **return the node where the cycle begins**. If there is no cycle, return `null`.
 
 It's very similar to the previous problem, but this time we need to return the node where the cycle begins.
@@ -165,12 +177,30 @@ def detectCycle(self, head: ListNode) -> ListNode:
         slow = slow.next
         fast = fast.next.next
         if slow == fast:
-            break
-    else:
-        return None
-    # now fast points to the meeting point
+            # new pointer starts at head
+            slow = head
+            while slow != fast:
+                slow = slow.next
+                fast = fast.next
+            return slow
+    return None # no cycle
 
-    # new pointer starts at head
+# -------------------------------------------------
+
+# Another approach
+def detectCycle(self, head: ListNode) -> ListNode:
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow == fast:
+            break
+
+    # if there's no cycle
+    if not fast or not fast.next:
+        return None
+
+    # if there's a cycle
     slow = head
     while slow != fast:
         slow = slow.next
@@ -380,6 +410,10 @@ def maxTwinSum(self, head: ListNode) -> int:
 
 ### Remove Linked List Elements
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=JI71sxtHTng) | Use **dummy node** to avoid edge case of inserting to empty list. Use a `cur` pointer to traverse the list. If the next node of `cur` is the node to remove, set `cur.next` to `cur.next.next`. Otherwise, move `cur` to the next node. Return the next node of the dummy node (head). |
+
 Given the `head` of a linked list and an integer `val`, remove all the nodes of the linked list that has `Node.val == val`, and return the new head.
 
 - EX:
@@ -407,6 +441,10 @@ def removeElements(self, head: ListNode, val: int) -> ListNode:
 
 ### Reverse a Linked List
 
+| Video Solution                                                | Hint                                                                           |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=G0_I-ZF0S38) | Use **3 pointers** (`prev`, `curr`, and `nextNode`) to reverse the linked list |
+
 Write a function that accepts a linked list and reverses it in place.
 
 - EX: `1 -> 2 -> 3 -> 4 -> 5` --> `5 -> 4 -> 3 -> 2 -> 1`
@@ -421,9 +459,7 @@ Write a function that accepts a linked list and reverses it in place.
 def reverse_linked_list(head):
     prev = None # Initialize previous pointer to None
     curr = head
-    nextNode = head.next
 
-    # Loop until current pointer is None
     while curr:
         nextNode = curr.next
         curr.next = prev
@@ -439,7 +475,9 @@ def reverse_linked_list(head):
 
 ### Reverse Linked List II (Reverse a sub-list)
 
-> TODO: watch neetcode video
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=RF_M9tX4Eag) | Handle edge cases: if `left == right`, Then traverse the list until you reach the node at position `left - 1`. Then reverse the nodes from position `left` to position `right`, then connect the reversed nodes to the rest of the list. return the next node of the `dummy` node (`head`). |
 
 Given the `head` of a singly linked list and two integers `left` and `right` where `left <= right`, reverse the nodes of the list from position `left` to position `right`, and return the reversed list.
 ![reverse-linked-list](./img/reverse-linked-list-II-1.jpeg)
@@ -821,6 +859,10 @@ def merge_sorted_lists(l1, l2):
 
 ### Design Browser History
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=i1G-kKnBu8k) | Use (array / stack) and a `curIdx` pointer to store the current page. Use `visit` to append the new page to the history. Use `back` to move `steps` back in history. Use `forward` to move `steps` forward in history. always check if `curIdx` is valid by comparing it to the length of the history and the steps. **OR** use a doubly linked list |
+
 You have a browser of one tab where you start on the homepage and you can visit another url, get back in the history number of steps or move forward in the history number of steps.
 
 Implement the `BrowserHistory` class:
@@ -908,6 +950,10 @@ Implement the `BrowserHistory` class:
 
 ### Flatten a Multilevel Doubly Linked List
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=N5MUtk_NRIw) | Use a **stack** to store the nodes in the parent list, and then we can pop the nodes from the stack and append them to the child list. Use a `prev` pointer to store the current node in the parent list. Use a `curr` pointer to store the current node in the stack. |
+
 You are given a doubly linked list which in addition to the `next` and `previous` pointers, it could have a `child` pointer, which may or may not point to a separate doubly linked list. These child lists may have one or more children of their own, and so on, to produce a multilevel data structure, as shown in the example below.
 
 Given the `head` of a multilevel doubly linked list, **flatten** the list so that all the nodes appear in a single-level, doubly linked list. You are given the `head` of the first level of the list.
@@ -938,26 +984,21 @@ Given the `head` of a multilevel doubly linked list, **flatten** the list so tha
       if not head:
           return None
 
-      # create a dummy node to avoid edge case of inserting to empty list
       dummy = Node(0, None, head, None)
       stack = [head]
       prev = dummy
 
       while stack:
-          # pop the node from the stack
           curr = stack.pop()
           # connect the current node to the previous node
           prev.next = curr
           curr.prev = prev
 
-          # if the current node has a next node, push the next node to the stack
           if curr.next:
               stack.append(curr.next)
-          # if the current node has a child node, push the child node to the stack
           if curr.child:
               stack.append(curr.child)
-              # set the child node to None
-              curr.child = None
+              curr.child = None # set the child node to None
 
           # update the previous node
           prev = curr

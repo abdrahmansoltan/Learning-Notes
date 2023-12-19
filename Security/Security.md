@@ -9,6 +9,9 @@
   - [3rd party libraries](#3rd-party-libraries)
   - [Logging](#logging)
   - [HTTPS \& Secure Headers](#https--secure-headers)
+    - [Security concerns in using HTTP](#security-concerns-in-using-http)
+    - [HTTPS for security](#https-for-security)
+  - [Content Security Policy (CSP)](#content-security-policy-csp)
   - [Distributed Denial of Service (DDoS)](#distributed-denial-of-service-ddos)
   - [Code Secrets](#code-secrets)
   - [Access Control](#access-control)
@@ -239,6 +242,18 @@ It's the process of recording events that happen in an application. It's used to
 
 ## HTTPS & Secure Headers
 
+### Security concerns in using HTTP
+
+The `HTTP` protocol is not secure. because it sends the data in plain text. so anyone can see the data.
+
+- You're not certain that the data is sent to the right server. because anyone can pretend to be the server.
+- So, the connection will be **insecure**. and it's vulnerable to `Man in the middle` attacks. Instead, you can use the `HTTPS` protocol. which is a secure version of `HTTP`.
+  ![HTTPS](./img/http-vs-https.svg)
+
+---
+
+### HTTPS for security
+
 - **HTTPS** is a protocol that encrypts the data sent between the client and the server. It's used to protect the privacy and integrity of the data.
 
   - It uses `SSL/TLS` certificates to encrypt the data.
@@ -247,15 +262,72 @@ It's the process of recording events that happen in an application. It's used to
     - Login pages
     - Payment pages
 
-- **Secure Headers** are important for security. because they tell the browser to do something that will make the website more secure.
+> **Summary:** `HTTPS` gives you the certainty that the website (server) you're talking to is the right one.
 
-  - **X-Frame-Options**: is a header that tells the browser to prevent the website from being loaded in an iframe. and it's used to prevent `clickjacking` attacks.
-  - **X-XSS-Protection**: is a header that tells the browser to prevent the website from being loaded if it detects a `XSS` attack. and it's used to prevent `XSS` attacks.
-  - **X-Content-Type-Options**: is a header that tells the browser to prevent the website from being loaded if it detects a `MIME` type mismatch. and it's used to prevent `MIME` type mismatch attacks.
-  - **Content-Security-Policy**: is a header that tells the browser to prevent the website from being loaded if it detects a `XSS` attack. and it's used to prevent `XSS` attacks.
-  - **Strict-Transport-Security**: is a header that tells the browser to only use `HTTPS` for the website. and it's used to prevent `Man in the middle` attacks.
-  - **Referrer-Policy**: is a header that tells the browser to prevent the website from being loaded if it detects a `Referrer` attack. and it's used to prevent `Referrer` attacks.
-  - **Feature-Policy**: is a header that tells the browser to prevent the website from being loaded if it detects a `Feature` attack. and it's used to prevent `Feature` attacks.
+- When using `HTTPS`, we can use **Secure Headers** to make the website more secure, by telling the browser to do something that will add extra security.
+
+  - `X-Frame-Options`: is a header that tells the browser to prevent the website from being loaded in an iframe. and it's used to prevent `clickjacking` attacks.
+  - `X-XSS-Protection`: is a header that tells the browser to prevent the website from being loaded if it detects a `XSS` attack. and it's used to prevent `XSS` attacks.
+  - `X-Content-Type-Options`: is a header that tells the browser to prevent the website from being loaded if it detects a `MIME` type mismatch. and it's used to prevent `MIME` type mismatch attacks.
+  - `Content-Security-Policy`: is a header that tells the browser to prevent the website from being loaded if it detects a `XSS` attack. and it's used to prevent `XSS` attacks.
+  - `Strict-Transport-Security`: is a header that tells the browser to only use `HTTPS` for the website. and it's used to prevent `Man in the middle` attacks.
+  - `Referrer-Policy`: is a header that tells the browser to prevent the website from being loaded if it detects a `Referrer` attack. and it's used to prevent `Referrer` attacks.
+  - `Feature-Policy`: is a header that tells the browser to prevent the website from being loaded if it detects a `Feature` attack. and it's used to prevent `Feature` attacks.
+
+- Now, browsers have **limit some functionalities** for websites that don't use `HTTPS`. like:
+
+  - `Geolocation`
+  - `Webcam`
+  - `Microphone`
+  - `Notifications`
+  - `Payment`
+  - `Service Workers`
+  - `...`
+
+  > This is done to give users more privacy and security.
+
+- Also, by using `HTTPS`, you can use `HTTP/2` and `HTTP/3` which are faster than `HTTP/1.1` ⚡️.
+
+---
+
+## Content Security Policy (CSP)
+
+**Content Security Policy (CSP)** is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks
+
+- Browsers that don't support it still work with servers that implement it, and vice versa: browsers that don't support CSP ignore it, functioning as usual, defaulting to the standard same-origin policy for web content. If the site doesn't offer the CSP header, browsers likewise use the standard same-origin policy.
+- To enable CSP, you need to configure your web server to return the `Content-Security-Policy` HTTP header.
+
+  - Alternatively, the `<meta>` element can be used to configure a policy, for example:
+
+    ```html
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src https://*; child-src 'none';"
+    />
+    ```
+
+- Configuring Content Security **Policy** involves adding the `Content-Security-Policy` HTTP header to a web page and giving it values to control what resources the user agent is allowed to load for that page.
+
+  - For example, a page that uploads and displays images could allow images from anywhere, but restrict a form action to a specific endpoint. A properly designed Content Security Policy helps protect a page against a cross-site scripting attack.
+
+- **Writing a policy**
+
+  - A policy is described using a series of policy directives, each of which describes the policy for a certain resource type or policy area.
+  - A policy needs to include a **default-src** or **script-src** directive to prevent inline scripts from running, as well as blocking the use of `eval()`.
+  - A policy needs to include a **default-src** or **style-src** directive to restrict inline styles from being applied from a `<style>` element or a `style attribute`.
+
+  ```js
+  // wants all content to come from the site's own origin (this excludes subdomains.)
+  Content-Security-Policy: default-src 'self'
+
+  // wants to allow content from a trusted domain and all its subdomains (it doesn't have to be the same domain that the CSP is set on.)
+  Content-Security-Policy: default-src 'self' example.com *.example.com
+
+  // wants to allow users of a web application to include images from any origin in their own content, but to restrict audio or video media to trusted providers, and all scripts only to a specific server that hosts trusted code.
+  Content-Security-Policy: default-src 'self'; img-src *; media-src example.org example.net; script-src userscripts.example.com
+  ```
+
+> For more info & examples -> [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 ---
 
@@ -339,5 +411,6 @@ This result in that a real user can't access the website **(Denied!)**
 >   - [OWASP Top 10 Security Risks](https://sucuri.net/guides/owasp-top-10-security-vulnerabilities-2020/)
 >   - [Brute Force Attack](https://sucuri.net/guides/what-is-brute-force-attack/)
 > - OWASP Web Application Security Testing Checklist -> [here](https://github.com/0xRadi/OWASP-Web-Checklist)
+> - OWASP Cheat Sheet Series -> [here](https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html)
 
 ---

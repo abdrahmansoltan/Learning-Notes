@@ -16,6 +16,12 @@
 
 ## Two sum
 
+| Video Solution                                                | Hint                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=KLlXCFG5TnA) | Use a dictionary to store the number and its index and then iterate through the array and check if the complement is in the dictionary |
+
+---
+
 Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.
 
 - You may assume that each input would have **exactly one solution**, and you may not use the same element twice.
@@ -27,34 +33,42 @@ Given an array of integers `nums` and an integer `target`, return indices of the
   - Output: Because `nums[0] + nums[1] == 9`, we return `[0, 1]`.
 
 - Explanation:
-  - if we know that the array has 2 numbers that add up to the target, we can find the second number by subtracting the first number from the target
-  - we can use a dictionary to store the number and its index and then iterate through the array and check if the complement is in the dictionary
+  - Bruteforce solution is that we can use `2` nested loops to iterate through the array and check if the sum of the current `2` numbers is equal to the target
+  - if we know that the array has `2` numbers that add up to the `target`, we can find the second number by subtracting the first number from the target
+  - we can use a dictionary to store the number and its index and then iterate through the array and check if the `complement` is in the dictionary
+    - `dictionary = {num: index}`
+    - `complement = target - num`
+  - We iterate only once through the array, as we guarantee that the **previous** numbers will be in the dictionary
 
 ```py
 def twoSum(self, nums: List[int], target: int) -> List[int]:
     # create a dictionary to store the number and its index
-    num_index = {}
+    prevDict = {}
 
     # iterate through the nums
     for i, num in enumerate(nums):
         complement = target - num
         # if the complement is in the dictionary, return the indices
-        if complement in num_index:
-            return [num_index[complement], i]
+        if complement in prevDict:
+            return [prevDict[complement], i]
         # if the complement is not in the dictionary, add the number and its index to the dictionary
-        num_index[num] = i
+        prevDict[num] = i
 ```
 
 ---
 
 ## Valid Anagram
 
+| Video Solution                                                | Hint                                                                                                                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=9UtInBqnCgA) | Use 2 dictionaries to store the frequency of each character in each string and then compare the dictionaries to check if the strings are anagrams of each other |
+
 An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
 
 - EX: `cinema` and `iceman` are anagrams of each other.
 
 ```py
-# Time: O(s + t) | Space: O(s + t)
+# Time: O(s) | Space: O(s + t)
 def is_anagram(s, t):
     if len (s) != len(t):
         return False
@@ -78,6 +92,10 @@ def is_anagram(s, t):
 
 ## Group Anagrams
 
+| Video Solution                                                | Hint                                                                                                                                                                               |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=vzdNOK2oB2E) | Use a dictionary to store the sorted string as the key and the list of anagrams as the value, **OR** use a dictionary to store the charCount as a `tuple` of 26 numbers as the key |
+
 Given an array of strings `strs`, group the anagrams together. You can return the answer in **any order**.
 
 - EX:
@@ -86,10 +104,11 @@ Given an array of strings `strs`, group the anagrams together. You can return th
   - Output: `[["bat"],["nat","tan"],["ate","eat","tea"]]`
     ![group anagrams](./img/group-anagrams.jpg)
 
-- **Solution 1: O(n log(n))**
+- **Solution 1: O(m . n log(n))**
 
   - we can use a dictionary to store the sorted string as the key and the list of anagrams as the value
   - we can iterate through the array and sort each string and then add it to the dictionary
+  - Time
 
   ```py
   def group_anagrams(strs):
@@ -102,6 +121,17 @@ Given an array of strings `strs`, group the anagrams together. You can return th
               anagrams[sorted_s] = [s]
           else:
               anagrams[sorted_s].append(s)
+
+      return anagrams.values()
+
+  # or using defaultdict
+  def group_anagrams(strs):
+      # key: sorted string | value: list of anagrams
+      anagrams = defaultdict(list)
+
+      for s in strs:
+          sorted_s = ''.join(sorted(s))
+          anagrams[sorted_s].append(s)
 
       return anagrams.values()
   ```
@@ -478,7 +508,7 @@ TODO: See neetcode for more details
 
 - Explanation:
   - When page/element is accessed, it is moved to the end of the queue (most recently used) and when the cache is full, the least recently used page/element is removed from the front of the queue
-  ![LRU Cache](./img/lru-1.png)
+    ![LRU Cache](./img/lru-1.png)
   - Data structures that we can use: `HashMap` and `Doubly Linked List` or `OrderedDict` in Python (which is a combination of `HashMap` and `Doubly Linked List`)
     - Or, we can use a `Queue` and a `HashMap` to store the key and the node in the queue
 

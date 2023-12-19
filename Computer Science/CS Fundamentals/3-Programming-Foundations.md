@@ -3,11 +3,12 @@
 - [INDEX](#index)
   - [what is programming?](#what-is-programming)
   - [programming language](#programming-language)
+    - [REPL](#repl)
   - [convert source code to machine code](#convert-source-code-to-machine-code)
   - [IDE](#ide)
   - [operators](#operators)
   - [Data types](#data-types)
-  - [Variables](#variables)
+  - [Variables (Bindings)](#variables-bindings)
   - [conditionals](#conditionals)
   - [function](#function)
   - [collections](#collections)
@@ -20,7 +21,6 @@
     - [runtime error](#runtime-error)
     - [symantic error is also known as **Logic error**](#symantic-error-is-also-known-as-logic-error)
   - [Debugging code in an IDE](#debugging-code-in-an-ide)
-  - [Advanced topics](#advanced-topics)
 
 ---
 
@@ -36,6 +36,41 @@ Programming is the process of converting ideas into instructions that a computer
 ---
 
 ## programming language
+
+- **Syntax:** is just how the language is structured. It's the set of rules that defines the combinations of symbols that are considered to be correctly structured programs in that language.
+- **Semantics:** is the meaning of those symbols.
+
+  - **Type checking**: is the process of verifying and enforcing the constraints of types. (before running the program)
+    - It extends the static environment by associating types with variables and expressions. It's done by the `compiler`.
+  - **Evaluation**: is the process of determining the meaning of expressions in a language. (while running the program)
+    - It extends the dynamic environment by associating values with variables and expressions. It's done by the `interpreter`.
+
+  > They're both important to ensure that the program does what we expect it to do (semantics) and that it's written in a way that the computer can understand (syntax).
+
+- Examples:
+
+  - `Variables`:
+
+    - **Syntax**: `variable_name = value` -> sequence of letters, digits, and underscores that doesn't start with a digit
+    - **Semantics**: `variable_name` is a name that refers to a value in memory
+    - **Type checking**: look up the type of the value and associate it with the variable in the `static environment`, if not found, throw an `error`
+    - **Evaluation**: look up the value associated with the variable in the `dynamic environment`, if not found, throw an `error`
+
+  - `Addition`:
+
+    - **Syntax**: `value1 + value2`, where `value1` and `value2` are expressions that evaluate to numbers
+    - **Semantics**: `value1` and `value2` are numbers, and the result is the sum of the two numbers
+    - **Type checking**: look up the types of the values and ensure that they're both numbers, if not, throw an `error`
+      - if `value1` is a number and `value2` is a number, then the `type checker` will return the type of the result as a number
+      - if `value1` is a number and `value2` is a string, then the `type checker` will throw an `error`
+    - **Evaluation**: add the two numbers together and return the result
+
+- `Errors`:
+
+  - **Syntax error**: it's when the code doesn't follow the language's rules about how symbols should be combined to create a program.
+  - **Type checking**: what you wrote doesn't type-check, meaning that the types of the values you're using don't match the types that the language expects.
+  - **Evaluation**: the program is syntactically correct and type-checks, but the program still doesn't do what you expect it to do.
+    - it produces wrong answer, or an exception, or an infinite loop
 
 - syntax of c++
 
@@ -57,12 +92,22 @@ Programming is the process of converting ideas into instructions that a computer
   print('Hello, world!');
   ```
 
-`note`
-each language comes with strength and weaknesses
+- **Notes**:
+  - each language comes with strength and weaknesses
+  - the goal of theses languages to transfer this to Machine Language
+  - Python is an interpretive language. This means we have to interpret it into machine code
 
-- the goal of theses languages to transfer this to Machine Language
+---
 
-- Python is an interpretive language. This means we have to interpret it into machine code
+### REPL
+
+It stands for `Read-Evaluate-Print-Loop`
+
+- It's a simple interactive computer programming environment that takes single user inputs, executes them, and returns the result to the user.
+- It's usually for quick testing and debugging of code (trying something out)
+- It's also known as an `interactive shell` or `language shell`
+- Notes:
+  - Usually it requires using semicolon `;` to execute the code, and if you don't use it, it will just print the result without executing it because it's waiting for more input.
 
 ---
 
@@ -118,11 +163,12 @@ data types: allows us to put our variable in a particular category so that the c
 
 ---
 
-## Variables
+## Variables (Bindings)
 
 The main purpose of variables is to store data in memory **for later use**.
 
 - **variable** is a name that refers to a value in memory.
+  - It's also known as **binding**. As it binds a `name` to a `value`.
 - variable names should contain only letters, numbers, and underscores. And even though numbers are allowed, the name shouldn't start with a number.
 
 ---
@@ -150,6 +196,9 @@ A function is a block of code packaged together with a name.
 ## collections
 
 - a collection in programming lets me group similar items together using a single name, which is known as a variable.
+- collections like `list` and `tuple` are:
+  - **Syntactic sugar for records (objects)**. the keys are named `1, 2, 3, ...` and the values are the items in the collection.
+  - **ordered**. This means that the items in the collection are stored in a particular order and won't change unless I explicitly change them.
 
 ---
 
@@ -179,6 +228,9 @@ The most basic type of shared code in Python is called a **module**.
 ---
 
 ## Errors
+
+- **Error** is when something unexpected happens
+- **Exception** is what to do when we have a runtime condition that should be an error, but we can handle it
 
 ### Errors Categories
 
@@ -222,13 +274,4 @@ The process of identifying and fixing bugs
 
 ---
 
-## Advanced topics
-
-1. **Memory management** it's important when a program is running that anything that's no longer needed gets removed from memory and thrown out, to free up that space for future manipulation.
-2. **Memory leak** it's where the amount of memory used by a program continues to grow unnecessarily.
-3. **garbage collection** This is an automated process in which the compiler keeps track of which items in memory are no longer needed and deletes them.
-4. structure your code to start separate tasks that are executed simultaneously. Each task is known as a **thread**. And the overall approach to writing code that executes threads concurrently is known as **multithreading**.
-5. Each thread in a multithreaded program requires additional processing power and memory from the computer where the code is being executed.
-6. Async in javascript is similar to multithreading
-7. What's an advantage of using multithreading? >> It can make your computer programs faster and more responsive.
-8. **Algorithms** set of instructions that describes how to get the exact result you want.
+[⬆ back to top](#index)
