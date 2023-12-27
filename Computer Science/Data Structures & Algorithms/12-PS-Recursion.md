@@ -5,7 +5,7 @@
   - [Fibonacci Number](#fibonacci-number)
     - [Recursion solution steps](#recursion-solution-steps)
     - [Fibonacci looping solution](#fibonacci-looping-solution)
-  - [Restore IP Addresses](#restore-ip-addresses)
+  - [Restore IP Addresses (Compute all valid IP addresses)](#restore-ip-addresses-compute-all-valid-ip-addresses)
   - [Permutations](#permutations)
   - [Permutations II](#permutations-ii)
   - [Letter Case Permutation](#letter-case-permutation)
@@ -138,7 +138,7 @@ def fib(n):
 
 ---
 
-## Restore IP Addresses
+## Restore IP Addresses (Compute all valid IP addresses)
 
 | Video Solution                                                | Hint                                                                                                                                                                                                                               |
 | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -146,7 +146,7 @@ def fib(n):
 
 Given a string s containing only digits, return all possible valid IP addresses that can be obtained from s. You can return them in any order.
 
-A valid IP address consists of exactly four integers, each integer is between `0` and `255`, separated by single dots and cannot have leading zeros. For example, `"0.1.2.201"` and `"192.168.1.1"` are valid IP addresses and `"0.011.255.245"`, `"192.168.1.312"` and `"
+A valid IP address consists of exactly four decimal strings separated by periods, each integer is between `0` and `255`, separated by single dots and cannot have leading zeros. For example, `"0.1.2.201"` and `"192.168.1.1"` are valid IP addresses and `"0.011.255.245"`, `"192.168.1.312"` and `"
 
 - Ex: `s = "25525511135"`
 
@@ -154,6 +154,9 @@ A valid IP address consists of exactly four integers, each integer is between `0
 
 - Explanation:
 
+  - There're 3 periods in a valid IP address, so we can enumerate all possible placements of these periods, and check whether all four corresponding substrings are between `0` and `255`.
+    - We can reduce the number of placements considered by spacing the periods `1` to `3` places apart.
+    - We can also prune by stopping as soon as the substring is not valid (no leading zeros, and less than `256`).
   - What we want to do is to just know **where to insert the dots**.
   - Bruteforce solution is where we use **Backtracking** to solve this problem. ✅
   - We can use **Decision Tree** to solve this problem.
@@ -170,22 +173,15 @@ A valid IP address consists of exactly four integers, each integer is between `0
   - Time complexity: `O(3^4) = O(1)` because we are only checking `3` possible combinations for each number, and we have a total of `4` numbers (`4` levels).
   - Space complexity: call stack `O(4)` because we have `4` levels in the call stack.
 
-- Example with steps for explanation
-  ![restore-ip-addresses](./img/restore-ip-addresses-3.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-4.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-5.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-6.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-7.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-8.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-9.png)
-  ![restore-ip-addresses](./img/restore-ip-addresses-10.png)
-
 ```py
 def restoreIpAddresses(s):
     res = []
     # check if the string is valid
     if len(s) > 12 or len(s) < 4:
         return res
+
+    def isValidPart(s):
+        return len(s) == 1 or (s[0] != '0' and int(s) <= 255)
 
     def backtrack(i, dots, curIP):
       """
@@ -198,17 +194,27 @@ def restoreIpAddresses(s):
         res.append(curIP[:-1]) # remove the last dot and append to the result
         return
       if dots > 4:
-        return
+        return # not a valid IP address
 
       # loop through the string and add the dots to the string (using min -> to avoid index out of range error if the string is less than 3 characters)
       for j in range(i, min(i+3, len(s))):
-        # check if the current string is a valid IP address (if the number is less than 256 or the starting character is not 0)
-        if int(s[i:j+1]) <= 255 and (i == j or s[i] != '0'):
-          backtrack(j+1, dots+1, curIP + s[i:j+1] + '.')
+        subString = s[i:j+1]
+        if isValidPart(subString):
+          backtrack(j+1, dots+1, curIP + subString + '.') # add the current string to the current IP address and add a dot
 
     backtrack(0, 0, '')
     return res
 ```
+
+- Example with steps for explanation
+  ![restore-ip-addresses](./img/restore-ip-addresses-3.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-4.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-5.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-6.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-7.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-8.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-9.png)
+  ![restore-ip-addresses](./img/restore-ip-addresses-10.png)
 
 ---
 
@@ -787,6 +793,10 @@ def canPartitionKSubsets(nums, k):
 
 ## Letter combinations of a phone number
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=0snEunUacZY) | Use **Backtracking** to solve this problem. We can use a **Decision Tree** to solve this problem. For each digit, we can either choose to include it in the combination or not include it in the combination. We can then use a `for` loop to iterate through the letters of the current digit and add it to the combination. Append the combination to the result list when we reach the required length. |
+
 Given a string containing digits from `2-9` inclusive, return all possible letter combinations that the number could represent. Return the answer in **any order**.
 
 - A mapping of digit to letters (just like on the telephone buttons) is given below. Note that `1` does not map to any letters.
@@ -797,12 +807,26 @@ Given a string containing digits from `2-9` inclusive, return all possible lette
   - Input: `digits = "23"`
 
 - Explanation:
-  - We can use a **backtracking** approach to solve this problem.
+  - For a `7` digit phone number, the brute-force approach is to form `7` ranges of characters, one for each digit.
+    - We will need to use `7` nested for-loops to iterate through all the possible combinations.
+    - For example, if the number is `"2276696"`:
+      - The first digit is `2`, so we form a range of characters from `a` to `c`.
+      - The second digit is `2`, so we form a range of characters from `a` to `c`.
+      - The third digit is `7`, so we form a range of characters from `p` to `r`.
+      - The fourth digit is `6`, so we form a range of characters from `m` to `o`.
+      - The fifth digit is `6`, so we form a range of characters from `m` to `o`.
+      - The sixth digit is `9`, so we form a range of characters from `w` to `y`.
+      - The seventh digit is `6`, so we form a range of characters from `m` to `o`.
+    - The drawback of this is its repeated code and the fact that it is not scalable. If the number of digits is `10`, we will need to form `10` ranges of characters, and use `10` nested for-loops to iterate through all the possible combinations.
+  - We can use a **backtracking / recursion** approach to solve this problem.
     ![letter combinations of a phone number](./img/letter-combinations-of-phone-num-2.png)
     1. We can start with an empty string and then append each letter of the first digit to the string.
     2. Then we can **recursively** call the function with the next digit and append each letter of the next digit to the string. We can continue this process until we reach the end of the string.
     3. Once we reach the end of the string, we can add the string to the result array.
-  - Time complexity: `O(n.4^n)` where `n` is the length of the input string; `4` because some digits has 4 letters
+  - Time complexity: `O(n.4^n)` where `n` is the length of the input string; `4` **because some digits has 4 letters at most for each digit**.
+    - `4` because we have `4` decisions (branches) for each digit in the input string.
+    - `^n` because we have `n` digits in the input string (height of the decision tree).
+    - `n` because we are looping through the input string.
 
 ```py
 def letterCombinations(digits):

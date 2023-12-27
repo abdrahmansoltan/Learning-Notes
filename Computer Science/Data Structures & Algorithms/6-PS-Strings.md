@@ -6,6 +6,7 @@
     - [String to Integer (atoi)](#string-to-integer-atoi)
     - [Integer to String](#integer-to-string)
     - [Multiply Strings](#multiply-strings)
+    - [Roman to Integer](#roman-to-integer)
   - [Substring (Sliding Window)](#substring-sliding-window)
     - [Longest Substring Without Repeating Characters](#longest-substring-without-repeating-characters)
     - [Longest Substring with K Distinct Characters](#longest-substring-with-k-distinct-characters)
@@ -22,9 +23,13 @@
     - [Valid Palindrome](#valid-palindrome)
     - [Valid Palindrome II](#valid-palindrome-ii)
     - [Length of Last Word](#length-of-last-word)
+    - [Reverse Words in a String](#reverse-words-in-a-string)
   - [2 Pointers String Problems](#2-pointers-string-problems)
     - [Is Subsequence](#is-subsequence)
     - [Backspace String Compare](#backspace-string-compare)
+  - [String Shapes](#string-shapes)
+    - [Sinusoidal String](#sinusoidal-string)
+    - [ZigZag Conversion](#zigzag-conversion)
 
 ---
 
@@ -221,6 +226,95 @@ def multiply(num1, num2):
     return ''.join(map(str, result[start:]))
     # or
     # return ''.join(str(i) for i in result[start:])
+```
+
+---
+
+### Roman to Integer
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=3jdxYj3DD98) | Use a `hash table` to keep track of the `value` of each character in the string and check if the current character is less than the next character to subtract the current character from the next character instead of adding it to the result |
+
+Roman numerals are represented by seven different symbols: `I`, `V`, `X`, `L`, `C`, `D` and `M`.
+
+| Symbol | Value |
+| ------ | ----- |
+| I      | 1     |
+| V      | 5     |
+| X      | 10    |
+| L      | 50    |
+| C      | 100   |
+| D      | 500   |
+| M      | 1000  |
+
+For example, `2` is written as `II` in Roman numeral, just two one's added together. `12` is written as `XII`, which is simply `X + II`. The number `27` is written as `XXVII`, which is `XX + V + II`.
+
+Roman numerals are usually written largest to smallest from left to right. However, the numeral for four is not `IIII`. Instead, the number four is written as `IV`. Because the one is before the five we subtract it making four. The same principle applies to the number nine, which is written as `IX`. There are six instances where subtraction is used:
+
+- `I` can be placed before `V` (5) and `X` (10) to make 4 and 9.
+- `X` can be placed before `L` (50) and `C` (100) to make 40 and 90.
+- `C` can be placed before `D` (500) and `M` (1000) to make 400 and 900.
+
+Given a roman numeral, convert it to an integer.
+
+- EX: `s = "III"` -> `3`
+
+- Explanation:
+
+  - Roman numerals are usually written **largest to smallest from left to right**, So we need to handle cases like `IV` and `IX` where the smaller number is before the larger number
+  - We can use a `hash table` to keep track of the `value` of each character in the string
+  - We can iterate over the string and check if the current character is less than the next character to subtract the current character from the next character instead of adding it to the result
+    - `IV` -> `5 - 1` -> `4`
+    - `VI` -> `5 + 1` -> `6`
+
+- Time Complexity: `O(n)`
+- Space Complexity: `O(1)`
+  - Not `O(n)` because we have a fixed number of characters in the Roman numerals (fixed hash table size)
+
+```py
+def romanToInt(s):
+    roman_to_int = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    }
+
+    result = 0
+
+    # Iterate over the string
+    for i in range(len(s)):
+        # Check if the current character is less than the next character to subtract the current character from the next character instead of adding it to the result
+        if i < len(s) - 1 and roman_to_int[s[i]] < roman_to_int[s[i+1]]:
+            result -= roman_to_int[s[i]]
+        else:
+            result += roman_to_int[s[i]]
+
+    return result
+
+# -------------------------------------------------------------------
+# Another approach
+# You can iterate over the string from right to left and add the current character to the result if the current character is greater than or equal to the next character, otherwise subtract it
+
+# -------------------------------------------------------------------
+# Another approach
+def romanToInt(s):
+    roman_to_int = {
+        'I': 1,
+        'V': 5,
+        'X': 10,
+        'L': 50,
+        'C': 100,
+        'D': 500,
+        'M': 1000
+    }
+
+    # Using reduce function
+    return reduce(lambda x, i: x + (-roman_to_int[s[i]] if roman_to_int[s[i]] < roman_to_int[s[i+1]] else roman_to_int[s[i]]), range(len(s)), 0)
 ```
 
 ---
@@ -835,19 +929,19 @@ def isAlphaNum(char):
 
 def is_palindrome(s):
   # First & last pointers
-  left, right = 0, len(s)-1
+  l, r = 0, len(s)-1
 
-  while left < right:
-    while left < right and not isAlphaNum(s[left]):
-      left += 1
-    while left < right and not isAlphaNum(s[right]):
-      right -= 1
+  while l < r:
+    while l < r and not isAlphaNum(s[l]):
+      l += 1
+    while l < r and not isAlphaNum(s[r]):
+      r -= 1
 
-    if s[left].lower() != s[right].lower():
+    if s[l].lower() != s[r].lower():
       return False
 
-    left += 1
-    right -= 1
+    l += 1
+    r -= 1
 
   return True
 
@@ -980,6 +1074,56 @@ Given a string `s` consisting of some words separated by some number of spaces, 
 
 ---
 
+### Reverse Words in a String
+
+Given an input string `s`, reverse the order of the **words**.
+
+- EX: `s = "the sky is blue"` -> `"blue is sky the"`
+
+- **Solution 1**: slow & extra memory ❌
+
+  ```py
+  def reverseWords(s):
+      # split the string into words
+      words = s.split()
+      # reverse the words
+      words.reverse()
+      # join the words into a string
+      return ' '.join(words)
+  ```
+
+- **Solution 2**: fast & less memory ✅ **(won't work because strings are immutable in python)**
+
+  - Instead of allocating extra memory to store the words, we can use a **two pointers** pattern to iterate over the string and reverse the words in-place
+  - For example, `"the sky is blue"` -> `"eulb si yks eht"`, then we can reverse each word to get the desired result `"blue is sky the"`
+    - This is done by initializing a variable to keep track of the `start` of the current word and iterating over the string until we reach the end of the string
+    - When we reach the end of the current word, we reverse it and update the `start` variable to the index of the next word
+
+  ```py
+  def reverseWords(s):
+      # reverse the entire string
+      s.reverse()
+
+      def reverseWord(s, start, end):
+          while start < end:
+              s[start], s[end] = s[end], s[start]
+              start += 1
+              end -= 1
+
+      start = 0
+      for i in range(len(s)):
+          if s[i] == ' ':
+              reverseWord(s, start, i-1)
+              start = i+1
+
+      # reverse the last word (if the string does not end with an empty space)
+      reverseWord(s, start, len(s)-1)
+
+      return s
+  ```
+
+---
+
 ## 2 Pointers String Problems
 
 ### Is Subsequence
@@ -1095,3 +1239,100 @@ Given two strings `s` and `t`, return `true` if they are equal when both are typ
 
       return i
   ```
+
+---
+
+## String Shapes
+
+### Sinusoidal String
+
+Given a string, return it in a sinusoidal shape
+
+- EX:
+
+  - Input: `"Hello World!"`
+  - Output: `"e_lHloWrdlo!"`
+
+    - `_` represents a whitespace
+    - Because the shape will be like this:
+
+      ```
+        e         _           l
+      H    l    o     W     r     d
+            l           o          !
+      ```
+
+- Explanation:
+  - The brute-force approach would be to use a 2D array to store the characters in the string in a sinusoidal shape, then iterate over the array and return the string
+  - However, observe that the result begins with the characters `s[1]`, `s[5]`, `s[9]`, ..., followed by `s[0]`, `s[2]`, `s[4]`, ..., and then `s[3]`, `s[7]`, `s[11]`, ... and so on. Therefore, we can create the result string by 3 iterations of the string, each time skipping a certain number of characters.
+
+```py
+def sinusoidalString(s):
+    result = ''
+
+    # first row (s[1], s[5], s[9], ...)
+    for i in range(1, len(s), 4):
+        result += s[i]
+
+    # second row (s[0], s[2], s[4], ...)
+    for i in range(0, len(s), 2):
+        result += s[i]
+
+    # third row (s[3], s[7], s[11], ...)
+    for i in range(3, len(s), 4):
+        result += s[i]
+
+    return result
+
+# ---------------------------------------------------------------------------
+
+# Another solution using slicing
+def sinusoidalString(s):
+    return s[1::4] + s[::2] + s[3::4]
+```
+
+---
+
+### ZigZag Conversion
+
+The string `"PAYPALISHIRING"` is written in a zigzag pattern on a given number of rows like this:
+
+```
+P   A   H   N
+A P L S I I G
+Y   I   R
+```
+
+![zigzag-conversion](./img/zigzag-conversion-1.png)
+
+And then read line by line: `"PAHNAPLSIIGYIR"`
+
+Write the code that will take a string and make this conversion given a number of rows.
+
+- EX:
+
+  - Input: `s = "PAYPALISHIRING", numRows = 3`
+  - Output: `"PAHNAPLSIIGYIR"`
+
+- Explanation:
+  - Use a list of rows to store the characters in the string in a zigzag shape, then iterate over the list and return the string
+  - We can use a variable to keep track of the current row and another variable to keep track of the direction (up or down)
+    ![zigzag-conversion](./img/zigzag-conversion-2.png)
+
+```py
+def convert(s, numRows):
+    if numRows == 1:
+        return s
+
+    rows = [''] * numRows
+    currentRow = 0
+    goingDown = False
+
+    for char in s:
+        rows[currentRow] += char
+        if currentRow == 0 or currentRow == numRows-1: # if we have reached the first or last row, change the direction
+            goingDown = not goingDown
+        currentRow += 1 if goingDown else -1
+
+    return ''.join(rows)
+```

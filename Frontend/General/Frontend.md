@@ -55,7 +55,7 @@ The four basic steps include:
 It's a set of web platform APIs that allow you to create new **custom**, **reusable**, **encapsulated** `HTML` tags to use in web pages and web apps.
 
 - It enables us to reuse code without fear of code collisions and conflicts with other code on the page
-- It consists of 3 main technologies:
+- It consists of these main technologies:
 
   - **Custom Elements**:
     - A set of JavaScript APIs that allow you to define custom elements and their behavior, which can then be used as desired in your user interface.
@@ -69,6 +69,8 @@ It's a set of web platform APIs that allow you to create new **custom**, **reusa
   - **HTML Templates**:
     - The `<template>` and `<slot>` elements enable you to write markup templates that are not displayed in the rendered page. These can then be reused multiple times as the basis of a custom element's structure.
     - This is done by creating a `<template>` element and adding the desired elements to it
+  - **Scoped Styles**:
+    - scope styles to a block of `HTML`
 
 - This is the main idea behind `React`, `Vue`, `Angular`, etc. frameworks. They are all based on the idea of creating **reusable** `HTML` components
 

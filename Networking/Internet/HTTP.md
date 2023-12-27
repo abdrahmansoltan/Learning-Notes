@@ -14,6 +14,8 @@
   - [HTTP headers](#http-headers)
     - [Cookies](#cookies)
   - [HTTPS](#https)
+    - [Why we need HTTPS ?](#why-we-need-https-)
+    - [How HTTPS works ?](#how-https-works-)
     - [Handshake](#handshake)
     - [Enabling HTTPS on Your Servers](#enabling-https-on-your-servers)
 
@@ -193,6 +195,8 @@ if a client, or the server, or both, need information about the state of the oth
 
 ## HTTPS
 
+### Why we need HTTPS ?
+
 We need HTTPS for **Privacy, integrity, and identification.**
 
 - **Privacy** means that no one can eavesdrop on your messages.
@@ -202,13 +206,22 @@ We need HTTPS for **Privacy, integrity, and identification.**
   - a manipulation could be done by a malware
 - **identity** means that I can check that this message is coming from what computer.
   - When visiting a HTTPS website (ex: `www.google.com`) , the browser receives a certificate that the server is actually `google.com` and not other server who is pretending to be `google.com`
-  - this is done using A digital signature attached to a message can identify the sender
+  - this is done using A **digital signature** attached to a message can identify the sender
   - identification means that the site that you are visiting is indeed the one you think it is.
   - HTTPS, via **SSL certificates** (secure socket layer), ensures you are connected exactly with the receiver you would expect.
 
 HTTPS also gives us **PWA capabilities**
 
 > a lot of websites are now using HTTPS by default, regardless if sensitive data is going to be exchanged or not. This is because Google is flagging websites as **not secure** if they're not SSL protected.
+
+---
+
+### How HTTPS works ?
+
+- It makes requests secure by encrypting the data using **TLS** protocol.
+- This mean that the data is encrypted before being sent and decrypted after being received.
+- The encryption is done using **asymmetric encryption** (public key encryption) and **symmetric encryption** (private key encryption)
+  - This is done in the `SSL handshake` process.
 
 ---
 
@@ -219,20 +232,21 @@ It's the negotiation between a browser and a server where they both established 
 ![handshake failure](./img/handshake1.png)
 ![handshake success](./img/handshake2.png)
 
-During an SSL handshake, the server and the client follow the below set of steps:
+- During an **SSL handshake**, the server and the client follow the below set of steps:
 
-1. Client Hello. The client will send the information that will be required by the server to start an HTTPS connection.
-2. Server Hello
-3. Server Key Exchange Message
-4. SSL Certificate Request
-5. SSL Client Certificate
-6. Client Key Exchange Message
-7. Finished.
+  1. The client will send the information that will be required by the server to start an HTTPS connection.
+  2. Server will send the information that will be required by the client to start an HTTPS connection.
+  3. Server Key Exchange Message
+  4. SSL Certificate Request (from server to client)
+  5. SSL Client Certificate (from client to server to authenticate the client)
+  6. Client Key Exchange Message (Secure Connection Established ✅)
 
 ![handshake](./img/handshake3.png)
+
+> All these steps are done in the `OSI model` layer 5 (session layer)
 
 ---
 
 ### Enabling HTTPS on Your Servers
 
-- Follow steps [here](https://web.dev/enabling-https-on-your-servers/)
+- Follow steps [here](https://web.dev/articles/enable-https)

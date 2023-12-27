@@ -2,6 +2,13 @@
 
 - [INDEX](#index)
   - [Functional programming](#functional-programming)
+  - [Types](#types)
+    - [Type checking](#type-checking)
+    - [Type inference](#type-inference)
+  - [Modules](#modules)
+  - [Thunks \& Memoization](#thunks--memoization)
+    - [Thunks delay](#thunks-delay)
+    - [Memoization](#memoization)
   - [Advanced topics](#advanced-topics)
 
 ---
@@ -141,6 +148,123 @@
   - **Pure functions**: functions that have no side effects, meaning that they don't modify any state or variables outside of their scope. This means that they're easier to reason about and test.
   - **Immutability**: data that doesn't change its state after it's created. This makes it easier to avoid errors when different parts of a program modify the same data structure in unexpected ways.
   - **Referential transparency**: expressions that can be replaced with their corresponding values without changing the program's behavior. This means that a function call can be replaced by its return value, and the result will be the same.
+
+---
+
+## Types
+
+### Type checking
+
+- **Strongly typed** means that the type of a value doesn't suddenly change. For example, if you have a variable that's a string, it will always be a string. It can't suddenly become a number without an explicit conversion.
+
+- **Weakly typed** means that the type of a value can change. For example, a variable that's a string can become a number without an explicit conversion.
+
+- **Static typing** means that the type of a variable is known at compile time. For example, if a variable is declared as an integer, it can't be assigned a string.
+
+  - It can reject a program before it's run, which can prevent errors from happening at runtime.
+
+- **Dynamic typing** means that the type of a variable is known at runtime. For example, a variable can be assigned a string and later reassigned to an integer.
+
+  - There's little to no type checking at compile time, which means that errors can happen at runtime.
+  - Usually, to prevent errors here, It's common to check the type of a value before performing an operation on it.
+
+    ```py
+    def multiplyByTwo(x):
+      if type(x) == int:
+        return x * 2
+      else:
+        return None
+    ```
+
+---
+
+### Type inference
+
+**Type inference** is the ability to automatically deduce the type of a value based on its context. For example, if you assign a value of `5` to a variable, the compiler can infer that the type of that variable is an `integer`.
+
+- Usually used in **statically typed languages** to reduce the amount of boilerplate code that's required to write a program.
+- It helps us by reducing the amount of code we have to write, and not being required to specify the type of every variable and function.
+- How languages determine the type of a value using type inference:
+  - Determine types of bindings in order
+  - Analyze definition for all necessary constraints -> collect all facts needed to determine the type of a binding
+    - for example, if `x > 0` then `x` is an `integer`
+  - Raise Type Error if constraints are violated
+  - Finally enforce constraints on all bindings
+
+---
+
+## Modules
+
+**Module** is a file that contains code, and it's used to organize code into logical units. It's also known as a **library**, **package**, or **component**.
+
+- For larger programs, Using one-top-level file to store all the code can be difficult to maintain and understand. So, we can split the code into multiple files, and each file is a module.
+
+  - This helps with bindings, because we can have multiple bindings with the same name in different modules.
+  - It also helps with readability, because we can group related code into the same module.
+
+- Inside a module, we can have **bindings** that are only accessible inside that module. This is known as **encapsulation**.
+
+  - This means that we can have bindings with the same name in different modules, and they won't conflict with each other.
+  - It also means that we can hide the implementation details of a module from the outside world, and only expose the bindings that are meant to be used by other modules.
+  - It can contain **functions**, **classes**, **constants**, and other **modules**.
+
+- Outside a module, we can access the bindings that are exported from that module. This is known as **abstraction**.
+
+  - This means that we can use the bindings from a module without having to know how they're implemented.
+  - It also means that we can use the same binding name in different modules, and they won't conflict with each other.
+
+- Example of a module in python:
+
+  ```py
+  # module.py
+  def add(x, y):
+    return x + y
+
+  def multiply(x, y):
+    return x * y
+
+  PI = 3.14
+  ```
+
+  ```py
+  # main.py
+  import module
+
+  print(module.add(2, 3)) # 5
+  print(module.multiply(3, 4)) # 12
+  print(module.PI) # 3.14
+  ```
+
+---
+
+## Thunks & Memoization
+
+### Thunks delay
+
+**Thunk** is a function that's used to **delay the evaluation of an expression**. This means that the expression won't be evaluated until the thunk is called.
+
+- It's used to improve performance by avoiding unnecessary computations, and to implement lazy evaluation.
+- It uses `closures` to store the expression and its environment.
+- It's also used to implement **memoization**.
+- Example of a thunk:
+
+  ```py
+  def task(x, y):
+    return x + y
+
+  def thunk():
+    return task(3, 4) # Here the task is not evaluated until the thunk is called
+
+  print(thunk()) # 7
+  ```
+
+### Memoization
+
+**Memoization** is a technique that's used to improve performance by storing the results of expensive function calls and returning the cached result when the same inputs occur again.
+
+- It's an optimization technique that's used to speed up programs by caching the results of function calls.
+
+  - This means that if the same function is called with the same arguments, the cached result is returned instead of calling the function again.
 
 ---
 
