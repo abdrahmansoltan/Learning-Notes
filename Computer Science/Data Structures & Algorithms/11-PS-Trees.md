@@ -898,13 +898,14 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
     - So we can't just check the neighbors and children one time and we have to check the whole tree for each node -> `O(n^2)` **BAD! ❌**
   - Instead, we can:
     - Use **ranges** for each point ✅
-    - Or, use **In-Order Traversal** and check if the values are in ascending order ✅
+    - Or, use **In-Order Traversal** and check if the values are in ascending order
 
-- **Solution 1:** Using `min` and `max` ranges
+- **Solution 1:** Using `min` and `max` ranges for each node
 
   - create a function that accepts a `root` node, a `min` value and a `max` value
   - Each node will have a `min` and `max` value that it should be in the range of
     ![validate bst](./img/validate-bst-2.png)
+    ![validate bst](./img/validate-bst-3.png)
 
     - root node should be in the range of `(-inf, inf)`
       - we use infinity because we don't know the values of the nodes in the tree

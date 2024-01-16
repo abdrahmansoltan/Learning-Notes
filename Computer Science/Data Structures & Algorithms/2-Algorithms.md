@@ -3,12 +3,12 @@
 - [INDEX](#index)
   - [Algorithm](#algorithm)
   - [Algorithm Analysis (Big-O)](#algorithm-analysis-big-o)
-    - [Elements of good code](#elements-of-good-code)
     - [Asymptotic Analysis](#asymptotic-analysis)
     - [Runtime Analysis](#runtime-analysis)
       - [Time complexity](#time-complexity)
       - [Space complexity](#space-complexity)
     - [Big O Rules](#big-o-rules)
+    - [Big O Types](#big-o-types)
       - [O(n)](#on)
       - [O(1)](#o1)
       - [O(n^2)](#on2)
@@ -87,7 +87,7 @@
 
 It's a set of instructions to solve a problem/perform a task
 
-> **Data structures are just saving memory, and Algorithms are just actions taken on that memory**
+> **Data structures are saving memory, and Algorithms are actions taken on that memory**
 
 - We use Big O to analyze the performance of an algorithm (how fast it is, how much memory it takes up, etc.)
 - It's not enough to know how long an algorithm takes to run—you need to know how the running time increases as the input size increases. That’s where Big O notation comes in.
@@ -99,7 +99,8 @@ It's a set of instructions to solve a problem/perform a task
 
 **Big O:** It tells us how time scales with respect to some input size. (How well/fast a problem is solved)
 
-- **Big O** doesn't tell you the speed in **seconds**. Big O notation tells you how fast the algorithm grows.
+- **Big O** doesn't tell you the speed in **seconds**. Big O notation tells you how fast the algorithm **grows** as the input grows.
+
   - we don't use `seconds` because:
     - different machines will record different times for the same algorithm
     - the same machine will record different times for the same algorithm if it runs at different times of the day
@@ -108,16 +109,13 @@ It's a set of instructions to solve a problem/perform a task
     - same operation can be implemented to take different amounts of time, e.g. `for loop` vs `while loop`
     - Experiments can be done only on a limited set of test inputs; hence, they leave out the running times of inputs not included in the experiment (and these inputs may be important)
 
-> So, to study the running time of an algorithm, we need to know the **growth rate** of the number of operations in the algorithm as the input size grows, and not the actual number of operations for a specific input size.
-
 - Many `Big O` notations don't use `n` as it's just a variable and any letter will do, but it's still the number of operations an algorithm will make
   ![big o](./img/big-o-1.png)
 
-> Why we use it?
->
-> - to have a benchmark on how our code performs
-> - useful for discussing trade-offs between different approaches
-> - when code slows down or crashes, identifying parts of the code that are inefficient can help us find pain-points in our apps
+- Why we use it?
+
+  - to have a benchmark on how our code performs, and to discuss trade-offs between different approaches
+  - when code slows down or crashes, identifying parts of the code that are inefficient can help us find pain-points in our apps
 
 - You might think that we don't need to care about Big O because computers are fast, but that's not true. because of 2 reasons:
   1. Computers are fast, but they're not infinitely fast.
@@ -125,40 +123,10 @@ It's a set of instructions to solve a problem/perform a task
 
 ---
 
-### Elements of good code
-
-- **readable**
-
-- **scalable**
-
-  - **speed** --> CPU --> **Time complexity**
-    - compare algorithms on which one is better in scale (how fast it is)
-  - **memory** --> **space complexity**
-    - heap --> store variable
-      - most primitives(`booleans`, `numbers`, `undefined`, `null`) are constant space
-        ![space-complexity](./img/space-complexity.png)
-      - strings require `O(n)` space (`n` is the string length)
-      - reference-types are generally `O(n)`, where `n` is the length(for arrays) or the number of keys(for objects)
-        ![space-complexity](./img/space-complexity2.png)
-    - stack --> operations (function calls, etc.)
-      - **call stack** is where your code is read and executed
-      - **stack overflow** happens when the call stack is too large
-      - **tail call optimization** is when the last line of a function is a function call, and the result of that function call is returned directly to the caller of the current function -> [Tail recursion](#tail-recursion)
-
----
-
 ### Asymptotic Analysis
 
-- In **algorithm analysis**, we focus on the **Growth Rate** of the running time as a function of the input size `n`, taking a “big-picture” approach. For example, it is often enough just to know that the running time of an algorithm grows proportionally to `n`.
+- Algorithm analysis focuses on the growth rate of the running time based on input size. It estimates the number of primitive operations, avoiding language or hardware-specific details.
 
-  - We use functions to show how the time taken by an algorithm changes based on the input size. Basically, we're interested in understanding how the number of operations in an algorithm grows as the input gets larger. This helps us figure out how efficient an algorithm is.
-  - Thus, we can perform an analysis of an algorithm by estimating the **number of primitive operations** executed up to a constant factor, rather than getting bogged down in language-specific or hardware-specific analysis of the exact number of operations that execute on the computer.
-
-- The running time of an algorithm depends on how long it takes a computer to run the lines of code of the algorithm—and that depends on multiple factors like:
-  - the speed of the computer
-  - the programming language
-  - the compiler that translates the program from the programming language into code that runs directly on the computer
-  - among other factors.
 - To calculating the running time of an algorithm more carefully. We can follow these steps:
 
   1. we think about the running time of the algorithm as a **function of the size of its input**.
@@ -169,7 +137,8 @@ It's a set of instructions to solve a problem/perform a task
        - > There will always be a Value of `n` for which `an^2` is greater than `bn + c`, and this difference increases as `n` increases. We say that `an^2` **dominates** `bn + c` as `n` increases.
 
 - By dropping the less significant terms and the constant coefficients, we can focus on the important part of an algorithm's running time: **its rate of growth**.
-- We use **asymptotic notation** in 3 forms:
+
+- We use **Asymptotic Notation** in 3 forms:
 
   - `big-Theta` notation (Average case)
     - usually requires that we calculate expected running times based on a given input distribution, which usually involves sophisticated probability theory.
@@ -177,17 +146,19 @@ It's a set of instructions to solve a problem/perform a task
   - `big-Omega` notation (Best case)
     - is usually too optimistic to be useful, as it does not reflect what happens on average.
       ![best-case](./img/best-case.png)
-  - `big-O` notation (Worst case)
+  - `big-O` notation (Worst case) ✅
     - is much easier than average-case analysis, as it requires only the ability to identify the worst-case input, which is often simple.
       ![worst-case](./img/worst-case.png)
-
-  > We usually characterize running times in terms of the worst case, as a function of the input size, `n`, of the algorithm.
 
 ---
 
 ### Runtime Analysis
 
 - This is done by measuring the performance (**number of steps / operations**) which varies between devices so we need something standard
+  - The running time of an algorithm depends on how long it takes a computer to run the lines of code of the algorithm—and that depends on multiple factors like:
+    - the speed of the computer
+    - the programming language
+    - the compiler that translates the program from the programming language into code that runs directly on the computer
 - When we talk about `big O`, we talk about the **"worst case scenario"** -> It's a reassurance that no matter what happens, the algorithm will never be slower than the `big O` we've calculated
 
 ![big-o](./img/big-o.png)
@@ -222,29 +193,6 @@ It's a set of instructions to solve a problem/perform a task
       n //= 10 # O(log n) because we're dividing n by 10 in each iteration (reduce the size of the problem by 10 in each iteration)
     return sum
   ```
-
-- Hard Examples
-
-  - Function that prints all strings of length `k` where the characters are in sorted order
-
-    ```py
-    # Time complexity -> O(n * 26^n)
-    def printSortedStrings(remaining, prefix=""):
-      if remaining == 0:
-        if isInOrder(prefix):
-          print(prefix)
-      else:
-        for c in range(ord('a'), ord('z') + 1):
-          printSortedStrings(remaining - 1, prefix + chr(c))
-    # helper
-    def isInOrder(s):
-      for i in range(1, len(s)):
-        prev = s[i - 1]
-        curr = s[i]
-        if prev > curr:
-          return False
-      return True
-    ```
 
 - **Notes:**
 
@@ -327,7 +275,7 @@ def sqrt_helper(n, min, max):
 
    - because we're looking for how things scale roughly. is it `linear`, `quadratic`, etc.
 
-4. Different inputs -> Different variables
+4. Different inputs -> Different variables to represent them
 
    - 2 different arrays with different lengths (`a`, `b`) can't have same `n`
 
@@ -354,21 +302,22 @@ def sqrt_helper(n, min, max):
 
 ---
 
+### Big O Types
+
 #### O(n)
 
 This is called **linear Time** Algorithm.
 
-Ex: looping on array using `for-loop`
-![counting operations](./img/counting-operations.png)
+- Ex: looping on array using `for-loop`
+  ![counting operations](./img/counting-operations.png)
 
-- we will simply count how many **primitive operations** are executed, and use this number as a measure of the running time of the algorithm.
-  - Ex of **primitive operations**: (They correspond to low-level instructions that take constant time to perform.)
+- we will count how many **primitive operations** are executed, and use this number as a measure of the running time of the algorithm.
+  - Examples of **primitive operations**: (They correspond to low-level instructions that take constant time to perform.)
     - assignment
     - comparison
     - arithmetic
     - calling a function
     - entering and returning from a function
-  - > Instead of trying to determine the specific execution time of an algorithm, we can simply count the number of primitive operations performed.
 - depending on what we count, the number of operations can be as slow as `2n` or as high as `5n+2`. But regardless of the exact number, the number of operations grows roughly proportionally with `n`
 
 #### O(1)
@@ -512,6 +461,22 @@ This is called **Factorial Time** or **oh no!**
       else:
         return n * factorial(n-1) # O(n) because we're reducing the size of the problem by 1 in each iteration
     ```
+
+- Elements of good code
+  - **readable**
+  - **scalable**
+  - **speed** --> CPU --> **Time complexity**
+  - **memory** --> **space complexity**
+    - heap --> store variable
+      - most primitives(`booleans`, `numbers`, `undefined`, `null`) are constant space
+        ![space-complexity](./img/space-complexity.png)
+      - strings require `O(n)` space (`n` is the string length)
+      - reference-types are generally `O(n)`, where `n` is the length(for arrays) or the number of keys(for objects)
+        ![space-complexity](./img/space-complexity2.png)
+    - stack --> operations (function calls, etc.)
+      - **call stack** is where your code is read and executed
+      - **stack overflow** happens when the call stack is too large
+      - **tail call optimization** is when the last line of a function is a function call, and the result of that function call is returned directly to the caller of the current function -> [Tail recursion](#tail-recursion)
 
 ---
 
@@ -920,7 +885,7 @@ A sorting algorithm is said to be **stable** if two objects with equal keys appe
 
 - Any comparison-based sorting algorithm which is not stable by nature can be modified to be stable by changing the key comparison operation. so that the comparison of two keys considers position as a factor for objects with equal keys.
 
-- Where stable sorting algorithms are useful?
+- When are stable sorting algorithms useful?
 
   - When we want to sort objects by multiple attributes
   - Consider the following dataset of Student Names and their respective class sections:
@@ -956,12 +921,14 @@ It's a sorting algorithm where we **insert** each element in the correct place i
 
   - ex: `online-algorithm` -> algorithm that can work when the data is coming-in, it doesn't have to have the entire array(data) at once, as we "keep one side of the array sorted and insert the others in their correct order"
 
+- It works by examining each item and compare it to items on its left, and insert the item in the correct position in the array
+
 - **steps:**
   ![insertion-sort](./img/insertion-sort-3.png)
 
   1. start by picking the `second` element in the array because we assume that the `first` element is already sorted.
      ![insertion-sort](./img/insertion-sort-0.png)
-  2. now compare the second element with (the one before it) and **swap** if necessary, then repeat until the element is in the correct order
+  2. now compare the second element with (the one before it (its left element)) and **swap** if necessary, then repeat until the element is in the correct order
      ![insertion-sort](./img/insertion-sort-1.png)
   3. continue to the next element and if it is in the (incorrect order), iterate through the sorted portion (the left side) to place the element in the correct place
      ![insertion-sort](./img/insertion-sort-2.png)
@@ -976,10 +943,10 @@ It's a sorting algorithm where we **insert** each element in the correct place i
 ```py
 def insertion_sort(arr):
   for i in range(1, len(arr)):
-    j = i - 1 # index of element before current element
+    j = i # current element
     # keep swapping the element with the one before it until it's in the correct place
-    while j >= 0 and arr[j + 1] < arr[j]:
-      arr[j], arr[j + 1] = arr[j + 1], arr[j] # swap
+    while j > 0 and arr[j] < arr[j - 1]:
+      arr[j], arr[j - 1] = arr[j - 1], arr[j] # swap
       j -= 1
 
   return arr
@@ -1046,7 +1013,7 @@ def selection_sort(arr):
       arr[i], arr[min_index] = arr[min_index], arr[i]
   return arr
 
-# ----------------------------------------------- or -----------------------------------------------
+# ------------------------------- or -------------------------------
 
 def selection_sort(arr):
   suffix_start = 0
@@ -1056,25 +1023,7 @@ def selection_sort(arr):
         arr[suffix_start], arr[i] = arr[i], arr[suffix_start]
     suffix_start += 1
 
-# ----------------------------------------------- or -----------------------------------------------
-
-# helper function to find the index of the smallest element in the array
-def find_smallest(arr):
-  smallest = arr[0]
-  smallest_index = 0
-  for i in range(1, len(arr)):
-    if arr[i] < smallest:
-      smallest = arr[i]
-      smallest_index = i
-  return smallest_index
-
-def selection_sort(arr):
-  new_arr = []
-  for i in range(len(arr)):
-    smallest = find_smallest(arr)
-    # pop the smallest element from the array and append it to the new array
-    new_arr.append(arr.pop(smallest))
-  return new_arr
+  return arr
 ```
 
 > it's better than **Bubble sort** only in one condition:
@@ -1115,15 +1064,18 @@ def heapSort(arr):
 
 ### Divide & Conquer
 
-Both merge sort and quicksort employ a common algorithmic paradigm based on **recursion**. This paradigm, **divide-and-conquer**, breaks a problem into subproblems that are similar to the original problem, recursively solves the subproblems, and finally combines the solutions to the subproblems to solve the original problem.
+Both merge sort and quicksort employ a common algorithmic paradigm based on **recursion**. This paradigm, **divide-and-conquer**, breaks a problem into sub-problems that are similar to the original problem, recursively solves the sub-problems, and finally combines the solutions to the sub-problems to solve the original problem.
 
 ![divide-and-conquer](./img/divide-and-conquer-1.png)
 ![divide-and-conquer](./img/divide-and-conquer-2.png)
 
-- Merge Sort vs Quick Sort
+- `Merge Sort` vs `Quick Sort`
+  | Sorting Algorithm | Worst Case | Average Case | Constant Factor |
+  |-------------------|------------|--------------|-----------------|
+  | Quick Sort | O(n^2) | O(n log n) | Smaller |
+  | Merge Sort | O(n log n) ✅ | O(n log n) | Larger |
   - Quick sort is risky, In worst case, it can be `O(n^2)`, but in average case, it's `O(n log(n))`
   - unlike `merge sort` which is always `O(n log n)`
-  - Sometimes the constant can make a difference. `Quicksort` versus `merge sort` is one example. `Quicksort` has a smaller constant than `merge sort`. So if they're both `O(n log n)` time, `quicksort` is faster. And `quicksort` is faster in practice because it hits the average case way more often than the worst case.
 
 ---
 
@@ -1136,16 +1088,15 @@ It's all about continually **splitting** the array into halves until you have ar
 ![merge-sort](./img/Merge-Sort.png)
 
 - It's a combination of 2 things: `dividing` & `merging`
-- it exploits the fact that arrays of `0` or `1` elements are always sorted
-  - as it works by decomposing an array into smaller arrays of `0` or `1` elements, then building up a newly sorted array
-- it uses the technique: "Divide & Conquer" by implementing `recursion` and combining the solutions which gives us **`O(n log n)`** time complexity which is better than **`O(n^2)`**
+- it exploits the fact that arrays of `0` or `1` elements are always sorted, as it works by decomposing an array into smaller arrays of `0` or `1` elements, then building up a newly sorted array
+- it uses `recursion` and combining the solutions which gives us `O(n log n)` time complexity which is better than `O(n^2)`
 
-  - the number of times we **divide**(split-up/decompose) is equal to `log(n)` and the number of **merging**(comparisons) is `n`
+  - the number of times we **divide** (split-up/decompose) is equal to `log(n)` and the number of **merging**(comparisons) is `n`
 
 - The "divide" part is done by **recursion**
 - The "conquer" part is done by **Two pointers** (one for each array) or **slicing** and a `while` loop
 
-- it's one of the most efficient ways to sort lists
+- **it's one of the most efficient ways to sort lists**
   > We can notice that the number of comparisons is smaller than the number of swaps in `bubble sort` and `selection sort`, so it's more efficient
 - one downside is that it has a bigger space-complexity: **space-complexity of `O(n)`** unlike most sorting algorithms which has `O(1)`
   - this is due to storing the divided lists in memory
@@ -1160,10 +1111,11 @@ Consists of 2 functions: `merge` & `merge_sort`
 
    - is used to merge 2 sorted arrays into one sorted array
    - while there are still elements in both arrays (`arr1`, `arr2`) we haven't looked at:
-     - if the first value in the first array is smaller than the first value in the second array, push the value in the first array into our `results` and move on to the next value in the first array
-     - if the value in the first array is larger than the value in the second array, push the value in the second array into our results and move on to the next value in the second array
+     - Compare the first values of both arrays. Push the smaller value to the `result` array and move to the next value in that array.
    - once we exhaust one array, push in all remaining values from the other array
-   - > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
+   - Implementation is below for the `merge` function ⬇️
+
+   > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
 
 2. `merge_sort` function
 
@@ -1173,30 +1125,29 @@ Consists of 2 functions: `merge` & `merge_sort`
 
 ```py
 def merge(arr1, arr2):
-  results = []
+  res = []
   i = 0 # pointer for arr1
   j = 0 # pointer for arr2
 
   while i < len(arr1) and j < len(arr2):
     if arr1[i] <= arr2[j]: # to make it stable, change the comparison operator to <=
-      results.append(arr1[i])
+      res.append(arr1[i])
       i += 1 # move on to the next value in the first array
     else:
-      results.append(arr2[j])
+      res.append(arr2[j])
       j += 1 # move on to the next value in the second array
 
   # once we exhaust one array, push in all remaining values from the other arrays
-  while i < len(arr1):
-    results.append(arr1[i])
-    i += 1
+  if i < len(arr1):
+    res.extend(arr1[i:])
+    # or res += arr1[i:]
 
-  while j < len(arr2):
-    results.append(arr2[j])
-    j += 1
+  if j < len(arr2):
+    res.extend(arr2[j:])
+    # or res += arr2[j:]
 
-  return results
+  return res
 
- # ------------------------------------------------------------------------------ #
 
 def merge_sort(arr):
   # base case (Single element array is already sorted)
@@ -1214,8 +1165,8 @@ def merge_sort(arr):
 
 - Time complexity: **`O(n log n)`**
   ![merge-sort](./img/merge-sort3.png)
-  - `log(n)` -> the number of times we **divide by 2**(split-up/decompose)`is equal to`log(n)`
-  - `n` -> the number of **merging**(comparisons)
+  - `log(n)` -> the number of times we **divide by 2** (split-up/decompose) is equal to`log(n)`
+  - `n` -> the number of **merging** (comparisons)
 
 ---
 
@@ -1486,7 +1437,7 @@ def bucket_sort(array, max_val):
 
 ![sorting-comparison](./img/sorting-comparison.png)
 
-- the best sorting time complexity will always be `O(nlog(n))` as the `"n"` says that we do a comparison between the elements of the list
+- the best sorting time complexity will always be `O(n log(n))` as the `"n"` says that we do a comparison between the elements of the list
 
 ---
 
@@ -1534,24 +1485,25 @@ Binary search is a search algorithm that finds the position of a target value wi
   3. If `target > data[mid]`, then we recur on the second half of the sequence, that is, on the interval of indices from `mid+1` to high.
 
 - Here worst case is `O(log(n))` with log-base of `2` as we divide each group by `2` each time
+  - It's how many times we can divide `n` by `2` until we get the wanted number
 
 ```py
 # 1. Recursive Binary Search
 def binary_search(data, target, low, high):
   if low > high:
     return False  # interval is empty; no match
-  else:
-    mid = (low + high) // 2
-    if target == data[mid]:  # found a match
-      return True
-    elif target < data[mid]:
-      # recur on the portion left of the middle
-      return binary_search(data, target, low, mid - 1)
-    else:
-      # recur on the portion right of the middle
-      return binary_search(data, target, mid + 1, high)
 
-# -------------------------------------------------------------------------------------------------
+  mid = (low + high) // 2
+  if target == data[mid]:  # found a match
+    return True
+  elif target < data[mid]:
+    # recur on the portion left of the middle
+    return binary_search(data, target, low, mid - 1)
+  else:
+    # recur on the portion right of the middle
+    return binary_search(data, target, mid + 1, high)
+
+# ---------------------------------------------------------------------
 
 # 2. Iterative Binary Search ✅
 def binary_search_iterative(nums, target):
@@ -1571,12 +1523,12 @@ def binary_search_iterative(nums, target):
 
 - Time complexity: `O(log(n))`
 
-  - Because we divide the search space in half at each step, the total number of steps required to find the target is `log(n)`, where `n` is the number of elements in the list
+  - Because we divide the search space **in half** at each step, the total number of steps required to find the target is `log(n)`, where `n` is the number of elements in the list
 
     ```py
     # n is the number of elements in the list (r-l+1)
     # k is the number of steps required to find the target
-    n/2^k = 1
+    n / 2^k = 1
     n = 2^k
     log(n) = log(2^k)
     log(n) = k log(2)
@@ -1611,11 +1563,13 @@ def binary_search_iterative(nums, target):
         if nums[midIdx] == target:
           return midIdx
 
+        # Case 1: ascending order
         if isAscending:
           if nums[midIdx] > target:
             r = midIdx - 1
           else:
             l = midIdx + 1
+        # Case 2: descending order
         else:
           if nums[midIdx] < target:
             r = midIdx - 1
@@ -1759,11 +1713,15 @@ It's also called **"Level Order Traversal"**
         if curr.left: queue.append(curr.left)
         if curr.right: queue.append(curr.right)
 
+        # or if a graph
+        # for neighbor in curr.neighbors:
+        #   queue.append(neighbor)
+
       # increment the level
       level += 1
   ```
 
-- BFS Implementation for a "mango seller example"
+- Example: BFS Implementation for a "mango seller" problem
   ![bfs example](./img/bfs-implementation.png)
   ![bfs example](./img/bfs-implementation-1.png)
 
@@ -1846,7 +1804,7 @@ It's an algorithm for traversing or searching tree or graph data structures. It 
   - Think of it as a **maze**, where you're trying to find a way out and you're exploring all the possible paths until you find the exit and when you reach a dead-end, you go back to the last intersection and try another path
   - Usually time-complexity is `O(n)` as we visit each node once
 
-> It's called `Depth First Search` because we go deep into the tree before we go wide (asking its children)
+> It's called `Depth First Search` because we go deep into the tree before we go wide (asking other children)
 
 - the search follows one branch of the tree down as many levels as possible until the target notice is found or the end is reached, then it continues at the next ancestor with an unexplored children
   - the idea is to go as deep as possible from the left side and then start going to the right until the traversal of the tree is done
@@ -2161,6 +2119,8 @@ It returns a specific ordering of the nodes in a directed graph as long as the g
 
 - Another way of thinking about topological sort is that it's a way of arranging the nodes of a graph in a line such that all the edges point in the same direction to the right.
   ![top sort](./img/top-sort-5.png)
+  - a "Topological ordering" is an ordering of the nodes in a directed graph where for each directed edge from node `A` to node `B`, node `A` appears before node `B` in the ordering.
+  - the Topological Sort algorithm can find the topological ordering of a graph in `O(V + E)` time, where `V` is the number of vertices and `E` is the number of edges in the graph.
 
 > Many real world situations can be modelled as a `graph` with directed edges where some events must occur before others.
 
@@ -2179,6 +2139,8 @@ It returns a specific ordering of the nodes in a directed graph as long as the g
   - "DACs" are directed graphs with no directed cycles.
     ![top sort](./img/top-sort-6.png)
   - If a graph has **cycles** or is **not directed**, then there is no topological sort.
+
+---
 
 ### Implementing Topological Sort
 
@@ -2270,6 +2232,7 @@ def topological_sort(graph):
 
 - Here, we use **PostOrder DFS** traversal, meaning that we assign the order of the nodes after we've visited all of their children/neighbors (as they don't need to be visited in a specific order)
 - when reaching the base-case (leaf node), we add the node to the result
+  - **Base-case:** when the node has no children or all of its children have been visited
 - after finishing, we will have the nodes in a reverse order, so we reverse the result to get the correct order
   ![top sort](./img/top-sort-15.png)
 

@@ -90,6 +90,62 @@ It is the ability to create new classes based on an existing class.
 
 - it allows us to reuse code.
 - `superClass` -> `subClass` (parent -> child)
+- **Inheritance vs Composition**:
+
+  - **Inheritance**: it is an `is-a` relationship between classes.
+
+    - it is used when we want to:
+      - reuse the code of an existing class.
+      - create a new class from an existing class.
+      - create a hierarchy of classes.
+
+    ```py
+    class Animal:
+      def eat(self):
+        print("Animal is eating")
+
+    class Dog(Animal):
+      def bark(self):
+        print("Dog is barking")
+
+    dog = Dog()
+    dog.eat() # it can still eat
+    dog.bark()
+    ```
+
+  - **Composition**: it is a `has-a` relationship between classes.
+
+    - it is used when we want to:
+
+      - use the functionality of an existing class without modifying it.
+      - using object in another object, by keeping an instance-variable that refers to an object, and delegating operations to it instead of inheriting from it.
+        ![composition](./img/composition-1.png)
+
+    - Composition example 1️⃣
+
+      ```py
+      class Animal:
+        def __init__(self, name):
+          self.name = name
+
+        def eat(self):
+          print(f"{self.name} is eating")
+
+      class Dog:
+        def __init__(self, name):
+          self.animal = Animal(name)
+
+        def bark(self):
+          print(f"{self.animal.name} is barking")
+
+      dog = Dog("Dog")
+      dog.animal.eat() # it can still eat but through the animal object
+      dog.bark()
+      ```
+
+    - Composition example 2️⃣
+      ![composition](./img/composition-2.png)
+      - Here, Class `User` has delegated the operations to multiple classes `Attributes, Events, Sync` instead of having a single class `User` that has all the operations. So we "compose" the `User` class from multiple classes.
 
 #### E - Encapsulation
 

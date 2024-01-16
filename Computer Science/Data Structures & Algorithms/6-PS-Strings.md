@@ -1256,10 +1256,10 @@ Given a string, return it in a sinusoidal shape
     - `_` represents a whitespace
     - Because the shape will be like this:
 
-      ```
-        e         _           l
-      H    l    o     W     r     d
-            l           o          !
+      ```txt
+        e           _           l
+      H     l    o     W     r     d
+              l           o          !
       ```
 
 - Explanation:
@@ -1297,7 +1297,7 @@ def sinusoidalString(s):
 
 The string `"PAYPALISHIRING"` is written in a zigzag pattern on a given number of rows like this:
 
-```
+```txt
 P   A   H   N
 A P L S I I G
 Y   I   R

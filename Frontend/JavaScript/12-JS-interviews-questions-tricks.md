@@ -327,7 +327,7 @@
   'X' > 'a'; // false -> capital letters are always less than lowercase letters
   ```
 
-  - because the comparison is done by comparing the `Unicode` values of the characters.
+  - because the comparison is done by comparing the `Unicode` values of the characters using the `charCodeAt()` method.
 
     ```js
     'x'.charCodeAt(0); // 120

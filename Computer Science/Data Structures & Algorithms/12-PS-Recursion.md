@@ -116,6 +116,37 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
   fib = memoize(slowFib)
   ```
 
+- Using `lru_cache` decorator in python
+
+  ```py
+  from functools import lru_cache
+
+  @lru_cache(maxsize=1000) # cache the last 1000 calls
+  def fib(n):
+      if n < 2:
+          return n
+      return fib(n-1) + fib(n-2)
+  ```
+
+- **Important in interviews**: when testing edge cases, make sure to test `n = 0` and `n = 1`, and to test negative numbers and strings as well.
+
+  ```py
+  def fib(n):
+      # check if not number
+      if type(n) != int:
+          raise TypeError('n must be a positive number')
+      # check if negative number
+      elif n < 0:
+          raise ValueError('n must be positive')
+      elif n < 2:
+          return n
+      return fib(n-1) + fib(n-2)
+  ```
+
+- The DP solution ->
+  - [Top-Down approach](./2-Algorithms.md#top-down-approach-recursion--memoization)
+  - [Bottom-Up approach](./2-Algorithms.md#bottom-up-approach-iterative--tabulation)
+
 ---
 
 ### Fibonacci looping solution

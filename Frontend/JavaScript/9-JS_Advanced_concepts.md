@@ -822,6 +822,8 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 It is the **combination of two functions into one**, that when applied, returns the result of the chained functions **(using reduction of the result value)**.
 
 > In functional Programming, Composition **takes the place of inheritance in OOP**.
+>
+> Note that **"composition"** in OOP is different from **"composition"** in functional programming. More here [composition in OOP](../../Computer%20Science/OOP/1-OOP.md#i---inheritance)
 
 - Chaining with dots relies on JavaScript prototype feature - functions return arrays which have access to all the high-order-function (map, filter, reduce), but if I want to chain functions that just return a regular output:
 

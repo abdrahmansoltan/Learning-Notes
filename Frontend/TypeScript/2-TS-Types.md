@@ -1,14 +1,16 @@
 # INDEX
 
 - [INDEX](#index)
+  - [any](#any)
   - [Array](#array)
   - [Tuple](#tuple)
   - [Enum](#enum)
   - [Objects](#objects)
-  - [Object Excess Properties Checking](#object-excess-properties-checking)
+    - [Object destructuring](#object-destructuring)
+    - [Object Excess Properties Checking](#object-excess-properties-checking)
   - [unknown -- (type guard)](#unknown----type-guard)
   - [`this` keyword types](#this-keyword-types)
-  - [Type Aliases (type)](#type-aliases-type)
+  - [Type Aliases (`type`)](#type-aliases-type)
     - [`readonly` Modifier](#readonly-modifier)
   - [Interfaces](#interfaces)
     - [When to use Interfaces](#when-to-use-interfaces)
@@ -19,15 +21,27 @@
   - [Literal Types](#literal-types)
     - [String Literal Types](#string-literal-types)
   - [Partial Type](#partial-type)
-  - [function](#function)
+  - [Function](#function)
     - [function type](#function-type)
     - [function interface](#function-interface)
     - [`void`](#void)
     - [`never`](#never)
   - [Classes](#classes)
-    - [Abstract Classes](#abstract-classes)
     - [Class Access Modifiers](#class-access-modifiers)
+    - [Class Fields](#class-fields)
     - [Using Interfaces with classes](#using-interfaces-with-classes)
+    - [Abstract Classes](#abstract-classes)
+    - [Interfaces vs Abstract Classes](#interfaces-vs-abstract-classes)
+  - [Promises](#promises)
+
+---
+
+## any
+
+- It's the most flexible type in Typescript, It allows you to assign any type to that variable
+- It means that TS has no idea what this is, and can't check anything about it
+- It's used when you don't know what the type of the variable will be
+- Avoid using it as much as possible, as it defeats the purpose of using Typescript
 
 ---
 
@@ -48,7 +62,7 @@ let arr2: (string | number)[]; // array of strings or numbers
   ```ts
   const arr: (number | string)[] = [1, 2, 3, '22'];
 
-  // this is different from (array of all strings or all numbers):
+  // ⚠️ this is different from (array of all strings or all numbers):
   const arr: number[] | string[] = [1, 2, 3];
   const arr: number[] | string[] = ['1', '2', '3'];
   ```
@@ -57,7 +71,9 @@ let arr2: (string | number)[]; // array of strings or numbers
 
 ## Tuple
 
-It's an array of fixed lengths and ordered with specific types (every element in the array represents some property of a record) and the order of the types in the array is important as it's used to describe the structure of the array.
+It's an array-like structure where each element represent some property of a record.
+
+- It's an array of fixed lengths and ordered with specific types (every element in the array represents some property of a record) and the order of the types in the array is important as it's used to describe the structure of the array.
 
 > It's a special type exclusive to Typescript (doesn't exist in Javascript)
 
@@ -68,6 +84,36 @@ It's an array of fixed lengths and ordered with specific types (every element in
 
   myTuple = ['cat', 7, 'dog']; // ✅
   myTuple = ['cat', 'dog', 'dog']; // ❌
+
+  // it's actually like representing an object as an array
+  obj = {
+    name: 'cat',
+    age: 7,
+    type: 'dog'
+  };
+  tuple = ['cat', 7, 'dog'];
+  ```
+
+- It's different from `array` with different types, as it's used to represent a record with specific types and **order**, while `array` with different types is used to represent a list of values with different types
+
+  ```ts
+  let myTuple: [string, number, string];
+
+  myTuple = ['cat', 7, 'dog']; // ✅
+  myTuple = ['cat', 'dog', 'dog']; // ❌
+
+  let myArray = ['cat', 7, 'dog']; // will be inferred as (string | number)[]
+  ```
+
+- Note that you can write a tuple with same types, but it's not recommended as it's not clear what each element represents
+
+  ```ts
+  let myTuple: [string, string, string];
+
+  myTuple = ['cat', 'dog', 'dog']; // ✅
+  myTuple = ['cat', 7, 'dog']; // ❌
+
+  // It's not same as string[] ⚠️
   ```
 
 - **Gautcha (limitation of Tuples):** The way tuples are designed by Typescript, They don't actually prevent you from pushing or popping elements from the tuple **after creation** and doesn't raise errors as it assumes that the method won't change the array-structure
@@ -78,11 +124,19 @@ It's an array of fixed lengths and ordered with specific types (every element in
 
 It allows us to define a **set of named constants**. We can give these constants numeric or string values
 
+> It stand for "Enumeration" which is a set of named constants
+
+![enum](./img/enum.png)
+
 - It's used an enum when you have a constant set of values that will not be changed.
 
-  - It's to prevent misspelling of values
-    - > like action-constants in `Vuex`, `redux`
+  - It's to **prevent misspelling** of values or make code more readable
+    - like action-constants in `Vuex`, `redux`
   - it's like `Object.freeze` and [literal types](#literal-types) for objects
+
+- `enum` is **only** used to provide other engineers with a more understandable way to refer to a set of related values, and there're no other benefits to using it
+
+- Example
 
   ```ts
   enum Colors {
@@ -93,6 +147,25 @@ It allows us to define a **set of named constants**. We can give these constants
   }
 
   console.log(Colors.RED); // red
+
+  // ----------------------------------------------------------------
+
+  // example for using Enum for readability
+  enum MatchResult {
+    HOME_WIN = 'H',
+    AWAY_WIN = 'A',
+    DRAW = 'D'
+  }
+
+  team1 = {
+    name: 'Real Madrid',
+    score: 2,
+    result: 'H'
+  };
+
+  console.log(team1.result === MatchResult.HOME_WIN); // Readable and clear ✅
+  // instead of:
+  console.log(team1.result === 'H'); // Not clear and can be misspelled ❌
   ```
 
 - If not given a values to the constants, Behind the scenes, It assigns labels to numbers (starts at `0`)
@@ -108,7 +181,17 @@ It allows us to define a **set of named constants**. We can give these constants
   console.log(OrderStatus.DELIVERED); // 2
   ```
 
-> **Should you use enums?** -> Some say that enums don't have any benefits and that it can be replaced with object of values, and they have a valid point, and some say that it's useful for autocomplete
+- **Should you use enums?**
+  - Some say that enums don't have any benefits and that it can be replaced with object of values, and they have a valid point, and some say that it's useful for autocomplete
+  - When to use it:
+    - When you have a small set of values that are all closely related and known at compile time, and when you want to make your code more readable and prevent misspelling
+    - When you are sure that the values will not change in the future
+    - ex: days of the week, months of the year, primary colors, etc
+  - When not to use it:
+    - When you have a large set of values that are not closely related and not known at compile time
+    - When you want to use it for autocomplete, as it's not recommended to use it for that
+    - ex: set of movie categories on Netflix
+      - because movie categories change all the time, and it's not known at compile time
 
 ---
 
@@ -118,7 +201,6 @@ Objects can be typed by declaring what the object should look like in the annota
 
 ```ts
 // not good and hard to read
-// note that --> in object type we use `;` but in value section we use ','
 let student: { name: string; age: number; enrolled: boolean } = {
   name: 'Maria',
   age: 10,
@@ -127,9 +209,18 @@ let student: { name: string; age: number; enrolled: boolean } = {
 };
 ```
 
+- note that --> in object type we use semicolon (`;`) but in value section we use comma (`,`)
 - you can also use [type-aliases--(type)](#type-aliases-type)
 
-## Object Excess Properties Checking
+### Object destructuring
+
+When using object destructuring, write the annotated type after the destructuring, and not combined with the object
+
+```ts
+const { name, age }: { name: string; age: number } = student;
+```
+
+### Object Excess Properties Checking
 
 **Excess property checking** is when Typescript checks your object to ensure that it doesn’t contain any extra properties on top of what is defined in the type annotation for the object.
 
@@ -242,13 +333,15 @@ if (typeof userInput === 'string') {
 
 ---
 
-## Type Aliases (type)
+## Type Aliases (`type`)
 
 Type aliases can be used to "create" your own types. Instead of writing out object-types in an annotation, we can declare them separately in a **type alias** to a (possibly complex) object type.
 
 - It allows us to make our code more readable and to reuse the types elsewhere in our code
 - Type aliases do not create a new type; they rename a type. Therefore, you can use it to type an object and give it a descriptive name.
-- it's same as `interface`
+- It's usually used for complex types like `union` & `tuple` types, or as a preference for cleaner code
+- it's same as `interface`, but with some [differences](#interface-vs-type)
+
 - once a type alias is created, it can't be added to.
 
 ```ts
@@ -315,21 +408,36 @@ TypeScript provides the `readonly` modifier that allows you to mark the properti
 
 They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a slightly different syntax)
 
-- it's a blueprint for `object's items`
+- it's a **blueprint** for `object's items`
 
   - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something.
 
 - Use `PascalCase` for naming `interfaces`.
 
-```ts
-interface Student {
-  name: string;
-  age: number;
-  gender?: string; // (?) means that it's optional
-  enrolled: boolean;
-}
-let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
-```
+- EX:
+
+  ```ts
+  interface Student {
+    name: string;
+    age: number;
+    gender?: string; // (?) means that it's optional
+    enrolled: boolean;
+  }
+  let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
+  ```
+
+- The interface doesn't have to have all the types of the object, but it should have at least the required ones **(any additional properties are ignored)**
+
+  ```ts
+  interface Student {
+    name: string;
+    age: number;
+  }
+
+  let newStudent: Student = { name: 'Maria', age: 10 }; // ✅
+  let newStudent: Student = { name: 'Maria', age: 10, enrolled: true }; // ✅ because enrolled is optional
+  let newStudent: Student = { name: 'Maria', enrolled: true }; // ❌ because age is required
+  ```
 
 > we can use class instead with all its properties are '?' as classes are implemented in javascript unlike interfaces which is in Typescript and needs to be transpiled to Javascript
 
@@ -337,9 +445,11 @@ let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
 
 ### When to use Interfaces
 
-- Interfaces can be used to create reusable types that describe the shapes of objects/functions
+- Interfaces can be used to create reusable types that describe the shapes of objects/functions that have common properties that are interfaced with `interfaces`, **So, it makes us write generic code that can be re-used with different objects**.
 
   - Usually used with `functions` which accept arguments that are typed with `interfaces`
+    ![interface with function](./img/interfaces-4.png)
+    ![interface with function](./img/interfaces-5.png)
 
 - Restricting access (following [Dependency Inversion Principle](../Software%20Engineering/2-Design-patterns.md#d---dependency-inversion-principle-dip) design pattern)
 
@@ -375,19 +485,6 @@ let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
 
   greet({ name: 'Max', age: 30 });
   greet({ name: 'Anna', gender: 'female' }); // will also work because it fulfills the interface
-  ```
-
-- The interface doesn't have to have all the types of the object, but it should have at least the required ones
-
-  ```ts
-  interface Student {
-    name: string;
-    age: number;
-  }
-
-  let newStudent: Student = { name: 'Maria', age: 10 }; // ✅
-  let newStudent: Student = { name: 'Maria', age: 10, enrolled: true }; // ✅ because enrolled is optional
-  let newStudent: Student = { name: 'Maria', enrolled: true }; // ❌ because age is required
   ```
 
 ---
@@ -576,7 +673,7 @@ const draft: Partial<Blog> = {
 
 ---
 
-## function
+## Function
 
 We can specify the type of function parameters in a function definition which allows Typescript to enforce the types for the values being passed into the function
 
@@ -590,31 +687,65 @@ We can specify the type of function parameters in a function definition which al
 
 - it's when you want a variable to be a function with specific conditions
 
-```ts
-function add(n1: number, n2: number): number {
-  return n1 + n2;
-}
-```
+  ```ts
+  function add(n1: number, n2: number): number {
+    return n1 + n2;
+  }
+  ```
+
+- When using object argument with destructuring, write the annotated type after the destructuring, and not combined with the object
+
+  ```ts
+  const add = ({ n1, n2 }: { n1: number; n2: number }) => {
+    return n1 + n2;
+  };
+  ```
+
+  - Or, you can use `type-alias` to make it more readable
+
+    ```ts
+    type AddFn = (a: number, b: number) => number;
+    const add: AddFn = (n1, n2) => n1 + n2;
+
+    // Example of type alias of a general function type
+    type callback = () => void; // This is not an empty function, it's type alias referring to the use of a function
+    ```
+
+- Note that type inference works for functions as well, but it only works for the return value, not for the parameters
+
+  ```ts
+  function add(n1: number, n2: number) {
+    return n1 + n2;
+  }
+  // it's same as
+  function add(n1: number, n2: number): number {
+    return n1 + n2;
+  }
+  ```
+
+  > It's recommended to always annotate the return type of a function, even if it's not required, to always ensure that the function returns the **correct & intended type**
 
 ### function interface
 
-```ts
-interface TwoNumberMathFunc {
-  (a: number, b: number): number;
-}
+- it's when you want to create a function type and use it in multiple places
 
-const upperCaseFormatter: TwoNumberMathFunc = function (a, b) {
-  return a * b;
-};
-// or with arrow function
-const upperCaseFormatter: TwoNumberMathFunc = (a, b) => a * b;
-```
+  ```ts
+  interface TwoNumberMathFunc {
+    (a: number, b: number): number;
+  }
+
+  const upperCaseFormatter: TwoNumberMathFunc = function (a, b) {
+    return a * b;
+  };
+  // or with arrow function
+  const upperCaseFormatter: TwoNumberMathFunc = (a, b) => a * b;
+  ```
 
 ---
 
 ### `void`
 
-- It's a `return` type when the function returns **nothing**
+- It's a `return` type when the function returns **nothing** (or expected to return nothing)
   - or means that the function's return value **should be ignored**
 - Typescript can **infer** this type fairly well and we don't have to **annotate** it, but sometimes it may want you to annotate a function with a `void` return explicitly
 
@@ -651,90 +782,79 @@ function generateError(message: string, code: number): never {
 
 ## Classes
 
-Classes are templates for creating objects in Javascript. They contain a few different important pieces which allow for creation and extension of customized objects
+Classes are **templates / blueprint** for creating objects in Javascript. They contain a few different important pieces which allow for creation and extension of customized objects
 
 - In Typescript, The big difference being that the class-properties are typed, as are the parameters and return types for our constructor and methods.
 
   - The class properties are typed before the constructor
 
-    ```js
+    ```ts
     class Player {
-      first: number;
-      last: number;
-      constructor(first: string, last: string) {
+      first: string; // only for typing, we're still responsible for initializing the properties in the constructor
+      last: string; // only for typing, we're still responsible for initializing the properties in the constructor
+      constructor(first, last) {
         this.first = first;
         this.last = last;
       }
     }
+
+    function printPlayer(player: Player) {
+      console.log(player.first + ' ' + player.last);
+    }
+    let player = new Player('John', 'Doe');
+    // Notice that "Player" acts as both a (type and a Class) ⚠️
     ```
-
-### Abstract Classes
-
-Abstract classes are mainly for **inheritance** where other classes may derive from them. **We cannot create an instance of an abstract class**.
-
-- It's used to define a pattern (methods) that must be implemented by a child class
-  - An abstract class typically includes one or more abstract methods or property declarations. The class which extends the abstract class must define all the abstract methods.
-
-```ts
-abstract class APerson {
-  abstract getName(): string;
-}
-
-class Person extends APerson {
-  getName(): string {
-    return 'john doe';
-  }
-}
-
-const res = new Person();
-console.log(res.getName());
-```
-
----
 
 ### Class Access Modifiers
 
-used to declare how accessible a variable should be
+used to declare how accessible a variable should be from outside the class (They're only available in Typescript and not in Javascript)
 
-- `public` : default for all class properties, not necessary to use
-  - > it can be used for "clarity" for other developers to know that this property is public
-- `private` : private properties can only be accessed and modified from the class itself.
-  - it's like the `#` in **ES2015**, but the difference is that
-    - if the private property is used with `private` modifier, it will only show warning for typescript but the javascript will run it normally
-    - if the private property is used with (javascript native `#` modifier), it will show errors on runtime
-- `protected` : protected properties can be accessed by the class itself **and child classes** but not outside.
-- `readonly`: [readonly modifier](#readonly-modifier)
+- **Modifiers:**
+  ![access modifiers](./img/class-modifiers-1.png)
 
-```ts
-class Student {
-  protected studentGrade: number;
-  private studentId: number;
-  public constructor(grade: number, id: number) {
-    this.studentGrade = grade;
-    this.studentId = id;
+  - `public` : default for all class properties, not necessary to use
+    - it can be used for "clarity" for other developers to know that this property is public
+  - `private` : private properties can only be accessed and modified from the class itself.
+    - it's like the `#` in **ES2015**, but the difference is that
+      - if the private property is used with `private` modifier, it will only show warning for typescript but the javascript will run it normally
+      - if the private property is used with (javascript native `#` modifier), it will show errors on runtime
+  - `protected` : protected properties can be accessed by the class itself **and child classes** but not outside.
+  - `readonly`: [readonly modifier](#readonly-modifier)
+
+- Example:
+
+  ```ts
+  class Student {
+    protected studentGrade: number;
+    private studentId: number;
+    public constructor(grade: number, id: number) {
+      this.studentGrade = grade;
+      this.studentId = id;
+    }
+
+    id() {
+      return this.studentId;
+    }
   }
 
-  id() {
-    return this.studentId;
+  // Subclass
+  class Graduate extends Student {
+    studentMajor: string; // public by default
+    public constructor(grade: number, id: number, major: string) {
+      super(grade, id);
+      this.studentId = id; // TypeScript Error: Property 'studentId' is private and only accessible within class 'Student'.
+      this.studentGrade = grade; // Accessible because parent is protected
+      this.studentMajor = major;
+    }
   }
-}
 
-class Graduate extends Student {
-  studentMajor: string; // public by default
-  public constructor(grade: number, id: number, major: string) {
-    super(grade, id);
-    this.studentId = id; // TypeScript Error: Property 'studentId' is private and only accessible within class 'Student'.
-    this.studentGrade = grade; // Accessible because parent is protected
-    this.studentMajor = major;
-  }
-}
+  // Class Instance
+  const myStudent = new Graduate(3, 1234, 'computer science');
 
-const myStudent = new Graduate(3, 1234, 'computer science');
-
-console.log(myStudent.id()); //  prints 1234
-myStudent.studentId = 1235; // TypeScript Error: Property 'studentId' is private and only accessible within class 'Student'.
-console.log(myStudent.id()); // prints 1235
-```
+  console.log(myStudent.id()); //  prints 1234
+  myStudent.studentId = 1235; // TypeScript Error: Property 'studentId' is private and only accessible within class 'Student'.
+  console.log(myStudent.id()); // prints 1235
+  ```
 
 - you can also use these access modifiers in the constructor function instead of writing them many times
 
@@ -751,8 +871,47 @@ console.log(myStudent.id()); // prints 1235
   }
   ```
 
-- **Note:**
+- **Notes:**
+
+  - You can't modify the access modifiers of the parent class in the child class
+
+    ```ts
+    class Parent {
+      private id: string;
+    }
+
+    class Child extends Parent {
+      public id: string; // ERROR ❌
+    }
+    ```
+
   - The access modifiers are not used for protective or security reasons, but rather to help us write better code (by telling other developers what they can and can't do with the class) and to help us catch errors early on.
+
+---
+
+### Class Fields
+
+They're used to define properties in the class without having to define them in the constructor (new feature in ES2015)
+
+```ts
+// Option 1
+class Person {
+  name: string;
+  age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+// -------------------------------------------------------
+
+// Option 2 -> using `public` modifier ✅
+class Person {
+  constructor(public name: string, public age: number) {}
+}
+```
 
 ---
 
@@ -784,5 +943,104 @@ class Person implements Greetable {
   }
 }
 ```
+
+---
+
+### Abstract Classes
+
+Abstract classes are mainly for **inheritance** where other classes may derive from them. **We cannot create an instance of an abstract class**.
+![abstract class](./img/abstract-class.png)
+
+- You can't create an instance of an abstract class
+- It's used to define a pattern (methods) that must be implemented by a child class
+  ![abstract class](./img/abstract-class-1.png)
+
+  - An abstract class typically includes one or more abstract methods or property declarations. The class which extends the abstract class must define all the abstract methods.
+
+  - Usually the parent class may contain a method that uses properties that exist only in the child class, so we use `abstract` to tell Typescript that this method will be implemented in the child class
+
+    ```ts
+    abstract class Sorter {
+      // Methods that will be implemented in the child class
+      abstract compare(leftIndex: number, rightIndex: number): boolean;
+      abstract swap(leftIndex: number, rightIndex: number): void;
+      abstract length: number;
+
+      // Method that will be inherited to the child class
+      sort(): void {
+        const { length } = this;
+
+        for (let i = 0; i < length; i++) {
+          for (let j = 0; j < length - i - 1; j++) {
+            if (this.compare(j, j + 1)) {
+              this.swap(j, j + 1);
+            }
+          }
+        }
+      }
+    }
+
+    class NumbersCollection extends Sorter {
+      constructor(public data: number[]) {
+        super();
+      }
+
+      get length(): number {
+        return this.data.length;
+      }
+
+      compare(leftIndex: number, rightIndex: number): boolean {
+        return this.data[leftIndex] > this.data[rightIndex];
+      }
+
+      swap(leftIndex: number, rightIndex: number): void {
+        const leftHand = this.data[leftIndex];
+        this.data[leftIndex] = this.data[rightIndex];
+        this.data[rightIndex] = leftHand;
+      }
+    }
+
+    const numbersCollection = new NumbersCollection([50, 3, -5, 0]);
+    numbersCollection.sort(); // [ -5, 0, 3, 50 ]
+    ```
+
+- Abstract class example:
+
+  ```ts
+  abstract class APerson {
+    abstract getName(): string;
+  }
+
+  class Person extends APerson {
+    getName(): string {
+      return 'john doe';
+    }
+  }
+
+  const res = new Person();
+  console.log(res.getName());
+  ```
+
+---
+
+### Interfaces vs Abstract Classes
+
+![interface vs abstract class](./img/interface-vs-abstract-class.png)
+
+- **Abstract classes** are mainly for **inheritance** where other classes may derive from them. **We cannot create an instance of an abstract class**.
+- **Interfaces** are used to define a **contract**. Any class or struct that implements that contract must provide an implementation of the members defined in the interface.
+
+---
+
+## Promises
+
+- Promises in TypeScript take advantage of `generics`. This means we can explicitly state what type of Promise should be returned.
+
+  ```ts
+  // this async fun has a promise but doesn't return something
+  const myFunc = async (): Promise<void> => {
+    // do stuff
+  };
+  ```
 
 ---

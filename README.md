@@ -248,7 +248,8 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Security
 
-- [Security](./Security/Security.md)
+- [Security](./Security/1-Security.md)
+- [Web-Security](./Security/2-Web-Security.md)
 
 ---
 

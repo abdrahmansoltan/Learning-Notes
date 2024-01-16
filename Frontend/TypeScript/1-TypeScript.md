@@ -3,21 +3,23 @@
 - [INDEX](#index)
   - [TypeScript](#typescript)
     - [why use Typescript](#why-use-typescript)
-  - [Installing](#installing)
+  - [Installing \& Configuration](#installing--configuration)
+    - [Installation](#installation)
     - [Compiling](#compiling)
       - [Compiling one TS file](#compiling-one-ts-file)
       - [Compiling entire project with all its files](#compiling-entire-project-with-all-its-files)
+      - [Configuring the TS compiler](#configuring-the-ts-compiler)
       - [Compiling using bundlers (webpack, parcel, rollup)](#compiling-using-bundlers-webpack-parcel-rollup)
     - [Type Declarations](#type-declarations)
   - [Typing](#typing)
     - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
     - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
     - [Implicit Typing and Explicit Typing](#implicit-typing-and-explicit-typing)
-  - [Type Annotation \& Inference](#type-annotation--inference)
+  - [Type annotations vs Type inference](#type-annotations-vs-type-inference)
+    - [When to use type annotations ?](#when-to-use-type-annotations-)
   - [Type Assertions / Type Casting](#type-assertions--type-casting)
-    - [How to use Type Assertion](#how-to-use-type-assertion)
   - [Generics](#generics)
-    - [Generics Type Constraints](#generics-type-constraints)
+    - [Generics Constraints](#generics-constraints)
   - [Type Guard (Narrowing)](#type-guard-narrowing)
     - [`typeof` type guard](#typeof-type-guard)
     - [Truthiness guard](#truthiness-guard)
@@ -27,17 +29,11 @@
     - [Type Predicates](#type-predicates)
     - [Discriminated Unions](#discriminated-unions)
     - [Exhaustiveness Checks with Never](#exhaustiveness-checks-with-never)
-  - [Promises](#promises)
   - [Decorators](#decorators)
     - [Decorator configuration](#decorator-configuration)
     - [Decorator Composition](#decorator-composition)
     - [Class Decorator](#class-decorator)
   - [Namespace](#namespace)
-  - [Bundling Typescript with Webpack](#bundling-typescript-with-webpack)
-    - [For Development](#for-development)
-      - [Source Maps](#source-maps)
-    - [For Production](#for-production)
-  - [Using JS libraries with TypeScript](#using-js-libraries-with-typescript)
 
 ---
 
@@ -63,7 +59,9 @@
 
 ---
 
-## Installing
+## Installing & Configuration
+
+### Installation
 
 - [reference](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
 
@@ -80,13 +78,21 @@ npm i --save-dev @types/node  # type definitions
 
 ### Compiling
 
-Typescript doesn't run in the browser. We only use the language in our code-editor for development. Typescript only exists for the benefit of the developer.
+**Typescript doesn't run in the browser**. We only use the language in our code-editor for development. Typescript only exists for the benefit of the developer.
 
 - **Compiler:** is a piece of software that converts Typescript to Javascript so that it runs in the browser
 
 #### Compiling one TS file
 
 - `tsc` -> **TypeScript Compiler** is the command used to compile `typescript` to `javascript`
+
+- It's the way to run in using `node.js`
+
+  ```sh
+  tsc app.ts
+  ```
+
+  - It creates a new file called `app.js` that contains the compiled code
 
 - in `html` file -> always use the `.js` file and not the `.ts` file
 
@@ -127,6 +133,10 @@ Typescript doesn't run in the browser. We only use the language in our code-edit
   npm run build
   ```
 
+---
+
+#### Configuring the TS compiler
+
 - `tsconfig.json` -> This config file is also where you can tell TypeScript how strict it should be while checking your code and what to ignore. If you're moving a project to TypeScript, you can gracefully integrate TS by working with the settings in this config file.
 
 - Helpful configurations to note for in `tsconfig.json`
@@ -165,7 +175,17 @@ Typescript doesn't run in the browser. We only use the language in our code-edit
 
 #### Compiling using bundlers (webpack, parcel, rollup)
 
-- `webpack` -> is a bundler that can be used to compile TypeScript to JavaScript and use the javascript file in the `html` file instead of the `TS` file
+Here, the bundler will do the compiling for us using the script in the main HTML file
+
+```html
+<script src="src/app.ts"></script>
+
+<!-- Will be compiled to -->
+
+<script src="dist/bundle.js"></script>
+```
+
+- webpack -> is a bundler that can be used to compile TypeScript to JavaScript and use the javascript file in the `html` file instead of the `TS` file
 
   ```bash
   npm i --save-dev webpack webpack-cli webpack-dev-server typescript ts-loader
@@ -173,9 +193,11 @@ Typescript doesn't run in the browser. We only use the language in our code-edit
   npm run webpack-dev-server
   ```
 
-- `parcel`
+- parcel
 
   ```bash
+  npm i --save-dev parcel-bundler
+
   parcel index.html
   ```
 
@@ -257,7 +279,7 @@ let y = x + 'dot';
 
 ---
 
-## Type Annotation & Inference
+## Type annotations vs Type inference
 
 **Type** is an easy way to refer to the different `properties` + `functions` that a `value` has (value is anything that can be assigned to a variable)
 
@@ -265,17 +287,35 @@ let y = x + 'dot';
   ![type inference](./img/type-inference.png)
   ![type inference](./img/type-inference-1.png)
 
-- **Type annotations** vs **Type inference**
+- **Type annotations vs Type inference**
   ![type inference](./img/type-annotation-vs-inference.png)
 
   - **Type annotations** -> code we add to tell Typescript what type of value a variable will refer to (what type of value it will hold)
   - **Type inference** -> Typescript tries to figure out what type of value a variable refers to
 
-- **Note:** One situation where we shouldn't depend on type-inference and should use type-annotations, is when you declare a variable separately from initializing it **(delayed initialization)**
+### When to use type annotations ?
+
+- Function that returns the `any` type
+
+  - when we don't know what the return type of a function is, we should use type-annotation. For example `JSON.parse()` function returns `any` type, so we should use type-annotation to tell TS what type we expect to get back from it
+    ![type inference](./img/type-annotation-vs-inference-1.png)
+
+    ```ts
+    const json = '{"x": 10, "y": 20}';
+    const coordinates = JSON.parse(json); // type: any
+    console.log(coordinates); // {x: 10, y: 20}
+
+    // ----------------------------------------------
+
+    const json = '{"x": 10, "y": 20}';
+    const coordinates: { x: number; y: number } = JSON.parse(json); // type: {x: number, y: number}
+    ```
+
+- When you declare a variable separately from initializing it (declare variable in one line and initialize it later) **(delayed initialization)**
 
   ```ts
   let apples; // type: any ❌
-  let apples = 5; // type: number ✅
+  let apples = 5; // now, the type is inferred to be number ✅
 
   // ----------------------------------------------
 
@@ -286,12 +326,25 @@ let y = x + 'dot';
     }
   });
 
-  // instead use this:
+  // instead use this: ✅
   let foundLetter: string;
+  // ...
   ```
 
-  - or when we don't know what the return type of a function is, we should use type-annotation. For example `JSON.parse()` function returns `any` type, so we should use type-annotation to tell TS what type we expect to get back from it
-    ![type inference](./img/type-annotation-vs-inference-1.png)
+- When we want a variable to have a type that can't be inferred
+
+  - Usually with `union` / `or` types, because type inference doesn't will do its job but won't understand our intention
+
+    ```ts
+    const numbers = [-10, -1, 12];
+    let numberAboveZero: boolean | number = false; // type: boolean | number
+
+    numbers.forEach(number => {
+      if (number > 0) {
+        numberAboveZero = number; // type: number
+      }
+    });
+    ```
 
 ---
 
@@ -299,33 +352,36 @@ let y = x + 'dot';
 
 > Sometimes you might have more specific information about a value's type, and you want to make sure that Typescript knows it too.
 
-Type Assertions are used to tell TypeScript: (that even though TypeScript thinks it should be one type, it is actually a different type **that you want**). Common to see when a type is unknown
+**Type Assertions** are used to tell TypeScript: (that even though TypeScript thinks it should be one type, it is actually a different type **that you want**). Common to see when a type is unknown
 
-- Usually used with `unknown` or `union` types
+- It's a way to override typescript main behavior
+- Usually used with `unknown` or `union` or `enum` types
 
 > Generally, using type coercion (as Type), is a way of telling TypeScript "I know what I'm doing, so just trust me this has this type", so you generally should avoid it and let the type checker and type inference do its thing.
 
 - Type assertions helps you to force types when you are not in control of them.
   Typecasting refers to `type conversions`
 
-### How to use Type Assertion
+- **How to use Type Assertion?**
 
-- There are two ways to do type assertions
-  - `as` --> `let length: number = (lengthField as string);`
-  - `Bracket` syntax --> `let length: number = (<string>lengthField);`
-    - **Note:** it doesn't work with JSX/TSX, to fix this we add a trailing comma: `const getEl = <T,>(list: T[]):T => {}`
+  - There are two ways to do type assertions
+    - `as` --> `let length: number = (lengthField as string);`
+    - `Bracket` syntax --> `let length: number = (<string>lengthField);`
+      - **Note:** it doesn't work with JSX/TSX, to fix this we add a trailing comma: `const getEl = <T,>(list: T[]):T => {}`
 
-```ts
-const myFunc = (student: unknown): string => {
-  newStudent = student as string;
-  return newStudent;
-};
+- Example
 
-let mystery: unknown = 'Hello World';
-const numChars = (mystery as string).length;
-//or
-const numChars = (<string>mystery).length;
-```
+  ```ts
+  const myFunc = (student: unknown): string => {
+    newStudent = student as string;
+    return newStudent;
+  };
+
+  let mystery: unknown = 'Hello World';
+  const numChars = (mystery as string).length;
+  //or
+  const numChars = (<string>mystery).length;
+  ```
 
 ---
 
@@ -333,12 +389,13 @@ const numChars = (<string>mystery).length;
 
 A generic is a way to write a function that is reusable across different types, by using **type parameters**
 
-- They allow us to define reusable functions and classes that work with multiple types rather than a single type
-- "generic" means **not specific** (we don't know this type but we will know it as soon as we invoke the function)
+> "generic" means **not specific** (we don't know this type but we will know it as soon as we invoke the function)
 
-> **type parameters**: can be thought of as **function arguments, but for types**
->
-> - Functions may return different values, depending on the arguments you pass them.
+![generics](./img/generics.png)
+
+- They allow us to define reusable functions and classes that work with multiple types rather than a single type
+
+  - Functions may return different values, depending on the arguments you pass them.
 
 - why not just use `any` type?
 
@@ -349,34 +406,55 @@ A generic is a way to write a function that is reusable across different types, 
   - Using a `generic` means a number goes in and a number comes out or a string goes in and a string comes out.
   - `Generics` introduce the `Type Variable`
     - Rather than being a variable that accepts values, it's a variable that accepts types and is denoted with angle brackets myFunc`<T>`
-    - it help us write more reusable and generic :) functions
+    - it help us write more reusable and generic functions
 
-> **Note:** when calling a generic function, we don't need to specify the generic-type when invoking it (because of type inference), but in some cases like with DOM elements we might need to
+- It's similar to how arguments work in functions for reusability
 
-```ts
-// Typed Function that deals only with numbers
-const getItem = (arr: number[]): number => {
-  return arr[1];
-};
-// we can work around it and use union type like this:
-const getItem = (arr: (number | string)[]): number | string => {
-  return arr[1];
-};
+  ```ts
+  // bad ❌
+  const addOne = (a: number): number => {
+    return a + 1;
+  };
+  const addTwo = (a: number): number => {
+    return a + 2;
+  };
 
-// --------------------------------------------------------------
+  // good ✅
+  const add = (a: number, b: number): number => {
+    return a + b;
+  };
+  ```
 
-// Using Generics
-const getItem = <T>(arr: T[]): T => {
-  return arr[1];
-};
-// calling it
-getItem([1, 2, 3]); // ✅ -> because of type inference
-getItem<number>([1, 2, 3]); // ✅
-```
+  - Here, we can pass any type of number and it will work
+  - We can do the same with generics, as **it customizes the type of the function to whatever we pass in**
 
-In the first function, we have a function that takes in a number array and outputs the second number of the array. But what if we don't want to work with numbers? What if we want to work with strings? Well, we would need to create a second function. Or, we can use a generic, and whatever type we use when we call the function will translate to its return as well.
+- Example 1️⃣
 
-- another example
+  ```ts
+  // Typed Function that deals only with numbers
+  const getItem = (arr: number[]): number => {
+    return arr[1];
+  };
+  // we can work around it and use union type like this:
+  const getItem = (arr: (number | string)[]): number | string => {
+    return arr[1];
+  };
+
+  // --------------------------------------------------------------
+
+  // Using Generics
+  const getItem = <T>(arr: T[]): T => {
+    return arr[1];
+  };
+  // calling it
+  getItem([1, 2, 3]); // ✅ -> because of type inference (TS knows that we are passing a number array)
+  getItem<number>([1, 2, 3]); // ✅
+  getItem<string>(['1', '2', '3']); // ✅
+  ```
+
+  - In the first function, we have a function that takes in a number array and outputs the second number of the array. But what if we don't want to work with numbers? What if we want to work with strings? Well, we would need to create a second function. Or, we can use a generic, and whatever type we use when we call the function will translate to its return as well.
+
+- Example 2️⃣
 
   ```ts
   // function takes object that contains certain type(T) and another object that contains certain type(U)
@@ -390,33 +468,50 @@ In the first function, we have a function that takes in a number array and outpu
   console.log(mergedObj);
   ```
 
-**Generics Notes:**
-
-- DOM query selector methods are generic function, and that's why we can use generic type with them
+- Example 3️⃣
 
   ```ts
-  const input = document.querySelector<HTMLInputElement>('todo-input')!;
-  ```
+  // Generic Class
+  class DataStorage<T> {
+    data: T[] = [];
 
-- generics can be used with multiple types:
-
-  ```ts
-  function merge<T, U>(obj1: T, obj2: U) {
-    return { ...obj1, ...obj2 };
+    // also we can use it with methods
+    addItem(item: T) {
+      this.data.push(item);
+    }
   }
+
+  const textStorage = new DataStorage<string>();
   ```
 
-- A default type can be defined on a generic parameter as follows:
+- **Generics Notes:**
 
-  ```ts
-  <T = DefaultType>
-  ```
+  - When calling a generic function, we don't need to specify the generic-type when invoking it (because of type inference), but in some cases like with DOM elements we might need to
+  - DOM query selector methods are generic function, and that's why we can use generic type with them
+
+    ```ts
+    const input = document.querySelector<HTMLInputElement>('todo-input')!;
+    ```
+
+  - generics can be used with multiple types:
+
+    ```ts
+    function merge<T, U>(obj1: T, obj2: U) {
+      return { ...obj1, ...obj2 };
+    }
+    ```
+
+  - A default type can be defined on a generic parameter as follows:
+
+    ```ts
+    <T = DefaultType>
+    ```
 
 ---
 
-### Generics Type Constraints
+### Generics Constraints
 
-- You may sometimes want to write a generic function that works on a set of types where you have some knowledge about what capabilities that set of types will have. like `array` to be able to access the `.length` property, but the compiler could not prove that every type had a `.length` property, so it warns us that we can’t make this assumption.
+- Generic functions can operate on types with known properties, like `.length` for arrays. However, the compiler can't confirm that all types have these properties, leading to warnings.
 
   ```ts
   function logLength<T>(arg: T): T {
@@ -427,9 +522,9 @@ In the first function, we have a function that takes in a number array and outpu
   logLength(235); // ❌ Property 'length' does not exist on type 'number'.
   ```
 
-- Instead of working with `any` and `all` types, we’d like to constrain this function to work with `any` and `all` types that also have the `.length` property. As long as the type has this member, we’ll allow it, but it’s required to have at least this member. To do so, we must list our requirement as a constraint on what Type can be.
+- We want to restrict the function to types that have a `.length` property. This requirement is a constraint on the type.
 
-  - To do so, we’ll extend an interface that has the `length` property like `array`, then we’ll use this `interface` and the extends keyword to denote our constraint:
+  - To do so, we’ll extend an interface that has the `length` property like `array`, then we'll use this `interface` and the extends keyword to denote our constraint:
 
     ```ts
     function logLength<T extends Array>(arg: T): T {
@@ -437,7 +532,8 @@ In the first function, we have a function that takes in a number array and outpu
       return arg;
     }
 
-    logLength(235); // ✅
+    logLength(235); // ❌ Property 'length' does not exist on type 'number'.
+    logLength([1, 2, 3]); // ✅
     ```
 
 ---
@@ -454,7 +550,7 @@ In the first function, we have a function that takes in a number array and outpu
   - [`in` operator narrowing](#in-operator-narrowing)
   - [`instanceof` Narrowing](#instanceof-narrowing)
 
-- Better approach is to create interfaces for each type and use them in the type-guard
+- Better approach is to create interfaces for each type and use them in the type-guard by checking one of the methods above
 
   ```ts
   interface NumbersCollection {
@@ -488,12 +584,11 @@ In the first function, we have a function that takes in a number array and outpu
 
 ### `typeof` type guard
 
-- Usually used with union-types, as since they allow for multiple types for a value, It's good to check what came through before working with it.
 - it control the flow of code using the type of something
-- this process is called **Narrowing**
-  - as it narrows our choice with the type-guard condition
+- this process is called **Narrowing**, as it narrows our choice with the type-guard condition
 - usually used with [unknown type](./2-TS-Types.md#unknown----type-guard) or [Union Types](./2-TS-Types.md#union-types)
-- difference between `typeof` and `instanceof` is that `typeof` is used with primitive types and `instanceof` is used with objects
+  - since they allow for multiple types for a value, It's good to check what came through before working with it.
+- **Note:** difference between `typeof` and `instanceof` is that `typeof` is used with primitive types and `instanceof` is used with (objects or classes)
   ![type narrowing](./img/type-narrowing.png)
 
 ```ts
@@ -611,19 +706,6 @@ The concept here is that we add a **"discriminant"** which is just a property th
 ### Exhaustiveness Checks with Never
 
 It's the default thing to do when all the type-narrowing checks are all passed and this is the last check, and it's like: "we should never make it here, if we handled all cases correctly"
-
----
-
-## Promises
-
-- Promises in TypeScript take advantage of `generics`. This means we can explicitly state what type of Promise should be returned.
-
-  ```ts
-  // this async fun has a promise but doesn't return something
-  const myFunc = async (): Promise<void> => {
-    // do stuff
-  };
-  ```
 
 ---
 
@@ -749,124 +831,3 @@ Typescript has its own module-format called "namespaces" which is pre-dates the 
 - It's somehow deprecated, as the majority of the features in namespaces exists in ES-Modules now
 
 ---
-
-## Bundling Typescript with Webpack
-
-```bash
-npm install webpack webpack-cli webpack-dev-server typescript ts-loader --save-dev
-```
-
-### For Development
-
-- in `package.json` add this script :
-
-  ```json
-  "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack"
-    },
-  ```
-
-- For `development` --> create `webpack.config.js` file that contains this :
-
-  ```js
-  const path = require('path');
-
-  module.exports = {
-    mode: 'development',
-    entry: './src/app.ts',
-    output: {
-      filename: 'bundle.js',
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: 'dist'
-    },
-
-    // this part is for Adding TypeScript Support with the ts-loader Package
-
-    devtool: 'inline-source-map',
-    module: {
-      rules: [
-        {
-          test: /\.tsx?$/, // regular expression
-          use: 'ts-loader',
-          exclude: /node_modules/
-        }
-      ]
-    },
-    resolve: {
-      extensions: ['.ts', '.tsx', '.js']
-    }
-  };
-  ```
-
----
-
-#### Source Maps
-
-Source Maps take the minified bundle and map it backwards to its pre-built state so that we can see where the actual code is coming from that makes up the bundle, in case we want to debug it
-
-Guide [here](https://webpack.js.org/guides/typescript/#source-maps)
-
----
-
-### For Production
-
-- in `package.json` add this script :
-
-  ```json
-  "scripts": {
-    "start": "webpack-dev-server",
-    "build": "webpack --config webpack.config.prod.js"
-    },
-  ```
-
-- install `clean-webpack-plugin` package to clean the `dist` folder whenever we **rebuild** the project
-
-```bash
-npm i --save-dev clean-webpack-plugin
-```
-
-- For `Production` --> create `webpack.config.prod.js` file that contains this :
-
-  ```js
-  const path = require('path');
-  const CleanPlugin = require('clean-webpack-plugin');
-
-  module.exports = {
-    mode: 'production',
-    entry: './src/app.ts',
-    output: {
-      filename: 'bundle.js',
-      path: path.resolve(__dirname, 'dist')
-    },
-    devtool: 'none',
-    module: {
-      rules: [
-        {
-          test: /\.ts$/,
-          use: 'ts-loader',
-          exclude: /node_modules/
-        }
-      ]
-    },
-    resolve: {
-      extensions: ['.ts', '.js']
-    },
-    plugins: [new CleanPlugin.CleanWebpackPlugin()]
-  };
-  ```
-
----
-
-## Using JS libraries with TypeScript
-
-To be able to work with JS libraries in TS, we need to have a **"Type Declaration File"** for that library. This file will contain all the type information for the library, so that TypeScript can understand what the library is doing.
-
-- Type definition files have the extension `.d.ts`
-- if a library doesn't have type-declaration files like `lodash`, we can install the corresponding `@types` package externally
-
-  ```sh
-  npm i --save-dev @types/lodash
-  ```
-
-- the `@type` is from a github repo -> [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)

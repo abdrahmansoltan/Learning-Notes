@@ -5,13 +5,14 @@
   - [Injections](#injections)
     - [SQL Injection](#sql-injection)
     - [Cross-site scripting (XSS)](#cross-site-scripting-xss)
+      - [Stored XSS](#stored-xss)
+      - [How to find and test for XSS vulnerabilities](#how-to-find-and-test-for-xss-vulnerabilities)
     - [Cross-site request forgery (CSRF)](#cross-site-request-forgery-csrf)
   - [3rd party libraries](#3rd-party-libraries)
   - [Logging](#logging)
   - [HTTPS \& Secure Headers](#https--secure-headers)
     - [Security concerns in using HTTP](#security-concerns-in-using-http)
     - [HTTPS for security](#https-for-security)
-  - [Content Security Policy (CSP)](#content-security-policy-csp)
   - [Distributed Denial of Service (DDoS)](#distributed-denial-of-service-ddos)
   - [Code Secrets](#code-secrets)
   - [Access Control](#access-control)
@@ -131,6 +132,27 @@ Cross-site scripting (`XSS`) is a type of security vulnerability typically found
 
   - Escape the user input. by using escape characters to prevent the browser from interpreting the input as HTML.
     - ex: `&lt;` instead of `<`.
+
+#### Stored XSS
+
+- It occurs when a malicious script is injected directly into a vulnerable web application. Reflected XSS involves the reflecting of a malicious script off of a web application, onto a user's browser
+- It's called like that because the attack is stored in the database
+  - Ex: shop item name was entered as a malicious script, and it will be displayed(run) to other users in the shop items list page
+
+#### How to find and test for XSS vulnerabilities
+
+- The vast majority of XSS vulnerabilities can be found quickly and reliably using [Burp Suite's web vulnerability scanner](https://portswigger.net/burp/vulnerability-scanner).
+
+- XSS Protection with Imperva Application Security
+  - Imperva provides advanced protection against cross site scripting, using its web application firewall (WAF), a cloud-based solution that permits legitimate traffic and prevents bad traffic, safeguarding applications at the edge.
+  - In addition to XSS protection, Imperva provides multi-layered protection to make sure websites and applications are available, easily accessible and safe. The Imperva application security solution includes:
+    - `DDoS Protection` — maintain uptime in all situations. Prevent any type of DDoS attack, of any size, from preventing access to your website and network infrastructure.
+    - `CDN` — enhance website performance and reduce bandwidth costs with a CDN designed for developers. Cache static resources at the edge while accelerating APIs and dynamic websites.
+    - `Bot management` — analyzes your bot traffic to pinpoint anomalies, identifies bad bot behavior and validates it via challenge mechanisms that do not impact user traffic.
+    - `API security`— protects APIs by ensuring only desired traffic can access your API endpoint, as well as detecting and blocking exploits of vulnerabilities.
+    - `Account takeover protection` — uses an intent-based detection process to identify and defends against attempts to take over users’ accounts for malicious purposes.
+    - `RASP` — keep your applications safe from within against known and zero‑day attacks. Fast and accurate protection with no signature or learning mode.
+    - `Attack analytics` — mitigate and respond to real security threats efficiently and accurately with actionable intelligence across all your layers of defense.
 
 ---
 
@@ -287,47 +309,6 @@ The `HTTP` protocol is not secure. because it sends the data in plain text. so a
   > This is done to give users more privacy and security.
 
 - Also, by using `HTTPS`, you can use `HTTP/2` and `HTTP/3` which are faster than `HTTP/1.1` ⚡️.
-
----
-
-## Content Security Policy (CSP)
-
-**Content Security Policy (CSP)** is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross-Site Scripting (XSS) and data injection attacks
-
-- Browsers that don't support it still work with servers that implement it, and vice versa: browsers that don't support CSP ignore it, functioning as usual, defaulting to the standard same-origin policy for web content. If the site doesn't offer the CSP header, browsers likewise use the standard same-origin policy.
-- To enable CSP, you need to configure your web server to return the `Content-Security-Policy` HTTP header.
-
-  - Alternatively, the `<meta>` element can be used to configure a policy, for example:
-
-    ```html
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src https://*; child-src 'none';"
-    />
-    ```
-
-- Configuring Content Security **Policy** involves adding the `Content-Security-Policy` HTTP header to a web page and giving it values to control what resources the user agent is allowed to load for that page.
-
-  - For example, a page that uploads and displays images could allow images from anywhere, but restrict a form action to a specific endpoint. A properly designed Content Security Policy helps protect a page against a cross-site scripting attack.
-
-- **Writing a policy**
-
-  - A policy is described using a series of policy directives, each of which describes the policy for a certain resource type or policy area.
-  - A policy needs to include a **default-src** or **script-src** directive to prevent inline scripts from running, as well as blocking the use of `eval()`.
-  - A policy needs to include a **default-src** or **style-src** directive to restrict inline styles from being applied from a `<style>` element or a `style attribute`.
-
-  ```js
-  // wants all content to come from the site's own origin (this excludes subdomains.)
-  Content-Security-Policy: default-src 'self'
-
-  // wants to allow content from a trusted domain and all its subdomains (it doesn't have to be the same domain that the CSP is set on.)
-  Content-Security-Policy: default-src 'self' example.com *.example.com
-
-  // wants to allow users of a web application to include images from any origin in their own content, but to restrict audio or video media to trusted providers, and all scripts only to a specific server that hosts trusted code.
-  Content-Security-Policy: default-src 'self'; img-src *; media-src example.org example.net; script-src userscripts.example.com
-  ```
-
-> For more info & examples -> [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 
 ---
 
