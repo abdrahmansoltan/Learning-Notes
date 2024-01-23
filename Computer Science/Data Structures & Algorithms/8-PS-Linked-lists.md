@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Tips](#tips)
   - [Fast \& Slow Pointer](#fast--slow-pointer)
+    - [Middle of the Linked List](#middle-of-the-linked-list)
     - [Linked List Cycle](#linked-list-cycle)
     - [Linked List Cycle Length](#linked-list-cycle-length)
     - [Linked List Cycle II](#linked-list-cycle-ii)
@@ -10,6 +11,7 @@
     - [Palindrome Linked List](#palindrome-linked-list)
     - [Reorder List](#reorder-list)
     - [Maximum Twin Sum of a Linked List](#maximum-twin-sum-of-a-linked-list)
+    - [Remove Nth Node From End of List](#remove-nth-node-from-end-of-list)
   - [Singly Linked List](#singly-linked-list)
     - [Remove Linked List Elements](#remove-linked-list-elements)
     - [Reverse a Linked List](#reverse-a-linked-list)
@@ -17,9 +19,6 @@
     - [Reverse Nodes in k-Group](#reverse-nodes-in-k-group)
     - [Reverse alternating K-element Sub-list](#reverse-alternating-k-element-sub-list)
     - [Rotate List](#rotate-list)
-    - [Middle Point of a Linked List](#middle-point-of-a-linked-list)
-    - [Circular Linked List](#circular-linked-list)
-    - [From Last](#from-last)
     - [Merge Two Sorted Linked Lists](#merge-two-sorted-linked-lists)
   - [Doubly Linked List](#doubly-linked-list)
     - [Design Browser History](#design-browser-history)
@@ -47,26 +46,34 @@
 
 ## Fast & Slow Pointer
 
-It's a technique that uses two pointers to traverse the list at different speeds (`slow` and `fast`). This technique is useful for solving problems involving cycles in linked lists.
+### Middle of the Linked List
+
+| Video Solution                                                | Hint                                                           |
+| ------------------------------------------------------------- | -------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=A2_ldqM4QcY) | Use **fast and slow pointers** to find the middle of the list. |
+
+Write a function that accepts a linked list and returns the middle node in the list. If the list has an even number of elements, return the node at the end of the first half of the list. **Do not use a counter variable**, **do not retrieve the size of the list**, and **only iterate through the list one time**.
+
+- EX: `1 -> 2 -> 3 -> 4 -> 5` --> `3`
+- **Steps:**
+  ![linked list midpoint](./img/linked-list-midpoint.webp)
+  1. create 2 variables: `slow` and `fast`
+  2. `slow` and `fast` starts at the head
+  3. `slow` moves **1 step** at a time, `fast` moves **2 steps** at a time
+  4. when `fast` reaches the end of the list, `slow` will be at the middle node
 
 ```py
-slow = head
-fast = head
+def middle_point(head):
+    slow = fast = head
 
-while fast and fast.next:
-    slow = slow.next
-    fast = fast.next.next
-
-# now `slow` is at the middle of the list, and `fast` is at the end of the list
+    # check if there're 2 next nodes ahead of `fast`
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow
 ```
 
-- **Floyd's tortoise and hare algorithm**
-  - It's a cycle detection algorithm that uses two pointers to traverse the list at different speeds. It's a solution that doesn't require extra space (space to store the nodes that have been visited).
-    - "tortoise" 🐢 -> moves 1 step at a time (Slow)
-    - "hare" 🐰 -> moves 2 steps at a time (Fast)
-  - We can use two pointers, `fast` and `slow`. The `fast` pointer moves two steps at a time while the `slow` pointer moves one step. If the list has a cycle, the `fast` pointer will eventually meet the `slow` pointer.
-    ![linked list cycle](./img/linked-list-cycle-2.png)
-- This approach is quite useful when dealing with **cyclic** LinkedLists or arrays.
+---
 
 ### Linked List Cycle
 
@@ -196,7 +203,7 @@ def detectCycle(self, head: ListNode) -> ListNode:
         if slow == fast:
             break
 
-    # if there's no cycle
+    # if there's no cycle -> IMPORTANT ⚠️
     if not fast or not fast.next:
         return None
 
@@ -211,6 +218,10 @@ def detectCycle(self, head: ListNode) -> ListNode:
 ---
 
 ### Happy Number
+
+| Video Solution                                                | Hint                                                                                                                                                                                         |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ljz85bxOYJ0) | Use **fast and slow pointers** to exit when you find a cycle. If the cycle is at value `1`, return `True`. Otherwise, return `False`. Move calculation of square sum to a separate function. |
 
 Write an algorithm to determine if a number `n` is happy. A **happy number** is a number defined by the following process:
 
@@ -228,6 +239,7 @@ Write an algorithm to determine if a number `n` is happy. A **happy number** is 
     - `1^2 + 0^2 = 1` --> `true`
 
 - Solution 1: Using "Slow and Fast" pointers ✅
+  ![happy number](./img/happy-number-1.png)
 
   - **Time Complexity:** `O(log(n))`
   - **Space Complexity:** `O(1)
@@ -235,7 +247,7 @@ Write an algorithm to determine if a number `n` is happy. A **happy number** is 
     ```py
     def isHappy(self, n: int) -> bool:
         slow = fast = n
-        while True:
+        while True: # because it's given that a cycle will always be there
             slow = self.calculateSquareSum(slow)
             fast = self.calculateSquareSum(self.calculateSquareSum(fast))
             if slow == fast:
@@ -277,6 +289,10 @@ Write an algorithm to determine if a number `n` is happy. A **happy number** is 
 
 ### Palindrome Linked List
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=yOzXms1J6Nk) | Use **fast and slow pointers** to find the middle of the list. Then, reverse the second half of the list. Finally, compare the first half with the reversed second half to see if the linked list is a palindrome. **OR** just append the values of the list to an array and check if the array is a palindrome. |
+
 Given the `head` of a singly linked list, return `true` if it is a palindrome.
 
 - EX:
@@ -285,38 +301,58 @@ Given the `head` of a singly linked list, return `true` if it is a palindrome.
   - Output: `true`
   - Explanation: The first and last nodes of the list are 1. The second and second to last nodes are 2. Since each of these pairs are equal, we return true.
 
-- Explanation:
-  1. First, we find the middle of the linked list using the `fast` and `slow` pointers.
-  2. Then, we reverse the second half of the linked list.
-  3. Finally, we compare the first half with the reversed second half to see if the linked list is a palindrome.
+- **Solution 1**: Fast and Slow Pointers
 
-```py
-def isPalindrome(self, head: ListNode) -> bool:
-    slow = fast = head
-    while fast and fast.next:
-        slow = slow.next
-        fast = fast.next.next
+  - First, we find the middle of the linked list using the `fast` and `slow` pointers.
+  - Then, we reverse the second half of the linked list.
+  - Finally, we compare the first half with the reversed second half to see if the linked list is a palindrome.
+  - Time Complexity: `O(n)`, Space Complexity: `O(1)`
 
-    # reverse the second half
-    prev = None
-    while slow:
-        nextNode = slow.next
-        slow.next = prev
-        prev = slow
-        slow = nextNode
+  ```py
+  def isPalindrome(self, head: ListNode) -> bool:
+      slow = fast = head
+      while fast and fast.next:
+          slow = slow.next
+          fast = fast.next.next
 
-    # compare the first and second half
-    while prev:
-        if prev.val != head.val:
-            return False
-        prev = prev.next
-        head = head.next
-    return True
-```
+      # reverse the second half
+      prev = None
+      while slow:
+          nextNode = slow.next
+          slow.next = prev
+          prev = slow
+          slow = nextNode
+
+      # compare the values in the 2 halves
+      while prev:
+          if prev.val != head.val:
+              return False
+          prev = prev.next
+          head = head.next
+      return True
+  ```
+
+- Solution 2: Using an array
+
+  - Time Complexity: `O(n)`, Space Complexity: `O(n)`
+
+  ```py
+  def isPalindrome(self, head: ListNode) -> bool:
+      arr = []
+      curr = head
+      while curr:
+          arr.append(curr.val)
+          curr = curr.next
+      return arr == arr[::-1]
+  ```
 
 ---
 
 ### Reorder List
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=S5bfdUTrKLM) | Use **fast and slow pointers** to find the middle of the list. Then, disconnect the second half of the list and reverse it. Finally, merge the two halves of the list by alternating the nodes. **OR** just append the values of the list to an array and reorder the nodes of the list using the array. |
 
 Given a singly linked list `L: L0 -> L1 -> ... -> Ln-1 -> Ln`, reorder it to: `L0 -> Ln -> L1 -> Ln-1 -> L2 -> Ln-2 -> ...`
 ![reorder list](./img/reorder-list-1.jpg)
@@ -367,11 +403,17 @@ def reorder_list(head):
       # update pointers
       head1 = head1_next
       head2 = head2_next
+
+    # if needed to explicitly return, create a dummy node at first and return its next
 ```
 
 ---
 
 ### Maximum Twin Sum of a Linked List
+
+| Video Solution                                                | Hint                                                                                                                                                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=doj95MelfSA) | Use **fast and slow pointers** to find the middle of the list. Then, reverse the second half of the list. Finally, Loop through the first half and second half of the list and find the maximum twin sum. |
 
 Given a singly linked list, return the maximum twin sum of the given linked list.
 
@@ -397,11 +439,54 @@ def maxTwinSum(self, head: ListNode) -> int:
 
     # compare the first and second half
     maxSum = 0
-    while prev:
-        maxSum = max(maxSum, prev.val + head.val)
-        prev = prev.next
+    head2 = prev
+    while head2:
+        maxSum = max(maxSum, head.val + head2.val)
         head = head.next
+        head2 = head2.next
     return maxSum
+```
+
+---
+
+### Remove Nth Node From End of List
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=XVuQxVej6y8) | Move `fast` `n` steps ahead of `slow`. Then, move `slow` and `fast` until `fast` reaches the end of the list. Remove the `nth` node from the end of the list by setting `slow.next` to `slow.next.next`. Return the next node of the dummy node (head). |
+
+Given the `head` of a linked list, remove the `nth` node from the end of the list and return its head.
+
+- EX:
+  ![remove-nth-node-from-end-of-list](./img/remove-nth-node-from-end-of-list-1.jpeg)
+
+  - input: `1 -> 2 -> 3 -> 4 -> 5`, `n = 2`
+  - output: `1 -> 2 -> 3 -> 5`
+
+- **Steps:**
+  1. create 2 variables: `slow` and `fast`
+  2. `slow` and `fast` starts at the head
+  3. `fast` moves `n` steps ahead of `slow`, so that `fast` is `n` spaces ahead of `slow`
+  4. when `fast` reaches the end of the list, `slow` will be at the node `n` spaces from the last node
+
+```py
+def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
+    dummy = ListNode(0, head)
+    slow = fast = dummy
+
+    # move `fast` `n` steps ahead of `slow`
+    for _ in range(n):
+        fast = fast.next
+    # move `slow` and `fast` until `fast` reaches the end of the list
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next
+
+    # remove the nth node from the end of the list
+    slow.next = slow.next.next
+
+    # return the next node of the dummy node
+    return dummy.next
 ```
 
 ---
@@ -441,9 +526,9 @@ def removeElements(self, head: ListNode, val: int) -> ListNode:
 
 ### Reverse a Linked List
 
-| Video Solution                                                | Hint                                                                           |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=G0_I-ZF0S38) | Use **3 pointers** (`prev`, `curr`, and `nextNode`) to reverse the linked list |
+| Video Solution                                                | Hint                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=G0_I-ZF0S38) | Use **3 pointers** (`prev`, `curr`, and `nextNode`) to reverse the linked list. Return the `prev` node, which is the new head of the list. |
 
 Write a function that accepts a linked list and reverses it in place.
 
@@ -527,6 +612,30 @@ def reverseBetween(self, head: ListNode, left: int, right: int) -> ListNode:
     # 3. connect the reversed nodes to the rest of the list
     leftPrev.next = start # connect the node at position `left - 1` to the node at position `right`
     tail.next = cur # connect the node at position `left` to the node at position `right + 1`
+
+    return dummy.next
+
+# -------------------------------------------------
+
+# Another approach using different varibale names
+def reverseBetween(self, head: ListNode, left: int, right: int) -> ListNode:
+    if left == right: return head
+    dummy = ListNode(0, head)
+    leftPrev, cur = dummy, head
+    for _ in range(left-1):
+        leftPrev = leftPrev.next
+        cur = cur.next
+
+    futureEnd = cur # connect it to rightNext later
+    prev = None
+    for _ in range(right-left + 1):
+        nxt = cur.next
+        cur.next = prev
+        prev = cur
+        cur = nxt
+    # now prev is the start and cur is the rightNext
+    leftPrev.next = prev
+    futureEnd.next = cur
 
     return dummy.next
 ```
@@ -646,7 +755,9 @@ def reverse_alternate_k_elements(head, k):
 
 ### Rotate List
 
-// TODO: watch neetcode video
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=UcGtPs2LE_c) | Use **fast and slow pointers** to find the length of the list. Then, connect the last node to the first node to make it a circular list. Then, find the last node of the new list to rotate. Break the link between the last node of the new list and the first node of the new list. Return the new head. |
 
 Given the `head` of a linked list, rotate the list to the right by `k` places.
 
@@ -658,149 +769,51 @@ Given the `head` of a linked list, rotate the list to the right by `k` places.
 
 - Explanation:
   - **Step 1:** Connect the last node of the LinkedList to the `head`, because the list will have a different `tail` after the rotation.
+    ![rotate-list](./img/rotate-list-2.png)
   - **Step 2:** The new `head` of the LinkedList will be the node at the beginning of the `sub-list`.
   - **Step 3:** The node right before the start of `sub-list` will be the new `tail` of the rotated LinkedList.
+  - Notes:
+    - We need to handle cases where we rotate more than one round of the list (when `k` is greater than the length of the list)
+      - We need to find the length of the list to rotate
+      - `k = k % length` to handle cases where `k` is greater than the length of the list
 
 ```py
 def rotateRight(self, head: ListNode, k: int) -> ListNode:
-    if not head or not head.next or k == 0:
+    if not head:
         return head
 
     # find the length of the list
     length = 1
-    lastNode = head
-    while lastNode.next:
-        lastNode = lastNode.next
+    tail = head
+    while tail.next:
+        tail = tail.next
         length += 1
 
-    # connect the last node to the first node to make it a circular list
-    lastNode.next = head
-
     # find the length of the new list to rotate
-    k = k % length
+    k = k % length # to handle cases where `k` is greater than the length of the list (rotate more than 1 round of the list)
+    if k == 0:
+        return head # no need to rotate
     skipLength = length - k
 
-    # find the last node of the new list
-    last_node_of_rotated_list = head
+    # move to the pivot and rotate
+    cur = head
     for _ in range(skipLength - 1):
-        last_node_of_rotated_list = last_node_of_rotated_list.next
-    # now, `last_node_of_rotated_list` is at the last node of the new list
-
-    # break the link between the last node of the new list and the first node of the new list
-    head = last_node_of_rotated_list.next
-    last_node_of_rotated_list.next = None
-    return head
+        cur = cur.next
+    newHead = cur.next
+    cur.next = None # break the link between the new tail and the new head
+    tail.next = head # connect the last node to the first node to make it a circular list
+    return newHead
 ```
 
----
-
-### Middle Point of a Linked List
-
-Write a function that accepts a linked list and returns the middle node in the list. If the list has an even number of elements, return the node at the end of the first half of the list. **Do not use a counter variable**, **do not retrieve the size of the list**, and **only iterate through the list one time**.
-
-- EX: `1 -> 2 -> 3 -> 4 -> 5` --> `3`
-- **Steps:**
-  ![linked list midpoint](./img/linked-list-midpoint.webp)
-  1. create 2 variables: `slow` and `fast`
-  2. `slow` and `fast` starts at the head
-  3. `slow` moves **1 step** at a time, `fast` moves **2 steps** at a time
-  4. when `fast` reaches the end of the list, `slow` will be at the middle node
-
-```py
-def middle_point(head):
-    slow = head
-    fast = head
-
-    # check if there're 2 next nodes ahead of `fast`
-    while fast and fast.next:
-        slow = slow.next
-        fast = fast.next.next
-    return slow
-```
-
----
-
-### Circular Linked List
-
-Write a function that accepts a linked list and returns true if the linked list contains a **circular reference**.
-
-> Circular Linked List is a linked list where a node's next point actually points back to a previous node in the list.
-
-- EX: `1 -> 2 -> 3 -> 4 -> 5` --> `5.next = 2` --> `True`
-- **Steps:**
-  ![circular linked list](./img/circular-linked-list-1.png)
-  1. create 2 variables: `slow` and `fast`
-  2. `slow` and `fast` starts at the head
-  3. `slow` moves **1 step** at a time, `fast` moves **2 steps** at a time
-  4. if `slow` and `fast` ever meet, then there's a circular reference
-
-```py
-def circular_linked_list(head):
-    slow = head
-    fast = head
-
-    # check if there're 2 next nodes ahead of `fast`
-    while fast and fast.next:
-        slow = slow.next
-        fast = fast.next.next
-        # if `slow` and `fast` ever meet, then there's a circular reference
-        if slow == fast:
-            return True
-    return False
-```
-
----
-
-### From Last
-
-Write a function that accepts a linked list and a number `n`. The function should return the node `n` spaces from the last node in the list. Do not call the `size` method of the linked list. Assume that `n` will always be less than the length of the list.
-
-- EX: `1 -> 2 -> 3 -> 4 -> 5`, `n = 2` --> `3`
-- **Steps:**
-  1. create 2 variables: `slow` and `fast`
-  2. `slow` and `fast` starts at the head
-  3. `fast` moves `n` steps ahead of `slow`, so that `fast` is `n` spaces ahead of `slow`
-  4. when `fast` reaches the end of the list, `slow` will be at the node `n` spaces from the last node
-
-```py
-def from_last(head, n):
-    slow = head
-    fast = head
-
-    # move `fast` `n` steps ahead of `slow`
-    while n > 0:
-        fast = fast.next
-        n -= 1
-
-    # move `slow` and `fast` at the same pace
-    while fast.next:
-        slow = slow.next
-        fast = fast.next
-    return slow
-
-# -------------------------------------------------
-# Remove nth node from the end of a linked list (same Idea)
-# Create two pointers, slow and fast
-def removeNthFromEnd(head, n):
-    slow = fast = head
-    # Move fast pointer n nodes ahead
-    for i in range(n):
-        fast = fast.next
-    # If fast pointer is None, remove the head
-    if not fast:
-        return head.next
-    # Move both pointers until fast pointer reaches the end
-    while fast.next:
-        slow = slow.next
-        fast = fast.next
-    # Remove the nth node by updating previous node's nex   pointer
-    slow.next = slow.next.next
-    return head
-```
+- Time Complexity: `O(n)`, Space Complexity: `O(1)`
 
 ---
 
 ### Merge Two Sorted Linked Lists
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=XIdigk956u0) | Use a dummy node as a starting point. Use a `curr` pointer to traverse the two lists. Compare the values of the current nodes pointed to by `l1` and `l2`. You append the node with the smaller value to the `curr.next` pointer, then advance the pointer of the list from which the smaller value was appended. Finally, you return the `head` of the merged sorted list. |
 
 Write a function that accepts two sorted linked lists and returns a new linked list containing the combined sorted values from both lists.
 
@@ -918,7 +931,15 @@ Implement the `BrowserHistory` class:
           return self.cur.val
   ```
 
-- **Solution 2: Array (Better ✅)**
+- **Solution 2: Array**
+
+  - we can use an array to store the pages in the history and a pointer to store the current page
+  - we can use a variable to store the number of pages in the history
+  - Time Complexity:
+    - `visit`: `O(1)`
+    - `back`: `O(n)`
+    - `forward`: `O(n)`
+  - Space Complexity: `O(n)`
 
   ```py
   class BrowserHistory:
@@ -990,9 +1011,6 @@ Given the `head` of a multilevel doubly linked list, **flatten** the list so tha
 
       while stack:
           curr = stack.pop()
-          # connect the current node to the previous node
-          prev.next = curr
-          curr.prev = prev
 
           if curr.next:
               stack.append(curr.next)
@@ -1000,6 +1018,9 @@ Given the `head` of a multilevel doubly linked list, **flatten** the list so tha
               stack.append(curr.child)
               curr.child = None # set the child node to None
 
+          # connect the current node to the previous node
+          prev.next = curr
+          curr.prev = prev
           # update the previous node
           prev = curr
 

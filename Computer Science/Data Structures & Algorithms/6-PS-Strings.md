@@ -10,15 +10,15 @@
   - [Substring (Sliding Window)](#substring-sliding-window)
     - [Longest Substring Without Repeating Characters](#longest-substring-without-repeating-characters)
     - [Longest Substring with K Distinct Characters](#longest-substring-with-k-distinct-characters)
-    - [Longest Substring with At Least K Repeating Characters](#longest-substring-with-at-least-k-repeating-characters)
+    - [Longest Substring with At Least K Repeating Characters (Not Important ⚠️)](#longest-substring-with-at-least-k-repeating-characters-not-important-️)
     - [Longest Repeating Character Replacement](#longest-repeating-character-replacement)
+    - [Substring with Concatenation of All Words](#substring-with-concatenation-of-all-words)
+    - [Count Vowel Substrings of a String](#count-vowel-substrings-of-a-string)
+    - [Longest Common Prefix](#longest-common-prefix)
+  - [Have \& Need Technique Problems](#have--need-technique-problems)
     - [Minimum Window Substring](#minimum-window-substring)
     - [Permutation in String](#permutation-in-string)
     - [Find All Anagrams in a String](#find-all-anagrams-in-a-string)
-    - [Words Concatenation](#words-concatenation)
-    - [Isomorphic Strings](#isomorphic-strings)
-    - [Count Vowel Substrings of a String](#count-vowel-substrings-of-a-string)
-    - [Longest Common Prefix](#longest-common-prefix)
   - [Reversing Problems](#reversing-problems)
     - [Valid Palindrome](#valid-palindrome)
     - [Valid Palindrome II](#valid-palindrome-ii)
@@ -85,18 +85,15 @@ Implement the `myAtoi(string s)` function, which converts a string to a 32-bit s
   def myAtoi(s):
       i = 0
       sign = 1
+      num = 0
 
       # Remove all leading whitespaces
       while i < len(s) and s[i].isspace():
           i += 1
-
       # Check if the first non-whitespace character is not a digit or a sign (+ or -)
       if i < len(s) and (s[i] in ('+', '-')):
           sign = -1 if s[i] == '-' else 1
           i += 1
-
-      # Read in the next characters of the string until the next non-digit character or the end of the input is reached
-      num = 0
       while i < len(s) and s[i].isdigit():
           num = num * 10 + int(s[i])
           i += 1
@@ -125,7 +122,7 @@ Implement the `myAtoi(string s)` function, which converts a string to a 32-bit s
       # Read in the next characters of the string until the next non-digit character or the end of the input is reached
       num = 0
       while i < len(s) and s[i].isdigit():
-          num = num * 10 + ord(s[i]) - ord('0')
+          num = num * 10 + ord(s[i]) - ord('0') # instead of using int(), we can use the ord() function to convert the character to its ASCII value
           i += 1
 
       return max(-2**31, min(sign * num, 2**31 - 1))
@@ -135,9 +132,9 @@ Implement the `myAtoi(string s)` function, which converts a string to a 32-bit s
 
 ### Integer to String
 
-| Video Solution | Hint                                                                                                                                                                                                                                                                                                 |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NA             | Use `mod (%) 10` to get the last digit of the integer and `div (//) 10` to remove the last digit of the integer. As we can't use the `str()` function, we will use the `ord()` function to convert the digit to its ASCII value and add the `ASCII value of '0'` to it to get the digit as a string. |
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| NA             | Here, we can't loop over the integer `x` because we can't access the digits of an integer. Instead, we will use `mod (%) 10` to get the last digit of the integer and `div (//) 10` to remove the last digit of the integer. We will use the `ord()` function to convert the digit to its ASCII value. (use while loop until integer is 0) |
 
 Given an integer `x`, return a string representing `x`.
 
@@ -178,9 +175,9 @@ def intToString(x):
 
 ### Multiply Strings
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=1vZswirL8Y8) | We can use the same approach as the previous problem, but instead of adding the elements to the result, we can fill the matrix with the elements from `1` to `n^2` in spiral order. We can use the same pointers to keep track of the `top`, `bottom`, `left`, and `right` boundaries of the current cycle. We can use a variable `num` to keep track of the `number` to fill in the matrix with. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=1vZswirL8Y8) | We can't convert the strings to integers because they are too large. We can use the grade-school algorithm for multiplication, which consists of multiplying each digit of the first number by each digit of the second number. The number of digits in the product is equal to the sum of the number of digits in the two numbers. Loop backwards over the two strings and multiply each digit of the first number by each digit of the second number. |
 
 Given two non-negative integers `num1` and `num2` represented as strings, return the product of `num1` and `num2`, also represented as a string.
 
@@ -332,6 +329,9 @@ Given a string `s`, find the length of the **longest substring** without repeati
 - EX: `s = "abcabcbb"` -> `3` (substring: `"abc"`)
 - Explanation:
 
+  - The brute-force solution is to check all the substrings of the string and check if they have repeating characters or not -> `O(n^3)` ❌
+    - `O(n^2)` to check all the substrings
+    - `O(n)` to check if the substring has repeating characters or not
   - we can use a **sliding-window** pattern to check for all the substrings of the string
     ![longest-substring](./img/longest-substring-1.png)
     ![longest-substring](./img/longest-substring-2.png)
@@ -393,9 +393,9 @@ Given a string `s`, find the length of the **longest substring** without repeati
 
 ### Longest Substring with K Distinct Characters
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                     |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=V1gF8FCHz60) | Use **Sliding Window** and a `hash table` to keep track of the `count` of each character in the window and check if the window is valid (valid means that each new character in the window has maximum frequency of `k`) |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=V1gF8FCHz60) | Use **Sliding Window** and a `hash table` to keep track of the `count` of each character in the window and check if the window is valid (valid means that the number of distinct characters in the window is equal to `k` -> length of the hash table) |
 
 Given a string `s`, find the length of the **longest substring** with **at most** `k` distinct characters.
 
@@ -444,7 +444,7 @@ def lengthOfLongestSubstringKDistinct(s, k):
 
 ---
 
-### Longest Substring with At Least K Repeating Characters
+### Longest Substring with At Least K Repeating Characters (Not Important ⚠️)
 
 | Video Solution                                                | Hint |
 | ------------------------------------------------------------- | ---- |
@@ -488,6 +488,8 @@ Return the length of the longest substring containing the same letter you can ge
 - EX: `s = "AABABBA", k = 1` -> `4` (substring: `"AABA"`)
 - Explanation:
 
+  - Brute force solution is
+
   - We can choose any of the underlined characters in the string, and turn them into 'B': "AABABBA" -> "AABBBBA"
   - After doing so, we have the longest substring of one repeating character of length `4`.
 
@@ -508,37 +510,139 @@ Return the length of the longest substring containing the same letter you can ge
 # O(n)
 def characterReplacement(s, k):
     # Initialize a dictionary to keep track of the characters in the current window
-    char_count = {}
+    count = {}
+    l = 0
+    maxFreq = 0
+    res = 0
 
-    # Initialize the sliding-window with the first character in the string
-    ans = 0
-    left = 0
-    max_character_frequency = 0
-
-    # Iterate over the string
-    for right in range(len(s)):
-        # Add the current character to the window if it is not already in it
-        char_count[s[right]] = char_count.get(s[right], 0) + 1
-
-        # Update the maximum window size
-        max_character_frequency = max(max_character_frequency, char_count[s[right]])
+    for r in range(len(s)):
+        count[s[r]] = count.get(s[r], 0) + 1
+        maxFreq = max(maxFreq, count[s[r]])
 
         # If the current window is invalid, slide the window to the right until it becomes valid
-        while right - left + 1 - max_character_frequency > k:
-            char_count[s[left]] -= 1
-            # Slide the window to the right
-            left += 1
-
+        while r - l + 1 - maxFreq > k:
+            count[s[l]] -= 1
+            l += 1
         # Update the maximum window size if window is valid
-        ans = max(res, right - left + 1)
+        res = max(res, r - l + 1)
 
-    return ans
+    return res
 ```
 
 Time Complexity: `O(n)`
 Space Complexity: `O(26)` = `O(1)` (because we have a fixed number of characters in the English alphabet)
 
 ---
+
+### Substring with Concatenation of All Words
+
+Given a string `s` and a list of words `words`, where each word is the same length, find all starting indices of substrings in `s` that is a concatenation of every word in `words` **exactly once**.
+
+- EX: `s = "barfoothefoobarman", words = ["foo","bar"]` -> `[0,9]`
+
+- Explanation:
+
+  - Here, we will use a **sliding-window** pattern to check for all the substrings of the string
+  - We will use a dictionary to keep track of the frequency of words in `words`
+  - we will use a dictionary to keep track of the frequency of words in the current window
+  - Starting from every index in the string, we will check if the current window is a valid window
+  - if it is, we will append the index of the left pointer to the answer array
+  - if not, we will slide the window to the right until we have a valid window
+
+```py
+def findSubstring(s, words):
+    if not words or not s:
+        return []
+
+    word_count = {}
+    for word in words:
+        word_count[word] = word_count.get(word, 0) + 1
+
+    ans = []
+    word_length = len(words[0])
+    window_length = len(words) * word_length # the required window length to check for the concatenation of every word in words exactly once
+
+    for i in range(len(s) - window_length + 1):
+        seen_words = {}
+        for j in range(i, i + window_length, word_length):
+            current_word = s[j:j+word_length]
+            if current_word not in word_count:
+                break
+            seen_words[current_word] = seen_words.get(current_word, 0) + 1
+            if seen_words[current_word] > word_count[current_word]:
+                break
+        else:
+            # will enter this block if the for loop is not broken (not using "break" in the for loop)
+            ans.append(i)
+
+    return ans
+```
+
+---
+
+### Count Vowel Substrings of a String
+
+Given a string `s` return the number of substrings that have **all vowels** in order.
+
+- EX: `s = "abciiidef"` -> `3` (substrings: `"ae"`, `"ei"`, `"iii"`)
+- Steps:
+  - we can use a **sliding-window** pattern to check for all the substrings of the string
+  - then we check these pair for the desired condition, and if not we change one of the numbers in pair and check again and so on...
+
+```py
+def countVowelSubstrings(word):
+    # Store vowels in a set for O(1) lookup.
+    vowels = {'a', 'e', 'i', 'o', 'u'}
+
+    # Initialize the sliding-window with the first vowel in the string and the last vowel in the string
+    ans = 0
+    last_consonant = -1
+
+    # Initialize a dictionary to keep track of the last seen vowel
+    last_seen_vowels = {v: -2 for v in vowels} # -2 is the smallest possible index
+
+    for i, x in enumerate(word):
+        # If the current character is a consonant, update the last_consonant variable.
+        if x not in vowels:
+            last_consonant = i
+        # Otherwise, we've found a vowel.
+        else:
+            # Update the last_seen_vowels dictionary with the current index.
+            last_seen_vowels[x] = i
+            # Update the answer variable with the maximum of the current value and the minimum of the last seen vowel's
+            # index and the last consonant's index.
+            ans += max(min(last_seen_vowels.values())-last_consonant, 0)
+    return ans
+```
+
+---
+
+### Longest Common Prefix
+
+Write a function to find the longest common prefix string amongst an array of strings.
+
+- EX: `strs = ["flower","flow","flight"]` -> `"fl"`
+- Explanation:
+  - we will start with the first string in the array and check other strings to check if they have the same prefix (same current character)
+  - note that we need to check if we have reached the end of the other strings (out of bound), so that we would return the current prefix
+
+```py
+def longestCommonPrefix(strs):
+   res = ''
+
+   for i in range(len(strs[0])):
+      for j in range(1, len(strs)):
+         # if we have reached the end of the other string or the current character is not a prefix of the other string, return the result
+         if i >= len(strs[j]) or strs[j][i] != strs[0][i]:
+            return res
+      res += strs[0][i]
+
+    return res
+```
+
+---
+
+## Have & Need Technique Problems
 
 ### Minimum Window Substring
 
@@ -561,7 +665,7 @@ Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **
       - if we have enough of each character in the window, then we have a valid window
       - if not, then we need to slide the window **to the right** until we have a valid window
 
-- **Slow Solution** (checks the entire character count dictionary for each character in the string each time)
+- **Slow Solution** (checks the entire character count dictionary for each character in the string each time) -> `O(n^2)`, because we check the entire character count dictionary for each character in the string each time (it's good enough for interviews though!)
 
   ```py
   # O(n)
@@ -661,6 +765,10 @@ Given two strings `s` and `t` of lengths `m` and `n` respectively, return the **
 
 ### Permutation in String
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=UbyhOgBN834) | Use **"have & need"**: Use sliding window and a `hash table` to keep track of the `count` of each character in the window and keep track of the `number of characters in the window that are also in the target string` to check if the window is valid (`have == need`) |
+
 Given two strings `s1` and `s2`, return `true` if `s2` contains a permutation of `s1`, or `false` otherwise.
 
 - EX: `s1 = "ab", s2 = "eidbaooo"` -> `true`
@@ -681,26 +789,26 @@ def checkInclusion(s1, s2):
     for c in s1:
         target_count[c] = target_count.get(c, 0) + 1
 
-    ans = 0
-    left = 0
+    l = 0
     have, need = 0, len(target_count) # have is the number of characters in the window that are also in the target string
 
-    for right in range(len(s2)):
-        current_char = s2[right]
+    for r in range(len(s2)):
+        current_char = s2[r]
         char_count[current_char] = char_count.get(current_char, 0) + 1
 
         if current_char in target_count and char_count[current_char] == target_count[current_char]:
             have += 1
 
         while have == need:
-            if right - left + 1 == len(s1):
+            if r-l+ 1 == len(s1):
                 return True
 
             # Else: keep popping values from the left until we have a valid window
-            char_count[s2[left]] -= 1
-            if s2[left] in target_count and char_count[s2[left]] < target_count[s2[left]]:
+            char = s2[l]
+            char_count[char] -= 1
+            if char in target_count and char_count[char] < target_count[char]:
                 have -= 1
-            left += 1
+            l += 1
 
     return False
 ```
@@ -708,6 +816,10 @@ def checkInclusion(s1, s2):
 ---
 
 ### Find All Anagrams in a String
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=G8xtZy0fDKg) | Use **"have & need"**: Use sliding window and a `hash table` to keep track of the `count` of each character in the window and keep track of the `number of characters in the window that are also in the target string` to check if the window is valid (`have == need`) |
 
 Given two strings `s` and `p`, return an array of all the start indices of `p`'s anagrams in `s`. You may return the answer in any order.
 
@@ -744,153 +856,6 @@ def findAnagrams(s, p):
             left += 1
 
     return ans
-```
-
----
-
-### Words Concatenation
-
-Given a string `s` and a list of words `words`, where each word is the same length, find all starting indices of substrings in `s` that is a concatenation of every word in `words` **exactly once**.
-
-- EX: `s = "barfoothefoobarman", words = ["foo","bar"]` -> `[0,9]`
-
-- Explanation:
-
-  - Here, we will use a **sliding-window** pattern to check for all the substrings of the string
-  - We will use a dictionary to keep track of the frequency of words in `words`
-  - we will use a dictionary to keep track of the frequency of words in the current window
-  - Starting from every index in the string, we will check if the current window is a valid window
-  - if it is, we will append the index of the left pointer to the answer array
-  - if not, we will slide the window to the right until we have a valid window
-
-```py
-def findSubstring(s, words):
-    if not words or not s:
-        return []
-
-    word_count = {}
-    for word in words:
-        word_count[word] = word_count.get(word, 0) + 1
-
-    ans = []
-    word_length = len(words[0])
-    window_length = len(words) * word_length # the required window length to check for the concatenation of every word in words exactly once
-
-    for i in range(len(s) - window_length + 1):
-        seen_words = {}
-        for j in range(i, i + window_length, word_length):
-            current_word = s[j:j+word_length]
-            if current_word not in word_count:
-                break
-            seen_words[current_word] = seen_words.get(current_word, 0) + 1
-            if seen_words[current_word] > word_count[current_word]:
-                break
-        else:
-            # will enter this block if the for loop is not broken (not using "break" in the for loop)
-            ans.append(i)
-
-    return ans
-```
-
----
-
-### Isomorphic Strings
-
-Given two strings `s` and `t`, determine if they are isomorphic.
-
-> Two strings `s` and `t` are isomorphic if the characters in `s` can be replaced to get `t`.
-> ![isomorphic-strings](./img/isomorphic-strings-1.svg)
-
-- EX: `s = "egg", t = "add"` -> `True`
-- Explanation:
-
-  - Note that "No two characters may map to the same character, but a character may map to itself.", so we need to map each character in `s` to a unique character in `t` and vice versa.
-  - we must check if the characters in `s` can be replaced to get `t` and vice versa. This is done by:
-    ![isomorphic-strings](./img/isomorphic-strings-2.webp)
-
-    1. creating a dictionary to keep track of the corresponding characters in each string
-    2. check if the current characters are in the dictionaries, if not, add them
-    3. if they are in the dictionaries, check if they correspond to each other and if not return `False`
-
-Time Complexity: `O(n)`
-
-```py
-def isIsomorphic(s, t):
-    # Initialize dictionaries to keep track of the corresponding characters in each string
-    mapST, mapTS = {}, {}
-
-    for c1, c2 in zip(s, t):
-        # If the current characters are not in the dictionaries, add them
-        if c1 not in mapST and c2 not in mapTS:
-            mapST[c1] = c2
-            mapTS[c2] = c1
-        # If the current characters are in the dictionaries, check if they correspond to each other
-        elif mapST.get(c1) != c2 or mapTS.get(c2) != c1:
-            return False
-
-    return True
-```
-
----
-
-### Count Vowel Substrings of a String
-
-Given a string `s` return the number of substrings that have **all vowels** in order.
-
-- EX: `s = "abciiidef"` -> `3` (substrings: `"ae"`, `"ei"`, `"iii"`)
-- Steps:
-  - we can use a **sliding-window** pattern to check for all the substrings of the string
-  - then we check these pair for the desired condition, and if not we change one of the numbers in pair and check again and so on...
-
-```py
-def countVowelSubstrings(word):
-    # Store vowels in a set for O(1) lookup.
-    vowels = {'a', 'e', 'i', 'o', 'u'}
-
-    # Initialize the sliding-window with the first vowel in the string and the last vowel in the string
-    ans = 0
-    last_consonant = -1
-
-    # Initialize a dictionary to keep track of the last seen vowel
-    last_seen_vowels = {v: -2 for v in vowels} # -2 is the smallest possible index
-
-    for i, x in enumerate(word):
-        # If the current character is a consonant, update the last_consonant variable.
-        if x not in vowels:
-            last_consonant = i
-        # Otherwise, we've found a vowel.
-        else:
-            # Update the last_seen_vowels dictionary with the current index.
-            last_seen_vowels[x] = i
-            # Update the answer variable with the maximum of the current value and the minimum of the last seen vowel's
-            # index and the last consonant's index.
-            ans += max(min(last_seen_vowels.values())-last_consonant, 0)
-    return ans
-```
-
----
-
-### Longest Common Prefix
-
-Write a function to find the longest common prefix string amongst an array of strings.
-
-- EX: `strs = ["flower","flow","flight"]` -> `"fl"`
-- Explanation:
-  - we will start with the first string in the array and check other strings to check if they have the same prefix (same current character)
-  - note that we need to check if we have reached the end of the other strings (out of bound), so that we would return the current prefix
-
-```py
-def longestCommonPrefix(strs):
-   res = ''
-
-   for i in range(len(strs[0])):
-      for j in range(1, len(strs)):
-         # if we have reached the end of the other string or the current character is not a prefix of the other string, return the result
-         if i >= len(strs[j]) or strs[j][i] != strs[0][i]:
-            return res
-      res += strs[0][i]
-
-    return res
 ```
 
 ---

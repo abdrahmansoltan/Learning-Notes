@@ -12,6 +12,7 @@
   - [`this` keyword types](#this-keyword-types)
   - [Type Aliases (`type`)](#type-aliases-type)
     - [`readonly` Modifier](#readonly-modifier)
+    - [Literal type](#literal-type)
   - [Interfaces](#interfaces)
     - [When to use Interfaces](#when-to-use-interfaces)
     - [interface vs type](#interface-vs-type)
@@ -31,7 +32,8 @@
     - [Class Fields](#class-fields)
     - [Using Interfaces with classes](#using-interfaces-with-classes)
     - [Abstract Classes](#abstract-classes)
-    - [Interfaces vs Abstract Classes](#interfaces-vs-abstract-classes)
+      - [Interfaces vs Abstract Classes](#interfaces-vs-abstract-classes)
+    - [Class Composition in Typescript](#class-composition-in-typescript)
   - [Promises](#promises)
 
 ---
@@ -401,6 +403,29 @@ TypeScript provides the `readonly` modifier that allows you to mark the properti
   ```
 
 > the equivalent in variables is to use `const`
+
+### Literal type
+
+- It's a type that represents a single value, rather than a range of values, which is the case with `number` or `string` types
+- It's used to narrow down the possible values that a variable can hold
+
+```ts
+type userAttribute = 'id' | 'name' | 'age';
+
+let user = {
+  id: 1,
+  name: 'John',
+  age: 30
+};
+
+function getUserAttribute(attribute: userAttribute) {
+  return user[attribute];
+}
+// instead of
+function getUserAttribute(attribute: number | string) {
+  return user[attribute];
+}
+```
 
 ---
 
@@ -1021,14 +1046,54 @@ Abstract classes are mainly for **inheritance** where other classes may derive f
   console.log(res.getName());
   ```
 
----
-
-### Interfaces vs Abstract Classes
+#### Interfaces vs Abstract Classes
 
 ![interface vs abstract class](./img/interface-vs-abstract-class.png)
 
 - **Abstract classes** are mainly for **inheritance** where other classes may derive from them. **We cannot create an instance of an abstract class**.
 - **Interfaces** are used to define a **contract**. Any class or struct that implements that contract must provide an implementation of the members defined in the interface.
+
+---
+
+### Class Composition in Typescript
+
+- This is a clean way to compose classes together to create more complex objects
+
+  ```ts
+  // Good way to compose classes together ✅
+  class User {
+    static fromData(data: UserProps): User {
+      return new User(
+        new Attributes<UserProps>(data),
+        new Eventing(),
+        new ApiSync<UserProps>(rootUrl)
+      );
+    }
+  }
+
+  const user = User.fromData({ id: 1, name: 'John', age: 30 });
+
+  // -------------------------------------------------------
+
+  // Bad way to compose classes together ❌
+  class User {
+    constructor(
+      private attributes: Attributes<UserProps>,
+      private events: Eventing,
+      private sync: Sync<UserProps>
+    ) {
+      this.attributes = attributes;
+      this.events = events;
+      this.sync = sync;
+    }
+  }
+
+  const user = new User(
+    new Attributes<UserProps>(data),
+    new Eventing(),
+    new ApiSync<UserProps>(rootUrl)
+  );
+  ```
 
 ---
 

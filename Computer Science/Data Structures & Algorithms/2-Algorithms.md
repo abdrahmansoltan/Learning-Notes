@@ -45,8 +45,7 @@
       - [Hoare's Partitioning Scheme (Quick Select) (NOT IMPORTANT ⚠️)](#hoares-partitioning-scheme-quick-select-not-important-️)
         - [Implementing Quick sort using Hoare's Partitioning Scheme (Quick Select)](#implementing-quick-sort-using-hoares-partitioning-scheme-quick-select)
     - [Bucket Sort](#bucket-sort)
-    - [Radix Sort](#radix-sort)
-    - [Sorting Notes](#sorting-notes)
+    - [Radix Sort (NOT IMPORTANT ⚠️)](#radix-sort-not-important-️)
   - [Searching](#searching)
     - [Linear(sequential) Search](#linearsequential-search)
     - [Binary Search](#binary-search)
@@ -346,15 +345,16 @@ def printFirst(arr):
 
 This is called **Quadratic Time**
 
-- Explaining `O(n^2)` for loops
+- Explaining `O(n^2)` for nested loops
 
   - Usually when we have nested loops, we always think of `O(n^2)`, but that's not always the case.
 
   - we don't always loop through the whole array in the inner loop, sometimes we loop through half of it or a quarter of it, etc.
   - so when we say that It's `O(n^2)`, we're talking about the worst case scenario, which is looping through the whole array in the inner loop.
   - Plus that the final number of operations will be **bounded by `n^2`** (the number of operations will never be more than `n^2`)
-    - `O(c * n^2) -> O(n^2)`
-      ![o(n^2)](./img/o-n2.png)
+    ![o(n^2)](./img/o-n2.png)
+    - In the image above, you will find a geometric shape that is `n` by `n` (the number of operations will never be more than `n^2`)
+    - By adding the operations in the nested loops (blue squares), we notice that it's half the size of the shape (`n^2 / 2`), so it's bounded by `n^2` -> `O(c * n^2)` -> `O(n^2)`
 
 #### O(log(n))
 
@@ -623,9 +623,11 @@ def fib(n):
 
 **Tail recursion** is a version of recursion impacts the final phase of a recursive function. In tail recursion, the recursive call is the last thing that happens in the function. This means that **the return value of the recursive call is returned as the return value of the function**, without any additional processing.
 
-> When a program runs, the call stack stores the function calls (that have started but not completed yet) in a stack data structure. Each function call is stored in a stack frame. When a function returns, its stack frame is removed from the call stack.
->
-> The call stack is used to store local variables and parameters of each function call, and **what is left to do in the function**. When a function calls itself recursively, a new stack frame is created and pushed onto the call stack. When the function returns, the stack frame is popped off the call stack.
+- **The problem with normal recursion:**
+
+  - When a program runs, the call stack stores the function calls (that have started but not completed yet) in a stack data structure **(In Memory)**. Each function call is stored in a stack frame. When a function returns, its stack frame is removed from the call stack.
+    ![normal recursion](./img/tail-recursion-2.png)
+  - The call stack is used to store local variables and parameters of each function call, and **what is left to do in the function**. When a function calls itself recursively, a new stack frame is created and pushed onto the call stack. When the function returns, the stack frame is popped off the call stack.
 
 - This is important because it means that the function does not have to wait for the recursive call to be resolved. It can return immediately with the recursive call, and the recursive call can be resolved later.
 
@@ -648,6 +650,7 @@ def fib(n):
   ```
 
   ![tail recursion](./img/tail-recursion.png)
+  ![tail recursion](./img/tail-recursion-1.png)
 
 - a tail recursion must be a linear recursion (since there is no way to make a second recursive call if you must immediately return the result of the first).
 - Example:
@@ -759,13 +762,32 @@ We start with the **big picture** and then break it down into smaller pieces
 - It uses **memoization** (storing the result of each sub-problem in an array or map) and **recursion** (calling the function itself) to solve the problem.
 - **Memoization** is a top-down approach
 
+```py
+# Top-down Dynamic Programming
+def fib(n, cache):
+  if n < 2:
+    return n
+  if n in cache:
+    return cache[n]
+
+  cache[n] = fib(n - 1, cache) + fib(n - 2, cache)
+  return cache[n]
+
+print(fib(50, {}))
+```
+
+- By using memoization, we can reduce the time complexity of the `Fibonacci` problem from `O(2^n)` to `O(n)` 🔥
+
+---
+
 #### Bottom-up approach (Iteration + Tabulation)
 
 We start with the **smaller pieces** and then build it up into the big picture -> Real Dynamic Programming
 
 - It's the opposite of `Memoization` and `recursion`, because we start from the bottom **(base case)** and build it up to the top until we reach the final result.
   - the `bottom` (base case) is the smallest sub-problem that we already know the answer for it
-- It uses **tabulation** (storing the result of each sub-problem in an array or map) and **iteration** (looping) on the array to calculate the result of the next sub-problem using the previous sub-problems.
+    - For example in `Fibonacci` problem, the base case is `0` and `1`
+- It uses **tabulation** (storing the result of each sub-problem in an array or map) and **iteration** (looping) on the array to calculate the result of the next sub-problem **using the previous sub-problems**.
 
 > `Bottom-up` solution usually has less code than the `top-down` solution (recursion), but it's harder to think of
 
@@ -778,17 +800,34 @@ We start with the **smaller pieces** and then build it up into the big picture -
 
   ```py
   # Bottom-up Dynamic Programming
-  def dp(n):
+
+  # Approach 1: using extra array
+  def fib(n):
     if n < 2:
       return n
 
     arr = [0, 1]
     for i in range(2, n + 1):
-      temp = arr[1]
-      arr[1] = arr[0] + arr[1]
-      arr[0] = temp
+      arr.append(arr[i - 1] + arr[i - 2])
 
-    return arr[1]
+    return arr[n]
+
+  # Approach 2: using 2 variables (less space)
+  def fib(n):
+    if n < 2:
+      return n
+
+    # Base cases
+    prev = 0
+    curr = 1
+
+    for i in range(2, n + 1):
+      temp = curr
+      curr = prev + curr
+      prev = temp
+      # or: prev, curr = curr, prev + curr
+
+    return curr
   ```
 
 ---
@@ -797,7 +836,7 @@ We start with the **smaller pieces** and then build it up into the big picture -
 
 We can use DP to improve problems that are solved using Divide and Conquer usually `graph` and `tree` problems, Ex:
 
-**Q:** count the number of unique paths from `top-left` to `bottom-left`. You're only allowed to move `down` or `right` at any point in time.
+**Example:** count the number of unique paths from `top-left` to `bottom-left`. You're only allowed to move `down` or `right` at any point in time.
 
 - Brute Force Solution - Time and space: `O(2^(n+m))`
 
@@ -815,6 +854,9 @@ We can use DP to improve problems that are solved using Divide and Conquer usual
 - Tob-down (Memoization) Solution - Time and space: `O(n*m)`
   ![dynamic-programming](./img/dynamic-programming-5.png)
 
+  - It's same to brute force, but we're using memoization to store the result of each sub-problem in an array or map, so we don't need to solve them again, we just return the result from the cache.
+  - This will reduce the time complexity from `O(2^(n+m))` to `O(n*m)`
+
   ```py
   # Top-down Dynamic Programming
   def memoization(r, c, rows, cols, cache):
@@ -829,27 +871,38 @@ We can use DP to improve problems that are solved using Divide and Conquer usual
     return cache[r][c]
 
   print(memoization(0, 0, 4, 4, [[0] * 4 for _ in range(4)]))
+  # Here, the cache is a 2D array of size (rows * cols)
   ```
 
 - Bottom-up (Tabulation) Solution - Time: `O(n*m)` and space: `O(m)`, where `m` is the number of columns and `n` is the number of rows
   ![dynamic-programming](./img/dynamic-programming-6.png)
+  ![dynamic-programming](./img/dynamic-programming-7.png)
+
+  - Here, we start from the bottom and build it up to the top until we reach the final result.
+  - The bottom (base case) is the bottom-right cell, because we already know the answer for it, which is `1`
+  - Then, we build it up to the top until we reach the top-left cell, which is the final result
+    - The call to its top and left cells are the sub-problems that we already know the answer for it, so we can use them to calculate the answer for the current cell -> `1`
+    - Then, we build it up to the top until we reach the top-left cell, which is the final result
 
   ```py
   # Bottom-up Dynamic Programming
   def tabulation(rows, cols):
-    prevRow = [0] * cols
+    prevRow = [0] * cols # Imaginary row of 0s below the grid to handle the edge cases
 
     for r in range(rows -1, -1, -1):
       currRow = [0] * cols
       currRow[cols - 1] = 1 # last column is always 1
       for c in range(cols - 2, -1, -1):
-        currRow[c] = currRow[c + 1] + prevRow[c] # add the right and bottom cells
+        currRow[c] = currRow[c + 1] + prevRow[c] # add the right and bottom cells (because we can only move down or right)
       prevRow = currRow # set the current row as the previous row
 
     return prevRow[0] # return the first element of the previous row
 
   print(tabulation(4, 4))
   ```
+
+  - Time complexity: `O(n*m)` -> because we're looping through the entire array, and need to fill each cell
+  - Space complexity: `O(m)` -> num of columns -> because we're using only 2 rows (previous and current) (We saved a lot of space here 🔥)
 
 ---
 
@@ -915,6 +968,8 @@ A sorting algorithm is said to be **stable** if two objects with equal keys appe
 
 It's a sorting algorithm where we **insert** each element in the correct place in the sorted part of the array (the left side of the array)
 
+It builds up the sort by gradually creating a larger left half which is always sorted (solve smaller problems to solve the bigger problem)
+
 > It's called **"Insertion Sort"** because we take an element and **insert it in the correct place in the sorted array**
 
 - it's used when you know or think that the list is **"almost/already sorted"**
@@ -926,7 +981,7 @@ It's a sorting algorithm where we **insert** each element in the correct place i
 - **steps:**
   ![insertion-sort](./img/insertion-sort-3.png)
 
-  1. start by picking the `second` element in the array because we assume that the `first` element is already sorted.
+  1. start by picking the `second` element in the array because (we assume that the `first` element is already sorted as it's array on `1` element).
      ![insertion-sort](./img/insertion-sort-0.png)
   2. now compare the second element with (the one before it (its left element)) and **swap** if necessary, then repeat until the element is in the correct order
      ![insertion-sort](./img/insertion-sort-1.png)
@@ -1116,6 +1171,8 @@ Consists of 2 functions: `merge` & `merge_sort`
    - Implementation is below for the `merge` function ⬇️
 
    > **Note:** To make the `merge` function **stable**, we can change the comparison operator to `<=` instead of `<`
+   >
+   > ![merge-sort](./img/merge-sort-6.png)
 
 2. `merge_sort` function
 
@@ -1191,6 +1248,7 @@ It's all about continually **picking** an element as a **"pivot point"** and **p
       - `j` -> keeps track of the index of the first element in the `right` sub-array so that we can swap it with any element smaller than the **"pivot point"** in the `left` sub-array
     - After the partitioning is done, we **recursively** apply the above steps to the `left` sub-array and the `right` sub-array until the entire array is sorted
       ![quick sort](./img/quick-sort-5.png)
+    - Finally after the entire array is partitioned and sorted, we return the sorted array by concatenating the `left` sub-array, the **"pivot point"**, and the `right` sub-array **(recursively)**
       ![quick sort](./img/quick-sort-6.png)
 
 - Quick sort is unique, because its speed depends on the `pivot point` you choose
@@ -1199,7 +1257,7 @@ It's all about continually **picking** an element as a **"pivot point"** and **p
   - **best case** for time-complexity is `O(n log n)`
     ![quick-sort-best-case](./img/quick-sort-best-case.png)
     - In this example, there are `O(log n)` levels (the technical way to say that is, “he height of the call stack is `O(log n)`”). And each level takes `O(n)` time. he entire algorithm will take `O(n) * O(log n) = O(n log n)` time. This is the best-case scenario.
-  - it may have a **worst-case** for time-complexity of `O(n^2)` if the **"pivot point"** is the smallest point and is the first element. because we're not splitting by half, we're splitting by `1` element at a time
+  - it may have a **worst-case** for time-complexity of `O(n^2)` if the input is already sorted. because we're not splitting by half, we're splitting by `1` element at a time
     - `n * n-1 * n-2 * ... * 1` -> `O(n^2)`
       ![quick-sort-worst-case](./img/quick-sort-worst-case.png)
     - In this example, there're `O(n)` levels, so the entire algorithm will take `O(n) * O(n) = O(n^2)` time
@@ -1209,6 +1267,9 @@ It's all about continually **picking** an element as a **"pivot point"** and **p
     - > **Note:** The best case is also the average case. If you always choose a random element in the array as the pivot, quicksort will complete in O(n log n) time on average. **Quicksort is one of the fastest sorting algorithms out there**, and it’s a very good example of D&C.
 
 > **Note:** To avoid the worst-case scenario, we can choose the **"pivot point"** randomly but not the last element/first element, and there're optimizations that can be done to avoid the worst-case scenario
+
+- **Important for interviews**
+  - When asked about time complexity for quick sort, always say `O(n log n)` and mention that it can be `O(n^2)` in the worst-case scenario
 
 #### Quick sort implementation
 
@@ -1264,7 +1325,7 @@ It's all about continually **picking** an element as a **"pivot point"** and **p
   # helper function to partition the array into 2 sub-arrays
   def partition(arr, low, high):
     pivot = arr[high]
-    i = low - 1
+    i = low - 1 # index behind the pivot
 
     # walk from low to high and swap the elements that are smaller than the pivot with the elements that are larger than the pivot
     for j in range(low, high):
@@ -1369,10 +1430,9 @@ It's a sorting algorithm that works by distributing the elements of an array int
 - For every single element in the array, we need to create a bucket for it
   - The bucket is just a container that holds the elements with the index of the element as the key
     ![bucket sort](./img/bucket-sort-1.png)
-    - here:
-      - bucket `0` holds the number of times `0` appears in the array
-      - bucket `1` holds the number of times `1` appears in the array
-      - bucket `2` holds the number of times `2` appears in the array
+    - bucket `0` holds the number of times `0` appears in the array (which is `2`)
+    - bucket `1` holds the number of times `1` appears in the array (which is `1`)
+    - bucket `2` holds the number of times `2` appears in the array (which is `3`)
 - Then we sort the buckets
   - we will go through each bucket and add the `index` of of the bucket to the sorted array as many times as the value of the `bucket[index]`
     ![bucket sort](./img/bucket-sort-2.png)
@@ -1397,7 +1457,7 @@ def bucket_sort(array, max_val):
 
   # ----------------------------------------------
 
-  # Option 2: in-place
+  # Option 2: in-place ✅
   i = 0
   for j in range(len(buckets)):
     for _ in range(buckets[j]):
@@ -1418,7 +1478,7 @@ def bucket_sort(array, max_val):
 
 ---
 
-### Radix Sort
+### Radix Sort (NOT IMPORTANT ⚠️)
 
 - The previous sorting-algorithms were called: "Comparison Sorts", but the question is: "can we do better for the time-complexity?"
 
@@ -1430,14 +1490,6 @@ def bucket_sort(array, max_val):
 
 ![radix-sort](./img/radix-sort2.png)
 ![radix-sort](./img/radix-sort3.png)
-
----
-
-### Sorting Notes
-
-![sorting-comparison](./img/sorting-comparison.png)
-
-- the best sorting time complexity will always be `O(n log(n))` as the `"n"` says that we do a comparison between the elements of the list
 
 ---
 
@@ -1704,6 +1756,8 @@ It's also called **"Level Order Traversal"**
 
     level = 0
     while len(queue) > 0:
+      print(f'Current level: {level}')
+
       # loop through the queue
       for i in range(len(queue)):
         curr = queue.popleft()
@@ -1719,58 +1773,6 @@ It's also called **"Level Order Traversal"**
 
       # increment the level
       level += 1
-  ```
-
-- Example: BFS Implementation for a "mango seller" problem
-  ![bfs example](./img/bfs-implementation.png)
-  ![bfs example](./img/bfs-implementation-1.png)
-
-  ```py
-  from collections import deque
-
-  # create a graph
-  graph = {}
-  graph["you"] = ["alice", "bob", "claire"]
-  graph["bob"] = ["anuj", "peggy"]
-  graph["alice"] = ["peggy"]
-  graph["claire"] = ["thom", "jonny"]
-  graph["anuj"] = []
-  graph["peggy"] = []
-  graph["thom"] = []
-  graph["jonny"] = []
-
-  # helper: check if a person is a mango seller
-  def person_is_seller(name):
-    # mango sellers' names end with 'm' letter (e.g. thom)
-    return name[-1] == "m"
-
-
-  def search(name):
-    # Create a new queue
-    search_queue = deque()
-    # Add all of your neighbors to the search queue
-    search_queue += graph[name]
-
-    # This array is how you keep track of which people you've searched before.
-    searched = []
-
-    while search_queue:
-      # pop the first person off the queue
-      person = search_queue.popleft()
-      # Only search this person if you haven't already searched them to avoid infinite loops (the search queue will keep going back and forth between neighbors nodes)
-      if not person in searched:
-        if person_is_seller(person):
-          print(person + " is a mango seller!")
-          return True
-        else:
-          # add this person's friends to the search queue
-          search_queue += graph[person]
-          # Marks this person as searched
-          searched.append(person)
-    return False
-
-
-  search("you") # thom is a mango seller!
   ```
 
 ---
@@ -1902,7 +1904,7 @@ def postOrderDFS(root):
 
 #### InOrder DFS traversal
 
-Inorder means traversing the tree in a sorted order (smaller to larger) and to do so, we need to visit the `left` node first, then the `root` node, then the `right` node and so on
+Inorder means traversing the tree in a **sorted order (smaller to larger)** and to do so, we need to visit the `left` node first, then the `root` node, then the `right` node and so on
 ![inorder](./img/inorder.png)
 
 - we do this by :
@@ -2290,12 +2292,13 @@ def dfs(node, adj, visited, result):
 
 ## Union Find
 
-It's a data structure that keeps track of elements which are split into one or more disjoint sets.
+It's a tree data structure that keeps track of elements which are split into one or more disjoint sets (usually applied in connected graphs).
 
 The Union Find data structure allows us to **detect a cycle in an undirected graph** by iterating over just its edges. (Instead of doing the full `O(V+E)` search. This way we get an `O(E)` complexity).
 
 - It's used in trees, and graphs
 - It can deal with **disjoint sets** (sets that have no elements in common) -> Disconnect components in a graph
+  - a set is represented by a connected graph (each node in the graph is connected to at least one other node in the graph)
   ![union-find](./img/union-find-1.png)
 - It works as a **Forest of Trees**
   ![union-find](./img/union-find-2.png)
@@ -2305,11 +2308,12 @@ The Union Find data structure allows us to **detect a cycle in an undirected gra
 - Each node starts off as its own separate set, as we iterate over the edges, we will **union** the nodes together if they are not already in the same set.
   - We `union` them by making the parent of one node the parent of the other node.
     ![union-find](./img/union-find-3.png)
-  - We usually `union` by `rank`(which is the `height` of the tree), we make the shorter tree a child of the taller tree.
+    - Here, the second union is better, because it makes the tree shorter and **balanced** so that it will be easier to find the parent node
+  - We usually `union` by `rank`(which is the `height` of the tree-root / parent), we make the shorter tree a child of the taller tree.
     ![union-find](./img/union-find-4.png)
 - Used to detect cycles in undirected graphs, instead of using `DFS` or `BFS` which takes `O(V+E)` time, we can use `Union Find` which takes `O(E)` time.
   - It's done by iterating over the edges, and `union` the nodes together if they are not already in the same set.
-  - If we find an edge where both nodes are in the same set, then we have found a cycle.
+  - If we find an edge where both nodes are in the same set, **then we have found a cycle**.
     - This is because we will be trying to connect 2 `nodes` that are already connected, which means that there is a cycle.
 
 ```py
@@ -2353,6 +2357,12 @@ class UnionFind:
 
         return True
 ```
+
+- **Time Complexity:**
+  - Let's take it step by step:
+    - `find` takes `O(log(n))` time, because it's a recursive function that goes through the parents of the node until it reaches the root node, `O(log(n))` which is the height of the tree, because the tree is balanced
+    - `union` takes `O(log(n))` time, because it calls `find` twice, and `find` takes `O(log(n))` time, the union itself takes `O(1)` time because it's just assigning the parent of one node to the other node
+    - `union` is called `E` times, where `E` is the number of edges in the graph, so the total time complexity is `O(E.log(n))` ✅
 
 ---
 
@@ -2670,11 +2680,14 @@ def helper(i, curComb, combs, n, k):
 
 ## Matrix graph
 
+- The difference between here and the adjacency list is that we will always need to check the boundaries of the matrix before most operations.
+
 ### Matrix DFS
 
 When dealing with matrix, we can use `DFS` to traverse the matrix for many types of problems
 
 - Ex: count num of unique paths from topLeft to bottomRight
+  ![matrix-dfs](./img/matrix-dfs-1.png)
 
   ```py
   def uniquePaths(grid, m: int, n: int) -> int:
@@ -2706,6 +2719,11 @@ When dealing with matrix, we can use `DFS` to traverse the matrix for many types
         dfs(r, c + 1) +
         dfs(r, c - 1)
       )
+      # or
+      # directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+      # paths = 0
+      # for (dr, dc) in directions:
+      #   paths += dfs(r + dr, c + dc)
 
       # backtrack: remove the current cell from visited
       visited.remove((r, c))
@@ -2714,6 +2732,13 @@ When dealing with matrix, we can use `DFS` to traverse the matrix for many types
 
     return dfs(0, 0)
   ```
+
+  - Time complexity: `O(4^(m*n))`
+    - `m*n` is the number of cells in the matrix
+    - `4` is the number of directions we can go to from each cell
+    - `4^(m*n)` is the number of paths we can take from the topLeft to the bottomRight
+  - Space complexity: `O(m*n)`
+    - `m*n` is the number of cells in the matrix -> call stack size
 
 ---
 
@@ -2725,10 +2750,12 @@ When dealing with matrix, we can use `BFS` to traverse the matrix for many types
 
 - Ex: find the length of the shortest path from topLeft to bottomRight
 
+  - Here, we go layer by layer, and the first time we reach the bottomRight cell, we are guaranteed that we found the shortest path
+
   ```py
   def shortestPath(grid, m: int, n: int) -> int:
     ROWS, COLS = m, n
-    visited = set()
+    visite d = set()
 
     def bfs(r, c):
       queue = deque([(r, c, 0)]) # (row, col, distance)
@@ -2749,19 +2776,18 @@ When dealing with matrix, we can use `BFS` to traverse the matrix for many types
           (row, col - 1)
         ]:
           if (
-            min(nr, nc) < 0 or
-            nr >= ROWS or
-            nc >= COLS or
+            min(nr, nc) < 0 or # boundary check
+            nr >= ROWS or # boundary check
+            nc >= COLS or # boundary check
             (nr, nc) in visited or
             grid[nr][nc] == 1
           ):
             continue # invalid path
 
+          # add the neighbor to the queue that we need to visit next (valid path)
+          queue.append((nr, nc, distance + 1))
           # mark the current cell as visited
           visited.add((nr, nc))
-
-          # add the neighbor to the queue
-          queue.append((nr, nc, distance + 1))
 
       return -1 # no valid path
 

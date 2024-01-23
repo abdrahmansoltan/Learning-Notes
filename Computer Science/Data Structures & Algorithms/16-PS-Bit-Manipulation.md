@@ -529,4 +529,16 @@ Return the array in the form `[x1,y1,x2,y2,...,xn,yn]`.
         return nums
     ```
 
+- Another solution: with extra space but simpler
+
+  ```py
+  # without bit manipulation
+  def shuffle(nums, n):
+      result = []
+      for i in range(n):
+          result.append(nums[i])
+          result.append(nums[i+n])
+      return result
+  ```
+
 ---

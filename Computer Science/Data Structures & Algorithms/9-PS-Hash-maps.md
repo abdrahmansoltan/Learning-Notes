@@ -2,11 +2,15 @@
 
 - [INDEX](#index)
   - [Two sum](#two-sum)
+  - [Majority Element](#majority-element)
+  - [Majority Element II](#majority-element-ii)
+  - [Intersection of Two Arrays](#intersection-of-two-arrays)
   - [Valid Anagram](#valid-anagram)
   - [Group Anagrams](#group-anagrams)
   - [Unique Number of Occurrences](#unique-number-of-occurrences)
   - [Contains Duplicate II](#contains-duplicate-ii)
   - [Verifying an Alien Dictionary](#verifying-an-alien-dictionary)
+  - [Isomorphic Strings](#isomorphic-strings)
   - [Hand of Straights](#hand-of-straights)
   - [4Sum II](#4sum-ii)
   - [Repeated DNA Sequences](#repeated-dna-sequences)
@@ -34,8 +38,10 @@ Given an array of integers `nums` and an integer `target`, return indices of the
 
 - Explanation:
   - Bruteforce solution is that we can use `2` nested loops to iterate through the array and check if the sum of the current `2` numbers is equal to the target
+    ![two sum](./img/two-sum-2.webp)
   - if we know that the array has `2` numbers that add up to the `target`, we can find the second number by subtracting the first number from the target
   - we can use a dictionary to store the number and its index and then iterate through the array and check if the `complement` is in the dictionary
+    ![two sum](./img/two-sum-3.webp)
     - `dictionary = {num: index}`
     - `complement = target - num`
   - We iterate only once through the array, as we guarantee that the **previous** numbers will be in the dictionary
@@ -57,11 +63,176 @@ def twoSum(self, nums: List[int], target: int) -> List[int]:
 
 ---
 
+## Majority Element
+
+| Video Solution                                                | Hint                                                                                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=7pnhv842keE) | Use a dictionary to store the frequency of each number and if the frequency of the current number is greater than `n // 2`, return it |
+
+Given an array `nums` of size `n`, return the majority element.
+
+The majority element is the element that appears more than `⌊n / 2⌋` times. You may assume that the majority element always exists in the array.
+
+- EX:
+
+  - Input: `nums = [3,2,3]`
+  - Output: `3`
+
+- Explanation:
+  - Bruteforce solution is that we can use `2` nested loops to iterate through the array and check if the count of the current number is greater than `n/2`
+  - we can use a dictionary to store the frequency of each number and then iterate through the dictionary and return the number with the max count
+
+```py
+def majorityElement(nums):
+    count = {}
+    for num in nums:
+        freq = count.get(num, 0) + 1
+        count[num] = freq
+
+        if freq > len(nums) / 2:
+            return num
+
+    return -1
+```
+
+- **Follow-up:** Can you solve the problem in `O(1)` space complexity and `O(n)` time complexity?
+
+  - We can use **Boyer-Moore Voting Algorithm** to solve this problem in `O(1)` space complexity and `O(n)` time complexity
+  - The algorithm works as follows:
+    - We maintain a `count` variable to store the count of the current number and a `candidate` variable to store the current candidate
+    - We iterate through the array and check if the `count` is `0`, if it is, we set the current number as the `candidate`
+    - If the current number is equal to the `candidate`, we increment the `count` by `1`, otherwise we decrement the `count` by `1`
+    - At the end, we return the `candidate`
+
+  ```py
+  def majorityElement(nums):
+      res, count = 0, 0
+
+        for n in nums:
+            if count == 0:
+                res = n
+            count += (1 if n == res else -1)
+
+        return res
+  ```
+
+---
+
+## Majority Element II
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Eua-UrQ_ANo) | Use a dictionary to store the frequency of each number and then iterate through the dictionary and check if the frequency of the current number is greater than `n // 3`, return it **OR** use Boyer-Moore Voting Algorithm |
+
+Given an integer array of size `n`, find all elements that appear more than `⌊ n/3 ⌋` times.
+
+- EX:
+
+  - Input: `nums = [3,2,3]`
+  - Output: `[3]`
+
+- Explanation:
+  - Same as the previous problem, we can use a dictionary to store the frequency of each number and then iterate through the dictionary and check if the frequency of the current number is greater than `n // 3`, return it
+
+```py
+def majorityElement(nums):
+    count = {}
+    for num in nums:
+        count[num] = count.get(num, 0) + 1
+
+    res = []
+    for num in count:
+        if count[num] > len(nums) // 3:
+            res.append(num)
+
+    return res
+```
+
+- **Follow-up**: Could you solve the problem in linear time and in `O(1)` space?
+
+  ```py
+  def majorityElement(nums):
+      res = []
+      count1, count2, candidate1, candidate2 = 0, 0, 0, 1
+
+      for n in nums:
+          if n == candidate1:
+              count1 += 1
+          elif n == candidate2:
+              count2 += 1
+          elif count1 == 0:
+              candidate1, count1 = n, 1
+          elif count2 == 0:
+              candidate2, count2 = n, 1
+          else:
+              count1 -= 1
+              count2 -= 1
+
+      for c in [candidate1, candidate2]:
+          if nums.count(c) > len(nums) // 3:
+              res.append(c)
+
+      return res
+  ```
+
+---
+
+## Intersection of Two Arrays
+
+| Video Solution | Hint                                                                                                                                                                                            |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Use a hash set to store the numbers in the first array and then iterate through the second array and check if the number is in the second array and not in the hash set, add it to the hash set |
+
+Given two integer arrays `nums1` and `nums2`, return an array of their intersection. Each element in the result must be **unique** and you may return the result in **any order**.
+
+- EX:
+
+  - Input: `nums1 = [1,2,2,1], nums2 = [2,2]`
+  - Output: `[2]`
+
+```py
+# Approach 1: using hash table
+def intersection(nums1, nums2):
+    # create a dictionary to store the frequency of each number in the first array
+    count = {}
+    for num in nums1:
+        count[num] = count.get(num, 0) + 1
+
+    # iterate through the second array and check if the number is in the dictionary
+    result = []
+    for num in nums2:
+        if num in count:
+            result.append(num)
+            del count[num]
+
+    return result
+
+# ------------------------------------------------------
+
+# Approach 2: using set
+def intersection(nums1, nums2):
+    res = set()
+
+    for num in nums1:
+        if num in nums1 and num not in res:
+            res.add(num)
+
+    return list(res)
+```
+
+- Time complexity: `O(n * m)` where `n` is the length of the first array and `m` is the length of the second array
+  - This is because we iterate through the first array and for each number, we iterate through the second array to check if the number is in the second array
+  - We can improve the time complexity by using a hash set to store the numbers in the first array and then iterate through the second array and check if the number is in the second array and not in the hash set, add it to the hash set -> `O(n + m)`
+- Space complexity: `O(n)` where `n` is the length of the first array
+  - This is because we use a dictionary / set to store the frequency of each number in the first array
+
+---
+
 ## Valid Anagram
 
-| Video Solution                                                | Hint                                                                                                                                                            |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=9UtInBqnCgA) | Use 2 dictionaries to store the frequency of each character in each string and then compare the dictionaries to check if the strings are anagrams of each other |
+| Video Solution                                                | Hint                                                                                                                                                             |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=9UtInBqnCgA) | Use 2 dictionaries to store the frequency of each character in each string and then compare the dictionaries to check if the count of each character is the same |
 
 An anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
 
@@ -88,13 +259,27 @@ def is_anagram(s, t):
     return sorted(s) == sorted(t)
 ```
 
+- Time complexity: `O(s + t) ~ O(n)` where `s` is the length of the first string and `t` is the length of the second string
+- Space complexity: `O(s + t) ~ O(n)` where `s` is the length of the first string and `t` is the length of the second string
+
+- **Follow up:** can you solve it in `O(1)` space complexity?
+
+  - We can sort the strings and then compare them to check if they're anagrams of each other
+
+    ```py
+    def is_anagram(s, t):
+        return sorted(s) == sorted(t)
+    ```
+
+  - Time complexity: `O(n log(n))` or base on the sorting algorithm used
+
 ---
 
 ## Group Anagrams
 
-| Video Solution                                                | Hint                                                                                                                                                                               |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=vzdNOK2oB2E) | Use a dictionary to store the sorted string as the key and the list of anagrams as the value, **OR** use a dictionary to store the charCount as a `tuple` of 26 numbers as the key |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=vzdNOK2oB2E) | Use a dictionary to store the sorted string as the key and the list of anagrams as the value (don't forget to join the sorted string because the sorted function returns an array), **OR** store the charCount as a `tuple` of `26` numbers as the key |
 
 Given an array of strings `strs`, group the anagrams together. You can return the answer in **any order**.
 
@@ -108,7 +293,10 @@ Given an array of strings `strs`, group the anagrams together. You can return th
 
   - we can use a dictionary to store the sorted string as the key and the list of anagrams as the value
   - we can iterate through the array and sort each string and then add it to the dictionary
-  - Time
+    - IMPORTANT: we need to `join` the sorted string because the sorted function returns an array
+  - Time complexity: `O(m . n log(n))` where:
+    - `m` is the length of the array
+    - `n` is the length of the longest string in the array (because we're sorting each string)
 
   ```py
   def group_anagrams(strs):
@@ -143,6 +331,10 @@ Given an array of strings `strs`, group the anagrams together. You can return th
   - Time complexity: `O(n.m.26)` -> `O(n.m)` where:
     - `n` is the length of the array
     - `m` is the length of the longest string in the array
+    - `26` is the number of characters in the alphabet
+  - Space complexity: `O(n.m.26)` -> `O(n.m)` where:
+    - `n` is the length of the array
+    - `m` is the length of the longest string in the array
 
   ```py
   def group_anagrams(strs):
@@ -171,6 +363,10 @@ Given an array of strings `strs`, group the anagrams together. You can return th
 
 ## Unique Number of Occurrences
 
+| Video Solution                                                | Hint                                                                                                                                                |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=vuYlOjpqxXs) | Use a dictionary to store the frequency of each number and then use a `hash set` to store check if the length of the dictionary `values` are unique |
+
 Given an array of integers arr, return true if the number of occurrences of each value in the array is unique or false otherwise.
 
 - EX:
@@ -195,6 +391,10 @@ def uniqueOccurrences(arr):
 
 ## Contains Duplicate II
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ypn0aZ0nrL4) | Use a dictionary to store the index of each number and then iterate through the array and check if the current number is in the dictionary and if the difference between the indices is less than or equal `k`, **OR** use a sliding window |
+
 Given an integer array `nums` and an integer `k`, return `true` if there are two distinct indices `i` and `j` in the array such that `nums[i] == nums[j]` and `abs(i - j) <= k`.
 
 - EX:
@@ -203,6 +403,9 @@ Given an integer array `nums` and an integer `k`, return `true` if there are two
   - Output: `true`
 
 - **Solution 1:** using HashMap
+
+  - Time complexity: `O(n)` where `n` is the length of the array
+  - Space complexity: `O(n)` where `n` is the length of the array
 
   ```py
   def containsNearbyDuplicate(nums, k):
@@ -217,6 +420,9 @@ Given an integer array `nums` and an integer `k`, return `true` if there are two
   ```
 
 - **Solution 2:** sliding window
+
+  - Time complexity: `O(n)` where `n` is the length of the array
+  - Space complexity: `O(k)` where `k` is the length of the window 🔥
 
   ```py
   def containsNearbyDuplicate(nums, k):
@@ -239,6 +445,10 @@ Given an integer array `nums` and an integer `k`, return `true` if there are two
 
 ## Verifying an Alien Dictionary
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ypn0aZ0nrL4) | Use a dictionary to store the index of each alien character and then iterate through the array and check if the current word is lexicographically greater than the next word, This is done by comparing each pair of adjacent characters in the words |
+
 In an alien language, surprisingly they also use English lowercase letters, but possibly in a different order. The order of the alphabet is some permutation of lowercase letters.
 
 Given a sequence of `words` written in the alien language, and the `order` of the alphabet, return `true` if and only if the given `words` are sorted lexicographicaly in this alien language.
@@ -259,7 +469,7 @@ Given a sequence of `words` written in the alien language, and the `order` of th
 
 ```py
 def isAlienSorted(words, order):
-    # Create a dictionary to store the order of each character in the alien language
+    # char -> index
     order_index = {c: i for i, c in enumerate(order)}
 
     # Iterate through the words and compare each pair words to check if they're in-order
@@ -270,13 +480,11 @@ def isAlienSorted(words, order):
         # looping through the characters of the first word because the first word is a substring of the second word
         for j in range(len(w1)):
             # If we reached the end of word2 but not word1, then the words are not sorted
-            if j == len(w2):
-                return False
+            if j == len(w2): return False
             # If the first word is lexicographically greater than the second word, then the words are not sorted
             if w1[j] != w2[j]:
                 # check order index for each character
-                if order_index[w1[j]] > order_index[w2[j]]:
-                    return False
+                if order_index[w1[j]] > order_index[w2[j]]: return False
                 break # because we found the different character, and it's valid
 
     return True
@@ -284,7 +492,51 @@ def isAlienSorted(words, order):
 
 ---
 
+## Isomorphic Strings
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=7yF-U1hLEqQ) | Use 2 dictionaries to store the corresponding characters in each string and then iterate through the strings using `zip()` and check if the current characters are in the dictionaries in both directions, if not, return `False` |
+
+Given two strings `s` and `t`, determine if they are isomorphic.
+
+> Two strings `s` and `t` are isomorphic if the characters in `s` can be replaced to get `t`.
+> ![isomorphic-strings](./img/isomorphic-strings-1.svg)
+
+- EX: `s = "egg", t = "add"` -> `True`
+- Explanation:
+
+  - Note that "No two characters may map to the same character, but a character may map to itself.", so we need to map each character in `s` to a unique character in `t` and vice versa.
+  - we must check if the characters in `s` can be replaced to get `t` and vice versa. This is done by:
+    ![isomorphic-strings](./img/isomorphic-strings-2.webp)
+
+    1. creating a dictionary to keep track of the corresponding characters in each string
+    2. check if the current characters are in the dictionaries, if not, add them
+    3. if they are in the dictionaries, check if they correspond to each other and if not return `False`
+
+Time Complexity: `O(n)`
+
+```py
+def isIsomorphic(s, t):
+    # Initialize dictionaries to keep track of the corresponding characters in each string
+    mapST, mapTS = {}, {}
+
+    for c1, c2 in zip(s, t):
+        if (c1 in mapST and mapST[c1] != c2) or (c2 in mapTS and mapTS[c2] != c1):
+            return False
+        mapST[c1] = c2
+        mapTS[c2] = c1
+
+    return True
+```
+
+---
+
 ## Hand of Straights
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=amnrMCVd2YI) | Create a dictionary to store the frequency of each card and then use a `minHeap` to get the minimum value in `O(1)` time instead of getting the minimum of `freq.values()` each time in `O(n)` time, then iterate through the `minHeap` and check if the next `W` cards are consecutive by returning `False` if the next card is not in the dictionary |
 
 Alice has a `hand` of cards, given as an array of integers. Now she wants to rearrange the cards into groups so that each group is size `W`, and consists of `W` **consecutive** cards. Return `true` if and only if she can.
 
@@ -299,19 +551,12 @@ Alice has a `hand` of cards, given as an array of integers. Now she wants to rea
   - we can be **greedy** and look for the minimum value available each time and start a group from there
 
     - because we know that the minimum value will be the start of a group -> `[1, 2, 3]` and we can't have `1` again in the next group because it's already used
-      ![hand of straights](./img/hand-of-straights-1.png)
-
-    - we will use a `minHeap` for this to get the minimum value in `O(1)` time instead of getting the minimum of `freq.values()` each time in `O(n)` time
-      ![hand of straights](./img/hand-of-straights-2.png)
 
   - We can use a dictionary to store the frequency of each card
-  - Then we can **sort** the hand and iterate through the hand
-    - If the current card is not in the dictionary, continue
-    - If the current card is in the dictionary, iterate through the next `W` cards, starting from the current card because the hand is sorted and we want to check if the next `W` cards are consecutive -> `[card, card+1, card+2, ..., card+W-1]` -> `[1, 2, 3], [2, 3, 4], [3, 4, 5], ...`
-      - If the card is not in the dictionary, return `False`
-      - If the card is in the dictionary, decrement its frequency
-      - If the card's frequency is `0`, remove it from the dictionary
-  - If the dictionary is empty, return `True`
+    ![hand of straights](./img/hand-of-straights-1.png)
+  - we will use a `minHeap` for this to get the minimum value in `O(1)` time instead of getting the minimum of `freq.values()` each time in `O(n)` time
+    ![hand of straights](./img/hand-of-straights-2.png)
+  - We must have consecutive cards in each group, so we can iterate from the **current card value not index** to the required group size and check if the next `W` cards are consecutive (by returning `False` if the next card is not in the dictionary)
 
 ```py
 def isNStraightHand(hand, groupSize):
@@ -388,6 +633,10 @@ def isNStraightHand(hand, groupSize):
 
 ## 4Sum II
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=kku30O4XpOg) | Use a dictionary to store the sum of each pair of numbers in the first two arrays and then iterate through the second two arrays and check if the complement is in the first dictionary, add the product of the frequencies to the count |
+
 Given four lists `A`, `B`, `C`, `D` of integer values, compute how many tuples `(i, j, k, l)` there are such that `A[i] + B[j] + C[k] + D[l]` is zero.
 
 - Ex: `A = [ 1, 2], B = [-2,-1], C = [-1, 2], D = [ 0, 2]`
@@ -397,56 +646,46 @@ Given four lists `A`, `B`, `C`, `D` of integer values, compute how many tuples `
     1. `(0, 0, 0, 1)` -> `A[0] + B[0] + C[0] + D[1] = 1 + (-2) + (-1) + 2 = 0`
     2. `(1, 1, 0, 0)` -> `A[1] + B[1] + C[0] + D[0] = 2 + (-1) + (-1) + 0 = 0`
 
-- **Solution 1:** using a dictionary -> `O(n^2)` time and `O(n^2)` space
+- Explanation:
+  - We can use a dictionary to store the sum of each pair of numbers in the first two arrays
+  - Then we can iterate through the second two arrays and check if the complement is in the first dictionary
+  - If the complement is in the first dictionary, add the product of the frequencies to the count
+    - We add the product of the frequencies because we want to count the number of tuples `(i, j, k, l)` there are such that `A[i] + B[j] + C[k] + D[l]` is zero
+    - We don't add`1` because we want to count the number of tuples, not the number of sums that are equal to `0`
 
-  ```py
-  def fourSumCount(A, B, C, D):
-      # create a dictionary to store the sum of each pair of numbers in A and B
-      sumAB = {}
-      for a in A:
-          for b in B:
-              sumAB[a+b] = sumAB.get(a+b, 0) + 1
+```py
+def fourSumCount(A, B, C, D):
+    # create a dictionary to store the sum of each pair of numbers in A and B
+    sumAB = {}
+    for a in A:
+        for b in B:
+            sumAB[a+b] = sumAB.get(a+b, 0) + 1
 
-      # create a dictionary to store the sum of each pair of numbers in C and D
-      sumCD = {}
-      for c in C:
-          for d in D:
-              sumCD[c+d] = sumCD.get(c+d, 0) + 1
+    # iterate through the keys of the first dictionary
+    count = 0
+    for c in C:
+        for d in D:
+            # if the complement is in the first dictionary, add the product of the frequencies to the count
+            if -(c+d) in sumAB:
+                count += sumAB[-(c+d)]
 
-      # iterate through the keys of the first dictionary
-      count = 0
-      for sum1 in sumAB:
-          # if the complement is in the second dictionary, add the product of the frequencies to the count
-          if -sum1 in sumCD:
-              count += sumAB[sum1] * sumCD[-sum1]
+    return count
+```
 
-      return count
-  ```
+- Time complexity: `O(a * b + c * d)` where `a` is the length of the first array, `b` is the length of the second array, `c` is the length of the third array, and `d` is the length of the fourth array
 
-- Solution 2: using a dictionary **(Better ✅)** -> `O(n^2)` time and `O(n)` space
-
-  ```py
-  def fourSumCount(A, B, C, D):
-      # create a dictionary to store the sum of each pair of numbers in A and B
-      sumAB = {}
-      for a in A:
-          for b in B:
-              sumAB[a+b] = sumAB.get(a+b, 0) + 1
-
-      # iterate through the keys of the first dictionary
-      count = 0
-      for c in C:
-          for d in D:
-              # if the complement is in the first dictionary, add the product of the frequencies to the count
-              if -(c+d) in sumAB:
-                  count += sumAB[-(c+d)]
-
-      return count
-  ```
+  - This is because we iterate through the first two arrays and then iterate through the second two arrays
+  - It will be `O(n^2)` if all the arrays have the same length
+  - Space complexity: `O(a * b)` where `a` is the length of the first array and `b` is the length of the second array
+    - This is because we store the sum of each pair of numbers in the first two arrays in a dictionary
 
 ---
 
 ## Repeated DNA Sequences
+
+| Video Solution                                                | Hint                                                                                                                                                                 |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=FzTYfsmtOso) | Use a dictionary to store the frequency of each substring (`s[i:i+10]`) and then iterate through the dictionary and return the substrings that occur more than once. |
 
 The **DNA sequence** is composed of series of nucleotides abbreviated as `'A'`, `'C'`, `'G'`, and `'T'`.
 
@@ -459,16 +698,27 @@ Given a **DNA sequence** `s`, return all the **10-letter-long** sequences (subst
   - Output: `["AAAAACCCCC", "CCCCCAAAAA"]`
   - Explanation: `"AAAAACCCCC"` appears twice, and `"CCCCCAAAAA"` appears twice.
 
+- Explanation:
+  - We can use a dictionary to store the frequency of each substring and then iterate through the dictionary and return the substrings that occur more than once
+    - substring: `s[i:i+10]`
+  - Time complexity: `O(n)` where `n` is the length of the string
+  - Space complexity: `O(n)` where `n` is the length of the string
+
 ```py
 def findRepeatedDnaSequences(s):
-    seen = set()
-    repeated = set()
+    # create a dictionary to store the frequency of each substring
+    count = {}
     for i in range(len(s)-9):
-        # get the current substring
         cur = s[i:i+10]
-        if cur in seen:
-            repeated.add(cur)
-        seen.add(cur)
+        count[cur] = count.get(cur, 0) + 1
+
+    # iterate through the dictionary and return the substrings that occur more than once
+    res = []
+    for key in count:
+        if count[key] > 1:
+            res.append(key)
+
+    return res
 ```
 
 ---

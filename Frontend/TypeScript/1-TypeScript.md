@@ -3,14 +3,6 @@
 - [INDEX](#index)
   - [TypeScript](#typescript)
     - [why use Typescript](#why-use-typescript)
-  - [Installing \& Configuration](#installing--configuration)
-    - [Installation](#installation)
-    - [Compiling](#compiling)
-      - [Compiling one TS file](#compiling-one-ts-file)
-      - [Compiling entire project with all its files](#compiling-entire-project-with-all-its-files)
-      - [Configuring the TS compiler](#configuring-the-ts-compiler)
-      - [Compiling using bundlers (webpack, parcel, rollup)](#compiling-using-bundlers-webpack-parcel-rollup)
-    - [Type Declarations](#type-declarations)
   - [Typing](#typing)
     - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
     - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
@@ -20,6 +12,7 @@
   - [Type Assertions / Type Casting](#type-assertions--type-casting)
   - [Generics](#generics)
     - [Generics Constraints](#generics-constraints)
+    - [Advanced generic constraints](#advanced-generic-constraints)
   - [Type Guard (Narrowing)](#type-guard-narrowing)
     - [`typeof` type guard](#typeof-type-guard)
     - [Truthiness guard](#truthiness-guard)
@@ -30,7 +23,8 @@
     - [Discriminated Unions](#discriminated-unions)
     - [Exhaustiveness Checks with Never](#exhaustiveness-checks-with-never)
   - [Decorators](#decorators)
-    - [Decorator configuration](#decorator-configuration)
+    - [How to use Decorators](#how-to-use-decorators)
+    - [Decorator Factories](#decorator-factories)
     - [Decorator Composition](#decorator-composition)
     - [Class Decorator](#class-decorator)
   - [Namespace](#namespace)
@@ -56,170 +50,6 @@
   - Values that are potentially absent (`null` or `undefined`)
 - It serves as the foundation for a great code authoring experience
   - `Example`: in-editor autocomplete
-
----
-
-## Installing & Configuration
-
-### Installation
-
-- [reference](https://classroom.udacity.com/nanodegrees/nd0067-fwd-t3/parts/cd0292/modules/c0ad589b-67b3-4791-931f-9b0fa8ac0ed3/lessons/f92490de-12fb-4c61-a74a-3889a4727954/concepts/061049c2-7fdf-4d69-868b-e51c64c7ceef)
-
-```bash
-npm i typescript --save-dev  # save to devDependencies
-
-npm i --save-dev ts-node  # to run typescript files directly without compiling them
-
-npm i --save-dev @types/node  # type definitions
-
-```
-
----
-
-### Compiling
-
-**Typescript doesn't run in the browser**. We only use the language in our code-editor for development. Typescript only exists for the benefit of the developer.
-
-- **Compiler:** is a piece of software that converts Typescript to Javascript so that it runs in the browser
-
-#### Compiling one TS file
-
-- `tsc` -> **TypeScript Compiler** is the command used to compile `typescript` to `javascript`
-
-- It's the way to run in using `node.js`
-
-  ```sh
-  tsc app.ts
-  ```
-
-  - It creates a new file called `app.js` that contains the compiled code
-
-- in `html` file -> always use the `.js` file and not the `.ts` file
-
-- `watch mode` : like live-server
-
-  ```sh
-  tsc app.ts --watch   # or --w
-  # this will create a new file called app.js
-  ```
-
----
-
-#### Compiling entire project with all its files
-
-- To use TypeScript, you need to add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
-
-  - this command will `transpile` TypeScript to JavaScript
-
-  ```json
-  "scripts": {
-      "build": "npx tsc"
-    },
-  ```
-
-- Add the default TypeScript configuration file with the configurations for the project (how and where to compile the files) -> `tsconfig.json`
-
-  ```sh
-  npx tsc --init # this will create a `tsconfig.json` file with default configurations
-  ```
-
-- Run this command to compile the project
-
-  ```bash
-  tsc  # this will tell TS to convert all (.ts) files to (.js)
-  # or
-  tsc --watch
-  # or using the "build" script above
-  npm run build
-  ```
-
----
-
-#### Configuring the TS compiler
-
-- `tsconfig.json` -> This config file is also where you can tell TypeScript how strict it should be while checking your code and what to ignore. If you're moving a project to TypeScript, you can gracefully integrate TS by working with the settings in this config file.
-
-- Helpful configurations to note for in `tsconfig.json`
-
-  ```json
-  {
-    "compilerOptions": {
-      "target": "es5", // which level of JS-support to target
-      "module": "commonjs",
-      "lib": ["ES2018", "DOM"],
-      "outDir": "./build", // destination folder will have JS files
-      "rootDir": "./src", // just include src folder that has TS files
-      "strict": true,
-      "noImplicitAny": true //  TypeScript will issue an error whenever it would have inferred (any)
-    },
-    "exclude": ["node_modules", "tests"]
-  }
-  ```
-
-  - `target` - sets what version of JS TypeScript will be transpiled to (and include compatible library declarations).
-  - `module` - sets what module system will be used when transpiling
-    - specify what module code is generated when dealing with modules(multiple files with `import`/`export`)
-    - best -> `"ES6"`
-  - Node.js uses the common.js module system by default
-  - `lib` - It's a set of bundled library-declaration files that describe the target runtime environment
-    - Used to state what libraries your code is using. In this case, `ES2018` and the `DOM API`
-  - `outDir` - where you want your src code to output to. Often named build, prod, or server (when using it server-side)
-  - `strict` - enable strict type-checking options
-  - `noImplicitAny` - disallow the "any" type (covered in TypeScript Basics)
-  - specifying which file to compile:
-    - `files`: list all files you want to compile to `js` or use (`include` & `exclude`)
-    - `exclude`: files or directories to exclude in compiling
-  - for `Debugging` --> use `"sourceMap": true`
-
----
-
-#### Compiling using bundlers (webpack, parcel, rollup)
-
-Here, the bundler will do the compiling for us using the script in the main HTML file
-
-```html
-<script src="src/app.ts"></script>
-
-<!-- Will be compiled to -->
-
-<script src="dist/bundle.js"></script>
-```
-
-- webpack -> is a bundler that can be used to compile TypeScript to JavaScript and use the javascript file in the `html` file instead of the `TS` file
-
-  ```bash
-  npm i --save-dev webpack webpack-cli webpack-dev-server typescript ts-loader
-
-  npm run webpack-dev-server
-  ```
-
-- parcel
-
-  ```bash
-  npm i --save-dev parcel-bundler
-
-  parcel index.html
-  ```
-
-More here: [Bundling Typescript with Webpack](#bundling-typescript-with-webpack)
-
----
-
-### Type Declarations
-
-They are special files that end with `.d.ts` instead of `.ts`
-
-- in `.d.ts` files, we find no implementation details, no code that is ever going to be run as javascript (no output), Instead we find files that only contain type information declarations of types which Typescript can use for our code
-- example for them is the types files for the libraries where all the type-declarations are
-- it's useful when working with 3rd party libraries code
-
-  - if a library doesn't have type-declaration files like `lodash`, we can install the corresponding `@types` package externally
-
-    ```sh
-    npm i --save-dev @types/lodash
-    ```
-
-    - the `@type` is from a github repo -> [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)
 
 ---
 
@@ -538,6 +368,43 @@ A generic is a way to write a function that is reusable across different types, 
 
 ---
 
+### Advanced generic constraints
+
+We can use `keyof` operator to constrain a generic to only accept keys of a certain type
+![keyof](./img/generic-constraints-1.jpeg)
+
+> It depends on [Literal type](./2-TS-Types.md#literal-type)
+
+- For example:
+
+  ```ts
+  function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+    return obj[key];
+  }
+
+  let user = {
+    id: 1,
+    name: 'test',
+    age: 20
+  };
+
+  getProperty(user, 'id'); // ✅
+  getProperty(user, 'name'); // ✅
+  getProperty(user, 'age'); // ✅
+  getProperty(user, 'm'); // ❌ Argument of type '"m"' is not assignable to parameter of type '"id" | "name" | "age"'.
+  ```
+
+- This is done instead of explicitly defining the type of the key
+
+  ```ts
+  // BAD ❌
+  function getProperty(obj: any, key: string): string | number {
+    return obj[key];
+  }
+  ```
+
+---
+
 ## Type Guard (Narrowing)
 
 - **Type Guard** : protects us from doing something unless we check the type first
@@ -711,15 +578,22 @@ It's the default thing to do when all the type-narrowing checks are all passed a
 
 ## Decorators
 
-Decorators are a way to decorate members of a class, or a class itself, with extra functionality. When you apply a decorator to a class or a class member, you are actually calling a function that is going to receive details of what is being decorated, and the decorator implementation will then be able to transform the code dynamically, adding extra functionality, and reducing boilerplate code.
+Decorators are functions that can be used to modify the behavior of classes, methods, and properties at runtime.
 
-- They are a way to have `metaprogramming` in TypeScript, which is a programming technique that enables the programmer to create code that uses other code from the application itself as data.
+![decorators](./img/decorators-1.png)
+
+- When you apply a decorator to a class or a class member, you are actually calling a function that is going to receive details of what is being decorated, and the decorator implementation will then be able to transform the code dynamically, adding extra functionality, and reducing boilerplate code.
+- They are a way to have **"Meta Programming"** in TypeScript, which is a programming technique that enables the programmer to create code that uses other code from the application itself as data.
+- It's based on the concept of **Prototype** in JavaScript
+  - A prototype is a blueprint of an object. It encapsulates the properties and methods that are common to all instances of the object.
+  - When you create an object from a prototype, the object inherits all the properties and methods from the prototype.
+  - In JavaScript, every object has a prototype, and the prototype is also an object.
 
 ---
 
-### Decorator configuration
+### How to use Decorators
 
-- To enable experimental support for decorators, you must enable the experimentalDecorators compiler option either on the command line or in your tsconfig.json
+- Decorators are experimental, and they are not part of the ECMAScript standard yet, **To enable experimental support for decorators**, you must enable the `experimentalDecorators` compiler option either on the command line or in your tsconfig.json
 
   ```bash
   # command line
@@ -735,6 +609,107 @@ Decorators are a way to decorate members of a class, or a class itself, with ext
     }
   }
   ```
+
+- How to use it on a property, method, accessor
+  ![decorators](./img/decorators-2.png)
+
+- Example:
+
+  ```ts
+  class Boat {
+    color: string = 'red';
+
+    get formattedColor(): string {
+      return `This boat color is ${this.color}`;
+    }
+
+    @testDecorator
+    pilot(): void {
+      console.log('swish');
+    }
+  }
+
+  function testDecorator(target: any, key: string): void {
+    console.log('Target:', target);
+    console.log('Key:', key);
+  }
+  ```
+
+- The decorator function is called **only one time** when the class is defined, not when it's instantiated
+- The decorator function receives multiple arguments:
+  - 1st argument -> `target`: the prototype of the object
+  - 2nd argument -> `key`: the name of the property/method/accessor that we are decorating
+  - 3rd argument -> `descriptor`: an object that contains the property descriptor of the member
+- From this we can see that we now will have access to the `prototype` of the object, and the `descriptor` of the member that we are decorating, which enables us to modify the object's behavior at runtime.
+
+- **Property descriptor** is an object that contains the property descriptor of the member
+  ![property descriptor](./img/decorators-3.png)
+
+  - It's the key way that we can modify the behavior of the object inside the decorator function
+
+    ```ts
+    function testDecorator(target: any, key: string, desc: PropertyDescriptor): void {
+      const method = desc.value;
+      desc.value = function () {
+        console.log('BEFORE METHOD');
+        method();
+        console.log('AFTER METHOD');
+      };
+    }
+    // Here, we are overriding the method with a new function that will log "BEFORE METHOD" before calling the original method, and then log "AFTER METHOD" after calling the original method.
+    ```
+
+  - So, It's like intercepting the method call and adding extra functionality to it.
+
+- **Notes:**
+
+  - In order to access any primitive type, we need to use `target.constructor` instead of `target`, this is because the prototype only contains the methods definitions and not the class properties. Instead, the **constructor** contains the class properties.
+
+    ```ts
+    function testDecorator(target: any, key: string): void {
+      console.log(target.color); // undefined ❌
+      console.log(target.constructor.color); // red ✅
+    }
+    ```
+
+---
+
+### Decorator Factories
+
+Decorator factories are functions that return decorator functions and they are used to configure decorators.
+
+- It's used when we want to pass arguments to the decorator function, and we can't do that directly because the decorator function is called only one time when the class is defined, not when it's instantiated.
+
+- Example:
+
+  ```ts
+  function testDecoratorFactory(color: string) {
+    return function (target: any, key: string, desc: PropertyDescriptor): void {
+      const method = desc.value;
+      desc.value = function () {
+        console.log(`BEFORE METHOD: ${color}`);
+        method();
+        console.log('AFTER METHOD');
+      };
+    };
+  }
+
+  class Boat {
+    color: string = 'red';
+
+    get formattedColor(): string {
+      return `This boat color is ${this.color}`;
+    }
+
+    @testDecoratorFactory('blue')
+    pilot(): void {
+      console.log('swish');
+    }
+  }
+  ```
+
+  - Here, we are passing the color as an argument to the decorator factory function, and then we are returning the decorator function that will be called when the class is defined.
+  - So, the decorator factory function is called when the class is defined, and the decorator function is called when the method is called.
 
 ---
 

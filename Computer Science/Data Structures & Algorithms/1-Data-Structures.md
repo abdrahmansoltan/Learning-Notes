@@ -36,6 +36,7 @@
       - [Double hashing](#double-hashing)
     - [Hash table implementation](#hash-table-implementation)
     - [Time complexity of HashMap](#time-complexity-of-hashmap)
+    - [Maps (TreeMap)](#maps-treemap)
   - [Stacks and Queues](#stacks-and-queues)
     - [Stacks](#stacks)
       - [Array-Based Stack Implementation](#array-based-stack-implementation)
@@ -56,7 +57,7 @@
       - [Binary Search Tree (BST)](#binary-search-tree-bst)
       - [Tree Traversal](#tree-traversal)
     - [TreeMap](#treemap)
-  - [Priority Queue (Heap)](#priority-queue-heap)
+  - [Priority Queue / Heap](#priority-queue--heap)
     - [Implementation of Priority Queue](#implementation-of-priority-queue)
     - [Binary Heap](#binary-heap)
       - [Binary heap methods](#binary-heap-methods)
@@ -106,7 +107,8 @@ A computer system will have a huge number of **bytes** of memory (`1 byte` = `8 
     ![blocks](./img/memoryBlocks.png)
 - computer hardware is designed, in theory, so that any byte of the main memory can be efficiently accessed based upon its memory address. In this sense, we say that a computer’s main memory performs as **random access memory (RAM)**.
 
-  - it is just as easy to retrieve byte `#8675309` as it is to retrieve byte `#309`
+  > It's called "Random Access" because it's just as easy to retrieve byte `#8675309` as it is to retrieve byte `#309`, we don't have to go through all the bytes to get to the wanted byte
+
   - Array elements can be quickly accessed (constant time) by using the formula `start + cellSize * index`, where "start" is the memory address, "cellSize" is the bytes per element, and "index" is the desired element's position.
     - Ex: cell `4` begins at memory location `2146+2*4 = 2154`.
 
@@ -186,8 +188,12 @@ The downside of this approach is that the size of the array must be specified in
 - This is not memory-efficient. You are reserving memory for future operations that may not occur.
 - If the array is too small to hold all the items, it will be necessary to create a new, larger array and then copy the old array into the new one.
   ![array full](./img/arrays-full.png)
+
+  > We can't just add the new element to a new memory location, because we need to keep the array **contiguous** in memory
+
   - This operation takes `O(n)` time, where `n` is the current number of items. In addition, if the array becomes overfull, it will be necessary to create a new, smaller array and copy the items again. Once again, this operation takes `O(n)` time.
     ![array full](./img/arrays-full-1.png)
+
 - Reserving extra memory can be wasteful if not needed, because we're reserving memory for future operations that may not occur.
   - **This is why arrays are recommended in situations when you know beforehand how many elements you;re going to store.**
 
@@ -837,6 +843,8 @@ Irrespective of how good a hash function is, collisions are bound to occur. Ther
 #### Rehashing
 
 - When the `load factor` of the hash table increases, the hash table is re-hashed (i.e., the `size` of the table is increased approximately by a factor of `2` and the table is rehashed -> like **dynamic arrays**).
+- Note that when doing so, we will have to re-compute the hash values for all the keys that are already stored in the hash table.
+  - This is because the old hash function will return values that are out of the range or in wrong positions in the new hash table.
 
 #### Double hashing
 
@@ -868,6 +876,10 @@ class HashTable:
 
     def _hash(self, key):
         # Hashing logic
+        idx = 0
+        for c in key:
+            idx += ord(c)
+        return idx % len(self.keyMap)
 
     def set(self, key, value):
         index = self._hash(key)
@@ -883,10 +895,11 @@ class HashTable:
 
     def get(self, key):
         index = self._hash(key)
-        if self.keyMap[index]:
-            for i in range(len(self.keyMap[index])):
-                if self.keyMap[index][i][0] == key:
-                    return self.keyMap[index][i][1]
+         # check for collisions (Open addressing)
+        while self.keyMap[index] is not None:
+            if self.keyMap[index][0] == key:
+                return self.keyMap[index][1]
+            index += 1
         return None
 
     def keys(self):
@@ -894,8 +907,7 @@ class HashTable:
         keys = []
         for i in range(len(self.keyMap)):
             if self.keyMap[i]:
-                for j in range(len(self.keyMap[i])):
-                    keys.append(self.keyMap[i][j][0])
+                keys.append(self.keyMap[i][0]) # if we're using separate chaining, we need to loop through the linked-list
         return keys
 
     def values(self):
@@ -903,8 +915,7 @@ class HashTable:
         values = []
         for i in range(len(self.keyMap)):
             if self.keyMap[i]:
-                for j in range(len(self.keyMap[i])):
-                    values.append(self.keyMap[i][j][1])
+                values.append(self.keyMap[i][1])
         return values
 ```
 
@@ -917,6 +928,29 @@ class HashTable:
 - Access: `O(1)`
 
 > Note that these are not the worst case time complexities. In the worst case, all the keys hash to the same index and we have to iterate through a linked list to find the key. In that case, the time complexity would be `O(n)`. But if we have a good hash function, we can avoid this situation and have `O(1)` time complexity for all operations.
+
+---
+
+### Maps (TreeMap)
+
+It's a data structure that stores key-value pairs **in a sorted order**, and it's implemented using a **binary search tree**.
+
+- in python: `sortedDict`
+
+  ```py
+  from sortedcontainers import SortedDict
+
+  treeMap = SortedDict({'c': 3, 'a': 1, 'b': 2}) # {'a': 1, 'b': 2, 'c': 3}
+  ```
+
+- Comparison between `HashMap` and `TreeMap`:
+
+  |     Operation     | HashMap (Hash Table) | TreeMap (Binary Search Tree) |
+  | :---------------: | :------------------: | :--------------------------: |
+  |      Search       |        `O(1)`        |          `O(log n)`          |
+  |     Insertion     |        `O(1)`        |          `O(log n)`          |
+  |     Deletion      |        `O(1)`        |          `O(log n)`          |
+  | Inorder Traversal |     `O(n log n)`     |            `O(n)`            |
 
 ---
 
@@ -1239,10 +1273,10 @@ They're nodes (vertices) connected via "Edges"
 
 - **Adjacency List** (most common) ✅
   - Here:
-    - we use `hash-table` to store the edges with the vertex as the key and the edges as the value array
+    - we use `hash-table` to store the edges with the vertex as the key and the edges as the value array -> `neighbors`
       ![graphs-adjacency-list](./img/graphs-adjacency-list.png)
-    - Or we can use `array` to store the edges with the vertex as the index and the edges as the value array
-      - this is more space-efficient than using `hash-table` as we don't have to store the keys as the `indices` are the keys
+    - Or we can use `array` to store the edges with the vertex as the index and the edges as the value array -> `neighbors`
+      - this is **more space-efficient** than using `hash-table` as we don't have to store the keys as the `indices` are the keys
         ![graphs-adjacency-list](./img/graphs-adjacency-list-1.png)
   - Here it's more space-efficient, as it's `O(n + e)` space complexity. This is because we only have to store the values for the edges that actually exist in an array for each node
   - it's the most used, as most data in real-world tends to lend itself to sparser and/or larger graphs
@@ -1257,35 +1291,62 @@ They're nodes (vertices) connected via "Edges"
   ![adding an edge](./img/graphs-edge1.png)
   ![adding an edge](./img/graphs-edge2.png)
 
-```py
-class Graph:
-  def __init__(self):
-    self.numberOfNodes = 0
-    self.adjacentList = {}
+- Approach 1:
 
-  def addVertex(self, node):
-    self.adjacentList[node] = []
-    self.numberOfNodes += 1
+  ```py
+  class GraphNode:
+    def __init__(self, value):
+      self.value = value
+      self.edges = []
 
-  def addEdge(self, node1, node2):
-    # undirected Graph
-    self.adjacentList[node1].append(node2) # add node2 to node1's list
-    self.adjacentList[node2].append(node1) # add node1 to node2's list
+  class Graph:
+    def __init__(self, nodes):
+      self.nodes = nodes
 
-# Using it
-myGraph = Graph()
-myGraph.addVertex('0')
-myGraph.addVertex('1')
-myGraph.addVertex('2')
+    def add_edge(self, node1, node2):
+      node1.edges.append(node2)
+      node2.edges.append(node1)
 
-myGraph.addEdge('0', '1')
-myGraph.addEdge('0', '2')
-myGraph.addEdge('1', '2')
+  # Using it
+  input_nodes = [GraphNode(0), GraphNode(1), GraphNode(2)]
+  edge_list = [(0, 1), (0, 2), (1, 2)]
 
-# 0 --> 1, 2
-# 1 --> 0, 2
-# 2 --> 0, 1
-```
+  graph = Graph(input_nodes)
+  for edge in edge_list:
+    graph.add_edge(input_nodes[edge[0]], input_nodes[edge[1]])
+  ```
+
+- Approach 2:
+
+  ```py
+  class Graph:
+    def __init__(self):
+      self.numberOfNodes = 0
+      self.adjacentList = {}
+
+    def addVertex(self, node):
+      self.adjacentList[node] = []
+      self.numberOfNodes += 1
+
+    def addEdge(self, node1, node2):
+      # undirected Graph
+      self.adjacentList[node1].append(node2) # add node2 to node1's list
+      self.adjacentList[node2].append(node1) # add node1 to node2's list
+
+  # Using it
+  myGraph = Graph()
+  myGraph.addVertex('0')
+  myGraph.addVertex('1')
+  myGraph.addVertex('2')
+
+  myGraph.addEdge('0', '1')
+  myGraph.addEdge('0', '2')
+  myGraph.addEdge('1', '2')
+
+  # 0 --> 1, 2
+  # 1 --> 0, 2
+  # 2 --> 0, 1
+  ```
 
 ---
 
@@ -1318,7 +1379,7 @@ It's a special type of graph, where no edges point back to the root node (no cyc
         return 1 + depth(node.parent)
       ```
 
-  - `height` of a node is the maximum number of edges from the desired `node` to the `leaf`.
+  - `height` of a node is the maximum number of edges from the desired `node` to its deepest `leaf` node.
 
     - So, height of a tree is the number of edges from the `root` to the furthest `leaf`.
     - height of a leaf node is `0`
@@ -1359,7 +1420,9 @@ It's a special type of graph, where no edges point back to the root node (no cyc
   - When certain constraints and properties are imposed on a binary tree, it results in a number of variations of binary trees.
 - Binary Search Tree
   ![binary tree](./img/binary-tree.webp)
-  - A binary tree where the `left` child is less than the parent and the `right` child is greater than the parent.
+  - It's a **Sorted Binary Tree**.
+    - A binary tree where the `left` child is less than the parent and the `right` child is greater than the parent.
+    - These sorting rules are recursive, meaning that they apply to every (node & sub-tree) in the tree
   - This property of Binary Search Tree makes it suitable for **searching operations** as at each node we can decide accurately whether the value will be in left subtree or right subtree. Therefore, it is called a Search Tree.
 - AVL Tree
   - A self-balancing binary search tree. It is named after its two inventors, **Adelson-Velsky** and **Landis**.
@@ -1435,6 +1498,7 @@ class Tree:
   - Each `node` can only have either `0`, `1` or `2` child-nodes
   - Each child can have only one parent
   - Each child node is labeled as being either a `left-child` or a `right-child`, and the `left-child` node precedes the `right-child` node in the order of children of a `node`
+  - It can't have cycles (it's an `acyclic` graph)
 - A `node` represent a certain state which has 3 properties:
   ![binary tree node](./img/binary-tree-node.png)
   1. **value**
@@ -1546,7 +1610,7 @@ An alternative representation of a binary tree is to have a single array `A` of 
       - selecting another **root** node and reorder the tree
       - Algorithms which balance an unbalanced-trees, like : `AVL Tree`, `Red Black Tree`
 
-    > Usually in interviews, we assume that the tree is balanced.
+    > Usually in interviews, we assume that the tree is **balanced**.
 
   - no `O(1)` operations like in `hash-tables`
   - removing elements is a bit tricky, as we need keep track to a reference to the **parentNode**, so that we know what the deleted node is replaced with
@@ -1598,6 +1662,11 @@ An alternative representation of a binary tree is to have a single array `A` of 
 
 - **Removing a node:**
 
+  - Cases:
+    ![BST insertion](./img/bst-removing-1.png)
+    ![BST insertion](./img/bst-removing-2.png)
+    ![BST insertion](./img/bst-removing-3.png)
+
   - Here, when we need to remove a node that has children, we need to
     - find the **minimum value** in the **right subtree (largest side)** and replace the node with it, then remove the minimum value from the right subtree
     - or find the **maximum value** in the **left subtree (smallest side)** and replace the node with it, then remove the maximum value from the left subtree
@@ -1620,17 +1689,16 @@ An alternative representation of a binary tree is to have a single array `A` of 
         return None # remove the node
 
       # case 2: one child
-      elif not root.left:
+      elif not root.left and root.right:
         return root.right
-      elif not root.right:
+      elif not root.right and root.left:
         return root.left
 
       # case 3: two children
       else:
         # find the minimum value in the right subtree because it's the next largest value in the tree
         min_val = find_min(root.right)
-        # copy that value to the current node
-        root.val = min_val
+        root.val = min_val # replace the node with the minimum value
         # then recursively delete the minimum value in the right subtree
         root.right = remove(root.right, min_val)
 
@@ -1642,6 +1710,8 @@ An alternative representation of a binary tree is to have a single array `A` of 
        root = root.left
      return root.val
   ```
+
+  - This is one of the advantages of BST over sorted Arrays, as we can do insertion and deletion in `O(log(n))` time, which is much faster than `O(n)` in arrays
 
 ---
 
@@ -1673,7 +1743,7 @@ treeMap = SortedDict({"a": 1, "b": 2, "c": 3})
 
 ---
 
-## Priority Queue (Heap)
+## Priority Queue / Heap
 
 It's a type of queue where each element has a priority associated with it. Elements with higher priorities are served before elements with lower priorities (Arranged based on their priority).
 
@@ -1724,9 +1794,10 @@ It's a more efficient data structure for presenting Priority-queue.
 
 - It's very similar to Binary-search-tree, but with some different rules: **(It's not a BST)**
 
+  - It's a **complete binary tree** (all levels are filled except the last level)
+    - Nodes are added from `left` to `right` in the tree -> This will guarantee that the tree is always "complete".
   - There's no order to nodes in `left` and `right` nodes **(Weak order)**, but there's an order between the parent node and its children nodes **(Heap order)**
     - `left` and `right` child nodes can be any value as long as they're less than the upper node
-  - Nodes are added from `left` to `right` in the tree -> This will guarantee that the tree is always **complete binary tree** (all levels are filled except the last level)
   - in a **MinBinaryHeap**, parent nodes are always smaller than child nodes
 
     - for every position `p` in the heap, the `key` stored at `p` is **greater** than or equal to the `key` stored at `p's parent`
@@ -1768,12 +1839,12 @@ It's a more efficient data structure for presenting Priority-queue.
 - search: `O(n)` -> because it's **not ordered** like `BST`, so we need to loop through the entire thing to find the element
 - `heapify`: `O(n)` -> because we need to loop through the entire thing to find the element
 
-- **Inserting / Pushing** -> `O(log n)`
+- **Inserting / Pushing** -> `O(log n)` -> height of the tree
 
   - when inserting, we first add item to the end of the `values` array, then we **bubble-up** (swap it up until it finds its correct spot)
     ![binary-heap-insertion](./img/binary-heap-insertion1.png)
 
-- **Popping / Removing** -> `O(log n)`
+- **Popping / Removing** -> `O(log n)` -> height of the tree
   1. remove the root (because it's the highest priority)
   2. swap its position with the most recently added (last element in values array) -> **bubble-up** to the top.
   3. adjust (**sink/bubble-down**) until we have correct spots
@@ -1791,10 +1862,12 @@ It's a more efficient data structure for presenting Priority-queue.
 
 - For any parent node of an Array at index `n`:
   ![Array representation](./img/binary-heap3.png)
+  - We may start at index `1` to make the math easier, but it's more common to start at index `0`
   - the `left` child is stored at `2n + 1`
   - the `right` child is stored at `2n + 2`
 - For any child node at index `n`:
   - its parent is at index `(n - 1) / 2` **floored**
+- Here, we are guaranteed not to have empty slots in the array, because we're adding elements from left to right, and it's a **complete binary tree**
 
 ---
 
@@ -1827,14 +1900,11 @@ class PriorityQueue:
         """
         idx = len(self.values) - 1 # last index
         element = self.values[idx] # last element
-        while idx > 0:
+        while idx > 0 and element.priority < self.values[(idx - 1) // 2].priority:
+            # swap the element with its parent
             parentIdx = (idx - 1) // 2
-            parent = self.values[parentIdx]
-            if element.priority <= parent.priority:
-                break # we found the correct spot
+            self.values[idx], self.values[parentIdx] = self.values[parentIdx], self.values[idx]
 
-            # else, swap the parent with the element in one line
-            self.values[parentIdx], self.values[idx] = self.values[idx], self.values[parentIdx]
 
     def dequeue(self):
         if len(self.values) == 0:
@@ -1842,37 +1912,34 @@ class PriorityQueue:
         if len(self.values) == 1:
             return self.values.pop()
 
-        max = self.values[0]
+        root = self.values[0]
         end = self.values.pop() # remove the last element in the array
         if len(self.values) > 0:
             self.values[0] = end # replace the root with the last element to start the sinking down process
             self.sinkDown() # move the node down the tree until it finds its correct spot
-        return max
+        return root
 
     def sinkDown(self):
         idx = 0
         length = len(self.values)
         element = self.values[0]
-        while True:
+
+        while 2 * idx + 1 < length:
+            # Helper data
             leftChildIdx = 2 * idx + 1
             rightChildIdx = 2 * idx + 2
-            swap = None
-            if leftChildIdx < length:
-                leftChild = self.values[leftChildIdx]
-                if leftChild.priority > element.priority:
-                    swap = leftChildIdx
-            if rightChildIdx < length:
-                rightChild = self.values[rightChildIdx]
-                if (
-                    (swap is None and rightChild.priority > element.priority)
-                    or (swap is not None and rightChild.priority > leftChild.priority)
-                ):
-                    swap = rightChildIdx
-            if swap is None:
-                break
-            self.values[idx] = self.values[swap]
-            self.values[swap] = element
-            idx = swap
+            leftChild = self.values[leftChildIdx]
+            rightChild = self.values[rightChildIdx]
+
+            # if left child is smaller than the element and right child
+            if leftChild.priority < element.priority and leftChild.priority < rightChild.priority:
+                self.values[idx], self.values[leftChildIdx] = self.values[leftChildIdx], self.values[idx]
+                idx = leftChildIdx
+            elif rightChild.priority < element.priority and rightChild.priority < leftChild.priority:
+                self.values[idx], self.values[rightChildIdx] = self.values[rightChildIdx], self.values[idx]
+                idx = rightChildIdx
+            else:
+                break # the element is in the correct spot
 ```
 
 ---
@@ -1956,7 +2023,9 @@ It's a special type of tree, where each node is a letter (character), and each n
 
 > It's called `prefix tree` because each node represents a prefix of a word, and each path from the root to the leaf node represents a word
 
-- It's a specialized tree used in **searching** most often with text, It provides fast prefix searching
+- It's a specialized tree used in **searching prefixes** most often with text, It provides fast prefix searching
+
+  - The problem with hash tables is that they don't provide a way to search for all words that begin with a given prefix, they just provide instant lookups for exact matches
 
 - It's similar to a `Hash set` but it's more efficient when it comes to looking up prefixes of words
 - It's often used to store words, as each node is a letter, and each node can have multiple children
@@ -2014,25 +2083,30 @@ A trie constructs a tree of nodes based on the letters in the keys added to it. 
 
       def insert(self, word):
           current = self.root
-          for letter in word:
+          for c in word:
               # 1. if the letter doesn't exist in the children of the current node -> add it
-              node = current.children.get(letter)
-              if node is None:
-                  node = TrieNode()
-                  current.children[letter] = node
+              if c not in current.children:
+                  current.children[c] = TrieNode()
               # 2. move to the next node
-              current = node
+              current = current.children[c]
           # 3. mark the end of the word at the last node (after the loop is done)
           current.endOfWord = True
 
       def search(self, word):
           current = self.root
-          for letter in word:
-              node = current.children.get(letter)
-              if node is None:
-                  return False
-              current = node
+          for c in word:
+              if c not in current.children:
+                  current.children[c] = TrieNode()
+              current = current.children[c]
           return current.endOfWord # return True if the endOfWord is True
+
+      def startWith(self, prefix):
+          current = self.root
+          for c in prefix:
+              if c not in current.children:
+                  return False
+              current = current.children[c]
+          return True
 
       # ----------------------- Not Important ------------------------- #
       def delete(self, word):

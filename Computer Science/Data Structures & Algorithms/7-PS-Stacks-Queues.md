@@ -3,18 +3,18 @@
 - [INDEX](#index)
   - [Notes](#notes)
   - [Stacks](#stacks)
-    - [Queue using two stacks](#queue-using-two-stacks)
+    - [Implement Queue using Stacks](#implement-queue-using-stacks)
     - [Implement Stack using Queues](#implement-stack-using-queues)
     - [Valid Parentheses](#valid-parentheses)
     - [Valid Parenthesis String](#valid-parenthesis-string)
     - [Minimum Remove to Make Valid Parentheses](#minimum-remove-to-make-valid-parentheses)
     - [Minimum Add to Make Parentheses Valid](#minimum-add-to-make-parentheses-valid)
     - [Tag Validator](#tag-validator)
+  - [Maximum Frequency Stack](#maximum-frequency-stack)
   - [Monotonic Stack Technique](#monotonic-stack-technique)
-    - [Next Greater Element](#next-greater-element)
+    - [Next Greater Element I](#next-greater-element-i)
     - [Next Greater Element II](#next-greater-element-ii)
     - [Daily Temperatures](#daily-temperatures)
-  - [Maximum Frequency Stack](#maximum-frequency-stack)
 
 ---
 
@@ -29,15 +29,15 @@
 
 ## Stacks
 
-### Queue using two stacks
+### Implement Queue using Stacks
 
 | Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                      |
 | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Video Solution](https://www.youtube.com/watch?v=7ArHz8jPglw) | Use one stack for adding elements and the other stack for removing elements. When we want to `add` an element, we just push it to the first stack. When we want to `remove` an element, we move all elements from the first stack to the second stack **(if the second stack is empty)**, then pop the top element from the second stack. |
 
-Implement a queue data structure using two stacks. Do not create an array inside of the 'Queue' class. Queue should implement the methods 'add', 'remove', and 'peek'. Adding to the queue should store an element until it is removed.
+Implement a queue data structure using two stacks. Do not create an array inside of the 'Queue' class. Queue should implement the methods 'push', 'pop', and 'peek'. Adding to the queue should store an element until it is removed.
 
-- EX: `q = Queue()` --> `q.add(1)` --> `q.add(2)` --> `q.peek()` --> `1` --> `q.remove()` --> `1` --> `q.remove()` --> `2`
+- EX: `q = Queue()` --> `q.push(1)` --> `q.push(2)` --> `q.peek()` --> `1` --> `q.pop()` --> `1` --> `q.pop()` --> `2`
 
 - verify the constraints:
 
@@ -53,13 +53,13 @@ Implement a queue data structure using two stacks. Do not create an array inside
     ![queue using two stacks](./img/queue-using-two-stacks.png)
 
   - When we want to `add` an element, we just push it to the first stack.
-  - When we want to `remove` an element, we move all elements from the first stack to the second stack, then pop the top element from the second stack.
+  - When we want to `pop` an element, we move all elements from the first stack to the second stack, then pop the top element from the second stack.
     - This is done **ONLY** if the second stack is empty.
   - When we want to `peek` an element, we move all elements from the first stack to the second stack, then peek the top element of the second stack.
     - This is done **ONLY** if the second stack is empty.
   - Time Complexity:
-    - `add`: `O(1)`
-    - `remove`: `O(n)`
+    - `push`: `O(1)`
+    - `pop`: `O(n)`
     - `peek`: `O(n)`
 
 ```py
@@ -68,10 +68,10 @@ class Queue:
         self.stack1 = []
         self.stack2 = []
 
-    def add(self, item):
+    def push(self, item):
         self.stack1.append(item)
 
-    def remove(self):
+    def pop(self):
         # Move all items from stack1 to stack2
         if not self.stack2:
             while self.stack1:
@@ -157,6 +157,17 @@ def isValid(s):
         elif not stack or stack.pop() != char:
             return False
     return not stack
+
+# Solution 2
+def isValid(s):
+    dic = {'(': ')', '[': ']', '{': '}'}
+    stack = []
+    for char in s:
+        if char in dic:
+            stack.append(char)
+        elif not stack or dic[stack.pop()] != char:
+            return False
+    return not stack # Important, don't return True here, because if the stack is empty, then we return False
 ```
 
 ---
@@ -172,7 +183,7 @@ Same as [Valid Parentheses](#valid-parentheses) but here we have a third type of
 - EX: `s = "(*))"` --> `true`
 - EX: `s = "(*))"` --> `true`
 
-- **Solution 1**: Using `min` and `max` counters (Greedy) ✅
+- **Solution 1**: Using `min` and `max` counters **(Greedy)** ✅
 
   - We use two counters `min` and `max` to keep track of the minimum and maximum number of opening brackets that we need to balance the closing brackets.
   - Each time we encounter an `opening` bracket, we increment both counters.
@@ -198,8 +209,8 @@ Same as [Valid Parentheses](#valid-parentheses) but here we have a third type of
               leftMin -= 1
               leftMax -= 1
           else:
-              leftMin -= 1
-              leftMax += 1
+              leftMin -= 1 # use the star as a closing bracket
+              leftMax += 1 # use the star as an opening bracket
 
           if leftMax < 0:
               return False
@@ -445,47 +456,65 @@ def tag_validator(code):
 
 ---
 
+## Maximum Frequency Stack
+
+Implement `FreqStack`, a class which simulates the operation of a stack-like data structure.
+
+`FreqStack` has two functions:
+
+1. `push(int x)`, which pushes an integer `x` onto the stack.
+2. `pop()`, which removes and returns the most frequent element in the stack.
+
+- If there is a tie for most frequent element, the element closest to the top of the stack is removed and returned.
+
+- EX:
+
+  - `push(5)`, `push(7)`, `push(5)`, `push(7)`, `push(4)`, `push(5)`, `pop()`, `pop()`, `pop()`, `pop()` --> `[5, 7, 5, 4]`
+
+- Explanation:
+  - Although this is a "max frequency" problem, we won't use a `MaxHeap` because we may have elements with the same frequency, and we need to pop the element that is closest to the top of the stack. **So we will use a `Stack`**
+  - We need to keep track of the frequency of each element, so we use a `hash map` to store the frequency of each element.
+    - `freq = {5: 3, 7: 2, 4: 1}`
+  - We also need to keep track of the elements with the same frequency, so we use a `hash map` to store the elements with the same frequency in a `list`.
+    - `group = {1: [4], 2: [7], 3: [5]}`
+    - It's like `Bucket Sort` where the key is the frequency and the value is the list of elements with the same frequency.
+      ![maximum frequency stack](./img/max-freq-stack-1.png)
+  - We also need to keep track of the maximum frequency, so we use a `maxfreq` variable to store the maximum frequency.
+
+```py
+class FreqStack:
+    def __init__(self):
+        self.freq = {}
+        self.maxfreq = 0
+        self.stacks = {} # dictionary of stacks
+
+    def push(self, val):
+        f = self.freq.get(val, 0) + 1
+        self.freq[val] = f # update the frequency of the element
+
+        if f > self.maxfreq:
+            self.maxfreq = f
+            self.stacks[self.maxfreq] = [] # create a new stack for the new maxfreq
+        self.stacks[f].append(val)
+
+    def pop(self):
+        val = self.stacks[self.maxfreq].pop() # pop the element with the maxfreq
+        self.freq[val] -= 1 # update the frequency of the element
+        if not self.stacks[self.maxfreq]: # if the stack is empty
+            self.maxfreq -= 1 # decrement the maxfreq
+
+        return val
+```
+
+---
+
 ## Monotonic Stack Technique
 
-It's a stack that is either **strictly increasing** or **strictly decreasing**.
+### Next Greater Element I
 
-- The Monotonic Stacks technique is a useful technique that can be used in the following scenarios:
-
-  - First element greater than an element, after (to the right of) it in the array - **(Monotonically Decreasing Stack)**.
-  - First element greater than an element, before (to the left of) it in the array - **(Monotonically Decreasing Stack)**.
-  - First element less than an element, after (to the right of) it in the array - **(Monotonically Increasing Stack)**.
-  - First element less than an element, before (to the left of) it in the array - **(Monotonically Increasing Stack)**.
-
-  ```py
-  # EX of a Monotonically Increasing Stack
-  arr = [5, 1, 7, 3, 0, 10, 2]
-
-  # for arr[3]:
-  # first element less than arr[3] after it in the array is arr[5] = 2
-  # first element less than arr[3] before it in the array is arr[1] = 1
-  # first element greater than arr[3] after it in the array is arr[2] = 7
-  # first element greater than arr[3] before it in the array is arr[0] = 5
-  ```
-
-  - instead of scanning the array to find the next greater/smaller element `O(n^2)`, we can use a monotonic stack to find it in `O(n)` time.
-
-- Example of `monotonic decreasing stack`:
-
-  ```py
-  # bottom --> [5, 4, 4, 2, 1] <-- top
-
-  # 1.) bottom --> [5, 4, 4, 2, 1]: 1 is less than 3: pop() it!
-  # 2.) bottom --> [5, 4, 4, 2]: 2 is less than 3: pop() it!
-  # 3.) bottom --> [5, 4, 4]: 4 is not less than 3: push(3) onto the stack!
-  # 4.) bottom --> [5, 4, 4, 3]: Done! :)
-  ```
-
-- It's used as a technique to solve problems that involve **finding the next greater/smaller element** in an array.
-  - A simple solution to these problems is to sort and return the first / last `k` elements in the collections, but that would take `O(nlogn)` time.
-  - Using a monotonic stack, we can solve these problems in `O(N log(k))` time and `O(k)` space.
-- This technique is also used with a `heap` to solve problems that involve **finding the next greater/smaller element** in an array.
-
-### Next Greater Element
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=68a1Dc_qVq4) | Use a **monotonic decreasing stack** to store the indices of the numbers that we have not found the next greater element for them. For each element in the second array, we check if the stack is not empty and the current number is greater than the top element of the stack. If so, we pop the top element of the stack and store the next greater element for it. |
 
 You are given two arrays (without duplicates) `nums1` and `nums2` where `nums1`’s elements are subset of `nums2`. Find all the next greater numbers for `nums1`'s elements in the corresponding places of `nums2`.
 
@@ -506,9 +535,8 @@ The Next Greater Number of a number `x` in `nums1` is the first greater number t
 def next_greater_element(nums1, nums2):
   # create a stack to store the numbers that we have not found the next greater element for them
   stack = []
-  # create a dictionary to store the index for each element in nums1
-  nums1Idx = {num: i for i, num in enumerate(nums1)}
   # for each element in nums1, store its index in the dictionary
+  nums1Idx = {num: i for i, num in enumerate(nums1)}
   res = [-1] * len(nums1)
 
   for cur in nums2:
@@ -529,6 +557,10 @@ def next_greater_element(nums1, nums2):
 ---
 
 ### Next Greater Element II
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ARkl69eBzhY) | Use a **monotonic decreasing stack** to store the indices of the numbers that we have not found the next greater element for them. For each element in the second array, we check if the stack is not empty and the current number is greater than the top element of the stack. If so, we pop the top element of the stack and store the next greater element for it. |
 
 Given a circular array (the next element of the last element is the first element of the array), print the Next Greater Number for every element. The Next Greater Number of a number `x` is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. If it doesn't exist, output -1 for this number.
 
@@ -591,7 +623,7 @@ Given a list of daily temperatures `T`, return a list such that, for each day in
 ```py
 def daily_temperatures(temperatures):
     res = [0] * len(temperatures)
-    stack = []
+    stack = [] # Mono-decreasing stack (last element is the smallest element in the stack)
 
     for i, t in enumerate(temperatures):
       while stack and t > temperatures[stack[-1]]:
@@ -603,53 +635,3 @@ def daily_temperatures(temperatures):
 ```
 
 ---
-
-## Maximum Frequency Stack
-
-Implement `FreqStack`, a class which simulates the operation of a stack-like data structure.
-
-`FreqStack` has two functions:
-
-1. `push(int x)`, which pushes an integer `x` onto the stack.
-2. `pop()`, which removes and returns the most frequent element in the stack.
-
-- If there is a tie for most frequent element, the element closest to the top of the stack is removed and returned.
-
-- EX:
-
-  - `push(5)`, `push(7)`, `push(5)`, `push(7)`, `push(4)`, `push(5)`, `pop()`, `pop()`, `pop()`, `pop()` --> `[5, 7, 5, 4]`
-
-- Explanation:
-  - Although this is a "max frequency" problem, we won't use a `MaxHeap` because we may have elements with the same frequency, and we need to pop the element that is closest to the top of the stack. **So we will use a `Stack`**
-  - We need to keep track of the frequency of each element, so we use a `hash map` to store the frequency of each element.
-    - `freq = {5: 3, 7: 2, 4: 1}`
-  - We also need to keep track of the elements with the same frequency, so we use a `hash map` to store the elements with the same frequency in a `list`.
-    - `group = {1: [4], 2: [7], 3: [5]}`
-    - It's like `Bucket Sort` where the key is the frequency and the value is the list of elements with the same frequency.
-      ![maximum frequency stack](./img/max-freq-stack-1.png)
-  - We also need to keep track of the maximum frequency, so we use a `maxfreq` variable to store the maximum frequency.
-
-```py
-class FreqStack:
-    def __init__(self):
-        self.freq = {}
-        self.maxfreq = 0
-        self.stacks = {} # dictionary of stacks
-
-    def push(self, val):
-        f = self.freq.get(val, 0) + 1
-        self.freq[val] = f # update the frequency of the element
-
-        if f > self.maxfreq:
-            self.maxfreq = f
-            self.stacks[self.maxfreq] = [] # create a new stack for the new maxfreq
-        self.stacks[f].append(val)
-
-    def pop(self):
-        val = self.stacks[self.maxfreq].pop() # pop the element with the maxfreq
-        self.freq[val] -= 1 # update the frequency of the element
-        if not self.stacks[self.maxfreq]: # if the stack is empty
-            self.maxfreq -= 1 # decrement the maxfreq
-
-        return val
-```

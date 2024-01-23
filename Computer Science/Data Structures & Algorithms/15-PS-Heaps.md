@@ -1,8 +1,7 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Notes](#notes)
-  - [Top/Smallest/Frequent k Elements Technique](#topsmallestfrequent-k-elements-technique)
+  - [Top / Least k Elements Technique](#top--least-k-elements-technique)
     - [Kth Largest Element in an Array](#kth-largest-element-in-an-array)
     - [Kth Largest Element in a Stream](#kth-largest-element-in-a-stream)
     - [Kth Smallest Element in an array](#kth-smallest-element-in-an-array)
@@ -31,17 +30,24 @@
 
 ---
 
-## Notes
+## Top / Least k Elements Technique
 
-- By design, heaps are data structures that resemble binary trees, but they are not binary search trees.
+- **Notes:**
 
----
+  - Try to always add a check for the `k` value to avoid errors
 
-## Top/Smallest/Frequent k Elements Technique
-
-The best data structure to use to solve problems that involve finding the top/smallest/frequent `k` elements is **Heap**. Because the heap data structure allows us to add and remove elements in `O(logn)` time where `n` is the number of elements in the heap.
+    ```py
+    if k >= len(arr):
+      return arr
+    if k <= 0:
+      return []
+    ```
 
 ### Kth Largest Element in an Array
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=XEmy13g1Qxc) | Use a `min heap` to store the `k` largest elements by pushing each element to the heap and popping the smallest element first if the size of the heap is larger than `k`. Finally, the root of the heap is the `kth` largest element |
 
 Given an integer array `nums` and an integer `k`, return the `kth` largest element in the array.
 
@@ -52,6 +58,7 @@ Given an integer array `nums` and an integer `k`, return the `kth` largest eleme
   - Explanation: The largest element in the array is `6`, the second largest element is `5`.
 
 - Explanation:
+
   - A brute force solution would be to sort the array and return the `kth` largest element, but the time complexity will be `O(nlogn)`
   - We can solve it in `O(n)` time complexity using a `Heap`:
     1. We iterate through the array and keep `k` largest elements in the heap such that each time we find a larger element than the smallest element in the heap, we do two things:
@@ -65,7 +72,10 @@ Given an integer array `nums` and an integer `k`, return the `kth` largest eleme
     3. since that we can find the smallest element in the heap in `O(1)` time, and since the smallest number is always at the `root` of the heap, so we can call `heap[0]` to get the smallest element
        - So, extracting the smallest element from a heap of `k` elements will take `O(logN)` time
 
-So the overall complexity will be `O(n + k log(n))` --> `O(n)`
+- So the overall complexity will be `O(n + k log(n))` --> `O(n)`
+  - `O(n)` to iterate through the array
+  - `O(k log(n))` to extract the smallest element from the heap `k` times
+  - `O(n)` + `O(k log(n))` --> `O(n)` because `k` is always smaller than `n`
 
 ```py
 def find_kth_largest(nums, k):
@@ -81,6 +91,17 @@ def find_kth_largest(nums, k):
 
     # now the root of the heap is the kth largest element
     return heap[0]
+
+# --------------------------------------------------------------
+
+# Another approach
+def find_kth_largest(nums, k):
+    minHeap = []
+    for num in nums:
+        heapq.heappush(minHeap, num)
+        if len(minHeap) > k:
+            heapq.heappop(minHeap)
+    return minHeap[0]
 ```
 
 > Note: it can also be solved with section sort in `O(n)` time complexity average case, but `O(n^2)` worst case
@@ -88,6 +109,10 @@ def find_kth_largest(nums, k):
 ---
 
 ### Kth Largest Element in a Stream
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=hOjcdrqMoQ8) | Use a `min heap` to store the `k` largest elements by pushing each element to the heap and popping the smallest element first if the size of the heap is larger than `k`. for `add` function, we will push the element to the heap and pop the top element if the size of the heap is larger than `k`. Finally, the root of the heap is the `kth` largest element |
 
 Design a class to find the `kth` largest element in a stream. Note that it is the `kth` largest element in the sorted order, not the `kth` distinct element.
 
@@ -106,24 +131,33 @@ Implement `KthLargest` class
 class KthLargest:
     def __init__(self, k: int, nums: List[int]):
         self.k = k
-        self.nums = nums
+        self.minHeap = nums
 
-        # create a minHeap with the first k elements
-        heapq.heapify(self.nums)
-        # pop the top element of the minHeap until the size of the minHeap is equal to k
-        while len(self.nums) > k:
-            heapq.heappop(self.nums)
+        for n in nums:
+          heapq.heappush(self.minHeap, n)
+          if len(self.minHeap) > k:
+            heapq.heappop(self.minHeap)
+        # Now, the minHeap contains the largest k elements
 
     def add(self, val: int) -> int:
-        heapq.heappush(self.nums, val)
-        if len(self.nums) > self.k:
-            heapq.heappop(self.nums)
-        return self.nums[0]
+        heapq.heappush(self.minHeap, val)
+        if len(self.minHeap) > self.k:
+          heapq.heappop(self.minHeap)
+        return self.minHeap[0]
 ```
+
+- Time Complexity:
+  - initial `O(n log(k))` to push all the elements to the minHeap
+  - `add` function `O(log(k))` to push the element to the minHeap
+  - `O(1)` to return the top element of the minHeap
 
 ---
 
 ### Kth Smallest Element in an array
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=hOjcdrqMoQ8) | Use a `max heap` to store the `k` smallest elements by pushing each element to the heap and popping the largest element first if the size of the heap is larger than `k`. Finally, the root of the heap is the `kth` smallest element |
 
 Given an unsorted array of numbers, find the ‘K’ smallest numbers in it.
 
@@ -147,6 +181,10 @@ def find_kth_smallest(nums, k):
 
 ### K Closest Points to Origin
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=rI2EBUEMfTk) | Use a `max heap` to store the `k` smallest elements by pushing each element to the heap as a pair of the `distance` and the point and popping the largest element first if the size of the heap is larger than `k`. Finally, loop through the heap and append the kth smallest elements to the result array. |
+
 Given an array of points where `points[i] = [xi, yi]` represents a point on the X-Y plane and an integer `k`, return the `k` closest points to the origin `(0, 0)`.
 The distance between two points on the X-Y plane is the Euclidean distance (i.e., `√(x1 - x2)^2 + (y1 - y2)^2`).
 
@@ -155,12 +193,14 @@ The distance between two points on the X-Y plane is the Euclidean distance (i.e.
   - Explanation: The distance between `(1, 3)` and the origin is `sqrt(10)`, the distance between `(-2, 2)` and the origin is `sqrt(8)`, since `sqrt(8) < sqrt(10)`, therefore `(-2, 2)` is closer to the origin. We only want the closest `k = 1` points from the origin, so the answer is just `[[-2, 2]]`.
 
 - Steps:
+
   1. we will use a minHeap instead of sorting the array because we want `O(n)` time complexity and not `O(nlogn)`
   2. push all the elements in the array to the minHeap -> `O(n)`
      - we don't need to calculate the root of the distance because we can compare the distance without calculating the root
   3. pop the top element of the minHeap `k` times to get the `k` closest points -> `O(k log(n))`
 
-So the overall complexity will be `O(n + k log(n))` --> `O(n)`
+- Time complexity will be `O(n + k log(n))` --> `O(n)`
+- Space complexity will be `O(n)` because we are storing all the elements in the minHeap
 
 ```py
 def k_closest(points, k):
@@ -174,6 +214,25 @@ def k_closest(points, k):
     for _ in range(k):
         dist, x, y = heapq.heappop(minHeap)
         res.append([x, y])
+
+    return res
+
+# --------------------------------------------------------------
+
+# Another approach
+def k_closest(points, k):
+    res = []
+    maxHeap = []
+
+    for p in points:
+        x, y = p
+        dist = (x ** 2) + (y ** 2)
+        heapq.heappush(maxHeap, [-dist, p])
+        if len(maxHeap) > k:
+            heapq.heappop(maxHeap)
+
+    while maxHeap:
+        res.append(heapq.heappop(maxHeap)[1])
 
     return res
 ```
@@ -221,6 +280,10 @@ def connect_ropes(ropes):
 
 ### Top K Frequent Elements
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=YPTqKIgVk-k) | Count the frequency of each element in the array and push them to a `minHeap` by their frequency in negative form (because we want to pop the elements with the highest frequency). Finally, pop the top element of the `minHeap` `k` times to get the `k` most frequent elements. **OR** use `bucket sort` by creating a list of lists (buckets) with the length of the array + 1, where the index will be the frequency of the element and the value will be the elements with that frequency. Then loop through the dictionary and append the key to the bucket with the index of the value (frequency). Finally, loop through the buckets from the end (max frequency) and append the elements to the result list until the length of the result list is `k`. |
+
 Given an integer array `nums` and an integer `k`, return the `k` most frequent elements. You may return the answer in **any order**.
 
 - EX: `nums = [1, 1, 1, 2, 2, 3], k = 2` --> `[1, 2]`
@@ -236,6 +299,7 @@ Given an integer array `nums` and an integer `k`, return the `k` most frequent e
   3. push all the elements in the dictionary to the minHeap (with the negative of the frequency-value because we want to pop the elements with the highest frequency) -> `O(n)`
   4. pop the top element of the minHeap `k` times to get the `k` most frequent elements -> `O(k log(n))`
   5. return the elements in the minHeap
+- Time complexity will be `O(n + k log(n))` --> `O(n)`
 
 ```py
 def top_k_frequent(nums, k):
@@ -291,6 +355,10 @@ def top_k_frequent(nums, k):
 ---
 
 ### Sort Characters By Frequency
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=trFw8IDw2Vg) | Use a `max heap` to store the `frequency` of each character in the string by pushing each character to the heap and popping the top element first if the size of the heap is larger than `k`. Finally, loop through the heap and append the characters to the result string. |
 
 Given a string `s`, sort it in **decreasing order** based on the **frequency** of characters, and return the sorted string.
 

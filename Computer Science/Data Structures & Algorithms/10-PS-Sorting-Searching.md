@@ -92,6 +92,8 @@ Given a sorted array of distinct integers and a `target` value, return the `inde
   - `nums = [1, 3, 5, 6], target = 2 --> 1`
   - `nums = [1, 3, 5, 6], target = 7 --> 4`
 
+- TODO: add more explanation
+
 ```py
 def searchInsert(nums, target):
     l, r = 0, len(nums) - 1
@@ -114,9 +116,9 @@ def searchInsert(nums, target):
 
 ### Find Smallest Letter Greater Than Target
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                    |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=uFRTcMsd2Jw) | Use **Binary search**, the trick here is that we check if the `mid` value is **less than or equal** to the target value, then we will search the right side of the array. If it is not, then we will search the left side of the array. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=uFRTcMsd2Jw) | Use **Binary search**, the trick here is that we check if the `mid` value is **less than or equal** to the target value, then we will search the right side of the array. If it is not, then we will search the left side of the array (handle the case where the left pointer exceeds the array length by using `l % len(letters)`) |
 
 Given a characters array `letters` that is sorted in non-decreasing order and a character `target`, return the smallest character in the array that is larger than `target`. Note that the letters wrap around.
 
@@ -150,6 +152,10 @@ def nextGreatestLetter(letters, target):
 
 ### Find first and last position of element in sorted array
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=OE7wUUpJw6I) | Use **Binary search**, the trick here is that we need to create a `search` function and call it twice, one to find the left most index and one to find the right most index. We will keep searching the left side of the array if we find the target value, by updating the `right` pointer to `m - 1`. We will keep searching the right side of the array if we find the target value, by updating the `left` pointer to `m + 1`, use a `leftBias` boolean to determine if we are looking for the left most index or the right most index |
+
 Given an array of integers `nums` sorted in ascending order, find the starting and ending position of a given `target` value. If `target` is not found in the array, return `[-1, -1]`.
 
 **You must write an algorithm with `O(log n)` runtime complexity.**
@@ -158,6 +164,38 @@ Given an array of integers `nums` sorted in ascending order, find the starting a
 
   - `nums = [5, 7, 7, 8, 8, 10], target = 8 --> [3, 4]`
   - `nums = [5, 7, 7, 8, 8, 10], target = 6 --> [-1, -1]`
+
+- Good solution `O(log(n))` ✅
+
+  - We can use **binary search** to find the target value, then we can search the left and right side of the array to find the first and last position of the target value
+    - This is done by calling `search` function twice, one to find the left most index and one to find the right most index
+      - **left most index** -> `search(True)` -> we will keep searching the left side of the array if we find the target value, by updating the `right` pointer to `m - 1`
+      - **right most index** -> `search(False)` -> we will keep searching the right side of the array if we find the target value, by updating the `left` pointer to `m + 1`
+    - We use a `leftBias` boolean to determine if we are looking for the left most index or the right most index
+
+  ```py
+  def searchRange(nums, target):
+      def search(leftBias):
+          """
+          leftBias(boolean): True if we are looking for the left most index
+          """
+          l, r = 0, len(nums) - 1
+          res = -1
+
+          while l <= r:
+              m = l + (r - l) // 2
+
+              if nums[m] < target: l = m + 1
+              elif nums[m] > target: r = m - 1
+              else:
+                  res = m
+                  # If we are looking for the left most index, then we want to keep searching the left side
+                  if leftBias: r = m - 1
+                  else: l = m + 1
+          return res
+
+      return [search(True), search(False)]
+  ```
 
 - Bad solution `O(n)` -> will eventually be `O(log(n))` if the target value is found in the array, but not the best solution ❌
 
@@ -191,40 +229,13 @@ Given an array of integers `nums` sorted in ascending order, find the starting a
       return search()
   ```
 
-- Good solution `O(log(n))` ✅
-
-  ```py
-  def searchRange(nums, target):
-      def search(leftBias):
-          """
-          leftBias(boolean): True if we are looking for the left most index
-          """
-          l, r = 0, len(nums) - 1
-          res = -1
-
-          while l <= r:
-              m = l + (r - l) // 2
-
-              if nums[m] == target:
-                  res = m
-                  # If we are looking for the left most index, then we want to keep searching the left side
-                  if leftBias:
-                      r = m - 1
-                  else:
-                      l = m + 1
-              elif nums[m] < target:
-                  l = m + 1
-              else:
-                  r = m - 1
-
-          return res
-
-      return [search(True), search(False)]
-  ```
-
 ---
 
 ### Search in a Sorted Infinite Array
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=5k5K6Yl6r3Q) | We can't use **binary search** because we don't know the size of the array, so we can't find the `mid` value. Instead, we can find the bounds of the array where we can perform a binary search. This is done by using `start = 0` and `end = 1`, then we will keep doubling the `end` value until we find the bounds. Then we can perform a binary search to find the target value. |
 
 Given an infinite sorted array (or an array with unknown size), find if a given number `key` is present in the array. Write a function to return the index of the `key` if it is present in the array, otherwise return `-1`.
 
@@ -301,6 +312,10 @@ def search_min_diff_element(arr, key):
 ---
 
 ### Peak Index in a Mountain Array ( Bitonic Array Maximum )
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=HgUOWB0StNE) | Use **Binary search**, Compare the `mid` value with the `mid + 1` and `mid - 1` values. If the `mid` value is greater than the `mid + 1` and `mid - 1` values, then we found the peak index. If the `mid` value is less than the `mid + 1` value, then we will search the right side of the array. If the `mid` value is less than the `mid - 1` value, then we will search the left side of the array |
 
 - Let's call an array `arr` a **mountain** if the following properties hold:
   - `arr.length >= 3`
@@ -391,6 +406,10 @@ def binary_search(arr, key, start, end):
 
 ### Search a 2D Matrix
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Ber2pi2C0j0) | Use **Binary search**, the trick here is to check if the current row is valid for searching by checking if the `target` value is greater than the last value in the current row, if it is, then we can search the next row. If it is not, then we can search the current row. |
+
 You are given an `m x n` integer matrix `matrix` sorted in ascending order, and an integer `target`. Return `true` if `target` is in `matrix`, or `false` otherwise.
 
 - Each row of `matrix` is sorted in ascending order.
@@ -411,57 +430,74 @@ You are given an `m x n` integer matrix `matrix` sorted in ascending order, and 
   - We can do even better, by performing a binary search on the entire matrix to make use of that the last element of each row is smaller than the first element of the next row
     - this will be `O(log(m) + log(n))`, where `m` is the number of rows and `n` is the number of columns
 
-- Solution 1 -> `O(log(m) + log(n))` -> double binary-search
-
-  ```py
-  def searchMatrix(matrix, target):
-      ROWS, COLS = len(matrix), len(matrix[0])
-      top, bottom = 0, ROWS - 1
-
-      # Perform binary search
-      while top <= bottom:
-        row = (top + bottom) // 2
-        # if the target is smaller than the first element of the row, go up
-        if target < matrix[row][0]:
-          bottom = row - 1
-        # if the target is bigger than the last element of the row, go down
-        elif target > matrix[row][COLS - 1]:
-          top = row + 1
-        else:
-          # Perform binary search on the row
-          left, right = 0, COLS - 1
-          while left <= right:
-            mid = (left + right) // 2
-            if target < matrix[row][mid]:
-              right = mid - 1
-            elif target > matrix[row][mid]:
-              left = mid + 1
+```py
+# Approach 1 ✅ -> O(m * log(n))
+def searchMatrix(matrix, target):
+    l, r = 0, len(matrix[0])-1
+        curRow = 0
+        while l <= r and curRow <= len(matrix)-1:
+            m = (l+r) // 2
+            val = matrix[curRow][m]
+            if target > matrix[curRow][-1]: curRow += 1
+            elif val < target: l += 1
+            elif val > target: r -= 1
             else:
-              return True
-          return False # MUST RETURN FALSE HERE AND NOT OUTSIDE THE WHILE LOOP
-  ```
+                return True
 
-- Solution 2 -> `O(m + n)`
+        return False
 
-  ```py
-  def searchMatrix(matrix, target):
-      if not matrix or not matrix[0]:
-          return False
+# ----------------------------------------------------------------
 
-      row = 0
-      col = len(matrix[0]) - 1
+# Approach 2 ❌
+def searchMatrix(matrix, target):
+    ROWS, COLS = len(matrix), len(matrix[0])
 
-      # Perform binary search
-      while row < len(matrix) and col >= 0:
-          if matrix[row][col] == target:
-              return True
-          elif matrix[row][col] > target:
-              col -= 1
+    top, bottom = 0, ROWS - 1
+
+
+    # Perform binary search
+
+    while top <= bottom:
+
+      row = (top + bottom) // 2
+
+      # if the target is smaller than the first element of the row, go up
+
+      if target < matrix[row][0]:
+
+        bottom = row - 1
+
+      # if the target is bigger than the last element of the row, go down
+
+      elif target > matrix[row][COLS - 1]:
+
+        top = row + 1
+
+      else:
+
+        # Perform binary search on the row
+
+        left, right = 0, COLS - 1
+
+        while left <= right:
+
+          mid = (left + right) // 2
+
+          if target < matrix[row][mid]:
+
+            right = mid - 1
+
+          elif target > matrix[row][mid]:
+
+            left = mid + 1
+
           else:
-              row += 1
 
-      return False
-  ```
+            return True
+
+        return False # MUST RETURN FALSE HERE AND NOT OUTSIDE THE WHILE LOOP
+
+```
 
 ---
 

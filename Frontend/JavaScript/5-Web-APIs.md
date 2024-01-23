@@ -121,6 +121,9 @@ So it’s easy to use JSON for data exchange when the client uses JavaScript and
 
 - **JSON** does not support comments. Adding a comment to JSON makes it invalid.
   - There’s another format named [JSON5](http://json5.org/), which allows unquoted keys, comments etc. But this is a standalone library, not in the specification of the language.
+- Important JSON concepts:
+  - **Serialize**: convert data from an object into some save-able format `json` -> (convert objects into `json`)
+  - **Deserialize**: put data on object using some previously saved data `json` -> (convert `json` into objects)
 
 ---
 

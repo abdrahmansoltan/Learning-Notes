@@ -18,6 +18,7 @@
     - [Lowest Common Ancestor of a Binary Tree](#lowest-common-ancestor-of-a-binary-tree)
     - [Vertical Order Traversal of a Binary Tree](#vertical-order-traversal-of-a-binary-tree)
     - [Flatten Binary Tree to Linked List](#flatten-binary-tree-to-linked-list)
+    - [Employee Importance](#employee-importance)
   - [Binary Search Trees (BST)](#binary-search-trees-bst)
     - [Insert into a Binary Search Tree](#insert-into-a-binary-search-tree)
     - [Delete Node in a BST](#delete-node-in-a-bst)
@@ -55,7 +56,7 @@
 - Trees usually have `O(log(n))` time complexity because it's the **height** of the tree -> `O(h)`
 - **Trees Tips:**
   - Whenever you see the word **"width"** in any tree question, it's a **Breadth First Search** problem
-  - Always ask if the tree is binary search tree (BST) or not, so that you can use the BST properties to solve the problem (e.g. left < root < right)
+  - Always ask if the tree is binary search tree (BST) or not, so that you can use the BST properties to solve the problem (e.g. `left < root < right`)
 - When you find the word `"Autocomplete"` in a question, it's a **Trie** problem
 - When verifying constraints, ask these questions:
   - are there any duplicates in the BST? and how to handle this case?
@@ -75,7 +76,7 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
   - Input: `root = [1,2,3,4,5,6]`
   - Output: `6`
 
-- **Solution 1**: dfs (brute force) -> `O(n)`
+- **Solution 1**: DFS -> `O(n)` ✅
 
   - we can use a **Depth-First Search** to traverse the tree and count the number of nodes in the tree
   - we can use a **Bottom-Up Approach** to solve this problem.
@@ -89,7 +90,6 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
       def dfs(node):
           if node is None:
               return 0
-
           return dfs(node.left) + dfs(node.right) + 1
 
       return dfs(root)
@@ -137,9 +137,9 @@ Given the `root` of a **complete** binary tree, return the number of the nodes i
 
 ### Level Width
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=4wPlA_InnGY) | Use **BFS** to traverse the tree and keep track of the indices of the leftmost and rightmost non-null nodes. The width of the level is then calculated as the difference between the indices plus one. We can use a queue to store the nodes that we need to visit. We start by adding the root node to the queue along with its index, which we set to 0. We also initialize two variables, max_width and level_width, to 0. max_width will be used to store the maximum width we have seen so far, and level_width will be used to store the width of the current level. Then, we start the BFS loop. In each iteration of the loop, we first get the number of nodes in the current level by getting the size of the queue. We then loop through all the nodes in the current level and update the leftmost and rightmost indices as necessary. We also add the children of each node to the queue along with their indices, which we calculate based on the indices of their parent node. At the end of each level, we update the max_width variable with the level_width if it is greater than max_width. We then reset the level_width variable to 0 for the next level. Once we have processed all the nodes in the tree, we return the max_width variable as the answer. |
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Use **BFS** to traverse the tree and keep track of the indices of the leftmost and rightmost non-null nodes. The width of the level is then calculated as the difference between the indices plus one. We can use a queue to store the nodes that we need to visit. We start by adding the root node to the queue along with its index, which we set to 0. We also initialize two variables, max_width and level_width, to 0. max_width will be used to store the maximum width we have seen so far, and level_width will be used to store the width of the current level. Then, we start the BFS loop. In each iteration of the loop, we first get the number of nodes in the current level by getting the size of the queue. We then loop through all the nodes in the current level and update the leftmost and rightmost indices as necessary. We also add the children of each node to the queue along with their indices, which we calculate based on the indices of their parent node. At the end of each level, we update the max_width variable with the level_width if it is greater than max_width. We then reset the level_width variable to 0 for the next level. Once we have processed all the nodes in the tree, we return the max_width variable as the answer. |
 
 Write a function that accepts a root node of a tree and return an array where each element is the width of the tree at each level.
 
@@ -211,9 +211,9 @@ def level_width(root):
 
 ### Maximum Width of Binary Tree
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=FPzLE2L7uHs) | Use **BFS** to traverse the tree and keep track of the indices of the leftmost and rightmost non-null nodes. The width of the tree is then calculated as the maximum width among all levels. We can use a `queue` to store the nodes that we need to visit. We start by adding the root node to the queue as `(node, row, col)`. We also initialize two variables, `prevLevel` and `prevIdx` |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=FPzLE2L7uHs) | The width of the tree is then calculated as the maximum width among all levels. Use **BFS** to traverse the tree by using a `queue` to store the nodes that we need to visit. We start by adding the root node to the queue as `(node, row, col)` or `(node, level, idx)`. We also initialize two variables, `prevLevel` and `prevIdx` |
 
 Given the `root` of a binary tree, return the **maximum width** of the given tree.
 
@@ -256,7 +256,6 @@ def widthOfBinaryTree(root):
 
     while q:
       node, level, idx = q.popleft()
-
       # if we're in a new level, update the prevLevel and prevIdx
       if level != prevLevel:
         prevLevel, prevIdx = level, idx
@@ -266,9 +265,9 @@ def widthOfBinaryTree(root):
 
       # add the children of the node to the queue
       if node.left:
-        q.append((node.left, level + 1, idx * 2))
+        q.append((node.left, level + 1, idx * 2)) # idx * 2 because it's a binary tree
       if node.right:
-        q.append((node.right, level + 1, idx * 2 + 1))
+        q.append((node.right, level + 1, idx * 2 + 1)) # idx * 2 + 1 because it's a binary tree
 
     return maxWidth
 ```
@@ -277,9 +276,9 @@ def widthOfBinaryTree(root):
 
 ### Path Sum
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=LSKQyOz_P8I) | Use **DFS** to traverse the tree and keep track of the current sum of the path from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we return `True`. Otherwise, we return `False`. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=LSKQyOz_P8I) | Use **DFS** to traverse the tree and keep track of the current sum of the path from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we return `True`. Otherwise, we return `False`. call the function recursively on the left and right subtrees |
 
 Given the `root` of a binary tree and an integer `targetSum`, return `true` if the tree has a **root-to-leaf** path such that adding up all the values along the path equals `targetSum`.
 
@@ -305,11 +304,15 @@ def hasPathSum(root, targetSum):
 ```
 
 - Time complexity: `O(n)` where `n` is the number of nodes in the tree
-- Space complexity: `O(h)` where `h` is the height of the tree, this space is used by the recursion stack
+- Space complexity: `O(h)` where `h` is the height of the tree, this space is used by the recursion stack (IMPORTANT ⚠️)
 
 ---
 
 ### Path Sum II
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=-mkM5FUaA5c) | Use **DFS** to traverse the tree and keep track of the current sum of the **path** from the root to the current node. If we reach a leaf node and the current sum is equal to the target sum, then we add the current path to the result. call the function recursively on the left and right subtrees, **Then backtrack** by popping / removing the current node from the path. |
 
 Given the `root` of a binary tree and an integer `targetSum`, return all **root-to-leaf** paths where each path's sum equals `targetSum`.
 
@@ -329,11 +332,11 @@ def pathSum(root, targetSum):
 
         # if the root is a leaf node, check if the current sum is equal to the target sum
         if not node.left and not node.right and curSum == targetSum:
-            result.append(path[:])
+            result.append(path[:]) # append a copy of the path to prevent it from being modified later
 
         dfs(node.left, curSum, path)
         dfs(node.right, curSum, path)
-        path.pop()
+        path.pop() # backtrack (remove the current node from the path)
 
     result = []
     dfs(root, 0, [])
@@ -343,6 +346,10 @@ def pathSum(root, targetSum):
 ---
 
 ### Path Sum III
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=VDTZiggKlAE) | Use **DFS** to traverse the tree and keep track of the current path. When traversing, we will: add the current node to the path, calculate sums of all sub-paths ending with the current node (loop backwords on the path array), if the sum is equal to the target sum, we will increment the `pathCount` by `1`, remove the current node from the path and backtrack |
 
 Given the `root` of a binary tree and an integer `targetSum`, return the number of paths where the sum of the values along the path equals `targetSum`.
 
@@ -361,7 +368,7 @@ The path does not need to start or end at the root or a leaf, but it must go dow
 
 - Time complexity: `O(n^2)` where `n` is the number of nodes in the tree, this is because we traverse each node once and for each node, we traverse all the nodes in the path (worst case)
   - if tree is `balanced`, then the time complexity will be `O(nlog(n))` (best case)
-- Space complexity: `O(N)` where `N` is the number of nodes in the tree, this space is used by the recursion stack
+- Space complexity: `O(n)` where `n` is the number of nodes in the tree, **this space is used by the recursion stack**
 
 ```py
 def pathSum(root, targetSum):
@@ -371,6 +378,7 @@ def pathSum(root, targetSum):
 
         path.append(node.val)
         pathCount, pathSum = 0, 0
+        # iterate in reverse order to
         for i in range(len(path) - 1, -1, -1):
             pathSum += path[i]
             if pathSum == targetSum:
@@ -389,6 +397,10 @@ def pathSum(root, targetSum):
 ---
 
 ### Binary Tree Paths
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=H2D4HcVZq_g) | Use **DFS** to traverse the tree and keep track of the current **path as string**. When traversing, we will: add the current node to the path, if the root is a leaf node, add the path to the result, call the function recursively on the left and right subtrees, when calling the function recursively, pass the path concatenated with the `->` symbol |
 
 Given the `root` of a binary tree, return all **root-to-leaf** paths in any order.
 
@@ -417,6 +429,10 @@ def binaryTreePaths(root):
 ---
 
 ### Sum Root to Leaf Numbers
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=H2D4HcVZq_g) | Use **DFS** to traverse the tree and keep track of the current sum of the path from the root to the current node. When traversing, we will: update the current sum **by multiplying it by `10` and adding the current node's value**, if the root is a leaf node, return the current sum, call the function recursively on the left and right subtrees and add the results of both calls |
 
 Given the `root` of a binary tree containing digits from `0-9` only, each root-to-leaf path could represent a number.
 
@@ -453,6 +469,10 @@ def sumNumbers(root):
 ---
 
 ### Diameter of Binary Tree
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=bkxqA8Rfv04) | Use **DFS** to traverse the tree and calculate the **height** of each node's `left` and `right` subtrees. The diameter of a node is the longest path between any two nodes in a tree. This path may or may not pass through the `root`. We can do this recursively for each node in the tree and keep track of the maximum diameter found so far. |
 
 Given the `root` of a binary tree, return the length of the **diameter** of the tree.
 
@@ -531,6 +551,10 @@ def maxPathSum(root):
 
 ### Symmetric Tree
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=Mao9uzxwvmc) | Use **DFS** to traverse the tree and check if the left subtree of the root is a mirror of the right subtree of the root. Check: if the `left` child of the `left` subtree is equal to the `right` child of the `right` subtree and if the `right` child of the `left` subtree is equal to the `left` child of the `right` subtree. if there's no left child but there's a right child, or if there're no right child but there's a left child, then the tree is not symmetric. |
+
 Given the `root` of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
 
 - Explanation:
@@ -559,6 +583,8 @@ def isSymmetric(root):
             return False
 
         return dfs(left.left, right.right) and dfs(left.right, right.left)
+        # or
+        # return left.val == right.val and dfs(left.left, right.right) and dfs(left.right, right.left)
 
     return dfs(root.left, root.right)
 ```
@@ -566,6 +592,10 @@ def isSymmetric(root):
 ---
 
 ### Same Tree
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=vRbbcKXCxOw) | Use **DFS** to traverse the trees and check if the values of the nodes are equal. If the values are equal, then we recursively call the function on the left and right subtrees. If the values are not equal, then we return `False`. If we reach the end of both trees, then we return `True`. |
 
 Given the roots of two binary trees `p` and `q`, write a function to check if they are the same or not.
 
@@ -596,6 +626,10 @@ def isSameTree(p, q):
 ---
 
 ### Lowest Common Ancestor of a Binary Tree
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=gs2LMfuOR9k) | Use **DFS** to traverse the tree and check: if the current node is equal to `p` or `q` if so, then we return the current node. Otherwise, we recursively call the function on the left and right subtrees. If both the left and right subtrees return a non-null value, **then we know that the current node is the lowest common ancestor of `p` and `q`**. Otherwise, we return the non-null value that was returned by either the left or right subtree which will be the lowest common ancestor of `p` and `q`. |
 
 Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
 
@@ -640,6 +674,10 @@ def lowestCommonAncestor(root, p, q):
 
 ### Vertical Order Traversal of a Binary Tree
 
+| Video Solution                                                | Hint                                                                                                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Yjf-8CyyL18) | Use **DFS or BFS** to traverse the tree and keep track of the nodes of each column in a dictionary. Sort the nodes of each column by their row and value. |
+
 Given the `root` of a binary tree, calculate the **vertical order traversal** of the binary tree.
 
 For each node at position `(row, col)`, its left and right children will be at positions `(row + 1, col - 1)` and `(row + 1, col + 1)` respectively. The root of the tree is at `(0, 0)`.
@@ -648,15 +686,17 @@ For each node at position `(row, col)`, its left and right children will be at p
 
 ![vertical order traversal](./img/vertical-order-traversal-1.jpg)
 
+- Explanation:
+
+  - **IMPORTANT:** In both solution, we must add the `row` with the node-value in the dictionary, because we want to sort the nodes of each column by their `row` and `value`.
+
 - Solution 1: using `queue`
 
   ```py
   def verticalTraversal(root):
-      # dictionary to store the nodes of each column
       columns = {} # {col: [(row, val), (row, val), ...]}
 
-      # queue to store the nodes that we need to visit
-      queue = [(root, 0, 0)]
+      queue = [(root, 0, 0)] # (node, row, col)
 
       # while the queue is not empty
       while queue:
@@ -687,10 +727,9 @@ For each node at position `(row, col)`, its left and right children will be at p
 
       # helper function to do the DFS
       def dfs(node, row, col):
-          if node:
-              columns[col] = columns.get(col, []) + [(row, node.val)]
-              dfs(node.left, row + 1, col - 1)
-              dfs(node.right, row + 1, col + 1)
+          columns[col] = columns.get(col, []) + [(row, node.val)]
+          if node.left: dfs(node.left, row + 1, col - 1)
+          if node.right: dfs(node.right, row + 1, col + 1)
 
       # call the helper function
       dfs(root, 0, 0)
@@ -707,6 +746,10 @@ For each node at position `(row, col)`, its left and right children will be at p
 
 ### Flatten Binary Tree to Linked List
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=rKnD7rLT0lI) | Use **DFS** to traverse the tree and get the left-leaves and right-leaves of the current node, then connect the left-child of the current node to the right-child of the current node, and connect the right-child of the current node to the left-child of the current node. return the last node of the tree. |
+
 Given the `root` of a binary tree, flatten the tree into a "linked list":
 
 - The "linked list" should use the same `TreeNode` class where the `right` child pointer points to the next node in the list and the `left` child pointer is always `null`.
@@ -720,68 +763,95 @@ Given the `root` of a binary tree, flatten the tree into a "linked list":
   - At each node, we set the previous node's `right` child to the current node and set the current node's `left` child to `null`.
   - We then update the previous node to the current node and recursively call the function on the left and right subtrees.
 
-  ```py
-  # Time complexity: O(n) where n is the number of nodes in the tree
-  # Space complexity: O(h) where h is the height of the tree
-  def flatten(root):
-      prev = None # current tail of the linked list
-
-      def dfs(node):
-          if node:
-              # set the previous node's right child to the current node
-              # and set the current node's left child to null
-              if prev:
-                  prev.right = node
-                  prev.left = None
-              # update the previous node to the current node
-              prev = node
-              # recursively call the function on the left and right subtrees
-              dfs(node.left)
-              dfs(node.right)
-
-      # call the helper function
-      dfs(root)
-  ```
-
-- Another solution:
-
-  ```py
-  def flatten(root):
-    # flatten the root tree and return the list tail
+```py
+def flatten(root):
     def dfs(root):
-      if not root:
-        return
+        if not root: return
+        # reach the end of the left and right subtrees
+        leftTail = dfs(root.left)
+        rightTail = dfs(root.right)
 
-      leftTail = dfs(root.left)
-      rightTail = dfs(root.right)
+        # keep the right subtree, and handle the left subtree
+        if root.left:
+          # connect the leftTail to the current root's right child
+          leftTail.right = root.right
+          # connect the current root's left child to the current root's right child
+          root.right = root.left
+          root.left = None
 
-      if root.left:
-        # connect the leftTail to the current root's right child
-        leftTail.right = root.right
-        # connect the current root's left child to the current root's right child
-        root.right = root.left
-        root.left = None
-
-      last = rightTail or leftTail or root
-      return last
-
+        # return the rightTail if it exists, otherwise return the leftTail, otherwise return the root (leaf node)
+        last = rightTail or leftTail or root
+        return last
     dfs(root)
-  ```
+```
+
+---
+
+### Employee Importance
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=8uMRWVfsfmQ) | First, map the employees to a dictionary for faster lookup by `id`. Then, add the importance value of the current employee to the total importance value. Finally, recursively call the function on the direct subordinates of the current employee and add the returned value to the total importance value. |
+
+You are given a data structure of employee information, which includes the employee's unique `id`, their importance value, and their direct subordinates' `id`.
+
+You are also given an `id`, which represents the id of a specific employee.
+
+Return the **importance value** of this employee and all their subordinates.
+
+- Ex:
+  ![employee importance](./img/employee-importance-1.jpeg)
+
+  - Input: `employees = [[1,5,[2,3]],[2,3,[]],[3,3,[]]], id = 1`
+  - Output: `11`
+  - Explanation: Employee `1` has importance value `5`, and he has two direct subordinates: employee `2` and employee `3`. They both have importance value `3`. So the total importance value of employee `1` is `5 + 3 + 3 = 11`.
+
+- Explanation:
+  - We can use a **Depth-First Search** to traverse the tree and calculate the total importance value of the employee and all their subordinates.
+  - We can use a **Bottom-Up Approach** to solve this problem.
+    1. We start by calculating the importance value of the current employee.
+    2. Then, we recursively call the function on the direct subordinates of the current employee and add the returned value to the total importance value.
+    3. Finally, we return the total importance value.
+
+```py
+def getImportance(employees, id):
+    # create a dictionary to store the employees
+    employeesDict = {} # {id: (importance, [subordinates])}
+
+    # populate the dictionary
+    for employee in employees:
+        employeesDict[employee.id] = (employee.importance, employee.subordinates)
+
+    # helper function to calculate the total importance value of the employee and all their subordinates
+    def dfs(id):
+        # calculate the importance value of the current employee
+        curImportance, subordinates = employeesDict[id]
+
+        # recursively call the function on the direct subordinates of the current employee
+        for subordinate in subordinates:
+            curImportance += dfs(subordinate)
+
+        return curImportance
+
+
+    return dfs(id)
+```
+
+- Time complexity: `O(n)` where `n` is the number of employees
+- Space complexity: `O(n)` where `n` is the number of employees
+  - `O(n)` for the dictionary
+  - `O(h)` for the recursion stack where `h` is the height of the tree
+  - `O(n + h)` -> `O(n)` because `h` is always less than `n`
 
 ---
 
 ## Binary Search Trees (BST)
 
-- **Binary Search Trees Tips:**
-  - When you're asked to find the **closest value** in a BST, you can use a **Depth First Search** to traverse the tree
-  - When you're asked to find the **closest value** in a BST, you can use a **Breadth First Search** to traverse the tree
-  - When you're asked to find the **closest value** in a BST, you can use a **Binary Search** to traverse the tree
-
 ### Insert into a Binary Search Tree
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                    |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=Cpg8f79luEA) | Use **Depth-First Search** to traverse the tree uisng **Binary Search** to find the correct position to insert the new node. Start at the `root` and keep searching until you find the valid position (where `root` is `None`) and return the new node. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=Cpg8f79luEA) | Use **Depth-First Search** to traverse the tree uisng **Binary Search** to find the correct position to insert the new node. Start at the `root` and keep searching until you find the valid position (where `root` is `None`) and return the new node. else if the value is less than the root's value, insert it to the left. else insert it to the right. |
 
 Write a function that accepts a root node of a BST and a value to insert into the tree. The function should return the root node of the BST after the insertion.
 
@@ -873,7 +943,7 @@ def deleteNode(root, key):
                 successor = successor.left
             # replace the root's value with the successor's value
             root.value = successor.value
-            # delete the successor node
+            # delete the successor node from the right subtree recursively
             root.right = deleteNode(root.right, successor.value)
 
     return root
@@ -900,7 +970,7 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
     - Use **ranges** for each point ✅
     - Or, use **In-Order Traversal** and check if the values are in ascending order
 
-- **Solution 1:** Using `min` and `max` ranges for each node
+- **Solution 1:** Using `min` and `max` ranges for each node ✅
 
   - create a function that accepts a `root` node, a `min` value and a `max` value
   - Each node will have a `min` and `max` value that it should be in the range of
@@ -913,7 +983,8 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
     - right child of the root node should be in the range of `(root.value, inf)`
 
   - Time complexity: `O(n)` where `n` is the number of nodes in the tree
-  - Space complexity: `O(h)` where `h` is the height of the tree
+  - Space complexity: `O(h) = O(log(n))` where `h` is the height of the tree -> call stack
+    - in worst case: `O(n)` where `n` is the number of nodes in the tree but this won't happen in a balanced tree
 
   ```py
   def isValidBST(root):
@@ -978,6 +1049,10 @@ Write a function that accepts a root node of a BST and returns `True` if the tre
 
 ### Binary Tree Inorder Traversal
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=g_S5WuasWUE) | Use **Depth-First Search** to traverse the tree and add the values of the nodes to an array. We can use a helper function to do the DFS and then return the array. **OR** Use iterative approach using a **Stack** to traverse the tree: 1. loop through the left nodes of the cur and add them to the stack until we reach a leaf node (None) 2. add the node's value to the result array 3. set the root to the node's right node |
+
 Given the `root` of a binary tree, return the inorder traversal of its nodes' values.
 
 ![binary-tree-inorder-traversal](./img/binary-tree-inorder-traversal.jpg)
@@ -996,6 +1071,9 @@ Given the `root` of a binary tree, return the inorder traversal of its nodes' va
     3. then we recursively call the function on the **right** node to reach the largest node
   - We can use a `DFS` to traverse the tree and add the values of the nodes to an array.
   - We can use a helper function to do the `DFS` and then return the array.
+  - Time complexity: `O(n)` where `n` is the number of nodes in the tree
+  - Space complexity: `O(h) = O(log(n))` where `h` is the height of the tree -> call stack
+    - in worst case: `O(n)` where `n` is the number of nodes in the tree but this won't happen in a balanced tree
 
   ```py
   def inorderTraversal(root):
@@ -1018,6 +1096,15 @@ Given the `root` of a binary tree, return the inorder traversal of its nodes' va
 - Solution 2: using `DFS` + `stack` **iteratively**
   ![binary-tree-inorder-traversal](./img/binary-tree-inorder-traversal-1.png)
 
+  - TODO: WAtch Neetcode course video about iterative DFS
+
+  - Steps:
+    1. Create empty stack to mimic the call stack
+    2. iterate through the tree and add the nodes to the stack, starting from the root node
+    3. while the stack is not empty, reach the left-most node of the tree and add it to the stack each time
+    4. when we reach a leaf node (None), we pop the last node in the stack and add it to the `result` array
+    5. then we set the root to the node's right node and repeat the process
+
   ```py
   def inorderTraversal(root):
       values = []
@@ -1038,11 +1125,37 @@ Given the `root` of a binary tree, return the inorder traversal of its nodes' va
           cur = node.right
 
       return values
+
+  # --------------------------------------------
+
+  # Another approach
+  def inorderTraversal(root):
+      values = []
+      stack = []
+
+      # while the stack is not empty or the cur is not None
+      while stack or root:
+          # 1. loop through the left nodes of the cur and add them to the stack until we reach a leaf node (None)
+          if root:
+              stack.append(root)
+              root = root.left
+          else:
+              # 2. add the node's value to the array
+              node = stack.pop()
+              values.append(node.value)
+              # 4. set the root to the node's right node
+              root = node.right
+
+      return values
   ```
 
 ---
 
 ### Binary Tree Postorder Traversal
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=QhszUQhGGlA) | Use **Depth-First Search** to traverse the tree and add the values of the nodes to an array. We can use a helper function to do the DFS and then return the array. **OR** Use iterative approach using a **Stack** to traverse the tree: 1. create a `visited` stack to store the nodes that we have visited before 2. create a `stack` to store the nodes of the tree 3. loop through the nodes of the tree and add them to the stack 4. while the stack is not empty, pop the first node in the stack and add it to the `visited` stack 5. if the node has a left node, add it to the stack 6. if the node has a right node, add it to the stack 7. loop through the `visited` stack and add the values of the nodes to the result array |
 
 Given the `root` of a binary tree, return the postorder traversal of its nodes' values.
 

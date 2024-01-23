@@ -195,6 +195,8 @@ Each object has a `prototype`, which contains **methods** and **properties** tha
     - `Object.getPrototypeOf(obj)` – returns the `[[Prototype]]` of `obj`.
     - `Object.setPrototypeOf(obj, proto)` – sets the `[[Prototype]]` of `obj` to `proto`.
 
+  - `__proto__` actually is invisible in javascript, it's added by the browser to make it easier to access the prototype of an object (debugging).
+    - That's one of the reasons why when we want to add things to the prototype of an object, we don't use `__proto__` instead we use `Object.getPrototypeOf`/`Object.setPrototypeOf` functions.
   - The `for..in` loop iterates over both its own and its inherited properties. All other key/value-getting methods only operate on the object itself.
 
 - **`"this"` is not affected by prototypes at all**.

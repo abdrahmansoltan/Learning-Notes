@@ -145,7 +145,30 @@ It is the ability to create new classes based on an existing class.
 
     - Composition example 2️⃣
       ![composition](./img/composition-2.png)
+
       - Here, Class `User` has delegated the operations to multiple classes `Attributes, Events, Sync` instead of having a single class `User` that has all the operations. So we "compose" the `User` class from multiple classes.
+
+        ```py
+        class User:
+          def __init__(self, attributes, events, sync):
+            self.attributes = attributes # Attributes class
+            self.events = events # Events class
+            self.sync = sync # Sync class
+
+          def create(self):
+            # using methods from the other classes (composition)
+            self.attributes.validate()
+            self.events.on_create()
+            self.sync.save()
+
+        # initializing classes
+        attributes = Attributes()
+        events = Events()
+        sync = Sync()
+
+        # creating a user
+        user = User(attributes, events, sync)
+        ```
 
 #### E - Encapsulation
 

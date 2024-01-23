@@ -15,6 +15,8 @@
   - [Is Graph Bipartite?](#is-graph-bipartite)
   - [Find if Path Exists in Graph](#find-if-path-exists-in-graph)
   - [Check if There is a Valid Path in a Grid](#check-if-there-is-a-valid-path-in-a-grid)
+  - [Number of unique paths in matrix graph](#number-of-unique-paths-in-matrix-graph)
+  - [Number of unique paths in adjacency list graph](#number-of-unique-paths-in-adjacency-list-graph)
   - [Shortest Path in Binary Matrix](#shortest-path-in-binary-matrix)
   - [Couples Holding Hands](#couples-holding-hands)
   - [Minimum Obstacle Removal to Reach Corner](#minimum-obstacle-removal-to-reach-corner)
@@ -111,6 +113,10 @@
 
 ## Flood Fill
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=aehEcTEPtCs) | Use `DFS` by first: checking if the current cell is in the image or not and if it's doesn't have the same color as the starting pixel or if it's already visited. if it's not, we change the color of the current cell and recursively call the function on the neighbors of the current cell. |
+
 An image is represented by an `m x n` integer grid `image` where `image[i][j]` represents the pixel value of the image.
 
 You are also given three integers `sr`, `sc`, and `newColor`. You should perform a **flood fill** on the image starting from the pixel `image[sr][sc]`.
@@ -149,9 +155,9 @@ Return _the modified image after performing the flood fill_.
 
 ```py
 class Solution:
-    def floodFill(self, image: List[List[int]], sr: int, sc: int, newColor: int) -> List[List[int]]:
+    def floodFill(self, image: List[List[int]], sr: int, sc: int, color: int) -> List[List[int]]:
         ROWS, COLS = len(image), len(image[0])
-        color = image[sr][sc]
+        startColor = image[sr][sc]
         visit = set()
 
         def dfs(r, c):
@@ -159,7 +165,7 @@ class Solution:
             if (
               r not in range(ROWS) or
               c not in range(COLS) or
-              image[r][c] != color or
+              image[r][c] != startColor or
               (r, c) in visit
             ):
                 return
@@ -180,6 +186,10 @@ class Solution:
 ---
 
 ## Number of islands
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=pV2kpPD66nE) | Use `BFS` or `DFS`, Check if the current cell is a `'1'` or not. if it's a `'1'`, increment the number of islands by 1 and call the helper function to mark the current island as visited. The helper function will mark the current cell as visited and then recursively call itself on the adjacent cells (up, down, left, right) that are `'1'`s. Call the helper function on all the cells in the grid if they are `'1'`s and not visited and increment the counter by 1 each call. |
 
 Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of islands. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
 ![number of islands](./img/num-of-islands.png)
@@ -223,7 +233,7 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
                       grid[nr][nc] == '1'
                   ):
                       visit.add((nr, nc))
-                      bfs(nr, nc)
+                      q.append((nr, nc))
 
       for r in range(ROWS):
           for c in range(COLS):
@@ -237,6 +247,7 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
 - Solution 2 -> `DFS`
 
   - Drawback here, is that space complexity will be `O(n.m)` = size of the grid -> `n` is the number of rows and `m` is the number of columns because in the worst case we will visit all the cells in the grid.
+    - This is wrong, because the space complexity will be `O(n.m)` = size of the grid -> `n` whether `dfs` or `bfs` because we're using a `visited` set to keep track of the visited cells. and the `stack` will keep growing.
     - also this will happen if we didn't use a `visited` set to keep track of the visited cells. because we will keep calling the function on the same cell over and over again. and the `stack` will keep growing.
 
   ```py
@@ -317,6 +328,10 @@ Given a 2D grid map of `'1'`s (land) and `'0'`s (water), count the number of isl
 
 ## Max Area of Island
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=iJGr1OtmH0c) | Use `DFS` by first: checking if the current cell is in the grid or not and if it's not a `1` or if it's already visited. if it's not, we mark the current cell as visited and increment the area by 1 and recursively call the function on the neighbors of the current cell and add their returned areas to the current area. Call the function on all the cells in the grid if they are `1`s and not visited and compare the current area with the max area and return the max area. |
+
 You are given an `m x n` binary matrix `grid`. An island is a group of `1`'s (representing land) connected **4-directionally** (horizontal or vertical.) You may assume all four edges of the grid are surrounded by water.
 
 The **area** of an island is the number of cells with a value `1` in the island.
@@ -376,6 +391,10 @@ class Solution:
 ---
 
 ## Rotting Oranges
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=4tYoVx0QoN0) | Use `BFS` by first: looping on each orange and building the initial queue of rotten oranges and count the fresh oranges. Then we process all the rotten oranges at the current level and add their neighbors to the queue and mark them as rotten. once we finish processing all the oranges in the **current level**, we increment the time by `1`. once the queue is empty, we stop and return the time. We also we need to store the `number of fresh oranges` in the grid. to know when to stop. if there are no fresh oranges left, we return the time. if there are still fresh oranges left, we return `-1`. |
 
 You are given an `m x n` grid `grid` where each cell can have one of three values:
 
@@ -459,6 +478,10 @@ class Solution:
 ---
 
 ## Walls and Gates
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=e69C6xhiSQE) | Use `BFS` by first: building the initial queue of gates. Then we process all the cells in the queue and add their neighbors to the queue and mark them as visited and set their distance to the current cell + 1. We also need to check if the current cell is a wall or not. if it's a wall, we skip it. |
 
 You are given an `m x n` grid `rooms` initialized with these three possible values.
 
@@ -547,6 +570,10 @@ Fill each empty room with the distance to its nearest gate. If it is impossible 
 
 ## Sudoku Solver
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=lLixGoGuClc) | Use `backtracking` by first: looping through the rows and columns of the grid and if the current cell is empty, we try to fill it with a number from `1` to `9` and check if it's valid or not. if it's valid, we recursively call the function on the next cell. if it's not valid, we try another number. We also need to check if the current cell is empty or not. if it's not empty, we skip it. We also need to check if the current number is valid or not. we can do that by checking the current row, column and sub-box of the current cell. |
+
 Write a program to solve a Sudoku puzzle by filling the empty cells.
 
 A sudoku solution must satisfy **all of the following rules**:
@@ -633,6 +660,10 @@ class Solution:
 
 ## Time Needed to Inform All Employees
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=zdBYi0p4L5Q) | Use `DFS` by first: building the graph (adjacency list) from the `manager` array. Then we start from the `root` and keep going until we reach the `leaf` nodes. We keep track of the `max_time` and update it whenever we reach a `leaf` node. We also keep track of the `current_time` and increment it whenever we call the function recursively for the employees of the current employee. We return the `max_time` at the end. |
+
 A company has `n` employees with a unique ID for each employee from `0` to `n - 1`. The head of the company has is the one with `headID`.
 
 Each employee has one direct manager given in the `manager` array where `manager[i]` is the direct manager of the `i-th` employee, `manager[headID] = -1`. Also, it is guaranteed that the subordination relationships have a tree structure.
@@ -677,28 +708,24 @@ Return _the number of minutes needed to inform all the employees about the urgen
 ```py
 # DFS
 def numOfMinutes(n, headID, manager, informTime):
-    graph = defaultdict(list)
-    # or: graph = [[] for _ in range(n)]
-
+    managerToEmployees = defaultdict(list)
+    time = 0
     # build the graph (adjacency list)
     for i, m in enumerate(manager):
         if m != -1:
-            graph[m].append(i) # m is the manager of i
+          managerToEmployees[m].append(i) # m is the manager of i
 
-    def dfs(node, current_time):
-        if not graph[node]:
-            nonlocal max_time # if using python2, use: global max_time or max_time = [0]
-            max_time = max(max_time, current_time)
+    def dfs(emp, curTime):
+        # base case: if the current employee has no subordinates, update the max time
+        if not managerToEmployees[emp]:
+            time = max(time, curTime)
             return
-
-        for neighbor in graph[node]:
-            dfs(neighbor, current_time + informTime[node])
-
-    max_time = 0
+        for e in managerToEmployees[emp]:
+            dfs(e, curTime + 1)
     dfs(headID, 0)
-    return max_time
+    return time
 
-# ----------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------
 
 # BFS
 def numOfMinutes(n, headID, manager, informTime):
@@ -728,6 +755,10 @@ def numOfMinutes(n, headID, manager, informTime):
 ---
 
 ## All Paths From Source to Target
+
+| Video Solution                                                | Hint                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=CYnvDzMprdc) | Use `DFS` by first: starting from node `0` and keep going until we reach node `n-1`. We keep track of the current `path` and add it to the result when we reach node `n-1`. |
 
 Given a directed acyclic graph (**DAG**) of `n` nodes labeled from `0` to `n - 1`, find all possible paths from node `0` to node `n - 1`, and return them in any order.
 
@@ -799,6 +830,10 @@ The graph is given as follows: `graph[i]` is a list of all nodes you can visit f
 ---
 
 ## Clone Graph
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=mQeF6bN8hMk) | Use `DFS` by first: creating a `HashMap` to keep track of the cloned nodes. If it's already cloned, then we return the cloned node to double-side it. We loop through the neighbors of the node and clone them and add them to the clone's neighbors. We use `DFS` to clone the neighbors of the neighbors and so on. |
 
 Given a reference of a node in a **connected** undirected graph. Return a **deep copy** (clone) of the graph.
 
@@ -1106,6 +1141,48 @@ def hasValidPath(grid: List[List[int]]) -> bool:
 
 ---
 
+## Number of unique paths in matrix graph
+
+count num of unique paths from topLeft to bottomRight
+
+- Solution 1: using DFS [here](./2-Algorithms.md#matrix-dfs)
+- Solution 2 using Top-Down DP [here](./2-Algorithms.md#dynamic-programming-vs-divide-and-conquer-brute-force)
+- Solution 3 using Bottom-Up DP [here](./2-Algorithms.md#dynamic-programming-vs-divide-and-conquer-brute-force)
+
+---
+
+## Number of unique paths in adjacency list graph
+
+Here the difference is that the input is given as an `adjacency list` instead of a `matrix`.
+
+Given node and target node, find the number of unique paths from node to target node.
+
+```py
+def uniquePathsIII(graph, node, target):
+    def dfs(node, target, visited):
+        if node in visited:
+            return 0
+        if node == target:
+            return 1
+
+        visited.add(node)
+        paths = 0
+        for neighbor in graph[node]:
+            paths += dfs(neighbor, target, visited)
+        visited.remove(node) # Backtrack
+
+        return paths
+
+    return dfs(node, target, set())
+```
+
+- Time complexity: `O(V^E)`
+  - where `V` is the number of nodes and `E` is the number of edges (number of decisions we can make at each node)
+- Space complexity: `O(V)`
+  - Because we are using a `visited` set to keep track of the visited nodes.
+
+---
+
 ## Shortest Path in Binary Matrix
 
 problem: [Here](https://leetcode.com/problems/shortest-path-in-binary-matrix/)
@@ -1150,6 +1227,13 @@ def shortestPathBinaryMatrix(grid: List[List[int]]) -> int:
 
     return -1
 ```
+
+- Time complexity: `O(E*V)` = `O(n^2)`
+
+  - where `E` is the number of edges and `V` is the number of vertices (cells)
+  - Because we may visit all the cells in the grid.
+
+- Another solution [here](./2-Algorithms.md#matrix-bfs)
 
 ---
 

@@ -62,7 +62,7 @@ The Fibonacci sequence is a series of numbers where a number is the sum of the t
 
 - Solution 1 - using recursion `O(2^n)` --> exponential time (BAD)
 
-  - Time complexity: `O(2^n)` because we're calling the function twice for each number in the sequence and doing this for each level(`n` levels)
+  - Time complexity: `O(2^n)` because we're calling the function twice for each number in the sequence (dividing the problem to 2 subproblems), and doing this for each level(`n` levels)
   - Space complexity: `O(n)` because we're using `n` levels in the **call stack**
 
   ```py
@@ -171,9 +171,9 @@ def fib(n):
 
 ## Restore IP Addresses (Compute all valid IP addresses)
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                               |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=61tN4YEdiTM) | Use **Backtracking** to solve this problem. base case: `number of dots == 4` and `index == len(s)`. Then check if the current string is a valid IP address. if it is, add it to the result list. if not, check other combinations. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=61tN4YEdiTM) | Use **Backtracking** to solve this problem. base case: `number of dots == 4` and `index == len(s)`, if so append the substring to the result array. Then iterate through the string and call the helper function to add the dots if the substring is valid. |
 
 Given a string s containing only digits, return all possible valid IP addresses that can be obtained from s. You can return them in any order.
 
@@ -206,14 +206,10 @@ A valid IP address consists of exactly four decimal strings separated by periods
 
 ```py
 def restoreIpAddresses(s):
-    res = []
-    # check if the string is valid
-    if len(s) > 12 or len(s) < 4:
-        return res
-
     def isValidPart(s):
         return len(s) == 1 or (s[0] != '0' and int(s) <= 255)
 
+    res = []
     def backtrack(i, dots, curIP):
       """
       i: current index in the string
@@ -251,9 +247,9 @@ def restoreIpAddresses(s):
 
 ## Permutations
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                        |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=KukNnoN-SoY) | Use **Backtracking** to solve this problem. base case: `len(nums) == 0`. Then loop through the array and remove the current element and get the permutations of the remaining elements until we have no more elements left. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=KukNnoN-SoY) | Use **Backtracking** to solve this problem. base case: `len(nums) == 0`. Then loop through the array and recursively call the helper function with the current element removed from the array and added to the current permutation. |
 
 Given an array `nums` of distinct integers, return all the possible permutations. You can return the answer in **any order**.
 
@@ -283,7 +279,12 @@ Given an array `nums` of distinct integers, return all the possible permutations
 
     ![permutations](./img/permutations-4.png)
 
-  - Time complexity: `O(n * n!)` -> `O(n!)` because we are generating all the permutations and `O(n)` because we are looping through the array.
+  - Time complexity: ` O(n * n!)``O(n!) `
+    - `O(n)` because we are looping through the array
+    - `O(n!)` because we are generating all the permutations of the array (we are making `n` decisions for each element in the array)
+  - Space complexity: ` O(n * n!)``O(n!) `
+    - `O(n)` because we are using `n` levels in the call stack
+    - `O(n!)` because we are generating all the permutations of the array
 
   ```py
   def permute(nums):
@@ -351,6 +352,8 @@ Given a collection of numbers, `nums`, that might contain duplicates, return all
     - We can use **Decision Tree** to solve this problem.
     - Same as the previous problem, but we need to check if the current element is the same as the previous element. If it is, we can skip it.
       - This is done by **sorting** the array first. so that the same elements are next to each other.
+  - Time complexity: `O(n * n! + nlogn)` -> `O(n * n!)` because we are generating all the permutations and `O(nlogn)` because we are sorting the array.
+  - Space complexity: `O(n * n!)` because we are generating all the permutations of the array
 
   ```py
   def permuteUnique(nums):
@@ -383,6 +386,7 @@ Given a collection of numbers, `nums`, that might contain duplicates, return all
     - we use this hashmap to create the decision tree.
       - we update the hashmap by decrementing the count of the current element on each level of the decision tree.
         ![permutations](./img/permutations-II-2.png)
+    - Space complexity: `O(n)` because we are using a hashmap to keep track of the elements that we have seen so far. (needs checking this)
 
   ```py
   def permuteUnique(nums):
@@ -411,6 +415,10 @@ Given a collection of numbers, `nums`, that might contain duplicates, return all
 ---
 
 ## Letter Case Permutation
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=DGDhf_vMfM4) | Use **Backtracking** to solve this problem. base case: `i == len(s)`, if so append the current string to the result array. Then for each element we want to call the helper function, and if the element is a letter, we want to call the helper function again with the letter swapped. |
 
 Given a string `s`, we can transform every letter individually to be lowercase or uppercase to create another string. Return a list of all possible strings we could create. You can return the output in **any order**.
 
@@ -457,6 +465,10 @@ Given a string `s`, we can transform every letter individually to be lowercase o
 
 ## Combinations
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=q0s6m7AiM7o) | Use **Backtracking** to solve this problem. base case: when the length of the current combination array is equal to `k`, if so append the current combination to the result array. Then we loop through the range from `start` to `n` and recursively call the helper function with the current element added to the combination array. |
+
 Given two integers `n` and `k`, return all possible combinations of `k` numbers out of the range `[1, n]`.
 
 You may return the answer in **any order**.
@@ -501,6 +513,10 @@ def combine(n, k):
 ---
 
 ## Subsets
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=REOH22Xwdkk) | Use **Backtracking** to solve this problem. base case: `i == len(nums)`, if so append the current subset to the result array. Then recursively call the helper function twice, once with the current element added to the subset and once without the current element added to the subset. |
 
 Given an integer array `nums` of **unique** elements, return all possible subsets (the power set).
 
@@ -580,6 +596,10 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
 
 ## Subsets II
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Vn2v6ajA7U0) | Trick here is to **sort** the array first. Then we can check if the current element is the same as the previous element. If it is, we can increment the cur index. else we can use the same approach as the previous problem. |
+
 Given an integer array `nums` that may contain duplicates, return all possible subsets (the power set).
 
 The solution set **must not** contain duplicate subsets. Return the solution in **any order**.
@@ -655,6 +675,10 @@ The solution set **must not** contain duplicate subsets. Return the solution in 
 ---
 
 ## Sum of All Subset XOR Totals
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=hxqPh0x8sB4) | Use **Backtracking** to solve this problem. base case: `i == len(nums)`, if so add the `XOR` of the current subset to the result. Then recursively call the helper function twice, once with the current element **XOR'ed** with the current subset and once without the current element **XOR'ed** with the current subset. |
 
 The **XOR total** of an array is defined as the bitwise `XOR` of **all its elements**, or `0` if the array is **empty**.
 
