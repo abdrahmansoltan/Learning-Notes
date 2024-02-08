@@ -4,7 +4,7 @@
   - [Numbers Manipulation](#numbers-manipulation)
     - [Numbers Notes](#numbers-notes)
     - [Reverse Integer](#reverse-integer)
-    - [Check if a decimal integer is a palindrome](#check-if-a-decimal-integer-is-a-palindrome)
+    - [Palindrome Number (Check if a decimal integer is a palindrome)](#palindrome-number-check-if-a-decimal-integer-is-a-palindrome)
     - [Count Primes](#count-primes)
   - [Numbers \& Math](#numbers--math)
     - [Power of Two](#power-of-two)
@@ -30,9 +30,30 @@
   123 // 100 = 1 # get the first digit
   ```
 
+- To loop through the digits of a number, we can use the **modulus** operator and the **division** operator and use a `while` loop until the number is `0`
+
+  ```py
+  x = 123
+  while x:
+      # get the last digit of the number
+      last_digit = x % 10
+      print(last_digit)
+      # get the number without the last digit
+      x = x // 10
+
+  # Output:
+  # 3
+  # 2
+  # 1
+  ```
+
 ---
 
 ### Reverse Integer
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=HAgLH58IgJQ) | Start by using the absolute value of the number and then check if the number is negative and save that in a variable. Then, loop through the digits of the number and get the last digit and add it to the result multiplied by 10. Then, divide the number by 10 to get the next digit. Finally, check if the number is out of range or is negative and return the result accordingly. |
 
 Given a signed 32-bit integer `x`, return `x` _with its digits reversed_. If reversing `x` causes the value to go outside the signed 32-bit integer range `[-2^31, 2^31 - 1]`, then return `0`.
 
@@ -71,7 +92,11 @@ def reverse(x):
 
 ---
 
-### Check if a decimal integer is a palindrome
+### Palindrome Number (Check if a decimal integer is a palindrome)
+
+| Video Solution                                                | Hint                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=yubRKwixN-U) | Convert the number to a string and then loop through the string and check if the characters are different. **OR** Loop through the digits of the number and check if the digits on both sides are different. |
 
 Given an integer `x`, return `true` if `x` is palindrome integer.
 
@@ -82,31 +107,68 @@ An integer is a palindrome when it reads the same backward as forward. For examp
   - Input: `x = 121`
   - Output: `true`
 
-```py
-def isPalindrome(x):
-    if x < 0:
-        return False
+- Solution 1: convert the number to a string and check if the string is a palindrome
 
-    # get the number of digits in x
-    num_digits = math.floor(math.log10(x)) + 1
+  - Time Complexity: `O(n)` where `n` is the number of digits in `x`
 
-    # loop through the digits of x
-    for i in range(num_digits // 2):
-        # get the i-th digit of x
-        left_digit = x // 10 ** (num_digits - i - 1) % 10
-        # get the (num_digits - i - 1)-th digit of x
-        right_digit = x // 10 ** i % 10
+  ```py
+  def isPalindrome(x):
+      # convert the number to a string
+      x = str(x)
 
-        # check if the digits are different
-        if left_digit != right_digit:
-            return False
+      # loop through the string
+      for i in range(len(x) // 2):
+          # check if the characters are different
+          left_char = x[i]
+          right_char = x[len(x) - i - 1]
+          if left_char != right_char:
+              return False
 
-    return True
-```
+      return True
+  ```
+
+- Solution 2: loop through the digits of the number and check if the digits are different
+
+  - First, we check if the number is negative and return `False` if it is
+  - Then check the digits at the beginning and the end of the number and return `False` if they are different
+    - First, we need to know the number of digits in the number, so that we can know what to divide the number by to get the first and last digits whether `10`, `100`, `1000`, etc...
+    - To get the first digit of the number, we can use the `modulus` operator, and to get the last digit of the number, we can use the `division` operator divided by `10`
+      ![Palindrome Number](./img/palindrome-number-1.png)
+    - Then we need to update the number by removing the first and last digits
+      ![Palindrome Number](./img/palindrome-number-2.png)
+      - We remove the first digit by dividing the number by `10` to shift the digits to the right
+      - We remove the last digit by using the `modulus` operator by the number of digits in the number to get the remainder of the division by `10` which is the last digit
+  - Time Complexity: `O(log n)` -> `O(n)` where `n` is the number of digits in `x`
+
+  ```py
+  def isPalindrome(x):
+      if x < 0:
+          return False
+
+      # get the number of digits in x
+      num_digits = math.floor(math.log10(x)) + 1
+
+      # loop through the digits of x
+      for i in range(num_digits // 2):
+          # get the i-th digit of x
+          left_digit = x // 10 ** (num_digits - i - 1) % 10
+          # get the (num_digits - i - 1)-th digit of x
+          right_digit = x // 10 ** i % 10
+
+          # check if the digits are different
+          if left_digit != right_digit:
+              return False
+
+      return True
+  ```
 
 ---
 
 ### Count Primes
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=5LMkddl2NCk) | Use the **Sieve of Eratosthenes** algorithm: create a array with `True` values for the initial state and then loop through the numbers and mark the multiples of each number as `False`. Finally count the number of `True` values in the array. |
 
 Given an integer `n`, return the number of prime numbers that are strictly less than `n`.
 
@@ -130,6 +192,25 @@ Given an integer `n`, return the number of prime numbers that are strictly less 
     - because the number of times we loop through the numbers from `2` to `n` is `O(log(log(n)))` as we can see in the image above which is equivalent to `O(n)`
 
 ```py
+# Naive solution (brute-force) -> O(n * sqrt(n)) ❌
+def countPrimes(n):
+    count = 0
+    for i in range(2, n):
+        is_prime = True
+        for j in range(2, i):
+            if i % j == 0:
+                is_prime = False
+                break
+
+        # increment the count if the number is prime
+        if is_prime:
+            count += 1
+
+    return count
+
+# ---------------------------OR------------------------------
+
+# Sieve of Eratosthenes -> O(n * log(log(n))) ✅
 def countPrimes(n):
     # create a list of numbers from 2 to n and mark them as prime
     is_prime = [True] * n

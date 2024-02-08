@@ -6,11 +6,11 @@
     - [Plus One](#plus-one)
   - [Array Permutation](#array-permutation)
     - [Build Array from Permutation](#build-array-from-permutation)
-    - [Next Permutation -- (Not important ⚠️)](#next-permutation----not-important-️)
+    - [Next Permutation](#next-permutation)
     - [Compute a random permutation](#compute-a-random-permutation)
     - [Shuffle an Array](#shuffle-an-array)
   - [Two pointers](#two-pointers)
-    - [Two Sum II](#two-sum-ii)
+    - [Two Sum II - Input Array Is Sorted](#two-sum-ii---input-array-is-sorted)
     - [3Sum (Triplet Sum to Zero)](#3sum-triplet-sum-to-zero)
     - [3Sum Closest](#3sum-closest)
     - [3Sum Smaller](#3sum-smaller)
@@ -21,21 +21,20 @@
     - [Remove Duplicates from Sorted Array II](#remove-duplicates-from-sorted-array-ii)
     - [Container with most water](#container-with-most-water)
     - [Squares of a Sorted Array](#squares-of-a-sorted-array)
-    - [Sort array based on parity](#sort-array-based-on-parity)
+    - [Sort Array By Parity](#sort-array-by-parity)
     - [Rearrange Array Elements by Sign](#rearrange-array-elements-by-sign)
+    - [Shortest Unsorted Continuous Subarray](#shortest-unsorted-continuous-subarray)
     - [Trapping Rain Water](#trapping-rain-water)
   - [Sliding Window](#sliding-window)
     - [Maximum Average Subarray I](#maximum-average-subarray-i)
     - [Minimum Size Subarray Sum](#minimum-size-subarray-sum)
     - [Longest Consecutive Equal Subarray](#longest-consecutive-equal-subarray)
-    - [Find the Longest Equal Subarray with at Most K Elements Removed](#find-the-longest-equal-subarray-with-at-most-k-elements-removed)
+    - [Longest Equal Subarray with at Most K Elements Removed](#longest-equal-subarray-with-at-most-k-elements-removed)
     - [Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold](#number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold)
     - [Fruit Into Baskets](#fruit-into-baskets)
     - [Longest Subarray of 1's After Deleting One Element](#longest-subarray-of-1s-after-deleting-one-element)
     - [Max Consecutive Ones III](#max-consecutive-ones-iii)
-    - [Sliding Window Maximum](#sliding-window-maximum)
     - [Chunk Array](#chunk-array)
-    - [Shortest Unsorted Continuous Subarray](#shortest-unsorted-continuous-subarray)
   - [Prefix / Prefix Sum](#prefix--prefix-sum)
     - [Range Sum Query - Immutable](#range-sum-query---immutable)
     - [Range Sum Query 2D - Immutable](#range-sum-query-2d---immutable)
@@ -58,6 +57,7 @@
     - [Meeting Rooms](#meeting-rooms)
     - [Meeting Rooms II](#meeting-rooms-ii)
     - [Maximum CPU Load](#maximum-cpu-load)
+    - [Single-Threaded CPU](#single-threaded-cpu)
     - [Employee Free Time](#employee-free-time)
   - [2D Array ( Matrix )](#2d-array--matrix-)
     - [Rotate Image](#rotate-image)
@@ -76,9 +76,9 @@
 
 ### Replace Elements with Greatest Element on Right Side
 
-| Video Solution                                                | Hint                                                                                                                                                                                             |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=ZHjKhUjcsaU) | The trick here, is to start from the right side (end) of the array and iterate in reverse order and keep track of the `rightMax` and update it every time by comparing it to the current element |
+| Video Solution                                                | Hint                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ZHjKhUjcsaU) | The trick here, is to start from the right side (end) of the array and iterate in reverse order and keep track of the `rightMax` and update it every time by comparing it to the current element. |
 
 Given an array `arr`, replace every element in that array with the greatest element among the elements to its right, and replace the last element with `-1`.
 
@@ -94,10 +94,12 @@ Given an array `arr`, replace every element in that array with the greatest elem
     - index `5` --> There are no elements to the right of index `5`, so we put `-1`.
 
 - Explanation:
-  - Instead of using nested loops `O(n^2)`, we can loop through the array in reverse order and keep track of the maximum element we've seen so far.
+  - The brute force approach is to iterate over the array and for each element, find the maximum element to its right and replace it with that element. -> `O(n^2)`
     ![replace elements](./img/replace-elements-1.png)
+  - Instead, we can loop through the array in reverse order and keep track of the maximum element we've seen so far.
     ![replace elements](./img/replace-elements-2.png)
 - Time complexity: `O(n)`
+- Space complexity: `O(1)` because we are modifying the array in-place
 
 ```py
 def replaceElements(arr):
@@ -143,30 +145,16 @@ You may assume the integer does not contain any leading zero, except the number 
 
   ```py
   def plusOne(digits):
-      # loop through the array in reverse order
       for i in range(len(digits) - 1, -1, -1):
-          # if the current digit is less than 9, increment it by 1 and return the array
-          if digits[i] < 9:
-              digits[i] += 1
-              return digits
           # if the current digit is 9, set it to 0 and continue to the next digit
-          else:
-              digits[i] = 0
-
-      # if we reach this point, it means that all the digits are 9, or arr is empty or has one digit so we need to add a 1 at the beginning of the array
-      return [1] + digits
-
-  # --------------------------------------------------
-
-  # Another approach ✅
-  def plusOne(digits):
-      for i in range(len(digits) - 1, -1, -1):
           if digits[i] == 9:
               digits[i] = 0
+          # if the current digit is less than 9, increment it by 1 and return the array
           else:
               digits[i] += 1
               return digits
 
+      # if we reach this point, it means that all the digits are 9, or arr is empty or has one digit so we need to add a 1 at the beginning of the array
       return [1] + digits
   ```
 
@@ -177,7 +165,7 @@ You may assume the integer does not contain any leading zero, except the number 
       carry = 1
       for i in range(len(digits) - 1, -1, -1):
           digits[i] += carry
-          carry = digits[i] // 10 # move to the next digit
+          carry = digits[i] // 10 # will be 0 if the digit is less than 10, otherwise it will be 1
           digits[i] %= 10
 
       if carry:
@@ -186,6 +174,7 @@ You may assume the integer does not contain any leading zero, except the number 
   ```
 
 - Time complexity: `O(n)`
+  - adding `1` to the beginning of the array is `O(n)` because we need to shift all the elements to the right -> `O(n + n) = O(2n) = O(n)`
 - Space complexity: `O(1)` because we are modifying the array in-place
 - Note for interview:
   - use these edge cases to test your code:
@@ -201,9 +190,9 @@ A **Permutation** of an array of integers arranged such that `arr[i]` becomes `a
 
 ### Build Array from Permutation
 
-| Video Solution                                                | Hint                                                                                                                                                                                               |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=1svjL7Docuo) | Iterate over the array and append the element at `nums[nums[i]]` to the result array, **OR** solve it without using extra space by using the modulo operator `%` to get the old value of `nums[i]` |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=1svjL7Docuo) | Iterate over the array and append the element at `nums[nums[i]]` to the result array, **OR** solve it without using extra space by storing both `nums[i]` and `nums[nums[i]]` in the same element. then loop again to extract `nums[nums[i]]` from the meta number. |
 
 Given a **zero-based permutation** `nums` (0-indexed), build an array `ans` of the **same length** where `ans[i] = nums[nums[i]]` for each `0 <= i < nums.length` and return it.
 
@@ -218,7 +207,7 @@ A **zero-based permutation** `nums` is an array of **distinct** integers from `0
     - `ans = [nums[0], nums[2], nums[1], nums[5], nums[3], nums[4]]`
     - `ans = [0,1,2,4,5,3]`
 
-- **Solution 1:** using a extra result array (Brute force & Extra space) ✅
+- **Solution 1:** using a extra result array (Brute force & Extra space)
 
   - Time complexity: `O(n)`
   - Space complexity: `O(n)`
@@ -238,17 +227,39 @@ A **zero-based permutation** `nums` is an array of **distinct** integers from `0
 
   - In order to solve it without using extra space, have a reference to the old and new values of `nums[i]` in the same element. because we will need the old value of `nums[i]` to calculate the new value of `nums[i]`
     ![build array from permutation](./img/build-array-from-permutation-1.png)
+
     - It's done by using this formula: `num1 + (some_constant) * num2`
+
       - `num1` is the old value of `nums[i]`
       - `num2` is the new value of `nums[i]`
       - `some_constant` is a constant that is greater than the maximum value in the array
         - we use it because the new value of `nums[i]` is greater than the maximum value in the array, so we need to get the old value of `nums[i]` by using the modulo operator `%`
+
   - After we have the reference to the old and new values of `nums[i]` in the same element, we need to recover the data, we can iterate over the array again and divide each element by `some_constant` to get the new value of `nums[i]`
     ![build array from permutation](./img/build-array-from-permutation-2.png)
   - So:
     - to get old value of `nums[i]` -> `nums[i] % some_constant`
     - to get new value of `nums[i]` -> `nums[i] // some_constant`
-  - The `some_constant` must be bigger than the maximum value in the array, which is given in the problem statement, so we can use the length of the array `n` as the `some_constant`
+  - EX:
+
+    ```py
+    num1 = 8
+    num2 = 4
+    constant = 10
+
+    # meta number that stores both num1 and num2
+    meta = num1 + constant * num2 # 48
+    # get num1
+    num1 = meta % constant # 48 % 10 = 8
+    # get num2
+    num2 = meta // constant # 48 // 10 = 4
+    ```
+
+  - Here:
+
+    - We can use the length of the array `n` as the `constant`
+    - `num1` is the old value of `nums[i]`
+    - `num2` is the new value of `nums[i]` (the value we want to get)
 
   - Time complexity: `O(n)`
   - Space complexity: `O(1)`
@@ -256,10 +267,12 @@ A **zero-based permutation** `nums` is an array of **distinct** integers from `0
   ```py
   def buildArray(nums):
       CONST = len(nums)
+      # 1. Store both num1 and num2 in the same element
       for i in range(len(nums)):
           a = nums[i]
-          b = nums[a] % CONST
+          b = nums[a] % CONST # get old value of nums[i] permuted
           nums[i] = a + CONST * b
+      # 2. Extract num2 from the meta number
       for i in range(len(nums)):
           nums[i] //= CONST
       return nums
@@ -267,15 +280,17 @@ A **zero-based permutation** `nums` is an array of **distinct** integers from `0
 
 ---
 
-### Next Permutation -- (Not important ⚠️)
+### Next Permutation
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=quAS1iydq7U) | The idea is to start from the **rightmost side** of the array and find the longest decreasing subarray. This is because the rightmost side is the least significant digit, and we want to increase the permutation by as little as possible. Then, we swap the element to the left of the subarray with the next largest element in the subarray. Then, we reverse the subarray to the right of the swapped element. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=quAS1iydq7U) | The idea is to start from the **rightmost side** of the array and find the longest decreasing subarray. Then get the `pivot` element which is the element to the left of the subarray. Then find the next largest element in the subarray and swap it with the `pivot` element. Then reverse the subarray to the right of the swapped element. Because we want to be in the first permutation starting from the element that we've swapped. |
 
-Implement **next permutation**, which rearranges numbers into the lexicographically next greater permutation of numbers.
+A **permutation** is a rearrangement of the elements of an array. For example, `[2, 1, 3]` is a permutation of `[1, 2, 3]`.
 
-If such an arrangement is not possible, it must rearrange it as the lowest possible order (i.e., sorted in ascending order).
+The **next permutation** of an array arr is defined as the **lexicographically next** greater permutation of arr. If arr is the **lexicographically largest** permutation, then the next permutation is the **lexicographically smallest** permutation.
+
+Given an integer array `nums`, return the **next permutation** of `nums`.
 
 The replacement must be **in place** and use only constant extra memory.
 
@@ -286,19 +301,22 @@ The replacement must be **in place** and use only constant extra memory.
   - `nums = [1]` -> `[1]`
 
 - Explanation
-  - We want to compute the next permutation given the current permutation. The idea is to find the next permutation by rearranging the existing values.
-  - One brute force approach is to generate all permutations and find the given permutation and return the next permutation. However, this approach is not efficient because it generates all permutations `O(n!)` and finds the given permutation `O(n)`.
-  - We can do better by understanding how permutations are generated. The idea is to start from the rightmost side of the array and find the longest decreasing subarray. This is because the rightmost side is the least significant digit, and we want to increase the permutation by as little as possible.
-    - Find the longest decreasing subarray.
-    - Swap the element to the left of the subarray with the next largest element in the subarray.
-    - Reverse the subarray to the right of the swapped element.
-  - The key insight is that we want to increase the permutation by as little as possible. The loose analogy is how a car's odometer increments. The difference is that we cannot change values, only reorder them. So, we want to increase the permutation by as little as possible by rearranging the existing values.
-  - The idea is to start from the **rightmost side** of the array and find the longest decreasing subarray. This is because the rightmost side is the least significant digit, and we want to increase the permutation by as little as possible.
+
+  - First, let's remember how permutations are generated. The idea is to start from the rightmost side of the array and find the longest decreasing subarray. This is because the rightmost side is the least significant digit, and we want to increase the permutation by as little as possible.
+    ![permutations](./img/permutations-4.png)
+    - From the image above, we notice that usually the order of the permutations generated is relevant to the input elements order
+      - `A` comes before `B` in the input array, so `A` comes before `B` in the first 2 permutations, then `B` comes before `A` in the next 2 permutations, and so on...
+  - One approach is to generate all permutations and find the given permutation and return the next permutation. However, this approach is not efficient because it generates all permutations in **Factorial time `O(n!)`** and finding the given permutation takes another `O(n)` ❌
+
+  - Instead, We can find the next permutation by rearranging the existing values. By understanding how permutations are generated, we can start from the **rightmost side** of the array and find the longest decreasing subarray. This is because the rightmost side is the least significant digit, and we want to increase the permutation by as little as possible. ✅
     ![next permutation](./img/next-permutation.png)
-    - The longest decreasing subarray is the subarray that is already in descending order. For example, in the array `[0, 1, 2, 5, 3, 3, 0]`, the longest decreasing subarray is `[5, 3, 3, 0]`.
-      - We can't get the next permutation by modifying this subarray because it is already in descending order. Instead, we need to modify the element to the left of this subarray. In this case, it is `2`. We need to find the next largest element to `2` in the subarray `[5, 3, 3, 0]`. This element is `3`. We swap `2` and `3` to get `[0, 1, 3, 5, 3, 2, 0]`.
-  - Now, we have the next permutation, but it is not the smallest permutation. We need to sort the subarray to the right of `3` to get the smallest permutation. This is because the subarray to the right of `3` is in descending order. We need to sort it in ascending order to get the smallest permutation. We get `[0, 1, 3, 0, 2, 3, 5]`.
-  - The final answer is `[0, 1, 3, 0, 2, 3, 5]`.
+    - Find the longest decreasing subarray.
+    - Swap the element to the left of the subarray with the next largest element in the subarray. because it's the next permutation, so we need to increase it by as little as possible.
+    - Reverse the subarray to the right of the swapped element. because we want to be in the first permutation starting from the element that we've swapped. Which means the elements next to it should be in the smallest order possible.
+    - The [Video Solution](https://www.youtube.com/watch?v=quAS1iydq7U) explains it very good, so make sure to watch it.
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
 
 ```py
 def nextPermutation(nums):
@@ -311,8 +329,10 @@ def nextPermutation(nums):
     # if we found a decreasing subarray, then we need to rearrange the numbers to the right of nums[i−1] including itself
     if i > 0:
         j = len(nums) - 1
+        # find the next largest element in the right subarray
         while j >= i and nums[j] <= nums[i - 1]:
             j -= 1
+        # swap the next largest element with the pivot element
         nums[i - 1], nums[j] = nums[j], nums[i - 1]
 
     # reverse the numbers to the right of nums[i−1] including itself
@@ -359,9 +379,9 @@ def computeRandomPermutation(n):
 
 ### Shuffle an Array
 
-| Video Solution | Hint                                                                                                                                                                                                                                                                            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NA             | Create `original` property as a copy to the array to avoid modifying it, then use **Fisher-Yates shuffle** algorithm to generate a random permutation. The idea is to iterate over the array and swap each element with a random element using the `random.randrange()` method. |
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                                         |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Create `original` property as a copy to the array to avoid modifying it, then use **Fisher-Yates shuffle** algorithm to generate a random permutation. The idea is to iterate over the array and swap each element with a random element between the current index and the last index using the `random.randrange()` method. |
 
 Given an integer array `nums`, design an algorithm to randomly shuffle the array. All permutations of the array should be **equally likely** as a result of the shuffling.
 
@@ -378,32 +398,38 @@ Given an integer array `nums`, design an algorithm to randomly shuffle the array
 
 - Explanation:
   - Similar to the [Compute a random permutation](#compute-a-random-permutation) problem, we can use the **Fisher-Yates shuffle** algorithm to shuffle the array.
+  - First, we need to create a copy of the array to avoid modifying it, so that we can have a backup of the original array to reset it later.
+  - Then, we can use the **Fisher-Yates shuffle** algorithm to generate a random permutation.
+    ![shuffle an array](./img/shuffle-an-array.png)
+    - The idea is to iterate over the array and swap each element with a random element using the `random.randrange()` method.
+    - the random element should be between the current index and the last index. because we don't want to swap the current element with itself or with an element that we've already swapped.
+  - Time complexity: `O(n)`
+  - Space complexity: `O(n)` for the copy of the array
 
 ```py
 import random
 
 class Solution:
     def __init__(self, nums):
-        self.nums = nums
-        self.original = list(nums) # make a copy of the original array to avoid modifying it
+        self.data = nums
+        self.original = nums.copy() # make a copy of the original array to avoid modifying it
 
     def reset(self):
-        self.nums = self.original
-        self.original = list(self.original) # make a copy of the original array to avoid modifying it
-        return self.nums
+        self.data = self.original.copy()
+        return self.data
 
     def shuffle(self):
-        for i in range(len(self.nums)):
-            rand = random.randrange(i, len(self.nums))
-            self.nums[i], self.nums[rand] = self.nums[rand], self.nums[i]
-        return self.nums
+        for i in range(len(self.data)):
+            rand = random.randrange(i, len(self.data))
+            self.data[i], self.data[rand] = self.data[rand], self.data[i]
+        return self.data
 ```
 
 ---
 
 ## Two pointers
 
-### Two Sum II
+### Two Sum II - Input Array Is Sorted
 
 | Video Solution                                                | Hint                                                                                                                                                                                                                      |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -416,7 +442,7 @@ Return the indices of the two numbers, `index1` and `index2`, **added by one** a
 - EX: `nums = [2, 7, 11, 15], target = 9` --> `[0, 1]` because `nums[0] + nums[1] == 9`
 
 - Explanation:
-  - We can use the **two pointers** pattern to find the two numbers that sum to the target (making use of the fact that the array is sorted in ascending order), and return their indices
+  - We can use the same approach as the [Two Sum](./9-PS-Hash-maps.md#two-sum) problem, but instead of using a `hash table`, we can use the fact that the array is sorted in ascending order and use **two pointers** to find the two numbers that sum to the target in `O(n)` time and `O(1)` space.
     ![two sum](./img/two-sum-1.webp)
     - We can set the `left` pointer to the first element in the array and the `right` pointer to the last element in the array
   - Check if the `sum` of the two pointers is equal to the `target`, if it is, then return the indices
@@ -432,13 +458,13 @@ def two_sum(numbers, target):
 
     while left < right:
         curSum = numbers[left] + numbers[right]
-        # If the sum of the left and right pointers is the target, return the indices adding 1 to each since the problem is 1-indexed
-        if curSum == target:
-            return [left + 1, right + 1]
-        elif curSum < target:
+
+        if curSum < target:
             left += 1
-        else:
+        elif curSum > target:
             right -= 1
+        else:
+            return [left + 1, right + 1] # return the indices adding 1 to each since the problem is 1-indexed
     # If the target was not found, return [-1, -1]
     return [-1, -1]
 ```
@@ -447,9 +473,9 @@ def two_sum(numbers, target):
 
 ### 3Sum (Triplet Sum to Zero)
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=jzZsG8n2R9A) | Sort the array then, use **two pointers** to find the third element that sums to `zero`, instead of iterating over all possible pairs of elements. Avoid generating duplicate triplets by skipping over duplicates in the input array and avoiding identical pairs of `(i, j, k)` values. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=jzZsG8n2R9A) | First, sort the array then, loop through the array and for each element, use **two pointers** to find the 2 other elements that sum to `zero`, and add them to the result array. Make sure to skip duplicates by checking if the current element is the same as the previous element. and also when updating the pointers. |
 
 Given an array `nums` of n integers, are there elements a, b, c in `nums` such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
 
@@ -458,19 +484,32 @@ Given an array `nums` of n integers, are there elements a, b, c in `nums` such t
 
   - Bruteforce solution: `O(n^3)`
 
-    - Iterate over all possible triplets of elements in the array and check if the sum is equal to zero
+    - Iterate over all possible triplets of elements in the array and check if the sum is equal to zero and that the triplet is not already in the result array.
 
   - We can do better by using the **Three pointers**
     ![3sum](./img/3sum-1.png)
     - Sort the input array first. Use two pointers to find the third element that sums to `zero`, instead of iterating over all possible pairs of elements.
       ![3sum](./img/3sum.png)
+  - When we find a triplet, Make sure when updating the pointers to skip over duplicates in the input array and avoid identical pairs of `(i, j, k)` values.
+
+    ```py
+    while l < r:
+      # ...
+      l += 1
+      r -= 1
+      while left < right and nums[left] == nums[left-1]:
+          left += 1
+      while left < right and nums[right] == nums[right+1]:
+          right -= 1
+    ```
+
   - **Avoid generating duplicate triplets** by skipping over duplicates in the input array and avoiding identical pairs of `(i, j, k)` values.
 
     ```py
     if i > 0 and nums[i] == nums[i-1]: continue
     ```
 
-    - or we can use a `set` to avoid duplicates
+    - or we can use a `set` to avoid duplicates, but this will increase the space complexity to `O(n)` ❌
 
       ```py
       result = set()
@@ -478,10 +517,12 @@ Given an array `nums` of n integers, are there elements a, b, c in `nums` such t
       return list(result)
       ```
 
-  - Time complexity: `O(n.log(n)) + O(n^2) = O(n^2)`
+  - Time complexity: `O(n.log(n)) + O(n^2) =~ O(n^2)`
     - `O(n.log(n))` for the sorting algorithm
     - `O(n^2)` for the two nested loops
-  - Space complexity: `O(n)` for the sorted array (some sorting algorithms are in-place based on the language)
+  - Space complexity: `O(1)`
+    - `O(1)` if we don't take into account the space required for the output array
+    - it may be `O(n)` for the output array or based on the sorting algorithm used (as some sorting algorithms are in-place and some are not)
 
 ```py
 # Time: O(n.log(n)) + O(n^2) = O(n^2)
@@ -517,50 +558,13 @@ def three_sum(nums):
     return result
 ```
 
-- **Modification:** using a `helper` function
-
-  ```py
-  def three_sum(nums):
-      result = []
-      nums.sort()
-
-      for i in range(len(nums)):
-          # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
-          if i > 0 and nums[i] == nums[i-1]:
-              continue
-
-          # find all pairs that sum to -nums[i]
-          find_two_sum(nums, -nums[i], i+1, result)
-
-      return result
-
-  def find_two_sum(nums, target, left, result):
-      right = len(nums) - 1
-
-      while left < right:
-          total = nums[left] + nums[right]
-          if total < target:
-              left += 1
-          elif total > target:
-              right -= 1
-          else:
-              result.append([-target, nums[left], nums[right]])
-              left += 1
-              right -= 1
-              # skip duplicates
-              while left < right and nums[left] == nums[left-1]:
-                  left += 1
-              while left < right and nums[right] == nums[right+1]:
-                  right -= 1
-  ```
-
 ---
 
 ### 3Sum Closest
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=qBr2hq4daWE) | Sort the array then, use **two pointers** to find the third element that sums to `target`, keep track of the `minDiff` value to the target and update it if we find a closer value by using `abs()` when calculating the difference |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=jEXPzp_Tfvs) | First, sort the array then, loop through the array and for each element, use **two pointers** to find the 2 other elements that sum to the `target`, keep track of the `minDiff` value to the `target` and update it and the `res` value if we find a closer value by using `abs()` when calculating the difference. |
 
 Given an array `nums` of `n` integers and an integer `target`, find three integers in `nums` such that the sum is **closest** to `target`. Return the sum of the three integers.
 
@@ -573,17 +577,19 @@ You may assume that each input would have exactly one solution.
   - it's very similar to the [3Sum](#3sum-triplet-sum-to-zero) problem, but instead of checking if the `sum` is equal to `zero`, we check if the `sum` is equal to the `target`
   - also, we need to keep track of the `closest` value to the `target` and update it if we find a closer value
 
-    - to do that, we can use the `abs()` function to get the absolute value of the difference between the `sum` and the `target`, because if the difference is negative, then we need to make it positive to compare it with the `closest` value
+    - to do that, we need to keep track of the `minDiff` value to the `target` and update it if we find a closer value that its difference to the `target` is less than the `minDiff` value
+    - here, we need to calculate the **absolute value** of the difference between the `sum` and the `target` because if the difference is negative, then we need to make it positive to compare it with the `minDiff` value
 
       ```py
       diff = abs(total - target) # without abs(), the diff will be negative -> won't work
       ```
 
-  - Time complexity: `O(n.log(n)) + O(n^2) = O(n^2)`
-  - Space complexity: `O(n)` for the sorted array (some sorting algorithms are in-place based on the language)
+  - Time complexity: `O(n.log(n)) + O(n^2) ~= O(n^2)`
+  - Space complexity: `O(1)`
+    - `O(1)` if we don't take into account the space required for the output array
+    - it may be `O(n)` for the output array or based on the sorting algorithm used (as some sorting algorithms are in-place and some are not)
 
 ```py
-# Time: O(n^2)
 def three_sum_closest(nums, target):
     res = 0
     minDiff = float('inf')
@@ -612,9 +618,9 @@ def three_sum_closest(nums, target):
 
 ### 3Sum Smaller
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                             |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=qZ9XV3H6fL8) | Sort the array then, use **two pointers** to find the third element that sums to a value less than `target`, instead of iterating over all possible pairs of elements. Avoid generating duplicate triplets by skipping over duplicates in the input array, keep track of the `count` of the triplets `(right - left)` that satisfy the condition |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Px0nLMRebfU) | First, sort the array then, loop through the array and for each element, use **two pointers** to find the 2 other elements that sum to a `total` that is less than the `target`, keep track of the `count` of the triplets that satisfy the condition and update it by adding `right - left` to it (as it's the number of triplets that satisfy the condition in the current iteration). |
 
 Given an array `nums` of `n` integers and an integer `target`, find the number of index triplets `i`, `j`, `k` with `0 <= i < j < k < n` that satisfy the condition `nums[i] + nums[j] + nums[k] < target`.
 
@@ -627,6 +633,7 @@ Given an array `nums` of `n` integers and an integer `target`, find the number o
   - it's very similar to the [3Sum](#3sum-triplet-sum-to-zero) problem, but instead of checking if the `sum` is equal to `zero`, we check if the `sum` is less than the `target`
   - also, we need to keep track of the `count` of the triplets that satisfy the condition
 
+    - if the `total` is less than the `target`, then we need to move the `left` pointer to the right to get a larger value, but if we increment it by `1`, we will miss some values that satisfy the condition (between `left` and `right`). so we need to increment it by `right - left` to get all the values that satisfy the condition
     - **Trick here:** -> `right - left` is the number of triplets that satisfy the condition, because by common scene, we want the total to stay lower than the target, and we know that `left` is larger than all the values to the left of it, so all the values between `left` and `right` will satisfy the condition.
 
       ```py
@@ -643,8 +650,10 @@ Given an array `nums` of `n` integers and an integer `target`, find the number o
 
     - we can add it to the `count` and move the `left` pointer to the right to get a larger value
 
+- Time complexity: `O(n log(n)) + O(n^2) ~= O(n^2)`
+- Space complexity: `O(1)`
+
 ```py
-# Time: O(n^2)
 def three_sum_smaller(nums, target):
     nums.sort()
     count = 0
@@ -687,42 +696,55 @@ You may return the answer in **any order**.
     - Avoid duplicates by skipping over duplicates in the input array
     - Move the left and right pointers to the next unique values to avoid duplicates
 
-- Time complexity: `O(n^3)`
+- Solution 1: using 4 pointers
 
-```py
-def four_sum(nums, target):
-    nums.sort()
-    result = []
+  - Time complexity: `O(n log(n)) + O(n^3) ~= O(n^3)`
+  - Space complexity: `O(1)`
 
-    for i in range(len(nums) - 3): # because we have 4 pointers
-        # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
-    # OR: for i in range(len(nums)): ✅
-        if i > 0 and nums[i] == nums[i-1]: continue
+  ```py
+  def four_sum(nums, target):
+      nums.sort()
+      result = []
 
-        for j in range(i+1, len(nums) - 2): # because we have 3 pointers
-        # OR: for j in range(i+1, len(nums)): ✅
-            if j > i+1 and nums[j] == nums[j-1]: continue
+      for i in range(len(nums) - 3): # because we have 4 pointers
+          # if the current value is the same as the previous value, skip it, because we've already tried it (To avoid duplicates)
+      # OR: for i in range(len(nums)): ✅
+          if i > 0 and nums[i] == nums[i-1]: continue
 
-            # set left and right pointers to find the other two values
-            left, right = j+1, len(nums)-1
-            while left < right:
-                total = nums[i] + nums[j] + nums[left] + nums[right]
-                if total < target:
-                    left += 1
-                elif total > target:
-                    right -= 1
-                # otherwise, we have found the quadruplet
-                else:
-                    result.append([nums[i], nums[j], nums[left], nums[right]])
-                    left += 1
-                    right -= 1
-                    # skip duplicates
-                    while left < right and nums[left] == nums[left-1]: left += 1
-                    while left < right and nums[right] == nums[right+1]: right -= 1
-    return result
-```
+          for j in range(i+1, len(nums) - 2): # because we have 3 pointers
+          # OR: for j in range(i+1, len(nums)): ✅
+              if j > i+1 and nums[j] == nums[j-1]: continue
 
-- Another solution for any `N SUM` problem:
+              # set left and right pointers to find the other two values
+              left, right = j+1, len(nums)-1
+              while left < right:
+                  total = nums[i] + nums[j] + nums[left] + nums[right]
+                  if total < target:
+                      left += 1
+                  elif total > target:
+                      right -= 1
+                  # otherwise, we have found the quadruplet
+                  else:
+                      result.append([nums[i], nums[j], nums[left], nums[right]])
+                      left += 1
+                      right -= 1
+                      # skip duplicates
+                      while left < right and nums[left] == nums[left-1]: left += 1
+                      while left < right and nums[right] == nums[right+1]: right -= 1
+      return result
+  ```
+
+- Solution 2: for any `N SUM` problem (recursion)
+
+  - Here, we can use recursion to solve any `N SUM` problem by using the **Two Sum** problem as a base case (where `N = 2`)
+  - until we reach the base case, we can use recursion to solve the problem by reducing it to a smaller problem and calling the function again with:
+    - `n - 1` -> to reduce the number of elements to `n - 1`
+    - `start + 1` -> to reduce the number of elements to the right of the current element
+    - `target - nums[i]` -> to reduce the target by the current element
+  - When we finish the recursion, we can add the current element to the result array and return it
+
+- Time complexity: `O(n log(n)) + O(n^(n-1)) ~= O(n^n)`
+- Space complexity: `O(n)` for the recursion stack
 
   ```py
   def fourSum(nums, target):
@@ -753,7 +775,7 @@ def four_sum(nums, target):
                       res.append([nums[i]] + quad)
                   quadruplets.clear()
 
-      nSum(4, 0, target)
+      nSum(4, 0, target) # n = 4
       return res
   ```
 
@@ -761,9 +783,9 @@ def four_sum(nums, target):
 
 ### Minimum Absolute Difference
 
-| Video Solution                                                | Hint                                                                                                                                                                                          |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=dyEQ1plxH2U) | Sort the array first, then iterate over the array and keep track of the minimum difference between two adjacent elements. if you find a smaller difference, update the minimum and start over |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=fa3sjQ0XBzM) | Sort the array first, then iterate over the array using a `window` of size `2` to check the absolute difference between the two adjacent elements. Keep track of the minimum difference and update it if we find a smaller difference. |
 
 Given an array of distinct integers `arr`, find all pairs of elements with the minimum absolute difference of any two elements. Return a list of pairs in ascending order(with respect to pairs), each pair `[a, b]` follows
 
@@ -777,9 +799,12 @@ Given an array of distinct integers `arr`, find all pairs of elements with the m
 
 - Explanation:
   - Instead of using nested loops `O(n^2)`, we can sort the array first `O(n.log(n))` and then iterate over the array and keep track of the minimum difference between two adjacent elements.
+  - We will use a `window` of size `2` to iterate over the array and check the absolute difference between the two elements
     - This is because **the minimum difference will be between two adjacent elements in the sorted array -> (closest elements are next to each other)**
-  - if you find a smaller difference, update the minimum and start over
-  - if you find the same difference, add the pair to the result
+  - if you find a smaller difference, update the minimum difference and start over in the `result` array
+  - if you find the same difference, add the pair to the `result` array
+- Time complexity: `O(n.log(n)) + O(n) = O(n.log(n))`
+- Space complexity: `O(1)`
 
 ```py
 # Solution 1: using 2 pointers O(n.log(n)) + O(n) = O(n.log(n))
@@ -789,7 +814,7 @@ def minimumAbsDifference(arr):
     res = []
 
     for i in range(1, len(arr)):
-        diff = arr[i] - arr[i - 1]
+        diff = abs(arr[i] - arr[i - 1])
         if diff < minDiff:
             minDiff = diff
             res = [[arr[i - 1], arr[i]]] # start over
@@ -800,7 +825,7 @@ def minimumAbsDifference(arr):
 
 # --------------------------------------------------
 
-# Solution 1.1: using 2 different loops ✅
+# Or using 2 different loops
 def minimumAbsDifference(arr):
     arr.sort()
     minDiff = float('inf')
@@ -808,7 +833,7 @@ def minimumAbsDifference(arr):
 
     # find the minimum difference
     for i in range(1, len(arr)):
-        diff = arr[i] - arr[i - 1]
+        diff = abs(arr[i] - arr[i - 1])
         minDiff = min(minDiff, diff)
 
     # find all the pairs with the minimum difference
@@ -824,9 +849,9 @@ def minimumAbsDifference(arr):
 
 ### Remove Element
 
-| Video Solution                                                | Hint                                                                                     |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=Pcd1ii9P9ZI) | Remove **in-place** by using pointers, and swapping elements with the last valid element |
+| Video Solution                                                | Hint                                                                                                                                                                    |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=Pcd1ii9P9ZI) | Remove **in-place** by using pointers, and swapping elements with the last valid element and updating the last valid index if the current element is not equal to `val` |
 
 Given an array `nums` and a value `val`, remove all instances of that value **in-place** and return the new length.
 
@@ -836,12 +861,26 @@ Given an array `nums` and a value `val`, remove all instances of that value **in
 
 - Explanation:
   - we can use a **two pointers** pattern to check for all the elements in the array
-  - we can use the first pointer (`lastIndex`) to keep track of the last val element in the array
-  - and the second pointer to iterate over the array and check if the current element is equal to val `(i)`
+    ![remove element](./img/remove-element-1.png)
+  - we can use the first pointer (`lastIndex`) to keep track of the index of the last non-`val` element in the array
+  - and the second pointer to iterate over the array and check if the current element is equal to `val`
     - if it is, then we skip it, if not, then we swap the current element with the last val element and increment the `lastIndex` **and then** update the `lastIndex`
       > it's similar to `Quick Sort` algorithm, where we partition the array into two parts, one part with all the elements less than the `pivot` and the other part with all the elements greater than the pivot
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
 
 ```py
+# Solution 1: just returning the length of elements that are not equal to val
+def removeElement(nums, val):
+    length = 0
+    for num in nums:
+        if num != val:
+            length += 1
+    return length
+
+# ------------------------------------------------------------
+
+# Solution 2: using two pointers to swap elements ✅
 def removeElement(nums, val):
     lastIndex = 0
     for i in range(len(nums)):
@@ -849,15 +888,27 @@ def removeElement(nums, val):
             nums[lastIndex] = nums[i]
             lastIndex += 1
     return lastIndex
+
+# ------------------------------------------------------------
+
+# Solution 3: using two pointers to swap elements and return the mutated array (Not required for this problem)
+def removeElement(nums, val):
+    lastIndex = 0
+    for i in range(len(nums)):
+        if nums[i] != val:
+            # Swap the current element with the last valid element
+            nums[lastIndex], nums[i] = nums[i], nums[lastIndex]
+            lastIndex += 1
+    return nums
 ```
 
 ---
 
 ### Remove Duplicates From Sorted Array
 
-| Video Solution                                                | Hint                                                                                      |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=DEJAZBq0FDA) | Remove **in-place** by using pointers, and swapping elements with the last unique element |
+| Video Solution                                                | Hint                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=DEJAZBq0FDA) | Remove **in-place** by using 2 pointers, and swapping elements with the last unique element |
 
 Given a sorted array `nums`, remove the duplicates **in-place** such that each element appears only once and returns the new length.
 
@@ -881,6 +932,9 @@ You must use `O(1)` space.
     - and the second pointer to iterate over the array and check if the current element is equal to the `last unique element`
     - if it is, then we skip it, if not, then we increment the last unique index **and then** update the `last unique element`
 
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
+
 ```py
 # Approach 1: compare the current element with the last unique element
 def removeDuplicates(nums):
@@ -899,7 +953,7 @@ def removeDuplicates(nums):
 
 # ------------------------------------------------------------
 
-# Another approach: comparing the current element with the previous element
+# Approach 2: using a window of size 2 and comparing the current element with the previous element
 def removeDuplicates(nums):
     if len(nums) == 0: return 0
     lastIdx = 1
@@ -915,9 +969,9 @@ def removeDuplicates(nums):
 
 ### Remove Duplicates from Sorted Array II
 
-| Video Solution                                                | Hint                                                                                                                                                       |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=ycAq8iqh0TI) | Remove **in-place** by using pointers, and swapping elements with the last unique element if the count of the current element is less than or equal to `2` |
+| Video Solution                                                | Hint                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ycAq8iqh0TI) | Use 2 pointers to keep track of the last unique element and the `count` of the current element. If the count is less than or equal to `2`, then we swap it with the `last_unique` element and increment the `last_unique` index |
 
 Given a sorted array `nums`, remove the duplicates **in-place** such that duplicates appeared at most **twice** and return the new length.
 
@@ -929,8 +983,9 @@ return the new length.
 
 - Explanation:
 
-  - we can use a **two pointers** pattern
-  - We can't use the same approach as the [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array) problem because we will end up with more than two duplicates even if we check if the current element is equal to the `last unique element`
+  - The brute-force solution is to iterate over the array and check if the current element is equal to the next element and that the current count of the element is less than or equal to `2`, if it is, then we remove it from the array and shift the elements to the left
+    - but this solution is not efficient because we have to shift the elements to the left every time we remove an element: `(n-1)+(n-2)+...+1 = O(n^2)`
+  - And, We can't use the same approach as the [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array) problem because we will end up with more than two duplicates even if we check if the current element is equal to the `last unique element`
 
     ```py
     # Won't work ❌❌❌
@@ -941,44 +996,55 @@ return the new length.
         nums[last_unique] = nums[i]
     ```
 
-    - Instead, we need to keep track of the `count` of the current element
-
-  - we can use the first pointer to keep track of the `last unique` element in the array, and the second pointer to iterate over the array and check if the current element is equal to the last unique element
-    - if it is equal, then we increment the `count` of the current element by `1` as duplicates are allowed at most twice
-    - if it is not equal, then we reset the `count` of the current element to `1`
+  - **Instead**, we can use the first pointer to keep track of:
+    - first pointer -> the index of the `last unique` element in the array
+    - the second pointer to iterate over the array and check if the current element is equal to the last unique element
+    - `count` variable -> the number of times the current element appeared in the array (it will be `1` at the beginning and will be incremented if the current element is equal to the last unique element and reset to `1` if it's not)
   - Because the array is sorted, the duplicates will be next to each other, so we can check the `count` of the current element and decide whether to increment the `last unique` index or not
     - if the `count` is less than or equal to `2`, then we increment the `last unique` index **and then** update the `last unique` element
+      ![remove duplicates](./img/remove-duplicates-4.png)
+    - if the `count` is greater than `2`, then we skip the current element
+      ![remove duplicates](./img/remove-duplicates-3.png)
+      ![remove duplicates](./img/remove-duplicates-5.png)
+      ![remove duplicates](./img/remove-duplicates-6.png)
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
 
 ```py
 def removeDuplicates(nums):
-    if len(nums) == 0: return 0
-
-    last_unique = 0
-    count = 1 # count of the current element
-
-    for i in range(1, len(nums)):
-        # if the current element is equal to the last unique element, increment the count
-        if nums[i] == nums[last_unique]:
+    l, r = 0, 0
+    while r < len(nums):
+        count = 1  # count of the current element
+        while r + 1 < len(nums) and nums[r] == nums[r+1]:
             count += 1
-        # if the current element is not equal to the last unique element, reset the count to 1
-        else:
-            count = 1
+            r += 1
+        for _ in range(min(2, count)): # min(2, count) -> because we want to keep at most 2 duplicates
+            # swap the current element with the last unique element and increment the last unique index
+            nums[l] = nums[r]
+            l += 1
+        r += 1
+    return l
 
-        # if the count is less than or equal to 2, increment the last unique index and then update the last unique element
-        if count <= 2:
-            last_unique += 1
-            nums[last_unique] = nums[i]
+# ------------------------------------------------------------
 
-    return last_unique + 1
+# Another approach without using count variable
+def removeDuplicates(nums):
+    l = 0
+    for r in range(len(nums)):
+        if l < 2 or nums[r] != nums[l-2]:
+            nums[l] = nums[r]
+            l += 1
+    return l
 ```
 
 ---
 
 ### Container with most water
 
-| Video Solution                                                | Hint                                                                                                                                                         |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=UuiTKBwPgAo) | Use **two pointers** to find the two lines that form the container area, and move the pointer pointing to the shorter line towards the other end by one step |
+| Video Solution                                                | Hint                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=UuiTKBwPgAo) | Use **two pointers** to find the two lines that form the container area, and move the pointer pointing to the shorter line towards the other end by one step, calculating the area at each step and updating the maximum area |
 
 Given n non-negative integers `a1`, `a2`, ..., `an` , where each represents a point at coordinate `(i, ai)`. `n` vertical lines are drawn such that the two endpoints of the line `i` is at `(i, ai)` and `(i, 0)`. Find two lines, which, together with the x-axis forms a container, such that the container contains the most water.
 
@@ -987,9 +1053,9 @@ Given n non-negative integers `a1`, `a2`, ..., `an` , where each represents a po
 
 - Verify the constraints:
 
-  - Does the thickness of the lines matter? No.
-  - Do the left and right sides of the container form a wall? No.
-  - Does a higher line inside the container affect the area, breaking it into 2 parts? No.
+  - Does the thickness of the lines matter? -> No
+  - Do the left and right sides of the container form a wall? -> No
+  - Does a higher line inside the container affect the area, breaking it into 2 parts? -> No
     ![water container](./img/water-container-1.png)
 
 - Explanation:
@@ -998,13 +1064,14 @@ Given n non-negative integers `a1`, `a2`, ..., `an` , where each represents a po
 
   - Instead, Initialize **two pointers**, one at the beginning and one at the end of the array constituting the length of the lines.
   - At every step, find out the area formed between them
-    - width = `right index - left index`
+    - width = `right_index - left_index`
     - height = `min(height[left], height[right])`
   - update the result and move the pointer pointing to the shorter line towards the other end by one step.
     ![water container](./img/water-container-2.png)
-    - we choose which pointer to move by comparing the heights of the two lines and moving the pointer pointing to the shorter line towards the other end by one step
-      - so that we may get a relatively longer line next time and possibly will be able to hold more water.
-  - Time complexity: `O(n)` ✅
+    - we choose which pointer to move by comparing the heights of the two lines and moving the pointer pointing to the shorter line towards the other end by one step, so that we may get a relatively higher line next time and possibly will be able to hold more water.
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
 
 ```py
 def max_area(height):
@@ -1027,16 +1094,17 @@ def max_area(height):
 
 ### Squares of a Sorted Array
 
-| Video Solution                                                | Hint                                                                                                                                                                                            |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=FPCZsG_AkUg) | Use **two pointers** to find the largest element, compare the absolute values of the two pointers elements and add the largest to the result array (from the end of the array to the beginning) |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=FPCZsG_AkUg) | Use **two pointers** to find the largest element, compare the absolute values of the two pointers elements (starting at both ends of the array) and square the largest element and add it to the result array using the index of the responding pointer (from the end of the array to the beginning) |
 
 Given an integer array `nums` sorted in **non-decreasing** order, return an array of **the squares of each number sorted in non-decreasing order**.
 
 - EX: `[-4,-1,0,3,10] --> [0,1,9,16,100]`
 
 - Explanation:
-  - Bruteforce: We can solve it normally in `O(nlogn)` time by squaring each element and then sorting the array
+
+  - Brute-force: We can solve it by squaring each element and then sorting the array -> `O(nlogn)` ❌
   - But we can make use of the fact that the array is sorted in **non-decreasing** order and solve it in `O(n)` time
     ![sort squares](./img/sort-squares.jpg)
     - This is done by using 2 pointers, one at the start of the array and one at the end of the array
@@ -1044,17 +1112,11 @@ Given an integer array `nums` sorted in **non-decreasing** order, return an arra
       - this is because the array is sorted in **non-decreasing** order so we can get the largest element by comparing the `absolute` values of the 2 pointers (both sides)
     - we can then square the largest element and add it to the result array using the index of the responding pointer
 
+- Time complexity: `O(n)`
+- Space complexity: `O(n)`
+  - if we don't take into account the space required for the output array -> `O(1)`
+
 ```py
-# Brute force solution: O(nlogn) ❌
-def sortedSquares(nums):
-    for i in range(len(nums)):
-        nums[i] = nums[i] ** 2
-    nums.sort()
-    return nums
-
-# ------------------------------------------------------------
-
-# Two pointers solution: O(n) ✅
 def sortedSquares(nums):
     l, r = 0, len(nums) - 1
     result = [0] * len(nums)
@@ -1075,11 +1137,11 @@ def sortedSquares(nums):
 
 ---
 
-### Sort array based on parity
+### Sort Array By Parity
 
-| Video Solution                                                | Hint                                                                                                                                                                                                       |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=QC4c9fyr8As) | Use two loops, one for the even numbers and one for the odd numbers, annd append to result array, or use two pointers to swap the even numbers with the last even number and increment the last even index |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=QC4c9fyr8As) | Use 2 pointers to partition the array into two parts, one pointing to the index of the last even number and the other to loop over the array and **if it is even ->** swap the current element with the last even number. **OR** use 2 arrays `odd` and `even` and loop over the array and append the elements to the corresponding array, and return the concatenation of the two arrays |
 
 Given an array of integers, sort the array such that all even numbers appear before all the odd numbers.
 
@@ -1087,15 +1149,13 @@ The trick here is not to use any extra space, so we can't create a new array and
 
 - EX: `nums = [3, 1, 2, 4]` --> `[2, 4, 3, 1]`
 
-- **Solution 1**: Brute force: `O(n) time` and `O(n) space`
+- **Solution 1**: `O(n) time` and `O(n) space`
 
   - We can create 2 arrays, one for the `even` numbers and one for the `odd` numbers, then we can concatenate them
 
   ```py
   def sort_array_by_parity(nums):
-      even = []
-      odd = []
-
+      even, odd = [], []
       for num in nums:
           if num % 2 == 0:
               even.append(num)
@@ -1107,25 +1167,31 @@ The trick here is not to use any extra space, so we can't create a new array and
   # ------------------------------------------------------------
 
   # Another approach
-  res = []
-  for num in nums:
-      if num % 2 == 0:
-          res.append(num)
-  for num in nums:
-      if num % 2 != 0:
-          res.append(num)
-  return res
+  def sort_array_by_parity(nums):
+      res = []
+      for num in nums:
+          if num % 2 == 0:
+              res.append(num)
+      for num in nums:
+          if num % 2 != 0:
+              res.append(num)
+      return res
   ```
 
-- **Solution 2**: `O(n) time` and `O(1) space` ✅
+- **Solution 2**: In place -> `O(n) time` and `O(1) space` ✅
 
   - We can use the **two pointers** pattern to solve this problem
   - We can use the first pointer to keep track of the last even number in the array, and the second pointer to iterate over the array and check if the current element is even or odd
     ![sort array based on parity](./img/sort-array-based-on-parity.png)
     - if it is even, then we swap it with the last even number and increment the last even index
     - if it is odd, then we skip it
+  - By doing this, we will partition the array into two parts, one part with all the even numbers and the other part with all the odd numbers
+    ![sort array based on parity](./img/sort-array-based-on-parity-1.png)
 
-  > It's similar to the portioning step in the `Quick Sort` algorithm
+    > It's similar to the portioning step in the `Quick Sort` algorithm
+
+  - Time complexity: `O(n)`
+  - Space complexity: `O(1)`
 
   ```py
   def sort_array_by_parity(nums):
@@ -1146,7 +1212,7 @@ The trick here is not to use any extra space, so we can't create a new array and
 
 | Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                   |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=tX5bmjinQJc) | Use two arrays, one for the `positive` numbers and one for the `negative` numbers, then loop again and append the positive numbers first, then the negative numbers to the `result` array, **or** use **two pointers** to indicate the last positive and negative indices and increment them by `2` each time to get the next positive/negative number |
+| [Video Solution](https://www.youtube.com/watch?v=tX5bmjinQJc) | Use two arrays, one for the `positive` numbers and one for the `negative` numbers, then loop again and append the positive numbers first, then the negative numbers to the `result` array, **OR** use **two pointers** to indicate the last positive and negative indices and increment them by `2` each time to get the next positive/negative number |
 
 Given an array of integers `nums` of positive and negative numbers, rearrange it so that you have positive and negative numbers alternating in the array.
 
@@ -1155,14 +1221,25 @@ Given an array of integers `nums` of positive and negative numbers, rearrange it
   - `nums = [3, 1, -2, -5, 2, -4]` -> `[3, -2, 1, -5, 2, -4]`
 
 - Explanation:
-  - We can use 2 arrays, one for the `positive` numbers and one for the `negative` numbers, then loop again and append the positive numbers first, then the negative numbers to the `result` array
-  - Or, we will use a **two pointers** pattern to check for all the elements in the array
-    - we can use the first pointer to keep track of the last positive element in the array
-    - and the second pointer to iterate over the array and check if the current element is positive `(i)`
-      - if it is, then we skip it, if not, then we update the last positive element **and then** update the last positive index
+
+  - Solution 1:
+    - We can use 2 arrays, one for the `positive` numbers and one for the `negative` numbers, then loop over the array and append the number to its corresponding array
+    - Then, we can loop again and append the positive numbers first, then the negative numbers to the `result` array
+  - Solution 2:
+    - we will use a **two pointers** to check for all the elements in the array
+      - one pointer to keep track of the `last positive` index and the other to keep track of the `last negative` index
+    - Then loop over the array and check if the current element is positive or negative
+      - if it is positive, then we add it to the `result` array and increment the `last positive` index by `2`
+      - if it is negative, then we add it to the `result` array and increment the `last negative` index by `2`
+    - We use `2` as the increment value because we want to get the next positive/negative number as the output should be alternating between positive and negative numbers
+
+- Time complexity: `O(n)`
+- Space complexity:
+  - solution 1 -> `O(n)`
+  - solution 2 -> `O(1)`
 
 ```py
-# Solution 1: O(n) time and O(n) space ✅
+# Solution 1 ✅
 def rearrange(nums):
     positive, negative = [], []
     res = []
@@ -1181,31 +1258,113 @@ def rearrange(nums):
 
 # ------------------------------------------------------------
 
-# Solution 2: Two pointers: O(n) time and O(n) space
+# Solution 2
 def rearrange(nums):
     if not nums: return nums
 
-    new_nums = [0] * len(nums)
+    res = [0] * len(nums)
     i, j = 0, 1
 
     for num in nums:
         if num >= 0:
-            new_nums[i] = num
+            res[i] = num
             i += 2 # increment the last positive index by 2
         else:
-            new_nums[j] = num
+            res[j] = num
             j += 2 # increment the last negative index by 2
 
-    return new_nums
+    return res
 ```
+
+---
+
+### Shortest Unsorted Continuous Subarray
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=-FcGrlGgoXY) | Use a sorted copy of the array and compare it with the original array to find the first and the last elements that are out of sorting order by looping through the array and find the first element that is out of sorting order from the beginning and the first element that is out of sorting order from the end and return the window size. **OR** use **two pointers** to find the first and the last elements that are out of sorting order by looping through the array and find the first element that is out of sorting order from the beginning and the first element that is out of sorting order from the end, then expand the subarray to include any number which is bigger than the minimum or smaller than the maximum of the subarray |
+
+Given an integer array `nums`, you need to find one **continuous subarray** that if you only sort this subarray in ascending order, then the whole array will be sorted in ascending order.
+
+Return the **shortest** such subarray and output its length.
+
+- EX: `nums = [2,6,4,8,10,9,15]` --> `5`
+
+  - because the subarray `[6,4,8,10,9]` needs to be sorted in ascending order to make the whole array sorted in ascending order.
+
+- **Solution 1**: using sorting (`O(nlog(n))` time and `O(n)` space) ❌
+
+  - We can use a sorted copy of the array and compare it with the original array to find the first and the last elements that are out of sorting order.
+    - We will loop through the array and find the first element that is out of sorting order from the beginning and the first element that is out of sorting order from the end
+  - The subarray between these two elements is the required unsorted subarray -> window size = `r - l + 1`
+  - Time complexity: `O(nlog(n))`
+  - Space complexity: `O(n)`
+
+  ```py
+  def find_unsorted_subarray(nums):
+      sorted_nums = sorted(nums)
+      # find the first element out of sorting order from the beginning
+      l = 0
+      while l < len(nums) and nums[l] == sorted_nums[l]:
+          l += 1
+      # find the first element out of sorting order from the end
+      r = len(nums) - 1
+      while r > 0 and nums[r] == sorted_nums[r]:
+          r -= 1
+
+      return r - l + 1
+  ```
+
+- **Solution 2:** using **two pointers** (`O(n)` time and `O(1)` space) ✅
+  ![shortest unsorted continuous subarray](./img/shortest-unsorted-continuous-subarray-1.png)
+
+  - We know, once an array is sorted, the smallest element is at the beginning and the largest element is at the end of the array.
+    - So if we start from the beginning of the array to find the first element which is out of sorting order i.e., (which is **smaller than its previous element**), and similarly from the end of array to find the first element (which is **bigger than its previous element**)
+    - will sorting the subarray between these two numbers result in the whole array being sorted?
+      - No, because there could be some intermediate numbers that are bigger than the number in the beginning of the array and smaller than the number at the end of the array.
+      - We will need to include all such intermediate numbers while trying to find the smallest subarray to be sorted.
+      - we do so by getting the `min` and `max` of the subarray
+        - then we extend the subarray to include any number which is bigger than the minimum of the subarray
+        - and extend the subarray to include any number which is smaller than the maximum of the subarray
+        - this way we can include all the numbers that are out of sorting order
+  - Time complexity: `O(n)`
+  - Space complexity: `O(1)`
+
+  ```py
+  def find_unsorted_subarray(nums):
+      # find the start of the subarray
+      l = 0
+      while l < len(nums) - 1 and nums[l] <= nums[l+1]:
+          l += 1
+
+      # if the array is sorted
+      if l == len(nums) - 1:
+          return 0
+
+      # find the end of the subarray
+      r = len(nums) - 1
+      while r > 0 and nums[r] >= nums[r-1]:
+          r -= 1
+
+
+      # find the maximum and minimum of the subarray
+      subarray_max = max(nums[l:r+1])
+      subarray_min = min(nums[l:r+1])
+
+      # extend the subarray to include any number which is bigger than the minimum or smaller than the maximum of the subarray
+      while l > 0 and nums[l-1] > subarray_min: l -= 1
+      while r < len(nums) - 1 and nums[r+1] < subarray_max: r += 1
+
+      return r - l + 1
+  ```
 
 ---
 
 ### Trapping Rain Water
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                              |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=ZI2z5pq0TqA) | Use two arrays, one for the `left max` and one for the `right max`, then loop through the array and calculate the amount of water above each point using the formula `min(left_max[i], right_max[i]) - height[i]` and add them up |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=ZI2z5pq0TqA) | Use two arrays, one for the `left max` and one for the `right max`, then loop through the array and calculate the amount of water above each point using the formula `min(left_max[i], right_max[i]) - height[i]` and add them up. **OR** use **two pointers** (`left` and `right`) to find the `left_max` and `right_max` and calculate the water above each point for the side which has the smaller `max` |
 
 Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.
 
@@ -1233,10 +1392,10 @@ Given `n` non-negative integers representing an elevation map where the width of
 
   - To get the wanted amount of water, we need to **find the area of water above each point and add them up**.
     - if the water is above the current wall, the area will be positive, otherwise it will be negative. So **we will only add the positive areas to the total**.
+  - Here, **we calculate water per vertical-block for each point and not the area**
 
-- **Solution 1**: Extra memory used (O(n) space)
+- **Solution 1**: Extra memory used (`O(n)` space)
 
-  ![rain water](./img/trapping-rain-water-1.png)
   ![rain water](./img/trapping-rain-water-2.png)
 
   - **Steps**:
@@ -1252,6 +1411,9 @@ Given `n` non-negative integers representing an elevation map where the width of
       - Loop through the list of heights in reverse order to find the maximum height on the right side of each bar
       - Loop through the list of heights again and calculate the amount of water that can be trapped above each bar using the formula above.
       - Add up the amount of water trapped above each bar to get the total amount of water trapped.
+
+  - Time complexity: `O(n)`
+  - Space complexity: `O(n)`
 
   ```py
   def trap(height):
@@ -1286,45 +1448,36 @@ Given `n` non-negative integers representing an elevation map where the width of
 
 - **Solution 2**: Two pointers Less memory used (O(1) space)
 
-  ![rain water](./img/trapping-rain-water-3.png)
-
   - In solution 1, we actually used 2 pointers (1 individual pointer with one iteration for each) but we were iterating pointers **outwards**. Here we will use 2 pointers to iterate **inwards**.
-    ![rain water](./img/trapping-rain-water-4.png)
   - We can't use the 2 pointers in order to single handedly figure out what (the walls are for some container and the water inside), but what we can keep track of is the **maximum height of the left and right walls**.
   - So we will have 2 pointers, one at the beginning and one at the end of the array, and we will move the pointer that is pointing to the shorter wall inwards.
 
     - pointer 1: points to the left wall
     - pointer 2: points to the right wall
     - meaning that we keep track of every point that we have seen and keep track of the maximum value that is's seen and then decide which one to move inwards.
+      ![rain water](./img/trapping-rain-water-3.png)
+      ![rain water](./img/trapping-rain-water-4.png)
       ![rain water](./img/trapping-rain-water-5.png)
 
   - We only need the minimum of the two walls to calculate the water above the current wall. so if the `left wall pointer` is shorter, we move the `left pointer` inwards, otherwise we move the `right pointer` inwards. knowing that the minimum of the two walls is the maximum height of the water above the current wall.
-
-  - Here, **we calculate water per vertical-block for each point and not the area**
+    - This is the replacement of calculating the maximum height of the left and right walls for each position in the array. and then getting the minimum of the two walls to calculate the water above the current wall.
+    - Instead now by using 2 pointers, we know that if the left wall is shorter then we don't need to calculate the maximum height of the left wall for the next position, because we know that the left wall is shorter than the right wall, so we can move the left pointer inwards and calculate the water above the current wall.
 
   ```py
   def trap(height):
-      # initialize two lists to store the max height of the left and right of each position
-      left_max = 0
-      right_max = 0
+      l, r = 0, len(height) - 1
+      left_max, right_max = height[l], height[r]
       total_water = 0
 
-      # initialize two pointers, one at the beginning and one at the end
-      l, r = 0, len(height) - 1
-
       while l < r:
-          # check which pointer is shorter so that we can use it to calculate the water above the current wall and move it inwards
-          if height[l] < height[r]:
-              # 1. get current left wall height
-              left_max = max(left_max, height[l]) # Update the left_max if the current wall is taller than the previous one
-              # 2. calculate the water above the current wall
+          if left_max < right_max:
               total_water += left_max - height[l]
-              # 3. move the left pointer inwards
               l += 1
+              left_max = max(left_max, height[l])
           else:
-              right_max = max(right_max, height[r])
               total_water += right_max - height[r]
               r -= 1
+              right_max = max(right_max, height[r])
 
       return total_water
   ```
@@ -1345,9 +1498,9 @@ Given `n` non-negative integers representing an elevation map where the width of
 
 ### Maximum Average Subarray I
 
-| Video Solution                                                | Hint                                                                                                                                                     |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=56TxHMG0qhQ) | Use sliding window to calculate the sum of the next subarray, and keep track of the maximum average, and update the window when it exceeds the given `k` |
+| Video Solution                                                | Hint                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=56TxHMG0qhQ) | Use sliding window to calculate the sum of the current window, and keep track of the maximum average, and update the window size and maximum average when `r` exceeds `k - 1` (because the window size starts from `0`) |
 
 Given an array consisting of `n` integers, find the contiguous subarray of given length `k` that has the maximum average value. And you need to output the maximum average value.
 
@@ -1362,19 +1515,22 @@ Given an array consisting of `n` integers, find the contiguous subarray of given
     ![sliding window](./img/average-contiguous-subarrays-1.svg)
   - The efficient way to solve this problem would be to visualize each contiguous subarray as a sliding window of `k` elements. This means that when we move on to the next subarray, we will slide the window by one element.
     - To reuse the sum from the previous subarray, we will subtract the element going out of the window and add the element now being included in the sliding window.
-    - This will save us from going through the whole subarray to find the sum and, as a result, the algorithm complexity will reduce to `O(N)`.
+    - This will save us from going through the whole subarray to find the sum and, as a result, the algorithm complexity will reduce to `O(n)`.
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
 
 ```py
 def find_max_average(nums, k):
     maxSum = float('-inf')
-    windowSum = 0.0
+    windowSum = 0.0 # because the result should be a float
     l = 0
 
     for r in range(len(nums)):
         windowSum += nums[r]
 
         # when the window size starts to exceed k, we shrink the window
-        if r >= k - 1:
+        if r >= k - 1: # (k-1) and not (k) because the window size starts from 0 (0 indexed)
             maxSum = max(maxSum, windowSum)
             windowSum -= nums[l]
             l += 1
@@ -1386,9 +1542,9 @@ def find_max_average(nums, k):
 
 ### Minimum Size Subarray Sum
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                      |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=aYqYMIqZx5s) | Use sliding window to calculate the sum of the next subarray, and keep track of the minimum length, and update the window when its sum is greater than or equal to `target` by shrinking the window from the left to get the minimum size |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=aYqYMIqZx5s) | Use sliding window to calculate the sum of the current window, and keep track of the minimum length, and update the window size and minimum length when the sum is greater than or equal to `target` using a `while` loop. Handle edge case where the no window sum is greater than or equal to `target` and return `0` instead of `infinity` |
 
 Given an array of positive integers `nums` and a positive integer `target`, return the minimal length of a **contiguous subarray** `[nums[l], nums[l+1], ..., nums[r-1], nums[r]]` of which the sum is greater than or equal to `target`. If there is no such subarray, return `0` instead.
 
@@ -1398,13 +1554,13 @@ Given an array of positive integers `nums` and a positive integer `target`, retu
 
 - Explanation
 
-  - Bruteforce solution is to iterate over all possible subarrays and find the minimum length
-    - Nested loops for all possible subarrays: `O(n^2)`
-  - We can use the sliding window pattern to calculate the sum of the next subarray, but we need to keep track of the minimum length, and update the window when its sum is greater than or equal to `target` by shrinking the window from the left to get the minimum size
+  - Brute-force solution is to iterate over all possible sub-arrays and find the minimum length
+    - Nested loops for all possible sub-arrays: `O(n^2)`
+  - We can use the sliding window pattern to calculate the sum of the subarray, but we need to keep track of the `minimum window length`, and update the window when its sum is greater than or equal to `target` by shrinking the window from the left to get the minimum size
     ![sliding window](./img/minimum-size-subarray-sum-1.png)
 
-  - **IMPORTANT:** Time complexity: `O(n + n) = O(n)` because the outer `for` loop runs for all elements and the inner `while` loop processes each element **only once**, therefore the time complexity of the algorithm will be `O(n+n)` which is asymptotically equivalent to `O(n)`.
-    - It's not `O(n^2)` because the inner `while` loop will process each element **only once**.
+- **IMPORTANT:** Time complexity: `O(n + n) = O(n)` because the outer loop runs for all elements and the inner `while` loop processes each element **only once**, therefore the time complexity of the algorithm will be `O(n+n)` which is asymptotically equivalent to `O(n)`.
+  - It's not `O(n^2)` because the inner `while` loop will process each element **only once**.
 
 ```py
 # Time: O(n) -> O(n + n) = O(n)
@@ -1427,11 +1583,19 @@ def min_sub_array_len(target, nums):
 
 ### Longest Consecutive Equal Subarray
 
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                                          |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Use sliding window to calculate the length of the subarray, and keep track of the longest subarray, and update the window when (the current `right` element is not equal to the `left` element) by moving the `left` pointer to the right directly, then compare the length of the current subarray with the longest subarray |
+
 Find the length of the longest subarray with the same value in each element.
 
 - Ex:
 
   - `nums = [4, 2, 2, 3, 3, 3]` -> `3` (`[3, 3, 3]` is the longest subarray with the same value)
+
+- Explanation
+
+  - We can use the sliding window pattern to calculate the length of the subarray, but we need to keep track of the `longest subarray`, and update the window when (the current `right` element is not equal to the `left` element) by moving the `left` pointer to the right directly, then compare the length of the current subarray with the longest subarray
 
 ```py
 def longest_subarray(nums):
@@ -1444,11 +1608,29 @@ def longest_subarray(nums):
         length = max(length, r - l + 1)
 
     return length
+
+# Another approach
+def longest_subarray(nums):
+    length = 0
+    count = 1
+
+    for i in range(1, len(nums)):
+        if nums[i] == nums[i-1]:
+            count += 1
+        else:
+            length = max(length, count)
+            count = 1
+
+    return max(length, count)
 ```
 
 ---
 
-### Find the Longest Equal Subarray with at Most K Elements Removed
+### Longest Equal Subarray with at Most K Elements Removed
+
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Use sliding window, First, create a dictionary to keep track of the count of each element in the current window, then loop through the array and increment the count of the current element, and keep track of the maximum count, Use this formula to update the window: `window size - maximum count > k`, if true, then we need to shrink the window from the `left` by removing the `left` element from the dictionary and incrementing the `left` pointer. Finally, the `maxCount` will be the length of the longest equal subarray because it's equal to the length of the subarray after removing at most `k` elements |
 
 You are given an integer array `nums` and an integer `k`. A subarray is equal if all of its elements are equal. Note that empty subarray is an equal subarray.
 
@@ -1459,6 +1641,15 @@ Return the length of the longest possible equal subarray after deleting at most 
   - Input: `nums = [1,3,2,3,1,3], k = 3`
   - Output: `3`
   - Explanation: It's optimal to delete the elements at index `2` and index `4`. After deleting them, `nums` becomes equal to `[1, 3, 3, 3]`. The longest equal subarray starts at `i = 1` and ends at `j = 3` with length equal to `3`. It can be proven that no longer equal subarrays can be created.
+
+- Explanation
+
+  - We can use the sliding window pattern to calculate the length of the subarray, but we need to keep track of the `maximum count`, and update the window when (the window size - the maximum count is greater than `k`), then we need to shrink the window from the `left` by removing the `left` element from the dictionary and incrementing the `left` pointer
+    ![sliding window](./img/longest-equal-subarray-removal-1.png)
+  - Formula: `window size - maximum count > k`
+    - if true, then we need to shrink the window from the `left` by removing the `left` element from the dictionary and incrementing the `left` pointer
+    - if false, then we don't need to shrink the window and continue to the next element
+    - Finally, the `maxCount` will be the length of the longest equal subarray because it's equal to the length of the subarray after removing at most `k` elements
 
 ```py
 def longestEqualSubarray(nums, k):
@@ -1483,9 +1674,9 @@ def longestEqualSubarray(nums, k):
 
 ### Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold
 
-| Video Solution                                                | Hint                                                                                                                               |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=D8B4tKxMTnY) | Use sliding window to calculate the sum of the next subarray, and keep track of the number of subarrays that satisfy the condition |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=D8B4tKxMTnY) | Use sliding window, loop through the array and add the current element to the window sum, then check if the window size is `k - 1` or bigger, if it is, then check if the average is greater than `threshold`, then increment the result and shrink the window by (removing the `left` element from the window sum and incrementing the `left` pointer) |
 
 Given an array of integers `arr` and two integers `k` and `threshold`. Return the number of sub-arrays of size `k` and average greater than or equal to `threshold`.
 
@@ -1498,22 +1689,28 @@ Given an array of integers `arr` and two integers `k` and `threshold`. Return th
 - Explanation
 
   - Same as previous sliding-window problems where we need to calculate the sum of the next subarray, but we need to keep track of the number of subarrays that satisfy the condition, and update the window when its average is greater than or equal to `threshold` by shrinking the window from the left to get the minimum size
+  - We can have a `left` pointer and a `right` pointer, and we can keep track of the `windowSum` and the `result` (number of subarrays that satisfy the condition)
     ![sliding window](./img/suparrays-of-size-k-average-1.png)
+    - We start checking the average when the window size is `k - 1` because the window size starts from `0` (0 indexed)
+    - We can then check if the average is greater than or equal to `threshold`, then increment the `result` and shrink the window by (removing the `left` element from the window sum and incrementing the `left` pointer)
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
 
 ```py
 def num_of_subarrays(arr, k, threshold):
     result = 0
     windowSum = 0
-    windowStart = 0
+    l = 0
 
-    for windowEnd in range(len(arr)):
-        windowSum += arr[windowEnd]
+    for r in range(len(arr)):
+        windowSum += arr[r]
 
-        if windowEnd >= k - 1: # (k-1) because we start from 0
+        if r >= k - 1: # (k-1) because we start from 0
             if windowSum / k >= threshold:
                 result += 1
-            windowSum -= arr[windowStart]
-            windowStart += 1
+            windowSum -= arr[l]
+            l += 1
 
     return result
 ```
@@ -1522,246 +1719,223 @@ def num_of_subarrays(arr, k, threshold):
 
 ### Fruit Into Baskets
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=yYtaV0G3mWQ) | Use sliding window, Use a dictionary to keep track of the frequency of each fruit type, then loop through the array and add the current element to the dictionary, then check if the dictionary size is greater than `2` meaning that we have more than `2` types of fruits, then shrink the window by (decrementing the frequency of the `left` element and incrementing the `left` pointer) |
+
 Given an array of integers where each integer represents a fruit tree, you are given two baskets, and your goal is to put maximum number of fruits in each basket. The only restriction is that each basket can have only one type of fruit.
 
-It's similar to the [Longest Substring with K Distinct Characters](./6-PS-Strings.md#longest-substring-with-k-distinct-characters) problem.
+- Ex:
+
+  - `fruits = [1,2,3,2,2]` -> `4`
+    - Explanation: We can pick from trees `[2,3,2,2]`, if we start at the first tree, we would only pick from trees `[1, 2]`.
+
+- Explanation
+
+  - Here, we need to know the number of trees in the current window, and the number of trees in the current window should not exceed `2`.
+  - The brute-force solution would be to iterate over all possible sub-arrays and find the maximum length -> `O(n^2)`
+  - Instead, In order to do so, we can use a `dictionary` to keep track of the `frequency` of each fruit type (tree), and then loop through the array and add the current element to the dictionary
+    ![sliding window](./img/fruit-into-baskets-1.png)
+    - then check if the dictionary size is greater than `2` meaning that we have more than `2` types of fruits, then shrink the window by (removing the `left` element from the dictionary and incrementing the `left` pointer)
+      ![sliding window](./img/fruit-into-baskets-2.png)
+    - if the dictionary size is less than or equal to `2`, then we can calculate the length of the current subarray and compare it with the longest subarray
+      ![sliding window](./img/fruit-into-baskets-3.png)
+  - Finally, the length of the longest subarray will be the result
+
+- Time complexity: `O(n)`
+  - It's `O(2n)` because the outer loop runs for all elements and the inner loop runs for each element **only once**, therefore the time complexity of the algorithm will be `O(2n)` which is asymptotically equivalent to `O(n)`
+- Space complexity: `O(1)` ⚠️
+  - You may think that it should be `O(n)` because we are using a dictionary, but the space complexity of the above algorithm will be `O(1)` not `O(n)`
+  - because we can have a maximum of three types of fruits stored in the `fruitFrequency` dictionary -> `O(3)` in worst case which is `O(1)`
 
 ```py
 def fruits_into_baskets(fruits):
-    windowStart = 0
-    maxLength = 0
     fruitFrequency = {}
+    l = 0
+    res = 0
 
-    for windowEnd in range(len(fruits)):
-        rightFruit = fruits[windowEnd]
-        fruitFrequency[rightFruit] = fruitFrequency.get(rightFruit, 0) + 1
+    for r in range(len(fruits)):
+        fruitFrequency[fruits[r]] = fruitFrequency.get(fruits[r], 0) + 1
 
-        # Shrink the sliding window, until we are left with '2' fruits in the fruit frequency dictionary
         while len(fruitFrequency) > 2:
-            leftFruit = fruits[windowStart]
-            fruitFrequency[leftFruit] -= 1
-            if fruitFrequency[leftFruit] == 0:
-                del fruitFrequency[leftFruit]
-            windowStart += 1
+            f = fruits[l]
+            fruitFrequency[f] -= 1
+            if fruitFrequency[f] == 0:
+                del fruitFrequency[f]
+            l += 1
 
-        maxLength = max(maxLength, windowEnd - windowStart + 1)
-
-    return maxLength
-```
-
-Note: the space complexity of the above algorithm will be `O(1)` not `O(n)`, because we can have a maximum of three types of fruits stored in the `fruitFrequency` dictionary.
-
----
-
-### Longest Subarray of 1's After Deleting One Element
-
-Same as the [Longest Repeating Character Replacement](./6-PS-Strings.md#longest-repeating-character-replacement) problem.
-
----
-
-### Max Consecutive Ones III
-
-Given a binary array `nums` and an integer `k`, return the maximum number of consecutive `1`'s in the array if you can flip at most `k` `0`'s.
-
-- Solution 1: Sliding window like the [Longest Repeating Character Replacement](./6-PS-Strings.md#longest-repeating-character-replacement) problem.
-
-- Solution 2: (Faster)
-
-  ```py
-  def longest_ones(nums, k):
-      l = 0
-
-      for r in range(len(nums)):
-          if nums[r] == 0:
-              k -= 1
-          if k < 0: # If we have more than k zeros, move the left pointer to the right
-              if nums[l] == 0:
-                  k += 1
-              l += 1
-
-      return r - l + 1
-  ```
-
----
-
-### Sliding Window Maximum
-
-You are given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very left of the array to the very right. You can only see the `k` numbers in the window. Each time the sliding window moves right by one position.
-
-Return the max sliding window.
-
-- EX: `nums = [1, 3, -1, -3, 5, 3, 6, 7], k = 3` --> `[3, 3, 5, 5, 6, 7]`
-
-  - Explanation:
-    | Window Position | Max |
-    | --------------- | --- |
-    | [1 3 -1] -3 5 3 6 7 | 3 |
-    | 1 [3 -1 -3] 5 3 6 7 | 3 |
-    | 1 3 [-1 -3 5] 3 6 7 | 5 |
-    | 1 3 -1 [-3 5 3] 6 7 | 5 |
-    | 1 3 -1 -3 [5 3 6] 7 | 6 |
-    | 1 3 -1 -3 5 [3 6 7] | 7 |
-
-- **Explanation:** (recap: it's like (next greater element) using a stack, but we use dqueue to remove from left as well)
-
-  - The brute force solution is to iterate on all windows of size `k` and find the maximum element in each window. This solution takes `O(n.k)` since we have `O(n-k+1)` windows and for each window we take `O(k)` time to find the maximum element in it.
-    - to get a better solution, we will use the `next greater element` approach, using a **Monotonic decreasing queue (double-ended queue (`deque`))** to store the indices of the elements in the window.
-    - > `deque` allows for fast appends and pops **from both ends**.
-  - The first element in the `queue` is the index of the maximum element in the window.
-  - When we move the window to the right, we need to remove the element that is out of the window, and remove all elements that are smaller than the current element. Then we add the current element to the queue.
-    - This is done because we know that when going to the next window, the first element in the queue is out of the window, so we remove it. Then we remove all elements that are smaller than the current element, because **they will never be the maximum element in the window**. Then we add the current element to the queue.
-  - we use queue and not a stack, because we want to remove elements from the left side of the queue, and we want to remove the first element in the queue, which is the maximum element in the window.
-
-So, to recap: we use a `queue` to store the indices of the elements in the current window in a **decreasing order**. At each step, we add the current element to the queue, and then we pop from the `queue` (from the right) all the elements that are smaller than the current element. We then remove (from the left) the first element in the queue if it is outside of the current window. Finally, we add the first element of the queue to the output. **(The first element of the queue will always be the maximum element of the window because we are using a decreasing order)**
-
-- **Steps:**
-  1. Initialize a deque `q` to store the indices of the elements in the current sliding window, and initialize `l` and `r` pointers to `0`
-  2. iterate over the array `nums` and do the following:
-     - pop smaller values from `q` until we find a value that is greater than the current value
-     - append the current index ('r') to `q`
-     - remove the left val from the window
-       - If the index of the oldest element in the sliding window (`l`) is outside of the current sliding window, remove it from the deque `q` using the `popleft()` method
-     - check if the window is at least size `k` to add the maximum element (`nums[q[0]]`) to the result
-
-![sliding-window-maximum](./img/sliding-window-maximum.png)
-
-```py
-def max_sliding_window(nums, k):
-    if not nums: return []
-    result = []
-    q = collections.deque() # indices of the elements in the window
-    l = r = 0
-
-    while r < len(nums):
-      # pop smaller values from q if the current value is greater than the last value in q to always make the queue contain the max element
-      while q and nums[q[-1]] < nums[r]:
-          q.pop()
-      q.append(r)
-
-      # remove left val from window if it is outside of the current window
-      if l > q[0]:
-        q.popleft()
-
-      # check if the window is at least size k to start adding the maximum element to the result
-      if (r+1) >= k:
-        result.append(nums[q[0]])
-        l += 1 # left pointer will only move when the window is at least size k
-      r += 1
+        res = max(res, r - l + 1)
 
     return res
 ```
 
 ---
 
+### Longest Subarray of 1's After Deleting One Element
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ZvmoqExPz68) | Use sliding window, Keep track of the number of `zeros` in the current window, then loop through the array and if the number of `zeros` becomes more than `1`, then shrink the window from the `left` by (reducing the `zerosCount` if the `left` element is `0` and incrementing the `left` pointer), then update the result by comparing the length of the current subarray with the longest subarray. Finally, return the length of the longest subarray after deleting one element |
+
+Given a binary array `nums`, you should delete one element from it.
+
+Return the size of the longest non-empty subarray containing only 1's in the resulting array.
+
+- Ex:
+
+  - `nums = [1,1,0,1]` -> `3`
+    - Explanation: After deleting the number in position 2, `[1,1,1]` contains 3 numbers with value of 1's.
+
+- Explanation
+
+  - Same as the [Longest Repeating Character Replacement](./6-PS-Strings.md#longest-repeating-character-replacement) problem.
+  - Here, we keep track of the number of `zeros` in the current window which should not exceed `1`
+    - if `zeros` becomes more than `1`, we need to shrink the window from the `left` by (reducing the `zerosCount` if the `left` element is `0` and incrementing the `left` pointer)
+  - We update the result by comparing the length of the current subarray with the longest subarray
+  - Finally, we return the length of the longest subarray after deleting one element.
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
+
+```py
+def longest_subarray(nums):
+    l = 0
+    zerosCount = 0
+    res = 0
+
+    for r in range(len(nums)):
+        if nums[r] == 0:
+            zerosCount += 1
+
+        while zerosCount > 1:
+            if nums[l] == 0:
+                zerosCount -= 1
+            l += 1
+
+        res = max(res, r - l + 1)
+
+    return res - 1 # because we are deleting one element
+```
+
+---
+
+### Max Consecutive Ones III
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=TAMLsfGiyOg) | Use sliding window, Keep track of the number of `zeros` in the current window, then loop through the array and if the number of `zeros` becomes more than `k`, then shrink the window from the `left` by (reducing the `zerosCount` if the `left` element is `0` and incrementing the `left` pointer), then update the result by comparing the length of the current subarray with the longest subarray. Finally, return the length of the longest subarray after deleting one element |
+
+Given a binary array `nums` and an integer `k`, return the maximum number of consecutive `1`'s in the array if you can flip at most `k` `0`'s.
+
+- Ex:
+
+  - `nums = [1,1,1,0,0,0,1,1,1,1,0], k = 2` -> `6`
+    - Explanation: `[1,1,1,0,0,(1),1,1,1,1,(1)]`
+      - Numbers in parentheses were flipped from `0` to `1`. The longest subarray is underlined.
+
+- Explanation
+
+  - Similar to the previous problem, we keep track of the number of `zeros` in the current window which should not exceed `k`
+    - if `zeros` becomes more than `k`, we need to shrink the window from the `left` by decrementing the `onesCount` and incrementing the `left` pointer
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
+
+```py
+def longest_ones(nums, k):
+    l = 0
+    zerosCount = 0
+    maxLen = 0
+
+    for r in range(len(nums)):
+        if nums[r] == 0:
+            zerosCount += 1
+
+        while zerosCount > k:
+            if nums[l] == 0:
+                zerosCount -= 1
+            l += 1
+
+        maxLen = max(maxLen, r - l + 1)
+
+    return maxLen
+```
+
+---
+
 ### Chunk Array
 
-| Video Solution | Hint                                                                                                |
-| -------------- | --------------------------------------------------------------------------------------------------- |
-| NA             | Iterate over the array with step size equal to the chunk size and append the subarray to the result |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=VUN-O3B9ceY) | Iterate over the array with a step of `size` and append the sliced array from `i` to `i+size` to the `result`. **OR** use a current `subarray` and append it to the `result` when it's full (when its length is equal to `size`) and reset it. Handle the case where the last subarray is not full by checking if the `subarray` is not empty and append it to the `result` |
 
 Given an array and chunk size, divide the array into many subarrays where each subarray is of length size.
 
 - EX: `chunk([1, 2, 3, 4], 2) --> [[1, 2], [3, 4]]`
 
-```py
-# Time: O(n) ✅
-def chunk(arr, size):
-    chunked = []
-    for i in range(0, len(arr), size):
-        chunked.append(arr[i:i+size])
-    return chunked
+- Explanation
 
-# --------------------------OR-----------------------------------
+  - We can iterate over the array with a step of `size` and append the sliced array from `i` to `i+size` to the result
+  - **OR** use a current `subarray` and append it to the result when it's full (when its length is equal to `size`) and reset it.
+    - Here, we will need to handle the case where the last subarray is not full because we reached the end of the array, so we need to append it to the result by checking if the `subarray` is not empty
 
-def chunk(arr, size):
-    result = []
-    subarray = []
-    for i in arr:
-        subarray.append(i)
-        # if the subarray is full, append it to the result and reset the subarray
-        if len(subarray) == size:
-            result.append(subarray)
-            subarray = []
-    if subarray:
-        result.append(subarray)
-    return result
-```
+- Time complexity: `O(n)`
+- Space complexity: `O(k)` where `k` is the size of the `subarray`
 
----
+- JavaScript solution
 
-### Shortest Unsorted Continuous Subarray
+  ```js
+  function chunk(arr, size) {
+    const chunked = [];
+    for (let i = 0; i < arr.length; i += size) {
+      chunked.push(arr.slice(i, i + size));
+    }
+    return chunked;
+  }
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=p-O7FExDH1M) | Use **two pointers** to find the start and end of the unsorted subarray, and then find the minimum and maximum of the subarray, then extend the subarray to include any number which is bigger than the minimum or smaller than the maximum of the subarray. This way we can include all the numbers that are out of sorting order. |
+  // --------------------------OR-----------------------------------
 
-Given an integer array `nums`, you need to find one **continuous subarray** that if you only sort this subarray in ascending order, then the whole array will be sorted in ascending order.
-
-Return the **shortest** such subarray and output its length.
-
-- EX: `nums = [2,6,4,8,10,9,15]` --> `5`
-
-  - because the subarray `[6,4,8,10,9]` needs to be sorted in ascending order to make the whole array sorted in ascending order.
-
-- **Solution 1**: using sorting (`O(nlogn)` time and `O(n)` space)
-
-  - We can sort a copy of the array and compare it with the original array to find the first and the last elements that are out of sorting order.
-  - The subarray between these two elements is the required unsorted subarray.
-  - Time complexity: `O(nlogn)`
-
-  ```py
-  def find_unsorted_subarray(nums):
-      sorted_nums = sorted(nums)
-      # find the first element out of sorting order from the beginning
-      start = 0
-      while start < len(nums) and nums[start] == sorted_nums[start]:
-          start += 1
-      # find the first element out of sorting order from the end
-      end = len(nums) - 1
-      while end > 0 and nums[end] == sorted_nums[end]:
-          end -= 1
-
-      return end - start + 1 if end > start else 0
+  function chunk(arr, size) {
+    const result = [];
+    let subarray = [];
+    for (let i of arr) {
+      subarray.push(i);
+      if (subarray.length === size) {
+        result.push(subarray);
+        subarray = [];
+      }
+    }
+    if (subarray.length) {
+      result.push(subarray);
+    }
+    return result;
+  }
   ```
 
-- **Solution 2:** using **two sliding windows** (`O(n)` time and `O(1)` space) ✅
-  ![shortest unsorted continuous subarray](./img/shortest-unsorted-continuous-subarray-1.png)
-
-  - We know, once an array is sorted, the smallest element is at the beginning and the largest element is at the end of the array.
-    - So if we start from the beginning of the array to find the first element which is out of sorting order i.e., (which is **smaller than its previous element**), and similarly from the end of array to find the first element (which is **bigger than its previous element**)
-    - will sorting the subarray between these two numbers result in the whole array being sorted?
-      - No, because there could be some intermediate numbers that are bigger than the number in the beginning of the array and smaller than the number at the end of the array.
-      - We will need to include all such intermediate numbers while trying to find the smallest subarray to be sorted.
-      - we do so by getting the `min` and `max` of the subarray
-        - then we extend the subarray to include any number which is bigger than the minimum of the subarray
-        - and extend the subarray to include any number which is smaller than the maximum of the subarray
-        - this way we can include all the numbers that are out of sorting order
-  - Time complexity: `O(n)`
+- Python solution
 
   ```py
-  def find_unsorted_subarray(nums):
-      # find the start of the subarray
-      l = 0
-      while l < len(nums) - 1 and nums[l] <= nums[l+1]:
-          l += 1
-      # find the end of the subarray
-      r = len(nums) - 1
-      while r > 0 and nums[r] >= nums[r-1]:
-          r -= 1
+  def chunk(arr, size):
+      chunked = []
+      for i in range(0, len(arr), size):
+          chunked.append(arr[i:i+size])
+      return chunked
 
-      # if the array is sorted
-      if l == len(nums) - 1:
-          return 0
+  # --------------------------OR-----------------------------------
 
-      # find the maximum and minimum of the subarray
-      subarray_max = max(nums[l:r+1])
-      subarray_min = min(nums[l:r+1])
-
-      # extend the subarray to include any number which is bigger than the minimum or smaller than the maximum of the subarray
-      while l > 0 and nums[l-1] > subarray_min: l -= 1
-      while r < len(nums) - 1 and nums[r+1] < subarray_max: r += 1
-
-      return r - l + 1 if r > l else 0
+  def chunk(arr, size):
+      result = []
+      subarray = []
+      for i in arr:
+          subarray.append(i)
+          # if the subarray is full, append it to the result and reset the subarray
+          if len(subarray) == size:
+              result.append(subarray)
+              subarray = []
+      # if subarray is not empty, meaning that the last subarray is not full because we reached the end of the array, append it to the result
+      if subarray:
+          result.append(subarray)
+      return result
   ```
 
 ---
@@ -1770,9 +1944,9 @@ Return the **shortest** such subarray and output its length.
 
 ### Range Sum Query - Immutable
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                            |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=2pndAmo_sMA) | Use **prefix sum** to store the sum of the first `i` elements of the array (use an extra element to make it easier to calculate), then we can get the sum of any `subarray` by subtracting the `prefix` of the element before the `start` of the subarray from the `prefix` of the last element of the subarray |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=2pndAmo_sMA) | Use a `prefix` array to store the incremented sum of the elements of the array, then we can get the sum of any `subarray` by subtracting the `prefix` of the element before the `left` of the subarray from the `prefix` of the `right` of the subarray. and handle the case when `left` is `0` when calculating the sum of the subarray |
 
 Given an integer array `nums`, find the sum of the elements between indices `left` and `right` inclusive, where `(left <= right)`
 
@@ -1784,28 +1958,21 @@ Given an integer array `nums`, find the sum of the elements between indices `lef
   - Output: `[null, 6, 12, 15]`
 
 - Explanation:
-  - The brute-force solution is to calculate the sum of the subarray at each step, which takes `O(n)` time for each query -> `O(n^2)` time for all queries
-  - This is a **prefix sum** problem, we can use a `prefix` array to store the sum of the first `i` elements of the array, and then we can get the sum of any `subarray` by subtracting the `prefix` of the element before the `start` of the subarray (`left`) from the `prefix` of the last element of the subarray (`right`).
+
+  - The brute-force solution is that for each time we query the sum of a subarray, we iterate over the subarray and calculate the sum of the elements in the given range -> `O(n)` for each query and `O(n^2)` for `n` queries ❌
+    - Another brute-force solution is to calculate the sum of every possible subarray at first, and store them in a class property, which will take `O(n^2)` time, and then for each query, we can get the sum of the subarray from the stored subarrays in `O(1)` time for each query ❌
+  - This is a **prefix sum** problem, we can use a `prefix` array to store the sum of the first `i` elements of the array
+    - then for each query, we can get the sum of any `subarray` **(in constant time)** by subtracting the `prefix` of the element before the `start` of the subarray (`left`) from the `prefix` of the `end` of the subarray (`right`).
+      ![prefix-sum](./img/range-sum-query-1.png)
   - We do this because we want to remove the sum of the elements before the `start` of the subarray from the sum of the elements before the `end` of the subarray, so we can get the sum of the subarray.
-    - We do it by subtracting the `prefix` of the element before the `start` of the subarray from the `prefix` of the last element of the subarray.
-      - `prefix[right+1] - prefix[left]`
+
     - because the `prefix` of the element before the `start` of the subarray contains the sum of the elements before the `start` of the subarray, and the `prefix` of the last element of the subarray contains the sum of the elements before the `end` of the subarray.
+    - `prefix[right] - prefix[left - 1]`
       ![prefix-sum](./img/range-sum-query-0.png)
 
+  - We also need to handle case when `left` is `0` when calculating the sum of the subarray, because if `left` is `0`, we don't need to subtract anything from the `prefix` of the last element of the subarray, so the `leftSum` will be `0`
+
 ```py
-# Best approach ✅
-class NumArray:
-    def __init__(self, nums):
-        # we add an extra element to the prefix array to make it easier to calculate the sum of the first element
-        self.prefix = [0] * (len(nums))
-        for i in range(len(nums)):
-            self.prefix[i+1] = self.prefix[i] + nums[i]
-
-    def sumRange(self, left, right):
-        return self.prefix[right+1] - self.prefix[left]
-
-
-# Another approach
 class NumArray:
     def __init__(self, nums):
         self.prefix = []
@@ -1818,15 +1985,28 @@ class NumArray:
         rightSum = self.prefix[right]
         leftSum = self.prefix[left-1] if left > 0 else 0 # if left is 0, we don't need to subtract anything
         return rightSum - leftSum
+
+# --------------------------OR-----------------------------------
+
+# Another approach
+class NumArray:
+    def __init__(self, nums):
+        # we add an extra element to the prefix array to make it easier to calculate the sum of the first element
+        self.prefix = [0] * (len(nums))
+        for i in range(len(nums)):
+            self.prefix[i+1] = self.prefix[i] + nums[i]
+
+    def sumRange(self, left, right):
+        return self.prefix[right+1] - self.prefix[left]
 ```
 
 ---
 
 ### Range Sum Query 2D - Immutable
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=KE8MQuwE2yA) | Use **prefix sum** to store the sum of the each point **to the left and above**, then we can get the sum of any `subarray` by subtracting the `prefix` of the element before the `start` of the subarray from the `prefix` of the last element of the subarray |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=KE8MQuwE2yA) | Use **prefix sum** to store the sum of the each point **to the left and above**, then we can get the sum of any `rectangle` by summing the prefix of the `bottom right` corner with the prefix of the `top left` corner, and subtracting the prefix of the `top right` corner and the prefix of the `bottom left` corner |
 
 Given a 2D matrix `matrix`, handle multiple queries of the following type:
 
@@ -1836,63 +2016,84 @@ Given a 2D matrix `matrix`, handle multiple queries of the following type:
   - `NumMatrix(int[][] matrix)` Initializes the object with the integer matrix `matrix`.
   - `int sumRegion(int row1, int col1, int row2, int col2)` Returns the sum of the elements of `matrix` inside the rectangle defined by its **upper left corner** `(row1, col1)` and **lower right corner** `(row2, col2)`.
 
-![prefix-sum-2d](./img/range-sum-query-1.jpeg)
+- EX:
+
+  - `matrix = [[3, 0, 1, 4, 2], [5, 6, 3, 2, 1], [1, 2, 0, 1, 5], [4, 1, 0, 1, 7], [1, 0, 3, 0, 5]]`
+    ![prefix-sum-2d](./img/range-sum-query-1.jpeg)
+  - `sumRegion(2, 1, 4, 3)` -> `8` -> (sum of the red rectangle)
+  - `sumRegion(1, 1, 2, 2)` -> `11` -> (sum of the green rectangle)
+  - `sumRegion(1, 2, 2, 4)` -> `12` -> (sum of the blue rectangle)
 
 - **Solution 1**: Prefixing each row
 
-  - Same as previous problem, but we need to prefix each row
-  - Time complexity: `O(mn)` for the constructor and `O(1)` for each query
+  - Same as previous problem, but we need to prefix each row when initializing the class
+  - We get the sum of the subarrays in the given rectangle by calculating the prefix-sum of each row in the rectangle and then summing the sums of the rows
+  - Time complexity:
+    - For initializing the class and creating the prefix matrix: `O(mn)`
+    - For each query: `O(m)` where `m` is the number of rows in the rectangle -> **SLOW ❌**
+  - Space complexity: `O(mn)`
+
+    ```py
+    class NumMatrix:
+        def __init__(self, matrix):
+            self.prefix = [[0] * (len(matrix[0])) for _ in range(len(matrix))]
+            for r in range(len(matrix)):
+                curr_sum = 0
+                for c in range(len(matrix[0])):
+                    curr_sum += matrix[r][c]
+                    self.prefix[r][c] = curr_sum
+
+        def sumRegion(self, row1, col1, row2, col2):
+            res = 0
+            for r in range(row1, row2+1):
+                leftSum = self.prefix[r][col1-1] if col1 > 0 else 0
+                rightSum = self.prefix[r][col2]
+                res += rightSum - leftSum
+            return res
+    ```
+
+- **Solution 2**: Prefixing each point to the left and above ✅
+
+  - The idea here is that we will change the way that we calculate the prefix sum, and we will calculate the sum of each point **to the `left` and `above`** instead of the just sum of the subarray **from the `left`**
+    ![prefix-sum-2d](./img/range-sum-query-7.png)
+    - `sum = previousRowSum + previousColSum - previousRowColSum + currentMatrixPoint`
+      ![prefix-sum-2d](./img/range-sum-query-5.png)
+  - So, now when we need to get the sum of the rectangle, we can get the sum of the subarray by summing the prefix of the `bottom right` corner of the rectangle with the prefix of the `top left` corner of the rectangle
+    - prefix of the `bottom right` corner:
+      - `prefix[bottomRight] - prefix[topRight] - prefix[bottomLeft]`
+    - prefix of the `top left` corner:
+      - `prefix[topLeft]`
+  - So, the sum of the rectangle will be:
+
+    - `prefix[bottomRight] - prefix[topRight] - prefix[bottomLeft] + prefix[topLeft]`
+      ![prefix-sum-2d](./img/range-sum-query-2.png)
+      ![prefix-sum-2d](./img/range-sum-query-3.png)
+      ![prefix-sum-2d](./img/range-sum-query-6.png)
+
+  - In order to prevent checking for the existence first row and column, we can add an extra row and column to the matrix (filled with `0s`) to make it easier to calculate the sum of the first element
+    ![prefix-sum-2d](./img/range-sum-query-4.png)
+  - Time complexity:
+    - generating the prefix matrix: `O(mn)`
+    - each query: `O(1)` ✅
   - Space complexity: `O(mn)`
 
   ```py
   class NumMatrix:
       def __init__(self, matrix):
-          self.prefix = [[0] * (len(matrix[0])+1) for _ in range(len(matrix))]
-          for r in range(len(matrix)):
-              for c in range(len(matrix[0])):
-                  self.prefix[r][c+1] = matrix[r][c] + self.prefix[r][c]
-
-      def sumRegion(self, row1, col1, row2, col2):
-          sum = 0
-          for r in range(row1, row2+1):
-              print(self.prefix[r])
-              sum += self.prefix[r][col2+1] - self.prefix[r][col1]
-          return sum
-  ```
-
-- **Solution 2**: Prefixing each point to the left and above ✅
-
-  - This will assume each point is the **bottom right corner** of the subarray, and we need to get the sum of the subarray from the **top left corner** to the current point
-    ![prefix-sum-2d](./img/range-sum-query-2.png)
-    ![prefix-sum-2d](./img/range-sum-query-3.png)
-  - Calculating prefix sum for each point:
-    ![prefix-sum-2d](./img/range-sum-query-5.png)
-    - `sum = previousRowSum + previousColSum - previousRowColSum + currentMatrixPoint`
-  - Calculating the sum of the subarray from the **top left corner** to the current point:
-    ![prefix-sum-2d](./img/range-sum-query-6.png)
-    - `sum = previousRowColSum - previousRowSum - previousColSum + currentMatrixPoint`
-  - Also, in order to prevent checking for the existence first row and column, we can add an extra row and column to the matrix (filled with `0s`) to make it easier to calculate the sum of the first element
-    ![prefix-sum-2d](./img/range-sum-query-4.png)
-  - Time complexity:
-    - generating the prefix matrix: `O(mn)`
-    - each query: `O(1)`
-    - Space complexity: `O(mn)`
-
-  ```py
-  class NumMatrix:
-      def __init__(self, matrix):
           if not matrix or not matrix[0]: return
-          self.prefix = [[0] * (len(matrix[0]) + 1) for _ in range(len(matrix) + 1)]
-          for r in range(len(matrix)):
+          ROWS, COLS = len(matrix), len(matrix[0])
+          self.prefix = [[0] * (COLS + 1) for _ in range(ROWS + 1)]
+          for r in range(ROWS):
             prefix = 0
-            for c in range(len(matrix[0])):
-              prefix += matrix[r][c]
-              above = self.prefix[r][c+1]
+            for c in range(COLS):
+              prefix += matrix[r][c] # left sum
+              above = self.prefix[r][c+1] # above sum
               self.prefix[r+1][c+1] = prefix + above
 
 
       def sumRegion(self, row1, col1, row2, col2):
-          r1, c1, r2, c2 = row1+1, col1+1, row2+1, col2+1 # to include the extra row and column and make calculations easier
+          r1, c1, r2, c2 = row1+1, col1+1, row2+1, col2+1 # to include the extra zeros row and column and make calculations easier
+
           bottomRight = self.prefix[r2][c2]
           topLeft = self.prefix[r1-1][c1-1]
           topRight = self.prefix[r1-1][c2]
@@ -1988,6 +2189,10 @@ def product_except_self(nums):
 
 ### Continuous SubArray Sum
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=OKcrLfR-8mE) | Use Bruteforce to check every possible subarray, but that would be `O(n^2)` time complexity. **OR** We can solve it in `O(n)` time complexity using a **prefix sum** and a dictionary to store the `remainder` and its ending `index`, if the `remainder` was already added to the dictionary, that means we have seen it before, and the difference between the current index and the index of the `remainder` is the size of the subarray. |
+
 Given an integer array `nums` and an integer `k`, return `true` if `nums` has a continuous subarray of size at least two whose elements sum up to a multiple of `k`, or `false` otherwise.
 
 An integer `x` is a multiple of `k` if there exists an integer `n` such that `x = n * k`. `0` is **always** a multiple of `k`.
@@ -2010,6 +2215,17 @@ An integer `x` is a multiple of `k` if there exists an integer `n` such that `x 
       - So this will ensure that we won't return `true` if the first element is a multiple of `k`
 
 ```py
+# Brute force solution: O(n^2) time complexity
+def check_subarray_sum(nums, k):
+    for i in range(len(nums)):
+        curSum = nums[i]
+        for j in range(i+1, len(nums)):
+            curSum += nums[j]
+            if curSum % k == 0:
+                return True
+    return False
+
+# Time complexity: O(n) | Space complexity: O(n) ✅
 def check_subarray_sum(nums, k):
     # Create a dictionary to store the remainder and its index
     remaindersDict = {0: -1} # Initialize the dictionary with 0: -1 because the sum of the first element is 0 and the size of the subarray must be at least 2
@@ -2021,11 +2237,11 @@ def check_subarray_sum(nums, k):
         if k != 0:
             remainder = total % k
         # If the remainder is in the dictionary, check if the difference between the current index and the index of the remainder is greater than 1 -> len(subarray) >= 2
-        if remainder not in remaindersDict:
-            # If the remainder is not in the dictionary, add it to the dictionary
+        if remainder in remaindersDict:
+            if i - remaindersDict[remainder] > 1: # Handle the case when the first element is a multiple of k
+                return True
+        else:
             remaindersDict[remainder] = i
-        elif i - remaindersDict[remainder] > 1:
-            return True
 
     return False
 ```
@@ -2070,7 +2286,29 @@ def subarray_sum(nums, k):
 
 ### Find Pivot Index
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=u89i60lYx8U) | First, calculate the total sum of the array, then iterate over the array and do the following: Calculate the right sum by subtracting the left sum (prefix sum) and the current element from the total sum, If the left sum is equal to the right sum, return the current index, Then add the current element to the left sum. If the loop ends, return `-1` |
+
 Given an array of integers `nums`, calculate the **pivot index** of this array.
+
+The **pivot index** is the index where the sum of all the numbers **strictly** to the left of the index is equal to the sum of all the numbers **strictly** to the index's right.
+
+If the index is on the left edge of the array, then the left sum is `0` because there are no elements to the left. This also applies to the right edge of the array.
+
+- EX: `nums = [1, 7, 3, 6, 5, 6]` --> `3` because the sum of the numbers to the left of index `3` (`1 + 7 + 3 = 11`) is equal to the sum of numbers to the right of index `3` (`5 + 6 = 11`)
+
+- Explanation
+  - Brute force solution:
+    - Loop through the array and calculate the sum of the elements to the left of the current element and the sum of the elements to the right of the current element, and check if they are equal
+    - Time complexity: `O(n^2)` ❌
+    - Space complexity: `O(1)`
+  - We can use `prefix sum` technique to solve this problem in `O(n)` time complexity ✅
+  - We calculate the total sum of the array, then iterate over the array and do the following:
+    - Calculate the right sum by subtracting the left sum (prefix sum) and the current element from the total sum
+    - If the left sum is equal to the right sum, return the current index
+    - Then add the current element to the left sum
+  - If the loop ends, return `-1`
 
 ```py
 def pivot_index(nums):
@@ -2092,6 +2330,10 @@ def pivot_index(nums):
 ## Kadane's Algorithm
 
 ### Maximum Subarray Sum
+
+| Video Solution                                                     | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=5WZl3MMT0Eg&t=8s) | Use **Kadane's algorithm** to find the maximum sum of a contiguous subarray within an array of numbers in `O(n)` time. We can use a variable `max_sum` to store the maximum sum of the subarray, and another variable `current_sum` to store the current sum of the subarray. We iterate over the array and do the following: If the `current_sum` is less than `0`, we reset it to `0` **because we don't want to add a negative number to the next element in the array**. We then add the current element to the `current_sum`. We then check if the `current_sum` is greater than the `max_sum`, and if it is, we set the `max_sum` to the `current_sum`. |
 
 Given an integer array `nums`, find the contiguous subarray (containing at least one number) which has the largest sum and return its sum.
 
@@ -2142,6 +2384,19 @@ Given an integer array `nums`, find the contiguous subarray (containing at least
     - We then check if the `current_sum` is greater than the `max_sum`, and if it is, we set the `max_sum` to the `current_sum`.
 
 ```py
+# Brute force solution: O(n^2) time complexity ❌
+def max_subarray(nums):
+    max_sum = nums[0]
+
+    for i in range(len(nums)):
+        current_sum = 0
+        for j in range(i, len(nums)):
+            current_sum += nums[j]
+            max_sum = max(max_sum, current_sum)
+
+    return max_sum
+
+# Time complexity: O(n) | Space complexity: O(1) ✅
 def max_subarray(nums):
     max_sum = nums[0]
     current_sum = 0
@@ -2286,9 +2541,9 @@ This pattern is used to solve problems with `linked lists` and `arrays` that inv
 
 ### Find the Duplicate Number
 
-| Video Solution                                                | Hint                                                                                                                                                                                       |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [Video Solution](https://www.youtube.com/watch?v=wjYnzkAhcNk) | Use **Floyd's Cycle Detection** algorithm to find the intersection point of the two runners, then find the "entrance" to the cycle, which is the duplicate number that we are looking for. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=wjYnzkAhcNk) | Use **Floyd's Cycle Detection** algorithm to find the intersection point of the two runners, then find the "entrance" to the cycle, which is the duplicate number that we are looking for, by starting a new pointer at the beginning of the array and move it one step at a time, and move the slow runner one step at a time, and return the slow runner when the two runners meet. |
 
 Given an array of integers `nums` containing `n + 1` integers where each integer is in the range `[1, n]` inclusive.
 
@@ -2301,7 +2556,7 @@ There is only **one repeated number** in `nums`, return this repeated number.
   - Input: `nums = [1,3,4,2,2]`
   - Output: `2`
 
-- **Solution 1:** using HashMap **(not what the problem wants)** -> `O(n)` time and `O(n)` space
+- **Solution 1:** using HashMap / HashSet **(not what the problem wants)** -> `O(n)` time and `O(n)` space
 
   ```py
   def findDuplicate(nums):
@@ -2384,9 +2639,9 @@ It's a pattern that can be used to solve problems that involve overlapping inter
 
 ### Merge Intervals
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                        |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=44H3cEC2fFM) | Sort the intervals by the `start` time, then we can check if the current interval overlaps with the previous interval. If there is **no overlap**, then we can add the current interval to the merged intervals. If there is **overlap**, then we can merge the current interval with the previous interval |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=44H3cEC2fFM) | Sort the intervals by the `start` time, then we can check if the current interval overlaps with the previous interval. If there is **no overlap**, then we can add the current interval to the merged intervals. If there is **overlap**, then we can merge the current interval with the previous interval by setting the `end` time of the previous interval to the `max` of the two intervals. |
 
 Given an array of intervals where `intervals[i] = [starti, endi]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
 
@@ -2402,9 +2657,11 @@ Given an array of intervals where `intervals[i] = [starti, endi]`, merge all ove
   - goal is to merge the overlapping intervals like this:
     ![merge intervals](./img/merge-intervals-3.svg)
   - Bruteforce solution:
+
     - We can use nested loops to check if the current interval overlaps with the other intervals
     - Time complexity: `O(n^2)`
     - Space complexity: `O(n)`
+
   - We can sort the intervals by the `start` time
   - Then we can check if the current interval overlaps with the previous interval
 
@@ -2502,21 +2759,20 @@ def insert(intervals, newInterval):
 # Using For loop
 def insert(intervals, newInterval):
     merged = []
-    i = 0
-
-    while i < len(intervals):
-      if newInterval[0] > intervals[i][1]:
-        merged.append(intervals[i])
-        i += 1
-      elif newInterval[1] >= intervals[i][0]:
-        newInterval[0] = min(newInterval[0], intervals[i][0])
-        newInterval[1] = max(newInterval[1], intervals[i][1])
-        i += 1
-      else:
-        break
+    for interval in intervals:
+        # if the current interval comes before the new interval, add it to the merged intervals
+        if interval[1] < newInterval[0]:
+            merged.append(interval)
+        # if the current interval comes after the new interval, add the new interval to the merged intervals and add the rest of the intervals that come after the new interval
+        elif interval[0] > newInterval[1]:
+            merged.append(newInterval)
+            newInterval = interval
+        # if the current interval overlaps with the new interval, merge them
+        else:
+            newInterval[0] = min(newInterval[0], interval[0])
+            newInterval[1] = max(newInterval[1], interval[1])
 
     merged.append(newInterval)
-    merged += intervals[i:]
     return merged
 ```
 
@@ -2524,9 +2780,9 @@ def insert(intervals, newInterval):
 
 ### Interval List Intersections
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                           |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=3CtoB90-Hwc) | We can use two pointers to keep track of the current intervals in the two lists. We can then check if the current intervals overlap. If they do, we can get the intersection and add it to the result. Then we can move to the next interval that comes first. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=3CtoB90-Hwc) | We can use two pointers to keep track of the current intervals in the two lists. We can then check if the current intervals overlap (by checking if the start time of the first interval is less than or equal to the end time of the second interval **and** the start time of the second interval is less than or equal to the end time of the first interval). If they do, we can get the intersection and append it to the result. Then we can move to the next interval that comes first (by comparing the end times of the two intervals). |
 
 Given two lists of `closed` intervals, each list of intervals is pairwise disjoint and in sorted order. Return the intersection of these two interval lists.
 
@@ -2562,7 +2818,7 @@ def intervalIntersection(firstList, secondList):
             res.append(intersection)
 
         # move to the next interval that comes first
-        if firstList[i][1] < secondList[j][1]:
+        if firstEnd < secondEnd:
             i += 1
         else:
             j += 1
@@ -2573,6 +2829,10 @@ def intervalIntersection(firstList, secondList):
 ---
 
 ### Non-overlapping Intervals
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=nONCGxWoUfM) | Sort intervals by start time. Use prevEnd to track the end of the previous interval. Loop through intervals. If the current start time is less than prevEnd, remove the interval with the larger end time (by setting prevEnd to the min of the two end times) and increment the count. Otherwise, update prevEnd to the current end time. |
 
 Given an array of intervals `intervals` where `intervals[i] = [starti, endi]`, return the **minimum** number of intervals you need to remove to make the rest of the intervals non-overlapping.
 
@@ -2610,7 +2870,11 @@ def eraseOverlapIntervals(intervals):
 
 ### Meeting Rooms
 
-Given an array of meeting time intervals `intervals` where `intervals[i] = [starti, endi]`, determine if a person could attend all meetings.
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=PaJxqZVPhbg) | Sort the intervals by the `start` time. Loop through the sorted intervals and check if the `start` time of the `current` interval is less than the `end` time of the `previous` interval. If it is, then return `False`. If the loop finishes, return `True`. |
+
+Given an array of meeting time intervals `intervals` where `intervals[i] = [start-i, end-i]`, determine if a person could attend all meetings.
 
 - EX: `intervals = [[0,30],[5,10],[15,20]]` --> `false`
 
@@ -2619,9 +2883,11 @@ Given an array of meeting time intervals `intervals` where `intervals[i] = [star
 - **Steps**:
 
   1. Sort the intervals **by the start time**
-  2. Loop through the sorted intervals and check if the `end` time of the `current` interval is greater than the `start` time of the `next` interval. If it is, then return `false`.
+  2. Loop through the sorted intervals and check if the `end` time of the `current` interval is greater than the `start` time of the `next` interval. If it is, then return `False`.
      ![meeting rooms](./img/meeting-rooms-2.png)
-  3. If the loop finishes, return `true`.
+  3. If the loop finishes, return `True`.
+
+- Time complexity: `O(nlogn)` | Space complexity: `O(1)`
 
 ```py
 class Interval(object):
@@ -2647,6 +2913,10 @@ def canAttendMeetings(intervals):
 
 ### Meeting Rooms II
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [Video Solution](https://www.youtube.com/watch?v=FdzJmTCVyJU) | Create and sort two arrays for `start` and `end` times. Iterate over them with two pointers. If `start time` is less than `end time`, allocate a new room and move `start` pointer. If `start` time is greater or equal to `end` time, reuse the room and move both pointers. Return the number of rooms allocated, representing the minimum meeting rooms needed. |
+
 Given an array of meeting time intervals `intervals` where `intervals[i] = [starti, endi]`, return the **minimum** number of conference rooms required to hold all
 the meetings.
 
@@ -2668,6 +2938,8 @@ the meetings.
 
   4. Finally, we return the number of rooms allocated, which represents the minimum number of meeting rooms required to schedule all the meetings.
 
+  - Time complexity: `O(nlogn)` | Space complexity: `O(n)`
+
   ```py
   class Interval(object):
       def __init__(self, start, end):
@@ -2675,9 +2947,6 @@ the meetings.
           self.end = end
 
   def minMeetingRooms(intervals):
-      if not intervals:
-          return 0
-
       # initialize two arrays to keep track of the start times and end times
       start_times = sorted([interval.start for interval in intervals])
       end_times = sorted([interval.end for interval in intervals])
@@ -2768,6 +3037,53 @@ def find_max_cpu_load(jobs):
         max_cpu_load = max(max_cpu_load, current_cpu_load)
 
     return max_cpu_load
+```
+
+---
+
+### Single-Threaded CPU
+
+You are given `n` tasks labeled from `0` to `n - 1` represented by a 2D integer array `tasks`, where `tasks[i] = [enqueueTimei, processingTimei]` means that the `i-th` task will be available to process at `enqueueTimei` and will take `processingTimei` to finish processing.
+
+You have a single-threaded CPU that can process **at most one** task at a time.
+
+Return the **order** in which the tasks should be processed, if `task[i]` is processed before `task[j]`, it becomes available that `task[j]` will be available to process at `enqueueTimej`.
+
+- EX: `tasks = [[1,2],[2,4],[3,2],[4,1]]` --> `[0,2,3,1]`
+  - Explanation:
+    - Tasks 0, 1, 2, and 3 are ordered in terms of processing time.
+    - At time 1, only task 0 is available, so it is processed first.
+    - At time 2, tasks 1 and 2 are available, task 1 is processed next.
+    - At time 3, task 2 is available, and task 3 is available at time 4, so task 2 is processed next.
+    - Task 3 is then processed at time 4.
+
+```py
+def getOrder(tasks):
+    # sort the tasks by the enqueue time
+    tasks.sort(key=lambda x: x[0])
+
+    # initialize a minHeap to store the tasks
+    minHeap = []
+    # add the first task to the minHeap
+    heapq.heappush(minHeap, (tasks[0][1], tasks[0][0], 0)) # (processing_time, enqueue_time, index)
+
+    current_time = 0
+    order = []
+
+    while minHeap:
+        # get the task with the shortest processing time
+        processing_time, enqueue_time, index = heapq.heappop(minHeap)
+
+        # update the current time
+        current_time = max(current_time, enqueue_time) + processing_time
+        # add the index of the task to the order list
+        order.append(index)
+
+        # add the next task to the minHeap
+        if index + 1 < len(tasks):
+            heapq.heappush(minHeap, (tasks[index + 1][1], tasks[index + 1][0], index + 1))
+
+    return order
 ```
 
 ---
@@ -3025,9 +3341,9 @@ Given a matrix of m x n elements (m rows, n columns), return all elements of the
 
 ### Spiral Matrix II
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=RvLrWFBJ9fM) | We can use the same approach as the previous problem, but instead of adding the elements to the result, we can fill the matrix with the elements from `1` to `n^2` in spiral order. We can use the same pointers to keep track of the `top`, `bottom`, `left`, and `right` boundaries of the current cycle. We can use a variable `num` to keep track of the `number` to fill in the matrix with. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=RvLrWFBJ9fM) | We can use the same approach as the previous problem, but instead of adding the elements to the result, we can fill the matrix with the elements from `1` to `n^2` in spiral order. We can use the same pointers to keep track of the `top`, `bottom`, `left`, and `right` boundaries of the current cycle. We can use a variable `num` to keep track of the `number` to fill in the matrix by incrementing it by `1` for each element we add. |
 
 Given a positive integer n, generate an n x n matrix filled with elements from 1 to n^2 in spiral order.
 
@@ -3127,9 +3443,9 @@ def hasWon(board, player):
 
 ### Pascal's Triangle
 
-| Video Solution                                                | Hint                                                                                                                |
-| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=nPVEaB3AjUM) | Initiate 2D array with 1s, then iterate over the rows and calculate the sum of the previous row's adjacent elements |
+| Video Solution                                                | Hint                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=nPVEaB3AjUM) | Initiate 2D array with `1s`, then iterate over the rows starting from the second row and loop through the elements in the current row and calculate the current element using the previous row's elements (`j-1` & `j`) |
 
 Given a non-negative integer `numRows`, generate the first `numRows` of Pascal's triangle.
 
@@ -3220,11 +3536,25 @@ Given an integer `rowIndex`, return the `rowIndexth` (0-indexed) row of the Pasc
           res = curRow
 
       return res
+
+  # or
+
+  def getRow(rowIndex):
+      res = [1] * (rowIndex + 1)
+      for i in range(2, rowIndex + 1):
+          for j in range(1, i):
+              res[i - j] += res[i - j - 1]
+
+      return res
   ```
 
 ---
 
 ### Valid Sudoku
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=TjFXEUCMqI8) | Use 3 `hash maps` to keep track of the digits that have been seen in each `row`, `column`, and `sub-boxes`. each `hash map` will have the digit as a key, and a `set` of the indices of the rows, columns, or sub-boxes that have the digit as a value (for the `sub-boxes`, we can use the formula `box_index = (row / 3) * 3 + columns / 3` to get the index of the sub-boxes). Then we can iterate over the board and check if the current digit has been seen before in the current row, column, or sub-boxes. If the current digit has been seen before, then the board is not valid. Else, we can add the current digit to the set of digits of the current row, column, and sub-boxes. Return `True` at the end. |
 
 Determine if a `9 x 9` Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
 
@@ -3257,12 +3587,15 @@ Note:
   ```
 
 - Explanation:
+
   - There's no algorithm optimization in this problem, we just need to check if the board is valid or not using clear code.
   - We can see that each row, column, and `3x3` sub-boxes of the Sudoku grid contains all the digits from `1` to `9` without repetition.
   - We can use a `hash map` to keep track of the digits that have been seen in each `row`, `column`, and `sub-boxes`.
   - We can use the formula `box_index = (row / 3) * 3 + columns / 3` to get the index of the sub-boxes.
   - We can iterate over the board and check if the current digit has been seen before in the current row, column, or sub-boxes.
     - If the current digit has been seen before, then the board is not valid.
+
+- Time complexity: `O(9 * 9)` --> `O(1)` | Space complexity: `O(9 * 3)` --> `O(1)` **IMPORTANT ⚠️**
 
 ```py
 def isValidSudoku(board):
@@ -3272,22 +3605,24 @@ def isValidSudoku(board):
 
     # or without defaultdict
     # cols = {i: set() for i in range(9)}
+    # rows = {i: set() for i in range(9)}
+    # squares = {(i, j): set() for i in range(3) for j in range(3)}
 
     for r in range(9):
         for c in range(9):
-            if board[r][c] == ".":
-                continue
+          cur = board[r][c]
+            if cur == ".": continue
             if (
-                board[r][c] in rows[r] or
-                board[r][c] in cols[c] or
-                board[r][c] in squares[(r // 3, c // 3)]
+                cur in rows[r] or
+                cur in cols[c] or
+                cur in squares[(r // 3, c // 3)]
             ):
                 return False # means that the board is not valid because the current digit has been seen before
 
             # add the current digit to the set of digits of the current row, column, and sub-boxes
-            cols[c].add(board[r][c])
-            rows[r].add(board[r][c])
-            squares[(r // 3, c // 3)].add(board[r][c])
+            cols[c].add(cur)
+            rows[r].add(cur)
+            squares[(r // 3, c // 3)].add(cur)
 
     return True
 ```
@@ -3295,6 +3630,10 @@ def isValidSudoku(board):
 ---
 
 ### Robot Return to Origin
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=lk5L_GsZFSw) | Start at the origin (initiate 2 variables: `x=0, y=0`), then loop through the moves and update the `x` and `y` coordinates accordingly. If the robot ends up at the origin, then return `True`, else return `False` |
 
 There is a robot starting at position `(0, 0)`, the origin, on a 2D plane. Given a sequence of its moves, judge if this robot **ends up at `(0, 0)`** after it completes its moves.
 

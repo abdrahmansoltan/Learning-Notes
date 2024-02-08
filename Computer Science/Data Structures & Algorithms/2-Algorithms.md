@@ -73,6 +73,7 @@
   - [Two Heaps Technique](#two-heaps-technique)
   - [Backtracking](#backtracking)
     - [Subsets](#subsets)
+      - [Unique subsets from a set with duplicates](#unique-subsets-from-a-set-with-duplicates)
     - [Combinations](#combinations)
     - [Permutations](#permutations)
   - [Matrix graph](#matrix-graph)
@@ -191,6 +192,16 @@ It's a set of instructions to solve a problem/perform a task
       sum += n % 10
       n //= 10 # O(log n) because we're dividing n by 10 in each iteration (reduce the size of the problem by 10 in each iteration)
     return sum
+  ```
+
+  ```js
+  // Time complexity -> O(n log n) (Tricky)
+  for (i = 1; i <= n; i = i + 1) {
+    for (j = 1; j <= n; j = j * 2) {
+      // -> j = j * 2 -> O(log n) ⚠️
+      console.log('Hello World');
+    }
+  }
   ```
 
 - **Notes:**
@@ -2235,10 +2246,12 @@ def topological_sort(graph):
 - Here, we use **PostOrder DFS** traversal, meaning that we assign the order of the nodes after we've visited all of their children/neighbors (as they don't need to be visited in a specific order)
 - when reaching the base-case (leaf node), we add the node to the result
   - **Base-case:** when the node has no children or all of its children have been visited
-- after finishing, we will have the nodes in a reverse order, so we reverse the result to get the correct order
+- after finishing, we will have the nodes in a reverse order (because we're adding the decedents first, then the parent node), so we reverse the result to get the correct order
   ![top sort](./img/top-sort-15.png)
+  ![top sort](./img/top-sort-16.png)
 
 - Time complexity: `O(V + E)`, where `V` is the number of vertices and `E` is the number of edges
+- Space complexity: `O(V)`, where `V` is the number of vertices
 
 ```py
 def topological_sort(graph):
@@ -2249,18 +2262,15 @@ def topological_sort(graph):
     def dfs(node):
         if node in visited:
             return
-
         visited.add(node)
-
         for neighbor in node.neighbors:
             dfs(neighbor)
-
-        result.append(node)
+        result.append(node) # add the node to the result after we've visited all of its children
 
     for node in graph.nodes:
         dfs(node)
 
-    return result[::-1]
+    return result[::-1] # reverse the result to get the correct order
 
 # OR
 
@@ -2275,18 +2285,48 @@ def topological_sort(edges, n):
     for src, dst in edges:
         adj[src].append(dst)
 
-    for i in range(1, n + 1):
-        dfs(i, adj, visited, result)
-    return result[::-1]
+    def dfs(node):
+        if node in visited:
+            return
+        visited.add(node)
+        for neighbor in adj[node]:
+            dfs(neighbor)
+        result.append(node) # add the node to the result after we've visited all of its children
 
-def dfs(node, adj, visited, result):
-    if node in visited:
-        return
-    visited.add(node)
-    for neighbor in adj[node]:
-        dfs(neighbor, adj, visited, result)
-    result.append(node)
+
+    for i in range(1, n + 1):
+        dfs(i)
+
+    return result[::-1] # reverse the result to get the correct order
 ```
+
+- To handle case if it wasn't given whether the graph has cycle or not, we need to use another `hash set` for the `current_path`, and if a cycle is found, we return `False`
+
+  ```py
+  def topological_sort(graph):
+      result = []
+      visited = set()
+      current_path = set()
+
+      def dfs(node):
+          if node in current_path:
+              return False
+          if node in visited:
+              return
+          current_path.add(node)
+          for neighbor in node.neighbors:
+              if not dfs(neighbor):
+                  return False
+          current_path.remove(node)
+          visited.add(node)
+          result.append(node)
+
+      for node in graph.nodes:
+          if not dfs(node):
+              return None
+
+      return result[::-1]
+  ```
 
 ---
 
@@ -2299,7 +2339,7 @@ The Union Find data structure allows us to **detect a cycle in an undirected gra
 - It's used in trees, and graphs
 - It can deal with **disjoint sets** (sets that have no elements in common) -> Disconnect components in a graph
   - a set is represented by a connected graph (each node in the graph is connected to at least one other node in the graph)
-  ![union-find](./img/union-find-1.png)
+    ![union-find](./img/union-find-1.png)
 - It works as a **Forest of Trees**
   ![union-find](./img/union-find-2.png)
   - Each node is a tree, and each tree is a set
@@ -2371,14 +2411,14 @@ class UnionFind:
 It's a technique that uses 2 heaps to solve problems. It's used to find the **median** of a list of numbers.
 
 - It's used in problems where data is not given upfront, but instead, it's given incrementally in a **stream of data**.
-  - The naive approach is to sort the list of numbers and then find the median, but it takes `O(n.log(n))` time.
-  - Instead, we can use `Two Heaps` to find the median in `O(log(n))` time.
+  - Because if we have all the data upfront, we can just sort it and find the median in `O(n.log(n))` time.
+  - Instead, we can use `Two Heaps` to find the median in `O(log(n))` time. We use `heaps` because they allow us to insert and remove elements in `O(log(n))` time **(insert elements as we get them, and remove elements as we process them)**
 - It's based on the fact that we can divide a list of numbers into 2 halves, the `left` half and the `right` half, and the `median` is the middle number of the list.
 - We can use 2 `heaps` to keep track of the `left` half and the `right` half of the list.
   ![two heaps](./img/two-heaps-1.png)
-  - `left` heap will be a `max heap` that contains the `left` half of the list (smaller numbers)
-  - `right` heap will be a `min heap` that contains the `right` half of the list (larger numbers)
-- Now, Each time we insert an element, we need to maintain the balance between the 2 heaps, so that the `median` is always the root of the `left` heap.
+  - `left` heap will be a `max heap` that contains the `left` half of the list **(smaller numbers)**
+  - `right` heap will be a `min heap` that contains the `right` half of the list **(larger numbers)**
+- Now, Each time we insert an element, we need to **maintain the balance between the 2 heaps**, so that the `median` is always the root of the `left` heap.
 
   ```py
   len(leftHeap) <= len(rightHeap) + 1
@@ -2400,6 +2440,7 @@ It's a technique that uses 2 heaps to solve problems. It's used to find the **me
   - If the number is smaller than the `median`, then we insert it into the `left` heap
   - If the number is larger than the `median`, then we insert it into the `right` heap
   - If the number is equal to the `median`, then we insert it into the `left` heap
+  - Example:
     ![two heaps](./img/two-heaps-2.png)
     ![two heaps](./img/two-heaps-3.png)
     ![two heaps](./img/two-heaps-4.png)
@@ -2424,7 +2465,7 @@ class Median:
         else:
             heappush(self.rightHeap, num)
 
-        # balance the heaps
+        # Balance the heaps (Handle uneven sizes)
         if len(self.leftHeap) > len(self.rightHeap) + 1:
             heappush(self.rightHeap, -heappop(self.leftHeap))
         elif len(self.rightHeap) > len(self.leftHeap) + 1:
@@ -2436,8 +2477,8 @@ class Median:
             return -self.leftHeap[0]
         elif len(self.rightHeap) > len(self.leftHeap):
             return self.rightHeap[0]
-        # even number of elements
         else:
+            # even number of elements -> return the average of the roots of the 2 heaps
             return (-self.leftHeap[0] + self.rightHeap[0]) / 2
 ```
 
@@ -2467,7 +2508,7 @@ It's a technique that uses recursion to try all possible solutions to a problem 
 
 **Subset** is a set that contains all the elements of another set, and it can also contain none of the elements of that set.
 
-- Subsets are unique, meaning that we can't have 2 subsets that are the same like `[1, 2]` and `[2, 1]`
+- **Subsets are unique**, meaning that we can't have 2 subsets that are the same like `[1, 2]` and `[2, 1]`
   - This would be called **Permutations**
 - To create the decision tree, we will iterate over the elements of the set and make a decision whether to include the element in the subset or not. Then we will make another decision, and so on until we reach a solution.
   ![backtracking](./img/backtracking-2.png)
@@ -2476,6 +2517,7 @@ It's a technique that uses recursion to try all possible solutions to a problem 
 
   - The number of subsets is `2^n`, where `n` is the number of elements in the set. This is because each element has `2` choices, either to include it in the subset or not.
   - So, the time complexity is `O(n * 2^n)`
+    - `O(n)`: for the `for loop` on the elements of the input using the `index` in the `helper` function
   - Space complexity is `O(n)`
 
 - Recursive Code:
@@ -2483,62 +2525,54 @@ It's a technique that uses recursion to try all possible solutions to a problem 
   ```py
   def subsets(nums):
       subsets = []
-      curSet = []
-      helper(0, nums, curSet, subsets)
-      return subsets
+      def dfs(i, curSet):
+          # base case
+          if i == len(nums):
+              subsets.append(curSet[:]) # copy of the current subset
+              # or subsets.append(curSet.copy())
+              return
 
-  def helper(i, nums, curSet, subsets):
-      # base case
-      if i == len(nums):
-          subsets.append(curSet[:])
-          return
+          # include the current element
+          dfs(i + 1, curSet + [nums[i]])
+          # exclude the current element
+          dfs(i + 1, curSet)
 
-      # include the current element
-      helper(i + 1, nums, curSet + [nums[i]], subsets)
-      # exclude the current element
-      helper(i + 1, nums, curSet, subsets)
-  ```
-
-- Iterative Code:
-
-  ```py
-  def subsets(nums):
-      subsets = [[]]
-      for num in nums:
-          for i in range(len(subsets)):
-              subsets.append(subsets[i] + [num])
+      dfs(0, [])
       return subsets
   ```
 
-- If the problem says that the `nums` has no duplicates **(not distinct)**, then we should do some steps before we start the recursion:
+#### Unique subsets from a set with duplicates
+
+- If the problem says that the `nums` has duplicates and we should return all (distinct / unique) subsets, then we should do some steps before we start the recursion:
 
   - sort the `nums` array
-  - skip the duplicates when we're iterating over the `nums` array
+  - skip the duplicates when we're iterating over the `nums` array in the recursive call where we don't include the current element
+    ![backtracking](./img/backtracking-8.png)
+  - We skip the duplicates by incrementing the `index` until we reach the last duplicate, this is because the array was sorted, so the duplicates will be next to each other
+    ![backtracking](./img/backtracking-9.png)
+    - Here, `2` is duplicated 2 times, so we skip both of them, this is because:
+      - In the green path, we will have all the subsets that contain all the occurrences of the `2` (including the duplicates)
+      - In the red path, we will have all the subsets that don't contain any occurrence of the `2` (including the duplicates)
 
-  ```py
-  def subsets(nums):
-      subsets = []
-      curSet = []
-      nums.sort()
-      helper(0, nums, curSet, subsets)
-      return subsets
+```py
+def subsets(nums):
+    subsets = []
+    def dfs(i, curSet):
+        if i == len(nums):
+            subsets.append(curSet[:])
+            return
 
-  def helper(i, nums, curSet, subsets):
-      # base case
-      if i == len(nums):
-          subsets.append(curSet[:])
-          return
+        # include the current element
+        dfs(i + 1, curSet + [nums[i]])
+        # skip the duplicates
+        while i + 1 < len(nums) and nums[i] == nums[i + 1]:
+            i += 1
+        # exclude the current element
+        dfs(i + 1, curSet)
 
-      # include the current element
-      helper(i + 1, nums, curSet + [nums[i]], subsets)
-
-      # skip the duplicates
-      while i + 1 < len(nums) and nums[i] == nums[i + 1]:
-          i += 1
-
-      # exclude the current element
-      helper(i + 1, nums, curSet, subsets)
-  ```
+    dfs(0, [])
+    return subsets
+```
 
 ---
 
@@ -2549,66 +2583,66 @@ It's a technique that uses recursion to try all possible solutions to a problem 
 - Usually when we want combinations, we want them to be of a specific size `k` and not all the possible combinations.
 - There're 2 implementations:
 
-1. Get all the subsets, then stop when we reach the subsets of size `k`
-   ![backtracking](./img/backtracking-4.png)
+1. Get all the subsets, then stop when we reach the subsets of size `k` (Good enough for interviews ✅)
 
-   - Time complexity: `O(k * 2^n)` -> `O(2^n)`
-   - Space complexity: `O(n)`
+   - For each element, we make 2 decisions, either to include it in the subset or not
+     ![backtracking](./img/backtracking-4.png)
+
+     - This will create a decision tree of all the possible combinations
+     - Then we traverse the tree to find the combinations of size `k`
+     - We stop when we reach the combinations of size `k`
+
+     ```py
+     def combinations(n, k):
+       combs = []
+       def dfs(i, curComb):
+           # base case
+           if len(curComb) == k:
+               combs.append(curComb[:]) # or curComb.copy()
+               return
+           if i > n: return
+
+           # include the current element
+           dfs(i + 1, curComb + [i])
+           # exclude the current element
+           dfs(i + 1, curComb)
+
+       dfs(1, [])
+       return combs
+     ```
+
    - The issue here is that we're creating all the subsets, which is not necessary (like the empty subsets for not including any element)
-
-   ```py
-    def combinations(n, k):
-      combs = []
-      helper(1, [], combs, n, k)
-      return combs
-
-    def helper(i, curComb, combs, n, k):
-      # base cases
-      if len(curComb) == k:
-        combs.append(curComb[:])
-        return
-
-      if i > n:
-        return
-
-      # include the current element
-      helper(i + 1, curComb + [i], combs, n, k)
-      # exclude the current element
-      helper(i + 1, curComb, combs, n, k)
-
-   ```
+     - Time complexity: `O(k * 2^n)` -> `O(2^n)`
+       - `k` is the size of the combination
+       - `2^n` is the number of combination, we're branching 2 times for each element
+     - Space complexity: `O(n)`
 
 2. More efficient implementation:
+
    - using `looping` to create the decision tree by iterating over the elements of the set and make a decision whether to include the element in the subset or not. Then we will make another decision, and so on until we reach a solution.
      ![backtracking](./img/backtracking-5.png)
-   - Time complexity: `O(k * c(n, k))` -> `O(c(n, k))`
-   - Space complexity: `O(n)`
 
-```py
-def combinations(n, k):
-    combs = []
-    helper(1, [], combs, n, k)
-    return combs
+     ```py
+     def combinations(n, k):
+           combs = []
+           def dfs(i, curComb):
+               if len(curComb) == k:
+                   combs.append(curComb[:]) # or curComb.copy()
+                   return
+               if i > n: return
 
-def helper(i, curComb, combs, n, k):
-    # base cases
-    if len(curComb) == k:
-        combs.append(curComb[:])
-        return
+               for j in range(i, n + 1):
+                   dfs(j + 1, curComb + [j])
 
-    if i > n:
-        return
+           dfs(1, [])
+           return combs
+     ```
 
-    for j in range(i, n + 1):
-        # include the current element in the current combination
-        curComb.append(j)
-        helper(j + 1, curComb, combs, n, k)
-        # exclude the current element for future iterations
-        curComb.pop()
-
-        # or
-        # helper(j + 1, curComb + [j], combs, n, k)
-```
+   - This is more efficient because we're not creating all the subsets, we're just creating the subsets of size `k`
+     - Time complexity: `O(k * c(n, k))` -> `O(c(n, k))`
+       - `k` is the size of the combination
+       - `c(n, k)` is the number of combination
+     - Space complexity: `O(n)`
 
 ---
 
@@ -2625,11 +2659,13 @@ def helper(i, curComb, combs, n, k):
   - `{3, 1, 2}`
   - `{3, 2, 1}`
 
-- As the order matters, so we can't have 2 permutations that are the same like `[1, 2]` and `[2, 1]`, this will limit the number of permutations to `n!`
-  ![backtracking](./img/backtracking-6.png)
+- Unlike `Combinations`, where we choose to include or exclude an element, in `Permutations`, we always include the element, but we choose the position of the element in the permutation.
+  - As the order matters, so we can't have 2 permutations that are the same like `[1, 2]` and `[2, 1]`, this will limit the number of permutations to `n!`
+    ![backtracking](./img/backtracking-6.png)
+    ![backtracking](./img/backtracking-6-1.png)
 - If a set has ‘n’ distinct elements it will have `n!` permutations.
 
-- Recursive implementation:
+- Recursive implementation ✅:
 
   - Time complexity: `O(n^2 * n!)` -> `O(n!)`
     - `n^2` is the time complexity of `curPerm[:j] + [nums[i]] + curPerm[j:]` (inserting at a specific index in a list)
@@ -2638,23 +2674,22 @@ def helper(i, curComb, combs, n, k):
 
   ```py
   def permutations(nums):
-      return helper(0, nums)
+      perms = []
+      def dfs(i, curPerm):
+          # base case
+          if i == len(nums):
+              perms.append(curPerm[:]) # or curPerm.copy()
+              return
 
-  def helper(i, nums):
-      # base case
-      if i == len(nums):
-          return [[]] # return an empty permutation
+          # choosing the position of the element in the permutation
+          for j in range(len(curPerm) + 1):
+              dfs(i + 1, curPerm[:j] + [nums[i]] + curPerm[j:])
 
-      resPerm = []
-      for perm in helper(i + 1, nums):
-          # insert the current element in all the possible positions of the permutations
-          for j in range(len(perm) + 1):
-              resPerm.append(perm[:j] + [nums[i]] + perm[j:])
-
-      return resPerm
+      dfs(0, [])
+      return perms
   ```
 
-- Iterative implementation:
+- Iterative implementation ❌:
 
   - Same time and space complexity as the recursive implementation
   - simpler implementation

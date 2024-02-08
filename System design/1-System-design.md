@@ -4,33 +4,26 @@
   - [System Design](#system-design)
     - [Goal of system design](#goal-of-system-design)
     - [System design core principles](#system-design-core-principles)
-    - [Important concepts](#important-concepts)
   - [Browser / Client](#browser--client)
   - [DNS](#dns)
   - [CDN](#cdn)
+    - [CDN Types](#cdn-types)
+    - [Edge servers](#edge-servers)
   - [Web Server](#web-server)
   - [Proxies](#proxies)
     - [Forward Proxy](#forward-proxy)
     - [Reverse Proxy](#reverse-proxy)
   - [Load Balancer](#load-balancer)
+    - [Load Balancer Types](#load-balancer-types)
     - [Load balancer distribution strategies](#load-balancer-distribution-strategies)
-    - [Consistent Hashing](#consistent-hashing)
     - [Session Persistence](#session-persistence)
   - [Clustering](#clustering)
   - [Data Source](#data-source)
   - [Jobs](#jobs)
     - [Job server](#job-server)
-    - [Job Queue](#job-queue)
+    - [Job Queue (Message Queue)](#job-queue-message-queue)
   - [Services](#services)
   - [Monitoring](#monitoring)
-  - [Networking](#networking)
-    - [OSI Model](#osi-model)
-    - [TCP/IP](#tcpip)
-    - [UDP](#udp)
-    - [Public vs Private IP](#public-vs-private-ip)
-    - [Ports](#ports)
-  - [System Design Interview](#system-design-interview)
-  - [System Design Questions](#system-design-questions)
 
 ---
 
@@ -52,7 +45,15 @@
     - in the cloud -> `Database` to `Cloud Storage`
   - **Process Data**: how to process & transform data
 
-- Bad design choices are hard to change later. so, we need to make sure that we make the right design choices from the beginning.
+- Good design choices are based on observations of how the system will be used and how it will be affected by external factors and constraints.
+  - EX: We have large number of users, and the server (computer) can't handle the requests. We can solve this by determining the **bottleneck** first. and then we can solve it by:
+    ![System Design](./img/system-design-2.png)
+    - checking if it's a `CPU` problem or a `RAM` problem or a `Disk` problem -> we can add more resources to the server. -> **Vertical Scaling**
+    - checking if it's a resources limitation -> we can add more servers. -> **Horizontal Scaling** which will require a **Load Balancer** to distribute the traffic between the servers.
+    - checking if it's a `Database` problem -> we can add a `Caching Service` to cache the data. -> **Caching**
+    - Needing to monitor the system -> we can add a `Monitoring Service` to monitor the system and store the `logs` for any activities. -> **Monitoring logs**
+    - Needing to check if something is not working correctly (lower than threshold) -> we can add a **Metrics service** and **Alerts service** to notify the system admin if there's a problem in the system.
+- Bad design choices are hard to change / correct later. so, we need to make sure that we make the right design choices from the beginning.
   - Ex: choosing the wrong database, means that we'll have to change the entire system later by:
     - changing the database
     - migrating the data to the new database
@@ -65,10 +66,35 @@
 
 As you go up in seniority, you'll be expected to be able to design systems that are **scalable**, **reliable**, **highly available**, **secure**, **maintainable**, etc.
 
-- Usually, we won't have the prefect solution, but we need to figure out which option is the best. by trading off between the different options.
-  - > So system design is not about memorizing some facts. instead, it's about the **Thought process** by analyzing what improvements can be made and sacrifices can be made to make the system better.
-- When you're junior, mid-level, or early senior, you'll usually interact with **Low-level** code. like: **"Business logic"**, **"Application logic"**, **"Database"**, **"CI/CD"**, **"Dockers"**, **"Kubernetes"**, etc.
-- But when you're senior, you'll usually interact with **High-level** code. like: **"System design"**, **"Architecture"**, **"Data modeling"**, **"Microservices"**, **"Scalability"**, **"Reliability"**, **"High availability"**, **"Security"**, **"Maintainability"**, etc.
+- Usually, we won't have the prefect solution, but we need to figure out which option is the best. by **trading off** between the different options.
+
+> So system design is not about memorizing some facts. instead, it's about the **Thought process** by analyzing what improvements can be made and sacrifices can be made to make the system better.
+
+- Design Requirements:
+
+  - Move Data -> `Client` to `Server` or between `Servers` and `Databases` and `services`.
+  - Store Data -> `Database` to `Caching Service` or `Cloud Storage`.
+  - Process / Transform Data -> For example aggregating data from multiple sources to get a percentage of something for different metrics.
+
+- When you're junior, mid-level, or early senior, you'll usually interact with **Low-level** code. like:
+  - "Business logic"
+  - "Application logic"
+  - "Database"
+  - "CI/CD"
+  - "Dockers"
+  - "Kubernetes"
+  - etc
+- But when you're senior, you'll usually interact with **High-level** code. like:
+  - "System design"
+  - "Architecture"
+  - "Data modeling"
+  - "Microservices"
+  - "Scalability"
+  - "Reliability"
+  - "High availability"
+  - "Security"
+  - "Maintainability"
+  - etc
 
 ---
 
@@ -84,38 +110,51 @@ As you go up in seniority, you'll be expected to be able to design systems that 
     - downtime `1% -> 0.1%` -> availability `99% -> 99.9%`
     - downtime `0.1% -> 0.01%` -> availability `99.9% -> 99.99%`
     - downtime `0.01% -> 0.001%` -> availability `99.99% -> 99.999%`
+  - Notice that the improvement in downtime is huge going from `1%` to `0.1%`. but, the improvement in availability is small going from `99%` to `99.9%`. That's why we use **"The nines of availability"** to measure the availability of a system.
 
-- **Reliability**: the system should be reliable. (no data loss or crashes)
+- **Reliability**: the system should be reliable. (no data loss or crashes or system failures).
   ![Reliability](./img/reliability-1.png)
   ![Reliability](./img/reliability-2.png)
 
   - Usually we want to figure out if the system is reliable to perform its functionality without errors.
-    - we do this by reducing the amount of errors. Or increasing the mean time between failures (`MTBF`).
+  - we do this by reducing the amount of errors. Or increasing the mean time between failures (`MTBF`). This can be done by `horizontal scaling` as if one server is down, the other servers will handle the requests.
+    ![Reliability](./img/reliability-3.png)
 
-- **Service level objective (SLO)**: is a target value or range of values for a service level that is measured by a service level indicator. (it's a way to measure the availability and reliability of a system).
-- **Service level indicator (SLI)**: is a **measure** of **reliability** and **availability** of a system. (it's a way to measure the availability and reliability of a system).
-  - Ex: `CPU`, `RAM`, `Disk`, `Network`, etc.
-- **Service level agreement (SLA)**: is a **commitment** between a **service provider** and a **client**. (it's a way to measure the availability and reliability of a system).
-  - It's usually a **contract** between the **service provider** and the **client**. (it's a way to measure the availability and reliability of a system).
-
----
-
-### Important concepts
-
-- **Latency**: the time it takes for a request to go from the client to the server and back.
-  - it can be caused by: `network`, `server`, `database`, `caching service`, etc.
 - **Single point of failure**: a component that if it fails, the entire system will fail.
   ![Single point of failure](./img/single-point-of-failure.png)
+  - It happens when we have a single component that if it fails, the entire system will fail. So, we need to make sure that we don't have a single point of failure. by adding a redundant backup component (server, database, etc).
 - **Fault tolerance**: the ability of a system to continue operating even if there's a failure in one of its components.
   - It's related to **Reliability**
 - **Redundancy**: having multiple components that do the same thing. (having a backup component).
   - It's related to **Reliability**
 - **Throughput**: the amount of operations or data that can be processed (handle) in a period of time.
+
   - ex:
     - how many users can the system handle in second (`requests per second`).
     - how many queries can the database handle in second (`queries per second`).
-    - data transfer rate (`bits per second`).
+    - data transfer rate (`bytes per second`).
   - It's related to **Scalability**
+
+- **Latency**: the time it takes for a request to go from the client to the server and back.
+  ![Latency](./img/latency-1.png)
+
+  - We calculate it from the **User's perspective**.
+    - as the user doesn't care about the internal components. instead, the user cares about the time it takes for the request to go from the client to the server and back.
+  - it can be caused by: `network`, `server`, `database`, `caching service`, etc.
+  - It can be improved by:
+    - caching -> `caching service`
+    - CDN -> to cache the data closer to the client.
+    - Load Balancer -> to distribute the traffic between the servers.
+
+- **Service Level**
+  ![Service Level](./img/service-level-1.png)
+
+  - **Service level objective (SLO)**: is a target value or range of values for a service level that is measured by a service level indicator. (it's a way to measure the `availability` and `reliability` of a system).
+  - **Service level indicator (SLI)**: is a **measure** of **reliability** and **availability** of a system. (it's a way to measure the availability and reliability of a system).
+  - Ex: `CPU`, `RAM`, `Disk`, `Network`, etc.
+  - **Service level agreement (SLA)**: is a **commitment** between a **service provider** and a **client**. (it's a way to measure the availability and reliability of a system).
+
+    - It's usually a **contract / agreement** between the **service provider** and the **client**.
 
 ---
 
@@ -139,6 +178,7 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 **DNS** is a **Domain Name System**. It's a **phone book** for the internet. It's a **distributed database** that translates **domain names** to **IP addresses**.
 
 - usually a website has multiple servers, and each server has a different IP address. So, when a user types a domain name in the browser, the browser sends a request to the DNS server to get the IP address of the server that has the website.
+  - After the browser gets the IP address (after DNS query), it will **cache** it for a period of time. So, the next time the user types the domain name, the browser will use the cached IP address instead of sending a request to the DNS server.
 - IP address from the DNS has multiple formats:
   - `IPv4`: 4 numbers separated by dots. each number has max of `255` numbers.
     - `69.63.176.13`
@@ -146,26 +186,75 @@ As you go up in seniority, you'll be expected to be able to design systems that 
     - `2001:0db8:85a3:0000:0000:8a2e:0370:7334`
     - It was created to solve the problem of IPv4 addresses running out. as `IPv4` has only `4` billion addresses. and `IPv6` has `340` undecillion addresses.
 - DNS handles which `IP` address type to use. by default, it uses `IPv4`. but, if the server has `IPv6` address, it will use it instead.
+- The Domain consist of:
+  - `www`: subdomain
+  - `google`: domain
+  - `com`: top-level domain
+  - `www.google.com`: fully qualified domain name (FQDN) ✅
+- There're organizations that are responsible for managing the DNS servers. like: `ICANN`
+- There're re-sellers that are responsible for selling the domain names. like: `GoDaddy`, `Namecheap`, etc.
 
 ---
 
 ## CDN
 
-**CDN** is a **Content Delivery Network**. It's a network of servers that distributes the content to the client. It's a way that we can cache data closer to the client so that we don't have to send requests across the world.
+**CDN** is a **Content Delivery Network**. It's a network of servers that distributes the content to the client. It's our best options to minimize the latency in request-response by fetching the assets from a nearby server.
 
-- It's goal is to bring the content closer to the client.
+![CDN](./img/cdn-0.png)
+
+- It's goal is to bring the content closer to the client so that:
+  - we will lower the demand / hits on the server.
+  - we will decrease the latency.
+  - we will increase the availability. (because if one of the `CDNs` goes down, the other `CDNs` will handle the requests).
 - It holds the files that you want to serve to the client, to prevent the client from requesting the files from the server directly in case the files are already cached in the CDN.
-- It uses **"Edge servers"** to store the files. and it uses **"Load Balancer"** to distribute the traffic between the servers.
 
-  - Without `edge servers`, the client will have to request the files from the server directly. and it will result in a high latency ❌.
-    ![CDN](./img/cdn-1.png)
-  - With `edge servers`, the client will request the files from the `edge server`. and it will result in a low latency ✅.
-    ![CDN](./img/cdn-2.png)
+  - Assets like: `images`, `videos`, `CSS`, `JS`, etc.
+
+- Unless the code / assets in the `edge server` are not updated, the `CDN` will serve the files to the client
+
+  - if the files are updated, the `CDN` will request the files from the server. and then it will cache the files in the `CDN / edge server` and serve the files to the client.
 
 - Using a CDN may result additional complexity and cost.
   - as we need to make sure that the files are up to date. and we need to make sure that the files are cached in the CDN. and we need to make sure that the files are cached in the correct `edge server`. and we need to make sure that the files are cached in the correct region. etc.
   - also, we need to pay for the CDN service.
 - It's recommended to only use a CDN when the website has a high traffic and global distribution.
+
+---
+
+### CDN Types
+
+- **Push CDN**:
+
+  - On any update, the origin server automatically pushes the files to every CDN. and then the CDN will be always ready to serve the files to the client.
+    ![CDN](./img/cdn-3.png)
+  - Steps:
+    1. The origin server pushes the files to the CDN on any update. (push)
+    2. The CDN caches the files.
+    3. The client requests the files from the CDN (Hits the CDN).
+    4. The CDN serves the files to the client.
+
+- **Pull CDN**:
+  - On any update, the origin server doesn't push the files to the CDN. instead, the CDN will request the files from the origin server if the client requests the files. So, the CDN will only request the files from the origin server if the files are not cached in the CDN.
+    ![CDN](./img/cdn-4.png)
+  - Steps:
+    1. The client requests the files from the CDN (Hits the CDN).
+    2. The CDN checks if the files are cached in the CDN.
+    3. If the files are cached in the CDN, the CDN will serve the files to the client.
+    4. If the files are not cached in the CDN (cache miss), the CDN will request the files from the origin server. (pull)
+  - Here, we won't need to push the files to all the CDNs. as the update file might not be requested by clients in other regions. So, we will only push the files to the CDN that is requested by the client.
+
+---
+
+### Edge servers
+
+- It uses **"Edge servers"** to store the files. and it uses **"Load Balancer"** to distribute the traffic between the servers.
+
+  - Without `edge servers / CDN`, the client will have to request the files from the server directly. and it will result in a high latency ❌.
+    ![CDN](./img/cdn-1.png)
+  - With `edge servers / CDN`, the client will request the files from the `edge server`. and it will result in a low latency ✅.
+    ![CDN](./img/cdn-2.png)
+
+  > Note that `edge servers` are not the same as `CDN`. as `edge servers` are just a part of the `CDN`. and have the ability to run code, unlike `CDN` which only contains **static files**.
 
 ---
 
@@ -210,10 +299,15 @@ As you go up in seniority, you'll be expected to be able to design systems that 
     - `proxy` and `internet`
   - This way the client won't directly access the internet. instead, it will access it through the proxy.
 - It's on the `client` side. and it's usually used for security reasons.
-- The proxy can:
-  - **hide** the `client` IP address ( client's details ) from the `internet`.
+- The forward proxy can:
+  - **hide** the `client` IP address ( client's details / Source ) from the `internet`.
   - modify the request before sending it to the `internet`.
   - block certain websites.
+- It's used in:
+  - VPNs.
+  - corporate networks.
+  - schools.
+  - etc.
 
 ---
 
@@ -225,14 +319,19 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 - It acts as an **entry point** to the system.
   - It receives the request from the `internet` before it reaches the `server`. and then it forwards the request to the `server`.
 - It can:
-  - **hide** the `server` details from the `internet`. as the `internet` will only see the `proxy` IP address.
+  - **hide** the `server` (destination) details from the `internet`. as the `internet` will only see the `proxy` IP address.
 - It's very similar to the **Load Balancer**. but, it's not the same.
+
   - **Load Balancer** is used to distribute the traffic between the servers.
-    - > in fact, many **Load Balancers** are also **Reverse Proxies**. like: `Nginx`, `HAProxy`, etc.
+    - in fact, many **Load Balancers** are also **Reverse Proxies**. like: `Nginx`, `HAProxy`, etc.
   - **Reverse Proxy** is used to hide the `server` details from the `internet`.
     - when using a **Reverse Proxy** also as a **Load Balancer**, we get best of both worlds. as we get the **Load Balancer** functionality and the **Reverse Proxy** functionality like:
       - caching.
       - compression.
+
+- It's used as:
+  - `CDN`, where it caches the files and serves them to the client on behalf of the server.
+  - Load Balancer, where it distributes the traffic between the servers.
 
 ---
 
@@ -253,17 +352,6 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 - Usually to prevent breaking the entire system if the **Load Balancer** is down, we use a redundant backup load balancer
   ![Load Balancer](./img/load-balancer-8.png)
 
-- There's multiple types of **Load Balancers**:
-
-  - **Layer 4 Load Balancer**: it's a **TCP Load Balancer**. it's used to distribute the traffic based on the `IP address` and the `port number`.
-    - It's faster than the **Layer 7 Load Balancer**. as it doesn't need to look at the `URL` and the `HTTP headers` and only looks at the `IP address` and the `port number`.
-  - **Layer 7 Load Balancer**: it's an **Application layer (HTTP Load Balancer)**. it's used to distribute the traffic based on the `URL` and the `HTTP headers`.
-    - It's more advanced than the **Layer 4 Load Balancer**. as it can distribute the traffic based on the `URL` and the `HTTP headers`.
-      - it establishes connections using the `URL` and the `HTTP headers`. So it's more expensive.
-    - It's usually used for **HTTP** and **HTTPS** traffic.
-    - It's slower than the **Layer 4 Load Balancer**. as it needs to look at the `URL` and the `HTTP headers` and not only the `IP address` and the `port number`.
-    - It just **forwards** the request to the server. So it's cheap.
-
 - Most common **Load Balancers** are:
   - `Nginx` -> Open source (free)
   - `HAProxy`
@@ -271,6 +359,22 @@ As you go up in seniority, you'll be expected to be able to design systems that 
   - `AWS ELB`
   - `Azure Load Balancer`
   - `Google Cloud Load Balancer`
+
+---
+
+### Load Balancer Types
+
+There's multiple types of **Load Balancers**:
+
+- **Layer 4 Load Balancer**: it's a **TCP Load Balancer**. it's used to distribute the traffic based on the `IP address` and the `port number`.
+  - It's faster than the **Layer 7 Load Balancer**. as it doesn't need to look at the `URL` and the `HTTP headers` and only looks at the `IP address` and the `port number`.
+- **Layer 7 Load Balancer**: it's an **Application layer (HTTP Load Balancer)**. it's used to distribute the traffic based on the `URL` and the `HTTP headers`.
+
+  - It's more advanced than the **Layer 4 Load Balancer**. as it can distribute the traffic based on the `URL` and the `HTTP headers`.
+    - it establishes connections using the `URL` and the `HTTP headers`. So it's more expensive.
+  - It's usually used for **HTTP** and **HTTPS** traffic.
+  - It's slower than the **Layer 4 Load Balancer**. as it needs to look at the `URL` and the `HTTP headers` and not only the `IP address` and the `port number`.
+  - It just **forwards** the request to the server. So it's cheap.
 
 ---
 
@@ -283,25 +387,28 @@ As you go up in seniority, you'll be expected to be able to design systems that 
     ![Load Balancer](./img/load-balancer-4.png)
     - This is an issue because often the servers have different resources and capabilities. So, it's not a good idea to send the same amount of traffic to each server.
 - **Weighted Round Robin**:
-  - Here, we assign a `weight` to each server. and the `weight` is based on the server's resources and capabilities ( The higher the number, the higher the resources ).
+  - Here, we assign a `weight` to each server. and the `weight` is based on the server's resources and capabilities ( The higher the weight-number, the higher the resources ).
     ![Load Balancer](./img/load-balancer-5.png)
 - **Least Connections**:
-  - It sends the request to the server that has the least connections.
+
+  - It sends the request to the server that has the least connections (least current load).
   - It depends on `sessions` or how many requests are being processed by the server. and it's usually used for **long-lived connections**. like: `WebSockets`, `HTTP Streaming`, etc.
     ![Load Balancer](./img/load-balancer-6.png)
     ![Load Balancer](./img/load-balancer-7.png)
 
----
+- **Consistent Hashing** is a way to distribute the traffic based on the `URL` or the `IP address`.
 
-### Consistent Hashing
+  - For example a client with `IP = 6` and if we have `3` servers. then, we can use the `IP` to distribute the traffic between the servers. as we can use the `IP` to get a number between `0` and `3`. and then we can send the traffic to the server that has the same number.
+    ![Load Balancer](./img/conssistent-hashing-1.png)
 
-**Consistent Hashing** is a way to distribute the traffic based on the `URL` or the `IP address`.
+    - `IP = 6` -> `6 % 3 = 0` -> `server 0`
+    - `IP = 7` -> `7 % 3 = 1` -> `server 1`
+    - `IP = 8` -> `8 % 3 = 2` -> `server 2`
 
-![Load Balancer](./img/conssistent-hashing-1.png)
-
-- This way, we can send the traffic to the same server. and it's usually used for servers with `caching` or `in-memory caching`.
-- Hashing Algorithm
-  ![Load Balancer](./img/conssistent-hashing-2.png)
+  - This way, we can send the traffic from the same client (same IP) to the same server. and it's usually used for servers with `caching` or `in-memory caching` (like: `Redis`) -> **stateful servers**.
+  - Hashing Algorithm
+    ![Load Balancer](./img/conssistent-hashing-2.png)
+  - It's used to **maintain persistent connection between the same client and the server**. as the client will always send the request to the same server.
 
 ---
 
@@ -381,14 +488,22 @@ As you go up in seniority, you'll be expected to be able to design systems that 
 
 ---
 
-### Job Queue
+### Job Queue (Message Queue)
 
-**Job Queue** is a way to **queue** the **jobs**. (way to know how job servers should execute the jobs).
+**Job Queue** is a way to **queue** the **jobs / messages**. (way to know how job servers should execute the jobs).
 
 > It's also known as **"Message Queue"**
 
-- When we have a large number of application events in a fast-paced that the `server` can't handle. we can use a `job queue` to queue the jobs. and then the `job server` will execute the jobs later.
+- When we have a large number of `application events` in a fast-paced that the `server` can't handle. we can use a `message queue` to queue the jobs. and then the `server` will execute the jobs/messages later.
+  ![Job Queue](./img/message-queue-1.png)
+- This is done as a replacement for handling the `messages` via multiple servers Asynchronously.
 - This would enable us to scale the system. as we can make us handle more requests by queueing the jobs so that the server can handle them later.
+- Data stored in the queue are **Durably** stored:
+  - if the server is down, the data will still be there. because data is stored in `Disk` and not in `RAM`.
+  - the queue knows if the server can handle the message in the queue or not (as the server sends an `acknowledgment` to the queue after receiving the message), so that the queue doesn't need to send the message to the server again.
+- `Publish` and `Subscribe` (Pub/Sub) are the most popular ways to send and receive messages from the queue to/from multiple servers/services
+  - `Publish` is a way to send a message to the queue.
+  - `Subscribe` is a way to receive a message from the queue.
 - Most popular `job queues` are:
   - `RabbitMQ` ✅
   - `Kafka` ✅
@@ -434,111 +549,3 @@ As you go up in seniority, you'll be expected to be able to design systems that 
   - **Alerts** are a way to notify the system admin if there's a problem in the system. (like: `CPU` is high, `RAM` is high, `Disk` is full, low metrics (below the threshold), etc).
 
 ---
-
-## Networking
-
-- `TCP/IP` model is specific for the internet
-- `OSI` model is for any communication between 2 computers( systems ).
-
-### OSI Model
-
-As long as 2 computers are communicating, We can use the `OSI` model to abstract the communication process.
-
-[More Here](../Internet/Internet.md#osi-model)
-
----
-
-### TCP/IP
-
-**Transmission Control Protocol / Internet Protocol** is a **protocol** that is used to **communicate** between **computers**.
-
-- It consists of 2 protocols:
-
-  - **TCP**: it's a **connection-oriented** protocol. It's used to **send** and **receive** data between 2 computers. It's **reliable** and **ordered** but it's **slow**.
-
-    - It has error-checking mechanism. (it checks if the data is received completely or not).
-
-  - **IP**: it's a **connectionless** protocol. It's used to **send** and **receive** data between 2 computers. It's **unreliable** and **unordered**.
-    - `IPv4` -> it's `32` bits. (it has `4` bytes). each byte has max of `255` numbers
-      - `256.256.256.256` -> `4` billion addresses.
-    - `IPv6` -> it's `128` bits. (it has `16` bytes). each byte has max of `255` numbers
-      - it's used to solve the problem of `IPv4` addresses running out. as `IPv4` has only `4` billion addresses. and `IPv6` has `340` undecillion addresses.
-
-- **How it works:**
-
-  - It depends on **"Handshake"** to establish a connection between the `client` and the `server`. it's called: **"3-way handshake"**.
-    ![TCP/IP](./img/tcp-ip-2.png)
-
-    - The `client` sends a `SYN` (Synchronize) to the `server`. Then the `server` sends a `SYN-ACK` (Synchronize - Acknowledgement) to the `client` to let it know that it received the `SYN`. Then the `client` sends an `ACK` (Acknowledgement) to the `server` to let it know that it received the `SYN-ACK`.
-      ![TCP/IP](./img/tcp-ip-3.png)
-    - The process continues until the `client` and the `server` each time increase the `ISN` by `1` until they reach the `ISN` that they received from the other side.
-
-  - Steps:
-    ![TCP/IP](./img/tcp-ip-1.png)
-    1. The `client` generates a `ISN` (Initial Sequence Number) and sends it to the `server`.
-    2. The `server` generates a `ISN` and sends it to the `client`.
-    3. Now, both the `client` and the `server` have a `ISN`. and they can start sending data to each other.
-    4. The `client` sends a `SYN` (Synchronize ISN) to the `server`. Then the `server` sends a `SYN-ACK` (Synchronize ISN - Acknowledgement) to the `client` to let it know that it received the `SYN`.
-    5. The process continues until the `client` and the `server` each time increase the `ISN` by `1` until they reach the `ISN` that they received from the other side.
-
----
-
-### UDP
-
-**User Datagram Protocol** is a **connection-less** protocol. (it's like yelling "HI!" and assume that the other side heard it and keep sending data like that anyway)
-
-![UDP](./img/udp-1.png)
-
-- It's much faster than `TCP`. as it doesn't have the error-checking mechanism. (it doesn't check if the data is received completely or not).
-- It's **connection-less** means that it doesn't establish a connection between the `client` and the `server`. instead, it just sends the data to the `server` and assumes that the `server` received it.
-  - This make it doesn't consume much resources. as it doesn't have to establish a connection.
-- It's used in cases where we don't care about the data loss. like: `VoIP`, `Video Streaming`, `Online Gaming`, etc.
-  - This is because if there's a data loss, it will get corrected in the next data packet anyway. (as it's a stream of data).
-- So, we use `UDP` when we care about the speed and consistency. and we use `TCP` when we care about the reliability ( data loss ) and order.
-
----
-
-### Public vs Private IP
-
-- **Public IP** is an IP address that is **public** and **unique**. (it's the IP address that is used to communicate with the internet).
-
-  - Ex: `Router`, `Load Balancer`, `Server`, etc.
-
-- **Private IP** is an IP address that is **private** and **not unique**. (it's the IP address that is used to communicate with the local network).
-
----
-
-### Ports
-
-**Port** is a **communication endpoint**. It's a way to identify a specific process to which an **Internet message** or **request** is to be forwarded when it arrives at a server.
-
-- The default port for `HTTP` is `80`.
-- The default port for `HTTPS` is `443`.
-  - That's why when we type `https://www.google.com` in the browser, it will send a request to `https://www.google.com:443`.
-- We can't have multiple applications listening on the same port. as the port is used to identify the application.
-
----
-
-## System Design Interview
-
-It's meant to test your **ability to design scalable systems**. It's a **high-level** test to see if you can **design a system**.
-
-- **High Level Notes**
-  - There's no one right answer
-  - There's no one right way to solve a problem or design a system
-  - Focus on the data model
-  - Don't mention the technology you're going to use
-  - Draw a diagram
-  - Talk
-- **Steps**
-  - Identify 2 core features
-  - Possible implementation
-  - Identify and address difficulties
-  - Solution for **scaling**
-    - Scaling for Users:
-      - Caching -> Memory Cache -> Redis Cache -> CDN
-      - Deployment Options -> Load Balancer -> Horizontal Scaling
-
----
-
-## System Design Questions

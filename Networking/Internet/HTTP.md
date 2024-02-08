@@ -13,6 +13,7 @@
   - [HTTP status messages](#http-status-messages)
   - [HTTP headers](#http-headers)
     - [Cookies](#cookies)
+    - [HTTP Security risks](#http-security-risks)
   - [HTTPS](#https)
     - [Why we need HTTPS ?](#why-we-need-https-)
     - [How HTTPS works ?](#how-https-works-)
@@ -179,6 +180,8 @@ if a client, or the server, or both, need information about the state of the oth
 
 - **HTTP headers** contain text information stored in key-value pairs, and they are included in every HTTP request (and response, more on that later). These headers communicate core information, such as what browser the client is using what data is being requested.
 
+---
+
 ### Cookies
 
 - If a server wants, or needs, the client to remember where it has been or what state it is in, like what movie the client is currently watching. it can use a set `cookie header`, to give the client a cookie, a small piece of data.
@@ -190,6 +193,15 @@ if a client, or the server, or both, need information about the state of the oth
   <img src='./img/cookie3.PNG' width=48%>
 
 > so in summary: the web is stateless(each request is a new one) so we need cookies to persist data over time (on each request until we expire them)
+
+---
+
+### HTTP Security risks
+
+- `HTTP` is not secure against `man-in-the-middle` attacks.
+  - `man-in-the-middle` attack is a type of cyber-attack where a malicious actor inserts him/herself into a conversation between two parties, impersonates both parties and gains access to information that the two parties were trying to send to each other.
+  - This is because `HTTP` requests are sent in plain text, so anyone on the network can read them.
+- This is one of the reasons why `HTTPS` was created.
 
 ---
 

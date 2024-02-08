@@ -14,6 +14,7 @@
   - [Hand of Straights](#hand-of-straights)
   - [4Sum II](#4sum-ii)
   - [Repeated DNA Sequences](#repeated-dna-sequences)
+    - [Longest Consecutive Sequence](#longest-consecutive-sequence)
   - [LRU Cache](#lru-cache)
 
 ---
@@ -719,6 +720,83 @@ def findRepeatedDnaSequences(s):
             res.append(key)
 
     return res
+```
+
+---
+
+### Longest Consecutive Sequence
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=P6RZZMu_maU) | Use a `hash set` to store the numbers and then iterate through the `set` and check if the current number is the start of a sequence (by checking if the previous number is in the `set`), then check if the next number is in the `set` using a `while` loop to increment the current number and the current streak. Reset the current number and the current streak if the current number doesn't have a previous number in the `set` |
+
+Given an unsorted array of integers `nums`, return the length of the longest consecutive elements sequence.
+
+- Ex:
+
+  - Input: `nums = [100,4,200,1,3,2]`
+  - Output: `4`
+  - Explanation: The longest consecutive elements sequence is `[1, 2, 3, 4]`. Therefore its length is `4`.
+
+- Explanation
+
+  - The brute force solution is to **sort** the array and then loop through the array and check if the current number is the start of a sequence, then loop through the array and check if the next number is in the array, and keep track of the longest sequence
+    - Time complexity: `O(n log(n))` ❌
+  - Instead, we can use a `hash set` to store the numbers, so that we can check if the current number is the start of a sequence by checking if the previous number is in the set
+  - Then loop through the `set` and check if the next number is in the set, and keep track of the longest sequence by using a `while` loop to increment the current number and the current streak
+    ![sliding window](./img/longest-consecutive-sequence-1.jpeg)
+  - We check if the current number is **the start of a sequence** by checking if the previous number is in the set, then we check if the next number is in the `hash set` or not (that's why we're using a`set` to store the numbers and be able to check if the next number is in the set in `O(1)` time)
+    ![sliding window](./img/longest-consecutive-sequence-3.png)
+    - if the current number doesn't have a previous number in the set, then it's the start of a sequence, then we **reset** the:
+      - current number to the start of the sequence
+      - current streak to `1`
+  - We update the `longest streak` after reaching last valid number in the current sequence
+  - After reaching the end of the set, we return the longest streak
+    ![sliding window](./img/longest-consecutive-sequence-2.png)
+
+- Time complexity: `O(n)`
+- Space complexity: `O(n)` -> because we use a `set` to store the numbers
+
+```py
+# Solution 1: using hash set O(n) ✅
+def longest_consecutive(nums):
+    longest_streak = 0
+    num_set = set(nums)
+
+    for num in num_set:
+        # check if the current number is the start of a sequence by checking if the previous number is in the set
+        if num - 1 not in num_set: # num and not the index ⚠️
+            current_num = num
+            current_streak = 1
+
+            # check if the next number is in the set
+            while current_num + 1 in num_set:
+                current_num += 1
+                current_streak += 1
+
+            longest_streak = max(longest_streak, current_streak)
+
+    return longest_streak
+
+# ------------------------------------------------------
+
+# Solution 2: using sorting O(n log(n)) ❌
+def longest_consecutive(nums):
+    if not nums: return 0
+
+    nums.sort()
+    longest_streak = 1
+    current_streak = 1
+
+    for i in range(1, len(nums)):
+        if nums[i] != nums[i-1]:
+            if nums[i] == nums[i-1] + 1:
+                current_streak += 1
+            else:
+                longest_streak = max(longest_streak, current_streak)
+                current_streak = 1
+
+    return max(longest_streak, current_streak)
 ```
 
 ---

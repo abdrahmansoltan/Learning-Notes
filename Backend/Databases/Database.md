@@ -72,7 +72,7 @@ There are several reasons why we use databases instead of Excel spreadsheets:
 - `Graph` : It's for data that is connected in different ways.
 - `Wide-column store (Column-oriented)` : it's for big tables with a lot of columns.
   - It's good for storing data that is not relational.
-  - Apache Cassandra [Column oriented]
+  - Apache Cassandra (Column oriented)
 
 ---
 

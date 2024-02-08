@@ -751,6 +751,8 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 `call`, `apply`, `bind` are higher order functions used to set the `this` keyword and arguments of a (function / method)
 
+![call-apply-bind](./img/call-apply-bind.webp)
+
 - `call` => calls a function with the given lexical context as parameter (`call` it's like calling the `this` of the one object that calls the function)
 
   ```javascript
@@ -763,7 +765,7 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 - `apply` => is just like `call()`, **the difference is how we pass the arguments to the method** -> it accepts arguments in array
 
-  - it's not used in modern javascript because we can instead use `spread operator ...` with `call()`
+  - it's not used in modern javascript because we can instead use `spread operator (...)` with `call()`
 
     ```javascript
     let human = { name: ‘Ahmed’ }
@@ -804,7 +806,10 @@ recursion sometimes take long time as it calls multiple functions at the same ti
       multiplyByTwo(5); // Outputs 10
       ```
 
+- We can access these built-in functions from the `Function.prototype` object
 - **reducer function** is the process (function) of taking 2 elements and do an operation on them and returning only one thing
+
+> More [Here](https://javascript.plainenglish.io/quick-guide-to-call-apply-and-bind-methods-in-javascript-5c00cd856cfa)
 
 ---
 

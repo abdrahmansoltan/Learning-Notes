@@ -16,13 +16,14 @@
   - [Coin Change](#coin-change)
   - [Coin Change II](#coin-change-ii)
   - [Student Attendance Record II](#student-attendance-record-ii)
+  - [Longest Common Subsequence](#longest-common-subsequence)
   - [Unique Paths](#unique-paths)
   - [Maximum Profit in Job Scheduling](#maximum-profit-in-job-scheduling)
   - [Jump Game](#jump-game)
   - [Jump Game II](#jump-game-ii)
   - [0 or 1 Knapsack Pattern](#0-or-1-knapsack-pattern)
     - [0/1 Knapsack](#01-knapsack)
-    - [Unbounded KnapSack (Revisit again)](#unbounded-knapsack-revisit-again)
+    - [Unbounded KnapSack](#unbounded-knapsack)
     - [Partition Equal Subset Sum](#partition-equal-subset-sum)
     - [Partition Array Into Two Arrays to Minimize Sum Difference](#partition-array-into-two-arrays-to-minimize-sum-difference)
     - [Target Sum](#target-sum)
@@ -1212,6 +1213,99 @@ Given an integer `n`, return the number of all possible attendance records with 
 
 ---
 
+## Longest Common Subsequence
+
+| Video Solution                                                                                  | Hint                                                                                                                                                                                                                                                                                                                                         |
+| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ASoaQq66foQ) Or `LCS` video on neetcode course | Use a bottom-up dynamic programming approach. Use a `dp` matrix to store the length of the longest common subsequence for each pair of characters. Then iterate over the matrix and for each cell calculate the length of the longest common subsequence for the current pair of characters. Finally, return the last element in the matrix. |
+
+Given two strings `text1` and `text2`, return the length of their longest common subsequence. If there is no common subsequence, return `0`.
+
+A subsequence of a string is a new string generated from the original string with some characters (can be none) deleted without changing the relative order of the remaining characters. **(It doesn't have to be contiguous, but the order should be maintained)**
+![substring vs subsequence](./img/substring-vs-subsequence.png)
+
+A common subsequence of two strings is a subsequence that is common to both strings.
+
+- Ex:
+
+  - Input: `text1 = "abcde", text2 = "ace"`
+  - Output: `3`
+  - Explanation: The longest common subsequence is `"ace"`.
+
+- Explanation:
+
+  - This is a `DP` problem, because we will be using the results of the subproblems to solve the main problem.
+  - The subproblem is comparing 2 characters at a time and finding the longest common subsequence for each pair of characters.
+    ![longest common subsequence](./img/longest-common-subsequence-1.png)
+
+- **Solution 1: using dfs + memoization**
+
+  - We will use 2 pointers `i` and `j` to iterate over the strings and for each pair of characters we will calculate the length of the longest common subsequence.
+  - at each decision, we choose to increment `i` or `j` or both.
+    ![longest common subsequence](./img/longest-common-subsequence-2.png)
+    - choice 1 -> `i + 1` and `j + 1` if the current characters are equal.
+    - choice 2 -> `i + 1` if the current characters are not equal.
+    - choice 3 -> `j + 1` if the current characters are not equal.
+    - we will return the maximum between the 3 choices.
+  - if we reach a pointer that is out of the string, we will return `0`.
+  - the height of the decision tree will be `len(text1) + len(text2)`. because we will stop when both pointers reach the end of the strings.
+  - We will have repeated subproblems, so we will use a `memo` dictionary to store the results of the subproblems.
+    ![longest common subsequence](./img/longest-common-subsequence-3.png)
+
+  - Time complexity: `O(2^(m + n))` -> `O(2^n)`
+    - With the use of memoization, the time complexity will be `O(m * n)` because we are calculating the length of the longest common subsequence for each pair of characters.
+  - Space complexity: `O(n)` -> `O(n)`
+
+  ```py
+  def longestCommonSubsequence(text1: str, text2: str) -> int:
+      memo = {}
+      def dfs(i, j):
+          if i == len(text1) or j == len(text2):
+              return 0
+          if (i, j) in memo:
+              return memo[(i, j)]
+          if text1[i] == text2[j]:
+              memo[(i, j)] = 1 + dfs(i + 1, j + 1) # 1 plus the result of the smaller subproblem
+          else:
+              memo[(i, j)] = max(dfs(i + 1, j), dfs(i, j + 1)) # the maximum between the results of the smaller subproblems
+          return memo[(i, j)]
+
+      return dfs(0, 0)
+  ```
+
+- **Solution 2: using dp array**
+
+  - We will use a `dp` matrix to store the length of the longest common subsequence for each pair of characters.
+    - The matrix will have extra row and column for the empty string. which will be filled with `0`, because there is no common subsequence for an empty string.
+      ![longest common subsequence](./img/longest-common-subsequence-4.png)
+  - Then we will iterate over the matrix and for each cell we will calculate the length of the longest common subsequence for the current pair of characters.
+    ![longest common subsequence](./img/longest-common-subsequence-5.png)
+    - If the current characters are equal, then the length of the longest common subsequence for the current pair of characters is equal to the length of the longest common subsequence for the previous pair of characters **+ `1`**.
+    - Otherwise, the length of the longest common subsequence for the current pair of characters is equal to the **maximum** between the length of the longest common subsequence for the previous pair of characters in the same row and the length of the longest common subsequence for the previous pair of characters in the same column.
+  - Finally, we will return the last element in the matrix.
+    ![longest common subsequence](./img/longest-common-subsequence-6.png)
+  - Time complexity: `O(m * n)`
+    - where `m` is the length of the first string and `n` is the length of the second string.
+  - Space complexity: `O(m * n)`
+    - where `m` is the length of the first string and `n` is the length of the second string.
+
+  ```py
+  def longestCommonSubsequence(text1: str, text2: str) -> int:
+      m, n = len(text1), len(text2)
+      dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+      for i in range(1, m + 1):
+          for j in range(1, n + 1):
+              if text1[i - 1] == text2[j - 1]:
+                  dp[i][j] = dp[i - 1][j - 1] + 1
+              else:
+                  dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+      return dp[-1][-1]
+  ```
+
+---
+
 ## Unique Paths
 
 A robot is located at the top-left corner of a `m x n` grid. Given the two integers `m` and `n`, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
@@ -1516,7 +1610,7 @@ Given two integer arrays `profit` and `weight` of length `n`, we need to find a 
 
 ---
 
-### Unbounded KnapSack (Revisit again)
+### Unbounded KnapSack
 
 Given a list of `n` items, and a backpack with a limited capacity, return the maximum total profit that can be contained in the backpack. The i-th item's profit is `profit[i]` and its weight is `weight[i]`.
 
@@ -1524,28 +1618,72 @@ Given a list of `n` items, and a backpack with a limited capacity, return the ma
 
   - Input: `capacity = 8, profit = [15, 50, 60, 90], weight = [1, 3, 4, 5]`
   - Output: `140`
-  - Explanation: We can take items with indecies `1 and`3`, and leave the rest.
+  - Explanation: We can take items with indices `1` and`3`, and leave the rest.
 
-```py
-def unboundedKnapsack(capacity: int, profit: List[int], weight: List[int]) -> int:
-    n = len(profit)
-    dp = [[0] * (capacity + 1) for _ in range(n)] # dp[i][c] -> max profit for the first i items and capacity c
+- Solution 1: Top-down approach (memoization)
 
-    # Fill the first row
-    for c in range(capacity + 1):
-        if c >= weight[0]:
-            dp[0][c] = profit[0] * (c // weight[0])
+  - For each item, we can choose to take it or leave it.
+    ![unbounded knapsack](./img/unbounded-knapsack-1.png)
+    - if we take an item, then we will jump to the remaining capacity to find more items that can fit in the remaining capacity.
+    - if we leave an item, then we take the profit from the remaining items.
+  - The difference here, is that we have an unlimited number of each item. So we can take an item multiple times.
+    ![unbounded knapsack](./img/unbounded-knapsack-2.png)
+  - We can continue building the decision tree until we reach the end of the array or until the `capacity` reaches `0`. and then we can calculate the maximum `profit` for each item.
+    ![unbounded knapsack](./img/unbounded-knapsack-3.png)
 
-    for i in range(1, n):
-        for c in range(1, capacity + 1):
-            profit1, profit2 = 0, 0
-            if c >= weight[i]:
-                profit1 = profit[i] + dp[i][c - weight[i]]
-            profit2 = dp[i - 1][c]
-            dp[i][c] = max(profit1, profit2)
+    - In this case the height of the tree can be more than `n` because we can take an item multiple times.
+    - So the time complexity will be `O(n * 2^c)`. where `c` is the `capacity`.
 
-    return dp[-1][-1]
-```
+  ```py
+  def unboundedKnapsack(capacity: int, profit: List[int], weight: List[int]) -> int:
+      memo = {}
+      def dfs(i, capacity):
+          if i == len(profit): return 0
+          if (i, capacity) in memo: return memo[(i, capacity)]
+
+          # skip item i
+          maxProfit = dfs(i+1, capacity)
+          # include item i
+          newCap = capacity - weight[i]
+          if newCap >= 0:
+            p = profit[i] + dfs(i, newCap)
+            maxProfit = max(maxProfit, p)
+
+          memo[(i, capacity)] = maxProfit
+          return maxProfit
+
+      return dfs(0, capacity)
+
+  ```
+
+  - Time complexity: `O(n * c)`
+    - `n` is the number of items, `c` is the capacity
+  - Space complexity: `O(n * c)`
+
+- Solution 2: TODO: watch the "2.Unbounded Knapsack video"
+
+  - We can solve this problem using **dynamic programming**. by using a `dp` array to store the maximum profit for each item. and then loop through the array and calculate the maximum profit for each item.
+
+  ```py
+  def unboundedKnapsack(capacity: int, profit: List[int], weight: List[int]) -> int:
+      n = len(profit)
+      dp = [[0] * (capacity + 1) for _ in range(n)] # dp[i][c] -> max profit for the first i items and capacity c
+
+      # Fill the first row
+      for c in range(capacity + 1):
+          if c >= weight[0]:
+              dp[0][c] = profit[0] * (c // weight[0])
+
+      for i in range(1, n):
+          for c in range(1, capacity + 1):
+              profit1, profit2 = 0, 0
+              if c >= weight[i]:
+                  profit1 = profit[i] + dp[i][c - weight[i]]
+              profit2 = dp[i - 1][c]
+              dp[i][c] = max(profit1, profit2)
+
+      return dp[-1][-1]
+  ```
 
 ---
 

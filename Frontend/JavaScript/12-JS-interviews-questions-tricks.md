@@ -335,3 +335,19 @@
     'a'.charCodeAt(0); // 97
     // 97 < 88 < 120
     ```
+
+- How do you return multiple things from a function?
+
+  - You can return (one `array` or one `object`) with multiple values inside it.
+
+    ```js
+    function foo() {
+      return [1, 2, 3];
+    }
+
+    function bar() {
+      return { a: 1, b: 2, c: 3 };
+    }
+    ```
+
+  - Some languages like `Go` allow you to return multiple values from a function, but JavaScript doesn't support that.

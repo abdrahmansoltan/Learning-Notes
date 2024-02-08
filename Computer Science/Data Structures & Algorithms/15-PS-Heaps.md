@@ -412,6 +412,10 @@ Given a string `s`, sort it in **decreasing order** based on the **frequency** o
 
 ### Top K Frequent Words
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=cupg2TGIkyM) | Use a `max heap` to store the `frequency` of each word in the string by pushing each word to the heap and popping the top element first if the size of the heap is larger than `k`. Finally, loop through the heap and append the words to the result list. |
+
 Given an array of strings `words` and an integer `k`, return the `k` most frequent strings.
 Return the answer **sorted** by the **frequency** from highest to lowest. Sort the words with the same frequency by their **lexicographical order**.
 
@@ -420,31 +424,57 @@ Return the answer **sorted** by the **frequency** from highest to lowest. Sort t
   - Explanation: "i" and "love" are the two most frequent words.
     Note that "i" comes before "love" due to a lower alphabetical order.
 
-```py
-def top_k_frequent(words, k):
-    res = []
-    freq = {}
-    buckets = [[] for _ in range(len(words)+1)]
+- Solution 1: using Heap
 
-    for word in words:
-        freq[word] = freq.get(word, 0) + 1
+  ```py
+  def top_k_frequent(words, k):
+      res = []
+      freq = {}
+      maxHeap = []
 
-    for word, count in freq.items():
-        buckets[count].append(word)
+      for word in words:
+          freq[word] = freq.get(word, 0) + 1
 
-    for i in range(len(buckets)-1, -1, -1):
-        if len(res) == k:
-            break
-        if buckets[i]:
-            buckets[i].sort()
-            res.extend(buckets[i])
+      for key, val in freq.items():
+          heapq.heappush(maxHeap, [-val, key])
 
-    return res
-```
+      for _ in range(k):
+          res.append(heapq.heappop(maxHeap)[1])
+
+      return res
+  ```
+
+- **Solution 2:** Using Bucket Sort
+
+  ```py
+  def top_k_frequent(words, k):
+      res = []
+      freq = {}
+      buckets = [[] for _ in range(len(words)+1)]
+
+      for word in words:
+          freq[word] = freq.get(word, 0) + 1
+
+      for word, count in freq.items():
+          buckets[count].append(word)
+
+      for i in range(len(buckets)-1, -1, -1):
+          if len(res) == k:
+              break
+          if buckets[i]:
+              buckets[i].sort()
+              res.extend(buckets[i])
+
+      return res
+  ```
 
 ---
 
 ### Find K Closest Elements
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                           |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=o-YDQzHoaKM) | Use a `min heap` to store the `distance` of each element in the array by pushing each element to the heap as a pair of the absolute value of the `distance` and the element and popping the smallest element first if the size of the heap is larger than `k`. |
 
 Given a **sorted** integer array `arr`, two integers `k` and `x`, return the `k` closest integers to `x` in the array. The result should also be sorted in ascending order.
 
@@ -457,7 +487,7 @@ An integer `a` is closer to `x` than an integer `b` if:
 
   - Explanation: The closest elements to the target are `[3, 4, 5]`, and their absolute difference is `|3 - 3| = 0`, `|4 - 3| = 1`, and `|5 - 3| = 2`. Among them, `[1, 2, 3, 4]` is the **sorted** array.
 
-- Solution 1
+- Solution 1 ✅
 
   ```py
   def find_closest_elements(arr, k, x):
@@ -475,6 +505,8 @@ An integer `a` is closer to `x` than an integer `b` if:
   ```
 
 - Solution 2: more optimized using `binary search`
+
+  - TODO: add explanation
 
   ```py
   def find_closest_elements(arr, k, x):
@@ -511,11 +543,18 @@ An integer `a` is closer to `x` than an integer `b` if:
 
 ### Least Number of Unique Integers after K Removals
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=DpadOIYcSg0) | Use a `min heap` to store the `frequency` of each element in the array by pushing each element to the heap and popping the smallest element first if the size of the heap is larger than `k`. after popping the smallest element, decrement the frequency by `1` and push it back to the heap if the frequency is not `0`. Finally return the length of the heap which is the number of unique elements. |
+
 Given an array of integers `arr` and an integer `k`. Find the least number of unique integers after removing **exactly** `k` elements.
 
 - EX: `arr = [5, 5, 4], k = 1` --> `1`
 
   - Explanation: Remove the single `4`, only `5` is left.
+
+- Explanation:
+  - TODO: add explanation
 
 ```py
 def find_least_num_of_unique_ints(arr, k):
@@ -529,7 +568,9 @@ def find_least_num_of_unique_ints(arr, k):
 
     for _ in range(k):
         freq, key = heapq.heappop(minHeap)
+        # Important: we need to decrement the frequency by 1 to reach 0
         freq -= 1
+        # Important: if the frequency is not 0, we will push it back to the minHeap
         if freq > 0:
             heapq.heappush(minHeap, [freq, key])
 
@@ -539,6 +580,10 @@ def find_least_num_of_unique_ints(arr, k):
 ---
 
 ### Reorganize String
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=2g_b1aYTHeg) | Use a `max heap` to store the `frequency` of each character in the string by pushing each character with its frequency to the heap and popping the top element first and adding it to the result string, then decrement its frequency by `1` and if its frequency is not `0`, store it in the `prev` variable and push it back to the heap in the next iteration. |
 
 Given a string `s`, rearrange the characters of `s` so that any two adjacent characters are not the same.
 Return any possible rearrangement of `s` or return `""` if not possible.
@@ -554,6 +599,8 @@ Return any possible rearrangement of `s` or return `""` if not possible.
     - By appending the most frequent character first, we have the best chance to find a string where no two same characters come next to each other.
     - if the last element of the result string is the same as the current element, pop the next element and append it to the result string
     - if the `maxHeap` is empty and the last element of the result string is the same as the current element, this means that we can't reorganize the string so we return `""`
+- Time Complexity: `O(n log(n))` because we are pushing all the elements to the maxHeap and popping the top element of the maxHeap `n` times
+- Space Complexity: `O(n)` because we are storing all the elements in the maxHeap
 
 ```py
 def reorganize_string(s):
@@ -590,6 +637,36 @@ def reorganize_string(s):
             prev = [freq, char]
 
     return res
+
+# --------------------------------------------------------------
+
+# Another approach
+def reorganize_string(s):
+    maxHeap = []
+    freqDict = {}
+
+    for char in s:
+        freqDict[char] = freqDict.get(char, 0) + 1
+    for key, val in freqDict.items():
+        heapq.heappush(maxHeap, [-val, key])
+
+    res = ''
+    prev = None
+    while maxHeap:
+        freq, char = heapq.heappop(maxHeap)
+        res += char
+        freq += 1 # decrement the frequency by 1 to reach 0
+
+        if prev:
+            heapq.heappush(maxHeap, prev)
+            prev = None
+
+        if freq != 0:
+            prev = [freq, char]
+
+    return res if len(res) == len(s) else ''
+    # or
+    # res if not prev and not maxHeap else ''
 ```
 
 ---
@@ -973,6 +1050,8 @@ The median is the middle value in an ordered integer list. If the size of the li
      - if the size of the `minHeap` is equal to the `maxHeap`, we will calculate the median by getting the average of the top elements of the `minHeap` and `maxHeap`
      - if the size of the `minHeap` is larger than the `maxHeap`, the median will be the top element of the `minHeap`
      - if the size of the `maxHeap` is larger than the `minHeap`, the median will be the top element of the `maxHeap`
+
+> **Note:** Look in [this](./2-Algorithms.md#two-heaps-technique) section for more details about the two heaps technique
 
 ```py
 class MedianFinder:

@@ -410,6 +410,8 @@ Typescript has a distinct **OOP** style, so it's not always easy to use it with 
 
 ### TS with Express
 
+- More here: [Express with Typescript](../../Backend/Node.js/5-Node-Typescript.md#express-with-typescript)
+
 #### Solution 1: Adding type annotation when needed in Express
 
 - Simple type annotation with the help of type declaration file
@@ -536,3 +538,7 @@ Here, we want to make express (which is mostly written in a functional way) to w
 ---
 
 ### TS with React
+
+![ts with react](./img/ts-with-react-1.png)
+
+- More here: [Typescript with React](../../Frontend/Frameworks/React/10-React-Typescript.md)

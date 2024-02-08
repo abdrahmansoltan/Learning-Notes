@@ -5,6 +5,11 @@
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
   - [Web Components](#web-components)
+    - [Web Components Core Technologies](#web-components-core-technologies)
+    - [Using Web Components](#using-web-components)
+      - [Creating custom elements](#creating-custom-elements)
+      - [Reusing custom elements (web components) from the web](#reusing-custom-elements-web-components-from-the-web)
+    - [Using web components in frameworks](#using-web-components-in-frameworks)
   - [Gulp.js](#gulpjs)
     - [Gulp vs Webpack](#gulp-vs-webpack)
   - [Pug.js](#pugjs)
@@ -54,27 +59,58 @@ The four basic steps include:
 
 It's a set of web platform APIs that allow you to create new **custom**, **reusable**, **encapsulated** `HTML` tags to use in web pages and web apps.
 
+> More [here](https://htmlwithsuperpowers.netlify.app/)
+
 - It enables us to reuse code without fear of code collisions and conflicts with other code on the page
-- It consists of these main technologies:
-
-  - **Custom Elements**:
-    - A set of JavaScript APIs that allow you to define custom elements and their behavior, which can then be used as desired in your user interface.
-    - This is done by creating a `class` that extends the `HTMLElement` class with the desired behavior and then registering the new element using the `customElements.define()` method
-    - Each custom element has also `life cycle hooks` that can be used to add some functionality to the element
-      - create, insert, remove, attribute change, etc.
-  - **Shadow DOM**:
-    - A set of JavaScript APIs for attaching an encapsulated "shadow" DOM tree to an element — which is rendered separately from the main document DOM — and controlling associated functionality.
-    - In this way, you can keep an element's features private, so they can be scripted and styled without the fear of collision with other parts of the document. **(Isolate DOM fragments (`HTML` / `CSS`)from the main document DOM tree)**
-    - This is done by creating a `shadowRoot` using the `attachShadow()` method and then adding the desired elements to it
-  - **HTML Templates**:
-    - The `<template>` and `<slot>` elements enable you to write markup templates that are not displayed in the rendered page. These can then be reused multiple times as the basis of a custom element's structure.
-    - This is done by creating a `<template>` element and adding the desired elements to it
-  - **Scoped Styles**:
-    - scope styles to a block of `HTML`
-
 - This is the main idea behind `React`, `Vue`, `Angular`, etc. frameworks. They are all based on the idea of creating **reusable** `HTML` components
+- It's so popular, you may think that you're not using it, but you're using it in every framework you use
 
-- Example:
+  - It's too low level, so it's not used directly and is used through frameworks
+
+- Why?
+  - Easy as `HTML`
+  - Great reusability
+  - No build tools
+  - Encapsulated
+  - it's native in the browser / web
+
+### Web Components Core Technologies
+
+- It consists of these main technologies:
+  ![Web Components](./img/web-components-1.png)
+
+- **Custom Elements**:
+  - A set of JavaScript APIs that allow you to define custom elements and their behavior, which can then be used as desired in your user interface.
+    ![Web Components](./img/web-components-3.png)
+  - it must contain a hyphen `-` in its name, otherwise it will not be recognized as a custom element and will be rendered as a normal `HTML` element
+  - This is done by creating a `class` that extends the `HTMLElement` class with the desired behavior and then registering the new element using the `customElements.define()` method
+  - Each custom element has also `life cycle hooks` that can be used to add some functionality to the element
+    - create, insert, remove, attribute change, etc.
+- **Shadow DOM**:
+  - A set of JavaScript APIs for attaching an **encapsulated** "shadow" DOM tree to an element — which is rendered separately from the main document DOM — and controlling associated functionality.
+    ![Web Components](./img/web-components-4.png)
+    - `Light DOM` -> html code that we write
+    - `Shadow DOM` -> html code that the component writes
+  - In this way, you can keep an element's features private, so they can be scripted and styled without the fear of collision with other parts of the document. **(Isolate DOM fragments (`HTML` / `CSS`)from the main document DOM tree)**
+  - This is done by creating a `shadowRoot` using the `attachShadow()` method and then adding the desired elements to it
+- **HTML Templates**:
+  - The `<template>` and `<slot>` elements enable you to write markup templates that are not displayed in the rendered page. These can then be reused multiple times as the basis of a custom element's structure.
+    ![Web Components](./img/web-components-2.png)
+  - This is done by creating a `<template>` element and adding the desired elements to it
+- **Scoped Styles**:
+  - scope styles to a block of `HTML`
+- **ES Modules**:
+
+  - The ability to use `import` and `export` statements to share functionality between scripts -> (`HTML` imports)
+    ![Web Components](./img/web-components-5.png)
+
+---
+
+### Using Web Components
+
+#### Creating custom elements
+
+- Example of creating a custom element: `<my-element>`
 
   ```js
   class MyElement extends HTMLElement {
@@ -165,7 +201,148 @@ It's a set of web platform APIs that allow you to create new **custom**, **reusa
   </div>
   ```
 
-> More Here: [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components)
+- Styling custom elements
+  ![Web Components](./img/web-components-10.png)
+
+  - Anything in the light DOM will be rendered as normal `HTML` elements, so you can style them as you would normally do
+    ![Web Components](./img/web-components-8.png)
+
+  - Anything in the shadow DOM will be rendered as part of the custom element, So we can't style them directly **(because they are not part of the main DOM tree and we didn't directly write them)**
+    ![Web Components](./img/web-components-9.png)
+
+    ```html
+    <my-element>
+      <button>Click me!</button>
+    </my-element>
+    ```
+
+    ```css
+    /* Won't work ❌ */
+    my-element button {
+      color: red;
+    }
+    ```
+
+    - The same for classes and ids inside the shadow DOM
+
+  - The solution is:
+
+    - to use `::slotted()` pseudo-element to style the light DOM elements inside the shadow DOM
+
+      ```css
+      /* Will work ✅ */
+      ::slotted(button) {
+        color: red;
+      }
+      ```
+
+    - or style it inside the shadow DOM when creating the custom element
+
+      ```js
+      const style = document.createElement('style');
+
+      style.textContent = `
+        ::slotted(button) {
+          color: red;
+        }
+      `;
+      ```
+
+---
+
+#### Reusing custom elements (web components) from the web
+
+- `two-up` is a custom element that displays two images side by side
+
+  ```html
+  <two-up>
+    <img src="img/1.png" slot="left" />
+    <img src="img/2.png" slot="right" />
+  </two-up>
+
+  <script type="module" src="https://unpkg.com/two-up-element"></script>
+  ```
+
+  ![Web Components](./img/web-components-6.png)
+
+  - The worst case is that the script is not loaded, so the result will be just 2 images, which won't break the page
+
+- `generic-components` is a collection of generic web components that can be used in any project
+
+  ![Web Components](./img/web-components-7.png)
+
+- Other examples of web components:
+
+  - [Awesome Standalones](https://github.com/davatron5000/awesome-standalones)
+
+---
+
+### Using web components in frameworks
+
+Some JS frameworks have the ability to use web components inside them by importing them.
+
+- `React`:
+
+  - [React Web Components](https://reactjs.org/docs/web-components.html)
+  - [React Web Components with Hooks](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+
+- `Vue`:
+
+  - [Vue Web Components](https://vuejs.org/v2/guide/components-custom-events.html#Customizing-Component-v-model)
+  - [Vue Web Components with Slots](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+  - [Vue Web Components with Slots](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+  - [Vue Web Components with Slots](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+
+- `Svelte`:
+
+  - [Svelte Web Components](https://svelte.dev/docs#Creating_a_component)
+  - [Svelte Web Components with Slots](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+  - [Svelte Web Components with Slots](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+  - [Svelte Web Components with Slots](https://www.youtube.com/watch?v=PCWaFLy3VUo)
+
+- `Lit`: ✅
+
+  - It's a library for creating web components easily
+  - It works well with other frameworks and with TypeScript (because it's written in TypeScript and uses `decorators`)
+  - Resources:
+    - [Lit](https://lit.dev/)  
+    - [Lit vs. React: A comparison guide](https://blog.logrocket.com/lit-vs-react-comparison-guide/)
+  - Example:
+
+    ```js
+    import { LitElement, html, css } from 'lit';
+    import { customElement, property, state } from 'lit/decorators.js';
+
+    @customElement('my-element')
+    export class MyElement extends LitElement {
+      @property({ type: String }) name = 'World';
+      @state() count = 0;
+
+      static styles = css`
+        p {
+          color: green;
+        }
+      `;
+
+      render() {
+        return html`
+          <p>Hello, ${this.name}!</p>
+          <button @click=${this._onClick} part="button">
+            Click Count: ${this.count}
+          </button>
+        `;
+      }
+
+      private _onClick() {
+        this.count++;
+      }
+    }
+    ```
+
+    ```html
+    <!-- Using it -->
+    <my-element name="Lit"></my-element>
+    ```
 
 ---
 

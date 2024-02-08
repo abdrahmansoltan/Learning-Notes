@@ -42,7 +42,7 @@
 - In `string` problems, usually the brute-force solution uses `O(n)` space complexity, and the optimal solution uses `O(1)` space complexity, so we need to think of a way to solve the problem **without using extra space**
 - Verify the constraints:
   - Are all the characters in the string lowercase/uppercase?
-  - Are there any leading or trailing whitespaces?
+  - Are there any leading or trailing white-spaces?
   - Does case sensitivity matter? (e.g. "A" vs "a")
 
 ---
@@ -582,6 +582,10 @@ def findSubstring(s, words):
 
 ### Count Vowel Substrings of a String
 
+| Video Solution | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NA             | Use **Sliding Window** and a `hash table` to keep track of the `last seen index` of each character in the window to prevent sliding inclemently until the window is valid. Create a `seen_vowels` dictionary to keep track of the last seen vowel initially set to `-2` (the smallest possible index), and update it with the current index if the current character is a vowel. else update the `lastNonVowelIdx` variable with the current index. If it is a vowel, update the `ans` variable with the maximum of the current value and the minimum of the last seen vowel's index and the last consonant's index. |
+
 Given a string `s` return the number of substrings that have **all vowels** in order.
 
 - EX: `s = "abciiidef"` -> `3` (substrings: `"ae"`, `"ei"`, `"iii"`)
@@ -591,33 +595,33 @@ Given a string `s` return the number of substrings that have **all vowels** in o
 
 ```py
 def countVowelSubstrings(word):
-    # Store vowels in a set for O(1) lookup.
     vowels = {'a', 'e', 'i', 'o', 'u'}
-
-    # Initialize the sliding-window with the first vowel in the string and the last vowel in the string
     ans = 0
-    last_consonant = -1
-
-    # Initialize a dictionary to keep track of the last seen vowel
+    lastNonVowelIdx = -1
+    # dictionary to keep track of the last seen vowel
     last_seen_vowels = {v: -2 for v in vowels} # -2 is the smallest possible index
 
     for i, x in enumerate(word):
-        # If the current character is a consonant, update the last_consonant variable.
+        # If the current character is not a vowel, update the lastNonVowelIdx variable.
         if x not in vowels:
-            last_consonant = i
-        # Otherwise, we've found a vowel.
+            lastNonVowelIdx = i
         else:
             # Update the last_seen_vowels dictionary with the current index.
             last_seen_vowels[x] = i
+            minVowelIdx = min(last_seen_vowels.values())
             # Update the answer variable with the maximum of the current value and the minimum of the last seen vowel's
             # index and the last consonant's index.
-            ans += max(min(last_seen_vowels.values())-last_consonant, 0)
+            ans += max(minVowelIdx - lastNonVowelIdx, 0)
     return ans
 ```
 
 ---
 
 ### Longest Common Prefix
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=0sWShKIJoo4) | Loop over the first string in the array and check other strings to check if they have the same prefix (same current character). Note that we need to check if we have reached the end of the other strings (out of bound), so that we would return the current prefix to exit the function. Else we would add the current character to the prefix after checking all the strings. |
 
 Write a function to find the longest common prefix string amongst an array of strings.
 
@@ -634,7 +638,7 @@ def longestCommonPrefix(strs):
       for j in range(1, len(strs)):
          # if we have reached the end of the other string or the current character is not a prefix of the other string, return the result
          if i >= len(strs[j]) or strs[j][i] != strs[0][i]:
-            return res
+            return res # Early return to exit the function
       res += strs[0][i]
 
     return res
@@ -898,6 +902,7 @@ def is_palindrome(s):
 
   while l < r:
     while l < r and not isAlphaNum(s[l]):
+    # or while l < r and not s[l].isalnum():
       l += 1
     while l < r and not isAlphaNum(s[r]):
       r -= 1
@@ -933,9 +938,9 @@ def is_palindrome(s):
 
 ### Valid Palindrome II
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                          |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=JrxRYBwG6EI) | Use **Two Pointers** to check if the string is a palindrome. When encountering a mismatch, we can check if the string without the character at the `left` pointer is a palindrome **or** the string without the character at the `right` pointer is a palindrome. Use a helper function to check if a string is a palindrome. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=JrxRYBwG6EI) | Use **Two Pointers** to check if the string is a palindrome. When encountering a mismatch, we can check if the string without the character at the `left` pointer is a palindrome **or** the string without the character at the `right` pointer is a palindrome and return the result immediately. Use a helper function to check if a string is a palindrome. |
 
 Given a string `s`, return `true` if the `s` can be palindrome after deleting **at most one** character from it.
 
@@ -950,6 +955,7 @@ Given a string `s`, return `true` if the `s` can be palindrome after deleting **
     - The **Brute Force** approach would be to check if the string is a palindrome after deleting each character from it, but this would take `O(n^2)` time, we can do better.
 
       ```py
+      # Brute Force (O(n^2)) ❌
       def validPalindrome(s):
           # helper function to check if a string is a palindrome
           def isPalindrome(s):
@@ -969,6 +975,7 @@ Given a string `s`, return `true` if the `s` can be palindrome after deleting **
       ![valid palindrome 2](./img/valid-palindrome-2.png)
 
 ```py
+# O(n) ✅
 def validPalindrome(s):
     # helper function to check if a string is a palindrome
     def isPalindrome(s):
@@ -992,9 +999,9 @@ def validPalindrome(s):
 
 ### Length of Last Word
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=KT9rltZTybQ) | Iterate over the string backwards and return the length of the first word we encounter. Pay attention to an edge case where the string does not end with an empty space (One word string). In this case, we will have to return the length of the last word anyway after we have iterated over the entire string. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=KT9rltZTybQ) | Iterate over the string backwards and if you encounter a character that is not a space, increment the `res` variable. If you encounter a space and the length of the last word (`res` variable) is greater than `0`, return the length of the last word. Else, continue iterating backwards. **OR** use Brute force and split the string into words and return the length of the last word. |
 
 Given a string `s` consisting of some words separated by some number of spaces, return the length of the **last** word in the string.
 
@@ -1041,6 +1048,10 @@ Given a string `s` consisting of some words separated by some number of spaces, 
 
 ### Reverse Words in a String
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=KT9rltZTybQ) | Iterate over the string backwards and if you encounter a character that is not a space, increment the `res` variable. If you encounter a space and the length of the last word (`res` variable) is greater than `0`, return the length of the last word. Else, continue iterating backwards. **OR** use Brute force and split the string into words and return the length of the last word. |
+
 Given an input string `s`, reverse the order of the **words**.
 
 - EX: `s = "the sky is blue"` -> `"blue is sky the"`
@@ -1065,6 +1076,7 @@ Given an input string `s`, reverse the order of the **words**.
     - When we reach the end of the current word, we reverse it and update the `start` variable to the index of the next word
 
   ```py
+  # TODO: doesn't work, need to find a way to reverse the string in-place
   def reverseWords(s):
       # reverse the entire string
       s.reverse()
@@ -1093,9 +1105,9 @@ Given an input string `s`, reverse the order of the **words**.
 
 ### Is Subsequence
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=99RVfqklbCE) | Use a counter variable to keep track of the number of characters in `s` that are also in `t`. Use a pointer to iterate over `t` and check if the current character is equal to the current character in `s`. If so, increment the counter variable. If the counter variable is equal to the length of `s`, return `True`, as this means that we have found all the characters in `s` in `t`. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=99RVfqklbCE) | Use **Two Pointers** `i, j` one for the current character in `s` and the other for the current character in `t`. Iterate over `t` and check if the current character is equal to the current character in `s`. If so, increment the `i` pointer. Finally, check if the `i` pointer is equal to the length of `s` to see if we have found all the characters in `s` in `t`. |
 
 Given two strings `s` and `t`, return `true` if `s` is a **subsequence** of `t`, or `false` otherwise.
 
@@ -1112,27 +1124,26 @@ Given two strings `s` and `t`, return `true` if `s` is a **subsequence** of `t`,
     - and the second pointer to iterate over `t` and check if the current character is equal to the current character in `s`
   - Finally we check if the first pointer is equal to the length of `s` to see if we have found all the characters in `s` in `t`
 
-- Time complexity: `O(n)`
+- Time complexity: `O(n)` | Space complexity: `O(1)` ✅
 
 ```py
 def isSubsequence(s, t):
-    matchedChars = 0
-    for j in range(len(t)):
-        if matchedChars == len(s)-1:
-            break
+    i, j = 0, 0
+    while i < len(s) and j < len(t):
         if s[i] == t[j]:
             i += 1
+        j += 1
 
-    return matchedChars == len(s)-1
+    return i == len(s)
 ```
 
 ---
 
 ### Backspace String Compare
 
-| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                     |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=k2qrymM_DOo) | Use a helper function to build the final string, the function Iterates over the string and checks if the current character is a backspace character. If so, `pop` the last character from the array. If not, append the current character to the array. Return the final string. Then compare the two strings using the helper function. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=k2qrymM_DOo) | Use a helper function to build the final string, the function Iterates over the string and checks if the current character is a backspace character. If so, `pop` the last character from the array. If not, append the current character to the array. Return the final string. Then compare the two strings using the helper function. **OR** Use **Two Pointers** to iterate over the strings backwards and use a `nextValidChar` helper function to skip the backspace characters. Then compare the two strings and check if a pointer has reached the end of the string together or one of them has reached the end of the string. |
 
 Given two strings `s` and `t`, return `true` if they are equal when both are typed into empty text editors. `'#'` means a backspace character.
 
@@ -1140,7 +1151,7 @@ Given two strings `s` and `t`, return `true` if they are equal when both are typ
 
   - Explanation: Both `s` and `t` become `"ac"`.
 
-- Solution 1: Time: `O(n)`, Space: `O(s + t)` = `O(n)`
+- **Solution 1:** Time: `O(m + n) ~= O(n)`, Space: `O(s + t) ~= O(n)`
   ![backspace-string-compare](./img/backspace-string-compare-1.png)
 
   ```py
@@ -1158,7 +1169,7 @@ Given two strings `s` and `t`, return `true` if they are equal when both are typ
       return buildString(s) == buildString(t)
   ```
 
-- Solution 2: Time: `O(m + n)` => `O(n), Space:`O(1)` ✅
+- **Solution 2:** Time: `O(m + n)` => `O(n), Space:`O(1)` ✅
   ![backspace-string-compare](./img/backspace-string-compare-2.png)
 
   - we can use **two pointers** to iterate over the strings backwards and check if the current character is a backspace character
@@ -1203,6 +1214,29 @@ Given two strings `s` and `t`, return `true` if they are equal when both are typ
           i -= 1 # move to the next character
 
       return i
+
+  # --------------------------------------------------
+
+  # Cleaner solution
+  def backspaceCompare(s, t):
+      def nextValidChar(s, i):
+          skips = 0
+          while i >= 0:
+              if s[i] == '#': skips += 1
+              elif skips > 0: skips -= 1
+              else: break
+              i -= 1
+          return i
+
+      i, j = len(s)-1, len(t)-1
+      while i >=0 or j >= 0:
+          i, j = nextValidChar(s, i), nextValidChar(t, j)
+          if i < 0 and j < 0: return True
+          if (i < 0 or j < 0) or s[i] != t[j]: return False
+
+          i -= 1
+          j -= 1
+      return True
   ```
 
 ---

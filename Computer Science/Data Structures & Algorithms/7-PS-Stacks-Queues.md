@@ -10,11 +10,12 @@
     - [Minimum Remove to Make Valid Parentheses](#minimum-remove-to-make-valid-parentheses)
     - [Minimum Add to Make Parentheses Valid](#minimum-add-to-make-parentheses-valid)
     - [Tag Validator](#tag-validator)
-  - [Maximum Frequency Stack](#maximum-frequency-stack)
+    - [Maximum Frequency Stack](#maximum-frequency-stack)
   - [Monotonic Stack Technique](#monotonic-stack-technique)
     - [Next Greater Element I](#next-greater-element-i)
     - [Next Greater Element II](#next-greater-element-ii)
     - [Daily Temperatures](#daily-temperatures)
+    - [Sliding Window Maximum](#sliding-window-maximum)
 
 ---
 
@@ -456,7 +457,7 @@ def tag_validator(code):
 
 ---
 
-## Maximum Frequency Stack
+### Maximum Frequency Stack
 
 Implement `FreqStack`, a class which simulates the operation of a stack-like data structure.
 
@@ -633,5 +634,129 @@ def daily_temperatures(temperatures):
 
     return res
 ```
+
+---
+
+### Sliding Window Maximum
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=DfljaUwZsOk) | Use a **Monotonic decreasing queue (`deque`)** to store the indices of the elements in the window, and pop the smaller elements from the queue before `appending` the current element to the queue, and remove the first element from the queue if it is outside of the current window, and add the first element of the queue to the output. **(The first element of the queue will always be the maximum element of the window because we are using a decreasing order)** |
+
+You are given an array of integers `nums`, there is a sliding window of size `k` which is moving from the very left of the array to the very right. You can only see the `k` numbers in the window. Each time the sliding window moves right by one position.
+
+Return the max sliding window.
+
+- EX: `nums = [1, 3, -1, -3, 5, 3, 6, 7], k = 3` --> `[3, 3, 5, 5, 6, 7]`
+
+  - Explanation:
+    | Window Position | Max |
+    | --------------- | --- |
+    | [1 3 -1] -3 5 3 6 7 | 3 |
+    | 1 [3 -1 -3] 5 3 6 7 | 3 |
+    | 1 3 [-1 -3 5] 3 6 7 | 5 |
+    | 1 3 -1 [-3 5 3] 6 7 | 5 |
+    | 1 3 -1 -3 [5 3 6] 7 | 6 |
+    | 1 3 -1 -3 5 [3 6 7] | 7 |
+
+- Explanation:
+
+  > It's similar to the [monotonic stack](./3-Problem-solving.md#monotonic-decreasing-stack) and the [monotonic queue](./3-Problem-solving.md#monotonic-decreasing-queue) problems, as we will make sure that the first element in the queue is the maximum element in the window, and pop it when it's out of the window.
+
+  - The brute force solution is to iterate on all windows of size `k` and find the maximum element in each window. This solution takes `O(n.k)` since we have `O(n-k+1)` windows and for each window we take `O(k)` time to find the maximum element in it.
+    - to get a better solution, we will use the `next greater element` approach, using a **Monotonic decreasing queue (double-ended queue (`deque`))** to store the indices of the elements in the window.
+    - > `deque` allows for fast appends and pops **from both ends**.
+  - The first element in the `queue` is the index of the maximum element in the window.
+  - When we move the window to the right, we need to remove the element that is out of the window, and remove all elements that are smaller than the current element. Then we add the current element to the queue.
+    - This is done because we know that when going to the next window, the first element in the queue is out of the window, so we remove it. Then we remove all elements that are smaller than the current element, because **they will never be the maximum element in the window**. Then we add the current element to the queue.
+  - we use queue and not a stack, because we want to remove elements from the left side of the queue, and we want to remove the first element in the queue, which is the maximum element in the window.
+
+So, to recap: we use a `queue` to store the indices of the elements in the current window in a **decreasing order**. At each step, we add the current element to the queue, and then we pop from the `queue` (from the right) all the elements that are smaller than the current element. We then remove (from the left) the first element in the queue if it is outside of the current window. Finally, we add the first element of the queue to the output. **(The first element of the queue will always be the maximum element of the window because we are using a decreasing order)**
+
+- **Steps:**
+  1. Initialize a deque `q` to store the indices of the elements in the current sliding window, and initialize `l` and `r` pointers to `0`
+  2. iterate over the array `nums` and do the following:
+     - pop smaller values from `q` until we find a value that is greater than the current value
+     - append the current index ('r') to `q`
+     - remove the left val from the window
+       - If the index of the oldest element in the sliding window (`l`) is outside of the current sliding window, remove it from the deque `q` using the `popleft()` method
+     - check if the window is at least size `k` to add the maximum element (`nums[q[0]]`) to the result
+
+![sliding-window-maximum](./img/sliding-window-maximum.png)
+
+```py
+def max_sliding_window(nums, k):
+    if not nums: return []
+    result = []
+    q = collections.deque() # indices of the elements in the window
+    l = r = 0
+
+    while r < len(nums):
+      # pop smaller values from q if the current value is greater than the last value in q to always make the queue contain the max element
+      while q and nums[q[-1]] < nums[r]:
+          q.pop()
+      q.append(r)
+
+      # remove left val from window if it is outside of the current window
+      if l > q[0]:
+        q.popleft()
+
+      # check if the window is at least size k to start adding the maximum element to the result
+      if (r+1) >= k:
+        result.append(nums[q[0]])
+        l += 1 # left pointer will only move when the window is at least size k
+      r += 1
+
+    return res
+
+# -------------------------------------------------------------
+
+# More clean ✅
+def max_sliding_window(nums, k):
+    result = []
+    q = collections.deque()
+    l = r = 0
+
+    for r in range(len(nums)):
+        while q and nums[q[-1]] < nums[r]:
+            q.pop()
+        q.append(r)
+
+        if l > q[0]: q.popleft()
+
+        if (r+1) >= k:
+            result.append(nums[q[0]])
+            l += 1
+
+    return result
+```
+
+- Another solution: (Simpler, but doesn't pass all test cases)
+
+  ```py
+  # without queue
+  def max_sliding_window(nums, k):
+      result = []
+      l  = 0
+      maxIndex = 0
+      for r in range(len(nums)):
+          if nums[r] > nums[maxIndex]:
+              maxIndex = r
+          if r - l + 1 == k:
+          # or if r >= k - 1:
+              result.append(nums[maxIndex])
+              l += 1
+              if l > maxIndex:
+                  for i in range(l, r+1):
+                      if nums[i] > nums[maxIndex]:
+                          maxIndex = i
+                  # or
+                  # newMaxIndex = l
+                  # for i in range(l, r+1):
+                  #         if nums[i] > nums[newMaxIndex]:
+                  #             newMaxIndex = i
+                  # maxIndex = newMaxIndex
+      return result
+  ```
 
 ---

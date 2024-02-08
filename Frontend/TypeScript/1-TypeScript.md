@@ -24,7 +24,7 @@
     - [Exhaustiveness Checks with Never](#exhaustiveness-checks-with-never)
   - [Decorators](#decorators)
     - [How to use Decorators](#how-to-use-decorators)
-    - [Decorator Factories](#decorator-factories)
+    - [Decorator Factories (factory decorator)](#decorator-factories-factory-decorator)
     - [Decorator Composition](#decorator-composition)
     - [Class Decorator](#class-decorator)
   - [Namespace](#namespace)
@@ -674,11 +674,11 @@ Decorators are functions that can be used to modify the behavior of classes, met
 
 ---
 
-### Decorator Factories
+### Decorator Factories (factory decorator)
 
 Decorator factories are functions that return decorator functions and they are used to configure decorators.
 
-- It's used when we want to pass arguments to the decorator function, and we can't do that directly because the decorator function is called only one time when the class is defined, not when it's instantiated.
+- It's used **when we want to pass arguments to the decorator function**, and we can't do that directly because the decorator function is called only one time when the class is defined, not when it's instantiated.
 
 - Example:
 

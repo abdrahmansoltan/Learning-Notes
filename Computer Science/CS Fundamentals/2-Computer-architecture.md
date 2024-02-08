@@ -161,6 +161,8 @@ It is what a program uses to keep track of method/function calls.
 
 **Central Processing Unit**: it's the brain of the computer
 
+![CPU](./img/cpu-1.png)
+
 - It's used to:
 
   - writing data to `disk` or `RAM`
@@ -175,10 +177,16 @@ It is what a program uses to keep track of method/function calls.
 - It's a small amount of `RAM` that is closer to the `CPU` than the main `RAM`
 - It's smaller than `RAM` and `Disk`
   - it's measured in `MB` (Megabytes)
+- It's used to speed-up the reading / writing process of data from / to `RAM`
 - It's a lot faster than `RAM` and `Disk`
   - as it's closer to the `CPU` and it has a scale of `nano-seconds` (`10^-9` seconds)
 - The `CPU` uses `Cache` to store data that it needs to access **frequently**
-- The drawback of `Cache` is that it's **not persistent**
+  - For example if the `CPU` needs to read data from `RAM` and it finds it in `Cache`, it will read it from `Cache` instead of `RAM` as it's faster
+    ![Cache](./img/cache-1.png)
+- The drawbacks of `Cache` is that:
+  - it's **not persistent** -> same as `RAM`, if the computer shuts down, the data in `Cache` will be lost
+  - it can't store a lot of data (as it's measured in `MB` unlike `RAM` and `Disk` which are measured in `GB` or `TB`)
+  - It's expensive
 
 ---
 
