@@ -1,17 +1,11 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Performance](#performance)
-  - [Minify / Minimize files](#minify--minimize-files)
-    - [Minimize images](#minimize-images)
-  - [Critical Render Path](#critical-render-path)
-  - [Code Splitting](#code-splitting)
-  - [Tree Shaking](#tree-shaking)
-  - [Avoid blocking main thread](#avoid-blocking-main-thread)
-  - [Avoid memory leaks](#avoid-memory-leaks)
-  - [Avoid multiple re-rendering](#avoid-multiple-re-rendering)
-  - [Caching](#caching)
-  - [Rollup Visualizer](#rollup-visualizer)
+  - [Progressive Web Apps PWA](#progressive-web-apps-pwa)
+  - [Manifest](#manifest)
+  - [Service Workers](#service-workers)
+    - [How to create service worker](#how-to-create-service-worker)
+  - [HTTPS](#https)
 
 ---
 
@@ -48,7 +42,7 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 
 ---
 
-### Manifest
+## Manifest
 
 - It defines how the application is displayed to the user and how it gets launched. All **metadata** related to the app is also defined here — starting URL, full and short name, link icons, splash screen and so on.
 - It's a `JSON` file that contains the metadata of the app
@@ -85,7 +79,7 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 
 ---
 
-### Service Workers
+## Service Workers
 
 - It's a **Javascript script file that runs in the background** Asynchronously (separate from our code and can run in a separate thread in the background)
 - It acts as a **proxy server** that sits between web applications, the browser, and the network (when available)
@@ -107,7 +101,7 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
   ![caching](./img/caching.png)
   ![caching](./img/caching-1.png)
 
-#### How to create service worker
+### How to create service worker
 
 - option 1: manually
 - option 2: using [Workbox](https://developer.chrome.com/docs/workbox/) which is usually added to PWA plugins
@@ -135,7 +129,7 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 
 ---
 
-### HTTPS
+## HTTPS
 
 - For security and preventing hackers from seeing your requests
 

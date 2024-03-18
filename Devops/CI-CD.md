@@ -5,6 +5,7 @@
     - [Continuous Integration](#continuous-integration)
     - [Continuous Delivery](#continuous-delivery)
     - [Continuous Deployment](#continuous-deployment)
+  - [Circle CI](#circle-ci)
   - [Pipeline](#pipeline)
   - [Github Actions](#github-actions)
 
@@ -63,6 +64,43 @@ A properly configured CI/CD pipeline allows organizations to adapt to changing c
 The difference is that instead of deploying your application manually, you set it to be **deployed automatically**. Human intervention is not required.
 
 ![Continuous Deployment](./img/cd.PNG)
+
+---
+
+## Circle CI
+
+It's a `Continuous Integration` and `Continuous Deployment` tool that is easy to set up and use. It is a cloud-based tool that is integrated with GitHub and Bitbucket.
+
+- It uses pre-defined **Jobs** to:
+
+  - install dependencies on a docker image and run it
+
+- **The build flow for a frontend application:**
+
+  - `webapp` -> build -> generates: (`app.#.js`, `vendor.#.js`, `otherfiles.#.extension`)
+    - `#` means a unique (number / hash) that is different on each build, so that when web browsers knows that the file has changed and it needs to download the new file. (cache busting)
+  - All these files are spit out into `dist` folder which was used to be deployed manually
+  - So it was a hassle to keep doing this manually for every build.
+
+  - Build is different depending on which `.env` file was used (Mode)
+
+- How we can use **CI/CD** to automate this process
+
+  - builds -> starts a `docker image` (with the environment needed to run the app set up)
+  - use a `config.yml` file that:
+    - contains all commands to make the `docker` environment
+    - installs all the required `dependencies`
+    - builds the webapp, depending on which `mode` it is run in
+    - runs the unit tests (angular test & vue tests)
+    - runs `linting` on the code.
+
+- Any PR that uses circle-ci has to run through the pipeline steps:
+
+  - installing dependencies
+  - testing + building (in parallel)
+  - building docker image
+
+  > if any of these fails, the pipeline stops and the build is therefore failed.
 
 ---
 

@@ -31,6 +31,7 @@
     - [Working with CSS](#working-with-css)
     - [Working with SASS](#working-with-sass)
     - [Working with modern Javascript (Babel)](#working-with-modern-javascript-babel)
+  - [Environment Variables in Webpack](#environment-variables-in-webpack)
   - [Webpack Notes](#webpack-notes)
 
 ---
@@ -777,9 +778,13 @@ When webpack bundles our application and outputs it to the `dist` folder which i
 
 - **Approach 1:** Usually we have 2 modes (`development`, `production`), so we usually have 3 files:
 
-  - `webpack.common.js` : this will have the common configuration between dev and prod
-  - `webpack.dev.js` : this will have the development configuration
-  - `webpack.prod.js` : this will have the production configurations
+  - `webpack.common.js` : this will have the common configuration between dev and prod which have all the common plugins before building both development and production
+  - `webpack.dev.js` : this will have the development configuration, it merges the common webpack as a first step then it make some configurations related to the dev and the development server.
+  - `webpack.prod.js` : this will have the production configurations, it merges the common webpack as a first step then it make some configurations related to the prod like
+    - minimizing the code
+    - removing the source maps
+    - adding a hash for the bundle every time it changes
+    - adding plugins used in production only
 
 - **Approach 2:** pass the `env` variable to webpack and use it to determine which file to use
 
@@ -1154,6 +1159,42 @@ Webpack doesn't know on its own how to transform javascript code. This task is o
     }
   };
   ```
+
+---
+
+## Environment Variables in Webpack
+
+- Webpack sets our environmental variables depend on the `BUILD_ENV` passed to the build scripts.
+
+  - if no `BUILD_ENV` value is passed in the script, it will be set to `development` and will load the `.env` file by default
+
+  ```js
+  const targetEnv = process.env.BUILD_ENV || 'dev';
+
+  let dotenvFileName = `.env.${targetEnv}`;
+  if (targetEnv === 'dev') {
+    dotenvFileName = '.env';
+  }
+  ```
+
+- We can use `environment variables` in webpack to do things conditionally in production or development mode
+
+  - This is done by using the `DefinePlugin` plugin
+
+    ```js
+    // webpack.config.js
+    const webpack = require('webpack');
+
+    module.exports = {
+      plugins: [
+        new webpack.DefinePlugin({
+          'process.env.BUILD_ENV': JSON.stringify('production')
+        })
+      ]
+    };
+    ```
+
+    - This will replace `process.env.BUILD_ENV` with the string `production` in the code
 
 ---
 

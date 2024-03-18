@@ -206,6 +206,9 @@ As you go up in seniority, you'll be expected to be able to design systems that 
   - we will lower the demand / hits on the server.
   - we will decrease the latency.
   - we will increase the availability. (because if one of the `CDNs` goes down, the other `CDNs` will handle the requests).
+- Different locations will have different ping times. So, we need to make sure that the content is cached in the `CDN` that is closer to the client.
+  - More here: [https://www.cloudping.info](https://www.cloudping.info)
+- So we need to distribute the content to the `CDN` to multiple locations. and then the `CDN` will distribute the content to the client.
 - It holds the files that you want to serve to the client, to prevent the client from requesting the files from the server directly in case the files are already cached in the CDN.
 
   - Assets like: `images`, `videos`, `CSS`, `JS`, etc.

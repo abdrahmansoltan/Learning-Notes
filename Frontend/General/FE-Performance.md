@@ -2,15 +2,27 @@
 
 - [INDEX](#index)
   - [Performance](#performance)
+    - [Performance Types](#performance-types)
+    - [Performance Metrics](#performance-metrics)
+    - [The importance of measurement](#the-importance-of-measurement)
+  - [JavaScript Performance](#javascript-performance)
+    - [The cost of JavaScript](#the-cost-of-javascript)
+    - [How to measure JS performance](#how-to-measure-js-performance)
+    - [Optimizing the cost of JavaScript](#optimizing-the-cost-of-javascript)
+  - [CSS Performance](#css-performance)
   - [Minify / Minimize files](#minify--minimize-files)
     - [Minimize images](#minimize-images)
   - [Critical Render Path](#critical-render-path)
-  - [Code Splitting](#code-splitting)
+  - [Code Splitting (Lazy Loading)](#code-splitting-lazy-loading)
   - [Tree Shaking](#tree-shaking)
   - [Avoid blocking main thread](#avoid-blocking-main-thread)
   - [Avoid memory leaks](#avoid-memory-leaks)
   - [Avoid multiple re-rendering](#avoid-multiple-re-rendering)
   - [Caching](#caching)
+    - [Why do we need caching?](#why-do-we-need-caching)
+    - [HTTP cache (`cache-control` headers)](#http-cache-cache-control-headers)
+    - [`content-addressable` storage](#content-addressable-storage)
+    - [Application cache](#application-cache)
   - [Rollup Visualizer](#rollup-visualizer)
   - [Web Vitals and Performance Score](#web-vitals-and-performance-score)
     - [Web Vitals](#web-vitals)
@@ -21,6 +33,339 @@
 ## Performance
 
 ![performance](./img/performance.PNG)
+
+- Why does performance matter?
+
+  - **User experience**: A slow website can lead to a poor user experience, which can lead to a loss of customers.
+    - `0.1` second is about the limit for having the user feel that the system is reacting instantaneously, meaning that no special feedback is necessary except to display the result.
+    - `1` second is about the limit for the user's flow of thought to stay uninterrupted, even though the user will notice the delay. No special feedback during delays of more than `0.1` but less than `1` second is necessary. But the user loses the feeling of operating directly on the data.
+    - `10` seconds is about the limit for keeping the user's attention focused on the dialogue. For longer delays, users will want to perform other tasks while waiting for the computer to finish, so they should be given feedback indicating when the computer expects to finish. Feedback during the delay is especially important if the response time is likely to be highly variable, since users will then not know what to expect.
+      ![performance](./img/performance-2.png)
+      - Note that the `10` seconds includes the time needed to download the files from the server and to parse and execute the files in the browser (run the application) and to render the files in the browser (paint the application) and to handle the user's interactions with the application (clicks, etc.)
+  - **SEO & Revenue**: Google uses the performance of a website as a ranking factor. A slow website can lead to a lower ranking in search results. Research shows that:
+    - `1` second delay resulted `11%` fewer page views, and `7%` loss in conversions
+    - `2` seconds delay in web page load time increased bounce rate by `103%` (Double the people are leaving the website)
+    - `400ms` improvement in performance resulted in `9%` increase in traffic at Yahoo
+    - Google found that a `2%` slower page resulted in `2%` fewer searches, which means `2%` fewer ads shown (money lost 📉)
+    - `100ms` improvement in performance resulted in `1%` increase in revenue at Amazon
+    - `53%` of users will leave a mobile page if it takes longer than `3` seconds to load
+    - if you want user to feel like your site is faster than your competitor's, you need to be `20%` faster
+
+- Why not make the website as fast as possible?
+  - **Complexity**: our applications are getting more complex and larger
+    ![performance](./img/performance-3.png)
+  - `LTE` and `3G` are still the most used networks in the world and they are slow
+    ![performance](./img/performance-4.png)
+  - **Cost**: It's expensive to make the website as fast as possible because it requires more resources and more time
+  - **Trade-offs**: It's not always possible to make the website as fast as possible because of the trade-offs between the performance and the user experience and the cost and the complexity
+- Performance needs are different for different applications
+  - for `news` website, the most important thing is to load the news quickly (showing content), we can't show loading states here because the user needs to see the news quickly
+  - for `game` website, the most important thing is to load the game quickly (showing content), we can show loading states here until the game is loaded because the user needs to play the full game
+  - for `gmail`, usually the page is loaded and user will leave it open for a long time, so the most important thing is to handle `memory leaks` and `performance` of the application
+  - `Twitter` might care about time to first tweet, but not about time to first interaction
+  - So, You should ask yourself: _"What does my product care about? What does my user care about?"_
+
+---
+
+### Performance Types
+
+![performance](./img/performance-5.png)
+
+- **Network load performance**
+  - This focuses on getting the files from the server to the client as quickly as possible
+  - Shipping less code to the client (minify, minimize, tree shaking, code splitting)
+  - Reducing the number of requests (caching, code splitting)
+- **Parsing and compiling performance**
+  - This focuses on how the browser processes the files once they are downloaded
+  - Parsing the `HTML`, `CSS`, `JS` files
+  - Compiling the `JS` files
+- **Rendering performance**
+  - This focuses on how the browser paints the files on the screen and how it handles the user's interactions with the application
+  - Critical render path
+  - Executing the code & avoiding blocking the main thread
+  - Avoiding memory leaks
+  - Avoiding blocking the main thread
+  - Avoiding multiple re-rendering
+
+---
+
+### Performance Metrics
+
+- Here are some numbers to think about from `RAIL` model
+  ![performance](./img/performance-6.png)
+  ![performance](./img/performance-7.png)
+- Don't be obsessed with the numbers, but use them as a guide to make the website as fast as possible, **It's about getting `10%` better, not `100%` better**
+
+---
+
+### The importance of measurement
+
+It's the first step to improve the performance of the website.
+
+> Always measure. Don't tune for speed until you've measured, and even then don't unless one part of the code overwhelms the rest. - Rob Pike
+
+Don't go just blindly applying performance optimizations, you need to measure first to know where the problem is and then apply the optimization to solve the problem
+
+There's a cost to every optimization, so you need to measure to know if the optimization is worth it or not (trade-offs)
+
+- Things to think about while measuring:
+
+  - Are we testing on a fancy computer or a slow phone?
+  - Are we simulating less than ideal network conditions?
+  - What is our performance budget?
+  - Which browsers are we testing on?
+    - Different browsers have different performance characteristics (something that you think is fast in one browser might be slow in another browser)
+
+- Tools to measure the performance:
+  - `Lighthouse` (Chrome extension)
+  - `WebPageTest`
+  - `PageSpeed Insights`
+  - `Chrome DevTools`
+  - `Performance` API
+
+---
+
+## JavaScript Performance
+
+### The cost of JavaScript
+
+We can't buy faster servers to improve performance of **client-side** applications, so we need to make the client-side applications as fast as possible.
+
+- A lot of time and effort is spent on compressing assets, removing requests, and reducing latency, but what about the cost of the JavaScript itself once the assets are downloaded and the application is running?
+
+  - Sometimes, the `js` files are the most expensive part of the application (parse, compile, execute, etc.)
+    ![performance](./img/performance-8.png)
+  - That's where the `cost of JavaScript` comes in to play and it's the most important thing to focus on to improve the performance of the client-side applications
+
+- **Okay, so what is happening in the yellow part?**
+  ![performance](./img/performance-13.png)
+
+  - **Parse**: The browser has to read the `js` file and convert it into a format it can understand
+
+    - parsing is slow, especially on mobile (as slow as `1MB/s` on mobile)
+
+  - **AST**
+
+    - After parsing, code is turned into an **abstract syntax tree (AST)** and then into bytecode
+
+    > `AST` is a tree representation of the abstract syntactic structure of source code written in a programming language.
+    >
+    > summary: it's a tree representation of the code that the browser can understand and execute
+    > ![AST](./img/ast.png)
+
+  - **Compile**: The browser has to convert the `js` file into a format that the computer can understand
+    - Javascript is a compiled language, but it's also an interpreted language -> (Just in Time `JIT` compilation) meaning that the `js` code is compiled moments before it's executed (it's getting compiled but not by us manually, it's getting compiled by the browser)
+      ![performance](./img/performance-9.png)
+    - There's an `optimization compiler` that optimizes for what is has seen. if it sees something new, it will `de-optimize` and `re-optimize` again
+  - **Execute**: The browser has to run the `js` file and execute the code
+  - **Memory**: The browser has to allocate memory to store the `js` file and the variables and the objects and the functions and the classes and the modules and the closures and the callbacks and the promises and the async/await and the generators ... etc.
+
+---
+
+### How to measure JS performance
+
+- Using `performance` API
+
+  ```js
+  import { performance } from 'perf_hooks';
+
+  let iterations = 1000000;
+  const a = 1;
+  const b = 2;
+  const add = (x, y) => x + y;
+
+  // Setup
+  performance.mark('start');
+  // Test
+  while (iterations--) {
+    add(a, b);
+  }
+  // Teardown
+  performance.mark('end');
+  performance.measure('My Special Benchmark', 'start', 'end');
+  const [measure] = performance.getEntriesByName('My Special Benchmark');
+  console.log(measure);
+  ```
+
+  ![performance](./img/performance-14.png)
+
+- The native optimization-compiler from the engine (`V8`) that happens behind the scenes is super useful, here's a comparison of the `duration` with & without it:
+  ![performance](./img/performance-16.png)
+
+  - It optimizes the code by detecting repeated calls to the same function and inlining the function to avoid the overhead of calling the function
+
+- We can get more insights from the engine about the performance of the code using the `--trace-opt` flag in `node` to see the `V8` engine optimizations and the `--trace-deopt` flag to see the `V8` engine de-optimizations
+  ![performance](./img/performance-15.png)
+
+---
+
+### Optimizing the cost of JavaScript
+
+The code you write is not always the code that `V8` executes, as it sometimes re-writes the code for you after it has seen it run. This is called `optimization` and `de-optimization`
+
+So, our job is to write as much readable code as possible, and `V8` job is to optimize it for us
+
+- **Parsing**
+
+  - One way to reduce the parsing time is to reduce the size of the `js` file **(have less code to parse)**
+  - Another way is to do as much parsing as you need and as little as you can by doing other parsing later **(lazy parsing)** -> Things that you don't need to parse immediately, you can parse them later when you need them
+    ![performance](./img/performance-10.png)
+    - You can use libraries & plugins to do lazy parsing like:
+      - [optimize-js](https://www.npmjs.com/package/optimize-js)
+      - [optimize-js-plugin](https://www.npmjs.com/package/optimize-js-plugin) -> for `webpack`
+      - [prepack](https://prepack.io/)
+      - [webpack](https://webpack.js.org/)
+      - [rollup](https://rollupjs.org/guide/en/)
+      - [parcel](https://parceljs.org/)
+      - [esbuild](https://esbuild.github.io/)
+  - Avoid nested functions
+    ![performance](./img/performance-11.png)
+    ![performance](./img/performance-12.png)
+
+- **Compiling**
+
+  - Optimize objects
+
+    - The `V8` engine has a hidden class mechanism that it uses to optimize the objects in the `js` code
+    - It does so by checking if objects have the same `map` using `%HaveSameMap` method to avoid repeating the same map for the same objects and to avoid creating a new map for the same objects, so that functions can be optimized when they are called with the same map (same object structure)
+
+      ```js
+      const a = { a: 1 };
+      const b = { a: 4 };
+      console.log(%HaveSameMap(a, b)); // true
+
+      const c = { a: 1 };
+      const d = { b: '4' };
+      console.log(%HaveSameMap(c, d)); // false (different maps)
+      ```
+
+  - Scoping and Prototypes
+
+    - The `V8` engine uses `hidden classes` to optimize Scoping and Prototypes when looking for properties in the `prototype chain`
+    - Takeaways:
+      - Initialize your properties at creation time and in the same order
+      - Try not to modify them after creation
+      - Maybe just use `Typescript` or `Flow` to help you with that (so that you don't have to worry about these things)
+
+  - Function inlining
+    - The `V8` engine inlines functions to optimize the code by detecting repeated calls to the same function and inlining the function to avoid the overhead of calling the function
+
+- **Takeaways:**
+  - The easiest way to reduce `parse`, `compile`, and `execution` times is to **ship less code**
+  - Use `User Timing API` to measure the performance of the `js` code and figure out where the biggest bottlenecks are
+  - Consider using a `type system` so that you don't have to worry about most of the things above
+
+---
+
+## CSS Performance
+
+To also improve the performance from the `css` side:
+
+- we can reduce complicated specificity and reduce the number of selectors to reduce the time needed to calculate these specificities.
+
+  ```css
+  /* BAD ❌ */
+  .sidebar > .menu-item:nth-child(4n + 1) {
+    color: red;
+  }
+
+  /* GOOD ✅ */
+  .menu-item {
+    color: red;
+  }
+  ```
+
+- Use simple class-names or `BEM` methodology
+- Remove unused `css` using `purgecss` or `uncss` or `purifycss`
+
+  - Because the browser has to parse and compile and execute the `css` files / rules, and check if the rules are applied to the `DOM` elements or not (which takes time)
+  - The less styles you have, the less there is to check.
+
+- [Critical render path](#critical-render-path) for `css` files
+
+  - The browser has to parse and compile and execute the `css` files to build the `CSSOM` tree and then combine the `CSSOM` tree with the `DOM` tree to form the render tree and then compute the layout of each visible element and paint them on the screen
+
+- Avoid **Reflow** by:
+
+  - Change `classes` at the lowest level of the `DOM` tree (not at the top level)
+  - Avoid repeatedly modifying `inline styles`
+
+    ```js
+    // BAD ❌
+    element.style.width = '100px';
+    element.style.height = '100px';
+    element.style.background = 'red';
+    // GOOD ✅
+    element.style.cssText = 'width: 100px; height: 100px; background: red;';
+    ```
+
+  - Do less work when changing `styles`
+
+    ```js
+    const button = document.getElementById('button');
+    const boxes = document.querySelectorAll('.box');
+
+    // BAD ❌
+    const doubleWidth = el => {
+      const width = el.offsetWidth; // calculate the width each time
+      el.style.width = `${width * 2}px`;
+    };
+    button.addEventListener('click', () => {
+      boxes.forEach(doubleWidth);
+    });
+
+    // GOOD ✅
+    button.addEventListener('click', () => {
+      const widths = boxes.map(el => el.offsetWidth); // calculate the width once
+      boxes.forEach((el, i) => {
+        el.style.width = `${widths[i] * 2}px`;
+      });
+    });
+    ```
+
+  - Trade smoothness for speed when animating (use bigger `steps` instead of smaller `steps`)
+  - Avoid `table layouts` (they are slow)
+  - Batch your `DOM` changes (use `requestAnimationFrame`) -> comes out of the box when using frameworks like `React`
+
+    - It's used to batch the `DOM` changes to avoid multiple re-rendering and to avoid blocking the main thread
+    - We use it to tell the browser to do the `DOM` changes in the next frame instead of doing them immediately
+
+      ```js
+      // BAD ❌
+      const element = document.getElementById('element');
+      element.style.width = '100px';
+      element.style.height = '100px';
+      element.style.background = 'red';
+
+      // GOOD ✅
+      const element = document.getElementById('element');
+      requestAnimationFrame(() => {
+        element.style.width = '100px';
+        element.style.height = '100px';
+        element.style.background = 'red';
+      });
+      ```
+
+  - Use libraries like `fastdom` to batch `DOM` changes to avoid multiple re-rendering and to avoid blocking the main thread
+
+    ```js
+    // GOOD ✅
+    // measure then mutate
+    fastdom.measure(() => {
+      const height = element.offsetHeight; // measure
+      fastdom.mutate(() => {
+        element.style.height = `${height * 2}px`; // mutate
+      });
+    });
+
+    // BAD ❌
+    const height = element.offsetHeight; // measure
+    element.style.height = `${height * 2}px`; // mutate
+    ```
+
+  - Use `debounce` to avoid multiple `resize` events
+
+> Most of these things are handled by the frameworks automatically like `React`, `Vue`, `Angular`, etc. ⚙️
 
 ---
 
@@ -79,20 +424,6 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
       document.head.appendChild(link);
       ```
 
-    - To also improve the performance from the `css` side, we can reduce complicated specificity and reduce the number of selectors to reduce the time needed to calculate these specificities.
-
-      ```css
-      /* bad */
-      .container .item .title {
-        color: red;
-      }
-
-      /* good */
-      .title {
-        color: red;
-      }
-      ```
-
 - How to measure the performance of the `js` part in the critical render path?
 
   - We can use the `Performance` API to measure the performance of the `js` part in the critical render path
@@ -115,7 +446,9 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
 
 ---
 
-## Code Splitting
+## Code Splitting (Lazy Loading)
+
+![code splitting](./img/code-splitting-0.png)
 
 It's an optimization technique to improve the performance of the web application by splitting the code into smaller **chunks** to reduce the size of the files and the **number of requests** (avoiding large bundles)
 
@@ -125,16 +458,25 @@ It's an optimization technique to improve the performance of the web application
 
 - It's also called **"Progressive bootstrapping"** or **"Lazy loading"**
 - It reduces the **execution time** of the code by loading only the required code for the current page instead of loading all the code at once
+  > Try to limit the loaded code (lazily or not) to less than `300KB`
 - It's done using `webpack`, `rollup`, `parcel`, etc.
   ![code splitting](./img/code-splitting-3.jpeg)
 - Types:
+
   1. **Route-based code splitting**: splitting the code based on the routes
   2. **Component-based code splitting**: splitting the code based on the components
   3. **Dynamic code splitting**: splitting the code based on the user's actions
 
+- There're a lot of libraries and plugins to do code splitting like:
+  - `react-loadable` -> it's a higher-order component for loading components with dynamic imports and displaying a loading component while the component is being loaded
+
+> You can analyze the bundle size using `webpack-bundle-analyzer` for `webpack` and `rollup-plugin-visualizer` for `rollup` -> [Rollup Visualizer](#rollup-visualizer)
+
 ---
 
 ## Tree Shaking
+
+> You can analyze the bundle size using `webpack-bundle-analyzer` for `webpack` and `rollup-plugin-visualizer` for `rollup` -> [Rollup Visualizer](#rollup-visualizer)
 
 ---
 
@@ -154,20 +496,56 @@ It's an optimization technique to improve the performance of the web application
 
 Caching in client-side applications is the process of storing data in the browser for later use. This data can be fetched from the server or generated by the application itself.
 
+### Why do we need caching?
+
 - It's used to reduce the number of requests to the server and to reduce the time needed to fetch the data from the server
 
-  - for example, caching the `js` files downloaded from the server to reduce the number of requests to the server and to reduce the time needed to fetch the `js` files from the server
+- For example, caching the `js` files downloaded from the server to reduce the number of requests to the server and to reduce the time needed to fetch the `js` files from the server
 
-    - if the bundle changed or updated, the server will send the new bundle and the browser will download it and cache it again. This is called **"cache busting"**
-      ![cache busting](./img/cache-busting-1.avif)
-      ![cache busting](./img/cache-busting-2.png)
+  - if the bundle changed or updated, the server will send the new bundle and the browser will download it and cache it again. This is called **"cache busting"**
+    ![cache busting](./img/cache-busting-1.avif)
+    ![cache busting](./img/cache-busting-2.png)
 
-  - Also, when serving static `SSR` files, they will have a different status codes based on if it's cached or not
-    - `200` -> modified (First time the file is requested)
-    - `304` -> not modified (The file is cached)
-      - also, will have `ETag` header to check if the file is modified or not
-        ![cache busting](./img/cache-busting-3.png)
-  - > More, here [HTTP cache](https://web.dev/articles/http-cache)
+- Also, when serving static `SSR` files, they will have a different **response status codes** based on if it's cached or not
+
+  - `200` -> modified (First time the file is requested)
+  - `304` -> not modified (The file is cached)
+
+---
+
+### HTTP cache (`cache-control` headers)
+
+- We will have `ETag` header to check if the file is modified or not -> **`HTTP` cache**
+  ![cache busting](./img/cache-busting-3.png)
+- Cashing only affects the "safe" `HTTP` methods like: `GET`, `HEAD`, `OPTIONS`
+- Cashing doesn't affect the "unsafe" `HTTP` methods like: `POST`, `PUT`, `DELETE`, `PATCH` **(because they change the state of the server)**
+
+- cache-control headers
+
+  - `no-store`: The response can't be cached, because:
+    - The response contains sensitive data
+    - The response contains data that changes frequently
+  - `no-cache`: The response can be cached, but the client must validate the response with the server before using it
+    - We can't use the cached response until we check with the server if the response is still valid (not changed)
+  - `max-age`: The response can be cached for a specific amount of time
+    - tell the browser not to bother if whatever asset it's asking for is older than a certain amount of time
+  - `public`: The response can be cached by any cache
+  - `immutable`: The response can be cached for a long time and it won't change
+
+> More, here [HTTP cache](https://web.dev/articles/http-cache)
+
+---
+
+### `content-addressable` storage
+
+- It's a way to cache the files/scripts in the browser using a `content-addressable` storage
+- It depend on hashing the files to generate a unique hash for each file and then use this hash as the file name to store the file in the browser
+
+  - ex: `file.js` -> `file-<hash>.js` -> `file-32523jfj3.js`
+
+---
+
+### Application cache
 
 - `storage` in the browser
   - local storage
@@ -184,6 +562,24 @@ Tool to Visualize and analyze your Rollup bundle to see which modules are taking
 
 - EX: [webpack bundle analyzer](https://www.npmjs.com/package/webpack-bundle-analyzer) for `webpack` and [rollup visualizer](https://www.npmjs.com/package/rollup-plugin-visualizer) for `rollup`
   ![rollup](./img/rollup.png)
+
+  ```js
+  // webpack.config.js
+  const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+  module.exports = {
+    plugins: [new BundleAnalyzerPlugin()]
+  };
+  ```
+
+  ```sh
+  npm run build
+  ```
+
+- You can use webpack plugins to reduce the size of the bundle like:
+  - `compression-webpack-plugin`
+  - `babel-plugin-lodash` (to reduce the size of the lodash library by tree shaking)
+  - `gzip-webpack-plugin`
 
 ---
 

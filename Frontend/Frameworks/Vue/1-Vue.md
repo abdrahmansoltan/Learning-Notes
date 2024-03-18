@@ -88,7 +88,9 @@
   - [Plugins](#plugins)
     - [Installing a plugin](#installing-a-plugin)
     - [Plugins use cases](#plugins-use-cases)
-  - [Notes](#notes)
+  - [Notes \& Guidelines](#notes--guidelines)
+    - [Vue guidelines and best practices](#vue-guidelines-and-best-practices)
+    - [Vue Notes](#vue-notes)
 
 ---
 
@@ -2167,7 +2169,161 @@ common scenarios where plugins are useful include:
 
 ---
 
-## Notes
+## Notes & Guidelines
+
+### Vue guidelines and best practices
+
+- use `kebab case` for event names -> `button-clicked` instead of `buttonClicked`
+- use `$_` prefix for private properties/methods in a Vue instance
+- use `v-text` instead of (mustache syntax `{{}}`) for text interpolation
+
+  ```html
+  <!-- ✅ -->
+  <span v-text="message"></span>
+  <!-- ❌ -->
+  <span>{{ message }}</span>
+  ```
+
+- instead of using `v-if` inside a `v-for`, compute a new array of items that should be rendered and use `v-if` on the parent element
+
+  ```html
+  <!-- ✅ -->
+  <template>
+    <ul>
+      <li v-for="user in activeUsers" :key="user.id">{{ user.name }}</li>
+    </ul>
+  </template>
+
+  <script>
+    computed: {
+      activeUsers() {
+        return this.users.filter(user => user.isActive);
+      }
+    }
+  </script>
+  ```
+
+  ```html
+  <!-- ❌ -->
+  <template>
+    <ul>
+      <li v-for="user in users" :key="user.id" v-if="user.isActive">{{ user.name }}</li>
+    </ul>
+  </template>
+  ```
+
+- Use `computed properties` instead of `methods` for data changes.
+  - `Computed properties` will only re-evaluate when needed (if the dependencies are changed) while `methods` will re-evaluate each time regardless
+- Using of shorthands:
+  - `v-bind:` -> `:`
+  - `v-on:` -> `@`
+  - `v-slot:` -> `#`
+- `data` property should always be a return function to maintain the uniqueness of each component instance
+
+  ```js
+  data() {
+    return {
+      count: 0
+    };
+  }
+  ```
+
+- Always define your props with their types or attribute types if they are nested objects
+
+  ```js
+  props: {
+    title: String,
+    user: {
+      type: Object,
+      default: () => ({})
+    }
+  }
+
+  // Or using vueTypes
+
+  import vueTypes from 'vue-types';
+  props: {
+    title: vueTypes.string.def(''),
+    user: vueTypes.shape({
+      name: vueTypes.string.isRequired,
+      age: vueTypes.number
+    }).def({})
+  }
+  ```
+
+- Do not change incoming `props`, either use `data` or `events`
+
+  - If you need to change the prop value, you should define a local data property and use it instead.
+
+    ```js
+    props: {
+      title: String
+    },
+    data() {
+      return {
+        localTitle: this.title
+      };
+    },
+    // or use computed property
+    computed: {
+      localTitle() {
+        return this.title;
+      }
+    },
+    methods: {
+      changeTitle() {
+        // this.title = 'New title'; // ❌
+        this.localTitle = 'New title'; // ✅
+      }
+    }
+    ```
+
+  - Note that if the prop is an object or an array, you should use a **deep copy** to avoid mutating the original value.
+
+- Don’t use multiple `v-if`’s. Use one `v-if` on a `template` instead of rendering multiple elements each time
+
+  ```html
+  <!-- ✅ -->
+  <template v-if="isLoading">
+    <p>Loading...</p>
+    <p>Please wait</p>
+    <loading-spinner />
+  </template>
+
+  <!-- ❌ -->
+  <p v-if="isLoading">Loading...</p>
+  <p v-if="isLoading">Please wait</p>
+  <loading-spinner v-if="isLoading" />
+  ```
+
+  - This is because `v-if` will be re-evaluated each time and it will be a performance issue
+
+- Don’t make API calls in a component. Use the designated `action` instead
+  - `actions` are used to handle all the API calls and other asynchronous operations. They are called from the component and then commit the result to the `store`.
+- If your `props` number gets too much, consider using `slots` instead.
+
+  ```html
+  <!-- ✅ -->
+  <MyComponent>
+    <template v-slot:header>
+      <h1>Here might be a page title</h1>
+    </template>
+
+    <p>A paragraph for the main content.</p>
+    <p>And another one.</p>
+
+    <template v-slot:footer>
+      <p>Here's some contact info</p>
+    </template>
+  </MyComponent>
+
+  <!-- ❌ -->
+  <MyComponent :header="header" :main="main" :footer="footer" />
+  ```
+
+---
+
+### Vue Notes
 
 - In Vue apps: Webpack is configured to replace **"@/path"** with **"src/path"**
 

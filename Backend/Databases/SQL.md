@@ -54,6 +54,7 @@
   - [Validating Data](#validating-data)
     - [Row Level Validation](#row-level-validation)
     - [Where to apply the validation?](#where-to-apply-the-validation)
+  - [Database transaction](#database-transaction)
   - [Interviews Questions](#interviews-questions)
 
 ---
@@ -1299,6 +1300,14 @@ Where to apply the validation (`user-side` or `server-side` or `database-side`) 
 - We should spread the validation between the 3 sides to make sure that the data is valid.
 - Web-server vs Database validation
   ![validation](./img/sql-validation-2.png)
+
+---
+
+## Database transaction
+
+
+
+- **Roll
 
 ---
 

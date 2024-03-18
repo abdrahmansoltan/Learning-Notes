@@ -1220,6 +1220,7 @@ You can set default values for the Axios instance using the `axios.defaults` obj
 
 ```js
 axios.defaults.baseURL = 'https://api.example.com';
+// or axios.defaults.baseURL =  process.env.BASE_URL + '/api/web/'
 axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;

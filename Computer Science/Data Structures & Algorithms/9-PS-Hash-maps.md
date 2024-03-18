@@ -13,6 +13,7 @@
   - [Isomorphic Strings](#isomorphic-strings)
   - [Hand of Straights](#hand-of-straights)
   - [4Sum II](#4sum-ii)
+  - [Continuous SubArray Sum](#continuous-subarray-sum)
   - [Repeated DNA Sequences](#repeated-dna-sequences)
     - [Longest Consecutive Sequence](#longest-consecutive-sequence)
   - [LRU Cache](#lru-cache)
@@ -679,6 +680,71 @@ def fourSumCount(A, B, C, D):
   - It will be `O(n^2)` if all the arrays have the same length
   - Space complexity: `O(a * b)` where `a` is the length of the first array and `b` is the length of the second array
     - This is because we store the sum of each pair of numbers in the first two arrays in a dictionary
+
+---
+
+## Continuous SubArray Sum
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=OKcrLfR-8mE) | Use Bruteforce to check every possible subarray, but that would be `O(n^2)` time complexity. **OR** We can solve it in `O(n)` time complexity using a **prefix sum** and a dictionary to store the `remainder` and its ending `index`, if the `remainder` was already added to the dictionary, that means we have seen it before, and the difference between the current index and the index of the `remainder` is the size of the subarray. |
+
+Given an integer array `nums` and an integer `k`, return `true` if `nums` has a continuous subarray of size at least two whose elements sum up to a multiple of `k`, or `false` otherwise.
+
+An integer `x` is a multiple of `k` if there exists an integer `n` such that `x = n * k`. `0` is **always** a multiple of `k`.
+
+- EX: `nums = [23, 2, 4, 6, 7], k = 6` --> `true` because `[2, 4]` is a continuous subarray of size 2 and sums up to 6 which is a multiple of 6.
+
+- Explanation
+  - the brute force solution is to loop through the array and check every possible subarray -> `O(n^2)` time complexity ❌
+  - One solution that may come to mind is to use a `Sliding Window` technique, but it won't work here because:
+    - We won't know when to shrink the window because the size of the subarray is not fixed ❌
+  - But we can solve it in `O(n)` time complexity using a **prefix sum** and a dictionary to store the `remainder` and its ending `index`:
+    - Here, we want to use `prefix sum` because we want to know the sum of the elements between two indices **(range sum)**
+      - `range sum = prefix_sum[right] - prefix_sum[left-1]`
+    - The `remainder` will be the indicator of whether the sum of the elements between two indices is a multiple of `k`
+    - If the `remainder` is in the dictionary, **that means we have seen it before**, So we're guaranteed that we added a (multiple of `k`) to the `remainder` since the last time we saw it.
+      - the difference between the current index and the index of the `remainder` is the size of the subarray **because the sum of the elements between the two indices is a multiple of `k`**
+      - Then we check if the difference between the current index and the index of the `remainder` is greater than `1`
+        ![continuous-subarray-sum](./img/continuous-subarray-sum.png)
+        - if so, return `True`
+    - If the `remainder` is not in the dictionary, that means we have not seen it before, so we add it to the dictionary
+    - **Note:** We initialize the dictionary with `{ 0: -1 }` because the sum of the first element is `0` and the size of the subarray must be at least `2` and if the first element is a multiple of `k`, we will get index as `0` and `0 - (-1) = 1` which is not greater than `1`, so we need to initialize the dictionary with `{ 0: -1 }` to avoid this case
+      - So this will ensure that we won't return `true` if the first element is a multiple of `k`
+
+```py
+# Brute force solution: O(n^2) time complexity ❌
+def check_subarray_sum(nums, k):
+    for i in range(len(nums)):
+        curSum = nums[i]
+        for j in range(i+1, len(nums)):
+            curSum += nums[j]
+            if curSum % k == 0:
+                return True
+    return False
+
+# -------------------------------------------------------------------
+
+# Time complexity: O(n) | Space complexity: O(n) ✅
+def check_subarray_sum(nums, k):
+    # Create a dictionary to store the remainder and its index
+    remaindersDict = {0: -1} # Initialize the dictionary with 0: -1 because the sum of the first element is 0 and the size of the subarray must be at least 2
+    total = 0
+
+    for i in range(len(nums)):
+        total += nums[i]
+        # If k is not 0, get the remainder of the sum by dividing by k
+        if k != 0:
+            remainder = total % k
+        # If the remainder is in the dictionary, check if the difference between the current index and the index of the remainder is greater than 1 -> len(subarray) >= 2
+        if remainder in remaindersDict:
+            if i - remaindersDict[remainder] > 1: # Handle the case when the first element is a multiple of k
+                return True
+        else:
+            remaindersDict[remainder] = i
+
+    return False
+```
 
 ---
 

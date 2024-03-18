@@ -4,6 +4,7 @@
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
+  - [How web pages are built](#how-web-pages-are-built)
   - [Web Components](#web-components)
     - [Web Components Core Technologies](#web-components-core-technologies)
     - [Using Web Components](#using-web-components)
@@ -52,6 +53,92 @@ The four basic steps include:
 4. The final step is to **paint** the screen, wherein the render tree is traversed, and the renderer’s `paint()` method is invoked, which paints each node on the screen using the UI backend layer.
 
 > **NOTE**: every browser has its own unique rendering engine. So naturally, every browser has its own way of interpreting web pages on a user’s screen. Here’s where a challenge arises for web developers regarding the cross-browser compatibility of their website.
+
+---
+
+## How web pages are built
+
+![Web Pages](./img/web-pages-0.png)
+
+1. The browser sends a `GET` request to the server to get the `HTML` file
+   ![Web Pages](./img/web-pages-1.png)
+2. The received `HTML` file is a `text` file that contains the structure of the web page, and the other files are linked to it (like `CSS`, `JS`, `images`, etc.)
+   ![Web Pages](./img/web-pages-2.png)
+3. The `HTML` file is parsed by the browser to create the `DOM` tree, which is a **representation of the structure of the web page in a tree-like structure**
+   ![Web Pages](./img/web-pages-3.png)
+
+4. The `CSS` file is parsed by the browser to create the `CSSOM` tree, which is a **representation of the styles of the web page in a tree-like structure**
+   ![Web Pages](./img/web-pages-4.png)
+   ![Web Pages](./img/web-pages-5.png)
+
+5. The `DOM` tree and the `CSSOM` tree are combined to create the `Render Tree`, which is a **representation of the structure of the web page with the styles applied to it**
+   ![Web Pages](./img/web-pages-6.png)
+
+   - it's what is actually shown on the page (`structure` + `rules` on how they should look like)
+   - it has a one-to-one mapping with the visible objects on the page
+   - Style calculations are done to:
+     - figure out the styles that should be applied to each element
+     - when there're multiple `rules` that need to be applied to the same element, we need to figure that all out here (the most specific rule is applied)
+   - The more complicated your `CSS` selectors are, the more work the browser has to do to figure out what styles to apply to each element, which takes more time (BAD for performance) -> use simple selectors as much as possible or `BEM` methodology
+
+     ```css
+     /* BAD ❌ */
+     .sidebar > .menu-item:nth-child(4n + 1) {
+       color: red;
+     }
+
+     /* GOOD ✅ */
+     .menu-item {
+       color: red;
+     }
+     ```
+
+6. **Layout (Reflow):** The `Render Tree` is used to calculate the layout of each visible object on the page (where it should be and how big it should be)
+
+   - It's the process of calculating the exact position and size of each element on the page
+   - Reflow happens whenever:
+     - the geometry of the page changes (like when the window is resized)
+     - the geometry of an element changes (like when the size/styles of an element changes or when an element is added/removed from the page)
+       - changing the `font`, `content`, `orientation`, `size`, `position`, ... of an element
+   - A reflow of an element causes a reflow of all the elements that are affected by it (like its children, siblings, and ancestors)
+   - It's a **blocking operation**, which means that the browser can't do anything else while it's happening
+   - It consumes a lot of resources (CPU, memory, etc.)
+   - It will definitely be noticeable by the user if it happens frequently
+
+   > **It's the most expensive part of the rendering process and one of the main causes of slow DOM scripts specially on devices with low processing power (like mobile devices)**
+   >
+   > Generally, a `reflow` is followed by a `repaint` (which is also expensive)
+
+7. **Paint:** The layout is used to paint each element on the page
+
+   - After knowing how things should look like and where they should be, Then the browser draws the pixels for each element on the screen
+   - Anytime you change something other than the `opacity`, `transform`, or `filter` properties, the browser will have to trigger a **repaint**
+   - Triggering a `layout / reflow` will always trigger a `repaint`, but triggering a `repaint` will not always trigger a `layout / reflow`
+     ![Web Pages](./img/web-pages-11.png)
+   - When debugging performance, to see if a `repaint` is happening, you can use the `paint flashing` feature in the `DevTools` (it will show you what's being repainted by flashing it).
+     ![Web Pages](./img/web-pages-12.png)
+     ![Web Pages](./img/web-pages-13.gif)
+
+8. **Composite:** After painting multiple layers, the browser **combines** them into a single layer and displays it on the screen
+
+9. Now initial render is done and page is displayed to the user 🎉
+
+   - Are we finally done 😮‍💨? No, we're not done yet 🥲
+
+10. **JavaScript:** The `JS` files are parsed and executed to add interactivity to the page
+
+    - It can change all the previous steps (the `DOM` tree, `CSSOM` tree, and `Render Tree`), which means that we might have to redo all the previous steps again after the `JS` is executed 🥲
+      ![Web Pages](./img/web-pages-7.gif)
+    - This is called **reflow** or **repaint** and it's very expensive
+      ![Web Pages](./img/web-pages-8.png)
+    - Does all the steps need to happen again every time a `JS` file is executed? **No**, not all the steps, only the steps that are affected by the `JS` file
+      - By focusing on only changing the things that need to be changed, we can avoid redoing all the previous steps, which is good for performance 🚀
+      - Read more about it in [What to animate? (Animation Performance)](../HTML-CSS/2-CSS.md#what-to-animate-animation-performance)
+
+    > **"Layout Trashing"** is the term used to describe the situation when the browser has to redo the layout process multiple times in a very short period of time due to javascript changes
+    > ![Web Pages](./img/web-pages-9.png)
+    >
+    > ![Web Pages](./img/web-pages-10.png)
 
 ---
 
@@ -305,7 +392,7 @@ Some JS frameworks have the ability to use web components inside them by importi
   - It's a library for creating web components easily
   - It works well with other frameworks and with TypeScript (because it's written in TypeScript and uses `decorators`)
   - Resources:
-    - [Lit](https://lit.dev/)  
+    - [Lit](https://lit.dev/)
     - [Lit vs. React: A comparison guide](https://blog.logrocket.com/lit-vs-react-comparison-guide/)
   - Example:
 

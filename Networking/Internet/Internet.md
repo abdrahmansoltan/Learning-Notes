@@ -8,6 +8,7 @@
     - [How internet works](#how-internet-works)
   - [Important Concepts](#important-concepts)
     - [Client / Server](#client--server)
+    - [Bandwidth \& Latency](#bandwidth--latency)
     - [IP address](#ip-address)
     - [Packet](#packet)
     - [ISP](#isp)
@@ -161,6 +162,22 @@ They communicate using [Application Protocols](#application-protocols)
 
 ---
 
+### Bandwidth & Latency
+
+- **Bandwidth**: is the maximum amount of data that can be transferred over a network in a given amount of time.
+  - It's measured in `bits per second` (bps)
+  - It's the speed of the network
+  - It's the amount of data that can be transferred in a certain amount of time
+
+  > it's the width of the pipe that the data is traveling through
+- **Latency**: is the time it takes for a data packet to travel from one point to another.
+  - It's measured in `milliseconds` (ms)
+  - It's the time it takes for the data to travel from the client to the server and back
+
+  > it's the length of the pipe that the data is traveling through
+
+---
+
 ### IP address
 
 Internet Protocol addresses are unique identifiers assigned to every device connected to a network.
@@ -231,7 +248,7 @@ When building applications with `TCP/IP`, We need to ensure that the application
 
 - `TCP` is a **connection**-oriented protocol (it's like saying "hi" and wait to see if the other side heard it)
 
-  - TCP do this by checking the packets in the receiver part and see if they're complete and all is there
+  - TCP do this by checking the packets in the receiver part and see if they're complete and all is there and in the right order
     ![TCP](./img/tcp.png)
   - It provides **reliability** and **error checking**
 
