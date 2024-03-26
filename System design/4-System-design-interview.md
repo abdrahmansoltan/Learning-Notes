@@ -3,12 +3,14 @@
 - [INDEX](#index)
   - [System Design Interview](#system-design-interview)
     - [How to approach](#how-to-approach)
-  - [System Design Questions](#system-design-questions)
+  - [System Design Questions (BE)](#system-design-questions-be)
     - [Design a Rate Limiter](#design-a-rate-limiter)
     - [Design TinyURL](#design-tinyurl)
     - [Design Twitter](#design-twitter)
     - [Design Discord](#design-discord)
     - [Design YouTube](#design-youtube)
+    - [Design Google Drive](#design-google-drive)
+  - [System Design Questions (FE)](#system-design-questions-fe)
 
 ---
 
@@ -68,7 +70,7 @@ It's base on taking **real-world problems** and designing a system to solve them
 
 ---
 
-## System Design Questions
+## System Design Questions (BE)
 
 - How to answer:
   1. **Clarify the goal and scope of the problem**
@@ -717,6 +719,113 @@ The majority of users in Twitter are `readers`, and only a small percentage of u
       - It will be implemented in the `load balancer` or in the `App Server` to make sure that the system is not overwhelmed with a large number of `uploads` at the same time
 
   - There're a lot of other features like **recommendation engine**, **search engine**, **commenting on a video**, **subscribing to a user**, **reporting a video**, and **notifications** that we didn't cover here
+
+---
+
+### Design Google Drive
+
+**Google Drive** is a file storage and synchronization service that allows users to store files on their servers, synchronize files across devices, and share files.
+
+- **Step 1:** scoping the problem (asking questions to the interviewer)
+
+  - What can the user do on Google Drive?
+    - Upload, download, rename, edit, delete a file
+  - Are we designing the whole Google Drive system or just a small part of it?
+    - Just a small part of it, like:
+      - Uploading, downloading and renaming a file
+      - Scaling the system to handle a large number of `reads` and `writes`
+
+- **Step 2:** clarifying the functional and non-functional requirements
+
+  - **Functional Requirements**:
+    - User should be able to upload, download, and rename a file
+  - **Non-Functional Requirements**:
+
+    - We have `200M` users, and `50M` daily active users, every user will:
+      - be given `15GB` of free storage -> `200M * 15GB` -> `3000PB` of storage (petabytes)
+      - upload `2` files per day (`10MB` per file) -> `100M` files `writes` per day -> `100M * 10MB` -> `1PB` of storage (petabytes)
+      - have read/write ratio of `2:1`, so we need to make sure that the system can handle `2` times more `reads` than `writes`
+    - `Latency and Throughput`:
+      - Here, they're not as important as the `availability`, but we need to make sure that the system can handle a large number of `reads` and `writes` per second
+    - `Availability`:
+      - It's the most important thing here, because the user need to feel safe that his files are stored in a safe place, and he can access them at any time
+      - Each file uploaded need to be replicated `3` times to make sure that the system is `fault-tolerant` and `highly available` -> so we need to have more than `3` copies of the file -> more than `3000PB * 3` -> `9000PB` of storage (petabytes)
+
+- **Step 3:** Propose a high-level design
+  ![Google Drive](./img/google-drive-0.png)
+
+  - When user uploads a file, it will hit the `App Server` which will store the `file` in the `object storage`, and then it will store the `metadata` of the `file` in a `key-value (KV) store` like `NoSQL Database`
+  - Data model:
+    - We will have a `Files` table to store the `files` -> `distributed file system` or `object storage`
+      - We can use `Object Storage` like `Amazon S3` or `Google Cloud Storage` to store the `files` in a flat structure (`id` and `file`) ✅
+        ![Google Drive](./img/google-drive-1.png)
+        - Upside: it's `scalable`, `reliable`, and `available` out of the box
+        - Downside: we can't edit the `files` in place, instead we can delete the `file` and upload a new `file`
+      - Or we can use a `file system` to store the `files` in a hierarchical structure like `HDFS` (Hadoop Distributed File System)
+        ![Google Drive](./img/google-drive-2.png)
+        - Upside: we can edit the `files` in place
+        - Downside: it's not `scalable` and it's not `fault-tolerant`
+    - We will have a `Metadata` table to store the `metadata` of the `files` -> `NoSQL Database`
+    - We will have a `Users` table to store the `users`
+  - Caching
+    - We can have a `cache` layer before the `NoSQL Database` to cache the `metadata` of the `files` but we are likely won't have a lot of `reads` for the `metadata` of the `files`, so we can skip the `cache` layer
+
+- **Step 4:** Design details
+
+  - Permissions:
+    - As we're using `Object Storage` like `Amazon S3` or `Google Cloud Storage`, we won't have permission-control at the `file` level, specially if we're distributing the `files` across CDNs
+      - so we can add permissions to the object storage to make sure that the `files` are `private` and only the user can access the `file`
+      - Or we need to make sure to restrict the access to the `files` by using a `signed URL` or in the `App Server` by checking the `user Token` and the `file ID` before serving the `file` to the user
+  - **Interface**:
+
+    - Uploading a file:
+
+      - The user will make a `POST` request to the `App Server` with the `file` and the `user ID`
+
+        ```js
+        uploadFile({
+          userId: '123',
+          file: 'file.pdf'
+        });
+        ```
+
+      - The `App Server` will store the `file` in the `Object Storage` like `Amazon S3` or `Google Cloud Storage`, and then it will store the `metadata` of the `file` in the `NoSQL Database`, and then it will return the `file` to the user
+
+    - Downloading a file:
+
+      - The user will make a `GET` request to the `App Server` with the `file ID` to download the `file`
+
+        ```js
+        downloadFile({
+          fileId: '123'
+        });
+        ```
+
+      - The `App Server` will get the `file` from the `Object Storage` like `Amazon S3` or `Google Cloud Storage`, and then it will return the `file` to the user
+
+    - Renaming a file:
+
+      - The user will make a `PUT` request to the `App Server` with the `file ID` and the `new file name` to rename the `file`
+
+        ```js
+        renameFile({
+          fileId: '123',
+          newFileName: 'new file name'
+        });
+        ```
+
+      - The `App Server` will update the `metadata` of the `file` in the `NoSQL Database`, and then it will return the `file` to the user
+
+  - **Storage**:
+
+    - We will use `Object Storage` like `Amazon S3` or `Google Cloud Storage` to store the `files` in a flat structure (`id` and `file`)
+      - We can use `CDN` to cache the `files` and to serve the `files` to the users with the lowest latency -> `pull CDN` (pull the `files` from the `origin` to the `edge` when the user requests the `file`)
+    - We will use a `NoSQL Database` to store the `metadata` of the `files`
+      - We can use `MongoDB` or `Cassandra` to store the `metadata` of the `files` in a `
+
+---
+
+## System Design Questions (FE)
 
 ---
 

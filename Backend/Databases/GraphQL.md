@@ -13,7 +13,7 @@
 
 ## GraphQL
 
-GraphQL is an open-source data query and manipulation language for APIs, and a runtime for fulfilling queries with existing data.
+GraphQL is an open-source **data query and manipulation language for APIs**, and a runtime for fulfilling queries with existing data.
 
 - GraphQL uses a strongly typed system to define the capabilities of an API. All the types that are exposed in an API are written down in a schema using the GraphQL Schema Definition Language (SDL) and/or code-first.
 
@@ -32,7 +32,7 @@ GraphQL is an open-source data query and manipulation language for APIs, and a r
 
   - `Overfetching` means getting more information than you need and the frontend needs to `filter` the responses from the server.
 
-    - if the endpoint holds data on burgers available at a restaurant, you’d hit the /burgers endpoint, and instead of only getting the names that you’re interested in, you may get everything that endpoint has to offer - including price, ingredients, calories, etc.
+    - if the endpoint holds data on burgers available at a restaurant, you’d hit the `/burgers` endpoint, and instead of only getting the names that you’re interested in, you may get everything that endpoint has to offer - including price, ingredients, calories, etc.
 
   - `underfetching` means we lose time as the each request doesn't give full information so we need to do more requests
 

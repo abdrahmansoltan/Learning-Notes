@@ -88,7 +88,7 @@ There are several reasons why we use databases instead of Excel spreadsheets:
 
 ## Database Models
 
-It's a way to organize dnd store data in a database.
+It's a way to organize and store data in a database.
 
 There are 3 types of database models:
 

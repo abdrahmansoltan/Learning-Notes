@@ -5,6 +5,7 @@
     - [Performance Types](#performance-types)
     - [Performance Metrics](#performance-metrics)
     - [The importance of measurement](#the-importance-of-measurement)
+    - [Performance Notes](#performance-notes)
   - [JavaScript Performance](#javascript-performance)
     - [The cost of JavaScript](#the-cost-of-javascript)
     - [How to measure JS performance](#how-to-measure-js-performance)
@@ -125,6 +126,16 @@ There's a cost to every optimization, so you need to measure to know if the opti
 
 ---
 
+### Performance Notes
+
+- **Very important tip**: Make sure you're measuring the performance of the website in **(Production mode)**
+  - if you're measuring the performance of the website in **(Development mode)**, you will get different results because the code is not optimized and the files are not minified and the files are not compressed and the files are not cached
+  - So, always measure the performance of the website in **(Production mode)** to get the real performance of the website
+  - You can use `webpack` to build the website in **(Production mode)** by running `webpack --mode production` or by setting the `mode` property to `production` in the `webpack.config.js` file
+-  
+
+---
+
 ## JavaScript Performance
 
 ### The cost of JavaScript
@@ -205,6 +216,41 @@ The code you write is not always the code that `V8` executes, as it sometimes re
 
 So, our job is to write as much readable code as possible, and `V8` job is to optimize it for us
 
+- **Shipping less JS code**
+
+  - When we use `Babel`, it adds a lot of `polyfills` and `shims` to the code to make it work in older browsers (which increases the size of the code), but we don't need all of them in the modern browsers
+  - So, we can use `@babel/preset-env` to only include the `polyfills` and `shims` that we need in the code
+
+    ```js
+    // .babelrc file
+    {
+      'presets': [
+        [
+          '@babel/preset-env',
+          {
+            'useBuiltIns': 'usage',
+            'corejs': 3
+          }
+        ]
+      ]
+    }
+
+    // ---------------OR--------------- //
+    {
+      'presets': [
+        [
+          'env',
+          {
+            'targets': {
+              'browsers': ['last 2 versions', 'safari >= 7']
+              // or: 'browsers': ["> 1%", "last 2 versions", "not ie <= 8"]
+            }
+          }
+      ]
+    ]
+    }
+    ```
+
 - **Parsing**
 
   - One way to reduce the parsing time is to reduce the size of the `js` file **(have less code to parse)**
@@ -254,6 +300,14 @@ So, our job is to write as much readable code as possible, and `V8` job is to op
   - The easiest way to reduce `parse`, `compile`, and `execution` times is to **ship less code**
   - Use `User Timing API` to measure the performance of the `js` code and figure out where the biggest bottlenecks are
   - Consider using a `type system` so that you don't have to worry about most of the things above
+  - Consider using tools that can help you with the `js` performance like
+    - `webpack`
+    - `rollup`
+    - `parcel`
+    - `esbuild`
+    - `prepack`
+    - `optimize-js`
+    - `optimize-js-plugin`
 
 ---
 
@@ -276,7 +330,7 @@ To also improve the performance from the `css` side:
   ```
 
 - Use simple class-names or `BEM` methodology
-- Remove unused `css` using `purgecss` or `uncss` or `purifycss`
+- Remove unused `css` using `purgecss` or `uncss` or `purifycss` or `cssnano` libraries
 
   - Because the browser has to parse and compile and execute the `css` files / rules, and check if the rules are applied to the `DOM` elements or not (which takes time)
   - The less styles you have, the less there is to check.

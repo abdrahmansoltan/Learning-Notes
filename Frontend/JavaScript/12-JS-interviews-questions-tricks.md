@@ -351,3 +351,56 @@
     ```
 
   - Some languages like `Go` allow you to return multiple values from a function, but JavaScript doesn't support that.
+
+- How to deep copy an object?
+
+  1. You can use `JSON.parse()` and `JSON.stringify()` to deep copy an object.
+
+     ```js
+     const obj = { a: 1, b: { c: 2 } };
+     const deepCopy = JSON.parse(JSON.stringify(obj));
+     ```
+
+     - But, this method has some limitations:
+       - It will not work with functions, `undefined`, or `symbol` properties.
+       - It will not work with circular references (an object that references itself).
+
+  2. You can use a `for...in` loop to iterate over the properties of the object and copy them to a new object using recursion to make sure nested objects are also deep copied.
+
+     ```js
+     function deepCopy(obj) {
+       const result = {};
+       for (const key in obj) {
+         if (typeof obj[key] === 'object') {
+           result[key] = deepCopy(obj[key]);
+         } else {
+           result[key] = obj[key];
+         }
+       }
+       return result;
+     }
+     ```
+
+  3. You can use `Object.assign()` to copy the properties of the object to a new object.
+
+     ```js
+     const obj = { a: 1, b: { c: 2 } };
+     const deepCopy = Object.assign({}, obj);
+     ```
+
+  4. You can use the `spread` operator to copy the properties of the object to a new object.
+
+     ```js
+     const obj = { a: 1, b: { c: 2 } };
+     const deepCopy = { ...obj };
+     ```
+
+     - But it will be shallow copy, not deep copy.
+
+  5. You can use `lodash` library to deep copy an object -> `cloneDeep()` method.
+
+     ```js
+     const _ = require('lodash');
+     const obj = { a: 1, b: { c: 2 } };
+     const deepCopy = _.cloneDeep(obj);
+     ```

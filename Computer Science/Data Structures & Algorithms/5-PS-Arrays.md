@@ -3626,8 +3626,8 @@ Given a non-negative integer `numRows`, generate the first `numRows` of Pascal's
 def generate(numRows):
     res = [[1] * (i + 1) for i in range(numRows)] # initialize the result list with 1s
     for i in range(2, numRows): # start from 2 because the first row is already initialized with 1s
+        prevRow = res[i - 1]
         for j in range(1, i): # start from 1 because the first and last elements are 1s
-            prevRow = res[i - 1]
             res[i][j] = prevRow[j - 1] + prevRow[j]
 
     return res
@@ -3637,9 +3637,9 @@ def generate(numRows):
 
 ### Pascal's Triangle II
 
-| Video Solution                                                | Hint                                                                                                                                                                                                 |
-| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Video Solution](https://www.youtube.com/watch?v=k1DNTyal77I) | Generate the first `rowIndex + 1` rows of Pascal's triangle, then return the `rowIndexth` row **Or** improve space complexity by using only one dimension array to store the previous row's elements |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=k1DNTyal77I) | Generate the first `rowIndex + 1` rows of Pascal's triangle, then return the `rowIndexth` row **Or** improve space complexity by using only one dimension array to store the previous row's elements and update the array in place by calculating the sum of the previous row's elements using the index `j-1` and `j` |
 
 Given an integer `rowIndex`, return the `rowIndexth` (0-indexed) row of the Pascal's triangle.
 
@@ -3765,7 +3765,7 @@ def isValidSudoku(board):
     rows = collections.defaultdict(set) # key = row, value = set of digits
     squares = collections.defaultdict(set)  # key = (r /3, c /3), value = set of digits
 
-    # or without defaultdict
+    # or without defaultdict ✅
     # cols = {i: set() for i in range(9)}
     # rows = {i: set() for i in range(9)}
     # squares = {(i, j): set() for i in range(3) for j in range(3)}
@@ -3830,7 +3830,7 @@ def judgeCircle(moves):
 
 ### Design Memory Allocator
 
-problem: <https://leetcode.com/problems/design-memory-allocator/>
+problem: [link](https://leetcode.com/problems/design-memory-allocator)
 
 Implement a class `Allocator` that distributes variable allocations in the computer's memory.
 
@@ -3870,42 +3870,3 @@ class Allocator:
 ```
 
 ---
-
-There're N segments numbered from 0 to N-1; length of the k-th segment is A[k]. Segments cannot be split into shorter segments. but can be merged to create longer ones. Margining segments of length X and Y will create a segment of length X+Y. what is the largest square we can build using those segments?
-
-For example consider array A such that: `A= [3, 3, 3, 2, 1, 1]`, we can pick three segments with lengths 3, 2 and 1 respectively. Now we can merge the segments of length 1 and 2 to form a segment of length 3. Thus we have only two segments left, and it is easy to show that we cannot combine them to form a square. Thus the side of the largest square that can be constructed is 3.
-
-write a function that given an array A of N integers, returns the maximum possible length of the side of a square we can build. if we can't build any square, the function should return 0.
-
-ex:
-
-- `A= [3, 3, 3, 2, 1, 1]` --> `3`
-- `A= [5, 4, 3, 2, 1, 10] --> 0`
-
-```py
-def solution(A):
-    # sort the array in descending order
-    A.sort(reverse=True)
-
-    # loop through the array
-    for i in range(len(A)):
-        # check if the current element is equal to the next element
-        if A[i] == A[i + 1]:
-            # check if the current element is equal to the next next element
-            if A[i] == A[i + 2]:
-                # return the current element
-                return A[i]
-
-            # check if the current element is greater than the next next element
-            if A[i] > A[i + 2]:
-                # return the next next element
-                return A[i + 2]
-
-            # check if the current element is less than the next next element
-            if A[i] < A[i + 2]:
-                # return the current element
-                return A[i]
-
-    # return 0 if we can't build any square
-    return 0
-```

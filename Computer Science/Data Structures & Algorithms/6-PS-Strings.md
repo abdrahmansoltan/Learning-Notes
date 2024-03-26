@@ -51,9 +51,9 @@
 
 ### String to Integer (atoi)
 
-| Video Solution | Hint                                                                                                                                                                                                                                                                      |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| NA             | We can perform the conversion digit by digit, by using a pointer to keep track of the current digit. We can use a variable `num` to keep track of the `number`. To add a digit to the number, we can multiply the current number by `10` and add the current digit to it. |
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=YA0LYrKI1CQ) | Use a pointer to keep track of the current digit, a variable `num` to keep track of the number to fill in the matrix with, and a variable `sign` to keep track of the sign of the number. First skip all the leading whitespaces using `str.isspace()` and then check if the first non-whitespace character is a digit (using `.isdigit()` method) or a sign (`+` or `-`) and update the sign accordingly. |
 
 Implement the `myAtoi(string s)` function, which converts a string to a 32-bit signed integer (similar to C/C++'s `atoi` function).
 
@@ -99,28 +99,47 @@ Implement the `myAtoi(string s)` function, which converts a string to a 32-bit s
           i += 1
 
       return max(-2**31, min(sign * num, 2**31 - 1))
+
+  # using for loop
+  def myAtoi(s):
+      sign = 1
+      num = 0
+
+      # Remove all leading whitespaces
+      for char in s:
+          if char.isspace(): continue
+          else:
+              if char in ('+', '-'):
+                  sign = -1 if char == '-' else 1
+              elif not char.isdigit():
+                  break
+              else:
+                  num = num * 10 + int(char)
+
+      return max(-2**31, min(sign * num, 2**31 - 1))
   ```
 
 - **Solution 2:** if using `int()` is not allowed
 
-  - The trick here is to use the `ord()` function to convert the character to its ASCII value
+  - It's similar to the first solution, but instead of using `int()`, we can use the `ord()` function to convert the character to its ASCII value
+
+    - `ord('0') = 48`
+    - `ord('1') = 49`
+    - `ord('2') = 50`
+    - `ord('3') = 51`
+    - `...`
 
   ```py
   def myAtoi(s):
       i = 0
       sign = 1
+      num = 0
 
-      # Remove all leading whitespaces
       while i < len(s) and s[i].isspace():
           i += 1
-
-      # Check if the first non-whitespace character is not a digit or a sign (+ or -)
       if i < len(s) and (s[i] in ('+', '-')):
           sign = -1 if s[i] == '-' else 1
           i += 1
-
-      # Read in the next characters of the string until the next non-digit character or the end of the input is reached
-      num = 0
       while i < len(s) and s[i].isdigit():
           num = num * 10 + ord(s[i]) - ord('0') # instead of using int(), we can use the ord() function to convert the character to its ASCII value
           i += 1
@@ -166,9 +185,11 @@ def intToString(x):
 
     while x > 0:
         ans += chr(x % 10 + ord('0'))
+        # or ans += str(x % 10)
         x //= 10
 
-    return ('-' if sign == -1 else '') + reversed(ans)
+    x += '-' if sign == -1 else '' # add the sign to the string if the number is negative
+    return reversed(ans)
 ```
 
 ---
@@ -192,6 +213,7 @@ Given two non-negative integers `num1` and `num2` represented as strings, return
     ![multiply-strings](./img/multiply-strings-1.png)
   - The number of digits in the product is equal to the sum of the number of digits in the two numbers
     - `len(num1) + len(num2)` -> `58 * 14 = 812` -> `2 + 2 = 4`
+  - **IMPORTANT:** When updating the result list, we need to add the product to the current digit in the result list and add the carry of the current digit to the digit on the left, then update the carry of the current digit
 
 ```py
 def multiply(num1, num2):
@@ -210,9 +232,11 @@ def multiply(num1, num2):
             # Calculate the index of the current digit in the result list
             index = i + j + 1
             # Add the product to the current digit in the result list
-            result[index] += product % 10
+            result[index] += product
             # Add the carry to the digit on the left
-            result[index-1] += product // 10
+            result[index-1] += result[index] // 10
+            result[index] %= 10
+
 
     # Remove the leading zeros from the result list
     start = 0
