@@ -193,8 +193,8 @@ class Person:
 
 - Some methods return information about the state of an object, while others modify the state of an object.
 
-  - Methods that modify the state of an object are known as **mutators**.
-  - Methods that return information about the state of an object are known as **accessors**.
+  - Methods that modify the state of an object are known as **mutators** -> `setters`
+  - Methods that return information about the state of an object are known as **accessors** -> `getters`
 
 - **Instance Method**
 

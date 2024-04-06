@@ -97,7 +97,7 @@ It's a document database with the scalability and flexibility that you want with
 
 - delete:
 
-  - It's a good practice not to send back to client a response message/data after delete request --> `null
+  - It's a good practice not to send back to client a response message/data after delete request --> `null`
 
     ```js
     res.status(204).json({

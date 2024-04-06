@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [TypeScript](#typescript)
     - [why use Typescript](#why-use-typescript)
+    - [Installation and Configuration](#installation-and-configuration)
   - [Typing](#typing)
     - [Statically vs dynamically typed](#statically-vs-dynamically-typed)
     - [Strongly vs weakly typed](#strongly-vs-weakly-typed)
@@ -35,6 +36,8 @@
 
 **TypeScript** is a **static and strongly typed** superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
 
+![typescript](./img/typescript-1.png)
+
 > It's just: Javascript with types
 
 ![typescript](./img/typescript.PNG)
@@ -45,11 +48,28 @@
 ### why use Typescript
 
 - It helps us find errors before the code runs & analyzes our code as we type by using **type annotations**
+
+- it makes sure that we're using the correct properties or methods on our objects and other types
+  ![type](./img/type-1.png)
+
+  ```ts
+  const sentence = 'This is a sentence';
+
+  sentence.includes('is'); // ✅
+  sentence.contains('is'); // ❌ -> Property/Method 'contains' does not exist on type 'string'.
+  ```
+
 - Types allow other engineers to understand what values are flowing around our codebase
 - It has the potential to move some kinds of errors from **runtime** (users) to **compile time** , ex:
   - Values that are potentially absent (`null` or `undefined`)
 - It serves as the foundation for a great code authoring experience
   - `Example`: in-editor autocomplete
+
+---
+
+### Installation and Configuration
+
+[TS-Dev 📄](./5-TS-Dev.md)
 
 ---
 
@@ -258,21 +278,21 @@ A generic is a way to write a function that is reusable across different types, 
   - Here, we can pass any type of number and it will work
   - We can do the same with generics, as **it customizes the type of the function to whatever we pass in**
 
-- Example 1️⃣
+- Example 1️⃣: **Generic Function**
 
   ```ts
-  // Typed Function that deals only with numbers
+  // Typed Function that deals only with numbers ❌
   const getItem = (arr: number[]): number => {
     return arr[1];
   };
-  // we can work around it and use union type like this:
+  // we can work around it and use union type like this (But still not optimal ❌)
   const getItem = (arr: (number | string)[]): number | string => {
     return arr[1];
   };
 
   // --------------------------------------------------------------
 
-  // Using Generics
+  // Using Generics ✅
   const getItem = <T>(arr: T[]): T => {
     return arr[1];
   };
@@ -284,7 +304,7 @@ A generic is a way to write a function that is reusable across different types, 
 
   - In the first function, we have a function that takes in a number array and outputs the second number of the array. But what if we don't want to work with numbers? What if we want to work with strings? Well, we would need to create a second function. Or, we can use a generic, and whatever type we use when we call the function will translate to its return as well.
 
-- Example 2️⃣
+- Example 2️⃣: **Generic Function with constraints**
 
   ```ts
   // function takes object that contains certain type(T) and another object that contains certain type(U)
@@ -298,10 +318,9 @@ A generic is a way to write a function that is reusable across different types, 
   console.log(mergedObj);
   ```
 
-- Example 3️⃣
+- Example 3️⃣: **Generic Class**
 
   ```ts
-  // Generic Class
   class DataStorage<T> {
     data: T[] = [];
 
@@ -312,6 +331,10 @@ A generic is a way to write a function that is reusable across different types, 
   }
 
   const textStorage = new DataStorage<string>();
+  textStorage.addItem('Max');
+
+  const numberStorage = new DataStorage<number>();
+  numberStorage.addItem(10);
   ```
 
 - **Generics Notes:**
@@ -580,8 +603,10 @@ It's the default thing to do when all the type-narrowing checks are all passed a
 
 Decorators are functions that can be used to modify the behavior of classes, methods, and properties at runtime.
 
+![decorators](./img/decorators-0.png)
 ![decorators](./img/decorators-1.png)
 
+- **Decorators run when the class is defined**, not when it's instantiated or when a method is called
 - When you apply a decorator to a class or a class member, you are actually calling a function that is going to receive details of what is being decorated, and the decorator implementation will then be able to transform the code dynamically, adding extra functionality, and reducing boilerplate code.
 - They are a way to have **"Meta Programming"** in TypeScript, which is a programming technique that enables the programmer to create code that uses other code from the application itself as data.
 - It's based on the concept of **Prototype** in JavaScript
@@ -593,7 +618,7 @@ Decorators are functions that can be used to modify the behavior of classes, met
 
 ### How to use Decorators
 
-- Decorators are experimental, and they are not part of the ECMAScript standard yet, **To enable experimental support for decorators**, you must enable the `experimentalDecorators` compiler option either on the command line or in your tsconfig.json
+- Decorators are **experimental**, and they are not part of the ECMAScript standard yet, **To enable experimental support for decorators**, you must enable the `experimentalDecorators` compiler option either on the command line or in your tsconfig.json
 
   ```bash
   # command line
@@ -612,6 +637,7 @@ Decorators are functions that can be used to modify the behavior of classes, met
 
 - How to use it on a property, method, accessor
   ![decorators](./img/decorators-2.png)
+- Note that decorators can be applied to (classes, properties, methods, accessors, parameters), not just classes because they are just functions that are called with different arguments depending on what they are decorating.
 
 - Example:
 
@@ -676,7 +702,7 @@ Decorators are functions that can be used to modify the behavior of classes, met
 
 ### Decorator Factories (factory decorator)
 
-Decorator factories are functions that return decorator functions and they are used to configure decorators.
+Decorator factories are functions that **return decorator functions** and they are used to configure decorators.
 
 - It's used **when we want to pass arguments to the decorator function**, and we can't do that directly because the decorator function is called only one time when the class is defined, not when it's instantiated.
 

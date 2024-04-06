@@ -319,23 +319,7 @@ def romanToInt(s):
 
 # -------------------------------------------------------------------
 # Another approach
-# You can iterate over the string from right to left and add the current character to the result if the current character is greater than or equal to the next character, otherwise subtract it
-
-# -------------------------------------------------------------------
-# Another approach
-def romanToInt(s):
-    roman_to_int = {
-        'I': 1,
-        'V': 5,
-        'X': 10,
-        'L': 50,
-        'C': 100,
-        'D': 500,
-        'M': 1000
-    }
-
-    # Using reduce function
-    return reduce(lambda x, i: x + (-roman_to_int[s[i]] if roman_to_int[s[i]] < roman_to_int[s[i+1]] else roman_to_int[s[i]]), range(len(s)), 0)
+# You can iterate over the string from (right to left) and add the current character to the result if the current character is greater than or equal to the next character, otherwise subtract it
 ```
 
 ---
@@ -359,11 +343,9 @@ Given a string `s`, find the length of the **longest substring** without repeati
   - we can use a **sliding-window** pattern to check for all the substrings of the string
     ![longest-substring](./img/longest-substring-1.png)
     ![longest-substring](./img/longest-substring-2.png)
-  - we use a hash set to keep track of the characters in the current window and a variable to keep track of the maximum window size
-  - we iterate over the string and add the current character to the window if it is not already in it
-    - if the current character is in the window, we remove it and slide the window to the right until it is not in the window
-    - we update the maximum window size if the current window size is greater than the maximum window size
-  - we return the maximum window size
+  - We can use a `hash set` for unique characters and a variable for max window size
+  - we iterate over the string. If a character is not in the window, we add it. If it is, we remove it and move the window right until it's gone.
+  - We update the max window size if needed and return it.
 
 - Solution 1: `O(n^2)` (slow) ❌
 

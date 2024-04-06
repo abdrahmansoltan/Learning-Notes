@@ -216,7 +216,7 @@ Migrations are a record of a **changes** made to the `schema` of a database.
 
 ## Models
 
-- as all rows in a table have the same schema so we can treat :
+- as all rows in a table have the same schema so we can treat:
   - `table` as a `Class`
   - `row` as a `instance of the class`
 - performs `CRUD` operations on the database from within a Node program.

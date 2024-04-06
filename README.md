@@ -142,47 +142,48 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ### Frameworks
 
-- [Frameworks](./Frontend/Angular/1-Frameworks.md)
+- [Frameworks](./Frontend/Frameworks/Frameworks.md)
 
 ---
 
 #### React
 
-- [React](./Frontend/React/1-React.md)
-- [Hooks](./Frontend/React/2-Hooks.md)
-- [Class-Components](./Frontend/React/3-Class-Components.md)
-- [React Router](./Frontend/React/4-React-router.md)
-- [Redux](./Frontend/React/5-Redux.md)
-- [Redux-toolkit](./Frontend/React/6-Redux-toolkit.md)
-- [performance](./Frontend/React/7-performance.md)
-- [React-Typescript](./Frontend/React/8-React-Typescript.md)
-- [React Interview Questions](./Frontend/React/9-React-Interview.md)
-- [React-Testing](./Frontend/React/10-React-Testing.md)
+- [React](./Frontend/Frameworks/React/1-React.md)
+- [Hooks](./Frontend/Frameworks/React/2-Hooks.md)
+- [Class-Components](./Frontend/Frameworks/React/3-Class-Components.md)
+- [React Router](./Frontend/Frameworks/React/4-React-router.md)
+- [Redux](./Frontend/Frameworks/React/5-Redux.md)
+- [Redux-toolkit](./Frontend/Frameworks/React/6-Redux-toolkit.md)
+- [performance](./Frontend/Frameworks/React/7-performance.md)
+- [React-Typescript](./Frontend/Frameworks/React/8-React-Typescript.md)
+- [React Interview Questions](./Frontend/Frameworks/React/9-React-Interview.md)
+- [React-Testing](./Frontend/Frameworks/React/10-React-Testing.md)
 
 ---
 
 #### Next js
 
-[Next.js](./Frontend/Nextjs/1-Nextjs.md)
+[Next.js](./Frontend/Frameworks/Nextjs/1-Nextjs.md)
 
 ---
 
 #### Angular
 
-- [Angular](./Frontend/Angular/2-Angular.md)
+- [Angular](./Frontend/Frameworks/Angular/1-Angular.md)
+- [AngularJS](./Frontend/Frameworks/Angular/2-AngularJS.md)
 
 ---
 
 #### Vue
 
-- [Vue](./Frontend/Vue/1-Vue.md)
-- [Vue-CLI / Vite](./Frontend/Vue/0-Vue-CLI-Vite.md)
-- [Vue Router](./Frontend/Vue/2-router.md)
-- [Vuex](./Frontend/Vue/3-Vuex.md)
-- [Composition API](./Frontend/Vue/4-Composition-API.md)
-- [Testing Vue](./Frontend/Vue/5-Testing-Vue.md)
-- [Typescript_Vue](./Frontend/Vue/6-Typescript_Vue.md)
-- [NUXT](./Frontend/Vue/7-NUXT.md)
+- [Vue](./Frontend/Frameworks/Vue/1-Vue.md)
+- [Vue-CLI / Vite](./Frontend/Frameworks/Vue/0-Vue-CLI-Vite.md)
+- [Vue Router](./Frontend/Frameworks/Vue/2-router.md)
+- [Vuex](./Frontend/Frameworks/Vue/3-Vuex.md)
+- [Composition API](./Frontend/Frameworks/Vue/4-Composition-API.md)
+- [Testing Vue](./Frontend/Frameworks/Vue/5-Testing-Vue.md)
+- [Typescript_Vue](./Frontend/Frameworks/Vue/6-Typescript_Vue.md)
+- [NUXT](./Frontend/Frameworks/Vue/7-NUXT.md)
 
 ---
 

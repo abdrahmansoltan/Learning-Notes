@@ -1582,6 +1582,24 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
     let option = new Option('Text', 'value', true, true);
     ```
 
+- Dealing with numbers in `<input>`
+
+  - The value of an `<input>` is always a **string**. If we need to get a number, we can use `parseInt` or `parseFloat`:
+
+    ```js
+    function onChange() {
+      let parsedValue = parseInt(input.value);
+      // or let parsedValue = +input.value;
+
+      // check if it's a number using isNaN()
+      if (!isNaN(parsedValue)) {
+        console.log(parsedValue);
+      } else {
+        console.log('Not a number');
+      }
+    }
+    ```
+
 ---
 
 ### event handler in forms (submitting)

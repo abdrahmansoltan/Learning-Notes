@@ -552,7 +552,38 @@ They are style-reactions to certain actions on elements
     - general styles
     - css variables
 
-- You can check new pseudo classes -> `:has()`, `:where()`, `:is()`
+- **pseudo classes for form elements**
+
+  - `:checked` -> for radio buttons and checkboxes
+  - `:disabled` -> for disabled elements
+  - `:enabled` -> for enabled elements
+  - `:focus` -> for focused elements
+  - `:required` -> for required elements
+  - `:optional` -> for optional elements
+  - `:valid` -> for valid elements
+  - `:invalid` -> for invalid elements
+  - `:in-range` -> for elements with a value within a specified range
+  - `:out-of-range` -> for elements with a value outside a specified range
+  - `:placeholder-shown`
+
+- **pseudo classes for numbering and indexing**
+
+  - `:first-child` -> for the first child of an element
+  - `:last-child` -> for the last child of an element
+  - `:nth-child(n)` -> for every `n`th child of an element
+  - `:nth-last-child(n)` -> for every `n`th child of an element, counting from the last child
+  - `:nth-of-type(n)` -> for every `n`th child of a type
+  - `:only-child` -> for the only child of an element
+  - `:only-of-type` -> for the only child of a type
+
+- **pseudo class that handles different details about element**
+
+  - `:not(selector)` -> selects every element that is not a certain selector
+  - `:empty` -> selects every element that has no children
+  - `:target` -> selects the current active target element
+  - `:has()` -> selects elements that have a specific descendant
+  - `:where()` -> selects elements that match a list of selectors
+  - `:is()` -> selects elements that match one of the selectors
 
 ---
 

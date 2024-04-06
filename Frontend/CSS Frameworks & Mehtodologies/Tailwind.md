@@ -34,7 +34,7 @@ Tailwind CSS is a **utility-first CSS framework** for rapidly building custom us
 
 ### TailwindCSS vs. Bootstrap
 
-- TailwindCSS is not a UI kit. Unlike **UI kits such as Bootstrap**, Bulma, and Foundation, Tailwind CSS doesn’t have a default theme or built-in UI components. Instead, it comes with pre-designed widgets you can use to build your site from scratch.
+- TailwindCSS is not a UI kit. Unlike **UI kits such as Bootstrap**, **Bulma**, and **Foundation**, Tailwind CSS doesn’t have a default theme or built-in UI components. Instead, it comes with pre-designed widgets you can use to build your site from scratch.
 - Bootstrap is known for its **responsiveness**, whereas proponents of Tailwind CSS typically value the framework’s **customizability**.
 - Another problem with Bootstrap, sites is that they almost always look alike, so this inhibits our ability to incorporate creativity into the dev environment. This is one of the advantages of Tailwind CSS: its ability to easily build complex user interfaces without encouraging any two sites to look the same.
 

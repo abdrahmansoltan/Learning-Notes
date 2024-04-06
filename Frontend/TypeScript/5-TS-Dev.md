@@ -37,7 +37,6 @@ npm i typescript --save-dev  # save to devDependencies
 npm i --save-dev ts-node  # to run typescript files directly without compiling them
 
 npm i --save-dev @types/node  # type definitions
-
 ```
 
 ---

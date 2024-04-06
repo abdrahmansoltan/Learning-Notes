@@ -1305,9 +1305,7 @@ Where to apply the validation (`user-side` or `server-side` or `database-side`) 
 
 ## Database transaction
 
-
-
-- **Roll
+- **Rollback** : is used to undo the changes made to the database since the last `COMMIT` statement.
 
 ---
 
@@ -1323,4 +1321,17 @@ Where to apply the validation (`user-side` or `server-side` or `database-side`) 
     SELECT (
       SELECT COUNT(*) FROM <table_name>
     )
+    ```
+
+- How to add extra security to prevent this SQL injection?
+
+  ```sql
+  SELECT * FROM users WHERE username = 'admin' AND password = '' OR 1=1;
+  ```
+
+  - Use `Prepared Statements` or `Parameterized Queries` to prevent SQL injection.
+
+    ```sql
+    SELECT * FROM users WHERE username = ? AND password = ?;
+    -- This query will be sent to the database server, and the parameters will be sent separately
     ```

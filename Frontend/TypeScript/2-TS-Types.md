@@ -433,7 +433,7 @@ function getUserAttribute(attribute: number | string) {
 
 They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a slightly different syntax)
 
-- it's a **blueprint** for `object's items`
+- it's a **blueprint** for `object's items` **(annotating the structure of an object/class)** and can be used to define the shape of an object.
 
   - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something.
 
@@ -832,7 +832,9 @@ Classes are **templates / blueprint** for creating objects in Javascript. They c
 
 ### Class Access Modifiers
 
-used to declare how accessible a variable should be from outside the class (They're only available in Typescript and not in Javascript)
+They're used to declare how accessible a variable should be from outside the class (They're only available in `Typescript` and not in `Javascript`)
+
+> **Why use access modifiers?** They're used to control the access to the class properties and methods, and to prevent other developers from accessing or modifying the properties in a way that could break the class.
 
 - **Modifiers:**
   ![access modifiers](./img/class-modifiers-1.png)
@@ -918,25 +920,42 @@ used to declare how accessible a variable should be from outside the class (They
 
 They're used to define properties in the class without having to define them in the constructor (new feature in ES2015)
 
-```ts
-// Option 1
-class Person {
-  name: string;
-  age: number;
+- **Option 1:** Define the properties in the constructor
 
-  constructor(name: string, age: number) {
-    this.name = name;
-    this.age = age;
+  ```ts
+  class Person {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
   }
-}
+  ```
 
-// -------------------------------------------------------
+- **Option 2:** Define the properties in the class
 
-// Option 2 -> using `public` modifier ✅
-class Person {
-  constructor(public name: string, public age: number) {}
-}
-```
+  ```ts
+  class Person {
+    name: string;
+    age: number = 30; // default value
+
+    constructor(name: string) {
+      this.name = name;
+    }
+  }
+  ```
+
+- **Option 3:** Define the properties in the class with access modifiers (Most recommended way in typescript ✅)
+
+  ```ts
+  class Person {
+    constructor(public name: string, public age: number = 30) {}
+  }
+  ```
+
+  - Here, by`public`, we're telling typescript to create a property with the same name and type as the parameter and to assign the parameter to the property
 
 ---
 
