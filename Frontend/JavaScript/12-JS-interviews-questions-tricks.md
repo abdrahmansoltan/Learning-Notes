@@ -4,6 +4,22 @@
   - [`this` keyword](#this-keyword)
   - [Functions](#functions)
   - [Interview Questions](#interview-questions)
+    - [What are `call()` and `apply()`?](#what-are-call-and-apply)
+    - [How can you tell if an image element is loaded on a page?](#how-can-you-tell-if-an-image-element-is-loaded-on-a-page)
+    - [What is event delegation?](#what-is-event-delegation)
+    - [What is a worker? and when would you use one?](#what-is-a-worker-and-when-would-you-use-one)
+    - [Can you implement a `bind()` function? (How to change scope)](#can-you-implement-a-bind-function-how-to-change-scope)
+    - [What is **Debounce** and **Throttle**?](#what-is-debounce-and-throttle)
+    - [We have 2 identical `DOM` trees, `A` and `B`. For `DOM` tree `A` we have the `location` of an element. Create a function to find that element in `DOM` tree `B`](#we-have-2-identical-dom-trees-a-and-b-for-dom-tree-a-we-have-the-location-of-an-element-create-a-function-to-find-that-element-in-dom-tree-b)
+    - [Create a function that moves an element **(Rendering Performance)**](#create-a-function-that-moves-an-element-rendering-performance)
+    - [Given this function, how can you convert it into a `Promise` ?](#given-this-function-how-can-you-convert-it-into-a-promise-)
+    - [what does double brackets mean in properties, ex: `[[prototype]]`?](#what-does-double-brackets-mean-in-properties-ex-prototype)
+    - [What will happen if you used `forEach` on a `Set`?](#what-will-happen-if-you-used-foreach-on-a-set)
+    - [Why do we get these results?](#why-do-we-get-these-results)
+    - [Why we don't use asthmatic comparison with strings?](#why-we-dont-use-asthmatic-comparison-with-strings)
+    - [How do you return multiple things from a function?](#how-do-you-return-multiple-things-from-a-function)
+    - [How to deep copy an object?](#how-to-deep-copy-an-object)
+    - [How to check if a value is a number?](#how-to-check-if-a-value-is-a-number)
 
 ---
 
@@ -84,73 +100,76 @@
 **Reference** -> [Front End Interview Handbook
 ](https://www.frontendinterviewhandbook.com/)
 
-- What are `call()` and `apply()`?
+### What are `call()` and `apply()`?
 
-  - **short answer:** They're ways of changing scope of `this` inside a function.
+- **short answer:** They're ways of changing scope of `this` inside a function.
 
-  - **detailed answer:**
-    - `call()` and `apply()` are predefined JavaScript methods.
-    - Both methods can be used to invoke a function, and both methods must have the owner object as first parameter.
-    - `call()` takes series of function arguments separately.
-    - `apply()` takes the function arguments in an array.
+- **detailed answer:**
+  - `call()` and `apply()` are predefined JavaScript methods.
+  - Both methods can be used to invoke a function, and both methods must have the owner object as first parameter.
+  - `call()` takes series of function arguments separately.
+  - `apply()` takes the function arguments in an array.
 
-- How can you tell if an image element is loaded on a page?
+### How can you tell if an image element is loaded on a page?
 
-  - Use the `complete` property of the image element.
+- Use the `complete` property of the image element.
 
-    ```js
-    if (document.getElementById('myImg').complete) {
-      // do something
-    }
-    ```
+  ```js
+  if (document.getElementById('myImg').complete) {
+    // do something
+  }
+  ```
 
-- What is event delegation?
-  - It is a technique involving adding event listeners to a parent element instead of adding them multiple times to the descendant elements.
-- What is a worker? and when would you use one?
+### What is event delegation?
 
-  - A worker is a JavaScript process that runs in the background independently of other scripts and without affecting the performance of the page.
-  - You can use workers to perform tasks such as:
-    - Simulating user interaction by generating events and performing DOM manipulation.
-    - Calculating data without blocking the UI.
-    - Parsing large JSON files.
-    - Generating images.
-    - Implementing an infinite scroll.
-  - When to use a worker:
-    - When you need to perform a complex task that doesn't need to be executed immediately.
-    - When you need to perform a CPU-intensive task without blocking the UI.
-    - When you need to perform a series of tasks that can be executed in parallel.
+- It is a technique involving adding event listeners to a parent element instead of adding them multiple times to the descendant elements.
 
-- Can you implement a `bind()` function? (How to change scope)
+### What is a worker? and when would you use one?
+
+- A worker is a JavaScript process that runs in the background independently of other scripts and without affecting the performance of the page.
+- You can use workers to perform tasks such as:
+  - Simulating user interaction by generating events and performing DOM manipulation.
+  - Calculating data without blocking the UI.
+  - Parsing large JSON files.
+  - Generating images.
+  - Implementing an infinite scroll.
+- When to use a worker:
+  - When you need to perform a complex task that doesn't need to be executed immediately.
+  - When you need to perform a CPU-intensive task without blocking the UI.
+  - When you need to perform a series of tasks that can be executed in parallel.
+
+### Can you implement a `bind()` function? (How to change scope)
+
+```js
+Function.prototype.bind = function (scope) {
+  const fn = this; // "this" is the function that will be bound
+  return function () {
+    return fn.call(scope); // "scope" is the object to bind to
+  };
+};
+
+// Using it
+const myBoundFunction = myFunction.bind(myObject);
+```
+
+- Follow up: How can you handle argument in your solution?
 
   ```js
   Function.prototype.bind = function (scope) {
-    const fn = this; // "this" is the function that will be bound
+    const fn = this;
     return function () {
-      return fn.call(scope); // "scope" is the object to bind to
+      return fn.apply(scope, [...arguments]);
     };
   };
-
-  // Using it
-  const myBoundFunction = myFunction.bind(myObject);
   ```
 
-  - Follow up: How can you handle argument in your solution?
+### What is **Debounce** and **Throttle**?
 
-    ```js
-    Function.prototype.bind = function (scope) {
-      const fn = this;
-      return function () {
-        return fn.apply(scope, [...arguments]);
-      };
-    };
-    ```
+- **Debounce** and **Throttle** are two similar (but different!) techniques to control how many times we allow a function to be executed over time.
+- **Debounce** will fire only once every **n** milliseconds, while **Throttle** will fire every **n** milliseconds.
 
-- What is **Debounce** and **Throttle**?
-
-  - **Debounce** and **Throttle** are two similar (but different!) techniques to control how many times we allow a function to be executed over time.
-  - **Debounce** will fire only once every **n** milliseconds, while **Throttle** will fire every **n** milliseconds.
-    - **Debounce** will wait **n** milliseconds after the last function call to actually call the function.
-    - **Throttle** will execute the function every **n** milliseconds, ignoring calls that happen in-between.
+  - **Debounce** will wait **n** milliseconds after the last function call to actually call the function.
+  - **Throttle** will execute the function every **n** milliseconds, ignoring calls that happen in-between.
 
   ```js
   // Debounce
@@ -177,80 +196,81 @@
   }
   ```
 
-  - Follow-up: where these techniques are used in real FE applications?
-    - **Debounce** is used in `search` bars, so that the search function is not called every time the user types a letter, but only after the user stops typing for a certain amount of time.
-    - **Throttle** is used in `scroll` events, so that the function is not called every time the user scrolls, but only after a certain amount of time has passed.
+- Follow-up: where these techniques are used in real FE applications?
+  - **Debounce** is used in `search` bars, so that the search function is not called every time the user types a letter, but only after the user stops typing for a certain amount of time.
+  - **Throttle** is used in `scroll` events, so that the function is not called every time the user scrolls, but only after a certain amount of time has passed.
 
-- We have 2 identical `DOM` trees, `A` and `B`. For `DOM` tree `A` we have the `location` of an element. Create a function to find that element in `DOM` tree `B`
-  ![domTree](./img/domTree-1.png)
+### We have 2 identical `DOM` trees, `A` and `B`. For `DOM` tree `A` we have the `location` of an element. Create a function to find that element in `DOM` tree `B`
 
-  - This is a **Reverse-Back** algorithm, meaning that we start from the element we want to find, and we traverse the DOM tree **upwards** to the root. Then, we traverse the DOM tree **downwards** to the element we want to find in the other DOM tree.
+![domTree](./img/domTree-1.png)
 
-    ```js
-    function reversePath(element, root) {
-      const path = []; // path to the element from the root
-      let pointer = element;
-
-      // 1. Traverse the DOM tree Upwards to the root
-      while (pointer.parentNode) {
-        // get the index of the current node in the parent
-        const index = [...pointer.parentNode.children].indexOf(pointer);
-        path.push(index);
-        pointer = pointer.parentNode;
-      }
-
-      // 2. Traverse the DOM tree Downwards to the element we want to find
-      pointer = root;
-      // now, path has the indexes from the target node to the root
-      while (path.length) {
-        pointer = pointer.children[path.pop()];
-      }
-      return pointer;
-    }
-    ```
-
-- Create a function that moves an element **(Rendering Performance)**
-
-  - Hint: usually here, the interviewer wants to see if you know about `requestAnimationFrame()`, which is a method that tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next **repaint**.
-
-    ```js
-    function moveElement(element, duration, distance) {
-      const start = performance.now(); // get the start time
-
-      function move(currentTime) {
-        const elapsed = currentTime - start; // get the time since the animation started
-        const progress = elapsed / duration; // calculate how far along the animation is (ratio of the elapsed time to the total duration)
-        const amountToMove = progress * distance; // calculate how far we should move the element
-
-        // move the element
-        element.style.transform = `translateX(${amountToMove}px)`;
-
-        // stop the animation after the specified duration
-        if (amountToMove < distance) {
-          requestAnimationFrame(move); // call the function again to repeat the animation loop
-        }
-      }
-      requestAnimationFrame(move);
-    }
-    ```
-
-    - trick: usually how the `easing` in animation happens is from changing of the `amountToMove` in the `move()` function.
-
-- Given this function, how can you convert it into a `Promise` ?
+- This is a **Reverse-Back** algorithm, meaning that we start from the element we want to find, and we traverse the DOM tree **upwards** to the root. Then, we traverse the DOM tree **downwards** to the element we want to find in the other DOM tree.
 
   ```js
-  // input
-  function getData(callback) {
-    setTimeout(() => callback('data'), 1000);
-  }
+  function reversePath(element, root) {
+    const path = []; // path to the element from the root
+    let pointer = element;
 
-  // Solution
-  function getData() {
-    return new Promise(resolve => {
-      setTimeout(() => resolve('data'), 1000);
-    });
+    // 1. Traverse the DOM tree Upwards to the root
+    while (pointer.parentNode) {
+      // get the index of the current node in the parent
+      const index = [...pointer.parentNode.children].indexOf(pointer);
+      path.push(index);
+      pointer = pointer.parentNode;
+    }
+
+    // 2. Traverse the DOM tree Downwards to the element we want to find
+    pointer = root;
+    // now, path has the indexes from the target node to the root
+    while (path.length) {
+      pointer = pointer.children[path.pop()];
+    }
+    return pointer;
   }
   ```
+
+### Create a function that moves an element **(Rendering Performance)**
+
+- Hint: usually here, the interviewer wants to see if you know about `requestAnimationFrame()`, which is a method that tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next **repaint**.
+
+  ```js
+  function moveElement(element, duration, distance) {
+    const start = performance.now(); // get the start time
+
+    function move(currentTime) {
+      const elapsed = currentTime - start; // get the time since the animation started
+      const progress = elapsed / duration; // calculate how far along the animation is (ratio of the elapsed time to the total duration)
+      const amountToMove = progress * distance; // calculate how far we should move the element
+
+      // move the element
+      element.style.transform = `translateX(${amountToMove}px)`;
+
+      // stop the animation after the specified duration
+      if (amountToMove < distance) {
+        requestAnimationFrame(move); // call the function again to repeat the animation loop
+      }
+    }
+    requestAnimationFrame(move);
+  }
+  ```
+
+  - trick: usually how the `easing` in animation happens is from changing of the `amountToMove` in the `move()` function.
+
+### Given this function, how can you convert it into a `Promise` ?
+
+```js
+// input
+function getData(callback) {
+  setTimeout(() => callback('data'), 1000);
+}
+
+// Solution
+function getData() {
+  return new Promise(resolve => {
+    setTimeout(() => resolve('data'), 1000);
+  });
+}
+```
 
 - Can you trigger a `Sleep` in Javascript?
 
@@ -274,9 +294,9 @@
 
     - funny fact: this is similar to `promisify()` function in `node.js`
 
-- what does double brackets mean in properties, ex: `[[prototype]]`?
+### what does double brackets mean in properties, ex: `[[prototype]]`?
 
-  - These are **internal properties** that are not accessible directly from the code, but only indirectly through other internal mechanisms.
+- These are **internal properties** that are not accessible directly from the code, but only indirectly through other internal mechanisms.
 
 - How to get the last element in the array in multiple ways?
 
@@ -296,111 +316,132 @@
   const lastElement = arr.pop();
   ```
 
-- What will happen if you used `forEach` on a `Set`?
+### What will happen if you used `forEach` on a `Set`?
 
-  - `forEach` will iterate over the values of the `Set`. where the `index`/`key` will be the same as the `value`.
-
-    ```js
-    const set = new Set(['a', 'b', 'c']);
-    set.forEach((value, key) => console.log(value, key));
-    // a a
-    // b b
-    // c c
-    ```
-
-- Why do we get these results?
+- `forEach` will iterate over the values of the `Set`. where the `index`/`key` will be the same as the `value`.
 
   ```js
-  let arr = [1, 2, 3, 4];
-
-  0 in arr; // true
-  4 in arr; // false
+  const set = new Set(['a', 'b', 'c']);
+  set.forEach((value, key) => console.log(value, key));
+  // a a
+  // b b
+  // c c
   ```
 
-  - it's because `in` operator checks if the `index` / `key` is in the array or not, not the value.
-  - So, `0` is a valid index, but `4` is not.
+### Why do we get these results?
 
-- Why we don't use asthmatic comparison with strings?
+```js
+let arr = [1, 2, 3, 4];
+
+0 in arr; // true
+4 in arr; // false
+```
+
+- it's because `in` operator checks if the `index` / `key` is in the array or not, not the value.
+- So, `0` is a valid index, but `4` is not.
+
+### Why we don't use asthmatic comparison with strings?
+
+```js
+'x' > 'a'; // true
+'X' > 'a'; // false -> capital letters are always less than lowercase letters
+```
+
+- because the comparison is done by comparing the `Unicode` values of the characters using the `charCodeAt()` method.
 
   ```js
-  'x' > 'a'; // true
-  'X' > 'a'; // false -> capital letters are always less than lowercase letters
+  'x'.charCodeAt(0); // 120
+  'X'.charCodeAt(0); // 88
+  'a'.charCodeAt(0); // 97
+  // 97 < 88 < 120
   ```
 
-  - because the comparison is done by comparing the `Unicode` values of the characters using the `charCodeAt()` method.
+### How do you return multiple things from a function?
 
-    ```js
-    'x'.charCodeAt(0); // 120
-    'X'.charCodeAt(0); // 88
-    'a'.charCodeAt(0); // 97
-    // 97 < 88 < 120
-    ```
+- You can return (one `array` or one `object`) with multiple values inside it.
 
-- How do you return multiple things from a function?
+  ```js
+  function foo() {
+    return [1, 2, 3];
+  }
 
-  - You can return (one `array` or one `object`) with multiple values inside it.
+  function bar() {
+    return { a: 1, b: 2, c: 3 };
+  }
+  ```
 
-    ```js
-    function foo() {
-      return [1, 2, 3];
-    }
+- Some languages like `Go` allow you to return multiple values from a function, but JavaScript doesn't support that.
 
-    function bar() {
-      return { a: 1, b: 2, c: 3 };
-    }
-    ```
+### How to deep copy an object?
 
-  - Some languages like `Go` allow you to return multiple values from a function, but JavaScript doesn't support that.
+1. You can use `JSON.parse()` and `JSON.stringify()` to deep copy an object.
 
-- How to deep copy an object?
+   ```js
+   const obj = { a: 1, b: { c: 2 } };
+   const deepCopy = JSON.parse(JSON.stringify(obj));
+   ```
 
-  1. You can use `JSON.parse()` and `JSON.stringify()` to deep copy an object.
+   - But, this method has some limitations:
+     - It will not work with functions, `undefined`, or `symbol` properties.
+     - It will not work with circular references (an object that references itself).
 
-     ```js
-     const obj = { a: 1, b: { c: 2 } };
-     const deepCopy = JSON.parse(JSON.stringify(obj));
-     ```
+2. You can use a `for...in` loop to iterate over the properties of the object and copy them to a new object using recursion to make sure nested objects are also deep copied.
 
-     - But, this method has some limitations:
-       - It will not work with functions, `undefined`, or `symbol` properties.
-       - It will not work with circular references (an object that references itself).
-
-  2. You can use a `for...in` loop to iterate over the properties of the object and copy them to a new object using recursion to make sure nested objects are also deep copied.
-
-     ```js
-     function deepCopy(obj) {
-       const result = {};
-       for (const key in obj) {
-         if (typeof obj[key] === 'object') {
-           result[key] = deepCopy(obj[key]);
-         } else {
-           result[key] = obj[key];
-         }
+   ```js
+   function deepCopy(obj) {
+     const result = {};
+     for (const key in obj) {
+       if (typeof obj[key] === 'object') {
+         result[key] = deepCopy(obj[key]);
+       } else {
+         result[key] = obj[key];
        }
-       return result;
      }
-     ```
+     return result;
+   }
+   ```
 
-  3. You can use `Object.assign()` to copy the properties of the object to a new object.
+3. You can use `Object.assign()` to copy the properties of the object to a new object.
 
-     ```js
-     const obj = { a: 1, b: { c: 2 } };
-     const deepCopy = Object.assign({}, obj);
-     ```
+   ```js
+   const obj = { a: 1, b: { c: 2 } };
+   const deepCopy = Object.assign({}, obj);
+   ```
 
-  4. You can use the `spread` operator to copy the properties of the object to a new object.
+4. You can use the `spread` operator to copy the properties of the object to a new object.
 
-     ```js
-     const obj = { a: 1, b: { c: 2 } };
-     const deepCopy = { ...obj };
-     ```
+   ```js
+   const obj = { a: 1, b: { c: 2 } };
+   const deepCopy = { ...obj };
+   ```
 
-     - But it will be shallow copy, not deep copy.
+   - But it will be shallow copy, not deep copy.
 
-  5. You can use `lodash` library to deep copy an object -> `cloneDeep()` method.
+5. You can use `lodash` library to deep copy an object -> `cloneDeep()` method.
 
-     ```js
-     const _ = require('lodash');
-     const obj = { a: 1, b: { c: 2 } };
-     const deepCopy = _.cloneDeep(obj);
-     ```
+   ```js
+   const _ = require('lodash');
+   const obj = { a: 1, b: { c: 2 } };
+   const deepCopy = _.cloneDeep(obj);
+   ```
+
+### How to check if a value is a number?
+
+- You can use the `typeof` operator to check if a value is a number.
+
+  ```js
+  typeof 42; // 'number'
+  typeof NaN; // 'number'
+  typeof Infinity; // 'number'
+  ```
+
+- Or, you can use the `Number.isNaN()` method with `parseInt()` to check if a value is a number.
+
+  ```js
+  Number.isNaN(42); // false
+  Number.isNaN(NaN); // true
+  Number.isNaN(Infinity); // false
+
+  // usually with input from the user we use parseInt()
+  Number.isNaN(parseInt('42')); // false
+  ```

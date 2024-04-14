@@ -15,6 +15,7 @@
     - [Form elements (controls)](#form-elements-controls)
     - [Autofill Forms](#autofill-forms)
     - [Form validation](#form-validation)
+    - [Input Masking](#input-masking)
     - [How is the Form data is transferred?](#how-is-the-form-data-is-transferred)
     - [Form submission](#form-submission)
   - [Accessibility](#accessibility)
@@ -426,13 +427,27 @@ Why do we need to tell the browser what our HTML elements represent?
 
   - You can use the `:invalid` pseudo-class to add styles to invalid form controls. In addition, there is also the `:valid` pseudo-class for styling valid form elements.
 
-  ```css
-  input:invalid {
-    border: 2px solid red;
-  }
-  ```
+    ```css
+    input:invalid {
+      border: 2px solid red;
+    }
+    ```
 
   - > **Note:** In practice :invalid is tricky to work with. Invalid form fields are already marked as :`invalid` before user interaction, which may confuse users. The `:user-invalid` pseudo-class solves this issue, as the styles are only applied after user interaction. Learn more about `:user-invalid`.
+
+- **Note:** You can find more [Constraint validation attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Constraint_validation) here
+
+---
+
+### Input Masking
+
+**Input masking** is a way to format the input of a form field to make it easier for the user to understand. For example, you can format a phone number field to automatically add the country code and hyphens between the numbers.
+![inputMasking](./img/input-masking.png)
+
+- More here [input masking](https://css-tricks.com/input-masking)
+- You can use libraries like:
+  - [inputmask](https://www.npmjs.com/package/inputmask)
+  - [react-input-mask](https://www.npmjs.com/package/react-input-mask)
 
 ---
 
@@ -835,7 +850,10 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
 
 ## Escape Characters
 
-There are some characters that are used in and reserved by HTML code:
+There are some characters that are used in and reserved by HTML code
+
+We use **escape characters** to display these characters in the browser and not have them interpreted by the browser as code.
+![Escape Characters](./img/escape_characters-1.png)
 
 - `<` and `>` are used to mark tags
 - `&` is used to start an entity reference

@@ -8,12 +8,20 @@
     - [Nested Routes](#nested-routes)
   - [Using the Router](#using-the-router)
     - [Router directives](#router-directives)
+    - [Route Properties (Params and Query Params)](#route-properties-params-and-query-params)
+      - [`ActivatedRoute` service](#activatedroute-service)
+      - [`ActivatedRouteSnapshot` and `RouterStateSnapshot`](#activatedroutesnapshot-and-routerstatesnapshot)
   - [Router Navigation](#router-navigation)
     - [Navigating using the `routerLink` directive](#navigating-using-the-routerlink-directive)
     - [Navigating to route programmatically](#navigating-to-route-programmatically)
     - [Relative Router Link References (Nested Routes)](#relative-router-link-references-nested-routes)
   - [Lazy Loading](#lazy-loading)
     - [Implementing Lazy Loading](#implementing-lazy-loading)
+  - [Router Guards](#router-guards)
+    - [Implementing Router Guards](#implementing-router-guards)
+    - [Route Guards Common Issues](#route-guards-common-issues)
+  - [Route Resolvers](#route-resolvers)
+    - [Why we use Route Resolvers](#why-we-use-route-resolvers)
 
 ---
 
@@ -222,6 +230,110 @@
 
 ---
 
+### Route Properties (Params and Query Params)
+
+In order to access the route parameters, we can use the `ActivatedRoute` service in the component
+
+![route-params](./img/route-params-1.png)
+
+#### `ActivatedRoute` service
+
+- The `ActivatedRoute` service is used to access the route parameters and query parameters of the route
+
+  - To be able to use the `ActivatedRoute` service, we need to inject it into the component using **dependency injection**
+
+    ```ts
+    constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service
+    ```
+
+  - The `ActivatedRoute` service has a property called `params` that is an `Observable` that contains the route parameters
+
+    ```ts
+    this.route.params.subscribe(params => {
+      console.log(params.id); // log the route parameter id
+    });
+    ```
+
+  - The `ActivatedRoute` service has a property called `queryParams` that is an `Observable` that contains the query parameters
+
+    ```ts
+    this.route.queryParams.subscribe(params => {
+      console.log(params.id); // log the query parameter id
+    });
+    ```
+
+- **Example:**
+
+  ```ts
+  // in first.component.ts
+  import { Component, OnInit } from '@angular/core';
+  import { ActivatedRoute } from '@angular/router';
+
+  @Component({
+    selector: 'app-first',
+    templateUrl: './first.component.html',
+    styleUrls: ['./first.component.css']
+  })
+  export class FirstComponent implements OnInit {
+    constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service (dependency injection)
+
+    ngOnInit() {
+      this.route.params.subscribe(params => {
+        console.log(params.id); // log the route parameter id
+      });
+
+      this.route.queryParams.subscribe(params => {
+        console.log(params.id); // log the query parameter id
+      });
+    }
+  }
+  ```
+
+- **Notes:**
+
+  - The `params` property of the `ActivatedRoute` service is an `Observable` that contains the route parameters
+  - The `queryParams` property of the `ActivatedRoute` service is an `Observable` that contains the query parameters
+  - The `subscribe` method of the `Observable` is used to subscribe to the `Observable` and get the value of the `Observable`
+
+#### `ActivatedRouteSnapshot` and `RouterStateSnapshot`
+
+They are used to access the route parameters and query parameters of the route **WITHOUT** subscribing to the `Observable`
+
+- This is done by using the `snapshot` property of the `ActivatedRoute` service
+
+  ```ts
+  console.log(this.route.snapshot.params.id); // log the route parameter id
+  console.log(this.route.snapshot.queryParams.id); // log the query parameter id
+  ```
+
+- **Example:**
+
+  ```ts
+  // in first.component.ts
+  import { Component, OnInit } from '@angular/core';
+  import { ActivatedRoute } from '@angular/router';
+
+  @Component({
+    selector: 'app-first',
+    templateUrl: './first.component.html',
+    styleUrls: ['./first.component.css']
+  })
+  export class FirstComponent implements OnInit {
+    constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service (dependency injection)
+
+    ngOnInit() {
+      console.log(this.route.snapshot.params.id); // log the route parameter id
+      console.log(this.route.snapshot.queryParams.id); // log the query parameter id
+    }
+  }
+  ```
+
+- **Notes:**
+
+  - By using the `snapshot` property of the `ActivatedRoute` service, We won't be able to get the updated values of the route parameters and query parameters when they change **(no live updates, only initial values when the component is initialized)**
+
+---
+
 ## Router Navigation
 
 ### Navigating using the `routerLink` directive
@@ -268,6 +380,13 @@
 - To navigate to a route programmatically, use the `Router` service in the component
 
 - The `Router` service is used to navigate to a route programmatically
+
+  - To be able to use the `Router` service, we need to inject it into the component using **dependency injection**
+
+    ```ts
+    constructor(private router: Router) {} // inject the Router service
+    ```
+
 - The `navigate` method of the `Router` service is used to navigate to a route
 
   - The `navigate` method takes an array of the path of the route as an argument
@@ -299,7 +418,7 @@
     styleUrls: ['./app.component.css']
   })
   export class AppComponent {
-    constructor(private router: Router) {}
+    constructor(private router: Router) {} // inject the Router service (dependency injection)
 
     navigateToFirstComponent() {
       this.router.navigate(['/first-component']);
@@ -370,3 +489,253 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
   - The lazy loaded module should be set up in its own `Domain module` and `Routing module` **with empty string path** to avoid routing issues
     ![lazy-loading](./img/lazy-loading-3.png)
     ![lazy-loading](./img/lazy-loading-4.png)
+
+---
+
+## Router Guards
+
+**Router guards** are used to protect the routes of the app and control the navigation to the routes
+
+- They are used to prevent **unauthorized** users from accessing certain routes
+  - They are used to prevent users from navigating to certain routes based on certain conditions
+    ![router-guards](./img/router-guards-1.png)
+- They're **Classes** that implement a specific interface and contain a method that returns a `boolean` or an `observable` that resolves to a `boolean`
+  - This `boolean` value determines whether the user can navigate to the route
+- There are 4 types of router guards in Angular:
+  ![router-guards](./img/router-guards-2.png)
+  - `CanActivate` : to prevent the user from navigating to a route
+  - `CanActivateChild` : to prevent the user from navigating to the child routes of a route
+  - `CanLoad` : to prevent the user from loading the module of a route (lazy loading modules)
+  - `CanDeactivate` : to prevent the user from leaving a route
+
+### Implementing Router Guards
+
+- **Steps to implement Router Guards:**
+
+  1. **Create a new guard** using the Angular CLI
+  2. **Implement the guard** by adding the logic to the guard
+  3. **Add the guard to the routes** of the `AppRoutingModule` using the `canActivate` property
+
+- **Example:**
+
+  - 1️⃣ **Create a new guard** using the Angular CLI
+
+    ```bash
+    ng generate guard auth/Auth
+    ```
+
+    - Note: Angular will add `guard` to the name of the guard automatically, so you don't need to add it because it will be `AuthGuardGuard` if you add `guard` to the name
+      - in newer versions of Angular, the guard will be a `function` instead of a `class`
+
+  - 2️⃣ This will generate a new guard called `auth.guard.ts` in the `src/app` directory
+
+    ```ts
+    // in auth.guard.ts
+    import { Injectable } from '@angular/core';
+    import {
+      CanActivate,
+      ActivatedRouteSnapshot,
+      RouterStateSnapshot,
+      UrlTree
+    } from '@angular/router';
+    import { Observable } from 'rxjs';
+
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class AuthGuard implements CanActivate {
+      canActivate(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+      ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+        return true; // return true to allow the user to navigate to the route
+      }
+    }
+    ```
+
+    - The `canActivate` method of the `AuthGuard` class is used to determine whether the user can navigate to the route
+    - The `canActivate` method takes the `ActivatedRouteSnapshot` and `RouterStateSnapshot` as arguments
+    - The `canActivate` method returns a `boolean` or an `Observable` that resolves to a `boolean` to allow the user to navigate to the route
+
+  - 3️⃣ **Add the guard to the routes** of the `AppRoutingModule` using the `canActivate` property
+
+    ```ts
+    // in app-routing.module.ts
+    const routes: Routes = [
+      { path: '', component: HomeComponent },
+      { path: 'first-component', component: FirstComponent, canActivate: [AuthGuard] },
+      { path: 'second-component', component: SecondComponent }
+    ];
+    ```
+
+    - The `canActivate` property is used to add the `AuthGuard` to the route `/first-component` to prevent the user from navigating to the route
+
+- **Notes:**
+
+  - The `canActivate` property can also take an array of guards to add multiple guards to the route
+
+    ```ts
+    { path: 'first-component', component: FirstComponent, canActivate: [AuthGuard, AnotherGuard] }
+    ```
+
+---
+
+### Route Guards Common Issues
+
+![router-guards](./img/router-guards-3.png)
+
+---
+
+## Route Resolvers
+
+**Route resolvers** are used to fetch the data needed for a route before the route is activated, and then pass the data to the component
+
+- They are used to prevent the user from navigating to the route until the data is fetched
+
+- **Example 1:**
+
+  - 1️⃣ **Create a new resolver** using the Angular CLI
+
+    ```bash
+    ng generate resolver data
+    ```
+
+    - Note: Angular will add `resolver` to the name of the resolver automatically, so you don't need to add it because it will be `DataResolverResolver` if you add `resolver` to the name
+
+  - 2️⃣ This will generate a new resolver called `data.resolver.ts` in the `src/app` directory
+
+    ```ts
+    // in data.resolver.ts
+    import { Injectable } from '@angular/core';
+    import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+    import { Observable } from 'rxjs';
+
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class DataResolver implements Resolve<any> {
+      resolve(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+      ): Observable<any> | Promise<any> | any {
+        return null; // return the data needed for the route
+      }
+    }
+    ```
+
+    - The `resolve` method of the `DataResolver` class is used to fetch the data needed for the route
+    - The `resolve` method takes the `ActivatedRouteSnapshot` and `RouterStateSnapshot` as arguments
+    - The `resolve` method returns an `Observable`, a `Promise`, or the data needed for the route
+
+  - 3️⃣ **Add the resolver to the routes** of the `AppRoutingModule` using the `resolve` property
+
+    ```ts
+    // in app-routing.module.ts
+    const routes: Routes = [
+      { path: '', component: HomeComponent },
+      { path: 'first-component', component: FirstComponent, resolve: { data: DataResolver } }, // add the resolver to the route
+      { path: 'second-component', component: SecondComponent }
+    ];
+    ```
+
+    - The `resolve` property is used to add the `DataResolver` to the route `/first-component` to fetch the data needed for the route
+
+- **Example 2:** resolving fetching data from a service then passing it to the component
+
+  - 1️⃣ **Create a new service**
+
+    ```ts
+    // in data.service.ts
+    import { Injectable } from '@angular/core';
+    import {
+      ActivatedRouteSnapshot,
+      MaybeAsync,
+      Resolve,
+      RouterStateSnapshot
+    } from '@angular/router';
+    import { Email } from './email';
+    import { EmailService } from './email.service';
+
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class EmailResolverService implements Resolve<Email> {
+      constructor(private emailService: EmailService) {}
+
+      resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): MaybeAsync<Email> {
+        const { id } = route.params;
+        return this.emailService.getEmail(id);
+      }
+    }
+    ```
+
+    - The `resolve` method of the `EmailResolverService` class is used to fetch the email data needed for the route
+    - The `resolve` method takes the `ActivatedRouteSnapshot` and `RouterStateSnapshot` as arguments (to access the route parameters)
+    - The `resolve` method returns an `Observable`, a `Promise`, or the email data needed for the route
+    - **Now, the data returned will now be passed to the component through the `ActivatedRoute` service**
+
+  - 2️⃣ **Add the resolver to the routes** of the `AppRoutingModule` using the `resolve` property
+
+    ```ts
+    // in app-routing.module.ts
+    import { EmailResolverService } from './email-resolver.service';
+
+    const routes: Routes = [
+      { path: '', component: HomeComponent },
+      { path: 'email/:id', component: EmailComponent, resolve: { email: EmailResolverService } },
+      { path: 'first-component', component: FirstComponent },
+      { path: 'second-component', component: SecondComponent }
+    ];
+    ```
+
+    - The `resolve` property is used to add the `EmailResolverService` to the route `/email/:id` to fetch the email data needed for the route
+
+  - 3️⃣ **Use the data in the component**
+
+    ```ts
+    // in email.component.ts
+    import { Component, OnInit } from '@angular/core';
+    import { ActivatedRoute } from '@angular/router';
+    import { Email } from './email';
+
+    @Component({
+      selector: 'app-email',
+      templateUrl: './email.component.html',
+      styleUrls: ['./email.component.css']
+    })
+    export class EmailComponent implements OnInit {
+      email: Email;
+
+      constructor(private route: ActivatedRoute) {}
+
+      ngOnInit() {
+        this.email = this.route.snapshot.data.email;
+      }
+    }
+    ```
+
+    - The `email` property of the `ActivatedRoute` service is used to access the email data fetched by the resolver
+    - The `email` data is passed to the component using the `ActivatedRoute` service
+
+- **Notes:**
+
+  - The `resolve` property can also take an object with the key as the name of the data and the value as the resolver
+
+    ```ts
+    { path: 'first-component', component: FirstComponent, resolve: { data: DataResolver } }
+    ```
+
+  - The data fetched by the resolver is passed to the component using the `ActivatedRoute` service
+
+    ```ts
+    this.route.data.subscribe(data => {
+      console.log(data); // log the data fetched by the resolver
+    });
+    ```
+
+---
+
+### Why we use Route Resolvers
+
+- Prevent the user from navigating to the route until the data is fetched
+- Pause rendering of the component until the data is fetched (to avoid `undefined` errors in the template)

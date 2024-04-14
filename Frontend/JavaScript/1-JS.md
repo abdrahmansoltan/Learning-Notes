@@ -1761,9 +1761,9 @@ const data = Object.fromEntries(dataArr); // convert arrays into key-value-pairs
 
 ## CROSS-SITE SCRIPTING (XSS) ATTACKS
 
-XSS involves an attacker placing malicious code into a site. Websites often feature content created by many different people.
+**XSS** involves an attacker placing malicious code into a site. Websites often feature content created by many different people.
 
-XSS can give the attacker access to information in:
+**XSS** can give the attacker access to information in:
 
 - The DOM (including form data)
 - That website's cookies

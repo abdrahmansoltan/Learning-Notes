@@ -44,12 +44,15 @@
     - [Chaining pipes](#chaining-pipes)
   - [Forms and Input Handling](#forms-and-input-handling)
     - [Input Handling (Two-way data binding)](#input-handling-two-way-data-binding)
+      - [Input masking in Angular](#input-masking-in-angular)
     - [Forms](#forms)
-    - [TEMPLATE-DRIVEN Forms](#template-driven-forms)
+      - [Reactive Forms](#reactive-forms)
+      - [Template Forms](#template-forms)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
   - [Notes](#notes)
     - [Expressions vs String Interpolation](#expressions-vs-string-interpolation)
+    - [Angular HTML Escaper](#angular-html-escaper)
 
 ---
 
@@ -57,7 +60,7 @@
 
 Angular is a `framework` for building client applications in HTML, CSS, and JavaScript/TypeScript
 
-- It's a **framework** because it provides a lot of things out of the box like `routing`, `forms`, `http`, etc.
+- It's a **framework** because it provides a lot of things out of the box like `routing`, `forms`, `http` libraries, etc.
 - Code is written in `Typescript`, and Templates are written in Angular template syntax (which is a superset of HTML with Angular-specific syntax).
 
 ---
@@ -1190,11 +1193,53 @@ its a word that you use to mark an element and get access to it in the template 
   <input [value]="name" (input)="name = $event.target.value" />
   ```
 
+#### Input masking in Angular
+
+- To create an input mask in Angular, you can use the [ngx-mask library](https://www.npmjs.com/package/ngx-mask)
+
+  ```bash
+  npm install ngx-mask --save
+  ```
+
+  - This library provides a directive that can be used to create an input mask
+
+  ```html
+  <!-- Create an input mask for a date field -->
+  <input type="text" mask="00/00/0000" />
+  ```
+
+  - We can also use `pipe` to for masking text
+
+    ```html
+    <p>{{ '1234567890' | mask: '(000) 000-0000' }}</p>
+    ```
+
+- You can also create a custom input mask using the `input` event and the `value` property of the input element
+
+  ```html
+  <input (input)="onInput($event)" />
+  ```
+
+  ```ts
+  onInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, '');
+    if (value.length > 8) {
+      value = value.substr(0, 8);
+    }
+    input.value = value;
+  }
+  ```
+
+  - Here, we are creating a custom input mask for a date field
+
 ---
 
 ### Forms
 
-Angular provides two different approaches to handling user input through forms: `reactive` and `template-driven`. Both capture user input events from the view, validate the user input, create a form model and data model to update, and provide a way to track changes.
+Angular has **two different approaches** to handling user input through forms: `Reactive Forms` and `Template Forms`. Both capture user input events from the view, validate the user input, create a form model and data model to update, and provide a way to track changes.
+
+![forms](./img/forms-1.png)
 
 |                     | `REACTIVE`                                    | `TEMPLATE-DRIVEN`                                                 |
 | ------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
@@ -1207,14 +1252,349 @@ Angular provides two different approaches to handling user input through forms: 
 
 ---
 
-### TEMPLATE-DRIVEN Forms
+#### Reactive Forms
 
-- `ngModel` directive **with 2-way-binding** is added to the `input element`
-- a local-reference equal to `ngModel` is added to the `input element`
+- Reactive forms are more **explicit** and **synchronous** than template-driven forms. They are created programmatically in the component class and are **immutable**.
+- To create a reactive form:
 
-```html
-<input [(ngModel)]="credentials.password" #email="ngModel" />
-```
+  - 1️⃣ You need to import the `ReactiveFormsModule` in the `app.module.ts` file
+
+    ```ts
+    // in app.module.ts
+    import { ReactiveFormsModule } from '@angular/forms';
+
+    @NgModule({
+      imports: [ReactiveFormsModule]
+    })
+    export class AppModule {}
+    ```
+
+    - The `ReactiveFormsModule` module provides the `FormControl`, `FormGroup`, and `FormArray` classes to create reactive forms
+
+  - 2️⃣ Then, you can create a reactive form in the component class
+
+    ```ts
+    // in app.component.ts
+    import { Component } from '@angular/core';
+    import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+    @Component({
+      selector: 'app-root',
+      template: 'app.component.html'
+    })
+    export class AppComponent {
+      // Telling Angular that we have a form group with the name "form"
+      myForm = new FormGroup({
+        name: new FormControl(''), // Telling Angular that we have a form-field named "name" with an initial value of ""
+        email: new FormControl('', [
+          Validators.required, // Telling Angular that the email field is required
+          Validators.email // Telling Angular that the email field should be a valid email
+        ]),
+        password: new FormControl('', [
+          Validators.required,
+          Validators.minLength(6),
+          Validators.pattern('^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$')
+        ])
+      });
+
+      onSubmit() {
+        console.log(this.myForm.value); // { name: 'John', email: 'test@test.com', password: '123456' }
+        console.log(this.myForm.get('name').value); // John
+        console.log(this.myForm.valid); // true or false
+      }
+    }
+    ```
+
+  - 3️⃣ Then, you can bind the form to the template using the `formGroup` directive
+
+    ```html
+    <!-- in app.component.html -->
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+      <input formControlName="name" />
+      <input formControlName="email" />
+      <input formControlName="password" />
+      <button type="submit" [disabled]="!myForm.valid">Submit</button>
+    </form>
+    ```
+
+    - The `formGroup` directive is used to bind the form to the template
+    - The `formControlName` directive is used to bind the input element to a form field
+
+  - 4️⃣ (OPTIONAL): You can handle form validation in the component class
+
+    ```ts
+    // in app.component.ts
+    get email() {
+      return this.myForm.get('email');
+    }
+
+    get password() {
+      return this.myForm.get('password');
+    }
+
+    onSubmit() {
+      if (this.myForm.valid) {
+        console.log(this.myForm.value);
+      } else {
+        if (this.email.hasError('required')) {
+          console.log('Email is required');
+        }
+        if (this.email.hasError('email')) {
+          console.log('Email is invalid');
+        }
+        if (this.password.hasError('required')) {
+          console.log('Password is required');
+        }
+      }
+    }
+    ```
+
+    ```html
+    <!-- in app.component.html -->
+    <p *ngIf="email.hasError('required')">Email is required</p>
+    <p *ngIf="email.hasError('email')">Email is invalid</p>
+    <p *ngIf="password.hasError('required')">Password is required</p>
+    ```
+
+  - 5️⃣ (OPTIONAL): You can listen to form changes in the component class, by subscribing to the `valueChanges` or `statusChanges` observables from the form
+
+    ```ts
+    // in app.component.ts
+    ngOnInit() {
+      this.myForm.valueChanges.subscribe(value => {
+        console.log(value); // Whenever the form value changes, this will log the form value
+      });
+
+      this.myForm.statusChanges.subscribe(status => {
+        console.log(status); // Whenever the form status changes, this will log the form status
+      });
+    }
+    ```
+
+- Here, we are:
+  - creating a reactive form with a single `FormControl` named `name` in the component class
+  - We are binding the form to the `form` property in the component class using the `formGroup` directive
+  - We are binding the input element to the `name` property in the form using the `formControlName` directive
+  - We are handling the form submission using the `ngSubmit` event, and not using the `submit` event (because it will reload the page and we're using a reactive form)
+- **Form Validation**
+
+  - `Validators` is a class that **provides built-in validators** like `required`, `email`, `minLength`, `maxLength`, etc.
+    - To have multiple validators for a form field, you can pass an array of validators to the `FormControl` constructor
+  - To access information about the form-field, you can use the `get()` method of the `FormGroup` object to get different properties of the form-field
+    ![form-validation](./img/form-validation-1.png)
+
+  - To handle validation errors, you can use the `errors` property of the `FormControl` object
+
+    - You can use the `hasError()` method to check if a specific error exists
+    - You can use the `getError()` method to get the error message
+
+    ```ts
+    // in the component class
+    get email() {
+      return this.myForm.get('email');
+      // or return this.myForm.controls.email;
+    }
+
+    get password() {
+      return this.myForm.get('password');
+    }
+
+    onSubmit() {
+      if (this.myForm.valid) {
+        console.log(this.myForm.value);
+      } else {
+        if (this.email.hasError('required') && this.password.touched) {
+          console.log('Email is required'); // or you can set an error message in the template via a variable
+        }
+        if (this.email.hasError('email')) {
+          console.log('Email is invalid');
+        }
+        if (this.password.hasError('required')) {
+          console.log('Password is required');
+        }
+      }
+    }
+    ```
+
+  - **Custom validation** can be done by passing a function to the `FormControl` constructor
+
+    - The function should return `null` if the field is valid, and an object with the error message if the field is invalid
+    - You can pass the function to the `FormControl` constructor as the second argument
+    - The function have access to the:
+
+      - (`FormControl` or `FormGroup` or `FormArray` or `AbstractControl`) objects
+
+    - Example of custom validation for the password field
+
+      ```ts
+      // in the component class
+      myForm = new FormGroup({
+        // ...
+        password: new FormControl('', [Validators.required, Validators.minLength(6), this.customValidator])
+      });
+
+      customValidator(control: FormControl) {
+        if (!control.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)) {
+          return { invalidPassword: true };
+        }
+        return null;
+      }
+      ```
+
+      ```html
+      <!-- in the template -->
+      <p *ngIf="password.hasError('invalidPassword')">
+        Password should contain at least one letter and one number
+      </p>
+      ```
+
+  > **Note:** `Validators` class provides **static methods** to create validators, So, it's a good practice to create a custom validator as a **static method** in a separate class for custom validation
+
+  - **Synchronous vs Asynchronous validation**
+
+    - **Synchronous validation**:
+      ![custom-validation](./img/form-validation-2.png)
+
+      - is done using the `Validators` class and the `errors` property of the `FormControl` object
+      - it's done **immediately** when the form is submitted
+      - Example of **Class-Based Custom Validator**:
+
+        ```ts
+        // in the component class
+        myForm = new FormGroup({
+          // ...
+          password: new FormControl('', [
+            Validators.required,
+            Validators.minLength(6),
+            CustomValidators.passwordValidator
+          ])
+        });
+
+        // in a separate file
+        export class CustomValidators implements Validator {
+          validate(control: AbstractControl): ValidationErrors | null {
+            if (!control.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)) {
+              return { invalidPassword: true };
+            }
+            return null;
+          }
+        }
+        ```
+
+        - We use `Validator` interface to create a custom validator class, and to help Angular understand that this class is a validator and tell the developer how to use it correctly
+
+    - **Asynchronous validation**:
+      ![async-validation](./img/form-validation-3.png)
+
+      - is done using the `asyncValidator` property of the `FormControl` object
+      - it's done **after a delay** when the form is submitted (like checking if the email is already taken from the server)
+      - It's called after the synchronous validation is done **(to avoid unnecessary server requests)**
+      - Example of **Async Custom Validator**:
+
+        ```ts
+        @Injectable({
+          providedIn: 'root'
+        })
+        export class UniqueUsername implements AsyncValidator {
+          constructor(private http: HttpClient) {} // 👈 inject the HttpClient
+
+          // Arrow function to bind the context of 'this'
+          validate = (control: FormControl) => {
+            const { value } = control;
+
+            return this.http.get<any>('https://api.angular-email.com/auth/signedin');
+          };
+        }
+
+        // -------------------------OR------------------------- //
+        export class UniqueUsername {
+          static validate(control: AbstractControl): Promise<ValidationErrors | null> {
+            return new Promise((resolve, reject) => {
+              setTimeout(() => {
+                if (control.value === 'test') {
+                  resolve({ isUsernameUnique: true });
+                } else {
+                  resolve(null);
+                }
+              }, 2000);
+            });
+          }
+        }
+        ```
+
+        - We use a **static method** to create an async custom validator, and to help Angular understand that this method is a validator and tell the developer how to use it correctly
+        - We use `Promise` to create an async custom validator
+
+---
+
+#### Template Forms
+
+- Here, we use `ngModel` directive **with 2-way-binding** added to the `input element`
+
+  - a local-reference equal to `ngModel` is added to the `input element`
+
+- To create a template form:
+
+  - 1️⃣ You need to import the `FormsModule` in the `app.module.ts` file
+
+    ```ts
+    // in app.module.ts
+    import { FormsModule } from '@angular/forms';
+
+    @NgModule({
+      imports: [FormsModule]
+    })
+    export class AppModule {}
+    ```
+
+    - The `FormsModule` module provides the `ngModel` directive to create template forms
+
+  - 2️⃣ Then, you can create a template form in the component class with (`ngForm` & `ngModel` directives)
+
+    ```html
+    <!-- in app.component.html -->
+    <form #credentials="ngForm" (ngSubmit)="onSubmit()">
+      <input [(ngModel)]="credentials.name" name="name" />
+      <input [(ngModel)]="credentials.email" name="email" />
+      <input [(ngModel)]="credentials.password" name="password" />
+      <button type="submit">Submit</button>
+    </form>
+    ```
+
+    - `ngForm` directive is used to create a template form which is a group of form fields that can be accessed using the `ngModel` directive
+    - `ngModel` directive is used to create a two-way data binding on form fields
+
+  - 3️⃣ Then, you can handle the form submission in the component class
+
+    ```ts
+    // in app.component.ts
+    import { Component } from '@angular/core';
+
+    @Component({
+      selector: 'app-root',
+      template: 'app.component.html'
+    })
+    export class AppComponent {
+      myForm = new FormGroup({
+        name: new FormControl(''),
+        email: new FormControl('', [Validators.required, Validators.email]),
+        password: new FormControl('', [Validators.required, Validators.minLength(6)])
+      });
+    }
+    ```
+
+- Here, we are:
+  - creating a template form with a single `FormControl` named `name` in the component class
+  - We are binding the form to the `form` property in the component class using the `ngForm` directive
+  - We are binding the input element to the `name` property in the form using the `ngModel` directive
+  - We are handling the form submission using the `ngSubmit` event, and not using the `submit` event (because it will reload the page and we're using a template form)
+- **Validation** is done using the `Validators` class and the `errors` property of the `FormControl` object
+
+  ```html
+  <input [(ngModel)]="credentials.email" name="email" required email />
+  ```
+
+  - You can find more [Constraint validation attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Constraint_validation) here
 
 ---
 
@@ -1343,3 +1723,33 @@ export class AppModule {
 ```
 
 ---
+
+### Angular HTML Escaper
+
+- Angular escapes the HTML content by default automatically to prevent **XSS attacks**
+  ![escaper](./img/escaper-2.png)
+  ![escaper](./img/escaper-1.png)
+- In order to render HTML content as HTML, you can use the `bypassSecurityTrustHtml` method from the `DomSanitizer` service, and then use the `innerHTML` property to render the HTML content
+
+  ```ts
+  import { DomSanitizer } from '@angular/platform-browser';
+
+  @...
+  export class MyComponent {
+    content = '<p>Some HTML content</p>';
+
+    constructor(private sanitizer: DomSanitizer) {}
+
+    getHtmlContent() {
+      return this.sanitizer.bypassSecurityTrustHtml(this.content);
+    }
+  }
+  ```
+
+  ```html
+  <p [innerHTML]="getHtmlContent()"></p>
+  ```
+
+- Notes:
+  - We can use the `[innerHTML]` property without using the `DomSanitizer` service, but it's not recommended because it can expose your app to **XSS attacks**
+  - **Be careful** when using this method because it can expose your app to **XSS attacks**

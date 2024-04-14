@@ -46,6 +46,14 @@ It basically allow to load sources from the specified origins -> hardcode from w
       " />
       ```
 
+    - Or, EX: Entering this script on an input, so that it would be sent to server and then sent to other users to show inputs from other users
+
+      ```html
+      <input type="text" value=" <img src="" onerror="alert('XSS')"" />
+      ```
+
+      - This script will be executed in the browser of the user who sees the input. because the browser trusts the source of the content, and the `onerror` event will be triggered because the `src` attribute is empty.
+
     - How to prevent this ? -> by using `CSP` headers.
       - `CSP` headers will prevent the browser from executing the script, **because it's not in the whitelist**.
 

@@ -8,6 +8,8 @@
     - [Creating modules](#creating-modules)
     - [Using modules](#using-modules)
   - [Router module](#router-module)
+  - [HTTP Module](#http-module)
+    - [HTTP Interceptors](#http-interceptors)
   - [Shared Module](#shared-module)
 
 ---
@@ -163,6 +165,176 @@ It's a module that provides the `routing` functionality to the Angular app and i
     - It will contain the routing module configuration
 
 - **Router Configuration ->** [Router configuration](./4-Angular-Router.md#router-configuration)
+
+---
+
+## HTTP Module
+
+To perform HTTP requests in Angular, we need to import the `HttpClientModule` in the module, and then we can use the `HttpClient` service to perform HTTP requests
+![http](./img/modules-4.png)
+
+- Check [observables](./6-Angular-RXJS.md#observables) for more information about observables and how the `HttpClient` service works with observables
+
+- Example of using the `HttpClient` service to perform an HTTP request
+
+  ```ts
+  // app.module.ts
+  import { HttpClientModule } from '@angular/common/http';
+
+  @NgModule({
+    declarations: [AppComponent],
+    imports: [BrowserModule, HttpClientModule], // import the HttpClientModule here
+    providers: [],
+    bootstrap: [AppComponent]
+  })
+  export class AppModule {}
+  ```
+
+  ```ts
+  // app.component.ts
+  import { HttpClient } from '@angular/common/http';
+
+  export class AppComponent {
+    // Dependency Injection of HttpClient
+    constructor(private http: HttpClient) {
+      this.http.get('https://jsonplaceholder.typicode.com/posts').subscribe(data => {
+        console.log(data);
+      });
+      // Note: calling just `get` method will not make the request, we need to subscribe to the observable to make the request
+    }
+  }
+  ```
+
+- Note: We can still use other tools like `fetch` or `axios` to perform HTTP requests in Angular, but it's recommended to use the `HttpClient` service provided by Angular
+  - One of the reasons is that the `HttpClient` service is integrated with Angular's `error handling` and `observables`, which makes it easier to handle the HTTP requests and responses and work with `RxJS` observables
+
+---
+
+### HTTP Interceptors
+
+**HTTP Interceptor** is a middleware that intercepts HTTP requests and responses from the client to the server and vice versa
+
+![auth service](./img/auth-service-12.png)
+![http interceptor](./img/http-interceptor-1.png)
+
+- It is used to modify the request or response, add headers, handle errors, etc.
+- Usually, we use HTTP Interceptor to add the token to the request headers before sending the request to the server, ex:
+
+  - add the JWT token to the request headers before sending the request to the server
+  - set cookies in the request headers before sending the request to the server
+  - handle errors in the response before sending the response to the client
+
+- Example of creating an HTTP Interceptor
+
+  - 1️⃣ Create a new class file for the interceptor
+
+    ```bash
+    ng g service interceptors/auth-interceptor
+    ```
+
+    - This will create a new service in the `interceptors` folder
+    - The service file will have a class with the same name as the service file
+
+  - 2️⃣ Implement the `HttpInterceptor` interface in the service class
+
+    ```ts
+    // auth-interceptor.ts (class file)
+    import { Injectable } from '@angular/core';
+    import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+    import { Observable } from 'rxjs';
+
+    @Injectable()
+    export class AuthInterceptor implements HttpInterceptor {
+      intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const modifiedRequest = req.clone({
+            headers: req.headers.set('Authorization', 'Bearer ' + token)
+          });
+          return next.handle(modifiedRequest);
+        } else {
+          return next.handle(req);
+        }
+      }
+    }
+    ```
+
+    - The `intercept` method is called for every HTTP request
+    - It takes two arguments:
+      - `req`: the request object
+      - `next`: the next interceptor in the chain
+    - It returns an observable of the `HttpEvent` type
+
+  - 3️⃣ Add the interceptor to the providers array in the `app.module.ts` file (to make it available to the entire app)
+
+    ```ts
+    // app.module.ts
+    import { HTTP_INTERCEPTORS } from '@angular/common/http';
+    import { AuthInterceptor } from './interceptors/auth-interceptor';
+
+    @NgModule({
+      declarations: [AppComponent],
+      imports: [BrowserModule, HttpClientModule],
+      providers: [
+        // Here, we're telling Angular to provide the AuthInterceptor and use it as an HTTP_INTERCEPTOR if any HTTP request is made in the app (because by default, Angular doesn't know about the AuthInterceptor, so we need to provide it here as it only uses the HTTP_INTERCEPTORS token)
+        {
+          provide: HTTP_INTERCEPTORS,
+          useClass: AuthInterceptor,
+          multi: true
+        }
+      ],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {}
+    ```
+
+    - The `HTTP_INTERCEPTORS` is a token that is used to provide the interceptors in Angular
+    - Here, we're telling Angular to provide the `AuthInterceptor` and use it as an `HTTP_INTERCEPTOR` if any HTTP request is made in the app (because by default, Angular doesn't know about the `AuthInterceptor`, so we need to provide it here as it only uses the `HTTP_INTERCEPTORS` token)
+
+  - 4️⃣ Now, the `AuthInterceptor` will intercept every HTTP request and add the token to the request headers before sending the request to the server
+
+- Notes:
+
+  - To have different handling for the request and response, we can:
+
+    - create separate interceptors for the request and response
+
+      ```ts
+      // auth-request-interceptor.ts
+      export class AuthRequestInterceptor implements HttpInterceptor {
+        intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+          // handle request
+        }
+      }
+
+      export class AuthResponseInterceptor implements HttpInterceptor {
+        intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+          // handle response
+        }
+      }
+      ```
+
+    - or we can handle both request and response in the same interceptor
+
+      ```ts
+      export class AuthInterceptor implements HttpInterceptor {
+        intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+          // ...
+          return next.handle(req).pipe(
+            tap(event => {
+              if (event instanceof HttpResponse) {
+                // handle response
+              }
+              if (event instanceof HttpRequest) {
+                // handle request
+              }
+
+              return event;
+            })
+          );
+        }
+      }
+      ```
 
 ---
 

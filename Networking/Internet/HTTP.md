@@ -145,6 +145,7 @@ It is a human-readable address, describing exactly where on the web and in what 
     - more secure than `GET` because the data is not visible in the URL
     - requests are never cached and cannot be bookmarked -> `No Proxy`
     - unlimited amount of data can be sent and bigger `payload` size
+    - Must have a request `body` (even if it's empty `{}`)
 
 - `PUT` vs `PATCH`
   - `PUT`: **replace** a source in collection

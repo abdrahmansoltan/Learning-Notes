@@ -2437,4 +2437,4 @@ common scenarios where plugins are useful include:
 
 - Security Warning
 
-  - Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to XSS(cross site scripting) vulnerabilities. Only use `v-html` on trusted content and never on user-provided content.
+  - Dynamically rendering arbitrary HTML on your website can be very dangerous because it can easily lead to **XSS(cross site scripting)** vulnerabilities. Only use `v-html` on trusted content and never on user-provided content.
