@@ -1,33 +1,38 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Starter CSS Code](#starter-css-code)
+  - [Cascading Style Sheets (CSS)](#cascading-style-sheets-css)
+    - [Styling Types](#styling-types)
+    - [Starter CSS Code (Global Reset / Normalize)](#starter-css-code-global-reset--normalize)
   - [How CSS works](#how-css-works)
     - [Visual Formatting Model](#visual-formatting-model)
-    - [Inheritance](#inheritance)
-  - [styling Types](#styling-types)
-  - [selectors](#selectors)
-    - [Descendant selectors](#descendant-selectors)
-    - [`[attribute]` Selector](#attribute-selector)
-    - [css selector specificity](#css-selector-specificity)
-      - [Calculation](#calculation)
-      - [Selectors Notes](#selectors-notes)
-  - [Properties Types](#properties-types)
-  - [Box Model](#box-model)
-    - [Outline](#outline)
-    - [Inline elements spacings](#inline-elements-spacings)
-    - [Collapsing Margins and Borders](#collapsing-margins-and-borders)
-    - [box model notes](#box-model-notes)
-  - [Display](#display)
-  - [pseudo Elements/Classes](#pseudo-elementsclasses)
+  - [Selectors](#selectors)
+    - [Selectors Types](#selectors-types)
+      - [Descendant selectors](#descendant-selectors)
+      - [`[attribute]` Selector](#attribute-selector)
+      - [Other selectors](#other-selectors)
+    - [Selector specificity](#selector-specificity)
+    - [Selectors Notes](#selectors-notes)
+  - [Pseudo Elements/Classes](#pseudo-elementsclasses)
     - [pseudo elements](#pseudo-elements)
     - [pseudo classes](#pseudo-classes)
-  - [Color](#color)
+  - [Inheritance](#inheritance)
+  - [Box Model](#box-model)
+    - [Box Sizing (width \& height calculation)](#box-sizing-width--height-calculation)
+    - [Outline](#outline)
+    - [Types of boxes](#types-of-boxes)
+    - [Collapsing-Margins Problem](#collapsing-margins-problem)
+    - [How to center an element](#how-to-center-an-element)
+    - [Box model notes](#box-model-notes)
+  - [Display \& Visibility](#display--visibility)
+  - [Colors](#colors)
     - [HSL Colors](#hsl-colors)
+    - [Color Notes](#color-notes)
   - [Font](#font)
     - [TypeFaces](#typefaces)
-      - [Units of Type Size](#units-of-type-size)
+    - [Units of Type Size](#units-of-type-size)
     - [Alignment](#alignment)
+    - [Text-Wrap and Overflow](#text-wrap-and-overflow)
     - [Font and Units Notes](#font-and-units-notes)
   - [Shadow](#shadow)
     - [box-shadow](#box-shadow)
@@ -45,55 +50,13 @@
     - [image filter](#image-filter)
     - [clip-path](#clip-path)
     - [Images Notes](#images-notes)
-  - [LAYOUTS](#layouts)
-    - [Fixed width vs Liquid Layouts](#fixed-width-vs-liquid-layouts)
-    - [Position](#position)
+  - [Positioning \& Prospective](#positioning--prospective)
+    - [`position` property](#position-property)
     - [`z-index`](#z-index)
-    - [Float](#float)
-    - [Flexbox](#flexbox)
-      - [`display: flex` vs `display: inline-flex`](#display-flex-vs-display-inline-flex)
-      - [`flex-direction`](#flex-direction)
-      - [`flex-wrap`](#flex-wrap)
-      - [`justify-content`](#justify-content)
-      - [`align-items`](#align-items)
-      - [`align-content`](#align-content)
-      - [`align-self`](#align-self)
-      - [`order`](#order)
-      - [`flex` shorthand (`flex-grow`, `flex-shrink`, `flex-basis`)](#flex-shorthand-flex-grow-flex-shrink-flex-basis)
-      - [flex `gap` (NEW FEATURE)](#flex-gap-new-feature)
-      - [Flexbox notes](#flexbox-notes)
-    - [Grid](#grid)
-      - [Grid terminology and implementation](#grid-terminology-and-implementation)
-      - [`auto` vs `fr`](#auto-vs-fr)
-      - [Grid gap](#grid-gap)
-      - [Grid functions](#grid-functions)
-        - [`minmax()`](#minmax)
-        - [`repeat()`](#repeat)
-        - [`fit-content()`](#fit-content)
-      - [`auto-fill` vs `auto-fit`](#auto-fill-vs-auto-fit)
-      - [Grid items](#grid-items)
-        - [Grid Lines (start/end)](#grid-lines-startend)
-        - [Grid Areas](#grid-areas)
-  - [CSS Variables (custom properties)](#css-variables-custom-properties)
-    - [Variables inheritance](#variables-inheritance)
-    - [Invalid At Computed Values Time (IACVT)](#invalid-at-computed-values-time-iacvt)
-    - [variables token: Number, string, images](#variables-token-number-string-images)
-    - [Css variables with Javascript](#css-variables-with-javascript)
   - [Calculations Built in Functions](#calculations-built-in-functions)
     - [`calc()`](#calc)
     - [`clamp()`](#clamp)
   - [icons - SVG](#icons---svg)
-  - [Animation \& Transitions](#animation--transitions)
-    - [What to animate? (Animation Performance)](#what-to-animate-animation-performance)
-    - [transform](#transform)
-    - [transition](#transition)
-      - [Animating(transitioning) background](#animatingtransitioning-background)
-    - [CSS Animation](#css-animation)
-      - [Animation properties](#animation-properties)
-      - [Animation Keyframes](#animation-keyframes)
-      - [Animation choreograph](#animation-choreograph)
-    - [data state animation](#data-state-animation)
-    - [Animation Notes](#animation-notes)
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
@@ -104,7 +67,67 @@
 
 ---
 
-## Starter CSS Code
+## Cascading Style Sheets (CSS)
+
+**CSS** is a language that describes the visual style and layout of the content (HTML) in a web page.
+
+- **CSS** stands the phrase **Cascading Style Sheets**.
+
+  - **"Cascading"** Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
+
+    - means that a lower priority style can be overridden by a higher priority style.
+
+    > Great article about it [here](https://2019.wattenberger.com/blog/css-cascade)
+
+  - **"Style"** is a set of rules that define how the content of an element should be displayed.
+  - **"Sheets"** means that the rules are organized into groups.
+
+- **CSS Rule**: It consists of `properties` and `values` that are applied to HTML elements (`selectors`) to style them.
+  ![css](./img/css-1.png)
+
+---
+
+### Styling Types
+
+- **inline style**
+
+  - it's a style that is applied directly to the element using the `style` attribute.
+
+    ```html
+    <h1 style="color:red"></h1>
+    ```
+
+- **internal style**
+
+  - it's a style that is applied to the whole page using the `<style>` tag in the `<head>` section.
+
+    ```html
+    <style>
+      h1 {
+        color: red;
+      }
+    </style>
+    ```
+
+- **external style**
+
+  - it's a style that is applied to the whole page using an external CSS file.
+
+    ```html
+    <link rel="stylesheet" href="style.css" />
+    ```
+
+    - `Link` tag is not a url link, it's a used for **linking** the HTML file to the CSS file.
+    - `rel` attribute is used to specify the relationship between the HTML file and the linked file. if we didn't specify it, the browser will assume it's a stylesheet file.
+
+- **Note**:
+  - **inline style** has the highest priority, then **internal style**, then **external style**
+    ![css-priority](./img/css-priority.png)
+  - when using 3rd party stylesheets, always put your own stylesheet after it, so it can override it.
+
+---
+
+### Starter CSS Code (Global Reset / Normalize)
 
 in this repo, you will find source for [CSS Default Starter / Global Styles / Tools](https://github.com/john-smilga/default-starter)
 
@@ -149,66 +172,85 @@ It's the process of turning the render tree into the actual pixels on the screen
 
 ---
 
-### Inheritance
+## Selectors
 
-It's when a property of a parent element is passed to its children elements.
+Selectors are used to target the HTML elements that we want to style.
 
-- How inheritance works
-  ![css inheritance](./img/css-inheritance.png)
+### Selectors Types
+
+- There are many types of selectors in CSS, and they can be combined to create complex rules.
+
+  - Based on the type:
+
+    - element -> `p`,`div`,..
+    - class -> `.class`
+    - id -> `#id`
+    - attribute -> `[attribute]`
+    - universal -> `*`
+
+  - Based on the relationship:
+
+    - descendant -> `div p`
+    - child -> `div > p`
+    - adjacent sibling -> `div + p`
+    - general sibling -> `div ~ p`
+
+  - Based on the state or position:
+
+    - `:hover`, `:active`, `:focus`, `:visited`, `:checked`, `:disabled`, `:enabled`, `:required`, `:optional`, `:valid`, `:invalid`, `:in-range`, `:out-of-range`, `:placeholder-shown`
+    - `:first-child`, `:last-child`, `:nth-child(n)`, `:nth-last-child(n)`, `:nth-of-type(n)`, `:only-child`, `:only-of-type`
+
+  - Based on the content (pseudo-elements):
+    - `:empty`, `:not(selector)`, `:has()`, `:where()`, `:is()`
+
+#### Descendant selectors
+
+- **Descendant selector** -> selects all elements that are descendants of a specified element.
+
+  - ex: `div p` -> selects all `<p>` elements inside `<div>` elements
+
+- **Examples:**
+
+  ```css
+  /* Selects all <p> elements inside <div> elements */
+  div p {
+    color: red;
+  }
+
+  /* Selects all elements with both name1 and name2 set within its class attribute */
+  .name1.name2 {
+    background-color: yellow;
+  }
+
+  /* Selects all <p> elements with class="intro" */
+  p.intro {
+    background-color: yellow;
+  }
+
+  /* Selects all <p> elements where the parent is a <div> element */
+  div > p {
+    background-color: yellow;
+  }
+
+  /* Selects all <p> elements where the parent is a <div> element (even if there are other elements nested between them) */
+  div p {
+    background-color: yellow;
+  }
+
+  /* Selects the first <p> element that is placed immediately after <div> elements */
+  div + p {
+    background-color: yellow;
+  }
+
+  /* Selects every <ul> element that is preceded by a <p> element */
+  p ~ ul {
+    background-color: yellow;
+  }
+  ```
 
 ---
 
-## styling Types
-
-1. inline style
-
-   - it crowds our HTML elements
-
-   ```html
-   <h1 style="color:red"></h1>
-   ```
-
-2. internal style
-   - in the `style` tag in `head`
-3. external style
-   - imported in `link` tag with attribute `rel="stylesheet"` in `head`
-   - when using 3rd party stylesheets, always put your own stylesheet after it, so it can override it.
-
-**Cascading**: Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
-
-- **cascade** is the algorithm for solving conflicts where multiple CSS rules apply to an HTML element.
-  - Great article about it [here](https://2019.wattenberger.com/blog/css-cascade)
-
----
-
-## selectors
-
-- Basic: Element selectors => `p`,`div`,..
-- Class selectors
-- ID selectors
-
-### Descendant selectors
-
-selector in a selector, ex: `p em`
-
-- **Examples** from [reference](https://www.w3schools.com/cssref/css_selectors.asp)
-
-  - `.name1.name2` => Selects all elements with both name1 and name2 set within its class attribute
-  - `p.intro` => Selects all `<p>` elements with class="intro"
-  - `div > p` => Selects all `<p>` elements where the parent is a `<div>` element (**Direct child**)
-  - `div p` => Selects all `<p>` elements where the parent is a `<div>` element (even if there are other elements nested between them)
-  - `div + p` => Selects the first `<p>` element that is placed **immediately** after `<div>` elements
-  - `p ~ ul` => Selects every `<ul>` element that is preceded by a `<p>` element (siblings)
-    - **All** `<ul>` after `<p>`
-  - `[target]` => Selects all elements with a target attribute
-  - `:not(p)` => Selects every element that is not a `<p>` element
-  - `:nth-child(n)` => [nthmaster](http://nthmaster.com/)
-  - `owl selector` -> applies to the elements with is not the first one
-    ![owl-selector](./img/owl-selector.png)
-
----
-
-### `[attribute]` Selector
+#### `[attribute]` Selector
 
 - `[]` selector -> Matches a specific attribute (whatever its value)
 
@@ -265,26 +307,56 @@ selector in a selector, ex: `p em`
 
 ---
 
-### css selector specificity
+#### Other selectors
+
+- `:not(p)` => Selects every element that is not a `<p>` element
+- `:nth-child(n)` => [nthmaster](http://nthmaster.com/)
+- `owl selector` -> applies to the elements with is not the first one
+  ![owl-selector](./img/owl-selector.png)
+
+---
+
+### Selector specificity
 
 If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
+![specificity](./img/specificity-0.png)
+![specificity](./img/specificity-4.png)
 
-> or with the **"Last rule Principle"** where if multiple elements have the same selector specificity, then only the last selector's styles will be applied. So placement is Important
+> or with the **"Last rule Principle"** where if multiple elements have the same selector specificity, then only the last selector's styles will be applied. So **the placement of the rule is important**
 
-#### Calculation
+- **Calculation**
+  ![specificity](./img/specificity-1.svg)
 
-- Start at 0
-- add 100 for each ID value
-- add 10 for each class value (or pseudo-class or attribute selector)
-- add 1 for each element selector or pseudo-element.
+  - Start at `0`
+  - add `100` for each ID value
+  - add `10` for each class value (or pseudo-class or attribute selector)
+  - add `1` for each element selector or pseudo-element.
 
-![specificity](./img/specificity.svg)
-![specificity](./img/specificity2.png)
+- Example:
+  ![specificity](./img/specificity-2.png)
 
-#### Selectors Notes
+---
 
+### Selectors Notes
+
+- We shouldn't depend on element-selectors and nested selectors, instead, we should use classes and IDs to style elements.
+  - This is because it's easier to maintain and update the styles later on without affecting other elements and the HTML structure.
+- `id` should be used for **unique** elements, and `class` for **reusable** elements.
+  - In the real world, we usually don't use `id` for styling, instead, we use `class` for everything (to be more flexible and reusable).
+  - if you have an `id` that is used twice, **the styles will be applied to the first one only.**
 - Universal selector (**`*`**) has **no specificity** and gets **0 points** (least specificity so it's like a fallback or when overriding default styles).
+- You can apply the same rule to multiple selectors by separating them with a comma.
+
+  ```css
+  h1,
+  h2,
+  h3 {
+    color: red;
+  }
+  ```
+
 - `!important` gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
+  ![specificity](./img/specificity-3.png)
 
   - if 2 rules have `!important`, then the last one will be applied
 
@@ -293,127 +365,9 @@ If there are two or more CSS rules that point to the same element, the selector 
 
 ---
 
-## Properties Types
+## Pseudo Elements/Classes
 
-- numbers: `10`, `200px`, `50%`, `14pt`
-- colors: `#FFF`, `rgb(255, 0, 0)`, `red`
-- strings: `img.png`, `url("img.png")`
-- boolens: `true`, `false`
-- lists: like 4 values for all directions in `border`
-- maps: `key-value pairs`
-
-  ```css
-  blue: (base: #6ac0e2, center: #38b5ea, shadow: #316980);
-  ```
-
----
-
-## Box Model
-
-- By default, elements have margin, so at the beginning, we reset the margins -> `* {margin: 0;}`
-- **`box-sizing`** : allows us to include the padding and border in an element's total width and height.
-  ![box-sizing](./img/box-sizing.png)
-- margin can be negative as it's related to the surrounding elements and not the element itself
-- **auto margin trick**: ![autoMargin](./img/autoMargin.png)
-
-### Outline
-
-- **outline** is outside of the border (and it may overlap with other elements)
-  ![outline](./img/outline.png)
-- **outline vs border**:
-
-  - `border` is part of the box-model and `outline` is not
-    - this means that `border` takes space of the element size and `outline` doesn't
-    - you can think of it as if the `outline` is like a `box-shadow` as it doesn't affect the page-layout at all
-  - there is no specified positions for `outline` -> `outline-left` is invalid
-  - there's no radius for the `outline`, so with them, we can't have round corners
-  - `outline` can have offset which allows us to move the outline (outside or inside)
-
-    ![outline](./img/outline2.png)
-
-    ```css
-    div {
-      outline: 2px solid #fff;
-      outline-offset: -5px;
-    }
-    ```
-
-  - **`outline` is an animated property**
-
-### Inline elements spacings
-
-- **inline elements** respect padding & margin **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
-  - To make them respect `width`/`height` -> use `display: inline-block;`
-
----
-
-### Collapsing Margins and Borders
-
-- **Collapsing margins** : it's when we have 2 margins(only **vertical** margins) that occupied the same space, so only one of them will be visible to the page which is the larger one and **not** their sum ![Margin Collapse](./img/MarginCollapse.png)
-
-  - This doesn't happen with horizontal margins
-  - this is not the same for **padding** as they get added together
-    - **So, between sections use padding not margin**
-
-- **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/border-collapse.png)
-
----
-
-### box model notes
-
-- to make global reset for margin/padding => use `*` and not `body`
-
-- When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
-
-  - it helps if you only want to specify spacing for one direction only instead of making the other direction equals `zero`
-    ![css-margin-block-inline](./img/css-margin-block-inline.png)
-
-  ```css
-  /* OLD */
-  margin: 0 20px;
-  /* NEW */
-  margin-inline: 20px;
-
-  /* OLD */
-  margin: 20px 0;
-  /* NEW */
-  margin-block: 20px;
-  ```
-
-> **THE VISUAL FORMATTING MODEL**: Algorithm that calculates boxes and determines the layout of theses boxes, for each element in the render tree, in order to determine the final layout of the page.
-
----
-
-## Display
-
-- `visibility:hidden` => hide the element but reserves it's place (leaves a space where the element would have been)
-- `display: none` => remove element from the flow, hide element and collapse its space
-
-  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
-
-    ```css
-    /* ALL THESE FOR mimicking [display:none;] */
-
-    /* 1) Hide it visually and preserve the space */
-    opacity: 0;
-
-    /* 2) Make it unaccessible to mouse and keyboard */
-    pointer-events: none;
-
-    /* 3) Hide it from screen readers */
-    visibility: hidden;
-    ```
-
-- `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
-- **inline-block**: `display: inline-block` --> causes a block-level element to flow like an inline element, while retaining other features of a block-level element.
-  - doesn't start a new line (like inline element)
-  - respects `margin`, `width`, `height` (like block element)
-
----
-
-## pseudo Elements/Classes
-
-They are used to style certain parts of an element or to style an element in a certain state
+They are used to style certain parts of an element or to style an element in a certain state, position, or relationship.
 
 ### pseudo elements
 
@@ -532,43 +486,56 @@ They create element and insert it before/after content of an element without ins
 
 ### pseudo classes
 
-They are style-reactions to certain actions on elements
+Pseudo classes are used to define the special state of an element.
 
-- **styling (hyperlinks / buttons)**
+- Some pseudo classes used with `<a>`, `<button>` elements:
 
-  - Always use these (pseudo classes) with `<a>`, `<button>` elements:
+  - `a:link` => `<a>` that are **unvisited** links with a **`href`** attribute
+  - `a:visited` => `<a>` that has been clicked on
+  - `a:hover` => `<a>` when we are **hovering**
+  - `a:active` => `<a>` when we are **clicking**
+  - `a:focus` => `<a>` when we are **tab focusing**
 
-    - `a:link` => `<a>` that are **unvisited** links with a **href**
-    - `a:visited` => `<a>` that has been clicked on
-    - `a:hover` => `<a>` when we are **hovering**
-    - `a:active` => `<a>` when we are **clicking**
-    - `a:focus` => `<a>` when we are **tab focusing**
+- root pseudo class `:root`
 
-- **root pseudo class**
+  - used to select the root element of the document (the `html` element)
 
-  - for the root element of the document (`html` element), higher specificity
-    - note that `rem` values will depend on values here
+    ```css
+    :root {
+      --main-color: red;
+      font-size: 12px;
+    }
+
+    h1 {
+      color: var(--main-color);
+    }
+    p {
+      font-size: 1rem; /* 12px because of the root element */
+    }
+    ```
+
+  - `rem` values will depend on values here
   - used for:
     - general styles
     - css variables
 
-- **pseudo classes for form elements**
+- pseudo classes for **Form elements**
 
-  - `:checked` -> for radio buttons and checkboxes
-  - `:disabled` -> for disabled elements
-  - `:enabled` -> for enabled elements
-  - `:focus` -> for focused elements
-  - `:required` -> for required elements
-  - `:optional` -> for optional elements
-  - `:valid` -> for valid elements
-  - `:invalid` -> for invalid elements
-  - `:in-range` -> for elements with a value within a specified range
-  - `:out-of-range` -> for elements with a value outside a specified range
+  - `:checked`
+  - `:disabled`
+  - `:enabled`
+  - `:focus`
+  - `:required`
+  - `:optional`
+  - `:valid`
+  - `:invalid`
+  - `:in-range`
+  - `:out-of-range`
   - `:placeholder-shown`
 
-- **pseudo classes for numbering and indexing**
+- pseudo classes for **Child elements & Indexes**
 
-  - `:first-child` -> for the first child of an element
+  - `:first-child` -> for the first child of an element **(not the first of a type)**
   - `:last-child` -> for the last child of an element
   - `:nth-child(n)` -> for every `n`th child of an element
   - `:nth-last-child(n)` -> for every `n`th child of an element, counting from the last child
@@ -576,7 +543,7 @@ They are style-reactions to certain actions on elements
   - `:only-child` -> for the only child of an element
   - `:only-of-type` -> for the only child of a type
 
-- **pseudo class that handles different details about element**
+- pseudo class that handles different **states of an element**
 
   - `:not(selector)` -> selects every element that is not a certain selector
   - `:empty` -> selects every element that has no children
@@ -587,23 +554,305 @@ They are style-reactions to certain actions on elements
 
 ---
 
-## Color
+## Inheritance
 
-![color](./img/color.png)
+**Inheritance** is a key concept in CSS that allows styles to be passed from parent elements to their children (descendants).
 
-- Hex Values **#RRGGBB**
+- Not all properties are inherited, only some of them are inherited by default (like `color`, `font-family`, `font-size`, other text properties).
+- Example:
 
-  - `123456789 A(10) B(11) C(12) D(13) E(14) F(15)`
+  ```css
+  body {
+    color: #444444;
+  }
 
-- `rgba(red, green, blue, alpha)`
+  p {
+    /* p will inherit the color from the body */
+  }
+  ```
 
-  - `alpha`: Defines the opacity as a number between `0.0` (fully transparent) and `1.0` (fully opaque)
+  ![css inheritance](./img/css-inheritance-1.png)
+
+- How inheritance works
+  ![css inheritance](./img/css-inheritance.png)
+
+- Notes:
+
+  - styles applied to the `body` element will be inherited by all other elements in the document. if you want to select all elements, **(without inheritance)**, you can use the `*` selector.
+
+    - It has the lowest specificity, so it's easy to override and like a fallback or when overriding default styles.
+
+  - In order to prevent force inheritance, you can use the `inherit` keyword to inherit the value from the parent element.
+
+    ```css
+    p {
+      color: inherit;
+    }
+    ```
+
+---
+
+## Box Model
+
+The **CSS Box Model** is a set of rules that describe how elements on a web page are rendered and sized by the browser.
+
+- It makes each element in the HTML document a rectangular box that consists of the following parts: (**content**, **padding**, **border**, and **margin**).
+
+  ![box model](./img/box-model-1.png)
+
+---
+
+### Box Sizing (width & height calculation)
+
+- The default behavior of calculating the `width` and `height` of an element is to include the content, padding, and border, but not the margin. This is called `content-box` (default value)
+  ![box-sizing](./img/box-model-2.png)
+- To include the padding and border in the `width` and `height` of an element, you can use the `box-sizing` property with the value `border-box`.
+
+  ```css
+  div {
+    box-sizing: border-box;
+  }
+  ```
+
+  ![box-sizing](./img/box-model-3.png)
+
+  - The old way has `box-sizing: content-box;` as the default value, but now the default value is `box-sizing: border-box;` in most modern browsers.
+  - In order to add it in the reset CSS, you can use:
+
+    ```css
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Don't use it on the body because it won't be inherited */
+    ```
+
+---
+
+### Outline
+
+- **outline** is outside of the border (and it may overlap with other elements)
+  ![outline](./img/outline.png)
+- **outline vs border**:
+
+  - `border` is part of the box-model and `outline` is not
+    - this means that `border` takes space of the element size and `outline` doesn't
+    - you can think of it as if the `outline` is like a `box-shadow` as it doesn't affect the page-layout at all
+  - there is no specified positions for `outline` -> `outline-left` is invalid
+  - there's no radius for the `outline`, so with them, we can't have round corners
+  - `outline` can have offset which allows us to move the outline (outside or inside)
+
+    ![outline](./img/outline2.png)
 
     ```css
     div {
-      background-color: rgba(255, 0, 0, 0.3);
+      outline: 2px solid #fff;
+      outline-offset: -5px;
     }
     ```
+
+  - **`outline` is an animated property**
+
+---
+
+### Types of boxes
+
+- **Block-level elements**:
+  ![block-level](./img/block-level.png)
+
+  - can have `margins`, `padding`, and `borders` ✅
+
+- **Inline elements**:
+  ![inline](./img/inline.png)
+
+  - can have `margins`, `padding`, and `borders` **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
+    - To make them respect `width`/`height` -> use `display: inline-block;`
+
+- **Inline-block elements**:
+  ![inline-block](./img/inline-block.png)
+  - it's a mix between `block` and `inline` elements
+  - it looks like an `inline` element but behaves like a `block` element
+  - can have `margins`, `padding`, and `borders` ✅
+
+---
+
+### Collapsing-Margins Problem
+
+It's a common issue in CSS when two **vertical margins** are touching each other, they will collapse (combine) into a single margin.
+
+- Here, only one of them will be visible to the page which is the larger one and **not** their sum
+  ![Margin Collapse](./img/collapsing-margins-1.png)
+
+  - This doesn't happen with horizontal margins
+  - this is not the same for **padding** as they get added together
+    - **So, between sections use padding not margin**
+
+- **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/collapsing-margins-2.png)
+
+---
+
+### How to center an element
+
+To center an element vertically and horizontally in a container, we have these options:
+
+1. Using `margin: auto`:
+
+   ```css
+   .container {
+     width: 700px;
+     margin: 0 auto;
+   }
+   /* This will center the container horizontally on the page */
+   ```
+
+2. using `flexbox`:
+
+   ```css
+   .container {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   }
+   ```
+
+3. using `position: absolute`:
+
+   ```css
+   .container {
+     position: relative;
+   }
+   .element {
+     width: 100px;
+     height: 100px;
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+
+     /* or */
+     top: calc(50% - 50px); /* 50px is half of the element height */
+     left: calc(50% - 50px); /* 50px is half of the element width */
+   }
+   ```
+
+4. using `grid`:
+
+   - center a container:
+
+     ```css
+     .container {
+       display: grid;
+       place-items: center;
+     }
+     ```
+
+   - center a grid-item inside its cell:
+     ![place-self](./img/place-self.png)
+
+     ```css
+     .grid-item {
+       place-self: center;
+     }
+     ```
+
+---
+
+### Box model notes
+
+- By default, elements have initial values for `margin` & `padding`, So at the beginning, we should reset them to `0` to avoid any unexpected behavior.
+
+  ```css
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* This won't work ❌ because `margin` and `padding` are not inherited */
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  ```
+
+- `margin` can be negative as it's related to the surrounding elements and not the element itself
+- `margin: auto` trick to center an element horizontally
+
+  - ![autoMargin](./img/autoMargin.png)
+
+- `height: auto` -> the height of the element will take the remaining height of the parent element.
+- When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
+
+  - it helps if you only want to specify spacing for one direction only instead of making the other direction equals `zero`
+    ![css-margin-block-inline](./img/css-margin-block-inline.png)
+
+    ```css
+    /* OLD ❌ */
+    margin: 0 20px;
+    /* NEW ✅ */
+    margin-inline: 20px;
+
+    /* OLD ❌ */
+    margin: 20px 0;
+    /* NEW ✅ */
+    margin-block: 20px;
+    ```
+
+> **THE VISUAL FORMATTING MODEL**: Algorithm that calculates boxes and determines the layout of theses boxes, for each element in the render tree, in order to determine the final layout of the page.
+
+---
+
+## Display & Visibility
+
+| Display                                                                         | Visibility                                                                     |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| It specifies the display behavior of an element.                                | It specifies whether an element is visible or hidden.                          |
+| It's a CSS property that defines the type of box used for an HTML element.      | It's a CSS property that determines whether an element is visible or hidden.   |
+| It can have values like `block`, `inline`, `inline-block`, `flex`, `grid`, etc. | It can have values like `visible`, `hidden`, `collapse`, `initial`, `inherit`. |
+
+- `visibility:hidden` => hide the element but reserves it's place (leaves a space where the element would have been)
+- `display: none` => remove element from the flow, hide element and collapse its space
+
+  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
+
+    ```css
+    /* ALL THESE FOR mimicking [display:none;] */
+
+    /* 1) Hide it visually and preserve the space */
+    opacity: 0;
+
+    /* 2) Make it unaccessible to mouse and keyboard */
+    pointer-events: none;
+
+    /* 3) Hide it from screen readers */
+    visibility: hidden;
+    ```
+
+- `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
+- **inline-block**: `display: inline-block` --> causes a block-level element to flow like an inline element, while retaining other features of a block-level element.
+  - doesn't start a new line (like inline element)
+  - respects `margin`, `width`, `height` (like block element)
+
+---
+
+## Colors
+
+![color](./img/color.png)
+
+- **Color** is a combination of **hue**, **saturation**, and **lightness** (HSL)
+
+  - **Hue** is the color itself (0-360)
+  - **Saturation** is the intensity of the color (0-100%)
+  - **Lightness** is the amount of white or black in the color (0-100%)
+
+- There're many ways to represent colors (most common is **RGB Model**)
+
+  ![rgb](./img/color-1.png)
+
+- **Defining colors in CSS**
+  ![color](./img/color-2.png)
+  - in **RGBA**, `alpha`: Defines the opacity as a number between `0.0` (fully transparent) and `1.0` (fully opaque)
+
+---
 
 ### HSL Colors
 
@@ -623,13 +872,25 @@ p {
 
 ---
 
+### Color Notes
+
+- It's a good practice to define colors in a separate file or at the top of the CSS file to make it easier to change them later.
+
+  ```css
+  :root {
+    --main-color: #087f5b; /* Main color */
+    --secondary-color: #343a40; /* accent color */
+    --light-color: #f8f9fa; /* light color */
+  }
+  ```
+
+---
+
 ## Font
 
 ### TypeFaces
 
 > When choosing a typeface, it is important to understand that a browser will usually only display it if it's installed on that user's computer.
-
-![typeFace](./img/typeface.png)
 
 - Browsers are supposed to support at least one typeface from each of the groups above which is called a **"font-stack / generic-family"**. For this reason, it is common to add the generic font name after your preferred choice of typefaces.
 
@@ -637,56 +898,82 @@ p {
 
     ```css
     font-family: Georgia, Times, serif;
+    /* Here, "Georgia" is the preferred typeface, "Times" is the backup, and "serif" is the generic font family. */
     ```
 
-- `@font-face` -> allows you to use a font, even if it is not installed on the computer of the person browsing, by allowing you to specify a path to a copy of the font, which will be downloaded if it is not on the user's machine.
+- `@font-face`
 
-  ```css
-  @font-face {
-    font-family: 'ChunkFiveRegular';
-    src: url('fonts/chunkfive.eot');
-  }
-  h1,
-  h2 {
-    font-family: ChunkFiveRegular, Georgia, serif;
-  }
-  ```
+  - It allows you to use a font, even if it is not installed on the computer of the person browsing, by allowing you to specify a path to a copy of the font, which will be downloaded if it is not on the user's machine.
+
+    ```css
+    /* Declaring a custom font */
+    @font-face {
+      font-family: 'ChunkFiveRegular';
+      src: url('fonts/chunkfive.eot');
+    }
+
+    h1,
+    h2 {
+      /* Using the custom font */
+      font-family: ChunkFiveRegular, Georgia, serif;
+    }
+    ```
 
   - Google also provides open source fonts. Rather than adding the `@font-face` rule to your own style sheet, you link to a CSS file and font files on their servers
+
+    - in the HTML `head`:
+
+      ```html
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto" />
+      ```
+
+    - in the CSS file:
+
+      ```css
+      @import url('https://fonts.googleapis.com/css?family=Roboto');
+      ```
 
 - when importing font-faces from a link, we have 2 methods:
 
   1. put the `<link>` code in the HTML `head` before the styles files
   2. use `@import url()`, **but it needs to be the first thing in your css file/s** to work correctly
 
-- to make text `uppercase / lowercase / capitalize`, you can use `text-transform` property
+---
 
-#### Units of Type Size
+### Units of Type Size
 
 - Setting font size in **pixels** is the best way to ensure that the type appears at the size you intended (because percentages and ems are more likely to vary if a user has changed the default size of text in their browser).
 
   - You can also use pt for point sizes instead of px for pixels, but you should only do this when creating style sheets for printer-friendly versions of pages.
 
-- **`line-height`** is a term to control **Leading (pronounced ledding)**
+- **`line-height`**
 
-  - it is a term typographers use for the **vertical space between lines of text**, and doesn't affect the font-size
-  - In a typeface, the part of a letter that drops beneath the baseline is called a **descender**, while the highest point of a letter is called the **ascender**. Leading is measured from the bottom of the descender on one line to the top of the ascender on the next.
+  - It's a term to control "Leading" (pronounced "ledding")
+  - it is a term typographers use for the **vertical space between lines of text**, and doesn't affect the `font-size`
     ![leading](./img/leading.png)
-  - Increasing the line-height makes the vertical gap between lines of text larger.
   - if we didn't use a unit then it's relevant to the current **font size**
 
-    - Ex:
+    ```css
+    p {
+      font-size: 20px;
+      line-height: 1.5; /* 30px */
+    }
+    ```
 
-      ```css
-      p {
-        font-size: 20px;
-        line-height: 1.5; /* 30px */
-      }
-      ```
+- `letter/word-spacing`
 
-- `letter/word-spacing` : **Kerning** is the term typographers use for the space between each letter. You can control the space between each letter with the letter-spacing property.
-  - When you specify a value for these properties, it should be given in **em**
-    - The default gap between words is set by the typeface around `0.25em`
+  - **"Kerning"** is the term typographers use for the space between each letter. You can control the space between each letter with the letter-spacing property.
+    ![kerning](./img/kerning.gif)
+  - When you specify a value for these properties, it should be given in `em`
+
+    ```css
+    p {
+      letter-spacing: 0.1em;
+      word-spacing: 0.2em;
+    }
+    ```
+
+  - The default gap between words is set by the typeface around `0.25em`
 
 ---
 
@@ -704,6 +991,33 @@ p {
 - `vertical-align`:
   - is a common source of confusion. It is not intended to allow you to vertically align text in the middle of block level elements such as `<p>` and `<div>,` **although** it does have this effect when used with **table cells** (the `<td>` and `<th>` elements).
   - It is more commonly used with inline elements such as `<img>,` `<em>,` or `<strong>` elements. When used with these elements, it performs a task very similar to the HTML align attribute used on the `<img>` element
+
+---
+
+### Text-Wrap and Overflow
+
+When text overflows the container, you can control how it behaves using the `overflow` property or by controlling how it wraps when it reaches the end of the container.
+
+- `overflow` property:
+  ![overflow](./img/overflow.jpg_large)
+
+  - `visible` -> the text will overflow the container
+  - `hidden` -> the text will be hidden
+  - `scroll` -> the text will be hidden but a scrollbar will appear
+  - `auto` -> the text will be hidden but a scrollbar will appear only if needed
+
+- `text-overflow` property:
+  ![text-overflow](./img/text-overflow.png)
+
+  - `clip` -> the text will be clipped
+  - `ellipsis` -> the text will be clipped and an ellipsis will be shown to indicate that there is more text
+
+- `text-wrap` property:
+  - `normal` -> the text will wrap to the next line
+  - `nowrap` -> the text will not wrap to the next line
+  - `pre` -> the text will wrap to the next line but will respect the line breaks in the text
+  - `pre-wrap` -> the text will wrap to the next line and will respect the line breaks in the text
+  - `pre-line` -> the text will wrap to the next line and will respect the line breaks in the text but will collapse multiple spaces into one
 
 ---
 
@@ -742,14 +1056,20 @@ p {
 - If you're getting your fonts from a service like [https://fonts.google.com](https://fonts.google.com), note that there may be some tracking of **IP-Addresses** of the users when the `HTML` page is downloaded in the browser
   - to avoid this, you can download the font files locally and refer to it in the `HTML` file
   - more info [here](https://blog.runcloud.io/google-fonts-gdpr/)
+- to make text `uppercase / lowercase / capitalize`, you can use `text-transform` property
 
 ---
 
 ## Shadow
 
+- To add shadows to elements, you can use the `box-shadow` property.
+- To add shadows to text, you can use the `text-shadow` property.
+
 ### box-shadow
 
 ![shadow](./img/shadow.webp)
+
+The first value is the horizontal offset, the second value is the vertical offset, the third value is the blur radius, and the fourth value is the color of the shadow.
 
 - `x-offset`: means in x-direction (horizontal)
 - `y-offset`: means in y-direction (vertical)
@@ -777,12 +1097,14 @@ p {
 
 ![text-shadow](./img/text-shadow.jpeg)
 
-```css
-.myClass {
-  /*           x   y  blur-radius  color */
-  text-shadow: 1px 1px 0px #ff0000;
-}
-```
+- Example:
+
+  ```css
+  .myClass {
+    /*           x   y  blur-radius  color */
+    text-shadow: 1px 1px 0px #ff0000;
+  }
+  ```
 
 - you can add multiple text-shadows to the same element by separating them with a comma
 
@@ -1022,31 +1344,31 @@ body {
 
 - if you have an empty space between the image and the bottom-border, make the img has the `display: block;` property
   - you can also make sure that you're using `box-sizing: border-box;`
+- In order to change color or `svg` image color, you can use `stroke` and `fill` properties
+
+  ```css
+  svg {
+    fill: red;
+  }
+  ```
 
 ---
 
-## LAYOUTS
+## Positioning & Prospective
 
-### Fixed width vs Liquid Layouts
+### `position` property
 
-- **Fixed width layout** : designs do not change size as the user increases or decreases the size of their browser window. Measurements tend to be given in **pixels**.
-  ![fixed layout](./img/fixed-layout.png)
-- **Liquid layout** : designs stretch and contract as the user increases or decreases the size of their browser window. They tend to use **percentages**.
-  ![liquid layout](./img/liquid-layout.png)
-
----
-
-### Position
-
+In CSS, the `position` property is used to control the layout of an element. It has 5 possible values: (`static`, `relative`, `absolute`, `fixed`, `sticky`)
 ![position](./img/position-1.jpeg)
 
-- `position: static;` is the default value
-- `position: relative;` moves an element in relation to where it would have been in normal flow (relative to its current position).
+- `static` is the **default value**
+- `relative` moves an element in relation to where it would have been in normal flow (relative to its current position).
   - its space is still reserved in the normal flow
-- `position: absolute;` relative to nearest parent element with `position: relative` until we reach the `<body>` element
-  - its space is removed from the normal flow
-- `position: fixed;` relative to **viewport(screen)**, and stays as we're scrolling
-- `position: sticky;` toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
+- `absolute` relative to nearest parent element with `relative` positioning until we reach the `<body>` element
+  ![absolute](./img/position-2.png)
+  ![absolute](./img/position-3.png)
+- `fixed` relative to **viewport(screen)**, and stays as we're scrolling
+- `sticky` toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
 
   ```css
   .nav {
@@ -1066,858 +1388,13 @@ body {
 ### `z-index`
 
 It specifies the elevation of an element relative to other elements on the page.
+![z-index](./img/z-index-1.png)
 
 - by default, it's equal to `0`
 - if multiple elements have the same `z-index`, then the last one is higher than the others and so on.
+  ![z-index](./img/z-index-2.png)
 - it doesn't work on elements with a `position: static;`
 - you can't hover on something that have a negative `z-index`
-
----
-
-### Float
-
-- float is sometimes used to create Multi-Column Layouts
-
-  ```css
-  .column1of3,
-  .column2of3,
-  .column3of3 {
-    width: 300px;
-    float: left;
-    margin: 10px;
-  }
-  ```
-
-- usually when using `float`, we specify width for the elements to act as the columns width
-- `float:left` => means tha the element will be on the left and the elements after it will **flow** around it from its right ![float](./img/float.png)
-- **IMPORTANT**: when element is floating it acts like it's not in the page like `position:absolute`, this means that if the element next to it has padding => the padding will override the floating element and not start at its end.
-- **Collapse Height**:
-  - If this parent element contained only contains floated elements, some browsers will treat it as if it is zero pixels tall (**the height of it would literally collapse to nothing**). This isn’t always obvious if the parent doesn’t contain any visually noticeable background, but it is important to be aware of.
-    ![collapse](./img/collapseFloat.webp)
-    ![collapse](./img/collapseFloat2.png)
-  - 2 solutions:
-    - to fix it we use `clear:both` on the parent element
-    - or we can use `overflow: auto` on the parent element
-- The **`clear`** property allows you to say that no element (within the same containing element) should touch the left or right-hand or both sides of a box.
-
-  - `clear` has four valid values (**it's like to ignore any floated item from specified direction**):
-    - `Both` is most commonly used, which clears floats coming from either direction.
-    - `left`
-    - `right`
-    - `None` is the default (Elements can touch either side)
-      ![clear](./img/clear.webp)
-  - we use `clear` property when we want the surrounding element to not be floated around element with a `float` property
-  - to clear float for the elements next to the (container element that has the floating elements), we can use a class `clearfix` like this --> **clearfix hack**
-
-    ```css
-    .clearfix::after,
-    .clearfix::before {
-      content="";
-      clear:both;
-      display: table
-    }
-    ```
-
-    - before:
-      ![clearfix](./img/clearfix1.png)
-    - after:
-      ![clearfix](./img/clearfix2.png)
-
-  - there's a new way to clear float --> `display: flow-root`
-
-    - The element generates a **block container** box, and lays out its contents using flow layout. It provides a better solution to the most use cases of the **"clearfix"** hack.
-    - It always establishes a new block formatting context for its contents.
-
----
-
-### Flexbox
-
-#### `display: flex` vs `display: inline-flex`
-
-`display: inline-flex` does not make flex items display `inline`. It makes the flex container display `inline`. That is the only difference between `display: inline-flex;` and `display: flex;`.
-
-- flex containers act as a **Block element**, so note this when you apply `display: flex` to a small item in order to center its contents
-
----
-
-#### `flex-direction`
-
-You can use the `flex-direction` property to specify the direction in which the flex items are displayed. The default value of this property is `row`, which means that the flex items are laid out horizontally, from left-to-right.
-
-- `flex-direction: row;` => default
-- `flex-direction: row-reverse;` => reverse the order of the items (usually for **RTL languages**)
-- `flex-direction: column;` => make the items go vertically
-- `flex-direction: column-reverse;` => make the items go vertically and reverse the order of the items
-
----
-
-#### `flex-wrap`
-
-It defines whether the flex items are forced in a single line (default) or can be flowed into multiple lines (**wrapped into new line**). If set to multiple lines, it also defines the `cross-axis` which determines the direction new lines are stacked in.
-
-> The `cross axis` is the axis perpendicular to the main axis.
-
-![flex-wrap](./img/flex-wrap.jpg.gz)
-
-- **nowrap**: (default) single-line(doesn't make flex go(wrap) into a new line) which may cause the container to overflow if couldn't squeeze and fit the flex-items
-  ![wrap](./img/nowrap.PNG)
-  - It means that when the end of line is reached, make the items smaller to fit the line together
-- **wrap**: multi-lines, direction is defined by `flex-direction`
-  ![wrap](./img/wrap.PNG)
-  - It means that when the end of line is reached, make the items keep their `width/height` and go to next line
-    - if `flex-direction: row` => the items will go to next row vertically
-    - if `flex-direction: column` => the items will go to next column horizontally
-- **wrap-reverse**: multi-lines, opposite to direction defined by `flex-direction`
-  ![wrap](./img/wrap-reverse.PNG)
-
----
-
-#### `justify-content`
-
-It aligns the flex items along the **main axis**. It helps distribute extra free space leftover when either all the flex items on a line are inflexible, or are flexible but have reached their maximum size.
-
-![flex-justify-content](./img/flex-justify-content.avif)
-
-- `space-around` vs `space-between` spacing
-  ![flex-justify-content](./img/flex-justify-content.png)
-
----
-
-#### `align-items`
-
-- It aligns the items inside a flex container along the **cross axis** just like `justify-content` does along the **main axis**.
-  ![flex-align-items](./img/flex-align-items.gz)
-
-- default value -> `align-items: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
-- when to use `align-items: baseline;` ?
-  - usually in **Navbar**, where we have a **logo** and you want the navbar links to be aligned with the logo
-
----
-
-#### `align-content`
-
-- It controls the spacing between lines of flex items along the **cross axis** between the rows/columns (based on the `flex-direction`)
-- This property has no effect when there is only one line of flex items. Use it when you have multiple rows/columns in your flex-container
-  ![flex-align-content](./img/flex-align-content.jpg.gz)
-- It is for multi line flexible boxes. It has no effect when items are in a single line. It aligns the whole structure according to its value.
-
-  - So the flex items need to be wrapped in order to see the effect of `align-content`
-
-    ```css
-    .flex-container {
-      display: flex;
-      flex-wrap: wrap; /* Required: wrap the items */
-      align-content: space-between;
-    }
-    ```
-
----
-
-#### `align-self`
-
-It allows the default alignment (or the one specified by align-items) to be overridden for **individual flex items**.
-
-- `align-self: auto;` => default
-- `align-self: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
-- `align-self: center;` => center the items vertically
-- `align-self: baseline;` => align the items to the baseline of the container (usually used in **Navbar**)
-  ![align-self](./img/align-self.png)
-
----
-
-#### `order`
-
-By default, all children have `order: 0`, and are laid out in the order they appear in the source code. You can use the `order` property to change this ordering.
-
-![flex-order](./img/flexbox-order.jpg)
-
-```css
-.item {
-  order: 0; /* default */
-  order: 1; /* move the item to the end */
-  order: -1; /* move the item to the beginning */
-}
-```
-
-- Why do we need to use `order` ?
-  - It is useful when you want to change the order of the items in the source code, but you don't want to change the HTML structure
-  - **Accessability**: with **screen-readers**, it is important to have the correct order in the source code so that the screen-reader can read the content in the correct order
-    - so we can set the items order in the source code as we want the screen-reader to read it, and then use `order` to change the order of the items visually
-
----
-
-#### `flex` shorthand (`flex-grow`, `flex-shrink`, `flex-basis`)
-
-It is used to specify the components of a flexible length (`flex-grow`, `flex-shrink` and `flex-basis`) in a short form.
-
-```css
-.item {
-  /* flex-grow: 1; flex-shrink: 1; flex-basis: 0%; */
-  flex: 1, 1, 0%;
-}
-```
-
-- `flex-grow`
-
-  - Determines how much of the available space inside the flex container the item should take up.
-
-    ```css
-    .item {
-      flex-grow: 0; /* default -> item is not allowed to grow */
-      flex-grow: 1; /* item is allowed to take up all the extra available space */
-      flex-grow: 2; /* item should take twice as much space as the other flex elements */
-    }
-    ```
-
-  - > **Note:** It indicates the proportion of the empty space the item will take up relative to the other items in the container. Not the proportion of the size of the item itself.
-
-  - Example comparing items with `flex-grow: 2` with items with `flex-grow: 1`
-    ![flex-grow](./img/flex-grow-1.png)
-
-- `flex-shrink`
-
-  - it determines how much the flex item will shrink relative to the rest of the flex items in the flex container **when there isn't enough space on the row/column**.
-
-    ```css
-    .item {
-      flex-shrink: 0; /* item is not allowed to shrink */
-      flex-shrink: 1; /* default -> item is allowed to shrink */
-      flex-shrink: 2; /* item is allowed to shrink twice (faster) as much as the other flex elements */
-    }
-    ```
-
-    ![flex-shrink](./img/flex-shrink.avif)
-
-  - to prevent flex item from shrinking when there's not enough space, we set `flex-shrink: 0`
-
-- `flex-basis`
-
-  - It sets the initial main size of a flex item unless `width`/`height` is set first.
-  - use it instead of `width` for **flex-items**:
-
-    ```css
-    .flex-item {
-      flex-basis: auto; /* default */
-      flex-basis: 100px; /* fixed size */
-      flex-basis: 50%; /* percentage */
-    }
-    ```
-
-  - it's recommended to ues `percentages %` and not `pixel` units
-  - for flexItems => `flex-basis` is used as:
-    - `width`-percentile if `row`-direction
-    - `height`-percentile if `column`-direction
-  - for flexItems => try not to use `width` and use `flex-basis` with remembering that if it doesn't work that means that the `flex-shrink` is set to 1 not 0
-    ![basis](./img/flex-basis1.gz)
-    ![basis](./img/flex-basis2.gz)
-
----
-
-#### flex `gap` (NEW FEATURE)
-
-To Have a space between flex items, we needed to use `justify-content` or by adding `margin` to the flex items
-
-Instead we use the new feature `gap`
-
-```css
-.flex-container {
-  display: flex;
-  gap: 5px;
-  /* or */
-  gap: 5px 3px;
-  /* or */
-  column-gap: 5px;
-  row-gap: 3px;
-}
-
-/* Old way (useful if there's no browser support) */
-.flex-item {
-  margin: 5px;
-}
-```
-
-- How to control number of flex items in the row of the flex container:
-
-  ```css
-  /* Flex Container */
-  .cards-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
-
-  /* 2 Flex Items */
-  .card {
-    flex: 0 0 calc(50% - 2rem);
-    /* the 2rem for the gap between flex items */
-  }
-  /* 3 Flex Items (in a @media query) */
-  .card {
-    flex: 0 0 calc(33.33% - 2rem);
-    /* the 2rem for the gap between flex items */
-  }
-  ```
-
----
-
-#### Flexbox notes
-
-- usually `margin-right: auto` is used with the last flex item to push it to the right side of the flex container (usually in **navbar**)
-
----
-
-### Grid
-
-It's a layout system that allows you to create a css grid of columns and rows to place content into.
-
-> Ultimate Guide to css grid ->
->
-> - [complete-guide-grid](https://css-tricks.com/snippets/css/complete-guide-grid/)
-> - [grid-item-placement](https://mastery.games/post/grid-item-placement/)
-
-- **Old Grid (960 pixel grid)**
-
-  - It's a 960 pixel wide, 12 column grid, each of which is is **60 pixels** wide
-  - Each column has a margin set to 10 pixels, which creates a a gap of **20 pixels** between each column and 10 pixels to the left and right-hand sides of the page.
-
-  ![960 grid](./img/960-grid.png)
-
-  **CSS frameworks** aim to make your life easier by providing the code for common tasks, such as creating layout grids,
-
-  - They save you from repeatedly writing code for the same tasks.
-  - They will have been tested across different browser versions (which helps avoid browser bugs).
-
-- **Grid vs Flexbox**
-  - **Flexbox** is a one-dimensional layout model, meaning that it can lay out content in only one direction at a time — either as a row or as a column.
-    - flexbox = `row` **Or** `column`
-  - **Grid** is a two-dimensional layout model, meaning that it can lay out items in rows and columns simultaneously.
-    - grid = `row` **And** `column`
-
-#### Grid terminology and implementation
-
-- Grid container
-
-  - `display`
-    - `display: grid;` => creates a grid container, this container will be a `block`-level element
-    - `display: inline-grid;` => creates a grid container, this container will be an `inline`-level element
-  - dimensions
-
-    - `grid-template-columns` => defines the columns of the grid
-    - `grid-template-rows` => defines the rows of the grid
-    - `grid-template-area` => defines a grid template by referencing the names of the grid areas which are specified with the `grid-area` property
-      - it is used to name the rows and columns of a grid and to set its layout, **then** you assign the named area to each element according to where you want it to be shown on the grid , this is done by => `grid-area`
-        ![grid-template-area](./img/grid-template-areas.png)
-      - > **Note:** before using `grid-template-area`, you need to define the rows and columns of the grid using `grid-template-columns` and `grid-template-rows`
-    - `grid-template` => shorthand that defines both the columns and the rows of the grid
-
-      ```css
-      .container {
-        display: grid;
-        grid-template-columns: 100px 100px 100px;
-        grid-template-rows: 100px 100px 100px;
-        /* or */
-        grid-template: 100px 100px 100px / 100px 100px 100px;
-      }
-      ```
-
--
-
-- some css grid terms:
-
-  - **gutter**: another name for the gap.
-  - **grid track**: multiple connected grid cells
-  - **Explicit grid**: means that the css grid is smart that as we add more items, it adds more rows
-
-- **overlapping grid items**:
-  - Grid allows cells to overlap with each other
-    ![overlapping grid items](./img/overlapping%20grid%20items.png)
-- to center a container, you can use these 2 options:
-
-  ```css
-  .grid-container {
-    display: grid;
-    /* option 1 */
-    align-items: center;
-    justify-content: center;
-
-    /* option 2 */
-    place-items: center;
-  }
-  ```
-
----
-
-#### `auto` vs `fr`
-
-- `fr` -> stands for **fraction** of the available space of the grid container
-
-  ![grid fr](./img/grid-fr.png)
-
-  - useful when you don't want to calculate the width-percentages of the columns/rows manually.
-
-    ```css
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      /* same as */
-      grid-template-columns: 50% 50%;
-    }
-    ```
-
-  - it makes the cell responsive
-  - beats `auto`, when they are together
-  - `auto` will take just it's width and `fr` will take all remaining space left
-
-    ```css
-    grid-template-columns: auto 1fr auto;
-    ```
-
-- `auto`
-
-  - is greedy (take the required space available for its content)
-    - for example, if we have a grid container with 2 columns, and the first column has a width of `auto`, then the first column will take the width of its content, and the second column will take the remaining space.
-  - it makes the cell responsive as it takes the remaining space
-  - it's the default behavior in implicit grids
-
-- **Note:** it's preferred to use `fr` over the percent unit `%`, using the `%` unit for columns/rows in addition to `gap` with px values would result mismatch calculations
-
-  ```css
-  .container {
-    display: grid;
-    /* correct */
-    grid-template-columns: 1fr 1fr;
-    /* wrong */
-    grid-template-columns: 50% 50%;
-
-    grid-gap: 50px 100px;
-  }
-  ```
-
----
-
-#### Grid gap
-
-- `gap` is a shorthand for `row-gap` and `column-gap`
-
-```css
-.container {
-  display: grid;
-  gap: 20px;
-  /* or */
-  row-gap: 20px;
-  column-gap: 20px;
-}
-```
-
----
-
-#### Grid functions
-
-##### `minmax()`
-
-![minmax](./img/minmax-1.png)
-![minmax](./img/minmax-2.png)
-
-- it lets you define a minimum and maximum size (range) for column width or row height
-
-  - convenient way to set the `min` as fixed value and the `max` as `fr` or percentage
-
-- `minmax()` can’t handle responsive design by itself. We need to handle that by ourselves
-- It's used to prevent grid cells from getting too **small** / **big**
-- It can be used instead of `px` or `fr`
-- note: using a `1fr` as the max value will ensure that the track expands and takes up the available space
-
-##### `repeat()`
-
-- It lets you repeat the same value multiple times in a `grid-template-columns` or `grid-template-rows` declaration to prevent you from writing out the same value over and over again.
-
-  ```css
-  .container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* same as */
-    grid-template-columns: 1fr 1fr 1fr;
-  }
-  ```
-
-##### `fit-content()`
-
-- It lets you define the size of a grid track based on the size of its content.
-
-  - It's useful when you want to make a grid cell as big as its content, but not bigger than a certain value.
-
-  ```css
-  .container {
-    display: grid;
-    grid-template-columns: repeat(3, fit-content(100px)); /* 3 columns with at most 100px */
-  }
-  ```
-
----
-
-#### `auto-fill` vs `auto-fit`
-
-When using CSS grid `minmax()` function, it's important to decide between using the `auto-fit` or `auto-fill` keywords. When used incorrectly, it can lead to unexpected results.
-
-- When using `minmax()` function, the `auto-fit` keyword will expand the grid items to fill the available space. While `auto-fill` will keep the available space reserved without altering the grid items width.
-  ![auto-fill vs auto-fit](./img/grid-auto-fit.png)
-
-  - That being said, using `auto-fit` might lead to grid items being too wide, especially when they are less than expected. Consider the following example.
-
-    ```css
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      grid-gap: 1rem;
-    }
-    ```
-
-    ![auto-fit](./img/auto-fit1.png)
-
-  - Most of the time, such behavior isn't needed, so using `auto-fill` is better.
-
-    ```css
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      grid-gap: 1rem;
-    }
-    ```
-
-    ![auto-fill](./img/auto-fill3.png)
-
-- if you don't know the size of page or the number of items that will occupy the grid but you know the width of columns, you can use the `auto-fill` for this:
-
-  ```css
-  grid-template-column: repeat(auto-fill, minmax(200px, 1fr));
-  ```
-
-![auto-fill](./img/auto-fill1.png)
-![auto-fill](./img/auto-fill2.png)
-
----
-
-#### Grid items
-
-By default, a grid-item will take up one grid cell.
-![grid item](./img/grid-item-1.png)
-
-However You can make a grid-item span multiple rows and/or columns using the following properties:
-
-##### Grid Lines (start/end)
-
-It's used to position the grid items using values to specify which grid lines the item should start and end on.
-
-![grid-lines](./img/grid-lines.png)
-
-```css
-.cell-1 {
-  grid-column-start: 1;
-  grid-column-end: 3;
-  grid-row-start: 1;
-  grid-row-end: 3;
-
-  /* or */
-  grid-column: 1/3;
-  grid-row: 1/3;
-
-  /* if provided with one value, it will be the end value */
-  grid-column: 1; /* grid-column-end: 1; */
-}
-```
-
-- we can use negative values for row/column:
-
-  ```css
-  .cell-4 {
-    grid-column: 1/-1;
-  }
-  ```
-
-- `span` keyword is used to specify the number of columns/rows that the grid item should span
-
-  ```css
-  .cell-1 {
-    grid-column: 2 / span 2; /* span 2 columns */
-    grid-row: 1 / span 2; /* span 2 rows */
-  }
-  ```
-
----
-
-##### Grid Areas
-
-`grid-area` property is used to assign a grid item to a grid area, or to create a named grid area.
-
-- `grid-area` is a shorthand property that sets all of the following properties in a single declaration: `grid-row-start`, `grid-column-start`, `grid-row-end`, and `grid-column-end`.
-
-  ```css
-  .item {
-    grid-area: 1 / 1 / 2 / 3;
-    /* same as */
-    grid-row-start: 1;
-    grid-column-start: 1;
-    grid-row-end: 2;
-    grid-column-end: 3;
-  }
-  ```
-
-- it specifies a grid item's size and location in a grid layout
-
-  - `grid-area: 2 / 1 / span 2 / span 3;` => start on row 2 column 1, and span 2 rows and 3 columns
-
-- It's also used with `grid-template-areas` to name the grid areas
-
-  ![grid-areas](./img/grid-area.png)
-
-  - if there is a column you want it to be empty => use `.` instead of the area name
-
----
-
-## CSS Variables (custom properties)
-
-They let us define variables in CSS that can be reused throughout the stylesheet.
-
-- they're also called **custom properties**
-  - they're called like that as they act as css-properties where they're `inherited` and they `cascade` (override based on specificity)
-- **Declaring** them is usually in the `:root` selector **(global scope)**
-
-  ```css
-  :root {
-    --primary: blue;
-  }
-  ```
-
-  - because the `:root` pseudo-class represents the root `<html>` element and is identical to the selector `html`, except that **its specificity is higher** because `:root` is a `pseudo-class` selector and `html` is a `type` selector
-    - > Note: the `<html>` element selector includes all elements and pseudo elements in the **DOM** unlike `*` selector
-    - We do this so that the variable is available everywhere in the stylesheet **(Global scope)**
-    - We can use them because they're **inherited** from the `root` element
-
-- **Using** css variables is done by using the `var()` function:
-
-  ```css
-  .box {
-    background-color: var(--primary);
-  }
-  ```
-
-- when using the variable, We can use a **Fall-back variable/ value** after a **comma** (`,`) and you can make many fallbacks => ex:
-
-  ```css
-  div {
-    color:var(--primary,black)
-
-    /* to request the fallback value manually -> use (initial) */
-    color: initial
-  }
-  ```
-
-- Rules of **scope** like in Javascript also applies in css variables, but:
-
-  - `Sass` variables are scoped on `{}` blocks (**block-scoped**) (**lexical-scoped**)
-  - `CSS` variables are scoped on elements (**element(local)-scoped**) (**dynamic-scoped**)
-
-    - this is great if you want the variable-value to only be applied in this element and elements inside it (its descendant elements) only
-    - also it's great if you want to **override** the variable-value in a specific element and its descendant elements only
-
-      - we can do this by:
-
-        - declaring the variable in the element itself
-
-          ```css
-          div {
-            --primary: red;
-          }
-          ```
-
-        - or declaring it in the inlined-style of the element
-
-          ```html
-          <div style="--primary: red"></div>
-          ```
-
-        - or declaring it using javascript
-
-          ```js
-          document.documentElement.style.setProperty('--primary', 'red');
-          ```
-
-  ```css
-  /* global scope */
-  :root {
-    --main-bg-color: coral;
-  }
-
-  /* local scope */
-  #div1 {
-    --main-bg-color: coral;
-    background-color: var(--main-bg-color);
-  }
-  ```
-
----
-
-### Variables inheritance
-
-- css variables are **inherited** from the parent element if it's declared in the parent element to the (`classes` / `pseudo-elements` / `pseudo-classes` / `IDs`) in the same element
-
-  ```css
-  button {
-    --color: red;
-    color: var(--color);
-  }
-
-  button:hover {
-    background: black;
-    color: var(--color);
-  }
-
-  button.pink {
-    border-color: #f06;
-    color: var(--color);
-  }
-
-  button.pink:hover {
-    background: #f06;
-    color: var(--color);
-  }
-  ```
-
-- you can disable **inheritance** by setting the property to `initial` on `*`
-
-  ```css
-  * {
-    --corner-size: initial;
-  }
-
-  p {
-    --corner-size: 1em; /* will not be inherited down */
-  }
-  ```
-
-- another way to control or limit inheritance is to **register property** using: `@property`:
-
-  - `@property` allows us to register our `properties` / `variables` and control how they behave, but watch out for **browser support**
-
-  ```css
-  @property --corner-size {
-    syntax: '*';
-    inherits: false;
-    initial-value: 2em;
-  }
-
-  p {
-    --corner-size: 1em;
-  }
-  ```
-
----
-
-### Invalid At Computed Values Time (IACVT)
-
-> **Parse time** (specified values), it's When the actual CSS code is `read`, `parsed`, and `converted` to a tree of objects (**CSSOM**). One and done operation.
->
-> **computed value**: An intermediate runtime representation where most relative values are absolutized but not all.
->
-> - this is when relative units are resolved to `px`
->
-> **used value**: The final stage, when values are fully resolved to be used for painting.
->
-> - this is when % widths are resolved to `px`
-
-**IACVT**: it's when calling the variable result in error (due to empty value or wrong value or unsupported value by browser), so the value will be set to `unset` which is equivalent to `initial`
-
-- Fallbacks can also trigger **IACVT**
-
-```css
-/* Ex: */
-div {
-  background: red;
-  background: var(--accent-color, 42px);
-  /* result will be (color-transparent) */
-}
-```
-
-![IACVT](./img/IACVT.png)
-
----
-
-### variables token: Number, string, images
-
-![tokens](./img/tokens.png)
-
-you can make the variable contains :
-
-- a piece of text that is used in defining property-value, like `--to: to;`
-
-  ```css
-  html {
-  --type: "linear-gradient(";
-  background: var(--type) white, black );
-  color: red;
-  }
-  ```
-
-- a number without a unit like `--p: 65;`
-
-  - use variables for pure-data like `65`, not css-values like `65%`
-
-    - this way you can use the number for any css-value with any unit unlike if you made the variable with css-value
-    - but watch out for numbers as string or integers as here we don't have **type-coercion**
-    - **Tip:** Prefer abstract `0` to `1` percentages than absolute pixel lengths
-
-      - 0-1 can be converted to a length:
-
-        ```css
-        calc(var(--mouse-x) * 100vw);
-        /* …but the reverse isn’t possible */
-        ```
-
-- img string
-
-  ```css
-  .img1 {
-    --img: 'cat1.jpg';
-    background: url('imgs/'var(--img));
-
-    /* note we can't make the url as (variable can't be URL-content) */
-    --img: 'imgs/cat1.jpg';
-    background: url(var(--img)); /* css bug */
-  }
-  ```
-
-  ![string-variable](./img/css-variable-string.png)
-
----
-
-### Css variables with Javascript
-
-> One of the main difference between the **old sass variables** and the **new css custom properties** is that in custom-properties, you can use `Javascript` to change the variables values after the compilation and the loading in the browser which will enable more dynamic styling
-
-You can **get / set** css-variable-value of an element in javascript by having the variable declared in the root before, then change it's value locally in the element styles:
-
-```js
-// Get variable from inline style
-element.style.getPropertyValue('--foo');
-
-// Get variable from wherever
-getComputedStyle(element).getPropertyValue('--foo');
-
-// Set variable on inline style
-element.style.setProperty('--foo', 38 + 4);
-
-// --------------------------------------------------- //
-
-// or change it in the root element
-let root = document.documentElement;
-
-document.addEventListener('pointermove', evt => {
-  let x = evt.clientX / innerWidth;
-  let y = evt.clientY / innerHeight;
-  root.style.setProperty('--mouse-x', x);
-  root.style.setProperty('--mouse-y', y);
-});
-```
 
 ---
 
@@ -1974,260 +1451,6 @@ font-size: clamp(1rem, 2.5vw, 2rem);
 
 - [Hero Icons](https://heroicons.com/) here we use `stroke` or `fill` properties **not** color
 - [Ionicons](https://ionic.io/ionicons) here we use `color` property
-
----
-
-## Animation & Transitions
-
-### What to animate? (Animation Performance)
-
-Note that animation in an expensive process of CPU/GPU and specially on CPU, and it's related to how the browser rendering engine works:
-![browser render](./img/browser-render.png)
-
-Here are some guidelines (CSS triggers):
-
-- **Composite** ✅ -> It's for blending things together like with: `transform`, `opacity`
-  - If you change a property that requires neither layout nor paint, and the browser jumps to just do compositing.
-  - This final version is the cheapest and most desirable for high pressure points in an app's lifecycle, like `animations` or `scrolling`.
-    ![browser render](./img/browser-render-3.png)
-  - > You can find more here: [Stick to Compositor](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/)
-- **Painting** 🤞 -> `color`, `background`
-  - browser skips layout, but it will still do paint.
-    ![browser render](./img/browser-render-2.png)
-  - it's not too expensive for rendering
-- **Layouts** ❌ -> one that changes an element’s geometry, like its `height`, `width`, `left`, `right`, `margin`, `padding` etc (**things that trigger layouts**)
-  - the browser will have to check all the other elements and “reflow” the page. Any affected areas will need to be repainted
-    ![browser render](./img/browser-render-1.png)
-  - it's very costly so try to avoid it
-  - instead use `transform: translate()`
-
----
-
-### transform
-
-- used for `translate()`, `scale()`, `rotate()`, `skew()`
-
-![transform](./img/transform.png)
-![skew](./img/transform-skew.png)
-
-- To change the origin of the transform, use `transform-origin` property
-  ![transform-origin](./img/transform-origin.png)
-
-> To generate 3D transform -> [CSS 3D Transform Generator](https://www.cssportal.com/css-3d-transform-generator/)
-
----
-
-### transition
-
-- `transition` property consists of multiple properties:
-  ![transition](./img/transition-1.png)
-
-  - `transition-property`
-
-    - used to specify which css-properties to apply the transition data on them.
-    - if you have multiple different properties and want to make their transition different:
-
-      - you can declare each on in the block where it happens
-
-        ```css
-        button {
-          opacity: 0.5;
-        }
-
-        button:active {
-          transition-duration: 0.5;
-          opacity: 1;
-        }
-        ```
-
-      - you can declare multiple values in the `transition-property` separated by comma
-
-        ```css
-        button {
-          transition-property: background, border-radius;
-          transition-duration: 4s, 2s;
-        }
-        ```
-
-  - `transition-delay` -> it's the time before the transition starts
-
-  - `transition-duration` -> it's the time the transition takes
-
-    - must specify the unit (`s`), even it's zero seconds
-
-  - `transition-timing-function` -> it's how the transition takes place
-    - `ease` - default = slow start, fast, slow end
-    - `linear` = same speed start to end
-    - `ease-in` = slow start
-    - `ease-out` = slow end
-    - `ease-in-out` = slow start, fast, slow end
-
-#### Animating(transitioning) background
-
-You can't use `background` with `transition` property, so if you want to animate the background you can use `box-shadow` with `inset` instead:
-
-```css
-button {
-  transition: 1s;
-}
-
-button:hover {
-  box-shadow: 0 0 0 2em red inset;
-}
-```
-
----
-
-### CSS Animation
-
-Applying animation to an element is done by 2 steps:
-
-1. Define the animation -> `@keyframes`
-2. Apply the animation -> `animation` name and properties
-
-#### Animation properties
-
-`animation` property consists of multiple properties:
-
-- `animation-name`
-- `animation-duration`
-- `animation-delay`
-  - note that it's for each single `iteration`
-- `animation-iteration-count`
-- `animation-direction`
-- `animation-timing-function`
-- `animation-fill-mode`
-  - it's what happens when the animation finishes or before it starts (before the first iteration)
-    ![CSS-Animation-Fill-mode](./img/CSS-Animation-Fill-mode.webp)
-  - values:
-    - `none` -> default -> go to initial state (`0%`) before start and go to final state (`100%`) after finish
-    - `forwards` -> **stick to final state (100%)**
-    - `backwards` -> default -> go to initial state (`0%`) after finish
-    - `both` -> `forwards` + `backwards` -> **stick to final state (100%)** + go to initial state (`0%`) after finish
-
-#### Animation Keyframes
-
-They're used to define the animation states and the time between them (the animation steps)
-![animation keyframes](./img/animation-keyframes-1.png)
-
-`keyframes` are different from `transition` as:
-
-- they define what happens between state **A** and state **B**
-
-```css
-div {
-  animation-name: move;
-  animation-duration: 10s;
-  animation-iteration-count: 3;
-
-  /* or using the shorthand */
-  animation: move 10s infinite;
-}
-
-@keyframes move {
-  0% {
-    transform: translateX(20px);
-  }
-  50% {
-    transform: translateX(100px);
-    background: red;
-  }
-  75% {
-    transform: translateX(-200px);
-    background: yellow;
-  }
-  100% {
-    transform: translateX(20px);
-    background: green;
-  }
-}
-
-/* or when we have one start point and one end point */
-
-@keyframes move {
-  from {
-    transform: translateX(20px);
-  }
-  to {
-    transform: translateX(100px);
-    background: red;
-  }
-}
-```
-
-- Ex: converting hamburger `menu` icon to `close` icon using `animation` and `keyframes`
-  ![hamburger](./img/hamburger-icon.png)
-  - [Codepen example 1](https://codepen.io/designcouch/pen/ExvwPY)
-  - [Codepen example 2](https://codepen.io/Danilo06/pen/PoNNvGm)
-
----
-
-#### Animation choreograph
-
-it's to use the `nth-child` selector and **CSS variables** to choreograph animations between multiple elements.
-
-```scss
-.balls-container {
-  --duration: 1s;
-  animation: move-right var(--duration) both;
-
-  &:nth-child(2) {
-    animation-delay: calc(var(--duration) - 0.1s);
-  }
-  &:nth-child(3) {
-    animation-delay: calc(var(--duration) * 2 - 0.1s * 2);
-  }
-}
-```
-
----
-
-### data state animation
-
-You can use `data-state` attribute to define state and make css values established based on current data-state
-
-- you change data.state in Javascript which then reflects in the `data-state` HTML attribute, then define which css property will be shown
-
-```css
-.container[data-state='success'] {
-  animation: slide-up 1s both;
-}
-```
-
----
-
-### Animation Notes
-
-- don't use hover or any effect without using `transition` property
-- instead of writing different final state in `100%`, you can call it any name and use `to <name>`
-- to see animation for an element in **DevTools** -> **ctrl + shift + p** and type **animation**
-- **Interview question**: "What if you add the `transition` in the `:hover` body instead of the normal body?"
-  - it will work but it's not recommended as it will make the transition happen when the mouse leaves the element and not when it enters it
-- `transform` is more efficient than `position` for animation
-- to change anchor point of element => `transform-origin`, find more [here](https://developer.mozilla.org/en-US/docs/Web/CSS/transform-origin)
-
-  ![transform-origin](./img/transform-origin2.png)
-  ![transform-origin](./img/transform-origin.png)
-
-- when using 3d animation / transform => use `perspective` property on the parent element
-- to disable animation (some users prefer no animation), we can use this media-query:
-
-  ```css
-  /*
-    If the user has expressed their preference for
-    reduced motion, then don't use animations on buttons.
-  */
-  @media (prefers-reduced-motion: reduce) {
-    button {
-      animation: none;
-    }
-    /* or */
-    * {
-      animation-duration: 0s !important;
-      transition-duration: 0s !important;
-    }
-  }
-  ```
 
 ---
 
@@ -2545,58 +1768,6 @@ There are two ways to add multiple style sheets to a page:
        padding: 5px 20px;
      }
      ```
-
-- To center an element vertically and horizontally in a container, we have these options:
-
-  1. using `flexbox`:
-
-     ```css
-     .container {
-       display: flex;
-       justify-content: center;
-       align-items: center;
-     }
-     ```
-
-  2. using `position: absolute`:
-
-     ```css
-     .container {
-       position: relative;
-     }
-     .element {
-       width: 100px;
-       height: 100px;
-       position: absolute;
-       top: 50%;
-       left: 50%;
-       transform: translate(-50%, -50%);
-
-       /* or */
-       top: calc(50% - 50px); /* 50px is half of the element height */
-       left: calc(50% - 50px); /* 50px is half of the element width */
-     }
-     ```
-
-  3. using `grid`:
-
-     - center a container:
-
-       ```css
-       .container {
-         display: grid;
-         place-items: center;
-       }
-       ```
-
-     - center a grid-item inside its cell:
-       ![place-self](./img/place-self.png)
-
-       ```css
-       .grid-item {
-         place-self: center;
-       }
-       ```
 
 - To add custom **underline** to element:
 

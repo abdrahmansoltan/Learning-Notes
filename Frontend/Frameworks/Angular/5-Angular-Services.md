@@ -105,7 +105,11 @@ Service is a broad category encompassing any value, function, or feature that an
     ```
 
 - We use `@Injectable` decorator to inject the service into other components
+
   - This enables Angular to inject the service as an instance of the class in the component where it is needed **(dependency injection)**
+
+  > Another alternative is to add the service in the `[providers] array in the module` to provide the service in the module's components **(not recommended anymore ❌, because it's not tree-shakable and creates multiple instances of the service class)**
+
 - We use `provided: 'root'` to provide the service in the root module **so that it can be used in the whole application**
 
 ---
@@ -149,6 +153,10 @@ Service is a broad category encompassing any value, function, or feature that an
 - **Maintainability**: We can maintain the service in one place and use it in multiple components
 - **Testability**: We can test the service separately from the component class
   - by creating a mock service and injecting it in the component class when testing the component class
+- **One instance**: We use `Singleton` pattern to create a single instance of the service class and use it in multiple components
+  - instead of creating one instance of the same class for each component
+  - This is super important when we have services that uses `Observables` to handle asynchronous data
+    - because we don't want to create multiple instances of the service class that uses Observables which will create multiple subscriptions and not maintain the state of the data and the previous emissions
 
 ---
 
@@ -184,6 +192,17 @@ Service is a broad category encompassing any value, function, or feature that an
 
 - When Angular sees a service in the constructor of a component, it looks in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
   ![inject](./img/enj.PNG)
+
+- **Question ?**: What is the difference between adding a class-access-modifier in the constructor and not adding it?
+
+  ```ts
+  constructor(private fetchDataService: FetchDataService) {}
+  // vs
+  constructor(fetchDataService: FetchDataService) {}
+  ```
+
+  - When we add a class-access-modifier (`private` or `public`), it creates a property of the service in the component class
+  - When we don't add a class-access-modifier, it creates a parameter of the service in the `constructor` (only accessible in the `constructor`)
 
 ---
 

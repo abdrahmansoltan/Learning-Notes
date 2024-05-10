@@ -34,7 +34,7 @@
 
 ## TypeScript
 
-**TypeScript** is a **static and strongly typed** superset of JavaScript. When we're done with our TypeScript code, it compiles to JavaScript.
+**TypeScript** is a **static and strongly typed** superset of JavaScript that have more features than JavaScript, and it's compiled to JavaScript.
 
 ![typescript](./img/typescript-1.png)
 

@@ -2,7 +2,7 @@
 
 - [INDEX](#index)
   - [Angular](#angular)
-    - [Compilation](#compilation)
+    - [How Angular works (Compilation)](#how-angular-works-compilation)
     - [Folders and files Structure](#folders-and-files-structure)
   - [Installation](#installation)
     - [Angular CLI](#angular-cli)
@@ -52,26 +52,31 @@
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
   - [Notes](#notes)
     - [Expressions vs String Interpolation](#expressions-vs-string-interpolation)
-    - [Angular HTML Escaper](#angular-html-escaper)
+    - [Angular HTML Escaper (Sanitization)](#angular-html-escaper-sanitization)
 
 ---
 
 ## Angular
 
-Angular is a `framework` for building client applications in HTML, CSS, and JavaScript/TypeScript
+Angular is a `framework` for building **reactive** web applications.
+
+> "reactive" means that the app responds to user input and changes in the environment in real-time (by manipulating the **DOM**)
 
 - It's a **framework** because it provides a lot of things out of the box like `routing`, `forms`, `http` libraries, etc.
 - Code is written in `Typescript`, and Templates are written in Angular template syntax (which is a superset of HTML with Angular-specific syntax).
 
 ---
 
-### Compilation
+### How Angular works (Compilation)
 
 - This is how Angular works under the hood
 
   ![compilation](./img/compilation-1.png)
 
-- transferring code to machine code using different types of compilation
+  - The server sends the `index.html` file to the browser (Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)
+  - The `main.ts` file bootstraps the `AppModule` and starts the app
+
+- Transferring code to machine code using different types of compilation
 
   - `Just-in-time compilation`
     ![Just-in](./img/justintime.PNG)
@@ -151,7 +156,11 @@ it's a utility tool for managing projects
 - ng-commands
 
   ```bash
+  # Creating new project
   ng new <project_name>
+
+  # Create new project with flags
+  ng new <project_name> --routing --style=scss --no-strict
 
   # Starting development server
   npm start # or ng serve
@@ -219,6 +228,19 @@ it's a utility tool for managing projects
   export class AppModule {}
   ```
 
+  ```ts
+  // in nav.component.ts
+  import { Component } from '@angular/core';
+
+  // @Component is a decorator that tells Angular that this class is a component
+  @Component({
+    selector: 'app-nav',
+    templateUrl: './nav.component.html',
+    styleUrls: ['./nav.component.css']
+  })
+  export class NavComponent {}
+  ```
+
 ---
 
 ### Component example
@@ -259,11 +281,34 @@ it's a utility tool for managing projects
 
   - When using the component, you must match the `selector` with the name of the component -> `app-nav`
 
+- **Notes:**
+
+  - We can write the `HTML` code directly in the component file using the `template` property instead of using the `templateUrl` property
+  - We can write the `CSS` code directly in the component file using the `styles` property instead of using the `styleUrls` property
+  - We can use the `selector` property to be any type of selector like `tag`, `class`, or `attribute`
+
+    ```ts
+    selector: 'app-nav'; // element tag selector
+    selector: '.app-nav'; // class selector
+    selector: '[app-nav]'; // attribute selector
+    ```
+
+    ```html
+    <!-- element tag selector -->
+    <app-nav></app-nav>
+    <!-- class selector -->
+    <div class="app-nav"></div>
+    <!-- attribute selector -->
+    <div app-nav></div>
+    ```
+
 ---
 
 ### Component properties
 
 - **Properties** are variables that are defined in the component class and are used in the component template
+
+- Example:
 
   ```ts
   // in nav.component.ts
@@ -531,10 +576,12 @@ The `style` attribute can be used to add inline styles to an element
 
 ## Data-Binding
 
-![databinding](./img/databinding2.PNG)
-![databinding](./img/databinding.PNG)
+**Data-binding** is a way to pass data from the component class to the component template
 
-- **String-interpolation**: it's a way to display data in the template using `{{}}` syntax
+![data binding](./img/databinding2.PNG)
+![data binding](./img/databinding.PNG)
+
+> **String-interpolation**: it's a way to display data in the template using `{{}}` syntax
 
 ### Property Binding
 
@@ -551,6 +598,10 @@ It sets a property on an HTML element. It's a one-way data binding from the comp
   <button [disable]="propery_x"></button>
 
   <input [value]="password" />
+
+  <p>{{ property_x }}</p>
+
+  <p [innerText]="property_x"></p>
   ```
 
   - `disable` is a property of the button element, and we are binding it to the property `propery_x` in the component class
@@ -608,9 +659,12 @@ It sets up an event handler on an HTML element. It's a one-way data binding from
 - it's the ability to being able to listen to events and update a property simultaneously
 
   ```html
-  <div [(ngModel)]="some_property"></div>
-  <!-- instead of this -->
-  <div [ngModel]="some_property" (change)="ngModel=newValue"></div>
+  <input [(ngModel)]="name" />
+  <p>{{ name }}</p>
+
+  <!-- Instead of -->
+  <input [value]="name" (input)="name = $event.target.value" />
+  <p>{{ name }}</p>
   ```
 
 - here the `ngModel` directive is doing 2 tasks:
@@ -621,14 +675,15 @@ It sets up an event handler on an HTML element. It's a one-way data binding from
 
 ## Directives
 
-Angular directives are extended `HTML attributes` with the prefix `ng-`.
+**Angular directives** are extended `HTML attributes` with the prefix `"ng-"`.
 ![directives](./img/directives-0.png)
 
-[Directives](https://angular.io/api?type=directive)
-
-![Directives](./img/Directives.png)
-![Directives](./img/Directives-1.png)
-![Directives](./img/Directives-2.png)
+- They're **instructions** in the DOM that tell Angular to do something to a DOM element
+- [Directives Resource](https://angular.io/api?type=directive)
+- **Directives Types**
+  ![Directives](./img/Directives.png)
+  ![Directives](./img/Directives-1.png)
+  ![Directives](./img/Directives-2.png)
 
 - Angular has multiple built-in directives like:
   - **Structural directives** : they change the structure of the DOM
@@ -698,13 +753,7 @@ Angular directives are extended `HTML attributes` with the prefix `ng-`.
 
   ```html
   <!-- this element "<p>" will only show if the property "blueClass=True" -->
-  <ng-template [ngIf]="blueClass">
-    <p>the button is blue</p>
-  </ng-template>
-
-  <!-- OR -->
   <p *ngIf="blueClass">the button is blue</p>
-  <!-- here we use * to tell angular to transform it to the other way above -->
   ```
 
 - `*ngFor`
@@ -880,6 +929,8 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
 ## Data flow between components
 
 ![communication](./img/data-flow-0.png)
+
+---
 
 ### Parent to Child (Passing data)
 
@@ -1078,6 +1129,7 @@ its a word that you use to mark an element and get access to it in the template 
 
 ![pipe](./img/pipes.png)
 ![pipe](./img/pipes-1.png)
+![pipe](./img/pipes-2.png)
 
 - Pipes are used to transform data **in the template** before displaying it.
 
@@ -1086,11 +1138,17 @@ its a word that you use to mark an element and get access to it in the template 
 - [pipe reference](https://angular.io/api?type=pipe)
   - Here, you can find all the built-in pipes in Angular
 - [date-pipe format options](https://angular.io/api/common/DatePipe#pre-defined-format-options)
+- **Format:** `{{ data | pipeName:arg1:arg2:... }}`
+
+  - `data` : the data you want to transform
+  - `pipeName` : the name of the pipe you want to use
+  - `arg1`, `arg2`, ... : the arguments you want to pass to the pipe (optional)
 
 - Example with `UpperCasePipe`: it transform text to all uppercase
 
   ```html
   <p>{{ 'hello' | uppercase }}</p>
+  <!-- this converts the text to uppercase, ex: HELLO -->
   ```
 
 - Example with `DatePipe`: it transform date to a specific format
@@ -1098,6 +1156,9 @@ its a word that you use to mark an element and get access to it in the template 
   ```html
   <p>{{ today | date: 'short' }}</p>
   <!-- this converts the date to a short format, ex: 6/15/15, 9:03 AM -->
+
+  <p>{{ today | date: 'E' }}</p>
+  <!-- this converts the date to the day of the week, ex: Mon -->
 
   <p>{{ today | date: 'MMMM d, y' }}</p>
   <!-- this converts the date to this custom format, ex: June 15, 2015 -->
@@ -1125,6 +1186,15 @@ its a word that you use to mark an element and get access to it in the template 
   ```html
   <p>{{ userObject | json }}</p>
   ```
+
+- `async` : it's a pipe that subscribes to an `Observable` or a `Promise` and returns the latest value it has emitted
+
+  ```html
+  <p>{{ user$ | async }}</p>
+  <!-- Here, user$ is an Observable that emits user objects, and the async pipe subscribes to it and returns the latest user object -->
+  ```
+
+  - It's an alternative to subscribing to an `Observable` in the component class (it's used in the template but not in the component class)
 
 ---
 
@@ -1549,6 +1619,8 @@ Angular has **two different approaches** to handling user input through forms: `
 
     - The `FormsModule` module provides the `ngModel` directive to create template forms
 
+    > **Note**: without importing the `FormsModule` module, you will get an error like `Can't bind to 'ngModel' since it isn't a known property of 'input'`
+
   - 2️⃣ Then, you can create a template form in the component class with (`ngForm` & `ngModel` directives)
 
     ```html
@@ -1724,7 +1796,7 @@ export class AppModule {
 
 ---
 
-### Angular HTML Escaper
+### Angular HTML Escaper (Sanitization)
 
 - Angular escapes the HTML content by default automatically to prevent **XSS attacks**
   ![escaper](./img/escaper-2.png)

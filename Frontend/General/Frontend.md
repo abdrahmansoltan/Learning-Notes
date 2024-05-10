@@ -1,10 +1,13 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Web Dev Fundamentals](#web-dev-fundamentals)
+    - [How web development works (High level overview)](#how-web-development-works-high-level-overview)
+    - [Static vs Dynamic websites](#static-vs-dynamic-websites)
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
-  - [How web pages are built](#how-web-pages-are-built)
+    - [How web pages are built in the browser](#how-web-pages-are-built-in-the-browser)
   - [Web Components](#web-components)
     - [Web Components Core Technologies](#web-components-core-technologies)
     - [Using Web Components](#using-web-components)
@@ -15,6 +18,39 @@
     - [Gulp vs Webpack](#gulp-vs-webpack)
   - [Pug.js](#pugjs)
   - [SEO](#seo)
+
+---
+
+## Web Dev Fundamentals
+
+**Frontend:** The part of the website that users interact with. Everything that you see when you’re navigating around the Internet, from fonts and colors to dropdown menus and sliders. (Browser side)
+
+### How web development works (High level overview)
+
+1. User types a URL in the browser to access a website
+2. The browser sends a `GET` request to the server to get the `HTML` file
+3. The server receives the request and prepare all the files needed to render the page (like `HTML`, `CSS`, `JS`, `images`, etc.)
+4. The server sends the files to the browser (the `HTML` file is sent firs, then the other files are sent)
+
+   - `HTML`, `CSS`, and `JS` files are sent, because these're the files that the browser needs to render the page
+     ![Web Pages](./img/frontend-1.png)
+
+5. The browser starts **rendering** the page
+
+   - The `HTML` and `CSS` files are parsed to create the `DOM` and `CSSOM` trees, respectively. These trees are combined to form the `Render Tree`, which is used to calculate and paint the layout. After painting, the browser combines all layers into one and displays it.
+
+---
+
+### Static vs Dynamic websites
+
+- **Static websites** are websites that are served to the browser as they are. They are usually created using `HTML`, `CSS`, and `JS` files and are stored on the server as they are.
+  ![static-websites](./img/static-websites.png)
+
+  - Here, the files are sent to the browser without any processing
+
+- **Dynamic websites** are websites that are dynamically generated on the server. They usually use a database to store the data and the files are generated on the server before sending them to the browser.
+  ![Dynamic](./img/dynamic-websites.png)
+  - Here, the server processes the files before sending them
 
 ---
 
@@ -56,7 +92,7 @@ The four basic steps include:
 
 ---
 
-## How web pages are built
+### How web pages are built in the browser
 
 ![Web Pages](./img/web-pages-0.png)
 

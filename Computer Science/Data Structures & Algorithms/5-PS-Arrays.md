@@ -140,7 +140,7 @@ You may assume the integer does not contain any leading zero, except the number 
   - We also need to handle the case when all the digits are `9`, because if we reach this point, it means that all the digits are `9`, or the array is empty or has one digit, so we will run out of digits and we will need to add a `1` at the beginning of the array before returning it
     ![plus one](./img/plus-one-1.png)
 
-- **Solution 1:** using basic math and early return
+- **Solution 1:** using basic math and early return ✅
 
   ```py
   def plusOne(digits):
@@ -178,7 +178,7 @@ You may assume the integer does not contain any leading zero, except the number 
 - Note for interview:
   - use these edge cases to test your code:
     - `[5]` -> `[6]` -> one digit less than `9`
-    - `[9]` -> `[1, 0]` -> one digit equal to `9`
+    - `[2, 9]` -> `[3, 0]` -> last digit is `9`
     - `[9, 9]` -> `[1, 0, 0]` -> all digits equal to `9`
 
 ---
@@ -695,7 +695,7 @@ You may return the answer in **any order**.
     - Avoid duplicates by skipping over duplicates in the input array
     - Move the left and right pointers to the next unique values to avoid duplicates
 
-- Solution 1: using 4 pointers
+- **Solution 1:** using 4 pointers ✅
 
   - Time complexity: `O(n log(n)) + O(n^3) ~= O(n^3)`
   - Space complexity: `O(1)`
@@ -727,13 +727,13 @@ You may return the answer in **any order**.
                       result.append([nums[i], nums[j], nums[left], nums[right]])
                       left += 1
                       right -= 1
-                      # skip duplicates
+                      # skip duplicates (optional)
                       while left < right and nums[left] == nums[left-1]: left += 1
                       while left < right and nums[right] == nums[right+1]: right -= 1
       return result
   ```
 
-- Solution 2: for any `N SUM` problem (recursion)
+- **Solution 2:** for any `N SUM` problem (recursion)
 
   - Here, we can use recursion to solve any `N SUM` problem by using the **Two Sum** problem as a base case (where `N = 2`)
   - until we reach the base case, we can use recursion to solve the problem by reducing it to a smaller problem and calling the function again with:
@@ -910,7 +910,7 @@ def removeDuplicates(nums):
     # initialize the index of the last unique element
     last_unique = 0
 
-    for i in range(1, len(nums)):
+    for i in range(len(nums)):
         # if the current element is not equal to the last unique element, increment the last unique index and then update the last unique element
         if nums[i] != nums[last_unique]:
             last_unique += 1
@@ -1279,7 +1279,7 @@ Return the **shortest** such subarray and output its length.
       while r > 0 and nums[r] == sorted_nums[r]:
           r -= 1
 
-      return r - l + 1
+      return r - l + 1 if r > 0 else 0
   ```
 
 - **Solution 2:** using **two pointers** (`O(n)` time and `O(1)` space) ✅
@@ -1483,7 +1483,7 @@ Given an array consisting of `n` integers, find the contiguous subarray of given
 ```py
 def find_max_average(nums, k):
     maxSum = float('-inf')
-    windowSum = 0.0 # because the result should be a float
+    windowSum = 0
     l = 0
 
     for r in range(len(nums)):

@@ -9,6 +9,7 @@
     - [Using modules](#using-modules)
   - [Router module](#router-module)
   - [HTTP Module](#http-module)
+    - [HTTP Params](#http-params)
     - [HTTP Interceptors](#http-interceptors)
   - [Shared Module](#shared-module)
 
@@ -17,6 +18,9 @@
 ## Modules
 
 Angular uses modules to `bundle` different components into packages
+
+It's a way to organize the code into different modules based on their functionality
+![module](./img/modules-0.png)
 
 - A single app can have multiple modules, each module can have multiple components, and each component can have multiple services.
   ![structure](./img/modules-1.png)
@@ -30,9 +34,27 @@ Angular uses modules to `bundle` different components into packages
     - provides common directives like `ngIf` and `ngFor`
     - It's re-exported by `BrowserModule`, so when we import `BrowserModule` we actually import `CommonModule` as well
 
-- **Shared Modules**
+- The `@NgModule` decorator of the Module is used to define the module and its properties
+  ![module](./img/modules-3.png)
 
-  - Instead of importing these common modules and components in every feature module, you can create a shared module that has all these modules and components. Import them into a shared module and import this shared module into all feature modules. This will save imports and a lot of coding lines.
+  - It takes a `metadata` object that tells Angular how to compile and launch the application **(like which components to compile, which services to provide, etc.)**
+
+    ```ts
+    @NgModule({
+      declarations: [AppComponent], // to declare components
+      imports: [BrowserModule], // to import other modules that we will depend on (inside the module)
+      exports: [], // to export components to other modules (for shared modules)
+      providers: [], // to provide services
+      bootstrap: [AppComponent] // to bootstrap the app
+    })
+    ```
+
+  - `declarations`
+    ![declarations](./img/modules-5.png)
+  - `imports` & `exports`
+    ![imports](./img/modules-6.png)
+
+---
 
 ### Module Types
 
@@ -46,6 +68,7 @@ Angular uses modules to `bundle` different components into packages
   - Contains the components that will be shown when the user navigates to a specific route
 - **Shared (Widget) Module**
   - Contains the common components, directives, and pipes that are used in multiple modules
+  - Instead of importing the common modules and components in every feature-module, you can create a shared module that has all these modules and components, Then import them into a shared module and import this shared module into all feature modules. This will save imports and a lot of coding lines.
 
 ---
 
@@ -98,46 +121,61 @@ Angular uses modules to `bundle` different components into packages
   ng g c modules/modal/modal
   ```
 
+  - This will create a new component in the `modules/modal` folder and add it to the `declarations` array of the module
+
+    ```ts
+    // modules/modal/modal.module.ts
+    import { NgModule } from '@angular/core';
+    import { CommonModule } from '@angular/common';
+    import { ModalComponent } from './modal.component';
+
+    @NgModule({
+      declarations: [ModalComponent], // Automatically add the component here ✅
+      imports: [CommonModule],
+      exports: []
+    })
+    // ...
+    ```
+
 ---
 
 ### Using modules
 
 One of the main advantages of using modules is that they can be reused in different parts of the application. This is done by exporting the components from the module and importing the module in the required module.
 
-- **First step** is to manually list all the components/services that you want to export in the `exports` array of the module
+- **Steps to use a module in another module**
 
-  ```ts
-  // modules/modal/modal.module.ts
-  import { NgModule } from '@angular/core';
-  import { CommonModule } from '@angular/common';
-  import { ModalComponent } from './modal.component';
+  - **First step** is to manually list all the components/services that you want to export in the `exports` array of the module
 
-  @NgModule({
-    declarations: [ModalComponent],
-    imports: [CommonModule],
-    exports: [ModalComponent] // export the component here
-  })
-  export class ModalModule {}
-  ```
+    ```ts
+    // modules/modal/modal.module.ts
+    import { NgModule } from '@angular/core';
+    import { CommonModule } from '@angular/common';
+    import { ModalComponent } from './modal.component';
 
-- **Second step** is to import the module in the required module
+    @NgModule({
+      declarations: [ModalComponent],
+      imports: [CommonModule],
+      exports: [ModalComponent] // export the component here
+    })
+    export class ModalModule {}
+    ```
 
-  ```ts
-  // app.module.ts
-  import { ModalModule } from './modules/modal/modal.module';
+  - **Second step** is to import the module in the required module
 
-  @NgModule({
-    declarations: [AppComponent],
-    imports: [BrowserModule, ModalModule], // add the module here
-    providers: [],
-    bootstrap: [AppComponent]
-  })
-  export class AppModule {}
-  // Now, the `ModalComponent` can be used in the `AppComponent` and other components of the app (without importing it explicitly) ✅
-  ```
+    ```ts
+    // app.module.ts
+    import { ModalModule } from './modules/modal/modal.module';
 
-- The `@NgModule` decorator of the Module is used to define the module and its properties
-  ![module](./img/modules-3.png)
+    @NgModule({
+      declarations: [AppComponent],
+      imports: [BrowserModule, ModalModule], // add the module here
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {}
+    // Now, the `ModalComponent` can be used in the `AppComponent` and other components of the app (without importing it explicitly) ✅
+    ```
 
 ---
 
@@ -207,6 +245,67 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
 
 - Note: We can still use other tools like `fetch` or `axios` to perform HTTP requests in Angular, but it's recommended to use the `HttpClient` service provided by Angular
   - One of the reasons is that the `HttpClient` service is integrated with Angular's `error handling` and `observables`, which makes it easier to handle the HTTP requests and responses and work with `RxJS` observables
+
+---
+
+### HTTP Params
+
+`HttpParams` is a class in Angular that is used to create URL parameters (query string for the URL) for an HTTP request
+
+- It's used to create a URL query string with key-value pairs for an HTTP request
+- It's immutable, which means that once it's created, it cannot be changed
+- Example of using `HttpParams` to create URL parameters for an HTTP request
+
+  ```ts
+  // app.component.ts
+  import { HttpClient, HttpParams } from '@angular/common/http';
+
+  export class AppComponent {
+    constructor(private http: HttpClient) {
+      const params = new HttpParams().set('userId', '1').set('id', '1');
+      this.http.get('https://jsonplaceholder.typicode.com/posts', { params }).subscribe(data => {
+        console.log(data);
+      });
+    }
+  }
+  ```
+
+  - In this example, we're creating URL parameters with key-value pairs `userId=1` and `id=1` and passing them to the `get` method of the `HttpClient` service
+  - The `get` method takes an optional configuration object as the second argument, where we can pass the `params` object
+
+- Example of using `HttpParams` with an observable:
+
+  ```ts
+  // service
+  // ...
+  export class NewsApiService {
+    url = 'https://newsapi.org/v2/top-head';
+    pageSize = 10;
+    apiKey = '123456789';
+    totalPages: number;
+
+    pagesInput: Subject<number>;
+    pagesOutput: Observable<any>;
+
+    constructor(private http: HttpClient) {
+      this.pagesInput = new Subject();
+      this.pagesOutput = this.pagesInput.pipe(
+        map(page => {
+          return new HttpParams()
+            .set('apiKey', this.apiKey)
+            .set('pageSize', this.pageSize.toString())
+        }),
+        switchMap(params => {
+          return this.http.get(this.url, { params });
+        }),
+        tap(res => {
+          // Here we add any operations that we want to do after fetching
+          this.totalPages = Math.ceil(response.totalResults / 10);
+        }
+      );
+    }
+  }
+  ```
 
 ---
 

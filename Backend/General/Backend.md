@@ -24,6 +24,8 @@
 
 ## Web Server
 
+It's a computer that is connected to the Internet, and is able to receive and send requests.
+
 ![Server](./img/server-1.png)
 ![Server](./img/server.PNG)
 
