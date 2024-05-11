@@ -139,12 +139,14 @@ You can use the `flex-direction` property to specify the direction in which the 
 
 - `flex-direction: row;` => default
   - means that the items are laid out horizontally, from **left-to-right**
-- `flex-direction: row-reverse;`
-  - means that the items are laid out horizontally, from **right-to-left**
+    ![flex-direction](./img/flex-direction-1.png)
+  - `flex-direction: row-reverse;`
+    - means that the items are laid out horizontally, from **right-to-left**
 - `flex-direction: column;`
   - means that the items are laid out vertically, from **top-to-bottom**
-- `flex-direction: column-reverse;`
-  - means that the items are laid out vertically, from **bottom-to-top**
+    ![flex-direction](./img/flex-direction-2.png)
+  - `flex-direction: column-reverse;`
+    - means that the items are laid out vertically, from **bottom-to-top**
 
 ---
 
@@ -474,6 +476,7 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
     /* or using `span` */
     grid-column: 2 / span 2; /* start on column 2 and span 2 columns */
     grid-row: 1 / span 2; /* start on row 1 and span 2 rows */
+    grid-row: 2; /* (ONE VALUE) start on row 2 and end on the last row */
 
     /* or using `-1` */
     grid-column: 1 / -1; /* start on column 1 and end on the last column */

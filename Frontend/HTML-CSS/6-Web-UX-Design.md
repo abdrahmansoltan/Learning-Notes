@@ -34,6 +34,12 @@
   - [User Experience (UX)](#user-experience-ux)
     - [UI \& UX](#ui--ux)
     - [UX Rules For Usability](#ux-rules-for-usability)
+  - [Components And Layout Patterns](#components-and-layout-patterns)
+    - [Elements Pattern](#elements-pattern)
+    - [Components Pattern](#components-pattern)
+    - [Sections Pattern](#sections-pattern)
+    - [D Pattern](#d-pattern)
+  - [Design Inspiration](#design-inspiration)
 
 ---
 
@@ -573,3 +579,126 @@ You can mix and match these elements to create a unique website personality
 - Use simple words! Avoid technical jargon and “smart-sounding” words
 - Break up long text with **sub-headings, images, block quotes, bullet points**, etc.
   ![User Experience](./img/ux-10.png)
+
+---
+
+## Components And Layout Patterns
+
+![Components And Layout Patterns](./img/ux-components-1.png)
+
+- Steps:
+  1. Use common elements and components to convey your website’s information
+  2. Combine components into layouts using common layout patterns
+  3. Assemble different layout areas into a complete, final page
+
+### Elements Pattern
+
+- **Text**
+  ![Elements Pattern](./img/ux-components-2.png)
+- **Buttons**
+  ![Elements Pattern](./img/ux-components-3.png)
+- **Images**
+  ![Elements Pattern](./img/ux-components-4.png)
+- **Input Fields**
+  ![Elements Pattern](./img/ux-components-5.png)
+- **Tags** (for filtering and categorizing content)
+  ![Elements Pattern](./img/ux-components-6.png)
+
+---
+
+### Components Pattern
+
+- **Breadcrumbs**
+  ![Components Pattern](./img/ux-components-7.png)
+- **Pagination**
+  ![Components Pattern](./img/ux-components-8.png)
+- **Alert and Status Bars**
+  ![Components Pattern](./img/ux-components-9.png)
+- **Statistics** (for showing numbers and data)
+  ![Components Pattern](./img/ux-components-10.png)
+- **Gallery** (for showing multiple images)
+  ![Components Pattern](./img/ux-components-11.png)
+- **Feature Boxes** (for showing features of a product)
+  ![Components Pattern](./img/ux-components-12.png)
+- **Preview and Profile Cards** (for showing a preview of a product or a profile with CTA)
+  ![Components Pattern](./img/ux-components-13.png)
+  ![Components Pattern](./img/ux-components-14.png)
+- **Accordions** (for showing and hiding content in a list)
+  ![Components Pattern](./img/ux-components-15.png)
+- **Tabs** (for showing different content in a tabbed interface)
+  ![Components Pattern](./img/ux-components-16.png)
+- **Carousels / Sliders** (for showing multiple images in a carousel)
+  ![Components Pattern](./img/ux-components-17.png)
+- **Customer Testimonials** (for showing customer reviews)
+  ![Components Pattern](./img/ux-components-18.png)
+- **Customer Logos** (for showing logos of customers to build trust towards the product or the brand)
+  ![Components Pattern](./img/ux-components-19.png)
+- **Featured-in Logos** (for showing logos of companies that featured the product)
+  ![Components Pattern](./img/ux-components-20.png)
+- **Steps / Guide** (for showing a step-by-step process or guide)
+  ![Components Pattern](./img/ux-components-21.png)
+  ![Components Pattern](./img/ux-components-22.png)
+- **Forms** (for collecting user data)
+  ![Components Pattern](./img/ux-components-23.png)
+  ![Components Pattern](./img/ux-components-24.png)
+- **Tables** (for showing data in a table)
+  ![Components Pattern](./img/ux-components-25.png)
+- **Pricing Tables** (for showing different pricing options)
+  ![Components Pattern](./img/ux-components-26.png)
+- **Modals** (for showing a popup with additional information)
+  ![Components Pattern](./img/ux-components-27.png)
+- **Tooltips** (for showing additional information on hover)
+
+---
+
+### Sections Pattern
+
+- **Navigation**
+  ![Components Pattern](./img/ux-components-30.png)
+  ![Components Pattern](./img/ux-components-28.png)
+  ![Components Pattern](./img/ux-components-29.png)
+- **Hero**
+  ![Components Pattern](./img/ux-components-31.png)
+  ![Components Pattern](./img/ux-components-32.png)
+  ![Components Pattern](./img/ux-components-33.png)
+- **Footer**
+  ![Components Pattern](./img/ux-components-34.png)
+- **Call To Action**
+  ![Components Pattern](./img/ux-components-35.png)
+- **Feature Row**
+  ![Components Pattern](./img/ux-components-36.png)
+
+---
+
+### D Pattern
+
+- **Row Of Boxes/Cards**
+  ![Components Pattern](./img/ux-components-37.png)
+- **Grid Of Boxes/Cards**
+  ![Components Pattern](./img/ux-components-38.png)
+- **Mix Of Row And Grid**
+  ![Components Pattern](./img/ux-components-39.png)
+- **Z-Pattern**
+  ![Components Pattern](./img/ux-components-40.png)
+- **F-Pattern**
+  ![Components Pattern](./img/ux-components-41.png)
+- **Single Column**
+  ![Components Pattern](./img/ux-components-42.png)
+- **Sidebar**
+  ![Components Pattern](./img/ux-components-43.png)
+- **Multi-Column / Magazine**
+  ![Components Pattern](./img/ux-components-44.png)
+- **Asymmetrical / Experimental**
+  ![Components Pattern](./img/ux-components-45.png)
+
+---
+
+## Design Inspiration
+
+Here're good resources for design inspiration:
+
+- [Land Book](http://land-book.com/)
+- [One Page Love](https://onepagelove.com/inspiration)
+- [Awwwards](https://www.awwwards.com/websites/)
+- [Screelane](https://screlane.com/)
+- [Dribbble](https://dribbble.com/)

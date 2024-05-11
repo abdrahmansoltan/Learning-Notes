@@ -39,6 +39,7 @@
     - [text-shadow](#text-shadow)
   - [images](#images)
     - [`object-fit` property](#object-fit-property)
+    - [Transforming Images](#transforming-images)
     - [`background-` properties](#background--properties)
       - [`background-image` property](#background-image-property)
         - [Linear Gradient](#linear-gradient)
@@ -729,11 +730,14 @@ To center an element vertically and horizontally in a container, we have these o
      left: 50%;
      transform: translate(-50%, -50%);
 
-     /* or */
+     /* or (NOT RECOMMENDED ❌) */
      top: calc(50% - 50px); /* 50px is half of the element height */
      left: calc(50% - 50px); /* 50px is half of the element width */
    }
    ```
+
+   ![center element](./img/center-element-1.png)
+   ![center element](./img/center-element-2.png)
 
 4. using `grid`:
 
@@ -1071,13 +1075,20 @@ When text overflows the container, you can control how it behaves using the `ove
 
 The first value is the horizontal offset, the second value is the vertical offset, the third value is the blur radius, and the fourth value is the color of the shadow.
 
+```css
+div {
+  /*           x-offset  y-offset  blur-radius  color */
+  box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.1);
+}
+```
+
 - `x-offset`: means in x-direction (horizontal)
 - `y-offset`: means in y-direction (vertical)
-- `blur-radius`: strength of blueness (Optional)
+- `blur-radius`: strength of blueness **(Optional)**
   - If omitted, the shadow is a solid line like a border
-- `spread-radius`: expand or grow the radius of the shadow in all directions (Optional)
-- `color`: the color of box-shadow (Optional)
-- `inset` to add border from the inside and not outside (Optional) => ex:
+- `spread-radius`: expand or grow the radius of the shadow in all directions **(Optional)**
+- `color`: the color of box-shadow **(Optional)**
+- `inset` to add border from the inside and not outside **(Optional)** => ex:
 
   ```css
   box-shadow: inset 0 0 0 3px #fff;
@@ -1135,6 +1146,36 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
     object-fit: cover;
   }
   ```
+
+---
+
+### Transforming Images
+
+- `transform` property is used to **rotate**, **scale**, **skew**, or **translate** an element.
+
+- `scale` -> to resize the image
+
+  ```css
+  img {
+    transform: scale(1.5);
+  }
+  ```
+
+  - Trick to make the image **zoomed-in** when hovering over it
+
+    ```css
+    img {
+      transition: transform 0.5s;
+    }
+
+    img:hover {
+      transform: scale(1.5);
+    }
+
+    .img-container {
+      overflow: hidden; /* To hide the overflowed part which gives the zoom effect */
+    }
+    ```
 
 ---
 
@@ -1198,7 +1239,7 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 
 - we have the ability to specify a **gradient** for the background of a box. The gradient is created using the `background-image` property:
 
-  - to add overlay gradient with one color, you make the linear-gradient with the same value for the 2 gradient colors
+  - to add **overlay gradient** with one color, you make the linear-gradient with the same value for the 2 gradient colors
 
   ```css
   div {
@@ -1207,6 +1248,8 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
     /* here, linear-gradient needs to be in rgba() form to show the image */
   }
   ```
+
+  - Here, the linear-gradient is on top of the background-image, which gives an overlay look.
 
 - **RECOMMENDED:** you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
 - There's also `radial-gradient` which is a gradient from the center to the outside
@@ -1228,10 +1271,8 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 - `background-size` property :
   ![backgroundSize](./img/background-size-cover-contain.svg)
 
-- **contain** : Scale the image, while preserving its intrinsic aspect ratio (if any), to the largest size such that both its width and its height can fit inside the background positioning area.
-- **cover** : Scale the image, while preserving its intrinsic aspect ratio (if any), to the smallest size such that both its width and its height can completely cover the background positioning area.
-
-- `img` is an **inline element**, so it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
+- `contain` : Scale the image, while preserving its intrinsic aspect ratio (if any), to the largest size such that both its width and its height can fit inside the background positioning area.
+- `cover` : Scale the image, while preserving its intrinsic aspect ratio (if any), to the smallest size such that both its width and its height can completely cover the background positioning area.
 
 ---
 
@@ -1342,6 +1383,7 @@ body {
 
 ### Images Notes
 
+- `img` is an **inline element**, so it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
 - if you have an empty space between the image and the bottom-border, make the img has the `display: block;` property
   - you can also make sure that you're using `box-sizing: border-box;`
 - In order to change color or `svg` image color, you can use `stroke` and `fill` properties

@@ -2114,7 +2114,7 @@ You must write an algorithm that runs in `O(n)` time and **without using the div
 
       for i in range(1, len(nums)):
           prefix[i] = prefix[i-1] * nums[i-1]
-      for i in range(len(nums)-2, -1, -1):
+      for i in range(len(nums)-2, -1, -1): # (-2) because we want to start from the second last element
           postfix[i] = postfix[i+1] * nums[i+1]
 
       # Multiply the elements of the two arrays to get the final result
@@ -2535,7 +2535,7 @@ This pattern is used to solve problems with `linked lists` and `arrays` that inv
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Video Solution](https://www.youtube.com/watch?v=wjYnzkAhcNk) | Use **Floyd's Cycle Detection** algorithm to find the intersection point of the two runners, then find the "entrance" to the cycle, which is the duplicate number that we are looking for, by starting a new pointer at the beginning of the array and move it one step at a time, and move the slow runner one step at a time, and return the slow runner when the two runners meet. |
 
-Given an array of integers `nums` containing `n + 1` integers where each integer is in the range `[1, n]` inclusive.
+Given an array of integers `nums` containing `n + 1` integers where each integer is **in the range `[1, n]` inclusive**.
 
 There is only **one repeated number** in `nums`, return this repeated number.
 
@@ -2560,7 +2560,7 @@ There is only **one repeated number** in `nums`, return this repeated number.
 
 - **Solution 2:** using **Floyd's Cycle Detection** -> `O(n)` time and `O(1)` space ✅
 
-  - The idea here, is to make use of the fact that the numbers in the array are in the range `[1, n]` and there is only one repeated number in the array. **So, we can use the numbers in the array as pointers (indices) to traverse the array**.
+  - The idea here, is to make use of the fact that **the numbers in the array are in the range `[1, n]`** and there is only one repeated number in the array. **So, we can use the numbers in the array as pointers (indices) to traverse the array**.
     ![find duplicate num](./img/find-duplicate-num-2.png)
     - So, if there is a duplicate number in the array, it means that multiple numbers are pointing to the same index.
   - To solve this problem without using space, we can use **Floyd's Cycle Detection algorithm**. This algorithm is used to detect cycles.

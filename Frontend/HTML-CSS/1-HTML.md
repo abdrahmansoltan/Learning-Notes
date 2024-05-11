@@ -9,7 +9,7 @@
     - [Why Semantic?](#why-semantic)
     - [Semantic tags](#semantic-tags)
   - [some inline elements to be aware of](#some-inline-elements-to-be-aware-of)
-  - [tricks](#tricks)
+  - [Tricks](#tricks)
   - [Forms](#forms)
     - [Form elements (controls)](#form-elements-controls)
     - [Autofill Forms](#autofill-forms)
@@ -274,7 +274,7 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ---
 
-## tricks
+## Tricks
 
 - to make link go to other tab and not the current one, use the **target** attribute : `target="_blank"`
 - to check if your HTML syntax is right => [HTML validation](https://validator.w3.org/)
@@ -933,6 +933,10 @@ for that we use media queries as we put each image in each media
 
 ## Tables
 
+Tables are used to display data in a grid format. The `<table>` element is used to create a table.
+
+> They're not used commonly in modern web design, because they're not responsive and not accessible. and Nowadays, flexbox and grid are used to create layouts.
+
 ### Spanning Columns and rows
 
 Sometimes you may need the entries in a table to stretch across more than one column or row.
@@ -942,11 +946,35 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
 ![table](./img/table-1.png)
 ![table](./img/table-2.png)
 
+- In the table row `<tr>`, the first cell can be `<th>` or `<td>`. If it is `<th>`, it will be a header cell, and if it is `<td>`, it will be a data cell.
+
+  ```html
+  <tr>
+    <th>Month</th>
+    <th>Savings</th>
+  </tr>
+  ```
+
+- To make a cell span multiple columns, use the `colspan` attribute.
+
+  ```html
+  <tr>
+    <!-- The first cell spans two columns -->
+    <th colspan="2">Savings</th>
+  </tr>
+  ```
+
+---
+
 ### Table Notes
 
 - `<td>` stands for **table data cell**
 - Part of the reason for having separate `<thead>` and `<tfoot>` elements is so that, if you have a table that is taller than the screen (or, if printed, longer than one page) then the browser can keep the header and footer visible whilst the contents of the table scroll. This is intended to make it easier for users to see which column the data is in.
   - however this functionality is not implemented by default in any current browser.
+- **Border collapse Problem**:
+  - In tables, when we have cells with borders, the borders of the cells can collapse into each other, making the table look messy.
+  - To fix this, you can use the `border-collapse` property in CSS.
+    ![border collapse](./img/collapsing-margins-2.png)
 
 ---
 
@@ -1018,3 +1046,7 @@ Here the **Tree structure** is the operation that make html code looks the way i
 
 - To add custom **underline** to element, use `border-bottom` property instead of `text-decoration` property to have more control over the underline.
   - usually to control the space between the text and the underline, use `padding-bottom` property.
+- When you want to serve the `HTML` file to the browser, you need to use a **web server**.
+  - You can use **VS Code** extension called **Live Server** to serve the file to the browser.
+  - Note: that by default the browser will look for a file called `index.html` in the root directory of the server. if it doesn't find it, it will show a list of files in the directory.
+    ![index.html](./img/index-html.png)
