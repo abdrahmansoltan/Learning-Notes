@@ -28,7 +28,7 @@
 ### How web development works (High level overview)
 
 1. User types a URL in the browser to access a website
-2. The browser sends a `GET` request to the server to get the `HTML` file
+2. The browser sends an HTTP `GET` request to the server to get the `HTML` file
 3. The server receives the request and prepare all the files needed to render the page (like `HTML`, `CSS`, `JS`, `images`, etc.)
 4. The server sends the files to the browser (the `HTML` file is sent firs, then the other files are sent)
 

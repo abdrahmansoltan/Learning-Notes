@@ -20,6 +20,8 @@
     - [How do you return multiple things from a function?](#how-do-you-return-multiple-things-from-a-function)
     - [How to deep copy an object?](#how-to-deep-copy-an-object)
     - [How to check if a value is a number?](#how-to-check-if-a-value-is-a-number)
+    - [What is a closure?](#what-is-a-closure)
+    - [What is the difference between classical and prototypal inheritance?](#what-is-the-difference-between-classical-and-prototypal-inheritance)
 
 ---
 
@@ -445,3 +447,67 @@ let arr = [1, 2, 3, 4];
   // usually with input from the user we use parseInt()
   Number.isNaN(parseInt('42')); // false
   ```
+
+### What is a closure?
+
+- A closure is the combination of a function and the lexical environment within which that function was declared. This environment consists of any local variables that were in-scope at the time the closure was created.
+
+  ```js
+  function outer() {
+    const name = 'John';
+    function inner() {
+      console.log(name);
+    }
+    return inner;
+  }
+
+  const innerFunction = outer();
+  innerFunction(); // 'John'
+  ```
+
+  - In this example, the `inner` function has access to the `name` variable from the `outer` function, even after the `outer` function has finished executing. This is because the `inner` function forms a closure over the `name` variable.
+  - Closures are commonly used to give objects data privacy, to create factory functions, and to create callback functions.
+  - Closures can also be used to create partial functions and currying in functional programming.
+
+### What is the difference between classical and prototypal inheritance?
+
+The difference between classical and prototypal inheritance is how objects inherit properties and methods from other objects.
+
+- in **classical inheritance**, objects inherit from classes, and classes inherit from other classes. This is the inheritance model used in class-based languages like Java, C++, and Python.
+
+  ```js
+  class Animal {
+    constructor(name) {
+      this.name = name;
+    }
+    speak() {
+      console.log(`${this.name} makes a noise`);
+    }
+  }
+
+  class Dog extends Animal {
+    speak() {
+      console.log(`${this.name} barks`);
+    }
+  }
+
+  const dog = new Dog('Rex');
+  dog.speak(); // 'Rex barks'
+  ```
+
+- in **prototypal inheritance**, objects inherit directly from other objects. This is the inheritance model used in prototype-based languages like JavaScript.
+
+  ```js
+  const animal = {
+    speak() {
+      console.log(`${this.name} makes a noise`);
+    }
+  };
+
+  const dog = Object.create(animal);
+  dog.name = 'Rex';
+  dog.speak(); // 'Rex makes a noise'
+  ```
+
+  - In JavaScript, objects inherit from other objects through the prototype chain. Each object has a prototype object, which acts as a template for the object. When a property or method is accessed on an object, JavaScript looks for it on the object itself, and if it's not found, it looks for it on the object's prototype, and so on up the prototype chain.
+  - Prototypal inheritance is more flexible than classical inheritance because objects can inherit from multiple prototypes, and objects can be created dynamically at runtime.

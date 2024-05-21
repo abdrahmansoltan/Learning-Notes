@@ -870,18 +870,17 @@ observer.observe(targetElement);
 
 - The `callback function`, when executed, is passed an array of entries, each an instance of `IntersectionObserverEntry`. This is an `array` because the Intersection Observer object can be used to observe multiple target elements
 - it is possible to adjust the intersection root’s rectangle by setting `root margin`
-- `Example`
+- Example of using the Intersection Observer API to apply **sticky navigation**:
 
-  ```javascript
-  // Sticky navigation: Intersection Observer API
-
-  const header = document.querySelector('.header');
+  ```js
+  const nav = document.querySelector('.nav'); // selecting the nav element that we want to make sticky
   const navHeight = nav.getBoundingClientRect().height; // to get the exact height without hard-coding it (instead of writing "-90px")
 
   // callback function
   const stickyNav = function (entries) {
     const [entry] = entries; // destructuring : same as entry =  entries[0]
-    // console.log(entry);
+
+    // if the entry is not intersecting, add the sticky class to the nav element, otherwise remove it
     if (!entry.isIntersecting) nav.classList.add('sticky');
     else nav.classList.remove('sticky');
   };

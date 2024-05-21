@@ -35,7 +35,7 @@
 
 Apart from helping you to scope styles, styled components include the following features:
 
-- **Automatic vendor prefixing**
+- **Automatic vendor prefixing** (Browser Support)
   - You can use standard CSS properties, and styled components will add vendor prefixes should they be needed.
   - write your CSS to the current standard and let styled-components handle the rest.
 - **Unique class names**

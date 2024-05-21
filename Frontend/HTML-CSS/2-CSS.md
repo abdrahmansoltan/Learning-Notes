@@ -8,19 +8,20 @@
     - [Visual Formatting Model](#visual-formatting-model)
   - [Selectors](#selectors)
     - [Selectors Types](#selectors-types)
-      - [Descendant selectors](#descendant-selectors)
+      - [Combinators](#combinators)
       - [`[attribute]` Selector](#attribute-selector)
       - [Other selectors](#other-selectors)
-    - [Selector specificity](#selector-specificity)
+    - [Pseudo Elements/Classes](#pseudo-elementsclasses)
+      - [pseudo classes](#pseudo-classes)
+      - [pseudo elements](#pseudo-elements)
+    - [Selector specificity (Cascade)](#selector-specificity-cascade)
     - [Selectors Notes](#selectors-notes)
-  - [Pseudo Elements/Classes](#pseudo-elementsclasses)
-    - [pseudo elements](#pseudo-elements)
-    - [pseudo classes](#pseudo-classes)
-  - [Inheritance](#inheritance)
   - [Box Model](#box-model)
     - [Box Sizing (width \& height calculation)](#box-sizing-width--height-calculation)
+    - [Padding](#padding)
+    - [Border](#border)
     - [Outline](#outline)
-    - [Types of boxes](#types-of-boxes)
+    - [Types of boxes (Block vs Inline)](#types-of-boxes-block-vs-inline)
     - [Collapsing-Margins Problem](#collapsing-margins-problem)
     - [How to center an element](#how-to-center-an-element)
     - [Box model notes](#box-model-notes)
@@ -28,12 +29,19 @@
   - [Colors](#colors)
     - [HSL Colors](#hsl-colors)
     - [Color Notes](#color-notes)
-  - [Font](#font)
-    - [TypeFaces](#typefaces)
-    - [Units of Type Size](#units-of-type-size)
+  - [Font \& Text](#font--text)
+    - [TypeFaces \& Font Families](#typefaces--font-families)
+    - [Text Formatting](#text-formatting)
     - [Alignment](#alignment)
+    - [Line \& Letter Spacing](#line--letter-spacing)
     - [Text-Wrap and Overflow](#text-wrap-and-overflow)
-    - [Font and Units Notes](#font-and-units-notes)
+    - [Font Notes](#font-notes)
+  - [Units](#units)
+    - [Pixels](#pixels)
+    - [Percentages](#percentages)
+    - [Em \& Rem](#em--rem)
+    - [Units Notes](#units-notes)
+  - [Inheritance](#inheritance)
   - [Shadow](#shadow)
     - [box-shadow](#box-shadow)
     - [text-shadow](#text-shadow)
@@ -61,8 +69,10 @@
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
-  - [Browser Prefixes (CSS Vendor Prefixes)](#browser-prefixes-css-vendor-prefixes)
+  - [Browser Support (CSS Vendor Prefixes)](#browser-support-css-vendor-prefixes)
   - [Scrolling](#scrolling)
+    - [Scrolling using CSS](#scrolling-using-css)
+    - [Scrolling using JavaScript](#scrolling-using-javascript)
   - [Modules (multiple style sheets)](#modules-multiple-style-sheets)
   - [Notes](#notes)
 
@@ -76,12 +86,13 @@
 
   - **"Cascading"** Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
 
-    - means that a lower priority style can be overridden by a higher priority style.
+    - means that a lower priority style can be overridden by a higher priority style -> [Specificity](#selector-specificity-cascade)
+    - also the styles are applied in a specific order, so the last style will be applied **(chronological order)**
 
     > Great article about it [here](https://2019.wattenberger.com/blog/css-cascade)
 
   - **"Style"** is a set of rules that define how the content of an element should be displayed.
-  - **"Sheets"** means that the rules are organized into groups.
+  - **"Sheets"** means that the rules are organized into groups called stylesheets.
 
 - **CSS Rule**: It consists of `properties` and `values` that are applied to HTML elements (`selectors`) to style them.
   ![css](./img/css-1.png)
@@ -90,36 +101,47 @@
 
 ### Styling Types
 
-- **inline style**
+- You don't quite start with a blank canvas; HTML tags do include a few minimal styles. For example, here are the built-in styles for `<a>` tags, in Chrome 86:
 
-  - it's a style that is applied directly to the element using the `style` attribute.
+  ```css
+  a {
+    color: -webkit-link;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  ```
 
-    ```html
-    <h1 style="color:red"></h1>
-    ```
+  - These styles are part of the **user-agent stylesheet** that the browser applies to all web pages by default (each browser has its own default styles).
 
-- **internal style**
+- But we can override these styles and add our own styles using CSS. and there are 3 ways to add styles to an HTML element:
 
-  - it's a style that is applied to the whole page using the `<style>` tag in the `<head>` section.
+  - **Inline style**
 
-    ```html
-    <style>
-      h1 {
-        color: red;
-      }
-    </style>
-    ```
+    - it's a style that is applied directly to the element using the `style` attribute.
 
-- **external style**
+      ```html
+      <h1 style="color:red;"></h1>
+      ```
 
-  - it's a style that is applied to the whole page using an external CSS file.
+    - It's a bad practice because:
+      - it mixes the content with the style, and it's hard to maintain and update.
+      - it only applies to the specific element, and it's not reusable for other elements.
 
-    ```html
-    <link rel="stylesheet" href="style.css" />
-    ```
+  - **Internal style**
 
-    - `Link` tag is not a url link, it's a used for **linking** the HTML file to the CSS file.
-    - `rel` attribute is used to specify the relationship between the HTML file and the linked file. if we didn't specify it, the browser will assume it's a stylesheet file.
+    - it's a style that is applied to the whole page using the `<style>` tag in the `<head>` section.
+
+      ![css](./img/css-2.png)
+
+    - It's better than inline style because it's reusable for all elements in the page, but it's not reusable for other pages (other HTML files).
+
+  - **External style**
+
+    - it's a style that is applied to the whole page using an external CSS file.
+      ![css](./img/css-3.png)
+
+      - `<Link>` tag is not a url link, it's a used for **linking** the HTML file to the CSS file.
+      - `rel` attribute is used to specify the **relationship** between the HTML file and the linked file. if we didn't specify it, the browser will assume it's a stylesheet file.
 
 - **Note**:
   - **inline style** has the highest priority, then **internal style**, then **external style**
@@ -163,6 +185,17 @@ What happens when we load a page in the browser?
 
 It's the process of turning the render tree into the actual pixels on the screen.
 
+- CSS builds its sense of direction based on this system. It has a **block direction (vertical)**, and an **inline direction (horizontal)**.
+
+  - Block direction is like lego blocks: they stack together one on top of the other.
+  - Inline direction is like people standing **in-line**; they stand side by side, not one on top of the other.
+
+  > Because not all languages are left-to-right, top-to-bottom, the browser by default uses block (vertical) and inline (horizontal) properties like `margin-block-start` instead of `margin-top`
+  >
+  > These alternatives are known as **logical properties**.
+  >
+  > You can learn more about different writing modes in this [wonderful article by Jen Simmons](https://24ways.org/2016/css-writing-modes/).
+
 - It uses an algorithm called **Box Model** to determine the size and position of each box to be painted on the screen.
 - To do that it takes into account factors like:
   - dimensions of the box -> `box-sizing`
@@ -204,20 +237,18 @@ Selectors are used to target the HTML elements that we want to style.
   - Based on the content (pseudo-elements):
     - `:empty`, `:not(selector)`, `:has()`, `:where()`, `:is()`
 
-#### Descendant selectors
+#### Combinators
 
-- **Descendant selector** -> selects all elements that are descendants of a specified element.
+**Combinators** are used to combine multiple selectors into a single rule. They are used to target elements based on their relationship with other elements.
 
+- Descendant selector
+
+  - selects all elements that are descendants of a specified element (no matter how deep they are nested in the DOM tree)
   - ex: `div p` -> selects all `<p>` elements inside `<div>` elements
 
 - **Examples:**
 
   ```css
-  /* Selects all <p> elements inside <div> elements */
-  div p {
-    color: red;
-  }
-
   /* Selects all elements with both name1 and name2 set within its class attribute */
   .name1.name2 {
     background-color: yellow;
@@ -228,13 +259,13 @@ Selectors are used to target the HTML elements that we want to style.
     background-color: yellow;
   }
 
-  /* Selects all <p> elements where the parent is a <div> element */
-  div > p {
-    background-color: yellow;
+  /* Selects all <p> elements inside <div> elements (parent) even if there are other elements nested between them */
+  div p {
+    color: red;
   }
 
-  /* Selects all <p> elements where the parent is a <div> element (even if there are other elements nested between them) */
-  div p {
+  /* Selects all <p> elements where <div> is a (direct parent) */
+  div > p {
     background-color: yellow;
   }
 
@@ -317,65 +348,114 @@ Selectors are used to target the HTML elements that we want to style.
 
 ---
 
-### Selector specificity
-
-If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
-![specificity](./img/specificity-0.png)
-![specificity](./img/specificity-4.png)
-
-> or with the **"Last rule Principle"** where if multiple elements have the same selector specificity, then only the last selector's styles will be applied. So **the placement of the rule is important**
-
-- **Calculation**
-  ![specificity](./img/specificity-1.svg)
-
-  - Start at `0`
-  - add `100` for each ID value
-  - add `10` for each class value (or pseudo-class or attribute selector)
-  - add `1` for each element selector or pseudo-element.
-
-- Example:
-  ![specificity](./img/specificity-2.png)
-
----
-
-### Selectors Notes
-
-- We shouldn't depend on element-selectors and nested selectors, instead, we should use classes and IDs to style elements.
-  - This is because it's easier to maintain and update the styles later on without affecting other elements and the HTML structure.
-- `id` should be used for **unique** elements, and `class` for **reusable** elements.
-  - In the real world, we usually don't use `id` for styling, instead, we use `class` for everything (to be more flexible and reusable).
-  - if you have an `id` that is used twice, **the styles will be applied to the first one only.**
-- Universal selector (**`*`**) has **no specificity** and gets **0 points** (least specificity so it's like a fallback or when overriding default styles).
-- You can apply the same rule to multiple selectors by separating them with a comma.
-
-  ```css
-  h1,
-  h2,
-  h3 {
-    color: red;
-  }
-  ```
-
-- `!important` gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
-  ![specificity](./img/specificity-3.png)
-
-  - if 2 rules have `!important`, then the last one will be applied
-
-- Specificity in CSS only concerns selectors, not their associated declarations. **!important** applies to a declaration, so it alone plays no role in specificity.
-- more info & examples here [css-specificity](https://www.webfx.com/blog/web-design/css-specificity/)
-
----
-
-## Pseudo Elements/Classes
+### Pseudo Elements/Classes
 
 They are used to style certain parts of an element or to style an element in a certain state, position, or relationship.
 
-### pseudo elements
+#### pseudo classes
 
-They create element and insert it before/after content of an element without inserting it in the HTML.
+Pseudo classes are used to apply styles to an element based on its current state or position.
 
-- We only use them for **styling** and not for **content** (as it's not part of the HTML so it's not accessible by screen readers).
-- we must provide a `content` property
+- Some pseudo classes used with `<a>`, `<button>` elements:
+
+  - `a:link` => `<a>` that are **unvisited** links with a **`href`** attribute
+  - `a:visited` => `<a>` that has been clicked on
+  - `a:hover` => `<a>` when we are **hovering**
+  - `a:active` => `<a>` when we are **clicking**
+  - `a:focus` => `<a>` when we are **tab focusing**
+
+- root pseudo class `:root`
+
+  - used to select the root element of the document (the `html` element)
+
+    ```css
+    :root {
+      --main-color: red;
+      font-size: 12px;
+    }
+
+    h1 {
+      color: var(--main-color);
+    }
+    p {
+      font-size: 1rem; /* 12px because of the root element */
+    }
+    ```
+
+  - `rem` values will depend on values here
+  - used for:
+    - general styles
+    - css variables
+
+- pseudo classes for **Form elements**
+
+  - `:checked` -> selects every checked `<input type="checkbox">` element
+  - `:disabled`
+  - `:enabled`
+  - `:focus`
+  - `:required`
+  - `:optional`
+  - `:valid`
+  - `:invalid`
+  - `:in-range`
+  - `:out-of-range`
+  - `:placeholder-shown`
+
+- pseudo classes for **Child elements & Indexes**
+
+  - `:first-child` -> for the first child of an element **(not the first of a type)**
+  - `:last-child` -> for the last child of an element
+  - `:nth-child(n)` -> for every `n`th child of an element
+  - `:nth-last-child(n)` -> for every `n`th child of an element, counting from the last child
+  - `:nth-of-type(n)` -> for every `n`th child of a type
+  - `:only-child` -> for the only child of an element
+  - `:only-of-type` -> for the only child of a type
+
+- pseudo class that handles different **states of an element**
+
+  - `:not(selector)` -> selects every element that is not a certain selector
+  - `:empty` -> selects every element that has no children
+  - `:target` -> selects the current active target element
+  - `:has()` -> selects elements that have a specific descendant
+  - `:where()` -> selects elements that match a list of selectors
+  - `:is()` -> selects elements that match one of the selectors
+
+---
+
+#### pseudo elements
+
+They're like [pseudo classes](#pseudo-classes) but they don't target a specific state, Instead, they target a specific part of an element (sub-elements), ex: `placeholder`, `first-letter`, ...
+
+> They're called "pseudo **elements**" because they select and style elements that are not part of the DOM (haven't explicitly been created with HTML tags).
+
+- They create element and insert it `before`/`after` content of an element without inserting it in the HTML.
+
+  - You can create the same effect by creating a new element and styling it, but it's not recommended because it's not semantic and it's not accessible.
+
+    ```html
+    <div class="box">Hello</div>
+
+    <style>
+      .box::before {
+        content: '🔥';
+      }
+    ```
+
+    ```html
+    <!-- Also works! ✅ -->
+    <span class="pseudo-element"></span>
+    <div class="box">Hello</div>
+
+    <style>
+      .pseudo-element {
+        content: '🔥';
+      }
+    ```
+
+- Note that they're not part of the DOM, so:
+  - they can't be selected by JavaScript.
+  - they aren't accessible by screen readers.
+- When using it, we must provide a `content` property to it in order to work (even if it's empty string `""`)
 
   ```css
   div::before {
@@ -389,7 +469,7 @@ They create element and insert it before/after content of an element without ins
   background-color: red;
   }
 
-  /* This Won't Work */
+  /* This Won't Work ❌ */
   div::before {
   background-color: red;
   }
@@ -485,111 +565,89 @@ They create element and insert it before/after content of an element without ins
 
 ---
 
-### pseudo classes
+### Selector specificity (Cascade)
 
-Pseudo classes are used to define the special state of an element.
+If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
+![specificity](./img/specificity-0.png)
+![specificity](./img/specificity-4.png)
 
-- Some pseudo classes used with `<a>`, `<button>` elements:
+> or with the **"Last rule Principle"** where if multiple elements have the same selector specificity, then only the last selector's styles will be applied. So **the placement of the rule is important**
 
-  - `a:link` => `<a>` that are **unvisited** links with a **`href`** attribute
-  - `a:visited` => `<a>` that has been clicked on
-  - `a:hover` => `<a>` when we are **hovering**
-  - `a:active` => `<a>` when we are **clicking**
-  - `a:focus` => `<a>` when we are **tab focusing**
+- **Calculation**
+  ![specificity](./img/specificity-1.svg)
 
-- root pseudo class `:root`
+  - Start at `0`
+  - add `100` for each ID value
+  - add `10` for each class value (or pseudo-class or attribute selector)
+  - add `1` for each element selector or pseudo-element.
 
-  - used to select the root element of the document (the `html` element)
-
-    ```css
-    :root {
-      --main-color: red;
-      font-size: 12px;
-    }
-
-    h1 {
-      color: var(--main-color);
-    }
-    p {
-      font-size: 1rem; /* 12px because of the root element */
-    }
-    ```
-
-  - `rem` values will depend on values here
-  - used for:
-    - general styles
-    - css variables
-
-- pseudo classes for **Form elements**
-
-  - `:checked`
-  - `:disabled`
-  - `:enabled`
-  - `:focus`
-  - `:required`
-  - `:optional`
-  - `:valid`
-  - `:invalid`
-  - `:in-range`
-  - `:out-of-range`
-  - `:placeholder-shown`
-
-- pseudo classes for **Child elements & Indexes**
-
-  - `:first-child` -> for the first child of an element **(not the first of a type)**
-  - `:last-child` -> for the last child of an element
-  - `:nth-child(n)` -> for every `n`th child of an element
-  - `:nth-last-child(n)` -> for every `n`th child of an element, counting from the last child
-  - `:nth-of-type(n)` -> for every `n`th child of a type
-  - `:only-child` -> for the only child of an element
-  - `:only-of-type` -> for the only child of a type
-
-- pseudo class that handles different **states of an element**
-
-  - `:not(selector)` -> selects every element that is not a certain selector
-  - `:empty` -> selects every element that has no children
-  - `:target` -> selects the current active target element
-  - `:has()` -> selects elements that have a specific descendant
-  - `:where()` -> selects elements that match a list of selectors
-  - `:is()` -> selects elements that match one of the selectors
-
----
-
-## Inheritance
-
-**Inheritance** is a key concept in CSS that allows styles to be passed from parent elements to their children (descendants).
-
-- Not all properties are inherited, only some of them are inherited by default (like `color`, `font-family`, `font-size`, other text properties).
 - Example:
+  ![specificity](./img/specificity-2.png)
+
+- It's similar to Javascript merging objects, where the last object will override the previous one.
 
   ```css
-  body {
-    color: #444444;
-  }
-
   p {
-    /* p will inherit the color from the body */
+    font-weight: bold;
+    color: hsl(0deg 0% 10%);
+  }
+  .introduction {
+    color: violet;
   }
   ```
 
-  ![css inheritance](./img/css-inheritance-1.png)
+  ```js
+  /* In order to calculate the final styles
+  const appliedStyles = {
+    ...inheritedStyles,
+    ...tagStyles,
+    ...classStyles,
+    ...idStyles,
+    ...inlineStyles,
+    ...importantStyles
+  };
+  */
 
-- How inheritance works
-  ![css inheritance](./img/css-inheritance.png)
+  const tagStyles = {
+    fontWeight: 'bold',
+    color: 'hsl(0deg 0% 10%)'
+  };
+  const classStyles = {
+    color: 'violet'
+  };
+  const appliedStyles = {
+    ...tagStyles,
+    ...classStyles
+  };
+  ```
 
-- Notes:
+---
 
-  - styles applied to the `body` element will be inherited by all other elements in the document. if you want to select all elements, **(without inheritance)**, you can use the `*` selector.
+### Selectors Notes
 
-    - It has the lowest specificity, so it's easy to override and like a fallback or when overriding default styles.
+- We shouldn't depend on element-selectors and nested selectors, instead, we should use classes and IDs to style elements.
+  - This is because it's easier to maintain and update the styles later on without affecting other elements and the HTML structure.
+- `id` should be used for **unique** elements, and `class` for **reusable** elements.
+  - In the real world, we usually don't use `id` for styling, instead, we use `class` for everything (to be more flexible and reusable).
+  - if you have an `id` that is used twice, **the styles will be applied to all elements with the same `id`**. but it's not recommended to use the same `id` for multiple elements ❌.
+- Universal selector (**`*`**) has **no specificity** and gets **0 points** (least specificity so it's like a fallback or when overriding default styles).
+- You can apply the same rule to multiple selectors by separating them with a comma.
 
-  - In order to prevent force inheritance, you can use the `inherit` keyword to inherit the value from the parent element.
+  ```css
+  h1,
+  h2,
+  h3 {
+    color: red;
+  }
+  ```
 
-    ```css
-    p {
-      color: inherit;
-    }
-    ```
+- `!important` gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
+  ![specificity](./img/specificity-3.png)
+
+  - if 2 rules have `!important`, then the last one will be applied
+
+- Specificity in CSS only concerns selectors, not their associated declarations. **!important** applies to a declaration, so it alone plays no role in specificity.
+- more info & examples here [css-specificity](https://www.webfx.com/blog/web-design/css-specificity/)
 
 ---
 
@@ -618,15 +676,75 @@ The **CSS Box Model** is a set of rules that describe how elements on a web page
   ![box-sizing](./img/box-model-3.png)
 
   - The old way has `box-sizing: content-box;` as the default value, but now the default value is `box-sizing: border-box;` in most modern browsers.
-  - In order to add it in the reset CSS, you can use:
+  - In order to add it in the reset CSS **(Global Styles)**, you can use:
 
     ```css
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
     }
 
-    /* Don't use it on the body because it won't be inherited */
+    /* Don't use it on the body because it won't be inherited, Instead use it on the ":root" or "*" */
     ```
+
+- Box model questions:
+  ![box-model](./img/box-model-4.png)
+  ![box-model](./img/box-model-5.png)
+
+---
+
+### Padding
+
+It's the inner space between the content and the border of an element.
+
+- Padding can be set for all directions at once, or it can be specified for individual directions:
+
+  ```css
+  .even-padding {
+    padding: 20px;
+  }
+  .asymmetric-padding {
+    padding-top: 20px;
+    padding-bottom: 40px;
+    padding-left: 60px;
+    padding-right: 80px;
+  }
+  /* The same thing, but using ✨ logical properties ✨ */
+  .asymmetric-logical-padding {
+    padding-block-start: 20px;
+    padding-block-end: 40px;
+    padding-inline-start: 60px;
+    padding-inline-end: 80px;
+  }
+  ```
+
+- The `padding` shorthand property has a couple tricks up its sleeve. It can be used to set asymmetric padding, in a few different ways.
+
+  ```css
+  .two-way-padding {
+    /* top/bottom = 10px, right/left = 20px */
+    padding: 15px 30px;
+  }
+
+  .asymmetric-padding {
+    /* top = 10px, right = 20px, bottom = 30px, left = 40px */
+    padding: 10px 20px 30px 40px;
+  }
+
+  .three-way-padding {
+    /* top = 10px, right/left = 20px, bottom = 30px */
+    padding: 10px 20px 30px;
+  }
+  ```
+
+  - This pattern is shared amongst other CSS properties that have shorthand values. like `margin`, `border`, `outline`, `background`, `font`, `list-style`, `animation`, `transition`, `grid`, `flex`
+
+---
+
+### Border
+
+It's the line that surrounds the content and padding of an element.
 
 ---
 
@@ -652,11 +770,13 @@ The **CSS Box Model** is a set of rules that describe how elements on a web page
     }
     ```
 
-  - **`outline` is an animated property**
+- **Notes:**
+  - `outline` is an animated property
+  - Please don't add `outline: none;` to get rid of the default outline on focus, instead, style it to match your design (to make it accessible for keyboard users)
 
 ---
 
-### Types of boxes
+### Types of boxes (Block vs Inline)
 
 - **Block-level elements**:
   ![block-level](./img/block-level.png)
@@ -763,6 +883,12 @@ To center an element vertically and horizontally in a container, we have these o
 
 ### Box model notes
 
+- Many developers believe that `pixels` are bad for accessibility. This is true when it comes to `font-size`, but pixels can be the best unit to use for `padding` (and other box model properties like `margin`/`border`) because they're fixed and don't change with the user's settings.
+
+  - Properly, we don't want our `padding` / `margin` to scale with the `font-size` of the element, so we use `px` for them.
+    ![box model](./img/box-model-6.png)
+    ![box model](./img/box-model-7.png)
+
 - By default, elements have initial values for `margin` & `padding`, So at the beginning, we should reset them to `0` to avoid any unexpected behavior.
 
   ```css
@@ -801,6 +927,25 @@ To center an element vertically and horizontally in a container, we have these o
     margin-block: 20px;
     ```
 
+- You can overwrite values of the `box-model` properties for specific elements like this:
+
+  ```css
+  /* ✅ */
+  .box {
+    padding: 48px;
+    padding-bottom: 0;
+  }
+
+  /*
+    ❌ because `padding-bottom` comes first,
+    it will be overwritten by the shorthand.
+  */
+  .box {
+    padding-bottom: 0;
+    padding: 48px;
+  }
+  ```
+
 > **THE VISUAL FORMATTING MODEL**: Algorithm that calculates boxes and determines the layout of theses boxes, for each element in the render tree, in order to determine the final layout of the page.
 
 ---
@@ -829,6 +974,8 @@ To center an element vertically and horizontally in a container, we have these o
 
     /* 3) Hide it from screen readers */
     visibility: hidden;
+    /* or */
+    opacity: 0;
     ```
 
 - `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
@@ -842,9 +989,10 @@ To center an element vertically and horizontally in a container, we have these o
 
 ![color](./img/color.png)
 
-- **Color** is a combination of **hue**, **saturation**, and **lightness** (HSL)
+- **Color** is a combination of **hue**, **saturation**, and **lightness** (`HSL` is a color model that describes color as a combination of hue, saturation, and lightness values)
+  ![hsl](./img/hsl-1.png)
 
-  - **Hue** is the color itself (0-360)
+  - **Hue** is the color itself (0-360) degrees
   - **Saturation** is the intensity of the color (0-100%)
   - **Lightness** is the amount of white or black in the color (0-100%)
 
@@ -854,7 +1002,7 @@ To center an element vertically and horizontally in a container, we have these o
 
 - **Defining colors in CSS**
   ![color](./img/color-2.png)
-  - in **RGBA**, `alpha`: Defines the opacity as a number between `0.0` (fully transparent) and `1.0` (fully opaque)
+  - in **RGBA**, `alpha` channel: Defines the opacity as a number between `0.0` (fully transparent) and `1.0` (fully opaque)
 
 ---
 
@@ -890,20 +1038,18 @@ p {
 
 ---
 
-## Font
+## Font & Text
 
-### TypeFaces
+### TypeFaces & Font Families
 
-> When choosing a typeface, it is important to understand that a browser will usually only display it if it's installed on that user's computer.
+> When choosing a typeface, it is important to understand that a browser will usually only display it if it's installed on that user's computer or if it is available on the web.
 
-- Browsers are supposed to support at least one typeface from each of the groups above which is called a **"font-stack / generic-family"**. For this reason, it is common to add the generic font name after your preferred choice of typefaces.
+- Browsers are supposed to support at least one typeface from each of the groups above which is called a **"font-stack / generic-family"**. For this reason, it is common to add the generic font name after your preferred choice of typefaces (in case the preferred typeface is not available or fails to load).
 
-  - For example, if you wanted **serif type**:
-
-    ```css
-    font-family: Georgia, Times, serif;
-    /* Here, "Georgia" is the preferred typeface, "Times" is the backup, and "serif" is the generic font family. */
-    ```
+  ```css
+  font-family: Georgia, Times, serif;
+  /* Here, "Georgia" is the preferred typeface, "Times" is the backup, and "serif" is the generic font family. */
+  ```
 
 - `@font-face`
 
@@ -940,17 +1086,129 @@ p {
 - when importing font-faces from a link, we have 2 methods:
 
   1. put the `<link>` code in the HTML `head` before the styles files
+     - This is faster because the browser will download the font file before the CSS file
   2. use `@import url()`, **but it needs to be the first thing in your css file/s** to work correctly
+
+     - This is useful when you want to use the same css file for multiple projects and you want to keep the font import in the same file
 
 ---
 
-### Units of Type Size
+### Text Formatting
 
-- Setting font size in **pixels** is the best way to ensure that the type appears at the size you intended (because percentages and ems are more likely to vary if a user has changed the default size of text in their browser).
+- font properties:
 
-  - You can also use pt for point sizes instead of px for pixels, but you should only do this when creating style sheets for printer-friendly versions of pages.
+  - `font-weight`: specifies the boldness of the font
+    - normal -> `400`
+    - bold -> `700`
+  - `font-style`: specifies the style of the font
+  - `font-variant`: specifies whether or not a text should be displayed in a small-caps font
+  - `font`: shorthand property for the font-style, font-variant, font-weight, font-size, line-height, and font-family properties
 
-- **`line-height`**
+- `text-transform` property:
+
+  - It is used to change the case of the text.
+  - It can have the following values:
+
+    - `uppercase` -> transforms the text to uppercase
+    - `lowercase` -> transforms the text to lowercase
+    - `capitalize` -> transforms the first character of each word to uppercase
+    - `none` -> no transformation
+
+    ```css
+    p {
+      text-transform: uppercase;
+    }
+    ```
+
+- `text-decoration` property:
+
+  - It is used to specify the decoration added to text.
+  - It can have the following values:
+
+    - `none` -> no decoration
+    - `underline` -> underlines the text
+    - `overline` -> overlines the text
+    - `line-through` -> draws a line through the text
+    - `blink` -> makes the text blink
+
+    ```css
+    p {
+      /*               line   line-style  line-color */
+      text-decoration: underline wavy red;
+
+      /* or just */
+      text-decoration: underline;
+    }
+    ```
+
+    - Instead of using the shorthand `text-decoration`, you can use the following properties:
+
+      ```css
+      span {
+        /* same as text-decoration but with more options */
+        text-decoration-line: underline;
+        text-decoration-style: wavy;
+        text-decoration-color: red;
+      }
+      ```
+
+- `text-shadow` property -> [text-shadow](#text-shadow)
+
+---
+
+### Alignment
+
+- to indent text, use `text-indent`
+
+  ```css
+  div {
+    text-align: left;
+    text-indent: 6rem;
+  }
+  ```
+
+- `text-align`:
+
+  - It is used to specify the horizontal alignment of text.
+  - It can have the following values:
+
+    - `left` -> aligns the text to the left
+    - `right` -> aligns the text to the right
+    - `center` -> aligns the text to the center
+    - `justify` -> aligns the text to both the left and right margins, adding extra space between words as necessary
+    - `start` -> aligns the text to the start of the line (useful for languages that are read from right to left)
+    - `end` -> aligns the text to the end of the line (useful for languages that are read from right to left)
+
+    ```css
+    p {
+      text-align: center;
+    }
+    ```
+
+    - For languages that are read from right to left (like Arabic), the `left` value will align the text to the right, and the `right` value will align the text to the left.
+
+      ```css
+      body {
+        direction: rtl;
+      }
+      ```
+
+- `vertical-align`:
+
+  - is a common source of confusion. It is not intended to allow you to vertically align text in the middle of block level elements such as `<p>` and `<div>,` **although** it does have this effect when used with **table cells** (the `<td>` and `<th>` elements).
+  - It is more commonly used with inline elements such as `<img>,` `<em>,` or `<strong>` elements. When used with these elements, it performs a task very similar to the HTML align attribute used on the `<img>` element
+
+    ```css
+    img {
+      vertical-align: middle;
+    }
+    ```
+
+---
+
+### Line & Letter Spacing
+
+- `line-height`
 
   - It's a term to control "Leading" (pronounced "ledding")
   - it is a term typographers use for the **vertical space between lines of text**, and doesn't affect the `font-size`
@@ -963,6 +1221,8 @@ p {
       line-height: 1.5; /* 30px */
     }
     ```
+
+  - ⚠️ It's acts differently with `JSX` (React)
 
 - `letter/word-spacing`
 
@@ -978,23 +1238,13 @@ p {
     ```
 
   - The default gap between words is set by the typeface around `0.25em`
+  - We can use negative values to make the letters overlap
 
----
-
-### Alignment
-
-- to indent text, use `text-indent`
-
-  ```css
-  div {
-    text-align: left;
-    text-indent: 6rem;
-  }
-  ```
-
-- `vertical-align`:
-  - is a common source of confusion. It is not intended to allow you to vertically align text in the middle of block level elements such as `<p>` and `<div>,` **although** it does have this effect when used with **table cells** (the `<td>` and `<th>` elements).
-  - It is more commonly used with inline elements such as `<img>,` `<em>,` or `<strong>` elements. When used with these elements, it performs a task very similar to the HTML align attribute used on the `<img>` element
+    ```css
+    p {
+      letter-spacing: -0.1em;
+    }
+    ```
 
 ---
 
@@ -1025,17 +1275,20 @@ When text overflows the container, you can control how it behaves using the `ove
 
 ---
 
-### Font and Units Notes
+### Font Notes
 
-- `white-space: no wrap` => this forces it to automatically go to next line when reaching max-width
-- `text-overflow:ellipsis` => when text passes the max-width, it shows this `...`at the max-width limit as indication of more text available
-- in the `html` element-selector we set the `font-size` to **62.5%** and not 10px => because we want to respect the user's font-size settings.
-- `rem` (root element) vs `em` (parent element) : ![rem-em](./img/rem-em.png)
-  - **em** ->
-    - `em` are measured relative to their **parent font-size**, if used to specify **font-size**
-    - `em` are measured relative to the **current font-size within element**, if used to specify **lengths (spacing)**
-      - as length/gap/spacing using `em` in `<p>` will be smaller than in `<h1>`
-  - **rem** -> is relative to the html (`root`) font-size
+- You can use the shorthand `font` property to set all the font properties at once.
+
+  ```css
+  p {
+    /* font-style font-variant font-weight font-size/line-height font-family */
+    font: italic bold 20px/30px Georgia, serif;
+  }
+  ```
+
+- `white-space: no wrap` => this forces it to automatically go to next line when reaching `max-width`
+- `text-overflow:ellipsis` => when text passes the `max-width`, it shows this `...`at the `max-width` limit as indication of more text available
+
 - **Viewport Units**: They create layouts that depend on the screen size
 
   - values from 0 to 100
@@ -1049,18 +1302,170 @@ When text overflows the container, you can control how it behaves using the `ove
     }
     ```
 
-![units](./img/units.PNG)
-
-> we shouldn't use **Pixels** for font-sizes as if user changed his browser **base font-size** (the default is 16px), then it won't reflect on the page.
->
-> - so instead we use a relative unit that can scale up/down like: `rem` or `em`
-
 - For more fun font use => [Rubik](https://fonts.google.com/specimen/Rubik)
 - For font-size scales -> [type-scale.com](https://type-scale.com/)
 - If you're getting your fonts from a service like [https://fonts.google.com](https://fonts.google.com), note that there may be some tracking of **IP-Addresses** of the users when the `HTML` page is downloaded in the browser
   - to avoid this, you can download the font files locally and refer to it in the `HTML` file
   - more info [here](https://blog.runcloud.io/google-fonts-gdpr/)
 - to make text `uppercase / lowercase / capitalize`, you can use `text-transform` property
+
+---
+
+## Units
+
+The most popular unit for anything size-related is the pixel (`px`), but there are other units that can be used in CSS.
+
+![units](./img/units.PNG)
+
+---
+
+### Pixels
+
+- Setting font size in **pixels** is the best way to ensure that the type appears at the size you intended (because percentages and ems are more likely to vary if a user has changed the default size of text in their browser).
+
+- Pixels are nice because they correspond more-or-less with what you see on the screen. It's a unit that many developers get comfortable with.
+
+- Problem with pixels is that they don't scale well with the user's preferences (if the user changes the default font size in the browser settings, the pixel size won't change) -> **Bad for Accessibility**
+
+---
+
+### Percentages
+
+The `percentage %` unit is often used with width/height, as a way to consume a portion of the available space.
+
+- It's relative to the parent element's size (width/height)
+
+  ```css
+  div {
+    width: 50%;
+  }
+  ```
+
+---
+
+### Em & Rem
+
+| `em`                                                                                        | `rem`                                                                        |
+| ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| relative to the **font-size** of the element itself (current element)                       | relative to the **font-size** of the root element (`html`)                   |
+| if used in the `font-size` property, it's relative to the **parent font-size**              | if used in the `font-size` property, it's relative to the **root font-size** |
+| if used in the `length` property, it's relative to the **current font-size within element** | if used in the `length` property, it's relative to the **root font-size**    |
+
+![rem-em](./img/rem-em.png)
+
+- `em` is not generally recommended for `font-size` ❌ because it can lead to **compounding** of font sizes (if you have nested elements with `em` font sizes, the font size will compound and get larger and larger as you nest more elements)
+
+  ```css
+  html {
+    font-size: 10px; /* 1rem = 10px */
+  }
+
+  body {
+    font-size: 1.6rem; /* 16px */
+  }
+
+  h1 {
+    font-size: 2.4rem; /* 24px */
+  }
+
+  p {
+    font-size: 1.4rem; /* 14px */
+  }
+  ```
+
+- `rem` (more recommended ✅) ->
+  - It's relative to the (`root` / `html`) element's `font-size`
+  - It's used to avoid the **compounding effect** of `em` units
+    - It behaves consistently and predictably, like `pixels`, but it respects user preferences when it comes to increasing/decreasing default font sizes.
+  - It's easier to manage & maintain as we can refactor the whole design by changing the `font-size` of the `html` element only
+
+---
+
+### Units Notes
+
+- we shouldn't use **Pixels** for font-sizes as if user changed his browser **base font-size** (the default is 16px), then it won't reflect on the page. Instead we use a relative unit that can scale up/down like: `rem` or `em`
+- You shouldn't actually set a `px` font size on the `html` tag
+
+  - This will override a user's chosen default font size in their browser settings which will affect using `rem` units
+  - Instead use **percentage** instead of `px`
+
+    ```css
+    html {
+      font-size: 100%;
+      /* or */
+      font-size: 62.5%; /* Now -> 1rem = 10px */
+    }
+    ```
+
+- Fun fact: when selecting the `html` tag, `em` and `rem` are the same because they're both relative to the `html` tag
+- There are other units like:
+  - `vw` and `vh` -> relative to the viewport size
+  - `pt` -> point (1/72 of an inch)
+  - `in` -> inch (for **print** styles)
+
+---
+
+## Inheritance
+
+**Inheritance** is a key concept in CSS that allows styles to be passed from parent elements to their children (descendants).
+
+- Inheritance is only applied if no style is defined for the element itself.
+- Not all properties are inherited, only some properties that inherit are **typography-related** (like `color`, `font-family`, `font-size`, other text properties).
+- Example:
+
+  ```css
+  body {
+    color: #444444;
+  }
+
+  p {
+    /* p will inherit the color from the body */
+  }
+  ```
+
+  ![css inheritance](./img/css-inheritance-1.png)
+
+- You can think of it like JavaScript's **prototype chain** where the child element inherits the properties from the parent element.
+
+  ```js
+  class Main {
+    color = 'black';
+  }
+  class Paragraph extends Main {
+    backgroundColor = 'red';
+    color = 'blue';
+  }
+  class Span extends Paragraph {}
+  const s = new Span();
+  console.log(s.color); // blue
+  ```
+
+  ```html
+  <main style="color: black;">
+    <p style="color: blue;">
+      Hello
+      <span>World</span>
+      <!-- will inherit the color from the p -->
+    </p>
+  </main>
+  ```
+
+- How inheritance works
+  ![css inheritance](./img/css-inheritance.png)
+
+- Notes:
+
+  - styles applied to the `body` element will be inherited by all other elements in the document. if you want to select all elements, **(without inheritance)**, you can use the `*` selector.
+
+    - It has the lowest specificity, so it's easy to override and like a fallback or when overriding default styles.
+
+  - In order to **force inheritance**, you can use the `inherit` keyword to inherit the value from the parent element (Not recommended)
+
+    ```css
+    p {
+      border: inherit;
+    }
+    ```
 
 ---
 
@@ -1091,8 +1496,10 @@ div {
 - `inset` to add border from the inside and not outside **(Optional)** => ex:
 
   ```css
-  box-shadow: inset 0 0 0 3px #fff;
+  box-shadow: inset 0 0 0 3px ##7cc0e7;
   ```
+
+  ![inset-shadow](./img/inset-shadow.jpeg)
 
 - sometimes it's used instead of border, as it doesn't affect the size of the element and doesn't cause shifting of other elements
 
@@ -1117,7 +1524,7 @@ div {
   }
   ```
 
-- you can add multiple text-shadows to the same element by separating them with a comma
+- you can add multiple text-shadows to the same element by separating them with a comma `","`
 
   ```css
   .myClass {
@@ -1331,6 +1738,9 @@ body {
 
 ### image filter
 
+The `filter` property in CSS is used to apply visual effects to an element. It can be used to adjust the color, contrast, brightness, and more.
+![filter](./img/filter-1.jpeg)
+
 - change color of image from `filter` property
 
   - make image color **black** => `filter: brightness(0);`
@@ -1383,7 +1793,10 @@ body {
 
 ### Images Notes
 
-- `img` is an **inline element**, so it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
+- `img` is an **inline element**, so:
+  - it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
+  - it will have a spacing at the bottom, so you can remove it by setting `display: inline-block`
+    ![img](./img/img-inline.jpeg)
 - if you have an empty space between the image and the bottom-border, make the img has the `display: block;` property
   - you can also make sure that you're using `box-sizing: border-box;`
 - In order to change color or `svg` image color, you can use `stroke` and `fill` properties
@@ -1560,7 +1973,7 @@ font-size: clamp(1rem, 2.5vw, 2rem);
 
 ## Form
 
-- **Note** => in some browsers, `input`, `select`, `placeholder` don't inherit font properties from their parent, so you will have to do it manually using `inherit` for the value of the properties.
+- **Note** => in some browsers, `input`, `select`, `placeholder` **don't inherit font properties** from their parent, so you will have to do it manually using `inherit` for the value of the properties.
 
   ```css
   .cta-form input,
@@ -1579,13 +1992,25 @@ font-size: clamp(1rem, 2.5vw, 2rem);
   }
   ```
 
+- `:focus` can be used to style the input when it's focused
+
+  ```css
+  .cta-form input:focus {
+    border: 2px solid #087f5b;
+    /* or */
+    outline: 2px solid #087f5b;
+    /* or */
+    box-shadow: 0 0 10px #087f5b; /* this gives you more control like rounded corners using blur-radius */
+  }
+  ```
+
 ---
 
-## Browser Prefixes (CSS Vendor Prefixes)
-
-> Browser vendors used to add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers could experiment with new ideas. This, in theory, helped to prevent their experiments from being relied upon and then breaking web developers' code during the standardization process.
+## Browser Support (CSS Vendor Prefixes)
 
 They're a way for browser makers to add support for new CSS features before those features are fully supported in all browsers. This may be done during a sort of testing and experimentation period where the browser manufacturer is determining exactly how these new CSS features will be implemented. These prefixes became very popular with the rise of CSS3.
+
+> Browser vendors used to add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers could experiment with new ideas. This, in theory, helped to prevent their experiments from being relied upon and then breaking web developers' code during the standardization process.
 
 - The most common browser CSS prefixes you will see in older code bases include:
 
@@ -1593,7 +2018,7 @@ They're a way for browser makers to add support for new CSS features before thos
   - `-o-` (old pre-WebKit versions of Opera)
   - `-ms-` (Internet Explorer and Microsoft Edge)
 
-- Sample usage:
+- Example:
 
   ```css
   div {
@@ -1602,63 +2027,79 @@ They're a way for browser makers to add support for new CSS features before thos
     -ms-transition: all 4s ease;
     -o-transition: all 4s ease;
     transition: all 4s ease;
+
+    /* This will make the transition work in all browsers */
   }
   ```
 
-> - You can check for the browser support from [caniuse.com](https://caniuse.com/)
-> - you can check what prefixes you need to apply for certain properties from [shouldiprefix.com](https://shouldiprefix.com/)
-> - You can auto prefix your styles using module-bundler or an extension like [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
+- You can check for the browser support from [caniuse.com](https://caniuse.com/)
+  - You can check if you need to use prefixes for a certain property by checking the browser support for that property
+    ![css-prefixes](./img/css-prefixes-1.png)
+- you can check what prefixes you need to apply for certain properties from [shouldiprefix.com](https://shouldiprefix.com/)
+- You can auto prefix your styles using module-bundler or an extension like [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
 
 ---
 
 ## Scrolling
 
-- **2 ways**
+To have **smooth scrolling** when clicking on links, you can use: css or javascript
 
-  - **using CSS** => (doesn't work on older versions of **safari Browser** )
+### Scrolling using CSS
 
-    ```css
-    html {
-      scroll-behavior: smooth;
-    }
-    ```
+- This doesn't work on older versions of **safari Browser**
+- It's a simple way to add smooth scrolling to your page
+- It's done by adding `scroll-behavior: smooth;` to the `html` element
 
-  - **using JS** => (work with all)
+  ```css
+  html {
+    scroll-behavior: smooth;
+  }
+  ```
 
-    - add this library to html file (for safari)
+---
 
-      ```html
-      <script
-        defer
-        src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"
-      ></script>
-      ```
+### Scrolling using JavaScript
 
-    - then in JS file :
+- This works on all browsers including older versions of **safari Browser**
+- It's done by adding an event listener to the links and then using the `scrollIntoView` method to scroll to the section
 
-      ```javascript
-      const allLinks = document.querySelectorAll('a:link');
+  ```js
+  const allLinks = document.querySelectorAll('a:link');
 
-      allLinks.forEach(function (link) {
-        link.addEventListener('click', function (e) {
-          e.preventDefault();
-          const href = link.getAttribute('href');
+  allLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      // 1. prevent default behavior
+      e.preventDefault();
 
-          // Scroll back to top
-          if (href === '#')
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
+      // 2. get the href attribute value
+      const href = link.getAttribute('href');
 
-          // Scroll to other links
-          if (href !== '#' && href.startsWith('#')) {
-            const sectionEl = document.querySelector(href);
-            sectionEl.scrollIntoView({ behavior: 'smooth' });
-          }
+      // 3. Handle the scroll behavior
+      if (href === '#')
+        // Scroll back to top
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
         });
-      });
-      ```
+      if (href !== '#' && href.startsWith('#')) {
+        // Scroll to other links (sections with id attribute equal to the href value)
+        const sectionEl = document.querySelector(href);
+        sectionEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+  ```
+
+- Another way to do it is by using a **polyfill** for older browsers
+
+  ```html
+  <script
+    defer
+    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"
+  ></script>
+  ```
+
+  - then in JS file, write the same code as above
 
 ---
 
@@ -1850,5 +2291,67 @@ There are two ways to add multiple style sheets to a page:
   body,
   html {
     overflow-x: hidden;
+  }
+  ```
+
+- The `"/"` character is becoming a more common pattern in modern CSS. It isn't about division, it's about separation. The slash allows us to create groups of values.
+
+  - `rgba(0, 0, 0, 0.5)` => `rgb(0, 0, 0) / 0.5`, this is a shorthand for the `rgba` function
+  - `font: 1rem/1.5 'Arial', sans-serif;` => `font-size: 1rem; line-height: 1.5; font-family: 'Arial', sans-serif;`
+  - `border-radius: 10px / 20px;` => `border-top-left-radius: 10px; border-top-right-radius: 20px; border-bottom-right-radius: 10px; border-bottom-left-radius: 20px;`
+
+- You can have custom bullet points for lists using `list-style-type` property:
+
+  - Approach 1:
+
+    ```css
+    ul {
+      list-style-type: none;
+    }
+
+    li::before {
+      content: '🔥';
+      margin-right: 10px;
+    }
+    ```
+
+  - Approach 2:
+
+    ```css
+    ul {
+      list-style-type: circle;
+      list-style-type: '🔥';
+
+      /* or an image / icon */
+      list-style-image: url('icon.png');
+    }
+    ```
+
+  - Approach 3: ([different type for each list item with `@counter-style`](https://devapt.com/customize-css-list-style-type))
+    ![list-style](./img/list-style.webp)
+
+- When styling `<a>` elements, it's recommended to style them with pseudo-classes in this order:
+
+  1. `:link`
+  2. `:visited`
+  3. `:hover`
+  4. `:active`
+
+  ```css
+  a,
+  a:link {
+    color: #000;
+  }
+
+  a:visited {
+    color: #666;
+  }
+
+  a:hover {
+    color: #f00;
+  }
+
+  a:active {
+    color: #0f0;
   }
   ```

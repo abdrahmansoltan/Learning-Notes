@@ -2664,6 +2664,7 @@ Given an array of intervals where `intervals[i] = [starti, endi]`, merge all ove
       ```
 
 - Time complexity: `O(nlogn)` because of the sorting
+  - `O(nlogn)` for sorting + `O(n)` for merging = `O(nlogn) + O(n)` ~= `O(nlogn)`
 - Space complexity: `O(n)` because of the merged intervals (output)
 
 ```py
@@ -2863,7 +2864,7 @@ Given an array of intervals `intervals` where `intervals[i] = [starti, endi]`, r
     - We loop through the sorted intervals and do the following:
       - If the current `start` time is less than `prevEnd`, means that the current interval overlaps with the previous interval, so we need to remove one of them to make the rest of the intervals non-overlapping.
         ![non-overlapping intervals](./img/non-overlapping-intervals-2.png)
-        - we need to remove the interval that ends later, because it has more chances to overlap with the next intervals (which is the `greedy` part of the solution and the trick that will give us the **minimum** number of intervals we need to remove)
+        - **we need to remove the interval that ends later, because it has more chances to overlap with the next intervals** (which is the `greedy` part of the solution and the trick that will give us the **minimum** number of intervals we need to remove)
         - so we update `prevEnd` to the `min` of the two end times and increment the `count`.
           ![non-overlapping intervals](./img/non-overlapping-intervals-3.png)
       - If the current `start` time is greater than or equal to `prevEnd`, means that the current interval does not overlap with the previous interval, so we can update `prevEnd` to the current `end` time.
@@ -2959,7 +2960,7 @@ Given an array of meeting time intervals `intervals` where `intervals[i] = [star
 
 - Explanation:
 
-  - We need to find the maximum number of overlapping intervals at any time, which represents the minimum number of rooms needed to schedule all the meetings.
+  - We need to **find the maximum number of overlapping intervals at any time**, which represents the minimum number of rooms needed to schedule all the meetings.
   - we will use a `count` variable to keep track of the number of rooms allocated.
   - We need to loop through the intervals and check if the `start` time of the **current** interval is less than the `end` time of the **previous** interval.
     - if it is, we need to allocate a new room by incrementing the `count` variable.
@@ -3383,6 +3384,8 @@ You are given an n x n 2D matrix representing an image, rotate the image by 90 d
         r -= 1
   ```
 
+  - Time complexity: `O(n^2)` | Space complexity: `O(1)`
+
 ---
 
 ### Spiral Matrix
@@ -3591,15 +3594,21 @@ def hasWon(board, player):
 
     # check columns
     for col in range(3):
-        if board[0][col] == player and board[1][col] == player and board[2][col] == player:
-            return True
+        if all(board[i][c] == player for i in range(3)): return True
+        # OR
+        # if board[0][col] == player and board[1][col] == player and board[2][col] == player:
+        #     return True
 
     # check diagonals
-    if board[0][0] == player and board[1][1] == player and board[2][2] == player:
-        return True
-    if board[0][2] == player and board[1][1] == player and board[2][0] == player:
-        return True
+    if all(board[i][i] == player for i in range(3)): return True
+    if all(board[i][2-i] == player for i in range(3)): return True
+    # OR
+    # if board[0][0] == player and board[1][1] == player and board[2][2] == player:
+    #     return True
+    # if board[0][2] == player and board[1][1] == player and board[2][0] == player:
+    #     return True
 
+    # if the player hasn't won yet
     return False
 ```
 

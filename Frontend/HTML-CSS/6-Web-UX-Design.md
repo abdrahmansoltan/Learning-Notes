@@ -38,7 +38,7 @@
     - [Elements Pattern](#elements-pattern)
     - [Components Pattern](#components-pattern)
     - [Sections Pattern](#sections-pattern)
-    - [D Pattern](#d-pattern)
+    - [Layout Patterns](#layout-patterns)
   - [Design Inspiration](#design-inspiration)
 
 ---
@@ -198,9 +198,12 @@ It is the art and technique of arranging type to make written language **readabl
 - Don’t make text too light! Use a tool to check contrast between text and background colors (Accessibility ♿️)
   ![Color](./img/ux-color-12.png)
   - Contrast ratio needs to be at least `4.5:1` for normal text and `3:1` for large text (`18px+`)
-  - Tools:
-    - [WCAG Color Contrast Checker](https://venngage.com/tools/color-contrast-checker)
-    - [Coolors](https://coolors.co/contrast-checker/112a46-acc8e5)
+  - You can use:
+    - the built-in color contrast checker in Chrome DevTools
+      ![Color](./img/ux-color-13.png)
+    - Online Tools:
+      - [WCAG Color Contrast Checker](https://venngage.com/tools/color-contrast-checker)
+      - [Coolors](https://coolors.co/contrast-checker/112a46-acc8e5)
 
 ---
 
@@ -654,23 +657,37 @@ You can mix and match these elements to create a unique website personality
 ### Sections Pattern
 
 - **Navigation**
-  ![Components Pattern](./img/ux-components-30.png)
-  ![Components Pattern](./img/ux-components-28.png)
-  ![Components Pattern](./img/ux-components-29.png)
+  - Here, we have navigation bar at the top of the page, and when the user clicks or hovers over one of the menu-items, a dropdown menu appears.
+    ![Components Pattern](./img/ux-components-28.png)
+    ![Components Pattern](./img/ux-components-29.png)
+    ![Components Pattern](./img/ux-components-30.png)
 - **Hero**
-  ![Components Pattern](./img/ux-components-31.png)
-  ![Components Pattern](./img/ux-components-32.png)
-  ![Components Pattern](./img/ux-components-33.png)
+  - It's the first section of the website, it's the first thing the user sees when they land on the website.
+    ![Components Pattern](./img/ux-components-31.png)
+    ![Components Pattern](./img/ux-components-32.png)
+    ![Components Pattern](./img/ux-components-33.png)
+    - It usually contains a heading, a subheading, a call-to-action button, and an image or a video.
+    - It's used to grab the user's attention and to make them want to scroll down and explore the rest of the website.
+    - It's usually full-width and has a lot of whitespace
+    - It has 2 popular types:
+      - text on one side and an image on the other side
+      - text on top and an image on the bottom (in the center)
 - **Footer**
-  ![Components Pattern](./img/ux-components-34.png)
+  - It's the last section of the website, it usually contains links to other pages, contact information, and social media links **(Site Map of the website)**
+    ![Components Pattern](./img/ux-components-34.png)
+    ![Components Pattern](./img/ux-components-34.png)
 - **Call To Action**
-  ![Components Pattern](./img/ux-components-35.png)
+  - It's a section at the end of the page that contains a call-to-action button to encourage the user to take action.
+    ![Components Pattern](./img/ux-components-35.png)
 - **Feature Row**
-  ![Components Pattern](./img/ux-components-36.png)
+  - It's a small section that describes a feature of the product or the service. (called "Row", because it consists of an image on one side and some text on the other side creating a "Row")
+    ![Components Pattern](./img/ux-components-36.png)
 
 ---
 
-### D Pattern
+### Layout Patterns
+
+It's the way you arrange the components on the page. Here're some popular layout patterns:
 
 - **Row Of Boxes/Cards**
   ![Components Pattern](./img/ux-components-37.png)
@@ -679,9 +696,12 @@ You can mix and match these elements to create a unique website personality
 - **Mix Of Row And Grid**
   ![Components Pattern](./img/ux-components-39.png)
 - **Z-Pattern**
-  ![Components Pattern](./img/ux-components-40.png)
+  - Here, we alternate between text and images to create a Z-pattern.
+    ![Components Pattern](./img/ux-components-40.png)
+  - It's popular because our eyes naturally follow this pattern (look at opposite corners of the screen)
 - **F-Pattern**
-  ![Components Pattern](./img/ux-components-41.png)
+  - Here, the configuration of the rows doesn't alternate between text and images, it's more like a straight line.
+    ![Components Pattern](./img/ux-components-41.png)
 - **Single Column**
   ![Components Pattern](./img/ux-components-42.png)
 - **Sidebar**

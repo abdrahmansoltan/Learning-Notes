@@ -87,37 +87,23 @@ Implement the `myAtoi(string s)` function, which converts a string to a 32-bit s
       sign = 1
       num = 0
 
-      # Remove all leading whitespaces
+      # 1. Remove all leading whitespaces
       while i < len(s) and s[i].isspace():
           i += 1
-      # Check if the first non-whitespace character is not a digit or a sign (+ or -)
+      # 2. Check if the first non-whitespace character is not a digit or a sign (+ or -)
       if i < len(s) and (s[i] in ('+', '-')):
           sign = -1 if s[i] == '-' else 1
           i += 1
+      # 3. Read in the next characters of the string until the next non-digit character or the end of the input is reached
       while i < len(s) and s[i].isdigit():
           num = num * 10 + int(s[i])
           i += 1
 
       return max(-2**31, min(sign * num, 2**31 - 1))
-
-  # using for loop
-  def myAtoi(s):
-      sign = 1
-      num = 0
-
-      # Remove all leading whitespaces
-      for char in s:
-          if char.isspace(): continue
-          else:
-              if char in ('+', '-'):
-                  sign = -1 if char == '-' else 1
-              elif not char.isdigit():
-                  break
-              else:
-                  num = num * 10 + int(char)
-
-      return max(-2**31, min(sign * num, 2**31 - 1))
   ```
+
+  - Time Complexity: `O(n)`
+  - Space Complexity: `O(1)`
 
 - **Solution 2:** if using `int()` is not allowed
 
@@ -192,6 +178,10 @@ def intToString(x):
     return reversed(ans)
 ```
 
+- Time Complexity: `O(log(x))`
+  - Because we are dividing the number by `10` in each iteration
+- Space Complexity: `O(log(x))`
+
 ---
 
 ### Multiply Strings
@@ -213,7 +203,11 @@ Given two non-negative integers `num1` and `num2` represented as strings, return
     ![multiply-strings](./img/multiply-strings-1.png)
   - The number of digits in the product is equal to the sum of the number of digits in the two numbers
     - `len(num1) + len(num2)` -> `58 * 14 = 812` -> `2 + 2 = 4`
-  - **IMPORTANT:** When updating the result list, we need to add the product to the current digit in the result list and add the carry of the current digit to the digit on the left, then update the carry of the current digit
+  - **IMPORTANT:** When updating the result list, we need to:
+    1. Add the product to the current digit in the result list
+    2. Add the carry of the current digit to the digit on the left
+    3. Update the carry of the current digit by dividing the current digit by `10`
+  - Don't forget to handle the edge-case where one of the numbers is `0`, in this case, the result will be `0`
 
 ```py
 def multiply(num1, num2):
@@ -248,6 +242,13 @@ def multiply(num1, num2):
     # or
     # return ''.join(str(i) for i in result[start:])
 ```
+
+- Time Complexity: `O(m * n)`
+  - `m` is the length of the first number
+  - `n` is the length of the second number
+- Space Complexity: `O(m + n)`
+  - `m` is the length of the first number
+  - `n` is the length of the second number
 
 ---
 
@@ -409,6 +410,7 @@ Given a string `s`, find the length of the **longest substring** with **at most*
 
 - Steps:
   - We will insert characters into a dictionary and keep track of the number of distinct characters in the current window
+    - We can know the current number of distinct characters in the window **by getting the length of the dictionary (number of keys)**
   - we will keep track of the current window length using the `left` and `right` pointers
   - we will slide the window to the right until we have `k` distinct characters in the window
     ![longest-substring-k-distinct](./img/longest-substring-with-k-distinct-characters-1.png)
@@ -494,23 +496,24 @@ Return the length of the longest substring containing the same letter you can ge
 - EX: `s = "AABABBA", k = 1` -> `4` (substring: `"AABA"`)
 - Explanation:
 
-  - Brute force solution is
-
   - We can choose any of the underlined characters in the string, and turn them into 'B': "AABABBA" -> "AABBBBA"
   - After doing so, we have the longest substring of one repeating character of length `4`.
+  - Brute force solution is to check all the substrings of the string and check if we can change the characters in the substring to the same character by changing at most `k` characters -> `O(n^2)` ❌
 
-- **Steps:**
+- **Steps:** (`O(n)` ✅)
+
   ![longest-char-replacement](./img/longest-char-replacement-1.png)
+
   1. we want to replace the (least frequent characters) in the current window with the (most frequent character in the window)
   2. to do this, we will need to keep track of the (character frequencies) inside the current window
   3. and check the `window length` against the `max character frequency` to see if the window is valid (valid means `<= k`)
 
-![longest-char-replacement](./img/longest-char-replacement-2.png)
-![longest-char-replacement](./img/longest-char-replacement-3.png)
-![longest-char-replacement](./img/longest-char-replacement-4.png)
-![longest-char-replacement](./img/longest-char-replacement-5.png)
-![longest-char-replacement](./img/longest-char-replacement-7.png)
-![longest-char-replacement](./img/longest-char-replacement-8.png)
+  ![longest-char-replacement](./img/longest-char-replacement-2.png)
+  ![longest-char-replacement](./img/longest-char-replacement-3.png)
+  ![longest-char-replacement](./img/longest-char-replacement-4.png)
+  ![longest-char-replacement](./img/longest-char-replacement-5.png)
+  ![longest-char-replacement](./img/longest-char-replacement-7.png)
+  ![longest-char-replacement](./img/longest-char-replacement-8.png)
 
 ```py
 # O(n)
@@ -535,8 +538,8 @@ def characterReplacement(s, k):
     return res
 ```
 
-Time Complexity: `O(n)`
-Space Complexity: `O(26)` = `O(1)` (because we have a fixed number of characters in the English alphabet)
+- Time Complexity: `O(n)`
+- **IMPORTANT:** Space Complexity: `O(26)` = `O(1)` (because we have a fixed number of characters in the English alphabet)
 
 ---
 
@@ -605,21 +608,27 @@ def countVowelSubstrings(word):
     ans = 0
     lastNonVowelIdx = -1
     # dictionary to keep track of the last seen vowel
-    last_seen_vowels = {v: -2 for v in vowels} # -2 is the smallest possible index
+    last_seen_vowels = {v: -1 for v in vowels} # -1 is the smallest possible index
 
-    for i, x in enumerate(word):
+    for i, char in enumerate(word):
         # If the current character is not a vowel, update the lastNonVowelIdx variable.
-        if x not in vowels:
+        if char not in vowels:
             lastNonVowelIdx = i
         else:
             # Update the last_seen_vowels dictionary with the current index.
-            last_seen_vowels[x] = i
+            last_seen_vowels[char] = i
             minVowelIdx = min(last_seen_vowels.values())
             # Update the answer variable with the maximum of the current value and the minimum of the last seen vowel's
             # index and the last consonant's index.
             ans += max(minVowelIdx - lastNonVowelIdx, 0)
     return ans
 ```
+
+- Time Complexity: `O(n) + O(5) = O(n)`
+  - `O(n)` to iterate over the string
+  - `O(5)` to iterate over the vowels in the dictionary's values (5 vowels)
+- Space Complexity: `O(5)` = `O(1)`
+  - because we have a fixed number of vowels in the English alphabet
 
 ---
 

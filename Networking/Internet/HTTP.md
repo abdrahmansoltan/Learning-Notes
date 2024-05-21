@@ -26,7 +26,7 @@
 
 > Reference: [MDN HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview)
 
-HTTP (**Hypertext Transfer Protocol**), is the format used to structure request and responses for effective communication between a client and a server.
+HTTP (**Hypertext Transfer Protocol**), is a set of rules for transferring files on the World Wide Web by communicating between a client and a server.
 
 It's a `TCP/IP` application layer protocol designed to transfer information between networked devices and runs on top of other layers of the network protocol stack.
 

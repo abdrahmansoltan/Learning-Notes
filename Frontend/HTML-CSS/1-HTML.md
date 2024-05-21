@@ -3,35 +3,24 @@
 - [INDEX](#index)
   - [HTML](#html)
     - [HTML document structure](#html-document-structure)
-    - [Metadata](#metadata)
     - [HTML Elements](#html-elements)
   - [Semantic HTML](#semantic-html)
     - [Why Semantic?](#why-semantic)
     - [Semantic tags](#semantic-tags)
-  - [some inline elements to be aware of](#some-inline-elements-to-be-aware-of)
-  - [Tricks](#tricks)
   - [Forms](#forms)
-    - [Form elements (controls)](#form-elements-controls)
+    - [Form elements (form controls)](#form-elements-form-controls)
     - [Autofill Forms](#autofill-forms)
     - [Form validation](#form-validation)
     - [Input Masking](#input-masking)
     - [How is the Form data is transferred?](#how-is-the-form-data-is-transferred)
     - [Form submission](#form-submission)
-  - [Accessibility](#accessibility)
-    - [`tab` keyboard-key](#tab-keyboard-key)
-    - [Keyboard Events](#keyboard-events)
-    - [Screen readers](#screen-readers)
-    - [Accessible HTML](#accessible-html)
-      - [Labels](#labels)
-    - [ARIA Roles](#aria-roles)
-      - [Live region roles](#live-region-roles)
   - [images](#images)
     - [Image Formats](#image-formats)
-    - [`fav-icon`](#fav-icon)
-      - [Using manifest](#using-manifest)
+    - [fav-icon (favicon)](#fav-icon-favicon)
+      - [Using manifest (Android and iOS)](#using-manifest-android-and-ios)
     - [background img in css](#background-img-in-css)
-    - [image size optimization (responsive images)](#image-size-optimization-responsive-images)
-      - [HTML `<picture>` Element](#html-picture-element)
+    - [image size optimization](#image-size-optimization)
+    - [HTML `<picture>` Element](#html-picture-element)
       - [`srcset` and `sizes` attributes](#srcset-and-sizes-attributes)
       - [Background images](#background-images)
       - [Which to use ?](#which-to-use-)
@@ -42,11 +31,15 @@
       - [PNG icons](#png-icons)
       - [CSS sprites](#css-sprites)
   - [Tables](#tables)
+    - [Table Structure](#table-structure)
     - [Spanning Columns and rows](#spanning-columns-and-rows)
     - [Table Notes](#table-notes)
   - [HTML Escape Characters \& Entities](#html-escape-characters--entities)
   - [DOM (document object model)](#dom-document-object-model)
-  - [Notes](#notes)
+    - [Metadata](#metadata)
+  - [Notes \& Tricks](#notes--tricks)
+    - [Notes](#notes)
+    - [Tricks](#tricks)
 
 ---
 
@@ -57,79 +50,72 @@
 > It's not a programming language, it's a **markup language**.
 
 - **HyperText** is a form of text in which documents can refer(link) to other documents and resources
-- **markup language** allows you to annotate text, and these annotations provide additional meaning to the contents of a document
+- **markup language** allows you to annotate text, and these annotations provide additional meaning to the contents of a document ("make this text a link, heading, etc...")
+  - It converts a plain text to a **structured** text
+    ![html](./img/html-1.png)
+    ![html](./img/html-2.png)
 - **void(empty) element** is html element with no contents and no closing tag
 
 ### HTML document structure
 
 We should provide the browser with information about the structure of the document by using `doctype` and `html` tags to **make the browser understand the document structure**.
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <!-- Content goes here -->
-  </body>
-</html>
-```
-
-- `DOCTYPE` -> tells the browser which version of `HTML` the page is using (usually `html 5`, but browsers usually display the page even if it is not included). without it the browser will go to `Quirks mode`
-
-  > "Quirks mode" is a way of rendering web pages used by some browsers. It is typically used to support older web pages that were designed for older browsers. In quirks mode, the browser does not follow the W3C standards for HTML, CSS, or JavaScript. This can cause web pages to display incorrectly.
-
-- `<head>` -> It's a container for **metadata** (data about data) is for things that are not visible in the browser window or things that describe the document
-
----
-
-### Metadata
-
-It defines the document `title`, `character set`, `styles`, `scripts`, and other information that helps browsers and search engines understand the document.
-
-```html
-<head>
-  <meta name="description" content="An Essay on Installation Art" />
-  <meta name="keywords" content="installation, art, opinion" />
-  <meta name="robots" content="nofollow" />
-  <meta http-equiv="author" content="Jon Duckett" />
-  <meta http-equiv="pragma" content="no-cache" />
-  <meta http-equiv="expires" content="Fri, 04 Apr 2014 23:59:59 GMT" />
-</head>
-```
-
-- `<meta>` element contains information about that web page (it tells search engines about your page, who created it, ...)
-
-- `<meta charset="UTF-8">`
-
-  - It's used to specify the character encoding for the HTML document (UTF-8 is the most common character encoding for the web).
-
-- `<meta name="viewport">`
+- Wrong structure ❌
 
   ```html
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <html>
+    <head>
+      <title>Document</title>
+    </head>
+    <body>
+      <!-- Content goes here -->
+    </body>
+  </html>
   ```
 
-  - The browser's **viewport** is the area of the window in which web content can be seen.
-  - Mobile devices often render pages in a virtual viewport wider than the screen, then shrink the result for display. This helps non-mobile-optimized sites look better on narrow screens. For instance, a page might be rendered at `980px` on a `640px` wide mobile screen, then shrunk to fit.
-    ![meta-viewport](./img/meta-viewport.png)
+  - Here, only the `head` and `body` tags are used, but the `doctype` tag is missing.
 
-  - The basic properties of the `viewport` meta-tag include:
-    - `width`: Controls the size of the viewport. It can be set to:
-      - a specific number of pixels like `width=600`
-      - or to the special value **device-width, which is 100vw, or 100% of the viewport width**.
-      - or `Minimum: 1`. `Maximum: 10000`.
-    - `height`: same as `width` but for the height of the viewport.
-    - `initial-scale`: Controls the zoom level when the page is first loaded.
-      - `Minimum: 0.1`
-      - `Maximum: 10`
-      - `Default:1`
-    - `user-scalable`: Controls whether zoom in and zoom out actions are allowed on the page. Valid values: (`0`, `1`, `yes`, `no`).
-      - The default is `yes` which means the user can zoom in and out.
+- Correct structure ✅
+
+  ```html
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Document</title>
+    </head>
+    <body>
+      <!-- Content goes here -->
+    </body>
+  </html>
+  ```
+
+- **Key Properties**:
+
+  - `<!DOCTYPE html>` -> tells the browser which version of `HTML` the page is using (usually `html 5`, but browsers usually display the page even if it is not included). without it the browser will go to `Quirks mode`
+
+    > "Quirks mode" is a way of rendering web pages used by some browsers. It is typically used to support older web pages that were designed for older browsers. In quirks mode, the browser does not follow the W3C standards for HTML, CSS, or JavaScript. This can cause web pages to display incorrectly.
+
+  - `<html>` -> It's the root element of an HTML page, and it's the container for all other HTML elements.
+
+    - `lang` attribute -> specifies the language of the document
+
+  - `<head>` -> It's a container for **metadata** (data about data) and information is for things that are not visible in the browser window or things that describe the document
+
+  - `<body>` -> It's a container for things that are visible in the browser window
+
+- **Notes:**
+
+  - Always try to use the correct hierarchy of the tags, as it helps the browser to understand the structure of the document.
+    - Ex:
+      - `h1` should be inside `header` and not inside `section`
+      - `h3` should be used only after `h2` and so on...
+        ![html](./img/html-3.png)
+  - What happens if you wrote the content immediately without the `head` or `body` tags?
+
+    - The browser will **still display the content** by adding the missing tags automatically. but it won't work as expected, because the `DOCTYPE` and `html` tags are missing.
 
 ---
 
@@ -142,7 +128,31 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
 - **Attribute** is a piece of data used to describe elements
 - **href** : HyperText Reference
 - **HTML Entity** is symbols that start with `&` ex: _copyright_[&copy;], _non-breaking space_[&nbsp;]
+
   - find more here: [html entities](https://www.w3schools.com/html/html_entities.asp)
+
+- Some inline elements to be aware of
+
+  > inline elements in HTML aren't effected by [width/height] properties
+  >
+  > - Inline elements: **Flow in between surrounding text**
+
+  - `<mark>`
+  - `<br>`
+  - `<a>`
+  - `<button>`
+  - `<img>`
+  - `<i>` -> old way to make text italic
+  - `<span>` -> a generic inline element with no special meaning bug can be used to style a part of the text
+  - `<input>`
+  - `<sup>` -> superscript
+    ![sup](./img/sup.png)
+  - `<sub>` -> subscript
+    ![sub](./img/sub.png)
+
+  > `<li>` is a **block element**, so if you want them to be next to each other, you could make them inline
+  >
+  > - Block-level elements: **start on a new line**
 
 ---
 
@@ -154,12 +164,11 @@ A semantic element clearly describes its meaning to both the browser and the dev
 
 ![tags](./img/semantic.png)
 
-- Examples of non-semantic elements: `<div>` and `<span>` -
+- Examples of non-semantic elements: `<div>` and `<span>`
   - they tell us nothing about their content.
   - Avoid `<span>` and `<div>` elements as much as possible
 - Examples of semantic elements: `<form>, <table>`, and `<article>`
   - They behave the same way as non-semantic elements e.g. `<div>`, but they have a **meaning**.
-    Writing Semantic HTML means that tags are never chosen based on the way they appear in a web browser, instead, they’re chosen based on the importance and structure of the content.
 
 > We shouldn’t use `<h1>` just because of its large text size. The same goes for other HTML elements. HTML should be coded to represent the data that will be populated with and not based on its default style.
 
@@ -189,9 +198,8 @@ Why do we need to tell the browser what our HTML elements represent?
   - **EX:**
 
     - use `<strong>` instead of `<b>` as `<strong>` is semantic and `<b>` is not
-    - use `<em>` instead of `<i>` as `<em>` is semantic and `<i>` is not
-
-      > `em` short for "emphasis", and `i` short for "italic"
+      - each one of these 2 tags have different semantic meaning, for example, `<b>` is used to make the text bold, while `<strong>` is used to make the text bold and important.
+    - use `<em>` instead of `<i>` as `<em>` is semantic and `<i>` is not. (`em` short for "emphasis", and `i` short for "italic")
 
 ---
 
@@ -201,7 +209,7 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ![tags](./img/semantic2.jpeg)
 
-- `<section>` element ->
+- `<section>`
   - usually starts with heading element `h2`
   - very useful to split our main content into smaller groups of content.
   - can be nested
@@ -209,16 +217,20 @@ Why do we need to tell the browser what our HTML elements represent?
   - These elements were not conceived to be part of a hierarchy (parent & child elements), in fact, they are made for working together.
   - you can use them one inside another without any problem.
   - usually they're used in a **cards/skills section**
-- `<nav>` element usually contains **unordered list** element `ul`
-- `<footer>` -> `Credits`, `copyrights`, `sitemaps`, `secondary navbars`, etc. All these types of elements can be grouped inside a `<footer>` tag.
-- `<main>` -> There can be **only one**, one document, one `<main>` element. This semantic element is especially useful for search engine optimization.
+- `<nav>`
+  - It's a container for navigation links, and usually contains **unordered list** element `ul` with `li` elements.
+- `<main>`
+  - There can be **only one**, one document, one `<main>` element. This semantic element is especially useful for search engine optimization.
   - When web bots get to your page, the `<main>` element will be yelling READ ME! So don't overlook it.
-- If it is not **main**, put it aside! --> `<aside>`
-  - content related but not a part of the main content
+- `<aside>`
+  - content related but not a part of the main content (like a sidebar)
   - Use it when you need to label extra content, for example, `newsfeeds`, `commercial offers`, `newsletter form`, etc.
+- `<footer>` -> `Credits`, `copyrights`, `sitemaps`, `secondary navbars`, etc.
+  - All these types of elements can be grouped inside a `<footer>` tag.
 - `<strong>` -> **bold** text (instead of `<b>`)
-- `<figure>` --> self-contained element that can be placed or removed at will.
+- `<figure>`
 
+  - self-contained element that can be placed or removed at will.
   - useful when it comes to group auxiliary (additional / helper) content.
   - its sidekick `<figcaption>` element, which is placed as first or last child of figure element
 
@@ -229,7 +241,9 @@ Why do we need to tell the browser what our HTML elements represent?
   </figure>
   ```
 
-- `<iframe>` is like a little window that has been cut into your page — and in that window you can see **another page**. The term iframe is an abbreviation of **inline frame**.
+- `<iframe>`
+
+  - It is like a little window that has been cut into your page — and in that window you can see **another page**. The term iframe is an abbreviation of **inline frame**.
 
   - ex: to embed a Google Map into a page.
 
@@ -248,79 +262,26 @@ Why do we need to tell the browser what our HTML elements represent?
   </address>
   ```
 
+- `<time>`
+
+  - used to represent dates and times in a machine-readable format (good for SEO)
+  - It can be used to represent the date and time of a blog post, the time of a comment, the time of a scheduled event, etc.
+
+  ```html
+  <time datetime="2021-09-01">September 1, 2021</time>
+  ```
+
 - `role` attribute can be used to also specify the role of the element in the page (specially for **screen readers**)
   - `<header role="banner">`
 
 ---
 
-## some inline elements to be aware of
-
-> inline elements in HTML aren't effected by [width/height] properties
->
-> - Inline elements: **Flow in between surrounding text**
-
-- `<mark>`
-- `<br>`
-- `<a>`
-- `<button>`
-- `<img>`
-- `<i>` -> old way to make text italic
-- `<span>`
-- `<input>`
-
-> `<li>` is a **block element**, so if you want them to be next to each other, you could make them inline
->
-> - Block-level elements: **start on a new line**
-
----
-
-## Tricks
-
-- to make link go to other tab and not the current one, use the **target** attribute : `target="_blank"`
-- to check if your HTML syntax is right => [HTML validation](https://validator.w3.org/)
-- `&nbsp;` will add more whiteSpace to a line but won't break it. (as HTML is space-collapsing)
-- **Lorem ipsum**
-  - using `emmet`, you can type `lorem` and it will continue the paragraph
-  - you can specify how many characters you want by typing the number after the `lorem` word: ex: `lorem50`
-- to link label to input form => use `id='nameofID'` in the `<input>` element,`for='nameofID'` in the `<label>` element
-- in `<input>`
-
-  - **radio** => for only one option
-
-    - so we need to make the multiple radio inputs have the same `name` attribute
-
-    ```html
-    <input type="radio" name="language" value="javascript" />
-    javascript
-    </input>
-    <input type="radio" name="language" value="python" />
-    python
-    </input>
-    <input type="radio" name="language" value="c++" />
-    c++
-    </input>
-
-    ```
-
-  - **checkbox** => for one/more options
-
-- in FORM when choosing option or inserting input field => what is sent is what in the **value** attribute
-- for progress-bars -> use `<progress>` element with `max` attribute
-
-  ```html
-  <progress max="100" value="50">50%</progress>
-  ```
-
----
-
 ## Forms
 
-- `<form>` element is used to
+`<form>` element is used to:
 
-  - group related form controls together
-  - collect user input and send data. The data is most often sent to a server for processing.
-
-    - this is done by using `action` attribute
+- group related (form controls) together
+- collect user input and send data. The data is most often sent to a server for processing.
 
   ```html
   <form action="/signup" method="get">
@@ -328,31 +289,57 @@ Why do we need to tell the browser what our HTML elements represent?
   </form>
   ```
 
-### Form elements (controls)
+  - this is done by using `action` attribute, which specifies the URL where the form data should be sent.
+  - the `method` attribute specifies the HTTP method used to send the data. (default is `GET`)
+
+### Form elements (form controls)
 
 - `<label>` makes the form control accessible to screen readers, and provides a bigger target, since you can tap or click the label to set focus on the control.
+
+  ```html
+  <label for="name">Name:</label>
+  <input type="text" id="name" name="name" />
+  ```
+
   - `for` attribute is used to link the label to the form control using the `id` attribute of the form control.
-- `<input>` element.
+    - This is also useful for screen readers, as it helps them understand the relationship between the label and the form control.
+
+- `<input>` element
+
+  ```html
+  <input type="text" id="name" name="name" value="John" placeholder="Enter your name" />
+  ```
+
   - `type` attribute to specify the type of control to display.
+    ![input-types](./img/input-types.jpeg)
+
+    - Types Notes:
+
+      - input elements with `checkbox` type should have a `label` element associated with them to let the user know what the checkbox is for.
+      - In order to make user be able to select only one `radio` button, you should give them the same `name` attribute.
+
+        ```html
+        <label for="phone">Call Me</label>
+        <input type="radio" name="contact" value="phone" id="phone" />
+
+        <label for="email">Email Me</label>
+        <input type="radio" name="contact" value="email" id="email" />
+        ```
+
   - `name` attribute to identify the data the user enters with the control.
     - If you submit the form, this `name` is included in the request with the value.
   - `value` attribute to specify the value of the control (used with controls that have a value, such as `radio button` and `option` elements).
   - `placeholder` attribute to provide a hint to the user about what to enter in the control.
+
 - `<textarea>` element is used to enter multiple lines of text
+
+  ```html
+  <textarea cols="30" rows="10"></textarea>
+  ```
 
   - it takes attributes for columns `cols` and rows `rows` to specify the size of the control.
 
-    ```html
-    <textarea cols="30" rows="10"></textarea>
-    ```
-
 - `<select>` element gives users a list of options to select from
-
-  - The browser by default uses the first option in the list if user didn't select an option.
-  - `<option>` element is used to define an option in a select list.
-    - The content of the element is the value of the option.
-    - The `value` attribute is used to specify the value of the option.
-  - With the `selected` attribute you can pre-select one option.
 
   ```html
   <select name="language">
@@ -361,9 +348,17 @@ Why do we need to tell the browser what our HTML elements represent?
   </select>
   ```
 
-- `<fieldset>` element is used to group form controls.
+  - The browser by default uses the first option in the list if user didn't select an option.
+  - `<option>` element is used to define an option in a select list.
+    - The content of the element is the value of the option.
+    - The `value` attribute is used to specify the value of the option that is sent to the server when the form is submitted.
+  - With the `selected` attribute you can pre-select one option.
 
-  - Every `<fieldset>` element requires a `<legend>` element, which is used to describe the group of form controls
+    ```html
+    <option value="javascript" selected>JavaScript</option>
+    ```
+
+- `<fieldset>` element is used to group form controls.
 
   ```html
   <fieldset>
@@ -377,20 +372,22 @@ Why do we need to tell the browser what our HTML elements represent?
   </fieldset>
   ```
 
+  - Every `<fieldset>` element requires a `<legend>` element, which is used to describe the group of form controls
+
 - `<button>` element is used to **( submit or reset )** a form.
 
-  - Every `<button>` element inside a form works as a Submit button by default. Sometimes you don't want this. To disable the default Submit behavior, you can add **type="button"** to the `<button>`. This tells the browser that the `<button>` should not submit the form.
+  ```html
+  <!-- submit button -->
+  <button type="submit">Submit</button>
 
-    ```html
-    <!-- submit button -->
-    <button type="submit">Submit</button>
+  <!-- reset button (resets the form to its initial state) -->
+  <button type="reset">Reset</button>
 
-    <!-- reset button (resets the form to its initial state) -->
-    <button type="reset">Reset</button>
+  <!-- button without default behavior -->
+  <button type="button">Click me</button>
+  ```
 
-    <!-- button without default behavior -->
-    <button type="button">Click me</button>
-    ```
+  - Every `<button>` element inside a form works as a Submit button by default. Sometimes you don't want this. To disable the default Submit behavior, you can add `type="button"` to the `<button>`. This tells the browser that the `<button>` should not submit the form.
 
   - You can also use an `<input>` element with type="submit" instead of a `<button>` element. The input looks and behaves just like a `<button>`. Instead of using a `<label>` element to describe the `<input>`, use the value attribute instead.
 
@@ -504,168 +501,6 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ---
 
-## Accessibility
-
-### `tab` keyboard-key
-
-A keyboard user typically uses the Tab key to navigate through interactive elements on a web `page—links`, `buttons`, `fields` for inputting text, etc. When an item is tabbed to, it has keyboard `focus` and can be activated or manipulated with the keyboard. A sighted keyboard user must be provided with a visual indicator of the element that currently has keyboard focus. Focus indicators are provided automatically by web browsers.
-
-- `tab` -> go forward
-- `shift + tab` -> go backwards
-
-Elements that are affected by `tab` are the one which the user interacts with like: `<input>`, `<a>`, `<iframe>`, ..
-
-- elements which are non-interactive are not affected by `tab`
-- Any element becomes focusable if it has `tabindex`. The value of the attribute is the order number of the element when Tab (or something like that) is used to switch between them.
-  - That is: if we have two elements, the first has `tabindex="1"`, and the second has `tabindex="2"`, then pressing Tab while in the first element – moves the focus into the second one.
-- the order of focusing on element using `tab` is called **tab-order**
-
-  - this order is by how elements are presented in the **DOM** and not the order by css-style
-
-- `tabindex` attribute:
-
-  - it makes the element tabbable
-
-    ```html
-    <div tabindex="0">W3Schools</div>
-    ```
-
-    ![tabIndex](./img/tabIndex.png)
-
-  - usually the negative-value is when you want to manage focus by javascript
-  - `tabindex="0"` puts an element among those without tabindex.
-
-> `Document.activeElement` -> read-only property of the Document interface returns the Element within the DOM that currently has focus.
-
----
-
-### Keyboard Events
-
-> find what is the number for each keyboard key from here: [keycode.info](https://www.keycode.info)
-
-You can use keyboard events to do stuff
-
-- `keydown`
-- `keypress`
-- `keyup`
-
-![keyboard-events](./img/keyboard-events.png)
-
----
-
-### Screen readers
-
-- **Alternative Text**
-  ![altText](./img/altText.png)
-
-  - By default, when a screen reader encounters an image:
-    - if it can't find alt text it will read aloud the file's name.
-    - if it finds the alt text empty `alt=""` --> it will skip over the image
-  - we don't use `picture of` or `graphic of` in **alt** as the screen reader says it in the beginning by default
-
-- **Hiding elements**
-  ![Hiding elements](./img/hiding.png)
-  ![Hiding elements](./img/hiding2.png)
-  - to only show in screen readers you can use class -> `.visuallyhidden`
-
----
-
-### Accessible HTML
-
-- Some elements have semantic meaning but no special functionality. Examples are:
-
-  - `<aside>`
-  - `<footer>`
-  - `<header>`
-
-- Other's provide a lot of built-in functionality such as:
-
-  - `<button>`
-  - `<input>`
-  - `<textarea>`
-
-#### Labels
-
-Form fields can be confusing for screen reader users. There are many ways to **label form fields** so the label is read out loud whenever the field has focus.
-
-- HTML labels
-
-  ```html
-  <form>
-    <label for="first">First Name</label>
-    <input id="first" type="text" />
-  </form>
-  ```
-
-- Implicit HTML labels
-
-  - you can do is wrap your inputs with the label tag. This is called **implicit labelling**.
-
-  ```html
-  <form>
-    <label>
-      First Name
-      <input id="first" type="text" />
-    </label>
-  </form>
-  ```
-
-Limitations with the `<label>` tag:
-
-- The label tag can only works with "**labelable**" elements. Those include:
-
-  - `<button>`
-  - `<input>`
-  - `<keygen>`
-  - `<meter>`
-  - `<output>`
-  - `<progress>`
-  - `<select>`
-  - `<textarea>`
-
-- If you ever need to label an element not on that list, use **aria-label** instead.
-
-  ```html
-  <div aria-label="Interactive div">Hello</div>
-  ```
-
----
-
-### ARIA Roles
-
-ARIA roles provide **semantic meaning to content**, allowing screen readers and other tools to present and support interaction with object in a way that is consistent with user expectations of that type of object. ARIA roles can be used to describe elements that don't natively exist in HTML or exist but don't yet have full browser support.
-
-You can find more here along with roles to use -> [here](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles)
-
-> Bootstrap uses class `.sr-only` to only show the element to **screen readers**, what it does is it does every possible way to hide the element from the page like this:
-
-```css
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-}
-```
-
-#### Live region roles
-
-Live Region roles are used to define elements with **content that will be dynamically changed** ex:(`chat`). Sighted users can see dynamic changes when they are visually noticeable. These roles help low vision and blind users know if content has been updated. Assistive technologies, like screen readers, can be made to announce dynamic content changes:
-
-- `assertive` - will interrupt whatever it's doing to announce.
-- `polite` - will announce the live region update when it next idles.
-- `off` - will not read the update.
-
-  ```html
-  <div aria-live="assertive">Waiting for a ride</div>
-  ```
-
----
-
 ## images
 
 `img` element can have these attributes:
@@ -692,7 +527,9 @@ Live Region roles are used to define elements with **content that will be dynami
 
 ---
 
-### `fav-icon`
+### fav-icon (favicon)
+
+It's a small icon that appears in the browser tab next to the page title. It's also used in bookmarks and in the history of the browser.
 
 - Websites that generate favicon icons:
 
@@ -708,25 +545,33 @@ Live Region roles are used to define elements with **content that will be dynami
   <link rel="icon" type="image/png" href="/images/favicon.png" />
   ```
 
-#### Using manifest
+#### Using manifest (Android and iOS)
 
-- for `apple` --> use resized favicon
+It's a JSON file that tells the browser how to display the website on a mobile device's home screen.
 
-- for `android` :
+- Aor `apple` --> use resized favicon
+
+  ```html
+  <link rel="apple-touch-icon" href="img/favicon-192.png" />
+  ```
+
+  - the "apple-touch-icon" is used by iOS devices when you save a website to your home screen.
+
+- For `android` :
 
   - create `manifest.webmanifest` file which contains this code :
 
-  ```json
-  // in webmanifest.json
-  {
-    "icons": [
-      { "src": "img/favicon-192.png", "type": "image/png", "sizes": "192x192" },
-      { "src": "img/favicon-512.png", "type": "image/png", "sizes": "512x512" }
-    ]
-  }
-  ```
+    ```json
+    // in webmanifest.json
+    {
+      "icons": [
+        { "src": "img/favicon-192.png", "type": "image/png", "sizes": "192x192" },
+        { "src": "img/favicon-512.png", "type": "image/png", "sizes": "512x512" }
+      ]
+    }
+    ```
 
-  - also add this to `html` `<head>`
+  - Then, add this to `html` `<head>`
 
     ```html
     <link rel="manifest" href="manifest.webmanifest" />
@@ -758,7 +603,10 @@ Live Region roles are used to define elements with **content that will be dynami
 
 ---
 
-### image size optimization (responsive images)
+### image size optimization
+
+- Try to use images with **double the size** of the image on the website (for retina displays), because the browser will automatically scale the image down to the correct size.
+  ![retina](./img/retina.png)
 
 - why we use the built-in HTML `width` and `height` ?
 
@@ -772,11 +620,22 @@ Live Region roles are used to define elements with **content that will be dynami
 - image size matter, as You should save the image at the same width and height it will appear on the website:
   - If the image is smaller than the width or height that you have specified, the image can be distorted and stretched.
   - If the image is larger than the width and height if you have specified, **the image will take longer to display on the page**.
-- to reduce size of images => [squoosh](https://squoosh.app/) and use the `webp` format
+- to reduce size of images => [squoosh](https://squoosh.app/)
 
+  - use the `webp` format for images as it's smaller in size and better in quality
   - but check `compatibility` with browsers **or** use it with `fallback img` and let the browsers choose by itself.
+    ![webp](./img/webp-support.png)
 
-#### HTML `<picture>` Element
+    ```html
+    <picture>
+      <source srcset="images/fm.webp" type="image/webp" />
+      <img src="images/fm.jpg" alt="family" width="600" height="450" />
+    </picture>
+    ```
+
+---
+
+### HTML `<picture>` Element
 
 - The HTML `<picture>` element gives web developers more flexibility in specifying image resources.
   - The `<picture>` element contains one or more `<source>` elements, each referring to different images through the `srcset` attribute. This way the browser can choose the image that best fits the current view and/or device.
@@ -937,14 +796,16 @@ Tables are used to display data in a grid format. The `<table>` element is used 
 
 > They're not used commonly in modern web design, because they're not responsive and not accessible. and Nowadays, flexbox and grid are used to create layouts.
 
-### Spanning Columns and rows
+### Table Structure
 
-Sometimes you may need the entries in a table to stretch across more than one column or row.
+- `<table>` element is used to create a table.
+- `<thead>` and `<tbody>` and `<tfoot>` elements are used to group the header, body, and footer content in a table.
+  ![table](./img/table-1.png)
+- `<tr>` element is used to define a row in a table.
+  ![table](./img/table-2.png)
 
-The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element and indicates how many columns / rows that cell should run across.
-
-![table](./img/table-1.png)
-![table](./img/table-2.png)
+  - `<th>` element is used to define a header cell in a table.
+  - `<td>` element is used to define a data cell in a table.
 
 - In the table row `<tr>`, the first cell can be `<th>` or `<td>`. If it is `<th>`, it will be a header cell, and if it is `<td>`, it will be a data cell.
 
@@ -954,6 +815,14 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
     <th>Savings</th>
   </tr>
   ```
+
+---
+
+### Spanning Columns and rows
+
+Sometimes you may need the entries in a table to stretch across more than one column or row.
+
+The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element and indicates how many columns / rows that cell should run across.
 
 - To make a cell span multiple columns, use the `colspan` attribute.
 
@@ -974,6 +843,7 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
 - **Border collapse Problem**:
   - In tables, when we have cells with borders, the borders of the cells can collapse into each other, making the table look messy.
   - To fix this, you can use the `border-collapse` property in CSS.
+    
     ![border collapse](./img/collapsing-margins-2.png)
 
 ---
@@ -1010,7 +880,55 @@ Here the **Tree structure** is the operation that make html code looks the way i
 
 ---
 
-## Notes
+### Metadata
+
+It defines the document `title`, `character set`, `styles`, `scripts`, and other information that helps browsers and search engines understand the document.
+
+```html
+<head>
+  <meta name="description" content="An Essay on Installation Art" />
+  <meta name="keywords" content="installation, art, opinion" />
+  <meta name="robots" content="nofollow" />
+  <meta http-equiv="author" content="Jon Duckett" />
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="expires" content="Fri, 04 Apr 2014 23:59:59 GMT" />
+</head>
+```
+
+- `<meta>` element contains information about that web page (it tells search engines about your page, who created it, ...)
+
+- `<meta charset="UTF-8">`
+
+  - It's used to specify the character encoding for the HTML document (UTF-8 is the most common character encoding for the web).
+
+- `<meta name="viewport">`
+
+  ```html
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  ```
+
+  - The browser's **viewport** is the area of the window in which web content can be seen.
+  - Mobile devices often render pages in a virtual viewport wider than the screen, then shrink the result for display. This helps non-mobile-optimized sites look better on narrow screens. For instance, a page might be rendered at `980px` on a `640px` wide mobile screen, then shrunk to fit.
+    ![meta-viewport](./img/meta-viewport.png)
+
+  - The basic properties of the `viewport` meta-tag include:
+    - `width`: Controls the size of the viewport. It can be set to:
+      - a specific number of pixels like `width=600`
+      - or to the special value **device-width, which is 100vw, or 100% of the viewport width**.
+      - or `Minimum: 1`. `Maximum: 10000`.
+    - `height`: same as `width` but for the height of the viewport.
+    - `initial-scale`: Controls the zoom level when the page is first loaded.
+      - `Minimum: 0.1`
+      - `Maximum: 10`
+      - `Default:1`
+    - `user-scalable`: Controls whether zoom in and zoom out actions are allowed on the page. Valid values: (`0`, `1`, `yes`, `no`).
+      - The default is `yes` which means the user can zoom in and out.
+
+---
+
+## Notes & Tricks
+
+### Notes
 
 - `<div>` element allows you to group multiple elements together in one **block-level box**.
 - `<span>` element acts like an inline equivalent of the `<div>` element (group inline content).
@@ -1024,10 +942,27 @@ Here the **Tree structure** is the operation that make html code looks the way i
 - **hero**: is first section of the page that we want the user to focus on (the headline)
 - **empty elements**: elements that do not have any words between an opening and closing tag, ex: `<hr />`
 - **Lists**:
+
   - in `<ol>` element, you can use the attribute `reversed` to reverse the list items
   - Another type of list element is **Description List element (`<dl>`)**
     - consists of a series of 2 matching element (**terms** and their **definitions**) (key-value pairs).
     - `<dl>` element works with pairs of `<dt>` and `<dd>` elements.
+  - You can create nested lists by placing a list inside another list (`<ul>`, `<ol>` should be inside `<li>` element)
+
+    ```html
+    <ul>
+      <li>Item 1</li>
+      <li>
+        Item 2
+        <ul>
+          <li>Subitem 1</li>
+          <li>Subitem 2</li>
+        </ul>
+      </li>
+      <li>Item 3</li>
+    </ul>
+    ```
+
 - use `<section>` element instead of `<div>`
 - To create a blockqoute, use `<blockquote>` element.
 
@@ -1044,9 +979,57 @@ Here the **Tree structure** is the operation that make html code looks the way i
   </blockquote>
   ```
 
+- Button vs Link:
+  - Use a `<button>` element when you want to create a button that performs an action in your web page (like submitting a form).
+  - Use an `<a>` element when you want to create a link to another page or website.
 - To add custom **underline** to element, use `border-bottom` property instead of `text-decoration` property to have more control over the underline.
   - usually to control the space between the text and the underline, use `padding-bottom` property.
 - When you want to serve the `HTML` file to the browser, you need to use a **web server**.
   - You can use **VS Code** extension called **Live Server** to serve the file to the browser.
   - Note: that by default the browser will look for a file called `index.html` in the root directory of the server. if it doesn't find it, it will show a list of files in the directory.
     ![index.html](./img/index-html.png)
+- Types of `<a>` links:
+  - Relative link -> `href="about.html"` -> link to a page in the same directory
+  - External link -> `href="https://www.google.com"` -> link to a page on the web
+  - Anchor link -> `href="#top"` -> link to a specific part of the same page
+
+---
+
+### Tricks
+
+- to make link go to other tab and not the current one, use the **target** attribute : `target="_blank"`
+- to check if your HTML syntax is right => [HTML validation](https://validator.w3.org/)
+- `&nbsp;` will add more whiteSpace to a line but won't break it. (as HTML is space-collapsing)
+- **Lorem ipsum**
+  - using `emmet`, you can type `lorem` and it will continue the paragraph
+  - you can specify how many characters you want by typing the number after the `lorem` word: ex: `lorem50`
+- to link label to input form => use `id='nameofID'` in the `<input>` element,`for='nameofID'` in the `<label>` element
+- in `<input>`
+
+  - **radio** => for only one option
+
+    - so we need to make the multiple radio inputs have the same `name` attribute
+
+    ```html
+    <input type="radio" name="language" value="javascript" />
+    javascript
+    </input>
+    <input type="radio" name="language" value="python" />
+    python
+    </input>
+    <input type="radio" name="language" value="c++" />
+    c++
+    </input>
+
+    ```
+
+  - **checkbox** => for one/more options
+
+- in FORM when choosing option or inserting input field => what is sent is what in the **value** attribute
+- for progress-bars -> use `<progress>` element with `max` attribute
+
+  ```html
+  <progress max="100" value="50">50%</progress>
+  ```
+
+---
