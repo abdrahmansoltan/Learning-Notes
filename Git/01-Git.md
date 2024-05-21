@@ -747,7 +747,7 @@ git log --oneline --decorate
     # Now the ignoring will work
     ```
 
-[This github repo for all recommended casses](<[https://link](https://github.com/github/gitignore)>)
+[This github repo for all recommended cases](https://github.com/github/gitignore)
 
 ### How to Ignore empty directories
 
