@@ -97,9 +97,14 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ### HTML & CSS
 
-- [HTML](./Frontend/HTML-CSS/3-HTML.md)
-- [CSS](./Frontend/HTML-CSS/4-CSS.md)
-- [Responsive-web-design](./Frontend/HTML-CSS/5-Responsive-web-design.md)
+- [HTML](./Frontend/HTML-CSS/1-HTML.md)
+- [CSS](./Frontend/HTML-CSS/2-CSS.md)
+- [CSS-Layouts](./Frontend/HTML-CSS/3-CSS-Layouts.md)
+- [CSS-Variables](./Frontend/HTML-CSS/4-CSS-Variables.md)
+- [CSS-Animation](./Frontend/HTML-CSS/5-CSS-Animation.md)
+- [Responsive-Web-Design](./Frontend/HTML-CSS/6-Responsive-Web-Design.md)
+- [Web-UX-Design](./Frontend/HTML-CSS/7-Web-UX-Design.md)
+- [Accessibility](./Frontend/HTML-CSS/8-Accessibility.md)
 
 ### CSS Methodologies & Frameworks
 

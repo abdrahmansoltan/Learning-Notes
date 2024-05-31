@@ -3,9 +3,8 @@
 - [INDEX](#index)
   - [Animation \& Transitions](#animation--transitions)
     - [What to animate? (Animation Performance)](#what-to-animate-animation-performance)
-  - [transform](#transform)
-  - [transition](#transition)
-    - [Animating(transitioning) background](#animatingtransitioning-background)
+  - [`transform` property](#transform-property)
+  - [Transition](#transition)
   - [CSS Animation](#css-animation)
     - [Animation properties](#animation-properties)
     - [Animation Keyframes](#animation-keyframes)
@@ -19,16 +18,19 @@
 
 ### What to animate? (Animation Performance)
 
-Note that animation in an expensive process of CPU/GPU and specially on CPU, and it's related to how the browser rendering engine works:
+Note that animation in an expensive process of CPU/GPU and specially on CPU, and it's related to how the browser-rendering-engine works:
 ![browser render](./img/browser-render.png)
 
 Here are some guidelines (CSS triggers):
 
 - **Composite** ✅ -> It's for blending things together like with: `transform`, `opacity`
+
   - If you change a property that requires neither layout nor paint, and the browser jumps to just do compositing.
   - This final version is the cheapest and most desirable for high pressure points in an app's lifecycle, like `animations` or `scrolling`.
     ![browser render](./img/browser-render-3.png)
-  - > You can find more here: [Stick to Compositor](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/)
+
+  > You can find more here: [Stick to Compositor](https://web.dev/stick-to-compositor-only-properties-and-manage-layer-count/)
+
 - **Painting** 🤞 -> `color`, `background`
   - browser skips layout, but it will still do paint.
     ![browser render](./img/browser-render-2.png)
@@ -36,17 +38,20 @@ Here are some guidelines (CSS triggers):
 - **Layouts** ❌ -> one that changes an element’s geometry, like its `height`, `width`, `left`, `right`, `margin`, `padding` etc (**things that trigger layouts**)
   - the browser will have to check all the other elements and “reflow” the page. Any affected areas will need to be repainted
     ![browser render](./img/browser-render-1.png)
-  - it's very costly so try to avoid it
-  - instead use `transform: translate()`
+  - it's very costly because it forces the browser to recalculate the layout of the page, **So try to avoid it as much as possible**
+    - instead use `transform: translate()`
 
 ---
 
-## transform
+## `transform` property
 
-- used for `translate()`, `scale()`, `rotate()`, `skew()`
+It's used to change the shape, size, and position of an element (usually for animation purposes)
 
-![transform](./img/transform.png)
-![skew](./img/transform-skew.png)
+- It's the best way to animate elements in CSS, because it's more efficient as it doesn't trigger layout or paint
+- It's used for `translate()`, `scale()`, `rotate()`, `skew()`
+
+  ![transform](./img/transform.png)
+  ![skew](./img/transform-skew.png)
 
 - To change the origin of the transform, use `transform-origin` property
   ![transform-origin](./img/transform-origin.png)
@@ -55,64 +60,76 @@ Here are some guidelines (CSS triggers):
 
 ---
 
-## transition
+## Transition
 
-- `transition` property consists of multiple properties:
+`transition` property is used to animate the changes in css properties
+
+- It works by applying the changes in the css properties over a period of time
+
+- The `transition` shorthand property consists of multiple properties:
   ![transition](./img/transition-1.png)
 
-  - `transition-property`
+- There're also different properties for `transition` separately:
 
-    - used to specify which css-properties to apply the transition data on them.
-    - if you have multiple different properties and want to make their transition different:
-
-      - you can declare each on in the block where it happens
-
-        ```css
-        button {
-          opacity: 0.5;
-        }
-
-        button:active {
-          transition-duration: 0.5;
-          opacity: 1;
-        }
-        ```
-
-      - you can declare multiple values in the `transition-property` separated by comma
-
-        ```css
-        button {
-          transition-property: background, border-radius;
-          transition-duration: 4s, 2s;
-        }
-        ```
-
-  - `transition-delay` -> it's the time before the transition starts
-
+  - `transition-property` -> it's the css-properties that will be animated
   - `transition-duration` -> it's the time the transition takes
 
     - must specify the unit (`s`), even it's zero seconds
 
-  - `transition-timing-function` -> it's how the transition takes place
+  - `transition-timing-function` -> it's how the transition takes place (rate of change)
+    ![transition-timing-function](./img/transition-2.png)
+
     - `ease` - default = slow start, fast, slow end
     - `linear` = same speed start to end
     - `ease-in` = slow start
     - `ease-out` = slow end
     - `ease-in-out` = slow start, fast, slow end
 
-### Animating(transitioning) background
+  - `transition-delay` -> it's the time before the transition starts (postponing the transition)
 
-You can't use `background` with `transition` property, so if you want to animate the background you can use `box-shadow` with `inset` instead:
+    - must specify the unit (`s`), even it's zero seconds
 
-```css
-button {
-  transition: 1s;
-}
+- If you have multiple different properties and want to make their transition different, you can:
 
-button:hover {
-  box-shadow: 0 0 0 2em red inset;
-}
-```
+  - Declare each on in the block where it happens
+
+    ```css
+    button {
+      opacity: 0.5;
+    }
+
+    button:active {
+      transition-duration: 0.5;
+      opacity: 1;
+    }
+    ```
+
+  - Or, declare multiple values in the `transition-property` separated by comma
+
+    ```css
+    button {
+      transition-property: background-color, border-radius;
+      transition-duration: 4s, 2s;
+    }
+    ```
+
+- **Animating(transitioning) background issue**
+
+  - You can't use `background` with `transition` property, so if you want to animate the background you can either:
+
+    - use `background-color` or `background-image` instead.
+
+    - use `box-shadow` with `inset` instead:
+
+      ```css
+      button {
+        transition: 1s;
+      }
+
+      button:hover {
+        box-shadow: 0 0 0 2em red inset;
+      }
+      ```
 
 ---
 
@@ -236,7 +253,22 @@ You can use `data-state` attribute to define state and make css values establish
 
 ## Animation Notes
 
-- don't use hover or any effect without using `transition` property
+- Don't use hover or any effect without using `transition` property
+- **Question:** what will happen if you use `transition` property inside the `:hover` body?
+
+  ```css
+  button {
+    background-color: red;
+  }
+
+  button:hover {
+    transition: background-color 1s;
+    background-color: blue;
+  }
+  ```
+
+  - it will make the transition happen when the mouse enters the element and **not** when it leaves it
+
 - instead of writing different final state in `100%`, you can call it any name and use `to <name>`
 - to see animation for an element in **DevTools** -> **ctrl + shift + p** and type **animation**
 - **Interview question**: "What if you add the `transition` in the `:hover` body instead of the normal body?"

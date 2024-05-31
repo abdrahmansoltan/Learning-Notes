@@ -57,7 +57,7 @@ Layouts are the way we arrange elements on a page.
 
 ## Float
 
-It's a CSS property that allows an element to be pushed to the left or right, allowing other elements to wrap around it.
+It's a CSS property that allows an element to be pushed to the left or right (removed from the normal document flow), and the other elements will wrap around it.
 
 - `float:left` => means tha the element will be on the left and the elements after it will **flow** around it from its right
   ![float](./img/float.png)
@@ -115,8 +115,10 @@ It's a CSS property that allows an element to be pushed to the left or right, al
 
 ## Flexbox
 
-It is a layout mode that provides a more efficient way to lay out, align and distribute space among items in a container, even when their size is unknown and/or dynamic.
+It is a layout method for laying out items in a single dimension, either as a row or a column.
 ![flexbox](./img/flexbox-1.png)
+
+- It allows us to distribute space dynamically across elements of an unknown size, **hence the term "flex"**.
 
 - Terminology:
   ![flexbox](./img/flexbox-2.png)
@@ -143,10 +145,12 @@ You can use the `flex-direction` property to specify the direction in which the 
   - `flex-direction: row-reverse;`
     - means that the items are laid out horizontally, from **right-to-left**
 - `flex-direction: column;`
+
   - means that the items are laid out vertically, from **top-to-bottom**
     ![flex-direction](./img/flex-direction-2.png)
-  - `flex-direction: column-reverse;`
-    - means that the items are laid out vertically, from **bottom-to-top**
+
+- `flex-direction: column-reverse;` -> means that the items are laid out vertically, from **bottom-to-top**
+  ![flex-direction](./img/flex-direction-3.png)
 
 ---
 
@@ -163,26 +167,26 @@ You can use the `flex-direction` property to specify the direction in which the 
 - `align-items`
 
   - It aligns the items inside a flex container along the **cross axis**.
-    ![flex-align-items](./img/flex-align-items.avif)
+    - `flex-direction: row` => aligns the items vertically
+      ![flex-align-items](./img/flex-align-items-1.png)
+    - `flex-direction: column` => aligns the items horizontally
+      ![flex-align-items](./img/flex-align-items.avif)
   - default value -> `align-items: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
   - when to use `align-items: baseline;` ?
     - usually in **Navbar**, where we have a **logo** and you want the navbar links to be aligned with the logo
 
 - `align-content`
 
-  - It aligns the lines of items along the **cross axis**
+  - It aligns the lines of items along the **cross axis** (when there are multiple lines of flex items)
     ![flex-align-content](./img/flex-align-content.avif)
-  - It has no effect when there is only one line of flex items. Use it when you have multiple rows/columns in your flex-container
-
-  - It controls the spacing between lines of flex items along the **cross axis** between the rows/columns (based on the `flex-direction`)
-  - It is for multi line flexible boxes. It has no effect when items are in a single line. It aligns the whole structure according to its value.
+  - It has no effect when there is only one line of flex items. So use it when you have multiple rows/columns in your flex-container
 
     - So the flex items need to be wrapped in order to see the effect of `align-content`
 
       ```css
       .flex-container {
         display: flex;
-        flex-wrap: wrap; /* Required: wrap the items */
+        flex-wrap: wrap; /* Required: wrap the items to have multiple lines */
         align-content: space-between;
       }
       ```
@@ -191,10 +195,10 @@ You can use the `flex-direction` property to specify the direction in which the 
 
   - It allows the default alignment (or the one specified by align-items) to be overridden for **individual flex items**.
     ![align-self](./img/align-self.png)
-  - `align-self: auto;` => default
-  - `align-self: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
-  - `align-self: center;` => center the items vertically
-  - `align-self: baseline;` => align the items to the baseline of the container (usually used in **Navbar**)
+  - `auto` => default
+  - `stretch` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
+  - `center` => center the items vertically
+  - `baseline` => align the items to the baseline of the container (usually used in **Navbar**)
 
 ---
 
@@ -204,16 +208,19 @@ It defines whether the flex items are forced in a single line (default) or can b
 
 > The `cross axis` is the axis perpendicular to the main axis.
 
-- **nowrap**: (default) single-line(doesn't make flex go(wrap) into a new line) which may cause the container to overflow if couldn't squeeze and fit the flex-items
-  ![wrap](./img/nowrap.PNG)
+- `nowrap` (default)
+  - single-line(doesn't make flex go(wrap) into a new line) which may cause the container to overflow if couldn't squeeze and fit the flex-items
+    ![wrap](./img/nowrap.PNG)
   - It means that when the end of line is reached, make the items smaller to fit the line together
-- **wrap**: multi-lines, direction is defined by `flex-direction`
-  ![wrap](./img/wrap.PNG)
-  - It means that when the end of line is reached, make the items keep their `width/height` and go to next line
+- `wrap`
+  - multi-lines, direction is defined by `flex-direction`
+    ![wrap](./img/wrap.PNG)
+  - It means that when the end of line is reached, make the items keep their `width/height` and go to the next line
     - if `flex-direction: row` => the items will go to next row vertically
     - if `flex-direction: column` => the items will go to next column horizontally
-- **wrap-reverse**: multi-lines, opposite to direction defined by `flex-direction`
-  ![wrap](./img/wrap-reverse.PNG)
+- `wrap-reverse`
+  - multi-lines, opposite to direction defined by `flex-direction` (here, the wrapping happens above the main axis, not below it)
+    ![wrap](./img/wrap-reverse.PNG)
 
 ---
 
@@ -240,7 +247,7 @@ By default, all children have `order: 0`, and are laid out in the order they app
 
 ### `flex` property (`flex-grow`, `flex-shrink`, `flex-basis`)
 
-It is used to specify the components of a flexible length (`flex-grow`, `flex-shrink` and `flex-basis`) in a short form.
+It is a shorthand property used to specify the components of a flexible length (`flex-grow`, `flex-shrink` and `flex-basis`) in a short form.
 
 ```css
 .item {
@@ -354,6 +361,9 @@ It's a new feature in CSS that allows you to add space between flex items in a f
 - flex containers act as a **Block element**, so note this when you apply `display: flex` to a small item in order to center its contents
 - `display: flex` vs `display: inline-flex`
   - The difference between `display: flex` and `display: inline-flex` is that the former will make the flex container a block-level element, while the latter will make it an inline-level element.
+- `flex-start` vs `left`:
+  - `flex-start` is used to align the items to the start of the **main axis**
+  - `left` is used to align the items to the **left side** of the container.
 
 ---
 

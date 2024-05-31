@@ -841,9 +841,10 @@ The `colspan` / `rowspan` attribute can be used on a `<th>` or `<td>` element an
 - Part of the reason for having separate `<thead>` and `<tfoot>` elements is so that, if you have a table that is taller than the screen (or, if printed, longer than one page) then the browser can keep the header and footer visible whilst the contents of the table scroll. This is intended to make it easier for users to see which column the data is in.
   - however this functionality is not implemented by default in any current browser.
 - **Border collapse Problem**:
+
   - In tables, when we have cells with borders, the borders of the cells can collapse into each other, making the table look messy.
   - To fix this, you can use the `border-collapse` property in CSS.
-    
+
     ![border collapse](./img/collapsing-margins-2.png)
 
 ---
@@ -940,7 +941,7 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
     - To explain the purpose of this `<span>` element
     - So that CSS styles can be applied to elements that have specific values for these attributes
 - **hero**: is first section of the page that we want the user to focus on (the headline)
-- **empty elements**: elements that do not have any words between an opening and closing tag, ex: `<hr />`
+- **empty elements**: elements that do not have any words between an opening and closing tag, ex: `<hr/>`
 - **Lists**:
 
   - in `<ol>` element, you can use the attribute `reversed` to reverse the list items
@@ -992,6 +993,8 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
   - Relative link -> `href="about.html"` -> link to a page in the same directory
   - External link -> `href="https://www.google.com"` -> link to a page on the web
   - Anchor link -> `href="#top"` -> link to a specific part of the same page
+- `<hr/>`
+  - It's an element used to create a horizontal rule (a line that separates content).
 
 ---
 

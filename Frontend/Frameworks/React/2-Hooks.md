@@ -18,6 +18,7 @@
     - [useEffect](#useeffect)
     - [useEffect dependency array](#useeffect-dependency-array)
     - [useEffect cleanup function](#useeffect-cleanup-function)
+    - [useLayoutEffect](#uselayouteffect)
   - [useReducer](#usereducer)
     - [`useReducer` vs `useState`](#usereducer-vs-usestate)
     - [Reducer function](#reducer-function)
@@ -570,6 +571,12 @@ It's a function that runs before the next time the `useEffect` callback function
 
 - How does the cleanup function remembers the variables from the `useEffect` callback function?
   - it's because of `closures` in `JavaScript`
+
+---
+
+### useLayoutEffect
+
+It's similar to `useEffect`, but it fires synchronously after all DOM mutations. It's used when you need to read from the DOM and then immediately make a change to the DOM.
 
 ---
 

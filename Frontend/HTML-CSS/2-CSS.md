@@ -6,6 +6,7 @@
     - [Starter CSS Code (Global Reset / Normalize)](#starter-css-code-global-reset--normalize)
   - [How CSS works](#how-css-works)
     - [Visual Formatting Model](#visual-formatting-model)
+    - [Types of elements (Block vs Inline)](#types-of-elements-block-vs-inline)
   - [Selectors](#selectors)
     - [Selectors Types](#selectors-types)
       - [Combinators](#combinators)
@@ -17,17 +18,17 @@
     - [Selector specificity (Cascade)](#selector-specificity-cascade)
     - [Selectors Notes](#selectors-notes)
   - [Box Model](#box-model)
-    - [Box Sizing (width \& height calculation)](#box-sizing-width--height-calculation)
+    - [Box Sizing width \& height calculation (Content)](#box-sizing-width--height-calculation-content)
     - [Padding](#padding)
     - [Border](#border)
+      - [Border radius](#border-radius)
     - [Outline](#outline)
-    - [Types of boxes (Block vs Inline)](#types-of-boxes-block-vs-inline)
-    - [Collapsing-Margins Problem](#collapsing-margins-problem)
-    - [How to center an element](#how-to-center-an-element)
+    - [Margin](#margin)
+      - [Collapsing-Margins Issue](#collapsing-margins-issue)
     - [Box model notes](#box-model-notes)
-  - [Display \& Visibility](#display--visibility)
   - [Colors](#colors)
     - [HSL Colors](#hsl-colors)
+    - [Linear Gradient](#linear-gradient)
     - [Color Notes](#color-notes)
   - [Font \& Text](#font--text)
     - [TypeFaces \& Font Families](#typefaces--font-families)
@@ -40,6 +41,7 @@
     - [Pixels](#pixels)
     - [Percentages](#percentages)
     - [Em \& Rem](#em--rem)
+    - [`vh` \& `vw`](#vh--vw)
     - [Units Notes](#units-notes)
   - [Inheritance](#inheritance)
   - [Shadow](#shadow)
@@ -48,15 +50,8 @@
   - [images](#images)
     - [`object-fit` property](#object-fit-property)
     - [Transforming Images](#transforming-images)
-    - [`background-` properties](#background--properties)
-      - [`background-image` property](#background-image-property)
-        - [Linear Gradient](#linear-gradient)
-        - [`background-image` notes](#background-image-notes)
-      - [`background-size` property](#background-size-property)
-      - [`background-clip` property](#background-clip-property)
-      - [`background-attachment` property](#background-attachment-property)
-      - [`background` shorthand property](#background-shorthand-property)
-    - [image filter](#image-filter)
+    - [`background` properties](#background-properties)
+    - [filter property](#filter-property)
     - [clip-path](#clip-path)
     - [Images Notes](#images-notes)
   - [Positioning \& Prospective](#positioning--prospective)
@@ -75,6 +70,9 @@
     - [Scrolling using JavaScript](#scrolling-using-javascript)
   - [Modules (multiple style sheets)](#modules-multiple-style-sheets)
   - [Notes](#notes)
+    - [Display vs Visibility](#display-vs-visibility)
+    - [How to center an element](#how-to-center-an-element)
+    - [General Notes](#general-notes)
 
 ---
 
@@ -183,7 +181,7 @@ What happens when we load a page in the browser?
 
 ### Visual Formatting Model
 
-It's the process of turning the render tree into the actual pixels on the screen.
+It's the process (Algorithm) of turning the render tree into the actual pixels on the screen after calculating the layout of each element.
 
 - CSS builds its sense of direction based on this system. It has a **block direction (vertical)**, and an **inline direction (horizontal)**.
 
@@ -206,6 +204,32 @@ It's the process of turning the render tree into the actual pixels on the screen
 
 ---
 
+### Types of elements (Block vs Inline)
+
+- **Block-level elements**:
+  ![block-level](./img/block-level.png)
+
+  - They can have `margins`, `padding`, and `borders` for all directions (top, right, bottom, left) and they respect `width`/`height` properties.
+
+- **Inline elements**:
+  ![inline](./img/inline.png)
+
+  - They can have `margins`, `padding`, and `borders` **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
+
+    > Remember from the [visual formatting model](#visual-formatting-model) that CSS has a **block direction (vertical)** and an **inline direction (horizontal)**. Inline elements are laid out in the inline direction, so they don't have a width or height. They only have a width and height if they're converted to block-level elements.
+
+  - To make them respect `width`/`height` -> use `display: inline-block;`
+
+- **Inline-block elements**:
+  ![inline-block](./img/inline-block.png)
+  - it's a mix between `block` and `inline` elements
+  - it looks like an `inline` element but behaves like a `block` element
+  - can have `margins`, `padding`, and `borders` ✅
+  - Note:
+    - `inline-block` elements respect the space between the elements in the HTML file (like `inline` elements), so if you have a space between them in the HTML file, it'll be shown in the browser.
+
+---
+
 ## Selectors
 
 Selectors are used to target the HTML elements that we want to style.
@@ -221,6 +245,7 @@ Selectors are used to target the HTML elements that we want to style.
     - id -> `#id`
     - attribute -> `[attribute]`
     - universal -> `*`
+      - It's usually used to **reset** the default styles of the browser
 
   - Based on the relationship:
 
@@ -241,48 +266,73 @@ Selectors are used to target the HTML elements that we want to style.
 
 **Combinators** are used to combine multiple selectors into a single rule. They are used to target elements based on their relationship with other elements.
 
+- Compound selector
+
+  - selects elements based on multiple classes or selectors
+
+    ```css
+    /* Selects all elements with both name1 and name2 set within its class attribute */
+    .name1.name2 {
+      background-color: yellow;
+    }
+
+    /* Selects all <p> elements with class="intro", so it's called a class selector */
+    p.intro {
+      background-color: yellow;
+    }
+    ```
+
 - Descendant selector
 
   - selects all elements that are descendants of a specified element (no matter how deep they are nested in the DOM tree)
-  - ex: `div p` -> selects all `<p>` elements inside `<div>` elements
 
-- **Examples:**
+    ```css
+    /* Selects all <p> elements inside <div> elements (parent) even if there are other elements nested between them */
+    div p {
+      color: red;
+    }
+    ```
 
-  ```css
-  /* Selects all elements with both name1 and name2 set within its class attribute */
-  .name1.name2 {
-    background-color: yellow;
-  }
+- Child selector (Direct descendant selector)
 
-  /* Selects all <p> elements with class="intro" */
-  p.intro {
-    background-color: yellow;
-  }
+  - selects all elements that are the direct children of a specified element
 
-  /* Selects all <p> elements inside <div> elements (parent) even if there are other elements nested between them */
-  div p {
-    color: red;
-  }
+    ```css
+    /* Selects all <p> elements that are direct children of <div> elements */
+    div > p {
+      color: red;
+    }
+    ```
 
-  /* Selects all <p> elements where <div> is a (direct parent) */
-  div > p {
-    background-color: yellow;
-  }
+- Adjacent sibling selector
+  ![combinators](./img/combinators-1.png)
 
-  /* Selects the first <p> element that is placed immediately after <div> elements */
-  div + p {
-    background-color: yellow;
-  }
+  - selects an element that is directly after another specific element (on the same level)
 
-  /* Selects every <ul> element that is preceded by a <p> element */
-  p ~ ul {
-    background-color: yellow;
-  }
-  ```
+    ```css
+    /* Selects the first <p> element that is placed immediately after <div> elements */
+    div + p {
+      color: red;
+    }
+    ```
+
+- General sibling selector
+  ![combinators](./img/combinators-2.png)
+
+  - selects all elements that are siblings of a specified element (on the same level, but not necessarily directly after it)
+
+    ```css
+    /* Selects every <ul> element that is preceded by a <p> element */
+    p ~ ul {
+      color: red;
+    }
+    ```
 
 ---
 
 #### `[attribute]` Selector
+
+It selects elements with a specific attribute (whatever its value or a specific attribute value).
 
 - `[]` selector -> Matches a specific attribute (whatever its value)
 
@@ -298,7 +348,7 @@ Selectors are used to target the HTML elements that we want to style.
   - ex: `p[class="dog"]`
 - `[~=]` selector -> Matches a specific attribute whose value appears in a space-separated list of words
   - ex: `p[class~="dog"]`
-- `[*=]` selector -> Matches a specific attribute whose value contains a specific substring
+- `[*=]` selector -> Matches a specific attribute whose value contains a specific substring **(anywhere in the value)**
 
   - ex: `p[attr*"do"]`
 
@@ -343,8 +393,9 @@ Selectors are used to target the HTML elements that we want to style.
 
 - `:not(p)` => Selects every element that is not a `<p>` element
 - `:nth-child(n)` => [nthmaster](http://nthmaster.com/)
-- `owl selector` -> applies to the elements with is not the first one
-  ![owl-selector](./img/owl-selector.png)
+- owl selector `* + *`
+  - applies to the elements with is not the first one
+    ![owl-selector](./img/owl-selector.png)
 
 ---
 
@@ -364,29 +415,6 @@ Pseudo classes are used to apply styles to an element based on its current state
   - `a:active` => `<a>` when we are **clicking**
   - `a:focus` => `<a>` when we are **tab focusing**
 
-- root pseudo class `:root`
-
-  - used to select the root element of the document (the `html` element)
-
-    ```css
-    :root {
-      --main-color: red;
-      font-size: 12px;
-    }
-
-    h1 {
-      color: var(--main-color);
-    }
-    p {
-      font-size: 1rem; /* 12px because of the root element */
-    }
-    ```
-
-  - `rem` values will depend on values here
-  - used for:
-    - general styles
-    - css variables
-
 - pseudo classes for **Form elements**
 
   - `:checked` -> selects every checked `<input type="checkbox">` element
@@ -399,9 +427,30 @@ Pseudo classes are used to apply styles to an element based on its current state
   - `:invalid`
   - `:in-range`
   - `:out-of-range`
-  - `:placeholder-shown`
+  - `:placeholder-shown` -> selects input elements with a placeholder text (when no value is entered yet)
 
-- pseudo classes for **Child elements & Indexes**
+- pseudo classes for **Child elements & Indexes (where the element is in the DOM tree)**
+
+  - `:root` -> selects the root element of the document
+
+    - used to select the root element of the document (the `html` element)
+
+    - `rem` values will depend on values here
+    - used for: general styles & css variables
+
+      ```css
+      :root {
+        --main-color: red;
+        font-size: 12px;
+      }
+
+      h1 {
+        color: var(--main-color);
+      }
+      p {
+        font-size: 1rem; /* 12px because of the root element */
+      }
+      ```
 
   - `:first-child` -> for the first child of an element **(not the first of a type)**
   - `:last-child` -> for the last child of an element
@@ -413,12 +462,13 @@ Pseudo classes are used to apply styles to an element based on its current state
 
 - pseudo class that handles different **states of an element**
 
-  - `:not(selector)` -> selects every element that is not a certain selector
+  - `:not()` -> selects every element that is not a certain selector
   - `:empty` -> selects every element that has no children
   - `:target` -> selects the current active target element
   - `:has()` -> selects elements that have a specific descendant
   - `:where()` -> selects elements that match a list of selectors
   - `:is()` -> selects elements that match one of the selectors
+  - `:selection` -> selects the portion of an (element / text) that is selected by a user
 
 ---
 
@@ -509,7 +559,7 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
   }
   ```
 
-- **Some usecases:**
+- **Some use-cases:**
 
   - adding quotes to `blockquote` element
   - Gradient borders
@@ -567,59 +617,74 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
 
 ### Selector specificity (Cascade)
 
+![specificity](./img/specificity-5.png)
+
 If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
 ![specificity](./img/specificity-0.png)
 ![specificity](./img/specificity-4.png)
 
-> or with the **"Last rule Principle"** where if multiple elements have the same selector specificity, then only the last selector's styles will be applied. So **the placement of the rule is important**
+- How does it work
 
-- **Calculation**
-  ![specificity](./img/specificity-1.svg)
+  - **Calculation**
+    ![specificity](./img/specificity-1.svg)
 
-  - Start at `0`
-  - add `100` for each ID value
-  - add `10` for each class value (or pseudo-class or attribute selector)
-  - add `1` for each element selector or pseudo-element.
+    - Start at `0`
+    - add `100` for each ID value
+    - add `10` for each class value (or pseudo-class or attribute selector)
+    - add `1` for each element selector or pseudo-element.
+
+  - It's similar to Javascript merging objects, where the last object will override the previous one.
+
+    ```css
+    p {
+      font-weight: bold;
+      color: hsl(0deg 0% 10%);
+    }
+    .introduction {
+      color: violet;
+    }
+    ```
+
+    ```js
+    /* In order to calculate the final styles
+    const appliedStyles = {
+      ...inheritedStyles,
+      ...tagStyles,
+      ...classStyles,
+      ...idStyles,
+      ...inlineStyles,
+      ...importantStyles
+    };
+    */
+
+    const tagStyles = {
+      fontWeight: 'bold',
+      color: 'hsl(0deg 0% 10%)'
+    };
+    const classStyles = {
+      color: 'violet'
+    };
+    const appliedStyles = {
+      ...tagStyles,
+      ...classStyles
+    };
+    ```
 
 - Example:
   ![specificity](./img/specificity-2.png)
+- The combinators like `+`, `>`, `~` don't affect the specificity.
 
-- It's similar to Javascript merging objects, where the last object will override the previous one.
+- **"Last rule Principle"**
 
-  ```css
-  p {
-    font-weight: bold;
-    color: hsl(0deg 0% 10%);
-  }
-  .introduction {
-    color: violet;
-  }
-  ```
+  - It's a rule in CSS where if multiple rules have the same specificity, then the last rule will be applied.
+  - So **the placement of the rule is important**
 
-  ```js
-  /* In order to calculate the final styles
-  const appliedStyles = {
-    ...inheritedStyles,
-    ...tagStyles,
-    ...classStyles,
-    ...idStyles,
-    ...inlineStyles,
-    ...importantStyles
-  };
-  */
+- `!important`
 
-  const tagStyles = {
-    fontWeight: 'bold',
-    color: 'hsl(0deg 0% 10%)'
-  };
-  const classStyles = {
-    color: 'violet'
-  };
-  const appliedStyles = {
-    ...tagStyles,
-    ...classStyles
-  };
-  ```
+  - It gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
+    ![specificity](./img/specificity-3.png)
+  - It's used to override all other styles, but it's not recommended to use it because it makes the code harder to maintain and update.
+  - if 2 rules have `!important`, then the last one will be applied (the same as the "last rule principle")
 
 ---
 
@@ -631,7 +696,7 @@ If there are two or more CSS rules that point to the same element, the selector 
   - In the real world, we usually don't use `id` for styling, instead, we use `class` for everything (to be more flexible and reusable).
   - if you have an `id` that is used twice, **the styles will be applied to all elements with the same `id`**. but it's not recommended to use the same `id` for multiple elements ❌.
 - Universal selector (**`*`**) has **no specificity** and gets **0 points** (least specificity so it's like a fallback or when overriding default styles).
-- You can apply the same rule to multiple selectors by separating them with a comma.
+- You can apply the same rule to multiple selectors by separating them with a comma `","` **(Grouping selectors)**.
 
   ```css
   h1,
@@ -641,11 +706,6 @@ If there are two or more CSS rules that point to the same element, the selector 
   }
   ```
 
-- `!important` gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
-  ![specificity](./img/specificity-3.png)
-
-  - if 2 rules have `!important`, then the last one will be applied
-
 - Specificity in CSS only concerns selectors, not their associated declarations. **!important** applies to a declaration, so it alone plays no role in specificity.
 - more info & examples here [css-specificity](https://www.webfx.com/blog/web-design/css-specificity/)
 
@@ -653,18 +713,17 @@ If there are two or more CSS rules that point to the same element, the selector 
 
 ## Box Model
 
-The **CSS Box Model** is a set of rules that describe how elements on a web page are rendered and sized by the browser.
+The **CSS Box Model** is a set of rules that describe how elements on a web page are rendered and sized by the browser. It's called a "box model" because every element on a web page is represented as a rectangular box.
 
 - It makes each element in the HTML document a rectangular box that consists of the following parts: (**content**, **padding**, **border**, and **margin**).
 
   ![box model](./img/box-model-1.png)
 
----
-
-### Box Sizing (width & height calculation)
+### Box Sizing width & height calculation (Content)
 
 - The default behavior of calculating the `width` and `height` of an element is to include the content, padding, and border, but not the margin. This is called `content-box` (default value)
   ![box-sizing](./img/box-model-2.png)
+  ![box-sizing](./img/box-model-9.png)
 - To include the padding and border in the `width` and `height` of an element, you can use the `box-sizing` property with the value `border-box`.
 
   ```css
@@ -674,6 +733,7 @@ The **CSS Box Model** is a set of rules that describe how elements on a web page
   ```
 
   ![box-sizing](./img/box-model-3.png)
+  ![box-sizing](./img/box-model-10.png)
 
   - The old way has `box-sizing: content-box;` as the default value, but now the default value is `box-sizing: border-box;` in most modern browsers.
   - In order to add it in the reset CSS **(Global Styles)**, you can use:
@@ -746,58 +806,170 @@ It's the inner space between the content and the border of an element.
 
 It's the line that surrounds the content and padding of an element.
 
+- There are three styles specific to border: (width, style, color)
+
+- They can be combined into a shorthand:
+
+  ```css
+  .box {
+    border: 3px solid hotpink;
+  }
+  ```
+
+  - The only required field is `border-style`. Without it, no border will be shown!
+
+    ```css
+    .not-good {
+      /* 🙅‍♀️ Won't work ❌ – needs a style! */
+      border: 2px pink;
+    }
+
+    .good {
+      /* 🙆‍♀️ Will produce a black, 3px-thick border */
+      border: solid;
+    }
+    ```
+
+- They can also be used with different values for each direction separately.
+
+  ```css
+  .box {
+    border-left-color: red;
+    border-right-color: blue;
+  }
+  ```
+
+- If we don't specify a border color, it'll use the font's color by default.
+
+  - If you want to specify this behaviour explicitly, it can be done with the special currentColor keyword.
+
+    ```css
+    .box {
+      color: hotpink;
+      border: 1px solid currentColor;
+      box-shadow: 2px 2px 2px currentColor;
+    }
+    ```
+
+---
+
+#### Border radius
+
+It's used to create rounded corners for an element.
+
+> It's not actually related to the border, but it's related to the element's corners (the `border-radius` property rounds an element even if it has no border!)
+
+- You can use the shorthand property `border-radius` to set the radius for all corners at once, or you can specify the radius for each corner separately.
+
+  ```css
+  .box {
+    border-radius: 10px;
+  }
+
+  .box {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 40px;
+
+    /* Wrong ❌ */
+    border-left-radius: 10px;
+  }
+  ```
+
+- If you have an element with square dimensions, you can create a circle by setting the `border-radius` to `50%`.
+
+  ```css
+  .circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  ```
+
 ---
 
 ### Outline
 
 - **outline** is outside of the border (and it may overlap with other elements)
   ![outline](./img/outline.png)
-- **outline vs border**:
 
-  - `border` is part of the box-model and `outline` is not
-    - this means that `border` takes space of the element size and `outline` doesn't
-    - you can think of it as if the `outline` is like a `box-shadow` as it doesn't affect the page-layout at all
-  - there is no specified positions for `outline` -> `outline-left` is invalid
-  - there's no radius for the `outline`, so with them, we can't have round corners
-  - `outline` can have offset which allows us to move the outline (outside or inside)
+- It has 3 properties: (width, style, color)
 
-    ![outline](./img/outline2.png)
+  ```css
+  div {
+    outline: 2px solid #fff;
+  }
+  ```
+
+- Outlines share many of the same properties as borders, but they have a few key differences (**outline vs border**)
+
+  - Outlines don't take up space in the layout, so they won't affect the size or position of the element.
+  - Outlines can't have rounded corners **(now it follows the `border-radius` of the element)**
+  - Outlines can have an offset, which allows you to move the outline (either inside or outside the element).
+
+- Outlines have a special `outline-offset` property. It allows you to add a bit of a gap between the element and its outline.
+
+  ```css
+  div {
+    outline: 2px solid #fff;
+    outline-offset: 5px;
+  }
+  ```
+
+- `outline` is an animated property
+- Notes:
+
+  - **Never** apply `outline: none;` to get rid of the default outline on focus, instead, style it to match your design
+
+    - This is because the outline is important for accessibility, especially for keyboard users.
+    - The only exception is if we provide a suitable alternative. For example:
+
+      ```css
+      button {
+        outline: none;
+      }
+
+      button:focus {
+        background: navy;
+        color: white;
+      }
+      ```
+
+---
+
+### Margin
+
+It's the space between the border of an element and the surrounding elements.
+
+- By default, most browsers add a margin to the top of the `<h1>` element. This is why there is a gap between the top of the browser and the box containing the `<h1>` element.
+
+  - That's why we use `* { margin: 0; }` to remove the default margin from all elements when resetting the styles.
+
+- `margin` can be negative as it's related to the surrounding elements and not the element itself
+- `margin: auto`
+  - It's a trick to **center an element horizontally** by setting the left and right margins to `auto`.
+  - It works by distributing the remaining space equally on both sides of the element. **This is why it only works on block-level elements**.
+- When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
+
+  - it helps if you only want to specify spacing for one direction only instead of making the other direction equals `zero`
+    ![css-margin-block-inline](./img/css-margin-block-inline.png)
 
     ```css
-    div {
-      outline: 2px solid #fff;
-      outline-offset: -5px;
-    }
+    /* OLD ❌ */
+    margin: 0 20px;
+    /* NEW ✅ */
+    margin-inline: 20px;
+
+    /* OLD ❌ */
+    margin: 20px 0;
+    /* NEW ✅ */
+    margin-block: 20px;
     ```
 
-- **Notes:**
-  - `outline` is an animated property
-  - Please don't add `outline: none;` to get rid of the default outline on focus, instead, style it to match your design (to make it accessible for keyboard users)
+  ![autoMargin](./img/autoMargin.png)
 
----
-
-### Types of boxes (Block vs Inline)
-
-- **Block-level elements**:
-  ![block-level](./img/block-level.png)
-
-  - can have `margins`, `padding`, and `borders` ✅
-
-- **Inline elements**:
-  ![inline](./img/inline.png)
-
-  - can have `margins`, `padding`, and `borders` **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
-    - To make them respect `width`/`height` -> use `display: inline-block;`
-
-- **Inline-block elements**:
-  ![inline-block](./img/inline-block.png)
-  - it's a mix between `block` and `inline` elements
-  - it looks like an `inline` element but behaves like a `block` element
-  - can have `margins`, `padding`, and `borders` ✅
-
----
-
-### Collapsing-Margins Problem
+#### Collapsing-Margins Issue
 
 It's a common issue in CSS when two **vertical margins** are touching each other, they will collapse (combine) into a single margin.
 
@@ -808,81 +980,15 @@ It's a common issue in CSS when two **vertical margins** are touching each other
   - this is not the same for **padding** as they get added together
     - **So, between sections use padding not margin**
 
-- **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;` ![border collapse](./img/collapsing-margins-2.png)
-
----
-
-### How to center an element
-
-To center an element vertically and horizontally in a container, we have these options:
-
-1. Using `margin: auto`:
-
-   ```css
-   .container {
-     width: 700px;
-     margin: 0 auto;
-   }
-   /* This will center the container horizontally on the page */
-   ```
-
-2. using `flexbox`:
-
-   ```css
-   .container {
-     display: flex;
-     justify-content: center;
-     align-items: center;
-   }
-   ```
-
-3. using `position: absolute`:
-
-   ```css
-   .container {
-     position: relative;
-   }
-   .element {
-     width: 100px;
-     height: 100px;
-     position: absolute;
-     top: 50%;
-     left: 50%;
-     transform: translate(-50%, -50%);
-
-     /* or (NOT RECOMMENDED ❌) */
-     top: calc(50% - 50px); /* 50px is half of the element height */
-     left: calc(50% - 50px); /* 50px is half of the element width */
-   }
-   ```
-
-   ![center element](./img/center-element-1.png)
-   ![center element](./img/center-element-2.png)
-
-4. using `grid`:
-
-   - center a container:
-
-     ```css
-     .container {
-       display: grid;
-       place-items: center;
-     }
-     ```
-
-   - center a grid-item inside its cell:
-     ![place-self](./img/place-self.png)
-
-     ```css
-     .grid-item {
-       place-self: center;
-     }
-     ```
+- **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;`
+  ![border collapse](./img/collapsing-margins-2.png)
 
 ---
 
 ### Box model notes
 
+- When selecting an element on the browser, you can see the `box-model` properties of the element in the **developer tools**, and the browsers highlight the element's box model when you hover over it (light-blue for content area, orange for margin)
+  ![box model](./img/box-model-8.png)
 - Many developers believe that `pixels` are bad for accessibility. This is true when it comes to `font-size`, but pixels can be the best unit to use for `padding` (and other box model properties like `margin`/`border`) because they're fixed and don't change with the user's settings.
 
   - Properly, we don't want our `padding` / `margin` to scale with the `font-size` of the element, so we use `px` for them.
@@ -904,28 +1010,7 @@ To center an element vertically and horizontally in a container, we have these o
   }
   ```
 
-- `margin` can be negative as it's related to the surrounding elements and not the element itself
-- `margin: auto` trick to center an element horizontally
-
-  - ![autoMargin](./img/autoMargin.png)
-
 - `height: auto` -> the height of the element will take the remaining height of the parent element.
-- When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
-
-  - it helps if you only want to specify spacing for one direction only instead of making the other direction equals `zero`
-    ![css-margin-block-inline](./img/css-margin-block-inline.png)
-
-    ```css
-    /* OLD ❌ */
-    margin: 0 20px;
-    /* NEW ✅ */
-    margin-inline: 20px;
-
-    /* OLD ❌ */
-    margin: 20px 0;
-    /* NEW ✅ */
-    margin-block: 20px;
-    ```
 
 - You can overwrite values of the `box-model` properties for specific elements like this:
 
@@ -945,43 +1030,6 @@ To center an element vertically and horizontally in a container, we have these o
     padding: 48px;
   }
   ```
-
-> **THE VISUAL FORMATTING MODEL**: Algorithm that calculates boxes and determines the layout of theses boxes, for each element in the render tree, in order to determine the final layout of the page.
-
----
-
-## Display & Visibility
-
-| Display                                                                         | Visibility                                                                     |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| It specifies the display behavior of an element.                                | It specifies whether an element is visible or hidden.                          |
-| It's a CSS property that defines the type of box used for an HTML element.      | It's a CSS property that determines whether an element is visible or hidden.   |
-| It can have values like `block`, `inline`, `inline-block`, `flex`, `grid`, etc. | It can have values like `visible`, `hidden`, `collapse`, `initial`, `inherit`. |
-
-- `visibility:hidden` => hide the element but reserves it's place (leaves a space where the element would have been)
-- `display: none` => remove element from the flow, hide element and collapse its space
-
-  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
-
-    ```css
-    /* ALL THESE FOR mimicking [display:none;] */
-
-    /* 1) Hide it visually and preserve the space */
-    opacity: 0;
-
-    /* 2) Make it unaccessible to mouse and keyboard */
-    pointer-events: none;
-
-    /* 3) Hide it from screen readers */
-    visibility: hidden;
-    /* or */
-    opacity: 0;
-    ```
-
-- `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
-- **inline-block**: `display: inline-block` --> causes a block-level element to flow like an inline element, while retaining other features of a block-level element.
-  - doesn't start a new line (like inline element)
-  - respects `margin`, `width`, `height` (like block element)
 
 ---
 
@@ -1021,6 +1069,64 @@ p {
   background-color: hsla(0, 100%, 100%, 0.5);
 }
 ```
+
+---
+
+### Linear Gradient
+
+It's a way to create a gradient that changes color smoothly from one color to another.
+
+- It's created using the `linear-gradient()` function, which takes two or more color values as arguments.
+
+  ```css
+  div {
+    background-image: linear-gradient(to right, red, yellow);
+  }
+  ```
+
+- You can also specify the direction of the gradient by using the `to` keyword followed by a direction (top, right, bottom, left, or any angle).
+
+  ```css
+  div {
+    background-image: linear-gradient(to bottom right, red, yellow);
+    /* or */
+    background-image: linear-gradient(45deg, red, yellow);
+  }
+  ```
+
+- You can also specify the position of the color stops by adding a percentage value after the color.
+
+  ```css
+  div {
+    background-image: linear-gradient(to right, red 20%, yellow 80%);
+  }
+  ```
+
+- We can have more than one gradient in the same element (they will be stacked on top of each other)
+
+  ```css
+  div {
+    background-image: linear-gradient(to right, red 20%, yellow 80%), linear-gradient(to bottom, blue, green);
+  }
+  ```
+
+- we have the ability to specify a **gradient** for the background of a box. The gradient is created using the `background-image` property:
+
+  - to add **overlay gradient** with one color, you make the linear-gradient with the same value for the 2 gradient colors
+
+  ```css
+  div {
+    /* background image (with darkening-overlay) */
+    background-image: linear-gradient(rgba(34, 34, 34, 0.6), rgba(34, 34, 34, 0.6)), url(hero.jpg);
+    /* here, linear-gradient needs to be in rgba() form to show the image */
+  }
+  ```
+
+  - Here, the linear-gradient is on top of the background-image, which gives an overlay look.
+
+- **Notes:**
+  - you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
+  - There's also `radial-gradient` which is a gradient from the center to the outside
 
 ---
 
@@ -1313,7 +1419,12 @@ When text overflows the container, you can control how it behaves using the `ove
 
 ## Units
 
-The most popular unit for anything size-related is the pixel (`px`), but there are other units that can be used in CSS.
+Units are used to specify the size of elements or values of properties in CSS.
+
+- Types of units:
+  - Relative Units (`em`, `rem`, `%`, `vw`, `vh`)
+  - Absolute Units (`px`, `pt`, `in`, `cm`, `mm`)
+- The most popular unit for anything size-related is the pixel (`px`), but there are other units that can be used in CSS.
 
 ![units](./img/units.PNG)
 
@@ -1331,13 +1442,22 @@ The most popular unit for anything size-related is the pixel (`px`), but there a
 
 ### Percentages
 
-The `percentage %` unit is often used with width/height, as a way to consume a portion of the available space.
+The `percentage %` unit is sometimes a value from the parent and other times it's a value from the element itself.
 
-- It's relative to the parent element's size (width/height)
+- For `width`/`height`, It's a way to consume a portion of the available space. (relative to the parent element's size)
 
   ```css
   div {
     width: 50%;
+  }
+  ```
+
+- For `font-size`, or text related properties, it's relative to the parent element's font size.
+
+  ```css
+  p {
+    font-size: 120%;
+    line-height: 50%;
   }
   ```
 
@@ -1378,6 +1498,25 @@ The `percentage %` unit is often used with width/height, as a way to consume a p
   - It's used to avoid the **compounding effect** of `em` units
     - It behaves consistently and predictably, like `pixels`, but it respects user preferences when it comes to increasing/decreasing default font sizes.
   - It's easier to manage & maintain as we can refactor the whole design by changing the `font-size` of the `html` element only
+
+---
+
+### `vh` & `vw`
+
+- `vh` -> 1% of the viewport's height
+- `vw` -> 1% of the viewport's width
+
+  ```css
+  div {
+    width: 50vw;
+    height: 50vh;
+  }
+  ```
+
+- They're used to create layouts that depend on the screen size
+
+  - `vh` is useful for creating full-screen sections
+  - `vw` is useful for creating layouts that depend on the screen size
 
 ---
 
@@ -1540,10 +1679,24 @@ div {
 
 ### `object-fit` property
 
-It is used to specify how an `<img>` or `<video>` should be resized to fit its container **(specially when the image is bigger than the container or when resizing the browser window)**
+It is used to specify how an `<img>` or `<video>` should be resized to fit its container and to maintain aspect ratio. **(specially when the image is bigger than the container or when resizing the browser window)**
 
-- This property tells the content to fill the container in a variety of ways; such as "preserve that aspect ratio" or "stretch up and take up as much space as possible".
+- It prevent the image from being stretched or distorted
+
+  ```css
+  img {
+    object-fit: cover;
+  }
+  ```
+
+- Values:
   ![object-fit](./img/object-fit.png)
+  - `fill` - This is the default value which stretches the image to fit the content box, regardless of its aspect-ratio.
+  - `contain` - This value will resize the image to fit the content box, maintaining its aspect ratio.
+  - `cover` - This value will resize the image to cover the content box, cropping the image if needed.
+  - `none` - This value will not resize the image at all.
+  - `scale-down` - This value will compare the difference between `none` and `contain`, and the smaller one will be used.
+- This property tells the content to fill the container in a variety of ways; such as "preserve that aspect ratio" or "stretch up and take up as much space as possible".
 - we use it to use images with specified `width`&`height` without distorting them
 
   ```css
@@ -1586,11 +1739,34 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 
 ---
 
-### `background-` properties
+### `background` properties
 
-#### `background-image` property
+The `background` properties are used to set the background for an element, which can be a color, an **image**, or a gradient.
 
-- **background-repeat**
+- You can have multiple backgrounds for an element by separating them with a comma `,`
+
+  ```css
+  div {
+    background: url('img_flwr.gif') no-repeat center center, linear-gradient(
+        to right,
+        #ff0000,
+        #0000ff
+      );
+  }
+  ```
+
+- `background-image`
+
+  - It is used to set the background image of an element.
+  - The image is placed on top of the background-color, and its position is relative to the element's padding box.
+
+    ```css
+    body {
+      background-image: url('img_flwr.gif');
+    }
+    ```
+
+- `background-repeat`
 
   - By default, as the element gets bigger, if the background-image is not big enough, it will **repeat** to fill the entire element(box). to control that, you can use `background-repeat` property
 
@@ -1604,20 +1780,44 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
     }
     ```
 
-  ![background-repeat](./img/background-repeat1.png)
-  ![background-repeat](./img/background-repeat2.png)
+    ![background-repeat](./img/background-repeat1.png)
+    ![background-repeat](./img/background-repeat2.png)
 
-- **background-position**
+- `background-size`
+  ![backgroundSize](./img/background-size-cover-contain.svg)
+
+  - Values:
+
+    - `contain`
+      - Scale the image, while preserving its intrinsic aspect ratio (if any), to the largest size such that both its width and its height can fit inside the background positioning area.
+    - `cover`
+      - It makes the image cover the whole area of its container without distorting it.
+        - We won't see the whole image, but it will cover the whole area (cropping the image)
+      - It scales the image, while preserving its intrinsic aspect ratio (if any), to the smallest size such that both its width and its height can completely cover the background positioning area.
+    - `auto` : The background image is displayed in its original size.
+    - `value` : The first value is the width and the second value is the height of the image.
+
+      ```css
+      div {
+        background-image: url('img_flwr.png');
+        background-size: 100px 50px;
+        /* or */
+        background-size: 100% 50%;
+      }
+      ```
+
+- `background-position`
 
   - When an image is not being repeated, It's likely that the image is bigger than the element, so we can control the position of the image inside the element using `background-position` property
     ![background-position](./img/background-position.png)
-  - you can use the `background-position` property to specify where in the browser window the background image should be placed.
+  - It specifies where in the element container the background image should be placed.
 
     ![background-position](./img/background-position-2.png)
 
-  - This property usually has a pair of values. The first represents the horizontal position and the second represents the vertical. -> ex:
+  - This property usually has a pair of values. The first represents the horizontal position and the second represents the vertical.
 
-    - `[top,bottom, left, right, center]`
+    - `[top, bottom, left, right, center]`
+      - for example, when selecting `top`, it will **align the top of the image with the top of the element**
     - length values from the top-left `20% 70%;`
     - absolute length values `1rem 2rem`
 
@@ -1631,119 +1831,90 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
     }
     ```
 
-    - > Note: If you only specify one value, the second value will default to **center**.
+  - Note: If you only specify one value, the second value will default to **center**.
 
-- **background-attachment**
+- `background-clip` property
 
-  - the `background-attachment` property specifies whether a background image should stay in one position or move as the user scrolls up and down the page. It can have one of two values:
+  - It specifies the painting area of the background of an element. meaning that it specifies the area where the background image or color is painted.
+  - It's usually used when you have a **border** around the element and you want the background to extend under the border or not.
   - Values:
+    ![background-clip](./img/background-clip.png)
+
+    - `border-box` -> The background extends to the outside edge of the border (but underneath the border in z-order).
+    - `padding-box` -> The background extends to the outside edge of the padding.
+    - `content-box` -> The background is painted within (clipped to) the content box.
+
+  - Ex: making the background image extend under the border or not
+
+    ```css
+    div {
+      background-image: url('img_flwr.gif');
+      background-repeat: no-repeat;
+      background-position: right top;
+      background-attachment: fixed;
+      background-clip: content-box;
+    }
+    ```
+
+- `background-attachment`
+
+  - It specifies whether a background image should stay in one position or move as the user scrolls up and down the page. It can have one of two values:
+
     - `fixed`
     - `scroll`
 
----
+    ```css
+    body {
+      background-image: url('img_tree.png');
+      background-repeat: no-repeat;
+      background-position: right top;
+      background-attachment: fixed;
+      /* or */
+      /* background-attachment: scroll; */
+    }
+    ```
 
-##### Linear Gradient
+- `background` shorthand property
 
-- we have the ability to specify a **gradient** for the background of a box. The gradient is created using the `background-image` property:
+  - The `background` property acts like a **shorthand** for all of the other background properties you have just seen, and also the background-color property
 
-  - to add **overlay gradient** with one color, you make the linear-gradient with the same value for the 2 gradient colors
+    ![background](./img/background-1.png)
 
-  ```css
-  div {
-    /* background image (with darkening-overlay) */
-    background-image: linear-gradient(rgba(34, 34, 34, 0.6), rgba(34, 34, 34, 0.6)), url(hero.jpg);
-    /* here, linear-gradient needs to be in rgba() form to show the image */
-  }
-  ```
+    ```css
+    body {
+      background: url('images/tulip.gif');
+      /* or with other options & values */
+      background: #ffffff url('images/tulip.gif') no-repeat top right;
+    }
+    ```
 
-  - Here, the linear-gradient is on top of the background-image, which gives an overlay look.
+- **Notes**:
 
-- **RECOMMENDED:** you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
-- There's also `radial-gradient` which is a gradient from the center to the outside
+  - when you have an empty div that have a `background-image` and want to make it available for screen readers for **SEO** -> add these attributes: [`role`, `aria-label`], ex:
 
----
-
-##### `background-image` notes
-
-- when you have an empty div that have a `background-image` and want to make it available for screen readers for **SEO** -> add these attributes: [`role`, `aria-label`], ex:
-
-  ```html
-  <div class="cta-img-box" role="img" aria-label="Woman enjoying food ></div>
-  ```
-
----
-
-#### `background-size` property
-
-- `background-size` property :
-  ![backgroundSize](./img/background-size-cover-contain.svg)
-
-- `contain` : Scale the image, while preserving its intrinsic aspect ratio (if any), to the largest size such that both its width and its height can fit inside the background positioning area.
-- `cover` : Scale the image, while preserving its intrinsic aspect ratio (if any), to the smallest size such that both its width and its height can completely cover the background positioning area.
+    ```html
+    <div class="cta-img-box" role="img" aria-label="Woman enjoying food ></div>
+    ```
 
 ---
 
-#### `background-clip` property
-
-It specifies the painting area of the background of an element. meaning that it specifies the area where the background image or color is painted.
-
-- Ex: making the background image extend under the border or not
-
-  ```css
-  div {
-    background-image: url('img_flwr.gif');
-    background-repeat: no-repeat;
-    background-position: right top;
-    background-attachment: fixed;
-    background-clip: content-box;
-  }
-  ```
-
-  ![background-clip](./img/background-clip.png)
-
----
-
-#### `background-attachment` property
-
-It specifies whether the background image should scroll or be fixed (will not scroll with the rest of the page)
-
-```css
-body {
-  background-image: url('img_tree.png');
-  background-repeat: no-repeat;
-  background-position: right top;
-  background-attachment: fixed;
-  /* or */
-  /* background-attachment: scroll; */
-}
-```
-
----
-
-#### `background` shorthand property
-
-The `background` property acts like a **shorthand** for all of the other background properties you have just seen, and also the background-color property
-
-![background](./img/background-1.png)
-
-```css
-body {
-  background: url('images/tulip.gif');
-  /* or with other options & values */
-  background: #ffffff url('images/tulip.gif') no-repeat top right;
-}
-```
-
----
-
-### image filter
+### filter property
 
 The `filter` property in CSS is used to apply visual effects to an element. It can be used to adjust the color, contrast, brightness, and more.
 ![filter](./img/filter-1.jpeg)
 
-- change color of image from `filter` property
+- We can change color of image using `filter` property
 
-  - make image color **black** => `filter: brightness(0);`
+  - make image color **black**
+
+    ```css
+    img {
+      filter: invert(100%);
+      /* or */
+      filter: brightness(0);
+    }
+    ```
+
   - make image color **grey** =>
 
     ```css
@@ -1760,7 +1931,26 @@ The `filter` property in CSS is used to apply visual effects to an element. It c
     }
     ```
 
-  - also you can try `filter: greyscale/blur/invert`
+- To blur the image, you can use the `blur` value
+
+  ```css
+  img {
+    filter: blur(5px);
+  }
+  ```
+
+- `filter` property can be used with `hover` to make the image change when hovering over it
+
+  ```css
+  img {
+    filter: grayscale(100%);
+    transition: filter 0.5s;
+  }
+
+  img:hover {
+    filter: grayscale(0%);
+  }
+  ```
 
 ---
 
@@ -1811,39 +2001,61 @@ The `filter` property in CSS is used to apply visual effects to an element. It c
 
 ## Positioning & Prospective
 
+**Positioning** is the process of determining the location of an element on the page.
+
 ### `position` property
 
 In CSS, the `position` property is used to control the layout of an element. It has 5 possible values: (`static`, `relative`, `absolute`, `fixed`, `sticky`)
 ![position](./img/position-1.jpeg)
 
-- `static` is the **default value**
-- `relative` moves an element in relation to where it would have been in normal flow (relative to its current position).
-  - its space is still reserved in the normal flow
-- `absolute` relative to nearest parent element with `relative` positioning until we reach the `<body>` element
-  ![absolute](./img/position-2.png)
-  ![absolute](./img/position-3.png)
-- `fixed` relative to **viewport(screen)**, and stays as we're scrolling
-- `sticky` toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
+- `static`
+  - It's the **default value**
+  - It means that the element is positioned according to the normal flow of the document.
+  - Here, `top`, `right`, `bottom`, and `left` properties have no effect.
+- `relative`
 
-  ```css
-  .nav {
-    position: sticky;
-    top: 0; /* once it reaches the top=0 with the viewport, then it will stick  */
-  }
-  ```
+  - It moves an element in relation to where it would have been in normal flow (relative to its current position).
+    ![relative](./img/position-4.png)
+  - its space is still reserved in the normal flow even if it's moved
 
-- when using `absolute` position with `inset: 0`, it makes the element expand to fill the height and width of the closest parent with a **non-static position**
+- `absolute`
 
-  - **inset**: The inset property in CSS is a shorthand for the four inset properties, `top`, `right`, `bottom` and `left` in one declaration. Just like the four individual properties themselves, inset has no effect on non-positioned (static) elements. In other words, an element must declare an explicit position value before inset properties can take effect.
+  - It's relative to nearest parent element with `relative` positioning until we reach the `<body>` element
+    ![absolute](./img/position-5.png)
+    ![absolute](./img/position-3.png)
+  - It removes the element from the normal flow of the document, so it doesn't take up space in the normal flow.
+  - Normal vs Absolute positioning:
+    ![absolute](./img/position-2.png)
 
-- **stacking context** --> `z-index` : as if the blocks have been stacked on top of each other on a z axis
+- `fixed`
+  - Here, element is removed from the normal flow and positioned relative to the root container element. (no space is reserved for it in the normal flow)
+    ![fixed](./img/position-6.png)
+  - When you scroll the page, the element stays in the same place **(because it's fixed/relative to the viewport)**
+- `sticky`
+
+  - It toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
+
+    ```css
+    .nav {
+      position: sticky;
+      top: 0; /* once it reaches the top=0 with the viewport, then it will stick  */
+    }
+    ```
+
+- Notes:
+
+  - when using `absolute` position with `inset: 0`, it makes the element expand to fill the height and width of the closest parent with a **non-static position**
+
+    - **inset**: The inset property in CSS is a shorthand for the four inset properties, `top`, `right`, `bottom` and `left` in one declaration. Just like the four individual properties themselves, inset has no effect on non-positioned (static) elements. In other words, an element must declare an explicit position value before inset properties can take effect.
 
 ---
 
 ### `z-index`
 
 It specifies the elevation of an element relative to other elements on the page.
-![z-index](./img/z-index-1.png)
+
+- **stacking context** --> `z-index` : as if the blocks have been stacked on top of each other on the **Z axis**
+  ![z-index](./img/z-index-1.png)
 
 - by default, it's equal to `0`
 - if multiple elements have the same `z-index`, then the last one is higher than the others and so on.
@@ -2146,9 +2358,111 @@ There are two ways to add multiple style sheets to a page:
 
 ## Notes
 
-- By default, most browsers add a margin to the top of the `<h1>` element. This is why there is a gap between the top of the browser and the box containing the `<h1>` element.
+### Display vs Visibility
 
-  - That's why we use `* { margin: 0; }` to remove the default margin
+| Display                                                                         | Visibility                                                                     |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| It specifies the display behavior of an element.                                | It specifies whether an element is visible or hidden.                          |
+| It's a CSS property that defines the type of box used for an HTML element.      | It's a CSS property that determines whether an element is visible or hidden.   |
+| It can have values like `block`, `inline`, `inline-block`, `flex`, `grid`, etc. | It can have values like `visible`, `hidden`, `collapse`, `initial`, `inherit`. |
+
+- `visibility:hidden` => hide the element but reserves it's place (leaves a space where the element would have been)
+- `display: none` => remove element from the flow, hide element and collapse its space
+
+  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
+
+    ```css
+    /* ALL THESE FOR mimicking [display:none;] */
+
+    /* 1) Hide it visually and preserve the space */
+    opacity: 0;
+
+    /* 2) Make it unaccessible to mouse and keyboard */
+    pointer-events: none;
+
+    /* 3) Hide it from screen readers */
+    visibility: hidden;
+    /* or */
+    opacity: 0;
+    ```
+
+- `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
+- **inline-block**: `display: inline-block` --> causes a block-level element to flow like an inline element, while retaining other features of a block-level element.
+  - doesn't start a new line (like inline element)
+  - respects `margin`, `width`, `height` (like block element)
+
+---
+
+### How to center an element
+
+To center an element vertically and horizontally in a container, we have these options:
+
+1. Using `margin: auto`:
+
+   ```css
+   .container {
+     width: 700px;
+     margin: 0 auto;
+   }
+   /* This will center the container horizontally on the page */
+   ```
+
+2. using `flexbox`:
+
+   ```css
+   .container {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+   }
+   ```
+
+3. using `position: absolute`:
+
+   ```css
+   .container {
+     position: relative;
+   }
+   .element {
+     width: 100px;
+     height: 100px;
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+
+     /* or (NOT RECOMMENDED ❌) */
+     top: calc(50% - 50px); /* 50px is half of the element height */
+     left: calc(50% - 50px); /* 50px is half of the element width */
+   }
+   ```
+
+   ![center element](./img/center-element-1.png)
+   ![center element](./img/center-element-2.png)
+
+4. using `grid`:
+
+   - center a container:
+
+     ```css
+     .container {
+       display: grid;
+       place-items: center;
+     }
+     ```
+
+   - center a grid-item inside its cell:
+     ![place-self](./img/place-self.png)
+
+     ```css
+     .grid-item {
+       place-self: center;
+     }
+     ```
+
+---
+
+### General Notes
 
 - To create a container for the whole page, we use `<div>` element with `id` attribute and give it a name like `container` or `wrapper` and then we put all the page content inside it. and to give the sections inside it a `max-width` and center them, we use:
 
@@ -2269,21 +2583,6 @@ There are two ways to add multiple style sheets to a page:
       background-color: #000;
     }
     ```
-
-- To add `border-radius` to just one side left/right, we need to specify the 2 left/right corners:
-
-  ```css
-  /* Correct */
-  .box {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-  }
-
-  /* Wrong */
-  .box {
-    border-left-radius: 10px;
-  }
-  ```
 
 - when you have a sliding item (animate from right to center like a **sidebar**) => use this :
 
