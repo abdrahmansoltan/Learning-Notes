@@ -6,7 +6,6 @@
     - [Starter CSS Code (Global Reset / Normalize)](#starter-css-code-global-reset--normalize)
   - [How CSS works](#how-css-works)
     - [Visual Formatting Model](#visual-formatting-model)
-    - [Types of elements (Block vs Inline)](#types-of-elements-block-vs-inline)
   - [Selectors](#selectors)
     - [Selectors Types](#selectors-types)
       - [Combinators](#combinators)
@@ -24,11 +23,13 @@
       - [Border radius](#border-radius)
     - [Outline](#outline)
     - [Margin](#margin)
-      - [Collapsing-Margins Issue](#collapsing-margins-issue)
+      - [Auto margins](#auto-margins)
+      - [Margin Collapse](#margin-collapse)
     - [Box model notes](#box-model-notes)
   - [Colors](#colors)
     - [HSL Colors](#hsl-colors)
     - [Linear Gradient](#linear-gradient)
+    - [Animated gradient](#animated-gradient)
     - [Color Notes](#color-notes)
   - [Font \& Text](#font--text)
     - [TypeFaces \& Font Families](#typefaces--font-families)
@@ -42,6 +43,7 @@
     - [Percentages](#percentages)
     - [Em \& Rem](#em--rem)
     - [`vh` \& `vw`](#vh--vw)
+    - [Keywords](#keywords)
     - [Units Notes](#units-notes)
   - [Inheritance](#inheritance)
   - [Shadow](#shadow)
@@ -64,14 +66,19 @@
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
+  - [Modules \& Layers (multiple style sheets)](#modules--layers-multiple-style-sheets)
+    - [Modules](#modules)
+    - [Layers](#layers)
   - [Browser Support (CSS Vendor Prefixes)](#browser-support-css-vendor-prefixes)
-  - [Scrolling](#scrolling)
-    - [Scrolling using CSS](#scrolling-using-css)
-    - [Scrolling using JavaScript](#scrolling-using-javascript)
-  - [Modules (multiple style sheets)](#modules-multiple-style-sheets)
   - [Notes](#notes)
     - [Display vs Visibility](#display-vs-visibility)
     - [How to center an element](#how-to-center-an-element)
+    - [Scrolling](#scrolling)
+      - [Scrolling using CSS](#scrolling-using-css)
+      - [Scrolling using JavaScript](#scrolling-using-javascript)
+    - [Customizable font-size calculation](#customizable-font-size-calculation)
+    - [Custom Audio Player](#custom-audio-player)
+    - [Double Border Corners](#double-border-corners)
     - [General Notes](#general-notes)
 
 ---
@@ -109,7 +116,7 @@
   }
   ```
 
-  - These styles are part of the **user-agent stylesheet** that the browser applies to all web pages by default (each browser has its own default styles).
+  - These styles are part of the **user-agent browser stylesheet** that the browser applies to all web pages by default (each browser has its own default styles).
 
 - But we can override these styles and add our own styles using CSS. and there are 3 ways to add styles to an HTML element:
 
@@ -201,32 +208,6 @@ It's the process (Algorithm) of turning the render tree into the actual pixels o
   - positioning scheme -> `float`, `absolute`, `relative`
   - stacking context -> `z-index`
   - viewport size
-
----
-
-### Types of elements (Block vs Inline)
-
-- **Block-level elements**:
-  ![block-level](./img/block-level.png)
-
-  - They can have `margins`, `padding`, and `borders` for all directions (top, right, bottom, left) and they respect `width`/`height` properties.
-
-- **Inline elements**:
-  ![inline](./img/inline.png)
-
-  - They can have `margins`, `padding`, and `borders` **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
-
-    > Remember from the [visual formatting model](#visual-formatting-model) that CSS has a **block direction (vertical)** and an **inline direction (horizontal)**. Inline elements are laid out in the inline direction, so they don't have a width or height. They only have a width and height if they're converted to block-level elements.
-
-  - To make them respect `width`/`height` -> use `display: inline-block;`
-
-- **Inline-block elements**:
-  ![inline-block](./img/inline-block.png)
-  - it's a mix between `block` and `inline` elements
-  - it looks like an `inline` element but behaves like a `block` element
-  - can have `margins`, `padding`, and `borders` ✅
-  - Note:
-    - `inline-block` elements respect the space between the elements in the HTML file (like `inline` elements), so if you have a space between them in the HTML file, it'll be shown in the browser.
 
 ---
 
@@ -437,25 +418,15 @@ Pseudo classes are used to apply styles to an element based on its current state
 
     - `rem` values will depend on values here
     - used for: general styles & css variables
-
-      ```css
-      :root {
-        --main-color: red;
-        font-size: 12px;
-      }
-
-      h1 {
-        color: var(--main-color);
-      }
-      p {
-        font-size: 1rem; /* 12px because of the root element */
-      }
-      ```
+    - It's a pseudo-class, so it has more specificity than the `html` element selector
+    - It includes all elements and pseudo elements in the **DOM** unlike `*` selector
 
   - `:first-child` -> for the first child of an element **(not the first of a type)**
   - `:last-child` -> for the last child of an element
   - `:nth-child(n)` -> for every `n`th child of an element
   - `:nth-last-child(n)` -> for every `n`th child of an element, counting from the last child
+  - `:first-of-type` -> for the first child of a type
+  - `:last-of-type` -> for the last child of a type
   - `:nth-of-type(n)` -> for every `n`th child of a type
   - `:only-child` -> for the only child of an element
   - `:only-of-type` -> for the only child of a type
@@ -613,6 +584,9 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
   - Create custom form controls like toggle checkbox input element
     ![toggle checkbox](./img/toggle-checkbox.webp)
 
+- Notes:
+  - sometimes you will find it used with single colon `":"` instead of 2 `"::"`, because in **CSS 2** there were no difference between pseudo-classes and pseudo-elements, but in **CSS 3** the `"::"` was introduced
+
 ---
 
 ### Selector specificity (Cascade)
@@ -739,10 +713,15 @@ The **CSS Box Model** is a set of rules that describe how elements on a web page
   - In order to add it in the reset CSS **(Global Styles)**, you can use:
 
     ```css
+    html {
+      box-sizing: border-box;
+      font-size: 100%;
+    }
+
     *,
     *::before,
     *::after {
-      box-sizing: border-box;
+      box-sizing: inherit;
     }
 
     /* Don't use it on the body because it won't be inherited, Instead use it on the ":root" or "*" */
@@ -942,14 +921,13 @@ It's used to create rounded corners for an element.
 
 It's the space between the border of an element and the surrounding elements.
 
+> It's easy to fall into the trap of thinking that margin is exclusively about changing the selected element's position. Really, though, it's about changing the gap between elements.
+
 - By default, most browsers add a margin to the top of the `<h1>` element. This is why there is a gap between the top of the browser and the box containing the `<h1>` element.
 
   - That's why we use `* { margin: 0; }` to remove the default margin from all elements when resetting the styles.
 
-- `margin` can be negative as it's related to the surrounding elements and not the element itself
-- `margin: auto`
-  - It's a trick to **center an element horizontally** by setting the left and right margins to `auto`.
-  - It works by distributing the remaining space equally on both sides of the element. **This is why it only works on block-level elements**.
+- `margin` can be **negative** as it's related to the surrounding elements and not the element itself
 - When you want to use the `margin` shorthand for all directions, we used to always specify horizontal & vertical spacing, now there're new css-properties called `margin-inline` and `margin-block`
 
   - it helps if you only want to specify spacing for one direction only instead of making the other direction equals `zero`
@@ -967,18 +945,56 @@ It's the space between the border of an element and the surrounding elements.
     margin-block: 20px;
     ```
 
+#### Auto margins
+
+- It's a trick to **center an element horizontally** by setting the left and right margins to `auto`.
   ![autoMargin](./img/autoMargin.png)
+- It works by distributing the remaining space equally on both sides of the element. (fill the maximum available space)
+  - This only works for **horizontal** margin. Setting top/bottom margin to `auto` is equivalent to setting it to `0px`
+  - This only works on **elements with an explicit width**. Block elements will naturally grow to fill the available horizontal space, so we need to give our element a width in order to center it. (Doesn't work with `width: 100%`)
 
-#### Collapsing-Margins Issue
+#### Margin Collapse
 
-It's a common issue in CSS when two **vertical margins** are touching each other, they will collapse (combine) into a single margin.
+It's a common issue in CSS when two **vertical margins** are overlapping, they will collapse (combine) into a single margin.
 
-- Here, only one of them will be visible to the page which is the larger one and **not** their sum
+> **Margins only collapse in Flow layout**
+>
+> - Margin collapse is unique to [Flow layout](./3-CSS-Layouts.md#flow-layout-block-vs-inline). If you have children inside a `display: flex` parent, those children's margins will never collapse.
+
+- Here, only one of them will be visible to the page which is the larger one and **not** their sum (**The bigger margin wins**)
   ![Margin Collapse](./img/collapsing-margins-1.png)
 
   - This doesn't happen with horizontal margins
   - this is not the same for **padding** as they get added together
     - **So, between sections use padding not margin**
+
+- Margins must be touching in order for them to collapse
+
+- Notes:
+
+  - Nesting doesn't prevent collapsing,
+  - Margins can collapse in the same direction
+
+    ```css
+    .parent {
+      margin-top: 72px;
+    }
+    .child {
+      margin-top: 24px;
+    }
+    ```
+
+  - More than 2 margins can also collapse
+  - For negative margins:
+    - The negative margins will share a space, and the size of that space is determined by the most significant negative margin.
+    - For mixed margins (positive and negative), they will be summed together.
+
+- How to fix it
+
+  - Add `<br/>` between the elements
+    ![Margin Collapse](./img/collapsing-margins-3.png)
+    ![Margin Collapse](./img/collapsing-margins-4.png)
+  - Add `padding` to the parent element instead of `margin` to the child element
 
 - **Border collapse** : sets whether table borders should collapse into a single border or be separated as in standard HTML => `border-collapse: separate;`
   ![border collapse](./img/collapsing-margins-2.png)
@@ -1010,7 +1026,11 @@ It's a common issue in CSS when two **vertical margins** are touching each other
   }
   ```
 
-- `height: auto` -> the height of the element will take the remaining height of the parent element.
+- `auto` value for width/height/margin/padding
+
+  - `margin: auto` -> centers the element horizontally
+  - `padding: auto` -> it's invalid and won't work ❌
+  - `width / height: auto` -> the width / height of the element will fill the available space (remaining width / height of the parent element)
 
 - You can overwrite values of the `box-model` properties for specific elements like this:
 
@@ -1125,8 +1145,14 @@ It's a way to create a gradient that changes color smoothly from one color to an
   - Here, the linear-gradient is on top of the background-image, which gives an overlay look.
 
 - **Notes:**
+  - linear-gradient is a `background-image` property, so it can be applied only with either `background` or `background-image` properties.
+    - `background-color` won't work ❌
   - you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
   - There's also `radial-gradient` which is a gradient from the center to the outside
+
+---
+
+### Animated gradient
 
 ---
 
@@ -1422,8 +1448,13 @@ When text overflows the container, you can control how it behaves using the `ove
 Units are used to specify the size of elements or values of properties in CSS.
 
 - Types of units:
-  - Relative Units (`em`, `rem`, `%`, `vw`, `vh`)
-  - Absolute Units (`px`, `pt`, `in`, `cm`, `mm`)
+  - Measurements:
+    - Relative Units (`em`, `rem`, `%`, `vw`, `vh`)
+    - Absolute Units (`px`, `pt`, `in`, `cm`, `mm`)
+  - Keywords:
+    - `auto`
+    - `fit-content`
+    - `min-content`
 - The most popular unit for anything size-related is the pixel (`px`), but there are other units that can be used in CSS.
 
 ![units](./img/units.PNG)
@@ -1517,6 +1548,29 @@ The `percentage %` unit is sometimes a value from the parent and other times it'
 
   - `vh` is useful for creating full-screen sections
   - `vw` is useful for creating layouts that depend on the screen size
+
+---
+
+### Keywords
+
+- `auto` value for width/height
+
+  - `width: auto` -> the width of the element will take the available space of the parent element
+
+- `min-content`
+
+  - `width: min-content` -> the width of the element will be the minimum required to fit the content inside it (it will shrink to the minimum width of the content)
+  - Here, we aren't sizing based on the space made available by the parent, we're sizing based on the element's children!
+  - It checks for any chance that the content might overflow and makes sure it fits within the parent element (white space between words) forcing the text to wrap to the next line if needed
+
+  - Use-cases:
+    - With `block` elements, it will shrink to the minimum width of the content
+    - `<figure>` element (to make the image and the caption fit together)
+      ![figure](./img/figure-1.png)
+
+- `fit-content` value for width
+
+  - `width: fit-content` -> the width of the element will be the minimum required to fit the content inside it (But it won't make block elements inline even if the content is small)
 
 ---
 
@@ -1977,16 +2031,24 @@ The `filter` property in CSS is used to apply visual effects to an element. It c
   }
   ```
 
-  - if done in a bigger scope like sections backgrounds, look at colt steel's **"Swipe"** project.
+  - if done in a bigger scope like sections backgrounds
+    ![skew background](./img/skew-background-3.png)
+    - We use pseudo elements to create a **skew** effect on the background, not the element itself **(to prevent skewing the content inside the element)**
+      ![skew background](./img/skew-background-2.png)
 
 ---
 
 ### Images Notes
 
+- Usually when using images, it's better to use it inside a wrapper `div` to control the image size and position and to avoid the image to overflow the container
 - `img` is an **inline element**, so:
   - it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
-  - it will have a spacing at the bottom, so you can remove it by setting `display: inline-block`
+  - it will have a spacing at the bottom
     ![img](./img/img-inline.jpeg)
+    - This is because the browser treats inline-elements as if the're typography, so it adds a space at the bottom as if it's a letter.
+    - To fix this, you can:
+      - make the image a **block or inline-block** element
+      - set the `line-height` of the wrapper to `0`
 - if you have an empty space between the image and the bottom-border, make the img has the `display: block;` property
   - you can also make sure that you're using `box-sizing: border-box;`
 - In order to change color or `svg` image color, you can use `stroke` and `fill` properties
@@ -2016,6 +2078,15 @@ In CSS, the `position` property is used to control the layout of an element. It 
 
   - It moves an element in relation to where it would have been in normal flow (relative to its current position).
     ![relative](./img/position-4.png)
+
+    ```css
+    .box {
+      position: relative;
+      top: 20px;
+      left: 20px;
+    }
+    ```
+
   - its space is still reserved in the normal flow even if it's moved
 
 - `absolute`
@@ -2072,8 +2143,13 @@ It specifies the elevation of an element relative to other elements on the page.
 Gives us the ability to do math in css, usually used with `width` and `height` properties
 
 - compatible with `length`, `frequency`, `angle`, `time`, `number` and `integer`
-- commonly used with percentages `%` and `vw` units
-- make sure there's a space between the operators inside calc
+- commonly used with mixed units like percentages `%` and `vw` units together
+
+  ```css
+  div {
+    width: calc(100% - 50px);
+  }
+  ```
 
 - **Advantages**
 
@@ -2099,6 +2175,12 @@ Gives us the ability to do math in css, usually used with `width` and `height` p
       width: calc(100% / 7);
     }
     ```
+
+- Tips when using `calc()`
+
+  - You can use 4 basic operators: `+`, `-`, `*`, `/`
+  - White space is required on both sides of the `+` and `-` operators, but not required for `*` and `/` operators
+  - Division by zero will cause errors
 
 ---
 
@@ -2181,6 +2263,18 @@ font-size: clamp(1rem, 2.5vw, 2rem);
 
   ![cells-gaps](./img/cells-gaps.png)
 
+- You can select the `td` and `th` elements using pseudo-classes like `:first-child`, `:last-child`, `:nth-child()`, `:nth-of-type()`, `:nth-last-child()`, `:nth-last-of-type()`
+
+  ```css
+  tr td:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  td:last-of-type {
+    background-color: #f2f2f2;
+  }
+  ```
+
 ---
 
 ## Form
@@ -2218,104 +2312,9 @@ font-size: clamp(1rem, 2.5vw, 2rem);
 
 ---
 
-## Browser Support (CSS Vendor Prefixes)
+## Modules & Layers (multiple style sheets)
 
-They're a way for browser makers to add support for new CSS features before those features are fully supported in all browsers. This may be done during a sort of testing and experimentation period where the browser manufacturer is determining exactly how these new CSS features will be implemented. These prefixes became very popular with the rise of CSS3.
-
-> Browser vendors used to add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers could experiment with new ideas. This, in theory, helped to prevent their experiments from being relied upon and then breaking web developers' code during the standardization process.
-
-- The most common browser CSS prefixes you will see in older code bases include:
-
-  - `-moz-` (firefox)
-  - `-o-` (old pre-WebKit versions of Opera)
-  - `-ms-` (Internet Explorer and Microsoft Edge)
-
-- Example:
-
-  ```css
-  div {
-    -webkit-transition: all 4s ease;
-    -moz-transition: all 4s ease;
-    -ms-transition: all 4s ease;
-    -o-transition: all 4s ease;
-    transition: all 4s ease;
-
-    /* This will make the transition work in all browsers */
-  }
-  ```
-
-- You can check for the browser support from [caniuse.com](https://caniuse.com/)
-  - You can check if you need to use prefixes for a certain property by checking the browser support for that property
-    ![css-prefixes](./img/css-prefixes-1.png)
-- you can check what prefixes you need to apply for certain properties from [shouldiprefix.com](https://shouldiprefix.com/)
-- You can auto prefix your styles using module-bundler or an extension like [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
-
----
-
-## Scrolling
-
-To have **smooth scrolling** when clicking on links, you can use: css or javascript
-
-### Scrolling using CSS
-
-- This doesn't work on older versions of **safari Browser**
-- It's a simple way to add smooth scrolling to your page
-- It's done by adding `scroll-behavior: smooth;` to the `html` element
-
-  ```css
-  html {
-    scroll-behavior: smooth;
-  }
-  ```
-
----
-
-### Scrolling using JavaScript
-
-- This works on all browsers including older versions of **safari Browser**
-- It's done by adding an event listener to the links and then using the `scrollIntoView` method to scroll to the section
-
-  ```js
-  const allLinks = document.querySelectorAll('a:link');
-
-  allLinks.forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      // 1. prevent default behavior
-      e.preventDefault();
-
-      // 2. get the href attribute value
-      const href = link.getAttribute('href');
-
-      // 3. Handle the scroll behavior
-      if (href === '#')
-        // Scroll back to top
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      if (href !== '#' && href.startsWith('#')) {
-        // Scroll to other links (sections with id attribute equal to the href value)
-        const sectionEl = document.querySelector(href);
-        sectionEl.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-  ```
-
-- Another way to do it is by using a **polyfill** for older browsers
-
-  ```html
-  <script
-    defer
-    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"
-  ></script>
-  ```
-
-  - then in JS file, write the same code as above
-
----
-
-## Modules (multiple style sheets)
+### Modules
 
 Some web page authors split up their CSS style rules into separate style sheets. For example, they might use one style sheet to control the layout and another to control fonts, colors and so on.
 
@@ -2353,6 +2352,90 @@ There are two ways to add multiple style sheets to a page:
     <link rel="stylesheet" type="text/css" href="css/typography.css" />
   </head>
   ```
+
+---
+
+### Layers
+
+We can use layers to control the order in which styles are applied to the page. The last layer will override the previous layers.
+
+- The `@layer` rule is a new feature in CSS that allows you to group related styles together in a single layer.
+- The `@layer` rule is used to define a new layer in a CSS file.
+
+```css
+@layer base {
+  body {
+    color: #666666;
+    background-color: #f8f8f8;
+    text-align: center;
+  }
+  #page {
+    width: 600px;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #d6d6d6;
+    padding: 20px;
+  }
+}
+
+@layer components {
+  .button {
+    background-color: #087f5b;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+  }
+
+  @media (max-width: 600px) {
+    .button {
+      padding: 5px 10px;
+    }
+  }
+}
+
+@layer utilities {
+  .text-center {
+    text-align: center;
+  }
+}
+```
+
+---
+
+## Browser Support (CSS Vendor Prefixes)
+
+They're a way for browser makers to add support for new CSS features before those features are fully supported in all browsers. This may be done during a sort of testing and experimentation period where the browser manufacturer is determining exactly how these new CSS features will be implemented. These prefixes became very popular with the rise of CSS3.
+
+> Browser vendors used to add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers could experiment with new ideas. This, in theory, helped to prevent their experiments from being relied upon and then breaking web developers' code during the standardization process.
+
+- The most common browser CSS prefixes you will see in older code bases include:
+
+  - `-moz-` (firefox)
+  - `-o-` (old pre-WebKit versions of Opera)
+  - `-ms-` (Internet Explorer and Microsoft Edge)
+
+- Example:
+
+  ```css
+  div {
+    -webkit-transition: all 4s ease;
+    -moz-transition: all 4s ease;
+    -ms-transition: all 4s ease;
+    -o-transition: all 4s ease;
+    transition: all 4s ease;
+
+    /* This will make the transition work in all browsers */
+  }
+  ```
+
+- **Note**: Nowadays, you don't need to add prefixes manually, because any **CSS Preprocessor** or **Module Bundler** will do it for you. (e.g. `Autoprefixer`, `PostCSS`)
+
+- You can check for the browser support from [caniuse.com](https://caniuse.com/)
+  - You can check if you need to use prefixes for a certain property by checking the browser support for that property
+    ![css-prefixes](./img/css-prefixes-1.png)
+- you can check what prefixes you need to apply for certain properties from [shouldiprefix.com](https://shouldiprefix.com/)
+- You can auto prefix your styles using module-bundler or an extension like [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
 
 ---
 
@@ -2459,6 +2542,151 @@ To center an element vertically and horizontally in a container, we have these o
        place-self: center;
      }
      ```
+
+---
+
+### Scrolling
+
+To have **smooth scrolling** when clicking on links, you can use: css or javascript
+
+#### Scrolling using CSS
+
+- This doesn't work on older versions of **safari Browser**
+- It's a simple way to add smooth scrolling to your page
+- It's done by adding `scroll-behavior: smooth;` to the `html` element
+
+  ```css
+  html {
+    scroll-behavior: smooth;
+  }
+  ```
+
+---
+
+#### Scrolling using JavaScript
+
+- This works on all browsers including older versions of **safari Browser**
+- It's done by adding an event listener to the links and then using the `scrollIntoView` method to scroll to the section
+
+  ```js
+  const allLinks = document.querySelectorAll('a:link');
+
+  allLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      // 1. prevent default behavior
+      e.preventDefault();
+
+      // 2. get the href attribute value
+      const href = link.getAttribute('href');
+
+      // 3. Handle the scroll behavior
+      if (href === '#')
+        // Scroll back to top
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      if (href !== '#' && href.startsWith('#')) {
+        // Scroll to other links (sections with id attribute equal to the href value)
+        const sectionEl = document.querySelector(href);
+        sectionEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+  ```
+
+- Another way to do it is by using a **polyfill** for older browsers
+
+  ```html
+  <script
+    defer
+    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"
+  ></script>
+  ```
+
+  - then in JS file, write the same code as above
+
+---
+
+### Customizable font-size calculation
+
+```css
+:red {
+  --base-size: 1rem;
+  --scale: 1.25;
+  --h5: calc(var(--base-size) * var(--scale)); /* 1.25rem */
+  --h4: calc(var(--h5) * var(--scale)); /* 1.5rem */
+  --h3: calc(var(--h4) * var(--scale)); /* 2rem */
+  --h2: calc(var(--h3) * var(--scale)); /* 2.5rem */
+  --h1: calc(var(--h2) * var(--scale)); /* 3rem */
+  --small: calc(var(--base-size) / var(--scale)); /* 0.8rem */
+}
+
+/* Usage */
+h1 {
+  font-size: var(--h1);
+}
+```
+
+---
+
+### Custom Audio Player
+
+- [Let’s Create a Custom Audio Player](https://css-tricks.com/lets-create-a-custom-audio-player/)
+- [Frontend Masters - Custom Audio Player](https://codepen.io/jen4web/pen/OJBjYVy)
+
+---
+
+### Double Border Corners
+
+Double borders on just the corner of some boxes may seem impossible to start with. However, there are [several possible solutions](https://stackoverflow.com/questions/14387690/how-can-i-show-only-corner-borders) to this issue.
+
+- The idea here is to create a double border effect by using a `::before` and `::after` pseudo-elements both for the container and the first element inside it.
+- Then we use `border-width` to control which sides you want to show based on what corner you want to apply the effect to.
+
+- Example:
+  ![double-border](./img/double-border.png)
+
+  ```css
+  .container {
+    position: relative;
+    border: 2px solid #000;
+  }
+
+  .container::before,
+  .container::after,
+  .container > :first-child::before,
+  .container > :first-child::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-color: #000;
+    border-style: solid;
+  }
+
+  /* now for each box, display it in its location and display the border on only 2 sides */
+  .container::before {
+    top: 0;
+    left: 0;
+    border-width: 2px 0 0 2px;
+  }
+  .container::after {
+    top: 0;
+    right: 0;
+    border-width: 2px 2px 0 0;
+  }
+  .container > :first-child::before {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 2px 2px;
+  }
+  .container > :first-child::after {
+    bottom: 0;
+    right: 0;
+    border-width: 0 2px 2px 0;
+  }
+  ```
 
 ---
 
@@ -2654,3 +2882,33 @@ To center an element vertically and horizontally in a container, we have these o
     color: #0f0;
   }
   ```
+
+- If you want to create a line with round edges (like a **pill shape**), you can use the `border-radius` property with a value that is half of the height of the element.
+
+  ```css
+  .pill {
+    height: 50px;
+    border-radius: 25px;
+  }
+  ```
+
+- To create a diagonal line on an element, you can:
+  ![diagonal-line](./img/diagonal-line.png)
+
+  - use `::before` or `::after` pseudo-elements with `content` property and rotate it using `transform` property
+  - use `clip-path` property with `polygon` function
+  - use `linear-gradient` background
+
+    ```css
+    .diagonal-line {
+      background: linear-gradient(to top right, #fff calc(50% - 1px), black, #fff calc(50% + 1px));
+
+      /* or to be transparent */
+      background: linear-gradient(
+        to top right,
+        transparent calc(50% - 1px),
+        black,
+        transparent calc(50% + 1px)
+      );
+    }
+    ```

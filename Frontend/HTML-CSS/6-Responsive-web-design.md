@@ -18,7 +18,7 @@
 
 ## Responsive Web Design (RWD)
 
-It's an approach to web design that makes web pages render well on a variety of devices and window or screen sizes by responding to the user's behavior and environment based on screen size, platform, and orientation.
+It's the art of making websites work across multiple devices and screen sizes by making the layout and experience **responds** to the user's device and behavior.
 
 ![responsive-web-design](./img/responsive-web-design-1.png)
 
@@ -104,7 +104,7 @@ The difference between `responsive design` and `adaptive design` is that:
 
 ## Media Queries
 
-They allow us to specify different styles for different devices and different screen sizes.
+They allow us to specify different styles that are only applied at certain screen sizes or viewport widths.
 ![media-queries](./img/media-queries-1.png)
 
 - They're tools for **overriding styles** based on the device's characteristics, such as screen size, orientation, and resolution.
@@ -123,24 +123,26 @@ if (condition) {
 @media (condition) {
   /* styles here */
 }
+
+// Example
+@media only screen and (max-width: 600px) {
+  /* styles here */
+}
 ```
 
 - `@media` keyword
-- `only` keyword is used to prevent old browsers that don't support media queries from applying the styles inside it. Otherwise, older browser will apply the styles in general (not just for the specified screen size media query)
+  - It initiates a media query block, and tells the browser that the styles inside the media query will only be applied if the condition is true.
+- `only` keyword
 
-  ```css
-  @media only and (max-width: 600px) {
-    /* styles here */
-  }
-  ```
+  - It's used to prevent old browsers that don't support media queries from applying the styles inside it. Otherwise, older browser will apply the styles in general (not just for the specified screen size media query)
 
-- `screen` keyword is used to specify that the styles inside the media query will only be applied for screens and not for printers or other devices
+- `screen` keyword
 
-  ```css
-  @media only screen and (max-width: 600px) {
-    /* styles here */
-  }
-  ```
+  - It's a "media type" used to specify that the styles inside the media query will only be applied for screens and not for printers or other devices
+
+- `and` keyword
+
+  - It's used to combine multiple conditions in a media query. All conditions must be true for the styles inside the media query to be applied.
 
 - Examples of media queries:
 
@@ -157,12 +159,28 @@ if (condition) {
     /* styles here apply for screens with width >= 600px and <= 900px */
   }
 
+  @media (max-width: 900px) or (min-width: 1200px) {
+    /* styles here apply for screens with width <= 900px or >= 1200px and not in between */
+  }
+
+  @media not (max-width: 600px) {
+    /* styles here apply for screens with width > 600px (similar to min-width: 601px) -> (Not commonly used) */
+  }
+
   @media (width: 600px) {
-    /* styles here apply for screens with width = 600px */
+    /* styles here apply for screens with width = 600px (Not commonly used) */
   }
 
   @media (orientation: portrait) {
-    /* styles here apply for screens with portrait orientation */
+    /* styles here apply for screens with portrait orientation (height > width) */
+  }
+  ```
+
+- In Media queries level 4, there're multiple new features (but not supported in all browsers yet) like:
+
+  ```css
+  @media (width >= 600px) {
+    /* styles here apply for screens with width >= 600px */
   }
   ```
 
@@ -201,6 +219,18 @@ if (condition) {
   }
   ```
 
+- You can use different types of "media types" in media queries, such as (`screen`, `print`, `speech`, etc) to have different styles for different devices (ex: removing adds and unnecessary content when printing)
+
+  ```css
+  @media screen and (max-width: 600px) {
+    /* styles here apply for screens with width <= 600px */
+  }
+
+  @media print {
+    /* styles here apply for printed pages */
+  }
+  ```
+
 - **TRICK**: instead of using `min-width` in media-query, to specify the width of a container or a grid, we can use the `min()` function
 
   ```css
@@ -211,6 +241,22 @@ if (condition) {
     /*OR: width: min(1000px, 100% - margin_width-left&right); */
   }
   ```
+
+- `@media` block has higher specificity than the normal CSS block, so it will override the normal CSS block
+
+  ```css
+  .el {
+    width: 100%;
+  }
+
+  @media (min-width: 600px) {
+    .el {
+      width: 50%;
+    }
+  }
+  ```
+
+  - In this example, the width of `.el` will be `50%` when the screen width is `>= 600px`, and `100%` otherwise.
 
 ---
 

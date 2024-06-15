@@ -20,10 +20,11 @@
       - [Using manifest (Android and iOS)](#using-manifest-android-and-ios)
     - [background img in css](#background-img-in-css)
     - [image size optimization](#image-size-optimization)
-    - [HTML `<picture>` Element](#html-picture-element)
+    - [`<picture>` Element](#picture-element)
       - [`srcset` and `sizes` attributes](#srcset-and-sizes-attributes)
       - [Background images](#background-images)
       - [Which to use ?](#which-to-use-)
+  - [Canvas](#canvas)
   - [Icons](#icons)
     - [How to use icons](#how-to-use-icons)
       - [Icon fonts](#icon-fonts)
@@ -230,9 +231,9 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<strong>` -> **bold** text (instead of `<b>`)
 - `<figure>`
 
-  - self-contained element that can be placed or removed at will.
-  - useful when it comes to group auxiliary (additional / helper) content.
-  - its sidekick `<figcaption>` element, which is placed as first or last child of figure element
+  - useful when it comes to group together an image and its caption.
+    ![figure](./img/figure-1.png)
+  - its sidekick `<figcaption>` element, which is placed as first or last child of figure element and contains the caption text.
 
   ```html
   <figure>
@@ -507,7 +508,7 @@ Why do we need to tell the browser what our HTML elements represent?
 
 - `src` -> source of the image (Required)
 - `alt` -> alternative text for the image (Required)
-  - Don't leave the `alt` attribute empty, as it will be read by screen readers, instead, use `alt=""` to tell the screen reader to skip it.
+  - Don't forget to add the `alt` attribute, as it will be read by screen readers, instead, use `alt=""` to tell the screen reader to skip it.
 - `width` and `height` -> to specify the size of the image
 - `srcset` -> to specify multiple versions of the image based on the device's pixel density
   - `srcset="images/fm.jpg 1x, images/fm-2x.jpg 2x"` -> the browser will choose the first image for devices with a pixel density of 1x and the second image for devices with a pixel density of 2x.
@@ -635,42 +636,32 @@ It's a JSON file that tells the browser how to display the website on a mobile d
 
 ---
 
-### HTML `<picture>` Element
+### `<picture>` Element
 
-- The HTML `<picture>` element gives web developers more flexibility in specifying image resources.
-  - The `<picture>` element contains one or more `<source>` elements, each referring to different images through the `srcset` attribute. This way the browser can choose the image that best fits the current view and/or device.
-- Each `<source>` element has a **media** attribute that defines when the image is the most suitable.
+It's used to provide multiple versions of an image based on different conditions, such as the device's pixel density, viewport width, or image format.
+
+- It contains one or more `<source>` elements, each referring to different image through the `srcset` attribute. This way the browser can choose the image that best fits the current view and/or device.
+
+  - Each `<source>` element has a `media` attribute that defines when the image is the most suitable.
 
 - It's used to Render images conditionally (show one and hide the other)
-  here, we use `<picture>` symantec element
 - **Notes:**
+
   - Always specify a fallback `<img>` element as the **last child element** of the `<picture>` element.
   - The `<img>` element is used by browsers that do not support the `<picture>` element, or if none of the `<source>` tags match.
 
-```html
-<picture>
-  <!-- browser will choose which src it can display and displays it in the <img> element below -->
-  <source srcset="img/hero.webp" type="image/webp" />
-  <source srcset="img/hero-min.png" type="image/png" />
+- Example:
 
-  <!-- fall-up (default) image (if the previous didn't render) -->
-  <img
-    src="img/hero-min.png"
-    class="hero-img"
-    alt="Woman enjoying food, meals in storage container, and food bowls on a table"
-  />
-</picture>
-```
+  ```html
+  <picture>
+    <!-- browser will choose which src it can display and displays it in the <img> element below -->
+    <source media="(min-width: 650px)" srcset="img_food.jpg" />
+    <source media="(min-width: 465px)" srcset="img_car.jpg" />
 
-Or Show different images for different screen sizes:
-
-```html
-<picture>
-  <source media="(min-width: 650px)" srcset="img_food.jpg" />
-  <source media="(min-width: 465px)" srcset="img_car.jpg" />
-  <img src="img_girl.jpg" />
-</picture>
-```
+    <!-- fall-up (default) image (if the previous didn't render) -->
+    <img src="img_girl.jpg" />
+  </picture>
+  ```
 
 > Also see `<figure>` element [here](#semantic-tags)
 
@@ -710,6 +701,10 @@ for that we use media queries as we put each image in each media
 #### Which to use ?
 
 ![responsive-images](./img/responsive-images.png)
+
+---
+
+## Canvas
 
 ---
 
@@ -982,7 +977,7 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
 
 - Button vs Link:
   - Use a `<button>` element when you want to create a button that performs an action in your web page (like submitting a form).
-  - Use an `<a>` element when you want to create a link to another page or website.
+  - Use an `<a>` element when you want to create a link to another (page or website) or to a specific part of the same page.
 - To add custom **underline** to element, use `border-bottom` property instead of `text-decoration` property to have more control over the underline.
   - usually to control the space between the text and the underline, use `padding-bottom` property.
 - When you want to serve the `HTML` file to the browser, you need to use a **web server**.

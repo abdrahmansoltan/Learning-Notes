@@ -10,6 +10,9 @@
     - [Animation Keyframes](#animation-keyframes)
     - [Animation choreograph](#animation-choreograph)
   - [data state animation](#data-state-animation)
+  - [Animation Examples](#animation-examples)
+    - [Loading spinner](#loading-spinner)
+    - [Converting hamburger-menu icon to close icon](#converting-hamburger-menu-icon-to-close-icon)
   - [Animation Notes](#animation-notes)
 
 ---
@@ -138,7 +141,30 @@ It's used to change the shape, size, and position of an element (usually for ani
 Applying animation to an element is done by 2 steps:
 
 1. Define the animation -> `@keyframes`
-2. Apply the animation -> `animation` name and properties
+
+   ```css
+   @keyframes move {
+     from {
+       transform: translateX(20px);
+     }
+     to {
+       transform: translateX(100px);
+     }
+   }
+   ```
+
+2. Apply the animation -> `animation-name` and properties
+
+   ```css
+   div {
+     animation-name: move;
+     animation-duration: 10s;
+     animation-iteration-count: 3;
+
+     /* or using the shorthand */
+     animation: move 10s infinite;
+   }
+   ```
 
 ### Animation properties
 
@@ -147,73 +173,93 @@ Applying animation to an element is done by 2 steps:
 - `animation-name`
 - `animation-duration`
 - `animation-delay`
-  - note that it's for each single `iteration`
+  - It's the time before the animation starts (for each iteration)
 - `animation-iteration-count`
+  - It's the number of times the animation will run
+    - `1` -> it will run once
+    - `2` -> it will run twice
+    - `n` -> it will run `n` times
+    - `infinite` -> it will run forever (common for loading-state animations)
 - `animation-direction`
+  - It's the direction of the animation
+    - `normal` -> default -> from `0%` to `100%`
+    - `reverse` -> from `100%` to `0%`
+    - `alternate` -> from `0%` to `100%` then from `100%` to `0%`
+    - `alternate-reverse` -> from `100%` to `0%` then from `0%` to `100%`
 - `animation-timing-function`
 - `animation-fill-mode`
   - it's what happens when the animation finishes or before it starts (before the first iteration)
     ![CSS-Animation-Fill-mode](./img/CSS-Animation-Fill-mode.webp)
-  - values:
     - `none` -> default -> go to initial state (`0%`) before start and go to final state (`100%`) after finish
     - `forwards` -> **stick to final state (100%)**
     - `backwards` -> default -> go to initial state (`0%`) after finish
     - `both` -> `forwards` + `backwards` -> **stick to final state (100%)** + go to initial state (`0%`) after finish
+
+---
 
 ### Animation Keyframes
 
 They're used to define the animation states and the time between them (the animation steps)
 ![animation keyframes](./img/animation-keyframes-1.png)
 
-`keyframes` are different from `transition` as:
+- `keyframes` are different from `transition` as they're not just the start and end points, but they're the steps between them
 
-- they define what happens between state **A** and state **B**
+- `keyframes` can be defined in percentage or by `from` and `to`:
 
-```css
-div {
-  animation-name: move;
-  animation-duration: 10s;
-  animation-iteration-count: 3;
+  ```css
+  div {
+    animation-name: move;
+    animation-duration: 10s;
+    animation-iteration-count: 3;
 
-  /* or using the shorthand */
-  animation: move 10s infinite;
-}
-
-@keyframes move {
-  0% {
-    transform: translateX(20px);
+    /* or using the shorthand */
+    animation: move 10s infinite;
   }
-  50% {
-    transform: translateX(100px);
-    background: red;
-  }
-  75% {
-    transform: translateX(-200px);
-    background: yellow;
-  }
-  100% {
-    transform: translateX(20px);
-    background: green;
-  }
-}
 
-/* or when we have one start point and one end point */
-
-@keyframes move {
-  from {
-    transform: translateX(20px);
+  @keyframes move {
+    0% {
+      transform: translateX(20px);
+    }
+    50% {
+      transform: translateX(100px);
+      background: red;
+    }
+    75% {
+      transform: translateX(-200px);
+      background: yellow;
+    }
+    100% {
+      transform: translateX(20px);
+      background: green;
+    }
   }
-  to {
-    transform: translateX(100px);
-    background: red;
-  }
-}
-```
 
-- Ex: converting hamburger `menu` icon to `close` icon using `animation` and `keyframes`
-  ![hamburger](./img/hamburger-icon.png)
-  - [Codepen example 1](https://codepen.io/designcouch/pen/ExvwPY)
-  - [Codepen example 2](https://codepen.io/Danilo06/pen/PoNNvGm)
+  /* or when we have one start point and one end point */
+
+  @keyframes move {
+    from {
+      transform: translateX(20px);
+    }
+    to {
+      transform: translateX(100px);
+      background: red;
+    }
+  }
+  ```
+
+- If you have multiple keyframes steps that have the same properties, you can combine them using comma (`,`):
+
+  ```css
+  @keyframes move {
+    0%,
+    100% {
+      transform: translateX(20px);
+    }
+    50% {
+      transform: translateX(100px);
+    }
+  }
+  ```
 
 ---
 
@@ -248,6 +294,30 @@ You can use `data-state` attribute to define state and make css values establish
   animation: slide-up 1s both;
 }
 ```
+
+---
+
+## Animation Examples
+
+### Loading spinner
+
+```css
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+}
+```
+
+### Converting hamburger-menu icon to close icon
+
+![hamburger](./img/hamburger-icon.png)
+
+- [Codepen example 1 (transition)](https://codepen.io/designcouch/pen/ExvwPY)
+- [Codepen example 2](https://codepen.io/Danilo06/pen/PoNNvGm)
 
 ---
 

@@ -2,26 +2,30 @@
 
 - [INDEX](#index)
   - [LAYOUTS](#layouts)
+  - [Flow layout (Block vs Inline)](#flow-layout-block-vs-inline)
   - [Float](#float)
   - [Flexbox](#flexbox)
     - [Flex direction](#flex-direction)
     - [Aligning items in the flex container](#aligning-items-in-the-flex-container)
     - [Wrapping](#wrapping)
     - [Order](#order)
-    - [`flex` property (`flex-grow`, `flex-shrink`, `flex-basis`)](#flex-property-flex-grow-flex-shrink-flex-basis)
+    - [Grow \& Shrink \& Basis (`flex`)](#grow--shrink--basis-flex)
     - [Gap](#gap)
     - [Flexbox notes](#flexbox-notes)
-  - [Grid](#grid)
+  - [CSS Grid](#css-grid)
+    - [Grid terminology](#grid-terminology)
     - [Aligning items in the grid (Rows \& Columns)](#aligning-items-in-the-grid-rows--columns)
       - [Grid container](#grid-container)
+        - [Display type](#display-type)
+        - [Grid template](#grid-template)
+        - [Grid gap](#grid-gap)
       - [Grid items (Placing Grid items in the container)](#grid-items-placing-grid-items-in-the-container)
-      - [Grid gap](#grid-gap)
-      - [Grid Lines (start/end)](#grid-lines-startend)
-      - [Grid Areas](#grid-areas)
+        - [Grid Lines (start/end)](#grid-lines-startend)
+        - [Grid Areas](#grid-areas)
     - [Sizing Grid columns and rows (`auto` \& `fr` units)](#sizing-grid-columns-and-rows-auto--fr-units)
     - [Grid functions](#grid-functions)
-    - [`auto-fill` vs `auto-fit`](#auto-fill-vs-auto-fit)
-    - [Grid notes](#grid-notes)
+    - [Responsive Grids (`auto-fill` vs `auto-fit`)](#responsive-grids-auto-fill-vs-auto-fit)
+    - [Grid Notes](#grid-notes)
 
 ---
 
@@ -51,7 +55,48 @@ Layouts are the way we arrange elements on a page.
 
   - [Floats](#float) (old way)
   - [Flexbox](#flexbox) (new way)
-  - [Grid](#grid) (new way)
+  - [Grid](#css-grid) (new way)
+
+---
+
+## Flow layout (Block vs Inline)
+
+**Flow layout** is the default layout mode. A plain HTML document, with no CSS applied, uses Flow layout exclusively.
+
+In Flow layout, every element will use a display value of either `inline`, `block`, or `inline-block`. This value governs how the Flow layout algorithm will place the element. The default value depends on the tag; `div` elements are `block` by default, while `spans` are `inline`.
+
+- **Block-level elements**:
+  ![block-level](./img/block-level.png)
+
+  - They can be used to create a block of text, or to arrange boxes into a layout.
+  - They can have `margins`, `padding`, and `borders` for all directions (top, right, bottom, left) and they respect `width`/`height` properties.
+
+- **Inline elements**:
+  ![inline](./img/inline.png)
+
+  - They are generally meant to highlight a selection of text.
+  - They can have `margins`, `padding`, and `borders` **only** for (right/left) and doesn't respect `top`/`bottom` margin & padding, and they also don't respect `width`/`height`
+
+    > Remember from the [visual formatting model](./2-CSS.md#visual-formatting-model) that CSS has a **block direction (vertical)** and an **inline direction (horizontal)**. Inline elements are laid out in the inline direction, so they don't have a width or height. They only have a width and height if they're converted to block-level elements.
+
+    - To make them respect `width`/`height` -> use `display: inline-block;`
+
+  - They respect space between them in the HTML file, so if you have a space between them in the HTML file, it'll be shown in the browser.
+    ![inline](./img/inline-1.png)
+    ![inline](./img/inline-2.png)
+
+- **Inline-block elements**:
+  ![inline-block](./img/inline-block.png)
+  - It's an element that internally acts like a block element, but externally acts like an inline element. The parent container will treat it as an inline element, since it's external. But the element itself can be styled like a block.
+    - it's a mix between `block` and `inline` elements
+    - it looks like an `inline` element but behaves like a `block` element
+  - can have `margins`, `padding`, and `borders` ✅
+  - it doesn't line-wrap as `inline` elements do ❌
+    ![inline-block](./img/inline-block-1.png)
+  - Note:
+    - `inline-block` elements respect the space between the elements in the HTML file (like `inline` elements), so if you have a space between them in the HTML file, it'll be shown in the browser.
+
+---
 
 ---
 
@@ -226,7 +271,7 @@ It defines whether the flex items are forced in a single line (default) or can b
 
 ### Order
 
-By default, all children have `order: 0`, and are laid out in the order they appear in the source code. You can use the `order` property to change this ordering.
+By default, all flex-items have `order: 0`, and are laid out in the order they appear in the HTML markup. You can use the `order` property to change this ordering.
 
 ![flex-order](./img/flexbox-order.avif)
 
@@ -240,21 +285,11 @@ By default, all children have `order: 0`, and are laid out in the order they app
 
 - Why do we need to use `order` ?
   - It is useful when you want to change the order of the items in the source code, but you don't want to change the HTML structure
-  - **Accessability**: with **screen-readers**, it is important to have the correct order in the source code so that the screen-reader can read the content in the correct order
-    - so we can set the items order in the source code as we want the screen-reader to read it, and then use `order` to change the order of the items visually
+  - **Accessability**: with **screen-readers**, it is important to have the correct order in the source code so that the screen-reader can read the content in the correct order, So we can set the items order in the source code as we want the screen-reader to read it, and then use `order` to change the order of the items visually
 
 ---
 
-### `flex` property (`flex-grow`, `flex-shrink`, `flex-basis`)
-
-It is a shorthand property used to specify the components of a flexible length (`flex-grow`, `flex-shrink` and `flex-basis`) in a short form.
-
-```css
-.item {
-  /* flex-grow: 1; flex-shrink: 1; flex-basis: 0%; */
-  flex: 1, 1, 0%;
-}
-```
+### Grow & Shrink & Basis (`flex`)
 
 - `flex-grow`
 
@@ -278,6 +313,14 @@ It is a shorthand property used to specify the components of a flexible length (
   - it determines how much the flex item will shrink relative to the rest of the flex items in the flex container **(when there isn't enough space on the row/column)**.
 
     ```css
+    .container {
+      display: flex;
+      width: 400px;
+    }
+    .item {
+      width: 200px; /* we have 3 items, so the total width is 600px (biggest than the container width) */
+    }
+
     .item {
       flex-shrink: 0; /* item is not allowed to shrink */
       flex-shrink: 1; /* default -> item is allowed to shrink */
@@ -295,15 +338,21 @@ It is a shorthand property used to specify the components of a flexible length (
 
     ```css
     .flex-item {
-      flex-basis: auto; /* default */
+      flex-basis: auto; /* default -> based on the width/height of the content */
       flex-basis: 100px; /* fixed size */
       flex-basis: 50%; /* percentage */
     }
     ```
 
-  - it's recommended to ues `percentages %` and not `pixel` units
+  - it's recommended to ues `percentages %` and not `pixel` units for `flex-basis` to make the layout responsive
 
-  - How to control number of flex items in the row of the flex container:
+  - it doesn't work ❌ if:
+
+    - `flex-grow` is set to `0`
+    - `flex-shrink` is set to `0`
+    - `width`/`height` are already set
+
+  - **Trick:** How to control number of flex items in the row of the flex container:
 
     ```css
     /* Flex Container */
@@ -325,10 +374,24 @@ It is a shorthand property used to specify the components of a flexible length (
     }
     ```
 
-  - it doesn't work ❌ if:
-    - `flex-grow` is set to `0`
-    - `flex-shrink` is set to `0`
-    - `width`/`height` are already set
+- `flex` shorthand property
+
+  - It is a shorthand property used to specify the components of a flexible length (`flex-grow`, `flex-shrink` and `flex-basis`) in a short form.
+
+    ```css
+    .item {
+      /* flex-grow: 1; flex-shrink: 1; flex-basis: 0%; */
+      flex: 1, 1, 0%;
+    }
+    ```
+
+  - If used with only one value, it will be applied to `flex-grow` and the other values will be set to their default values (`flex-shrink: 1; flex-basis: 0%`)
+
+    ```css
+    .item {
+      flex: 1;
+    }
+    ```
 
 ---
 
@@ -367,7 +430,7 @@ It's a new feature in CSS that allows you to add space between flex items in a f
 
 ---
 
-## Grid
+## CSS Grid
 
 It's a new layout system in CSS that allows you to create a grid of columns and rows to place content into. It's a two-dimensional layout system, meaning that it can lay out items in rows and columns simultaneously.
 
@@ -378,17 +441,17 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 > - [complete-guide-grid](https://css-tricks.com/snippets/css/complete-guide-grid/)
 > - [grid-item-placement](https://mastery.games/post/grid-item-placement/)
 
-- **Grid terminology**
+### Grid terminology
 
-  - It consists of a **Grid container** and **Grid items**.
-    ![grid](./img/grid-2.png)
-  - **Grid lines**: These are horizontal and vertical lines dividing the grid into rows and columns. The numbers represent lines.
-    ![grid](./img/grid-3.png)
-  - **Grid cells**: These are the spaces between the grid lines. They are the smallest unit of the grid that can hold an item. The gaps between the cells are called **gutters**.
+- It consists of a **Grid container** and **Grid items**.
+  ![grid](./img/grid-2.png)
+- **Grid lines**: These are horizontal and vertical lines dividing the grid into rows and columns. The numbers represent lines.
+  ![grid](./img/grid-3.png)
+- **Grid cells**: These are the spaces between the grid lines. They are the smallest unit of the grid that can hold an item. The gaps between the cells are called **gutters**.
 
 - **Old Grid System (960 pixel grid)**
 
-  - Before CSS Grid, web developers used a grid system like the 960 grid system to create layouts. It's a layout system that divides the page into 12 or 16 columns.
+  - Before CSS Grid, web developers used a grid system like the 960 grid system to create layouts. It's a layout system that divides the page into **12 or 16** columns.
     ![960 grid](./img/960-grid.png)
   - Each column has a width of `60 pixels`, with a `10 pixel` margin on each side.
   - Each column has a margin set to 10 pixels, which creates a a gap of **20 pixels** between each column and 10 pixels to the left and right-hand sides of the page.
@@ -397,7 +460,8 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
 - **Grid vs Flexbox**
 
-  - Flexbox is a **one-dimensional** layout system, meaning that it can lay out items in rows or columns, but not both at the same time. On the other hand, Grid is a **two-dimensional** layout system, meaning that it can lay out items in rows and columns simultaneously.
+  - Flexbox is a **one-dimensional** layout system, meaning that it can lay out items in rows or columns, but not both at the same time -> (Row or Column)
+  - Grid is a **two-dimensional** layout system, meaning that it can lay out items in rows and columns simultaneously -> (Row and Column)
 
 ---
 
@@ -405,17 +469,21 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
 ![grid](./img/grid-4.png)
 
-- **Display type**
-
-  - `display: grid;` => creates a grid container, this container will be a `block`-level element
-  - `display: inline-grid;` => creates a grid container, this container will be an `inline`-level element
-
 #### Grid container
+
+##### Display type
+
+- `display: grid;` => creates a grid container, this container will be a `block`-level element
+- `display: inline-grid;` => creates a grid container, this container will be an `inline`-level element
+
+---
+
+##### Grid template
 
 - `grid-template-columns` => defines the columns of the grid
 - `grid-template-rows` => defines the rows of the grid
   - It's common to only define the columns and let the rows be created implicitly
-- `grid-template-areas` => defines a grid template by referencing the names of the grid areas which are specified with the `grid-area` property
+- `grid-template-areas` => setup the layout of the grid in a(visually-friendly way) by referencing the names of the grid areas which are specified with the `grid-area` property
   ![grid-template-areas](./img/grid-template-areas.png)
 
   - It requires defining the (alias / name) of the cells in the grid, then assign the name to each element according to where you want it to be shown on the grid
@@ -437,7 +505,7 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
   - **⚠️ Note:** before using `grid-template-area`, you need to define the rows and columns of the grid using `grid-template-columns` and `grid-template-rows`
 
-- `grid-template` => shorthand that defines both the columns and the rows of the grid
+- `grid-template` => shorthand property that defines both the columns and the rows of the grid
 
   ```css
   .container {
@@ -463,23 +531,62 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
   > - `justify-content` is used to align the **grid tracks within the grid container**
   > - `justify-items` is used to align the **grid items within the row axis**
 
+- When you have more rows than explicitly defined in the `grid-template-rows`, the grid will create implicit rows to accommodate the content. but they will have a height of `auto` (the height of the content inside them)
+
+  - To control the height of the implicit rows, you can use the `grid-auto-rows` property
+
+    ```css
+    .container {
+      display: grid;
+      grid-template-rows: 200px 200px; /* the height of the explicit rows */
+      grid-auto-rows: 100px; /* the height of the implicit rows */
+    }
+    ```
+
+  - Same is applied for the columns using `grid-auto-columns`
+
+---
+
+##### Grid gap
+
+- `gap` is a shorthand for `row-gap` and `column-gap`
+- It was called `grid-gap` before, but it was changed to `gap` in the new version of CSS Grid
+- We can also use `row-gap` and `column-gap` separately
+
+  ```css
+  .container {
+    display: grid;
+    gap: 16px;
+    /* or */
+    row-gap: 16px;
+    column-gap: 16px;
+  }
+  ```
+
+  ![grid-gap](./img/grid-gap.png)
+
 ---
 
 #### Grid items (Placing Grid items in the container)
 
-- By default, a grid-item will take up one grid cell.
-  ![grid item](./img/grid-item-1.png)
+- By default, a grid-item will take up one grid cell in the grid container following the source order in the HTML markup.
+- You can use different properties to position the grid items in the grid container.
 
-- In order to manually place the grid items in the grid container, you can use the following properties:
+##### Grid Lines (start/end)
+
+It's used to position the grid items using values to specify which grid lines the item should start and end on.
+![grid-lines](./img/grid-lines.png)
+
+- In order to manually place the grid items in the grid container, you can use the following properties that specify the grid lines that the grid item should start and end on:
 
   ```css
   .item {
-    grid-column-start: 1;
-    grid-column-end: 3;
-    grid-row-start: 1;
-    grid-row-end: 3;
+    grid-column-start: 1; /* Specifies on which column-line to start the grid item */
+    grid-column-end: 3; /* Specifies on which column-line to end the grid item */
+    grid-row-start: 1; /* Specifies on which row-line to start the grid item */
+    grid-row-end: 3; /* Specifies on which row-line to end the grid item */
 
-    /* or */
+    /* or using shorthand properties */
     grid-column: 1/3; /* start on column 1 and end on start of column 3 */
     grid-row: 1/3;
 
@@ -494,72 +601,10 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
   }
   ```
 
-  - `grid-column-start` => specifies on which column-line to start the grid item
-  - `grid-column-end` => specifies on which column-line to end the grid item
-  - `grid-row-start` => specifies on which row-line to start the grid item
-  - `grid-row-end` => specifies on which row-line to end the grid item
   - `grid-column` => shorthand for `grid-column-start` and `grid-column-end`
   - `grid-row` => shorthand for `grid-row-start` and `grid-row-end`
 
-- `grid-area` => shorthand for `grid-row-start`, `grid-column-start`, `grid-row-end`, and `grid-column-end`
-- `justify-self` => aligns the grid item along the row axis
-- `align-self` => aligns the grid item along the column axis
-- `place-self` => shorthand for `justify-self` and `align-self`
-
-- overlapping grid items: Grid allows cells to overlap with each other
-  ![overlapping grid items](./img/overlapping%20grid%20items.png)
-
----
-
-#### Grid gap
-
-- `gap` is a shorthand for `row-gap` and `column-gap`
-- It was called `grid-gap` before, but it was changed to `gap` in the new version of CSS Grid
-- We can also use `row-gap` and `column-gap` separately
-
-  ```css
-  .container {
-    display: grid;
-    gap: 20px;
-    /* or */
-    row-gap: 20px;
-    column-gap: 30px;
-  }
-  ```
-
----
-
-#### Grid Lines (start/end)
-
-It's used to position the grid items using values to specify which grid lines the item should start and end on.
-
-![grid-lines](./img/grid-lines.png)
-
-```css
-.cell-1 {
-  grid-column-start: 1;
-  grid-column-end: 3;
-  grid-row-start: 1;
-  grid-row-end: 3;
-
-  /* or */
-  grid-column: 1/3;
-  grid-row: 1/3;
-
-  /* if provided with one value, it will be the end value */
-  grid-column: 1; /* grid-column-end: 1; */
-}
-```
-
-- we can use negative values for row/column:
-
-  ```css
-  .cell-4 {
-    grid-column: 1/-1; /* start on column 1 and end on the last column */
-  }
-  ```
-
-- `span` keyword is used to specify the number of columns/rows that the grid item should span
+- `span` keyword is used to specify the number of columns/rows that the grid item should span.
 
   ```css
   .cell-1 {
@@ -568,9 +613,38 @@ It's used to position the grid items using values to specify which grid lines th
   }
   ```
 
+- We can also name the grid lines and use the names to place the grid items
+
+  ```css
+  .container {
+    display: grid;
+    grid-template-columns: [start] 100px [main] 1fr [end];
+    grid-template-rows: [top] 100px [main] 1fr [bottom];
+  }
+
+  .item {
+    grid-column: start / end;
+    grid-row: top / bottom;
+  }
+  ```
+
+- Notes:
+
+  - we can use negative values for row/column:
+
+    ```css
+    .cell-4 {
+      grid-column: 1/-1; /* start on column 1 and end on the last column */
+    }
+    ```
+
+  - If you provided `grid-column-start` or `grid-row-start` without `grid-column-end` or `grid-row-end`, the item will span **only one cell**
+  - If you provided `grid-column-end` or `grid-row-end` without `grid-column-start` or `grid-row-start`, the item will span **all the cells** from the start to the end
+  - If you provided `grid-column` or `grid-row` with only **one value**, the item will span to the end of the grid in that direction
+
 ---
 
-#### Grid Areas
+##### Grid Areas
 
 `grid-area` property is used to assign a grid item to a grid area, or to create a named grid area.
 
@@ -605,21 +679,31 @@ It's used to position the grid items using values to specify which grid lines th
         'sidebar . main'
         'footer footer footer';
     }
+
+    .header {
+      grid-area: header;
+    }
     ```
+
+- Other properties:
+
+  - `justify-self` => aligns the grid item along the row axis
+    ![justify-self](./img/justify-self.png)
+  - `align-self` => aligns the grid item along the column axis
+  - `place-self` => shorthand for `justify-self` and `align-self`
+    ![place-self](./img/place-self.png)
 
 ---
 
 ### Sizing Grid columns and rows (`auto` & `fr` units)
 
-- `fr` -> stands for **fraction** of the available space of the grid container
+- `fr`
 
-  - It's used to specify the size of the columns and rows in the grid by dividing the available space into fractions
+  - It stands for **fraction** of the available space of the grid container and used to specify the size of the columns and rows in the grid by dividing the available space into fractions (instead of using `px` or `%`)
     ![grid fr](./img/grid-fr.png)
-  - It's similar to the `flex-grow` property in **Flexbox**
-
-  - useful when you don't want to calculate the width-percentages of the columns/rows manually.
 
     ```css
+    /* useful when you don't want to calculate the width-percentages of the columns/rows manually */
     .container {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -631,6 +715,8 @@ It's used to position the grid items using values to specify which grid lines th
       grid-template-rows: 50% 25% 25%;
     }
     ```
+
+  - It's similar to the `flex-grow` property in **Flexbox**
 
   - it makes the cells responsive as they take the remaining space available relative to the current viewport size
   - beats `auto`, when they are together (as `auto` will take the required space available for its content)
@@ -653,17 +739,20 @@ It's used to position the grid items using values to specify which grid lines th
 
 - `minmax()`
 
-  ![minmax](./img/minmax-1.png)
-  ![minmax](./img/minmax-2.png)
-
   - it lets you define a minimum and maximum size (range) for column width or row height
+    ![minmax](./img/minmax-1.png)
+    ![minmax](./img/minmax-2.png)
 
-    - convenient way to set the `min` as fixed value and the `max` as `fr` or percentage
-
-  - `minmax()` can’t handle responsive design by itself. We need to handle that by ourselves
   - It's used to prevent grid cells from getting too **small** / **big**
-  - It can be used instead of `px` or `fr`
-  - note: using a `1fr` as the max value will ensure that the track expands and takes up the available space
+  - It's common to set the `min` as fixed value and the `max` as (`fr` or `auto` or percentage `%`) to ensure that the track expands and takes up the available space (make the grid responsive)
+
+    ```css
+    .container {
+      display: grid;
+      grid-template-columns: minmax(100px, 1fr) 1fr;
+      /* the first column will be at least 100px and at most 1fr */
+    }
+    ```
 
 - `repeat()`
 
@@ -691,26 +780,43 @@ It's used to position the grid items using values to specify which grid lines th
     }
     ```
 
+  - It's similar to `auto` but with a maximum size limit
+
 ---
 
-### `auto-fill` vs `auto-fit`
+### Responsive Grids (`auto-fill` vs `auto-fit`)
 
-When using CSS grid `minmax()` function, it's important to decide between using the `auto-fit` or `auto-fill` keywords. When used incorrectly, it can lead to unexpected results.
+Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create responsive grids that adapt to the size of the viewport and wrapping columns into new rows when needed.
 
-- When using `minmax()` function, the `auto-fit` keyword will expand the grid items to fill the available space. While `auto-fill` will keep the available space reserved without altering the grid items width.
-  ![auto-fill vs auto-fit](./img/grid-auto-fit.png)
+- They are used as a replacement for explicitly define **the size of the grid container and number of columns in the grid**, by trying to fit as many columns as possible in the available space.
+  - Here, we don't define the grid container size, but we define the size of the columns and the number of columns will be created based on the available space.
+  - Use them when you don't know the size of page or the number of items that will occupy the grid but you know the width of columns.
+- They can be used as the first argument in the `repeat()` function to create a responsive grid layout.
 
-  - That being said, using `auto-fit` might lead to grid items being too wide, especially when they are less than expected. Consider the following example.
+  ```css
+  .container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    /* or */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+  ```
 
-    ```css
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      grid-gap: 1rem;
-    }
-    ```
+  - `auto-fit` keyword will expand the grid items to fill the available space.
+  - `auto-fill` will keep the available space reserved without altering the grid items width.
+    ![auto-fill vs auto-fit](./img/grid-auto-fit.png)
 
-    ![auto-fit](./img/auto-fit1.png)
+- That being said, using `auto-fit` might lead to grid items being too wide, especially when they are less than expected. Consider the following example.
+
+  ```css
+  .wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 1rem;
+  }
+  ```
+
+  ![auto-fit](./img/auto-fit1.png)
 
   - Most of the time, such behavior isn't needed, so using `auto-fill` is better.
 
@@ -724,18 +830,11 @@ When using CSS grid `minmax()` function, it's important to decide between using 
 
     ![auto-fill](./img/auto-fill3.png)
 
-- if you don't know the size of page or the number of items that will occupy the grid but you know the width of columns, you can use the `auto-fill` for this:
-
-  ```css
-  grid-template-column: repeat(auto-fill, minmax(200px, 1fr));
-  ```
-
-![auto-fill](./img/auto-fill1.png)
-![auto-fill](./img/auto-fill2.png)
-
 ---
 
-### Grid notes
+### Grid Notes
+
+- For tricky designs, always consider using more columns like `6` or `12` to make the layout more flexible and easier to manage.
 
 - To center a Grid-container, you can use these 2 options:
 
@@ -784,3 +883,23 @@ When using CSS grid `minmax()` function, it's important to decide between using 
     grid-gap: 50px 100px;
   }
   ```
+
+- overlapping grid items
+
+  - CSS-Grid allows cells to overlap with each other if you specify the same grid lines for the start and end of the grid item.
+
+    ```css
+    .item-1 {
+      grid-column: 1 / 3;
+      grid-row: 1 / 3;
+    }
+    .item-2 {
+      grid-column: 2 / 4;
+      grid-row: 2 / 4;
+    }
+    ```
+
+    - Here, the `item-1` and `item-2` will overlap with each other on the column 2 and row 2.
+    - It's useful when you want to create a layout where some items overlap with each other.
+      ![overlapping grid items](./img/overlapping-grid-items-1.png)
+      ![overlapping grid items](./img/overlapping-grid-items-2.png)

@@ -15,7 +15,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
 
 - they're also called **custom properties**
   - they're called like that as they act as css-properties where they're `inherited` and they `cascade` (override based on specificity)
-- **Declaring** them is usually in the `:root` selector **(global scope)**
+- **Declaring** them is usually in the `:root` selector **(global scope)** or in the element itself **(local scope)**
 
   ```css
   :root {
@@ -24,7 +24,6 @@ They let us define variables in CSS that can be reused throughout the stylesheet
   ```
 
   - because the `:root` pseudo-class represents the root `<html>` element and is identical to the selector `html`, except that **its specificity is higher** because `:root` is a `pseudo-class` selector and `html` is a `type` selector
-    - > Note: the `<html>` element selector includes all elements and pseudo elements in the **DOM** unlike `*` selector
     - We do this so that the variable is available everywhere in the stylesheet **(Global scope)**
     - We can use them because they're **inherited** from the `root` element
 
@@ -40,7 +39,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
 
   ```css
   div {
-    color:var(--primary,black)
+    color:var(--primary, black)
 
     /* to request the fallback value manually -> use (initial) */
     color: initial

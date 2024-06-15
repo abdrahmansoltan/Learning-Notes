@@ -71,6 +71,7 @@ You can use keyboard events to do stuff
   - By default, when a screen reader encounters an image:
     - if it can't find alt text it will read aloud the file's name.
     - if it finds the alt text empty `alt=""` --> it will skip over the image (useful when you want to hide the image from screen readers)
+      - example: if you have multiple star-image for movie-review and we don't want the screen-reader to repeatedly say "star image star image ...", Instead we only add `alt` to the first star-image with value `"star images"` and skip the other images.
   - we don't use `picture of` or `graphic of` in **alt** as the screen reader says it in the beginning by default
 
 - **Hiding elements**
