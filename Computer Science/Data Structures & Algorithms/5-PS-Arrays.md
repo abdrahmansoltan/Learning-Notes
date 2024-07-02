@@ -19,6 +19,7 @@
     - [Remove Element](#remove-element)
     - [Remove Duplicates From Sorted Array](#remove-duplicates-from-sorted-array)
     - [Remove Duplicates from Sorted Array II](#remove-duplicates-from-sorted-array-ii)
+    - [Check If Two String Arrays are Equivalent](#check-if-two-string-arrays-are-equivalent)
     - [Container with most water](#container-with-most-water)
     - [Squares of a Sorted Array](#squares-of-a-sorted-array)
     - [Sort Array By Parity](#sort-array-by-parity)
@@ -1003,6 +1004,62 @@ def removeDuplicates(nums):
             nums[l] = nums[r]
             l += 1
     return l
+```
+
+---
+
+### Check If Two String Arrays are Equivalent
+
+| Video Solution                                                | Hint                                                                                                                                                                                |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=ejBwc2oE7ck) | Use **4 pointers** to iterate over the two arrays: 2 pointers for the current word in the arrays and 2 for the current character in the word. Compare the characters at each index. |
+
+Given two string arrays `word1` and `word2`, return `true` if the two arrays represent the same string, and `false` otherwise.
+
+A string is represented by an array if the array elements concatenated in order forms the string.
+
+- Ex:
+
+  - `word1 = ["ab", "c"], word2 = ["a", "bc"]` -> `true` because `"ab" + "c" == "a" + "bc"`
+  - `word1 = ["a", "cb"], word2 = ["ab", "c"]` -> `false` because `"a" + "cb" != "ab" + "c"`
+
+- Explanation:
+
+  - The brute force approach is to concatenate the strings in each array using the `join()` method and compare the two strings. However:
+    - This approach has a time complexity of `O(n)` and a **space complexity of `O(n)`** because we need to create two new strings.
+  - A better approach is to use **two pointers** to iterate over the two arrays and compare the characters at each index.
+    - This approach has a time complexity of `O(n)` and a **space complexity of `O(1)`** because we are not creating any new strings.
+
+- Time complexity: `O(n)`
+- Space complexity: `O(1)`
+
+```py
+# Brute force approach
+def arrayStringsAreEqual(word1, word2):
+    return "".join(word1) == "".join(word2)
+
+# ---------------------------------------------- #
+
+# Two pointers approach
+def arrayStringsAreEqual(word1, word2):
+    i = j = 0 # pointers for word1 and word2 (index of word)
+    k = l = 0 # pointers for the current word in word1 and word2 (index of character)
+
+    while i < len(word1) and j < len(word2):
+        if word1[i][k] != word2[j][l]:
+            return False
+
+        k += 1
+        l += 1
+
+        if k == len(word1[i]):
+            i += 1
+            k = 0
+        if l == len(word2[j]):
+            j += 1
+            l = 0
+
+    return i == len(word1) and j == len(word2)
 ```
 
 ---

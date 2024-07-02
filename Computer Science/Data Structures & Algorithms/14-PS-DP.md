@@ -21,6 +21,7 @@
   - [Maximum Profit in Job Scheduling](#maximum-profit-in-job-scheduling)
   - [Jump Game](#jump-game)
   - [Jump Game II](#jump-game-ii)
+    - [Valid Parenthesis String](#valid-parenthesis-string)
   - [0 or 1 Knapsack Pattern](#0-or-1-knapsack-pattern)
     - [0/1 Knapsack](#01-knapsack)
     - [Unbounded KnapSack](#unbounded-knapsack)
@@ -1495,6 +1496,65 @@ def jump(nums: List[int]) -> int:
             currIndex = maxIndex
 
     return jumps
+```
+
+---
+
+### Valid Parenthesis String
+
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=QhPdNS143Qg) | Use **two counters** `min` and `max` to keep track of the minimum and maximum number of opening brackets that we need to balance the closing brackets. Each time we encounter an `opening` bracket, we increment both counters. Each time we encounter a `closing` bracket, we decrement both counters. Each time we encounter a `star`, we increment the `max` counter and decrement the `min` counter. |
+
+Given a string `s` containing only three types of characters: `'('`, `')'`, and `'*'`, return `true` if `s` is a valid string.
+
+The following rules define a valid string: Any left or right parenthesis `'('` and `')'` must have a corresponding parenthesis, `'*'` could be treated as a single right parenthesis `')'` or a single left parenthesis `'('` or an empty string.
+
+- EX:
+
+  - `s = "(*))"` --> `true`
+  - `s = "(((*)"` --> `false`
+
+- Explanation:
+
+  - This is a Greedy problem, because we will be making the locally optimal choice at each step to reach the globally optimal solution.
+  - You might initially think that we will need one counter to keep track of the number of opening brackets and another counter to keep track of the number of closing brackets. But this is not the case, because we can use the `star` as an empty string or as an `opening` bracket or as a `closing` bracket. **So, we will need two counters `min` and `max`**.
+  - We will use two counters `min` and `max` to keep track of the minimum and maximum number of opening brackets that we need to balance the closing brackets.
+  - Each time we encounter an `opening` bracket, we increment both counters.
+    - Because we need to add one `closing` bracket to balance the `opening` bracket.
+  - Each time we encounter a `closing` bracket, we decrement both counters.
+    - Because we have found a matching `closing` bracket.
+  - Each time we encounter a `star`, we increment the `max` counter and decrement the `min` counter.
+    - Because we can use the `star` as an `empty` string or as a `opening` bracket or as an empty string.
+  - At the end, if the `min` counter is not equal to `0`, then we return `false`.
+    - Because we have more `closing` brackets than `opening` brackets.
+  - Otherwise, we return `true`.
+    - Because we have the same number of `opening` brackets and `closing` brackets.
+
+- Time complexity: `O(n)`, where `n` is the length of the string.
+- Space complexity: `O(1)`
+
+```py
+def checkValidString(s):
+    leftMin = leftMax = 0
+
+    for char in s:
+        if char == '(':
+            leftMin += 1
+            leftMax += 1
+        elif char == ')':
+            leftMin -= 1
+            leftMax -= 1
+        else:
+            leftMin -= 1 # use the star as a closing bracket
+            leftMax += 1 # use the star as an opening bracket
+
+        if leftMax < 0:
+            return False
+
+        leftMin = max(leftMin, 0)
+
+    return leftMin == 0
 ```
 
 ---

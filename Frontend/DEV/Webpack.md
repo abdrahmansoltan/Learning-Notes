@@ -22,7 +22,8 @@
   - [Caching](#caching)
     - [Cache Busting](#cache-busting)
   - [Webpack Bundle Analyzer](#webpack-bundle-analyzer)
-  - [Webpack different modes](#webpack-different-modes)
+  - [Webpack different modes (Common, Development, Production, Test)](#webpack-different-modes-common-development-production-test)
+    - [For Common Configuration](#for-common-configuration)
     - [For Development](#for-development)
     - [For Production](#for-production)
   - [Working with Webpack](#working-with-webpack)
@@ -288,6 +289,7 @@ How to use it ? -> three ways to use Webpack: `Webpack config`, `Webpack CLI`, a
 **Loaders**: Third party extensions that help webpack to bundle files by telling webpack how to modify **(interpret and translate)** files (on a per-file basis) before its added to the dependency graph.
 
 - Loaders are also javascript `modules` (`functions`) that takes the `source file` and return it in a `modifies state`
+- They use `REGEX` pattern to match files and apply transformations to them
 - They are the transformations that are applied on the source code of a module.
   - They allow you to **pre-process** files as you `import` or `load` them. Thus, loaders are kind of like (**tasks** in other build tools) and provide a powerful way to handle frontend build steps, or like (allowing you to `import` css files directly from your Javascript modules).
   - Once the file becomes a module, webpack can use it as a dependency in the dependency graph.
@@ -772,19 +774,22 @@ When webpack bundles our application and outputs it to the `dist` folder which i
 
 ---
 
-## Webpack different modes
+## Webpack different modes (Common, Development, Production, Test)
 
 ![webpack.prod.js](./img/webpack-modes.png)
 
 - **Approach 1:** Usually we have 2 modes (`development`, `production`), so we usually have 3 files:
 
-  - `webpack.common.js` : this will have the common configuration between dev and prod which have all the common plugins before building both development and production
-  - `webpack.dev.js` : this will have the development configuration, it merges the common webpack as a first step then it make some configurations related to the dev and the development server.
-  - `webpack.prod.js` : this will have the production configurations, it merges the common webpack as a first step then it make some configurations related to the prod like
-    - minimizing the code
-    - removing the source maps
-    - adding a hash for the bundle every time it changes
-    - adding plugins used in production only
+  - `webpack.common.js`
+    - this will have the common configuration between `dev` and `prod` which have all the common plugins before building both development and production
+  - `webpack.dev.js`
+    - this will have the development configuration, it merges the common webpack as a first step then it make some configurations related to the dev and the development server.
+  - `webpack.prod.js`
+    - this will have the production configurations, it merges the common webpack as a first step then it make some configurations related to the prod like:
+      - minimizing the code
+      - removing the source maps
+      - adding a hash for the bundle every time it changes
+      - adding plugins used in production only
 
 - **Approach 2:** pass the `env` variable to webpack and use it to determine which file to use
 
@@ -861,6 +866,35 @@ When webpack bundles our application and outputs it to the `dist` folder which i
   ```
 
 > You can find more here: [Webpack for Common, Development, and Production](https://www.linkedin.com/pulse/webpack-common-development-production-rany-elhousieny-phd%25E1%25B4%25AC%25E1%25B4%25AE%25E1%25B4%25B0/) and here: [Webpack Documentation](https://webpack.js.org/guides/production/)
+
+---
+
+### For Common Configuration
+
+Main webpack configuration file, it includes all rules and plugins that are being processed in the bundling in each environment.
+
+- It includes plugins like:
+
+  - `CleanWebpackPlugin`: to clean the `dist` folder before each build
+  - `HtmlWebpackPlugin`: to generate the `index.html` file in the `dist` folder, and handle html options.
+  - `StyleLintPlugin`: to lint the css files
+  - `SvgStore`: to bundle all svg files into a single file (**svg sprites**), and handle reading and referencing in the html file
+  - `CopyWebpackPlugin`: to copy files from one location to another (`dist` folder)
+  - `ProvidePlugin`: to provide global variables to all modules (ex: `jQuery`)
+
+- It includes rules / loaders like:
+  - `babel-loader`: to transpile the `ES6` code to `ES5`
+  - `html-loader`: to load html files and pass some options to it
+  - `htmlhint-loader`: to lint the html files
+  - `imports-loader`: to reference the imported modules in the global scope
+  - `css-loader`: to load css files
+  - `sass-loader`: to load sass files
+  - `file-loader`: to load files (images, fonts,..) to be output in the `dist` folder
+  - `eslint-loader`: to lint the javascript files
+  - `style-loader`: to inject the css into the html file
+  - `postcss-loader`: to add vendor prefixes to the css file
+  - `url-loader`: to load files as `base64` strings
+  - `exports-loader`: to export a module/library to the path using the loader to be used
 
 ---
 

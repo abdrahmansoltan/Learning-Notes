@@ -31,6 +31,7 @@
       - [SVG icons](#svg-icons)
       - [PNG icons](#png-icons)
       - [CSS sprites](#css-sprites)
+  - [Video](#video)
   - [Tables](#tables)
     - [Table Structure](#table-structure)
     - [Spanning Columns and rows](#spanning-columns-and-rows)
@@ -782,6 +783,26 @@ for that we use media queries as we put each image in each media
 
 - They combine multiple images into a single image file and use CSS to display the desired image.
 - **CSS sprites** are commonly used for icons.
+
+---
+
+## Video
+
+- The `<video>` element is used to embed video content in a webpage.
+- The `<source>` element is used to specify multiple video files for the `<video>` element. The browser will choose the first file it can play.
+  - if the browser doesn't support the video format, it will skip to the next one until it finds a format it can play.
+- The `controls` attribute adds video controls, like `play`, `pause`, and `volume`.
+- The `autoplay` attribute automatically plays the video when the page loads.
+
+- Example:
+
+  ```html
+  <video controls autoplay>
+    <source src="movie.mp4" type="video/mp4" />
+    <source src="movie.ogg" type="video/ogg" />
+    Your browser does not support the video tag.
+  </video>
+  ```
 
 ---
 

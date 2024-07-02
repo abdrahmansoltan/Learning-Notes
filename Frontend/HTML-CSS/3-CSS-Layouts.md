@@ -2,8 +2,12 @@
 
 - [INDEX](#index)
   - [LAYOUTS](#layouts)
-  - [Flow layout (Block vs Inline)](#flow-layout-block-vs-inline)
-  - [Float](#float)
+    - [Box Types (Block vs Inline)](#box-types-block-vs-inline)
+  - [Positioning Schemes](#positioning-schemes)
+    - [Float](#float)
+    - [Positioning \& Prospective](#positioning--prospective)
+      - [`position` property](#position-property)
+      - [`z-index` (Stacking Context)](#z-index-stacking-context)
   - [Flexbox](#flexbox)
     - [Flex direction](#flex-direction)
     - [Aligning items in the flex container](#aligning-items-in-the-flex-container)
@@ -59,11 +63,12 @@ Layouts are the way we arrange elements on a page.
 
 ---
 
-## Flow layout (Block vs Inline)
+### Box Types (Block vs Inline)
 
 **Flow layout** is the default layout mode. A plain HTML document, with no CSS applied, uses Flow layout exclusively.
 
 In Flow layout, every element will use a display value of either `inline`, `block`, or `inline-block`. This value governs how the Flow layout algorithm will place the element. The default value depends on the tag; `div` elements are `block` by default, while `spans` are `inline`.
+![flow layout](./img/flow-layout.png)
 
 - **Block-level elements**:
   ![block-level](./img/block-level.png)
@@ -86,7 +91,6 @@ In Flow layout, every element will use a display value of either `inline`, `bloc
     ![inline](./img/inline-2.png)
 
 - **Inline-block elements**:
-  ![inline-block](./img/inline-block.png)
   - It's an element that internally acts like a block element, but externally acts like an inline element. The parent container will treat it as an inline element, since it's external. But the element itself can be styled like a block.
     - it's a mix between `block` and `inline` elements
     - it looks like an `inline` element but behaves like a `block` element
@@ -95,12 +99,17 @@ In Flow layout, every element will use a display value of either `inline`, `bloc
     ![inline-block](./img/inline-block-1.png)
   - Note:
     - `inline-block` elements respect the space between the elements in the HTML file (like `inline` elements), so if you have a space between them in the HTML file, it'll be shown in the browser.
+    - if you have a container that you want to take only 100% of its content, make it `inline-block`
+      ![inline-block](./img/inline-block-2.png)
+      ![inline-block](./img/inline-block-3.png)
 
 ---
 
----
+## Positioning Schemes
 
-## Float
+![positioning](./img/positioning-flow-1.png)
+
+### Float
 
 It's a CSS property that allows an element to be pushed to the left or right (removed from the normal document flow), and the other elements will wrap around it.
 
@@ -140,12 +149,26 @@ It's a CSS property that allows an element to be pushed to the left or right (re
 
     - To clear `float` for the elements next to the (container element that has the floating elements), we can use a class `clearfix` like this --> **clearfix hack**
 
-      ```css
+      ```scss
       .clearfix::after,
       .clearfix::before {
         content: '';
         clear: both;
         display: table;
+      }
+
+      // or if you're using sass, you can make it a mixin
+      @mixin clearfix {
+        &::after,
+        &::before {
+          content: '';
+          clear: both;
+          display: table;
+        }
+      }
+
+      .container {
+        @include clearfix;
       }
       ```
 
@@ -155,6 +178,81 @@ It's a CSS property that allows an element to be pushed to the left or right (re
         ![clearfix](./img/clearfix2.png)
 
     - There's a new way to clear float --> `display: flow-root`
+
+---
+
+### Positioning & Prospective
+
+**Positioning** is the process of determining the location of an element on the page.
+
+#### `position` property
+
+In CSS, the `position` property is used to control the layout of an element. It has 5 possible values: (`static`, `relative`, `absolute`, `fixed`, `sticky`)
+![position](./img/position-1.jpeg)
+
+- `static`
+  - It's the **default value**
+  - It means that the element is positioned according to the normal flow of the document.
+  - Here, `top`, `right`, `bottom`, and `left` properties have no effect.
+- `relative`
+
+  - It moves an element in relation to where it would have been in normal flow (relative to its current position).
+    ![relative](./img/position-4.png)
+
+    ```css
+    .box {
+      position: relative;
+      top: 20px;
+      left: 20px;
+    }
+    ```
+
+  - its space is still reserved in the normal flow even if it's moved
+
+- `absolute`
+
+  - It's relative to nearest parent element with `relative` positioning until we reach the `<body>` element
+    ![absolute](./img/position-5.png)
+    ![absolute](./img/position-3.png)
+  - It removes the element from the normal flow of the document, so it doesn't take up space in the normal flow.
+  - Normal vs Absolute positioning:
+    ![absolute](./img/position-2.png)
+
+- `fixed`
+  - Here, element is removed from the normal flow and positioned relative to the root container element. (no space is reserved for it in the normal flow)
+    ![fixed](./img/position-6.png)
+  - When you scroll the page, the element stays in the same place **(because it's fixed/relative to the viewport)**
+- `sticky`
+
+  - It toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
+
+    ```css
+    .nav {
+      position: sticky;
+      top: 0; /* once it reaches the top=0 with the viewport, then it will stick  */
+    }
+    ```
+
+- Notes:
+
+  - when using `absolute` position with `inset: 0`, it makes the element expand to fill the height and width of the closest parent with a **non-static position**
+
+    - **inset**: The inset property in CSS is a shorthand for the four inset properties, `top`, `right`, `bottom` and `left` in one declaration. Just like the four individual properties themselves, inset has no effect on non-positioned (static) elements. In other words, an element must declare an explicit position value before inset properties can take effect.
+
+---
+
+#### `z-index` (Stacking Context)
+
+It specifies the elevation of an element relative to other elements on the page.
+
+- **stacking context** --> `z-index` : as if the blocks have been stacked on top of each other on the **Z axis**
+  ![z-index](./img/z-index-1.png)
+
+- by default, it's equal to `0`
+- if multiple elements have the same `z-index`, then the last one is higher than the others and so on.
+  ![z-index](./img/z-index-2.png)
+- it doesn't work on elements with a `position: static;`
+- you can't hover on something that have a negative `z-index`
 
 ---
 

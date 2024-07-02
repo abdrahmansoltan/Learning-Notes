@@ -1,11 +1,12 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Animation \& Transitions](#animation--transitions)
+  - [CSS Animation](#css-animation)
     - [What to animate? (Animation Performance)](#what-to-animate-animation-performance)
+    - [Transition vs Animation](#transition-vs-animation)
   - [`transform` property](#transform-property)
   - [Transition](#transition)
-  - [CSS Animation](#css-animation)
+  - [CSS Animation](#css-animation-1)
     - [Animation properties](#animation-properties)
     - [Animation Keyframes](#animation-keyframes)
     - [Animation choreograph](#animation-choreograph)
@@ -17,7 +18,7 @@
 
 ---
 
-## Animation & Transitions
+## CSS Animation
 
 ### What to animate? (Animation Performance)
 
@@ -43,6 +44,18 @@ Here are some guidelines (CSS triggers):
     ![browser render](./img/browser-render-1.png)
   - it's very costly because it forces the browser to recalculate the layout of the page, **So try to avoid it as much as possible**
     - instead use `transform: translate()`
+
+---
+
+### Transition vs Animation
+
+![transition vs Animation](./img/transition-vs-keyframes.webp)
+
+| Transition                                                                                        | Animation                                                                                                              |
+| ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| It's used for simple animations, like hover effects                                               | It's used for more complex animations, like loading spinners                                                           |
+| It's used for changing the state of an element from one to another                                | It's used when you want to define multiple states for an element, or when you want to define the steps of an animation |
+| It can't be reused, you have to define it for each state for each element and each/all properties | It can be reused, you can define it once and use it multiple times for different elements                              |
 
 ---
 
@@ -187,6 +200,16 @@ Applying animation to an element is done by 2 steps:
     - `alternate` -> from `0%` to `100%` then from `100%` to `0%`
     - `alternate-reverse` -> from `100%` to `0%` then from `0%` to `100%`
 - `animation-timing-function`
+
+  - It's how the animation takes place (rate of change)
+    ![transition-timing-function](./img/transition-2.png)
+
+    - `ease` - default = slow start, fast, slow end
+    - `linear` = same speed start to end
+    - `ease-in` = slow start
+    - `ease-out` = slow end
+    - `ease-in-out` = slow start, fast, slow end
+
 - `animation-fill-mode`
   - it's what happens when the animation finishes or before it starts (before the first iteration)
     ![CSS-Animation-Fill-mode](./img/CSS-Animation-Fill-mode.webp)
@@ -318,6 +341,45 @@ You can use `data-state` attribute to define state and make css values establish
 
 - [Codepen example 1 (transition)](https://codepen.io/designcouch/pen/ExvwPY)
 - [Codepen example 2](https://codepen.io/Danilo06/pen/PoNNvGm)
+- To do it with pure CSS, use `input[type=checkbox]` to toggle the state
+
+  ```html
+  <input type="checkbox" id="menu" />
+  <label for="menu">
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+  </label>
+  ```
+
+  ```css
+  input[type='checkbox'] {
+    display: none;
+  }
+
+  label {
+    display: block;
+    width: 50px;
+    height: 50px;
+    background: #333;
+    position: relative;
+    cursor: pointer;
+  }
+
+  label div {
+    width: 30px;
+    height: 5px;
+    background: #fff;
+    position: absolute;
+    left: 10px;
+    transition: 0.5s;
+  }
+
+  input[type='checkbox']:checked + label div:nth-child(1) {
+    transform: rotate(45deg);
+    top: 22px;
+  }
+  ```
 
 ---
 
@@ -349,7 +411,6 @@ You can use `data-state` attribute to define state and make css values establish
   ![transform-origin](./img/transform-origin2.png)
   ![transform-origin](./img/transform-origin.png)
 
-- when using 3d animation / transform => use `perspective` property on the parent element
 - to disable animation (some users prefer no animation), we can use this media-query:
 
   ```css

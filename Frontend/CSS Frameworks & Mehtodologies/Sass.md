@@ -1,13 +1,10 @@
 # INDEX
 
 - [INDEX](#index)
-  - [CSS Preprocessors](#css-preprocessors)
-    - [Reasons to use a CSS Preprocessor](#reasons-to-use-a-css-preprocessor)
-    - [The Value and Limitations of Preprocessors](#the-value-and-limitations-of-preprocessors)
-    - [SASS vs Less vs Stylus](#sass-vs-less-vs-stylus)
   - [Sass](#sass)
     - [Why using Sass?](#why-using-sass)
     - [When to use Sass over CSS](#when-to-use-sass-over-css)
+    - [Sass compilers](#sass-compilers)
   - [Installation](#installation)
     - [1. Using Extension](#1-using-extension)
     - [2. Using Task Runner: NPM (preferred way ✅)](#2-using-task-runner-npm-preferred-way-)
@@ -15,7 +12,8 @@
       - [Using task runner like `gulp` or `grunt`](#using-task-runner-like-gulp-or-grunt)
       - [Using bundler like `webpack`](#using-bundler-like-webpack)
     - [SASS starter project (if needed)](#sass-starter-project-if-needed)
-  - [Partials: Modules](#partials-modules)
+  - [7-1 pattern (Folder Structure)](#7-1-pattern-folder-structure)
+  - [Partials](#partials)
     - [@import](#import)
     - [@use](#use)
     - [@forward](#forward)
@@ -29,9 +27,9 @@
   - [Mixin - Extending - Placeholder](#mixin---extending---placeholder)
     - [Mixin](#mixin)
       - [Mixins `null` values](#mixins-null-values)
-      - [Passing declaration block](#passing-declaration-block)
-    - [@extend](#extend)
+      - [Passing declaration block to mixins](#passing-declaration-block-to-mixins)
     - [Placeholder](#placeholder)
+    - [Mixin vs Placeholder](#mixin-vs-placeholder)
   - [Functions](#functions)
     - [Color Functions](#color-functions)
   - [Operators](#operators)
@@ -41,71 +39,11 @@
 
 ---
 
-## CSS Preprocessors
-
-A CSS preprocessor is a scripting language that extends CSS and **compile** the code which is written using a special compiler. They then use that to create a CSS file, which can then be referenced by the main HTML document
-
-- It means whatever you write in the preprocessor language will be compiled into normal CSS.
-  ![css-preprocessors](./img/css-preprocessors.jpg)
-
-- When using any CSS Preprocessor, you will be able to program in normal CSS just as you would if the preprocessor were not in place. The good thing is you also have more options available to you.
-  - Some, such as `SASS`, has specific style standards which are meant make the writing of the document even easier, and using some useful features like:
-    - Variables
-    - Loops
-    - If/Else Statements
-    - mixins
-    - nesting
-    - importing
-    - use logic and write less code
-- There are three main preprocessors – `Sass`, `LESS` and `Stylus`
-
----
-
-### Reasons to use a CSS Preprocessor
-
-- It will make your code **faster to build** and **easier to maintain**
-  - `variables`, `mixins` and `functions` that are declared at the beginning of the document which will make simple changes, like a color, easier to maintain.
-- It will make your CSS **DRY**
-- It will make your CSS more organized
-  - nested definitions. This is an excellent feature and keeps things organized
-- It will add stuff that should have been there. Like **variables** and **mixins**.
-
----
-
-### The Value and Limitations of Preprocessors
-
-Most CSS developers are familiar with preprocessors. Tools including `Sass`, `Less`, and `Stylus` introduced concepts such as file partials, nesting, variables, and mixins. Some features are gradually appearing in native CSS, but a preprocessor is still useful for managing large codebases and maintaining style and coding consistency.
-
-- It may be difficult to imagine life without a CSS preprocessor, but there are downsides:
-  - **Preprocessors are not extendable or limitable**.
-    - Most preprocessors are a black box which provide you a specific set of supported features. It may be possible to write custom functions, but functionality beyond the scope of that tool is remains impossible — such as inlining an SVG as a background image.
-    - Similarly, you can’t stop developers using options you’d rather avoid such as @extend or deep nesting. Linting can help, but it won’t stop the preprocessor compiling a valid file.
-  - **Preprocessors provide their own syntax**
-    - Preprocessor code may resemble CSS, but no browser can parse the file natively. The syntax is different and, if your tool changes or is unavailable, your code will require updates to make it usable.
-
----
-
-### SASS vs Less vs Stylus
-
-- **Sass**
-
-  - It was built on `Ruby` and has frameworks like `Gumby` and Foundation. Sass also has great mixin libraries
-
-- **Less**
-
-  - It runs inside `Node.js`, in the browser.
-  - The main difference between `LESS` and other CSS preprocessors is that `LESS` allows **real-time compilation** via `less.js` in the browser.
-
-- Stylus
-  - It is built on `node.js`, `Stylus` really strips down all of the extra characters that clog up your CSS. `Stylus` allows freedom in terms of syntax – you can omit braces, semicolons and even colons. Stylus incorporates powerful in-language functions and conditionals.
-
----
-
 ## Sass
 
 Sass is a CSS preprocessor, an extension of CSS that adds power and elegance to the basic language.
 
-- Once Sass is installed, you can compile your Sass to CSS using the sass command. You'll need to tell Sass which file to build from, and where to output CSS to.
+- Once Sass is installed, you can compile your Sass code to CSS code using the `sass` command. You'll need to tell Sass which file to build from, and where to output CSS to.
 
   ```sh
   sass --watch input.scss output.css
@@ -116,19 +54,18 @@ Sass is a CSS preprocessor, an extension of CSS that adds power and elegance to 
 ### Why using Sass?
 
 - Sass has features that don't exist in CSS yet like:
-  - [variables](#variables)
-  - [nesting](#nesting-selectors)
-  - [mixins](#mixins)
-  - [inheritance](#placeholder-and-extending)
-  - [modules - partials](#partials)
-  - [importing](#importing)
-  - [math](#operators)
-  - [color functions](#color-functions)
-  - [loops](#loops-and-iteration)
-  - [conditionals](#control-flow)
-  - [built-in functions](#functions)
+  - [variables](#variables) -> for reusing values
+  - [nesting](#nesting-selectors) -> for nesting selectors inside one another, allowing us to write less code
+  - [mixins](#mixin) -> for reusing style rules
+  - [inheritance](#placeholder)
+  - [modules - partials](#partials) -> for organizing code in multiple files
+  - [importing](#import) -> for importing other files
+  - [math operators](#operators) -> for doing math in your CSS
+  - [color functions](#color-functions) -> for manipulating colors
+  - [loops](#loops-and-iteration) -> for creating multiple styles with less code
+  - [conditionals](#control-flow) -> for writing complex logic in your styles
+  - [built-in functions](#functions) -> for manipulating values
   - [custom functions](#functions)
-  - [custom directives](#functions)
   - [and more](https://sass-lang.com/documentation)
 
 ---
@@ -143,8 +80,25 @@ Sass supports 2 syntaxes: `SCSS` (Sassy CSS) and `Sass` (indented syntax). The d
   - browser support
 
 - **SCSS vs SASS**
+  ![sass-vs-scss](./img/sass-vs-scss.png)
   - `SCSS` is like `Sass`, but is closer to regular CSS. **SCSS is fully CSS compliant**, meaning you can import regular CSS into a SCSS file, and it will work immediately.
-  - ![sass-vs-scss](./img/sass-vs-scss.png)
+
+---
+
+### Sass compilers
+
+There are many ways to compile Sass code to CSS code:
+
+- **Dart Sass** (the primary implementation of Sass)
+  - It's the **official** Sass compiler, and it's written in Dart
+  - It's the **recommended** compiler to use
+  - It's **faster** and **more up-to-date** than Ruby Sass
+- **Ruby Sass**
+  - It's the **original** Sass compiler, and it's written in Ruby
+  - It's **slower** and **no longer maintained**
+- **Node Sass**
+  - It's a **library** that provides binding for Node.js to LibSass, the C version of the popular stylesheet preprocessor, Sass
+  - It's **deprecated** and **no longer maintained** ❌
 
 ---
 
@@ -175,14 +129,22 @@ when using `live sass compiler` extension, use these settings in your `settings.
 
 You can use `npm` to compile your sass files, and it's the preferred way as it's more flexible and you can use it with any editor.
 
-- First install `sass` package using `npm install sass --save-dev`
+- First install `sass` package
+
+  ```sh
+  npm install sass --save-dev
+  ```
+
 - The write a script in `package.json` file to compile your sass files
 
   ```json
   "scripts": {
-    "sass": "sass --watch src/sass:public/css"
+    // "script-name": "sass --watch input.scss output.css"
+    "compile:sass": "sass --watch src/main.scss public/css/style.css"
   }
   ```
+
+---
 
 #### Using task runner like `gulp` or `grunt`
 
@@ -204,6 +166,8 @@ You can use `npm` to compile your sass files, and it's the preferred way as it's
 
 - Then run the task using `gulp sass`
 - You can also use `gulp watch` to watch for changes in your sass files and compile them automatically
+
+---
 
 #### Using bundler like `webpack`
 
@@ -285,31 +249,11 @@ use this as the contents of a fresh `package.json`:
 
 ---
 
-## Partials: Modules
+## 7-1 pattern (Folder Structure)
 
-These're `scss` files that starts with `_`, ex: `_layout.scss`
+It's a way to organize your `scss` files in a more structured way, where you have 7 different folders for different types of files, and 1 file for the main `scss` file that imports all the other files, which will be compiled into a single `css` file.
 
-> `partials` are designed to be **imported** into other scss files and they **won't become css files** by themselves
-
-- it's for instead of working with one long `css` file, you can actually **split up** your styles into multiple files and be more organized with sub-folders
-  - also it can lower the chance of **code-conflict** between developers working on the same project as they won't be working in the same file
-- `sass` will ignore any file that starts with `_`, and will not compile it to `css` file.
-  - The underscore lets Sass know that the file is only a partial file and that it should not be generated into a CSS file.
-- `Sass` partials are used with the `@use` rule or the `@import` rule.
-
-  - `@import` is the old way of importing partials, and it's not recommended to use it anymore
-  - `@use` is the new way of importing partials, and it's recommended to use it
-
-  ```scss
-  // _layout.scss
-  .container {
-    // code
-  }
-  // now you can import it in another file
-  @use 'layout';
-  ```
-
-- Usually, when using `partials` to organize your code, you will have a `main.scss` file that imports all of the other partials to be compiled into a single CSS file. So for organization, we can use the **7-1 pattern**:
+- Usually, when using [partials](#partials) to organize your code, you will have a `main.scss` file that imports all of the other partials to be compiled into a single CSS file. So for organization, we can use the **7-1 pattern**:
 
   ```sh
   scss/
@@ -321,7 +265,9 @@ These're `scss` files that starts with `_`, ex: `_layout.scss`
   |
   |– base/
   |   |– _reset.scss        # Reset/normalize
+  |   |– _base.scss         # Base styles (e.g. body tag)
   |   |– _typography.scss   # Typography rules
+  |   |- _utilities.scss    # Utility classes
   |   …                     # Etc.
   |
   |– components/
@@ -352,7 +298,7 @@ These're `scss` files that starts with `_`, ex: `_layout.scss`
   |   |– _jquery-ui.scss    # jQuery UI
   |   …                     # Etc.
   |
-  `– main.scss              # Main Sass file
+  |– main.scss              # Main Sass file
   ```
 
   ```scss
@@ -362,7 +308,9 @@ These're `scss` files that starts with `_`, ex: `_layout.scss`
   @use 'abstracts/mixins';
 
   @use 'base/reset';
+  @use 'base/base';
   @use 'base/typography';
+  @use 'base/utilities';
 
   @use 'components/buttons';
   @use 'components/carousel';
@@ -381,6 +329,30 @@ These're `scss` files that starts with `_`, ex: `_layout.scss`
 
   @use 'vendors/bootstrap';
   @use 'vendors/jquery-ui';
+  ```
+
+---
+
+## Partials
+
+These're `scss` files that starts with `_`, ex: `_layout.scss`
+
+- it's for instead of working with one long `css` file, you can actually **split up** your styles into multiple files and be more organized with sub-folders
+  - also it can lower the chance of **code-conflict** between developers working on the same project as they won't be working in the same file
+- `sass` will ignore any file that starts with `_`, and will not compile it to `css` file.
+  - The underscore lets Sass know that the file is only a partial file and that it should not be generated into a CSS file.
+- `Sass` partials are used with the `@use` rule or the `@import` rule.
+
+  - `@import` is the old way of importing partials, and it's not recommended to use it anymore
+  - `@use` is the new way of importing partials, and it's recommended to use it
+
+  ```scss
+  // _layout.scss
+  .container {
+    // code
+  }
+  // now you can import it in another file
+  @use 'layout';
   ```
 
 ---
@@ -629,17 +601,29 @@ $primary-color: #eee !global;
 It's used to insert a variable value inside a string.
 
 - It's done using `#{}`
-- It's commonly used with [loops and iteration](#loops-and-iteration)
+- It's commonly used with:
 
-```scss
-$company == "google";
+  - [loops and iteration](#loops-and-iteration)
 
-.ad #{$company}{
-  // code
-  background-image:url('img/#{$company}.png');
-  // code
-}
-```
+    ```scss
+    $company == "google";
+
+    .ad #{$company}{
+      // code
+      background-image:url('img/#{$company}.png');
+      // code
+    }
+    ```
+
+  - `calc()` function
+
+    ```scss
+    $width: 100px;
+
+    .box {
+      width: calc(#{$width} * 2);
+    }
+    ```
 
 ---
 
@@ -725,41 +709,63 @@ $colors: (
 
 ### Mixin
 
-It's like a variable for a block of style-code (allow for re-use of style)
+It's like a reusable block of code that can be used in multiple places in your stylesheets.
 
+- It's like a variable with a block of code
 - A mixin lets you make groups of CSS declarations that you want to reuse throughout your site. It helps keep your Sass very **DRY**.
 - mixins are used using `@include`
 - You can even pass in values (**arguments**) to make your mixin more flexible.
+
   - this is one of the main purposes of mixin
   - you can use **Default Argument Values** in mixins to define default values for arguments
     - arguments can be provided **in order** or **by name**
     - when keyword `args` is used, order is ignored
   - if you want to re-use a block of style without **arguments**, you should use [Placeholder](#placeholder)
 
-```scss
-// theme-mixin.scss
-// mixin with an argument with a default value
-@mixin theme($theme: DarkGray) {
-  background: $theme;
-  box-shadow: 0 0 1px rgba($theme, 0.25);
-  color: #fff;
-}
+- Examples:
 
-// Use in the same file
-.info {
-  @include theme;
-}
-.alert {
-  @include theme($theme: DarkRed);
-}
-.success {
-  @include theme($theme: DarkGreen);
-}
+  - **Simple mixin**
 
-// ---------------------------------------------------------
-// Use in another file
-@use 'theme-mixin';
-```
+    ```scss
+    @mixin transform-to-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .box {
+      @include transform-to-center;
+    }
+    ```
+
+  - **Mixin with arguments**
+
+    ```scss
+    @mixin transform($property, $value) {
+      -webkit-transform: $property($value);
+      -ms-transform: $property($value);
+      transform: $property($value);
+    }
+
+    .box {
+      @include transform(scale, 1.5);
+    }
+    ```
+
+  - **Mixin with default values**
+
+    ```scss
+    @mixin transform($property: scale, $value: 1.5) {
+      -webkit-transform: $property($value);
+      -ms-transform: $property($value);
+      transform: $property($value);
+    }
+
+    .box {
+      @include transform();
+    }
+    ```
 
 ---
 
@@ -773,55 +779,116 @@ if mixin has a property that doesn't apply to a specific element, the element wi
 
 ---
 
-#### Passing declaration block
+#### Passing declaration block to mixins
 
-- it's like **(like slots in components)**
+- it's like **slots** in components
 
-You can pass declaration block inside the mixin when invoking it using `@content`
-![mixins-blocks](./img/mixins-blocks.png)
+- You can pass declaration block inside the mixin when invoking it using `@content`
+  ![mixins-blocks](./img/mixins-blocks.png)
+- It's commonly used with `@media` queries, to avoid writing the `max-width` value every time
+- Example:
 
----
+  ```scss
+  @mixin media-phone {
+    @media (max-width: 600px) {
+      @content;
+    }
+  }
 
-### @extend
+  .box {
+    // without the need to write the max-width: 600px
+    @include media-phone {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  ```
 
-- the difference here from `mixins` is that `placeholders` help keeping Sass writing **Dry**
-  - `@extend` in Sass that allows for sharing of CSS properties from one selector to another without rewrite repeated code.
-    ![extend-vs-mixin](./img/extend-vs-mixin.png)
-    ![extend-vs-mixin](./img/extend-vs-mixin-2.png)
+- Generic example for `@content`:
+
+  ```scss
+  @mixin media($breakpoint) {
+    @if $breakpoint == 'phone' {
+      @media (max-width: 600px) {
+        @content;
+      }
+    } @else if $breakpoint == 'tablet' {
+      @media (max-width: 900px) {
+        @content;
+      }
+    } @else if $breakpoint == 'desktop' {
+      @media (max-width: 1200px) {
+        @content;
+      }
+    }
+  }
+
+  .box {
+    @include media('phone') {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  ```
 
 ---
 
 ### Placeholder
 
 - it's like [Mixin](#mixin) but without parameters
-- it starts with `%`
-- it's the safer way to use `@extend` without blowing in size with selectors in your `.css` file
-- `@extend` in Sass that allows for sharing of CSS properties from one selector to another.
+- it starts with `%` prefix
+- it's applied using `@extend` keyword
 
-```scss
-%main-box {
-  // code
-}
+  - `@extend` in Sass that allows for sharing of CSS properties from one selector to another without rewrite repeated code.
+    ![extend-vs-mixin](./img/extend-vs-mixin.png)
+    ![extend-vs-mixin](./img/extend-vs-mixin-2.png)
+  - it's the safer way to use `@extend` without blowing in size with selectors in your `.css` file
 
-.article {
-  @extend %main-box;
-  // rest of code
-}
+- Examples
 
-// it can also work with normal selectors
-.btn {
-  // code
-}
+  - extending a placeholder
 
-.btn-danger {
-  @extend .btn;
-}
-```
+    ```scss
+    %main-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
 
-> The difference between `placeholders` and `mixins`:
->
-> - `placeholders` are not compiled to CSS, they are only used to extend selectors. and `mixins` are compiled to CSS.
-> - `placeholders` consolidates shared code, whereas `mixins` allow you to pass in values to make your code more flexible.
+    .article {
+      @extend %main-box;
+      // rest of code
+    }
+    ```
+
+  - extending selector
+
+    ```scss
+    .main-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .article {
+      @extend .main-box;
+      // rest of code
+    }
+    ```
+
+---
+
+### Mixin vs Placeholder
+
+| Mixin                                                                              | Placeholder                                                                              |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Mixins are used to define reusable styles that can be included in other selectors. | Placeholders are used to define reusable styles that can be extended by other selectors. |
+| Mixins are used with `@include` to include the styles in the selector.             | Placeholders are used with `@extend` to extend the styles in the selector.               |
+| Mixins can take arguments to make them more flexible.                              | Placeholders cannot take arguments.                                                      |
+| Mixins are compiled to CSS.                                                        | Placeholders are not compiled to CSS. **(so you can't use them in the same file)**       |
+| Mixins are used when you want to reuse a block of style with arguments.            | Placeholders are used when you want to reuse a block of style without arguments.         |
 
 ---
 
@@ -829,29 +896,48 @@ You can pass declaration block inside the mixin when invoking it using `@content
 
 Sass provides many built-in modules which contain useful functions (and the occasional mixin). These modules can be loaded with the `@use` rule like any user-defined stylesheet, and their functions can be called like any other module member.
 
-- All built-in module URLs begin with sass: to indicate that they're part of Sass itself.
-- some of the predefined functions available in Sass, specifically the color functions: [Built-In Modules](https://sass-lang.com/documentation/modules)
 - sass functions return a **value** for a css property unlike mixins which return a block of css-code
 
-```scss
-// function example
-@use 'sass:math';
+- There're 2 types of functions in Sass:
 
-.container {
-  width: math.div(600px, 960px) * 100%; // 62.5%
-}
-```
+  - **Built-in functions** -> like `math.div()`, `color.red()`, etc
+
+    ```scss
+    // function example
+    @use 'sass:math';
+
+    .container {
+      width: math.div(600px, 960px) * 100%; // 62.5%
+    }
+
+    .box {
+      width: calc((100% - 40px) / 2);
+    }
+    ```
+
+    - All built-in module URLs begin with sass: to indicate that they're part of Sass itself.
+    - some of the predefined functions available in Sass, specifically the color functions: [Built-In Modules](https://sass-lang.com/documentation/modules)
+
+  - **Custom functions** -> like `add-10()`, `add-px()`, etc
+
+    ```scss
+    @function divide($a, $b) {
+      @return $a / $b;
+    }
+
+    .container {
+      width: divide(600px, 960px) * 100%; // 62.5%
+    }
+    ```
 
 - You can use `@if` to check for errors in the code or usually in **Sass functions**:
 
   ```scss
-  @function add-10($number) {
-    @if type-of($number) != 'number' {
-      @warn "`#{$number}` is not a number of `add-10`.";
-      @return false;
+  @function divide($a, $b) {
+    @if $b == 0 {
+      @error "Cannot divide by zero";
     }
-
-    @return $number + 10;
+    @return $a / $b;
   }
   ```
 

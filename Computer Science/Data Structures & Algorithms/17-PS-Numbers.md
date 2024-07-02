@@ -238,32 +238,48 @@ def countPrimes(n):
 
 ### Power of Two
 
+| Video Solution                                                | Hint                                                                                                                                                                                                                                                        |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Video Solution](https://www.youtube.com/watch?v=H2bjttEV4Vc) | Use the **bitwise AND** operator between `n` and `n - 1` to check if `n` is a power of `2`. If the result is `0`, then `n` is a power of `2`. **OR** Start with `1` and multiply it by `2` until it is not less than `n` then check if `n` is equal to `x`. |
+
 Given an integer `n`, return `true` if it is a power of two. Otherwise, return `false`.
 An integer `n` is a power of two, if there exists an integer `x` such that `n == 2^x`.
 
 - Solution 1: using loop (reusable for any number and not just `2`)
 
+  - Here, we loop through the number and divide it by `2` until the number is `1`, but we also check if the number is `0` or negative and return `False` in that case
+  - Another way to start with `1` and multiply it by `2` until it is not less than `n` anymore, and then check if `n` is equal to `x`
+
   ```py
   # O(log n)
   def is_power_of_two(n):
-      if n == 0:
+      if n <= 0:
           return False
 
       while n > 1:
           if n % 2 != 0:
             return False
-          n //= 2 # no need to use floor division here because n is an integer
+          n /= 2
 
       return True
+
+  # ---------------------------OR------------------------------
+
+  # O(log n) ✅
+  def is_power_of_two(n):
+      x = 1
+      while x < n:
+          x *= 2
+      return x == n
   ```
 
-- Solution 2: using bitwise operators
+- Solution 2: using bitwise operators **(interview question: Can you solve this problem without loops?)**
 
-  ![power of two](./img/power-of-two-1.jpg)
-
+  - Any multiple of `2` will have only one `1` in its binary representation
+    ![power of two](./img/power-of-two-1.jpg)
   - We can check this by using the **bitwise AND** operator between `n` and `n - 1`
-  - This is because `n` and `n - 1` will have all the same bits as `n`, except for the rightmost `1` in `n`, **so all the bits in `n` and `n - 1` will be different**
-    ![power of two](./img/power-of-two-2.png)
+    - This is because `n` and `n - 1` will have all the same bits as `n`, except for the rightmost `1` in `n`, **so all the bits in `n` and `n - 1` will be different**
+      ![power of two](./img/power-of-two-2.png)
 
   ```py
   # O(1)
@@ -402,19 +418,16 @@ The two dates are given as strings, their format is `YYYY-MM-DD` as shown in the
   - Input: `date1 = "2020-01-15", date2 = "2019-12-31"`
   - Output: `15`
 
+- Explanation:
+
+  - We can convert the dates to `datetime` objects and then subtract the two dates to get the difference in days
+    - To do so, we need to split the dates into their components (year, month, day)
+  - Then get the difference between the two dates and return the absolute value of the difference
+
+- Time Complexity: `O(1)`
+- Space Complexity: `O(1)`
+
 ```py
-from datetime import datetime
-
-def daysBetweenDates(date1, date2):
-    # convert the dates to datetime objects
-    date1 = datetime.strptime(date1, "%Y-%m-%d")
-    date2 = datetime.strptime(date2, "%Y-%m-%d")
-
-    # get the difference between the dates
-    diff = date1 - date2
-    return abs(diff.days)
-
-# ------------------- Another way to do it -------------------
 from datetime import date
 def daysBetweenDates(date1, date2):
     year1, month1, day1 = map(int, date1.split('-'))

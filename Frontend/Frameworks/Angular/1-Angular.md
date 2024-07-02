@@ -91,6 +91,12 @@ Angular is a `framework` for building **reactive** web applications.
 
   ![jit-aot](./img/jit-vs-aot2.PNG)
 
+- **Incremental DOM**
+  - it's a technique used by Angular to update the DOM efficiently
+  - Angular keeps a copy of the DOM in memory, and when the data changes, Angular compares the new DOM with the old DOM and only updates the parts that have changed
+  - It's similar to `Virtual DOM` in `React` but more efficient
+  - Read this [article](https://medium.com/@mubeennaeem247/angular-incremental-dom-bcae3db06108) for more information
+
 ---
 
 ### Folders and files Structure

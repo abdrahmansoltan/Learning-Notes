@@ -91,7 +91,7 @@ It's a set of instructions to solve a problem/perform a task
 
 - We use Big O to analyze the performance of an algorithm (how fast it is, how much memory it takes up, etc.)
 - It's not enough to know how long an algorithm takes to run—you need to know how the running time increases as the input size increases. That’s where Big O notation comes in.
-- Algorithm speed isn’t measured in seconds, but in **growth of the number of operations**.
+- Algorithm speed isn’t measured in seconds, but in **growth of the number of operations relative to the size of the input**.
 
 ---
 
@@ -134,7 +134,7 @@ It's a set of instructions to solve a problem/perform a task
      - For example, suppose that an algorithm, running on an input of size `n`, takes `6n^2 + 100n + 300` machine instructions. The `6n^2` becomes larger than the remaining terms, `100n + 300`, once `n` becomes large enough, `20` in this case. Here's a chart showing values of `6n^2` and `100n + 300` for values of `n` from `0` to `100`:
        ![asymptotic-notation](./img/asymptotic-notation-1.png)
      - We would say that the running time of this algorithm grows as `n^2` dropping the coefficient `6` and the remaining terms `100n + 300`. It doesn't really matter what coefficients we use; as long as the running time is `an^2 + bn + c`, where `a`, `b`, and `c` are constants: `a > 0`
-       - > There will always be a Value of `n` for which `an^2` is greater than `bn + c`, and this difference increases as `n` increases. We say that `an^2` **dominates** `bn + c` as `n` increases.
+       > There will always be a Value of `n` for which `an^2` is greater than `bn + c`, and this difference increases as `n` increases. We say that `an^2` **dominates** `bn + c` as `n` increases.
 
 - By dropping the less significant terms and the constant coefficients, we can focus on the important part of an algorithm's running time: **its rate of growth**.
 
@@ -199,7 +199,7 @@ It's a set of instructions to solve a problem/perform a task
   for (i = 1; i <= n; i = i + 1) {
     for (j = 1; j <= n; j = j * 2) {
       // -> j = j * 2 -> O(log n) ⚠️
-      console.log('Hello World');
+      // ...
     }
   }
   ```
@@ -217,40 +217,43 @@ It's a set of instructions to solve a problem/perform a task
 
 - It's the same as time complexity, but instead of measuring the time to run program, **we measure memory usage of a specific program**
 - What makes space complexity increase?
+
   - Assigning variables
   - Creating new data structures
   - function calls and allocations
-    - When we call a function, we push a new frame onto the **call stack**, which takes up some amount of memory. When we return from a function, we pop the frame off the stack, which also takes up some amount of memory.
+    - When we call a function, we push a new frame onto the **call stack**, which takes up some amount of memory. When we return from a function, we pop the frame off the stack, which takes up some amount of memory.
 
-```py
-# memory complexity -> O(1)
-def test1():
-  for i in range(1000):
-    # O(1) because we're not creating new data structure or assigning variables other than i
-    print(i)
+- Examples:
 
-# memory complexity -> O(n)
-def test2():
-  arr = []
-  for i in range(1000):
-    # O(n) because we're creating new data structure (arr) and assigning variables (i) in each iteration to the memory
-    arr.append(i)
+  ```py
+  # memory complexity -> O(1)
+  def test1():
+    for i in range(1000):
+      # O(1) because we're not creating new data structure or assigning variables other than i
+      print(i)
 
-# memory complexity -> O(log n), Time complexity -> O(log n)
-def sqrt(n):
-  return sqrt_helper(n, 1, n)
+  # memory complexity -> O(n)
+  def test2():
+    arr = []
+    for i in range(1000):
+      # O(n) because we're creating new data structure (arr) and assigning variables (i) in each iteration to the memory
+      arr.append(i)
 
-def sqrt_helper(n, min, max):
-  if max < min:
-    return -1
-  guess = (min + max) // 2 # O(log n) because we're calling the function recursively and reducing the size of the problem by 2 in each recursive call
-  if guess * guess == n:
-    return guess
-  elif guess * guess < n:
-    return sqrt_helper(n, guess + 1, max)
-  else:
-    return sqrt_helper(n, min, guess - 1)
-```
+  # memory complexity -> O(log n), Time complexity -> O(log n)
+  def sqrt(n):
+    return sqrt_helper(n, 1, n)
+
+  def sqrt_helper(n, min, max):
+    if max < min:
+      return -1
+    guess = (min + max) // 2 # O(log n) because we're calling the function recursively and reducing the size of the problem by 2 in each recursive call
+    if guess * guess == n:
+      return guess
+    elif guess * guess < n:
+      return sqrt_helper(n, guess + 1, max)
+    else:
+      return sqrt_helper(n, min, guess - 1)
+  ```
 
 - **Notes**:
   - when needing to create a bigger fixed array to insert new elements to a full fixed array, we use `O(n)` space complexity of the new array and not the sum of the two arrays

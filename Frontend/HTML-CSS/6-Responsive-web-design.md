@@ -11,7 +11,9 @@
   - [Responsive (Fluid) Layouts](#responsive-fluid-layouts)
   - [Responsive Typography](#responsive-typography)
   - [Responsive Images](#responsive-images)
-  - [Testing Responsive](#testing-responsive)
+    - [When and how to use responsive images](#when-and-how-to-use-responsive-images)
+    - [Common Techniques for Responsive Images](#common-techniques-for-responsive-images)
+  - [Testing Responsive Designs](#testing-responsive-designs)
   - [Tips](#tips)
 
 ---
@@ -108,6 +110,8 @@ They allow us to specify different styles that are only applied at certain scree
 ![media-queries](./img/media-queries-1.png)
 
 - They're tools for **overriding styles** based on the device's characteristics, such as screen size, orientation, and resolution.
+- What will happen if we're in a width that is shared between 2 media queries? The browser will apply the styles of the last media query that matches the screen size.
+  - This is because **media queries don't add any importance or specificity to the CSS**, they just add conditions to the CSS. So the last condition that matches the screen size will be applied.
 
 ### Anatomy of a media query
 
@@ -271,8 +275,8 @@ if (condition) {
 - Strategies for selecting breakpoints
   ![breakpoints](./img/breakpoints-2.png)
 
-we do breaks when **design breaks**
-![responsive](./img/responsive.PNG)
+- we add break-points when **design breaks**
+  ![responsive](./img/responsive.PNG)
 
 - Don't use device-specific break points, instead use **content-specific** break points
 
@@ -304,7 +308,12 @@ Mobile-first is the best approach for responsive web design because it's easier 
 
 ## Responsive Images
 
-Use responsive images to ensure that images scale in resolution with your site to avoid slowing loading time with overly large files.
+The goal of responsive images is to serve the right images to the right screen sizes and resolutions to avoid slowing down your site with overly large files **(web performance)**
+
+- We use responsive images to ensure that images scale in resolution with your site to avoid slowing loading time with overly large files.
+  ![responsive-images](./img/responsive-images-1.png)
+
+### When and how to use responsive images
 
 - Images also need to scale with your layout as visual elements.
 
@@ -317,28 +326,86 @@ Use responsive images to ensure that images scale in resolution with your site t
 
   - The problem with this approach is that every user has to download the **full-sized image**, even on mobile.
 
-- To fix the issue of downloading the full-sized-image, We can serve different versions scaled for different devices using the `srcset` attribute.
+- To fix the issue of downloading the full-sized-image, We can serve different versions scaled for different devices using the `srcset` attribute on the `img` element, or by using the `picture` and `source` elements.
 
-  ```html
-  <img src="img/logo.png" srcset="img/logo-small.png 300w, img/logo.png 1000w" alt="Full logo" />
-  ```
-
-  - `src` attribute is used to specify the default image.
-  - `srcset` attribute is used to specify different versions of the same image for different screen sizes and resolutions.
-
-    - `300w` and `1000w` are the **width descriptors**. They are used to specify the width of the image in pixels.
-    - it selects the image with the closest width to the user's device width.
-
-  - `srcset` attribute is used to specify different versions of the same image for different screen sizes and resolutions.
-  - `300w` and `1000w` are the **width descriptors**. They are used to specify the width of the image in pixels.
-  - The browser will then choose the best image for the user's device and screen size.
-  - **Note**: the browser will only download the image that it needs, so it will download the small image for small screens and the large image for large screens.
+  - the browser will only download the image that it needs, so it will download the small image for small screens and the large image for large screens.
 
 ---
 
-## Testing Responsive
+### Common Techniques for Responsive Images
 
-- Chrome DevTools
+![responsive-images](./img/responsive-images-2.png)
+
+- **Resolution switching**
+
+  - to serve the **same image** with different resolutions (different versions) to different devices
+  - it's done by using the `srcset` attribute
+
+    ```html
+    <img
+      srcset="img/logo-small.png 300w, img/logo.png 1000w"
+      sizes="(max-width: 600px) 300px, 1000px"
+      src="img/logo.png"
+      alt="Full logo"
+    />
+    ```
+
+    - the first image is for small screens and the second image is for large screens (`300w` and `1000w` are the **width descriptors** They are used to specify the width of the image in pixels).
+    - it selects the image with the closest width to the user's device width.
+    - `sizes` attribute is used to specify the width of the image in the layout. It's used to help the browser choose the best image for the user's device and screen size.
+    - `src` attribute is used as a fallback for browsers that don't support the `srcset` attribute.
+
+- **Density switching**
+
+  - to serve the **same image** and control the pixel density of the image that the browser will download
+  - it's done by using the `srcset` attribute
+
+    ```html
+    <img src="img/logo.png" srcset="img/logo-small.png 1x, img/logo.png 2x" alt="Full logo" />
+    ```
+
+    - the first image is for low-density screens and the second image is for high-density screens (`1x` and `2x` are the **pixel-density descriptors**)
+    - the browser will then choose the best image for the user's device and screen size.
+      - high resolution screens have a higher pixel density, so they need a higher resolution image to look sharp -> `2x`
+      - low resolution screens have a lower pixel density, so they need a lower resolution image to look sharp -> `1x`
+
+  - Another way of dowing this is by using `min-resolution` in media-query (usually for `background-image` property)
+
+    ```css
+    .el {
+      background-image: url('img/logo-small.png');
+    }
+
+    @media (min-resolution: 192dpi) {
+      .el {
+        background-image: url('img/logo-large.png');
+      }
+    }
+    ```
+
+- **Art direction**
+
+  - to serve **different images** with different aspect ratios to different devices
+  - it's done by using `picture` and `source` elements
+
+    ```html
+    <picture>
+      <source media="(max-width: 600px)" srcset="img/logo-small.png" />
+      <source media="(min-width: 601px)" srcset="img/logo.png" />
+      <img src="img/logo.png" alt="Full logo" />
+    </picture>
+    ```
+
+    - `media` attribute is used to specify the condition for the image to be displayed
+    - the first image is for small screens and the second image is for large screens
+    - the browser will then choose the best image for the user's device and screen size.
+    - `img` element is used as a fallback for browsers that don't support the `picture` element.
+
+---
+
+## Testing Responsive Designs
+
+- **Chrome DevTools**
 
   - Toggle device toolbar
   - Responsive Design Mode

@@ -4,6 +4,7 @@
   - [Web Dev Fundamentals](#web-dev-fundamentals)
     - [How web development works (High level overview)](#how-web-development-works-high-level-overview)
     - [Static vs Dynamic websites](#static-vs-dynamic-websites)
+    - [Building Good Websites](#building-good-websites)
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
@@ -51,6 +52,13 @@
 - **Dynamic websites** are websites that are dynamically generated on the server. They usually use a database to store the data and the files are generated on the server before sending them to the browser.
   ![Dynamic](./img/dynamic-websites.png)
   - Here, the server processes the files before sending them
+
+---
+
+### Building Good Websites
+
+These're 3 pillars of building good websites:
+![Building Good Websites](./img/building-good-websites.png)
 
 ---
 

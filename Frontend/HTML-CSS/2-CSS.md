@@ -5,7 +5,9 @@
     - [Styling Types](#styling-types)
     - [Starter CSS Code (Global Reset / Normalize)](#starter-css-code-global-reset--normalize)
   - [How CSS works](#how-css-works)
+    - [What happens when we load a page in the browser?](#what-happens-when-we-load-a-page-in-the-browser)
     - [Visual Formatting Model](#visual-formatting-model)
+    - [Inheritance](#inheritance)
   - [Selectors](#selectors)
     - [Selectors Types](#selectors-types)
       - [Combinators](#combinators)
@@ -14,7 +16,7 @@
     - [Pseudo Elements/Classes](#pseudo-elementsclasses)
       - [pseudo classes](#pseudo-classes)
       - [pseudo elements](#pseudo-elements)
-    - [Selector specificity (Cascade)](#selector-specificity-cascade)
+    - [Cascade and Specificity](#cascade-and-specificity)
     - [Selectors Notes](#selectors-notes)
   - [Box Model](#box-model)
     - [Box Sizing width \& height calculation (Content)](#box-sizing-width--height-calculation-content)
@@ -37,6 +39,7 @@
     - [Alignment](#alignment)
     - [Line \& Letter Spacing](#line--letter-spacing)
     - [Text-Wrap and Overflow](#text-wrap-and-overflow)
+    - [Multi-column Text](#multi-column-text)
     - [Font Notes](#font-notes)
   - [Units](#units)
     - [Pixels](#pixels)
@@ -45,7 +48,6 @@
     - [`vh` \& `vw`](#vh--vw)
     - [Keywords](#keywords)
     - [Units Notes](#units-notes)
-  - [Inheritance](#inheritance)
   - [Shadow](#shadow)
     - [box-shadow](#box-shadow)
     - [text-shadow](#text-shadow)
@@ -56,9 +58,6 @@
     - [filter property](#filter-property)
     - [clip-path](#clip-path)
     - [Images Notes](#images-notes)
-  - [Positioning \& Prospective](#positioning--prospective)
-    - [`position` property](#position-property)
-    - [`z-index`](#z-index)
   - [Calculations Built in Functions](#calculations-built-in-functions)
     - [`calc()`](#calc)
     - [`clamp()`](#clamp)
@@ -70,16 +69,21 @@
     - [Modules](#modules)
     - [Layers](#layers)
   - [Browser Support (CSS Vendor Prefixes)](#browser-support-css-vendor-prefixes)
-  - [Notes](#notes)
-    - [Display vs Visibility](#display-vs-visibility)
-    - [How to center an element](#how-to-center-an-element)
-    - [Scrolling](#scrolling)
-      - [Scrolling using CSS](#scrolling-using-css)
-      - [Scrolling using JavaScript](#scrolling-using-javascript)
-    - [Customizable font-size calculation](#customizable-font-size-calculation)
-    - [Custom Audio Player](#custom-audio-player)
-    - [Double Border Corners](#double-border-corners)
+    - [Vendor Prefixes](#vendor-prefixes)
+    - [Graceful Degradation](#graceful-degradation)
+  - [Notes \& Tricks](#notes--tricks)
+    - [Tricks and Techniques](#tricks-and-techniques)
+      - [Display vs Visibility](#display-vs-visibility)
+      - [How to center an element](#how-to-center-an-element)
+      - [Scrolling](#scrolling)
+        - [Scrolling using CSS](#scrolling-using-css)
+        - [Scrolling using JavaScript](#scrolling-using-javascript)
+      - [Customizable font-size calculation](#customizable-font-size-calculation)
+      - [Custom Audio Player](#custom-audio-player)
+      - [Double Border Corners](#double-border-corners)
+      - [Rotating elements (perspective)](#rotating-elements-perspective)
     - [General Notes](#general-notes)
+    - [Questions](#questions)
 
 ---
 
@@ -91,7 +95,7 @@
 
   - **"Cascading"** Process of combining different stylesheets and resolving conflicts between different CSS rules and declarations by the browser, when more than one rule applies to a certain element.
 
-    - means that a lower priority style can be overridden by a higher priority style -> [Specificity](#selector-specificity-cascade)
+    - means that a lower priority style can be overridden by a higher priority style -> [Specificity](#cascade-and-specificity)
     - also the styles are applied in a specific order, so the last style will be applied **(chronological order)**
 
     > Great article about it [here](https://2019.wattenberger.com/blog/css-cascade)
@@ -161,28 +165,57 @@ in this repo, you will find source for [CSS Default Starter / Global Styles / To
 
 > read the README.md file for instructions
 
+- Notes:
+
+  - When writing normalize css code, use `body` for the properties that are inherited by all elements (like `font` related properties), and use `*` for the properties that are not inherited by all elements (like `box-sizing`).
+
+    ```css
+    /* Global Styles */
+    html {
+      box-sizing: border-box;
+      font-size: 10px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: inherit;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      font-size: 1.6rem;
+      line-height: 1.6;
+    }
+    ```
+
 ---
 
 ## How CSS works
 
-What happens when we load a page in the browser?
+### What happens when we load a page in the browser?
+
 ![how css works](./img/how-css-works-1.png)
 
-1. The browser receives the HTML file and starts to parse it:
+1. **The browser receives the HTML file and starts to parse it**
    - When parsing the HTML file, it encounters a `<link>` tag with a `rel="stylesheet"` attribute, so it starts to download the CSS file
    - The browser continues parsing the HTML file and builds the **DOM** tree, in parallel with loading the CSS file.
-2. Loading CSS file:
+2. **Loading CSS file**
+
    - The browser parses the CSS file, and builds the **CSSOM** tree.
-     - `CSSOM` is the CSS Object Model, which is very similar to the DOM tree, but for CSS.
-     - it involves:
+     - `CSSOM` is the CSS Object Model, which is very similar to the DOM tree, but for CSS. It involves:
        - parsing the CSS file
        - figuring out which CSS rules apply to which elements
-       - resolving conflicts
+       - resolving conflicts **(Cascade)**
        - evaluating final values (`vm` -> `px`)
+         ![how css works](./img/how-css-works-2.png)
+
+3. **Rendering the page**
    - The `CSSOM` and `DOM` trees are combined into a **render tree**.
    - The render tree is used to compute the layout of each visible element and displays them on the screen.
-3. Rendering the page:
-   - The browser paints the pixels on the screen. **(Visual formatting model)**
+   - The browser paints the pixels on the screen -> [Visual formatting model](#visual-formatting-model)
 
 ---
 
@@ -201,13 +234,79 @@ It's the process (Algorithm) of turning the render tree into the actual pixels o
   >
   > You can learn more about different writing modes in this [wonderful article by Jen Simmons](https://24ways.org/2016/css-writing-modes/).
 
-- It uses an algorithm called **Box Model** to determine the size and position of each box to be painted on the screen.
+- It uses an algorithm called [Box Model](#box-model) to determine the size and position of each box to be painted on the screen.
 - To do that it takes into account factors like:
   - dimensions of the box -> `box-sizing`
   - box type -> `inline`, `block`, `inline-block`
-  - positioning scheme -> `float`, `absolute`, `relative`
+  - positioning scheme -> `float`, positioning (`absolute`, `relative`)
   - stacking context -> `z-index`
-  - viewport size
+  - viewport size, dimensions of images, etc.
+
+---
+
+### Inheritance
+
+**Inheritance** is a key concept in CSS that allows styles to be passed from parent elements to their children (descendants).
+
+- Inheritance is only applied if no style is defined for the element itself.
+- Not all properties are inherited, only some properties that inherit are **typography-related** (like `color`, `font-family`, `font-size`, other text properties).
+- Example:
+
+  ```css
+  body {
+    color: #444444;
+  }
+
+  p {
+    /* p will inherit the color from the body */
+  }
+  ```
+
+  ![css inheritance](./img/css-inheritance-1.png)
+
+- You can think of it like JavaScript's **prototype chain** where the child element inherits the properties from the parent element.
+
+  ```js
+  class Main {
+    color = 'black';
+  }
+  class Paragraph extends Main {
+    backgroundColor = 'red';
+    color = 'blue';
+  }
+  class Span extends Paragraph {}
+  const s = new Span();
+  console.log(s.color); // blue
+  ```
+
+  ```html
+  <main style="color: black;">
+    <p style="color: blue;">
+      Hello
+      <span>World</span>
+      <!-- will inherit the color from the p -->
+    </p>
+  </main>
+  ```
+
+- How inheritance works
+  ![css inheritance](./img/css-inheritance.png)
+
+  - "cascaded value" means that there was a style applied to the element itself
+
+- Notes:
+
+  - styles applied to the `body` element will be inherited by all other elements in the document. if you want to select all elements, **(without inheritance)**, you can use the `*` selector.
+
+    - It has the lowest specificity, so it's easy to override and like a fallback or when overriding default styles.
+
+  - In order to **force inheritance**, you can use the `inherit` keyword to inherit the value from the parent element (Not recommended)
+
+    ```css
+    p {
+      border: inherit;
+    }
+    ```
 
 ---
 
@@ -589,13 +688,14 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
 
 ---
 
-### Selector specificity (Cascade)
+### Cascade and Specificity
 
 ![specificity](./img/specificity-5.png)
+![specificity](./img/specificity-6.png)
 
-If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
-![specificity](./img/specificity-0.png)
-![specificity](./img/specificity-4.png)
+- If there are two or more CSS rules that point to the same element, the selector with the highest specificity value will "win", and its style declaration will be applied to that HTML element.
+  ![specificity](./img/specificity-7.png)
+  ![specificity](./img/specificity-8.png)
 
 - How does it work
 
@@ -606,6 +706,9 @@ If there are two or more CSS rules that point to the same element, the selector 
     - add `100` for each ID value
     - add `10` for each class value (or pseudo-class or attribute selector)
     - add `1` for each element selector or pseudo-element.
+    - The combinators like `+`, `>`, `~` don't affect the specificity.
+
+    ![specificity](./img/specificity-2.png)
 
   - It's similar to Javascript merging objects, where the last object will override the previous one.
 
@@ -644,21 +747,26 @@ If there are two or more CSS rules that point to the same element, the selector 
     };
     ```
 
-- Example:
-  ![specificity](./img/specificity-2.png)
-- The combinators like `+`, `>`, `~` don't affect the specificity.
-
 - **"Last rule Principle"**
 
   - It's a rule in CSS where if multiple rules have the same specificity, then the last rule will be applied.
   - So **the placement of the rule is important**
 
-- `!important`
+- `!important` keyword
 
   - It gets a specificity score of **10,000 points**. This is the highest specificity that one individual item can get.
     ![specificity](./img/specificity-3.png)
-  - It's used to override all other styles, but it's not recommended to use it because it makes the code harder to maintain and update.
+  - It's used to override all other styles, but it's not recommended to use it because it makes the code **harder to maintain** and update.
   - if 2 rules have `!important`, then the last one will be applied (the same as the "last rule principle")
+
+- Example:
+  ![specificity](./img/specificity-0.png)
+  ![specificity](./img/specificity-4.png)
+
+- Notes:
+  - The universal selector `*` has no specificity and gets `0` points.
+  - It's better to depend on specificity rather than the order of the rules to avoid conflicts.
+  - Only depend on the order of the rules when you want to override a specific rule. Ex: using 3rd party stylesheets and you want to override some styles by adding your own stylesheet after it.
 
 ---
 
@@ -1407,6 +1515,29 @@ When text overflows the container, you can control how it behaves using the `ove
 
 ---
 
+### Multi-column Text
+
+- `column-count` property:
+  ![multi-column](./img/column-count-1.jpg_large)
+
+  - It specifies the number of columns an element should be divided into.
+  - It can have the following values:
+
+    - `auto` -> the browser will determine the number of columns
+    - `2` -> the element will be divided into two columns
+    - `3` -> the element will be divided into three columns
+
+    ```css
+    p {
+      column-count: 3;
+      column-gap: 20px;
+    }
+    ```
+
+    ![multi-column](./img/column-count-2.png)
+
+---
+
 ### Font Notes
 
 - You can use the shorthand `font` property to set all the font properties at once.
@@ -1456,8 +1587,8 @@ Units are used to specify the size of elements or values of properties in CSS.
     - `fit-content`
     - `min-content`
 - The most popular unit for anything size-related is the pixel (`px`), but there are other units that can be used in CSS.
-
-![units](./img/units.PNG)
+- How units are converted to pixels:
+  ![units](./img/css-units.png)
 
 ---
 
@@ -1595,70 +1726,6 @@ The `percentage %` unit is sometimes a value from the parent and other times it'
   - `vw` and `vh` -> relative to the viewport size
   - `pt` -> point (1/72 of an inch)
   - `in` -> inch (for **print** styles)
-
----
-
-## Inheritance
-
-**Inheritance** is a key concept in CSS that allows styles to be passed from parent elements to their children (descendants).
-
-- Inheritance is only applied if no style is defined for the element itself.
-- Not all properties are inherited, only some properties that inherit are **typography-related** (like `color`, `font-family`, `font-size`, other text properties).
-- Example:
-
-  ```css
-  body {
-    color: #444444;
-  }
-
-  p {
-    /* p will inherit the color from the body */
-  }
-  ```
-
-  ![css inheritance](./img/css-inheritance-1.png)
-
-- You can think of it like JavaScript's **prototype chain** where the child element inherits the properties from the parent element.
-
-  ```js
-  class Main {
-    color = 'black';
-  }
-  class Paragraph extends Main {
-    backgroundColor = 'red';
-    color = 'blue';
-  }
-  class Span extends Paragraph {}
-  const s = new Span();
-  console.log(s.color); // blue
-  ```
-
-  ```html
-  <main style="color: black;">
-    <p style="color: blue;">
-      Hello
-      <span>World</span>
-      <!-- will inherit the color from the p -->
-    </p>
-  </main>
-  ```
-
-- How inheritance works
-  ![css inheritance](./img/css-inheritance.png)
-
-- Notes:
-
-  - styles applied to the `body` element will be inherited by all other elements in the document. if you want to select all elements, **(without inheritance)**, you can use the `*` selector.
-
-    - It has the lowest specificity, so it's easy to override and like a fallback or when overriding default styles.
-
-  - In order to **force inheritance**, you can use the `inherit` keyword to inherit the value from the parent element (Not recommended)
-
-    ```css
-    p {
-      border: inherit;
-    }
-    ```
 
 ---
 
@@ -2010,8 +2077,33 @@ The `filter` property in CSS is used to apply visual effects to an element. It c
 
 ### clip-path
 
-- `clip-path` tool => [clippy](https://bennettfeely.com/clippy/)
+The `clip-path` property in CSS is used to clip an element to a specific shape or path by specifying a clipping region.
+
+- It's used to create shapes like **circles**, **ellipses**, **polygons**, and **more**.
+
+  - `circle()`
+    ![clip-path](./img/clip-path-circle.png)
+  - `ellipse()`
+  - `polygon()`
+  - `inset()`
+    ![clip-path](./img/clip-path-inset.png)
+    ![clip-path](./img/clip-path-inset-1.png)
+    ![clip-path](./img/clip-path-inset-3.png)
+  - `path()` -> to create custom shapes
+
+- It works by controlling each point of the shape (x, y) and the radius of the shape
   ![clip-path](./img/clip-path.webp)
+
+- Example:
+
+  ```css
+  div {
+    clip-path: circle(50% at 50% 50%);
+    clip-path: polygon(10% 10%, 90% 10%, 90% 90%, 10% 80%);
+  }
+  ```
+
+- `clip-path` tool => [clippy](https://bennettfeely.com/clippy/)
 
 - Note that a similar result can be done using pseudo elements `::before` & `::after`
   ![skew background](./img/skew-background.png)
@@ -2058,81 +2150,6 @@ The `filter` property in CSS is used to apply visual effects to an element. It c
     fill: red;
   }
   ```
-
----
-
-## Positioning & Prospective
-
-**Positioning** is the process of determining the location of an element on the page.
-
-### `position` property
-
-In CSS, the `position` property is used to control the layout of an element. It has 5 possible values: (`static`, `relative`, `absolute`, `fixed`, `sticky`)
-![position](./img/position-1.jpeg)
-
-- `static`
-  - It's the **default value**
-  - It means that the element is positioned according to the normal flow of the document.
-  - Here, `top`, `right`, `bottom`, and `left` properties have no effect.
-- `relative`
-
-  - It moves an element in relation to where it would have been in normal flow (relative to its current position).
-    ![relative](./img/position-4.png)
-
-    ```css
-    .box {
-      position: relative;
-      top: 20px;
-      left: 20px;
-    }
-    ```
-
-  - its space is still reserved in the normal flow even if it's moved
-
-- `absolute`
-
-  - It's relative to nearest parent element with `relative` positioning until we reach the `<body>` element
-    ![absolute](./img/position-5.png)
-    ![absolute](./img/position-3.png)
-  - It removes the element from the normal flow of the document, so it doesn't take up space in the normal flow.
-  - Normal vs Absolute positioning:
-    ![absolute](./img/position-2.png)
-
-- `fixed`
-  - Here, element is removed from the normal flow and positioned relative to the root container element. (no space is reserved for it in the normal flow)
-    ![fixed](./img/position-6.png)
-  - When you scroll the page, the element stays in the same place **(because it's fixed/relative to the viewport)**
-- `sticky`
-
-  - It toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
-
-    ```css
-    .nav {
-      position: sticky;
-      top: 0; /* once it reaches the top=0 with the viewport, then it will stick  */
-    }
-    ```
-
-- Notes:
-
-  - when using `absolute` position with `inset: 0`, it makes the element expand to fill the height and width of the closest parent with a **non-static position**
-
-    - **inset**: The inset property in CSS is a shorthand for the four inset properties, `top`, `right`, `bottom` and `left` in one declaration. Just like the four individual properties themselves, inset has no effect on non-positioned (static) elements. In other words, an element must declare an explicit position value before inset properties can take effect.
-
----
-
-### `z-index`
-
-It specifies the elevation of an element relative to other elements on the page.
-
-- **stacking context** --> `z-index` : as if the blocks have been stacked on top of each other on the **Z axis**
-  ![z-index](./img/z-index-1.png)
-
-- by default, it's equal to `0`
-- if multiple elements have the same `z-index`, then the last one is higher than the others and so on.
-  ![z-index](./img/z-index-2.png)
-- it doesn't work on elements with a `position: static;`
-- you can't hover on something that have a negative `z-index`
 
 ---
 
@@ -2310,6 +2327,32 @@ font-size: clamp(1rem, 2.5vw, 2rem);
   }
   ```
 
+- To create custom radio buttons, you can hide the default radio button and style the label to look like a button
+
+  ```html
+  <input type="radio" id="radio1" name="radio" />
+  <label for="radio1">Radio Button</label>
+  ```
+
+  ```css
+  input[type='radio'] {
+    display: none; /* we hide the default radio button and style the label */
+  }
+
+  input[type='radio'] + label {
+    padding: 10px 20px;
+    background-color: #087f5b;
+    color: white;
+    border-radius: 5px;
+  }
+
+  input[type='radio']:checked + label {
+    background-color: #0a9172;
+  }
+  ```
+
+  - You will notice that the `input` is hidden and the `label` is styled to look like a button. When the `input` is checked, the `label` changes color. (`input` must exist in the same container as the `label` but can be hidden)
+
 ---
 
 ## Modules & Layers (multiple style sheets)
@@ -2318,40 +2361,40 @@ font-size: clamp(1rem, 2.5vw, 2rem);
 
 Some web page authors split up their CSS style rules into separate style sheets. For example, they might use one style sheet to control the layout and another to control fonts, colors and so on.
 
-There are two ways to add multiple style sheets to a page:
+- There are two ways to add multiple style sheets to a page:
 
-- Your HTML page can link to one style sheet and that stylesheet can use the `@import` rule to import other style sheets.
+  - Your HTML page can link to one style sheet and that stylesheet can use the `@import` rule to import other style sheets.
 
-  ```css
-  @import url('tables.css');
-  @import url('typography.css');
-  body {
-    color: #666666;
-    background-color: #f8f8f8;
-    text-align: center;
-  }
-  #page {
-    width: 600px;
-    text-align: left;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid #d6d6d6;
-    padding: 20px;
-  }
-  ```
+    ```css
+    @import url('tables.css');
+    @import url('typography.css');
+    body {
+      color: #666666;
+      background-color: #f8f8f8;
+      text-align: center;
+    }
+    #page {
+      width: 600px;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+      border: 1px solid #d6d6d6;
+      padding: 20px;
+    }
+    ```
 
-  - If a styesheet uses the `@import` rule, it should appear before the other rules.
+    - If a styesheet uses the `@import` rule, it should appear before the other rules.
 
-- In the HTML you can use a separate `<link>` element for each style sheet.
+  - In the HTML you can use a separate `<link>` element for each style sheet.
 
-  ```html
-  <head>
-    <title>Multiple Style Sheets - Link</title>
-    <link rel="stylesheet" type="text/css" href="css/site.css" />
-    <link rel="stylesheet" type="text/css" href="css/tables.css" />
-    <link rel="stylesheet" type="text/css" href="css/typography.css" />
-  </head>
-  ```
+    ```html
+    <head>
+      <title>Multiple Style Sheets - Link</title>
+      <link rel="stylesheet" type="text/css" href="css/site.css" />
+      <link rel="stylesheet" type="text/css" href="css/tables.css" />
+      <link rel="stylesheet" type="text/css" href="css/typography.css" />
+    </head>
+    ```
 
 ---
 
@@ -2409,11 +2452,17 @@ They're a way for browser makers to add support for new CSS features before thos
 
 > Browser vendors used to add prefixes to experimental or nonstandard CSS properties and JavaScript APIs, so developers could experiment with new ideas. This, in theory, helped to prevent their experiments from being relied upon and then breaking web developers' code during the standardization process.
 
+- You can check for the browser support from [caniuse.com](https://caniuse.com/)
+
+### Vendor Prefixes
+
 - The most common browser CSS prefixes you will see in older code bases include:
 
   - `-moz-` (firefox)
   - `-o-` (old pre-WebKit versions of Opera)
   - `-ms-` (Internet Explorer and Microsoft Edge)
+
+- When adding them, make sure to add the standard property at the end, so that the standard property will override the vendor-prefixed properties.
 
 - Example:
 
@@ -2431,17 +2480,40 @@ They're a way for browser makers to add support for new CSS features before thos
 
 - **Note**: Nowadays, you don't need to add prefixes manually, because any **CSS Preprocessor** or **Module Bundler** will do it for you. (e.g. `Autoprefixer`, `PostCSS`)
 
-- You can check for the browser support from [caniuse.com](https://caniuse.com/)
   - You can check if you need to use prefixes for a certain property by checking the browser support for that property
     ![css-prefixes](./img/css-prefixes-1.png)
+
 - you can check what prefixes you need to apply for certain properties from [shouldiprefix.com](https://shouldiprefix.com/)
 - You can auto prefix your styles using module-bundler or an extension like [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
 
 ---
 
-## Notes
+### Graceful Degradation
 
-### Display vs Visibility
+It's the practice of building your web functionality so that it provides a certain level of user experience in more modern browsers, but it will also degrade gracefully to a lower level of user in experience in older browsers.
+
+- It's done using `@supports` rule to check if the browser supports a certain property or not -> it's called **"Feature Query"**
+- It's used instead of [vendor prefixes](#vendor-prefixes) when we need to handle the case when the browser doesn't support a certain property (because the design will be broken)
+
+- Example
+
+  ```css
+  @supports (display: grid) {
+    /* CSS rules for browsers that support grid layout */
+  }
+
+  @supports not (display: grid) {
+    /* CSS rules for browsers that do not support grid layout */
+  }
+  ```
+
+---
+
+## Notes & Tricks
+
+### Tricks and Techniques
+
+#### Display vs Visibility
 
 | Display                                                                         | Visibility                                                                     |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -2476,7 +2548,7 @@ They're a way for browser makers to add support for new CSS features before thos
 
 ---
 
-### How to center an element
+#### How to center an element
 
 To center an element vertically and horizontally in a container, we have these options:
 
@@ -2545,11 +2617,11 @@ To center an element vertically and horizontally in a container, we have these o
 
 ---
 
-### Scrolling
+#### Scrolling
 
 To have **smooth scrolling** when clicking on links, you can use: css or javascript
 
-#### Scrolling using CSS
+##### Scrolling using CSS
 
 - This doesn't work on older versions of **safari Browser**
 - It's a simple way to add smooth scrolling to your page
@@ -2563,7 +2635,7 @@ To have **smooth scrolling** when clicking on links, you can use: css or javascr
 
 ---
 
-#### Scrolling using JavaScript
+##### Scrolling using JavaScript
 
 - This works on all browsers including older versions of **safari Browser**
 - It's done by adding an event listener to the links and then using the `scrollIntoView` method to scroll to the section
@@ -2608,7 +2680,7 @@ To have **smooth scrolling** when clicking on links, you can use: css or javascr
 
 ---
 
-### Customizable font-size calculation
+#### Customizable font-size calculation
 
 ```css
 :red {
@@ -2630,14 +2702,14 @@ h1 {
 
 ---
 
-### Custom Audio Player
+#### Custom Audio Player
 
 - [Let’s Create a Custom Audio Player](https://css-tricks.com/lets-create-a-custom-audio-player/)
 - [Frontend Masters - Custom Audio Player](https://codepen.io/jen4web/pen/OJBjYVy)
 
 ---
 
-### Double Border Corners
+#### Double Border Corners
 
 Double borders on just the corner of some boxes may seem impossible to start with. However, there are [several possible solutions](https://stackoverflow.com/questions/14387690/how-can-i-show-only-corner-borders) to this issue.
 
@@ -2687,6 +2759,40 @@ Double borders on just the corner of some boxes may seem impossible to start wit
     border-width: 0 2px 2px 0;
   }
   ```
+
+---
+
+#### Rotating elements (perspective)
+
+- when using 3d animation / transform => use `perspective` property on the parent element
+
+  - it's used to give the 3d effect to the child elements (the lower the value, the more the 3d effect)
+    ![perspective](./img/perspective-1.jpeg)
+
+  ```css
+  .card {
+    perspective: 1000px; /* 3d effect */
+  }
+
+  .card:hover {
+    transform: rotateY(180deg);
+  }
+  ```
+
+- when rotating cards **180 degrees** and you want not the back of the card to be visible, we use the `backface-visibility` property:
+
+  ```css
+  .card {
+    backface-visibility: hidden;
+  }
+
+  .card:hover {
+    transform: rotateY(180deg);
+  }
+  ```
+
+  ![backface-visibility](./img/backface-visibility.webp)
+  ![backface-visibility](./img/backface-visibility2.png)
 
 ---
 
@@ -2752,17 +2858,6 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 - usually when using compiler and bundling multiple `css`/`sass` files into one `.css` file, you may see file with extension: `.css.map`
 
   - this file is for mapping the style rules to their files so that it would show in the devtools to ease the debugging process
-
-- when rotating cards **180 degrees** and you want not the back of the card to be visible, we use the `backface-visibility` property:
-
-  ```css
-  .card {
-    backface-visibility: hidden;
-  }
-  ```
-
-  ![backface-visibility](./img/backface-visibility.webp)
-  ![backface-visibility](./img/backface-visibility2.png)
 
 - inline elements ( `<span>` ) are sensitive to spaces (before & after it) unlike other elements, To avoid this you can:
 
@@ -2912,3 +3007,38 @@ Double borders on just the corner of some boxes may seem impossible to start wit
       );
     }
     ```
+
+- To have a **video** playing as a background of elements:
+
+  ```css
+  .bg-video {
+    /* 1. make the video cover full container and positioned absolutely */
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    /* 2. make the video go behind the content */
+    z-index: -1;
+    /* 3. make the video fit the container */
+    object-fit: cover;
+  }
+  ```
+
+---
+
+### Questions
+
+- What decides which styles are applied to an element?
+
+  - The **Cascade** and **Specificity**.
+
+- why is the `:hover` styles override the normal styles?
+
+  - because by adding the `:hover` selector, you're increasing the specificity of the rule, so it will override the normal styles.
+
+- If you can't use flexbox or grid, how would you make 2 elements be in 2 columns in the container and vertically centered?
+  - I would set the width for each row, then use:
+    - `display: inline-block;` for the elements and `vertical-align: middle;` for them.
+    - Or, `display: table` for the container and `display: table-cell;` for the elements, and `vertical-align: middle;` for them.
+    - Or, use `float: left;` for the elements and `margin: auto;` for them.

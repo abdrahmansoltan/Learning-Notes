@@ -100,6 +100,8 @@ Starting around 2010, several competing JavaScript package managers emerged to h
 
 ### NPM
 
+It's a simple command-line tool that automates the process of downloading and installing packages from the **NPM Registry**. It also helps manage dependencies and versioning.
+
 - `npm init`
   - generate a new file named `package.json` This is a configuration file that npm uses to save all project information.
     - it can be described as a manifest of your project that includes the packages and applications it depends on, information about its unique source control, and specific metadata like the project's name, description, and author.
