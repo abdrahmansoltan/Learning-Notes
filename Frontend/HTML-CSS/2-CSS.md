@@ -57,6 +57,7 @@
     - [`background` properties](#background-properties)
     - [filter property](#filter-property)
     - [clip-path](#clip-path)
+    - [Masking](#masking)
     - [Images Notes](#images-notes)
   - [Calculations Built in Functions](#calculations-built-in-functions)
     - [`calc()`](#calc)
@@ -928,7 +929,7 @@ It's the line that surrounds the content and padding of an element.
 
 - If we don't specify a border color, it'll use the font's color by default.
 
-  - If you want to specify this behaviour explicitly, it can be done with the special currentColor keyword.
+  - If you want to specify this behaviour explicitly, it can be done with the special `currentColor` keyword.
 
     ```css
     .box {
@@ -1273,6 +1274,17 @@ It's a way to create a gradient that changes color smoothly from one color to an
     --main-color: #087f5b; /* Main color */
     --secondary-color: #343a40; /* accent color */
     --light-color: #f8f9fa; /* light color */
+  }
+  ```
+
+- `currentcolor` keyword
+
+  - is a keyword that can be used in place of a color value. It will use the current value of the `color` property.
+
+  ```css
+  .box {
+    color: red;
+    border: 2px solid currentColor;
   }
   ```
 
@@ -2119,7 +2131,7 @@ The `clip-path` property in CSS is used to clip an element to a specific shape o
     background: linear-gradient(to right, #f00, #00f);
     z-index: -1;
     transform: skewY(-5deg);
-    transform-origin: top left;
+    transform-origin: top left; /* control the anchor point to make the skewing from the top left corner */
   }
   ```
 
@@ -2127,6 +2139,32 @@ The `clip-path` property in CSS is used to clip an element to a specific shape o
     ![skew background](./img/skew-background-3.png)
     - We use pseudo elements to create a **skew** effect on the background, not the element itself **(to prevent skewing the content inside the element)**
       ![skew background](./img/skew-background-2.png)
+
+---
+
+### Masking
+
+The `mask` property in CSS is used to hide or show parts of an element by masking or clipping the image at specific points.
+
+![mask](./img/mask-1.png)
+
+- `mask-image` -> to specify the image to be used as a mask
+- `mask-size` -> to specify the size of the mask image
+- `mask-repeat` -> to specify how the mask image should be repeated
+- `mask-position` -> to specify the position of the mask image
+- `mask-origin` -> to specify the origin of the mask image
+
+```css
+div {
+  background-color: red;
+  width: 200px;
+  height: 200px;
+
+  mask-image: url('mask.png');
+  mask-size: cover;
+  mask-repeat: no-repeat;
+}
+```
 
 ---
 
@@ -2143,11 +2181,12 @@ The `clip-path` property in CSS is used to clip an element to a specific shape o
       - set the `line-height` of the wrapper to `0`
 - if you have an empty space between the image and the bottom-border, make the img has the `display: block;` property
   - you can also make sure that you're using `box-sizing: border-box;`
-- In order to change color or `svg` image color, you can use `stroke` and `fill` properties
+- In order to change color or `svg` image color, you can use `stroke` or `fill` properties
 
   ```css
   svg {
-    fill: red;
+    color: red; /* Won't work ❌ */
+    fill: red; /* Works ✅ */
   }
   ```
 
@@ -2165,6 +2204,13 @@ Gives us the ability to do math in css, usually used with `width` and `height` p
   ```css
   div {
     width: calc(100% - 50px);
+  }
+
+  .nav {
+    height: 6rem;
+  }
+  header {
+    height: calc(100vh - 6rem); /* 100% of the viewport height - navbar height */
   }
   ```
 
@@ -2196,7 +2242,7 @@ Gives us the ability to do math in css, usually used with `width` and `height` p
 - Tips when using `calc()`
 
   - You can use 4 basic operators: `+`, `-`, `*`, `/`
-  - White space is required on both sides of the `+` and `-` operators, but not required for `*` and `/` operators
+  - **White space** is required on both sides of the `+` and `-` operators, but not required for `*` and `/` operators
   - Division by zero will cause errors
 
 ---
@@ -2672,8 +2718,7 @@ To have **smooth scrolling** when clicking on links, you can use: css or javascr
   ```html
   <script
     defer
-    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"
-  ></script>
+    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"></script>
   ```
 
   - then in JS file, write the same code as above

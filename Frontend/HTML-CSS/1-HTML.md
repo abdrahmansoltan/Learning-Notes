@@ -58,7 +58,11 @@
     ![html](./img/html-2.png)
 - **void(empty) element** is html element with no contents and no closing tag
 
+---
+
 ### HTML document structure
+
+![html](./img/html-structure.png)
 
 We should provide the browser with information about the structure of the document by using `doctype` and `html` tags to **make the browser understand the document structure**.
 
@@ -684,8 +688,7 @@ There're new attributes for `<img>` element used to provide several additional s
   sizes="(max-width: 600px) 480px,
             800px"
   src="elva-fairy-800w.jpg"
-  alt="Elva dressed as a fairy"
-/>
+  alt="Elva dressed as a fairy" />
 
 <!-- same as : -->
 <img src="elva-fairy-480w.jpg" width="480" />
@@ -728,8 +731,7 @@ for that we use media queries as we put each image in each media
   <!-- Add the Font Awesome CSS file to your project -->
   <link
     rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-  />
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
   <!-- Use the <i> element to add an icon -->
   <i class="fas fa-camera"></i>
@@ -739,7 +741,8 @@ for that we use media queries as we put each image in each media
 
 #### SVG icons
 
-- **SVG** icons are vector images that can be scaled to any size without losing quality.
+**SVG** icons are vector images that can be scaled to any size without losing quality.
+
 - In order to use SVG icons in your project, you can:
 
   - **Download** the SVG file and add it to your project using the `<svg>` element
@@ -751,21 +754,21 @@ for that we use media queries as we put each image in each media
       height="16"
       fill="currentColor"
       class="bi bi-camera"
-      viewBox="0 0 16 16"
-    >
+      viewBox="0 0 16 16">
       <path fill-rule="evenodd" d="M8 10a2 2 0 100-4 2 2 0 000 4z" />
       <path
         fill-rule="evenodd"
-        d="M15 3h-3.586l-1-1H5.586l-1 1H1v1h1l1 1v7l-1 1H1v1h14v-1h-1l-1-1V5l1-1h1V3zm-3 9H4v-1h8v1z"
-      />
+        d="M15 3h-3.586l-1-1H5.586l-1 1H1v1h1l1 1v7l-1 1H1v1h14v-1h-1l-1-1V5l1-1h1V3zm-3 9H4v-1h8v1z" />
     </svg>
     ```
 
-  - **Use** an **icon library** like **Font Awesome** that provides SVG icons
+  - or, **Use** an **icon library** like **Font Awesome** that provides SVG icons (this is the new way to use icons in modern web development)
 
     ```html
     <i class="fas fa-camera"></i>
     ```
+
+  - or, Use [CSS Sprites](#css-sprites) to display the icon (this is the most common way to use icons in professional web development)
 
 ---
 
@@ -781,8 +784,38 @@ for that we use media queries as we put each image in each media
 
 **CSS sprites** are a way to reduce the number of HTTP requests made for image resources referenced by your site.
 
+- The old way of using icons was to have multiple images for each icon, which would result in multiple HTTP requests. This can slow down the loading time of your website.
+  - Instead of using multiple images, you can use a single image that contains all the icons you need.
 - They combine multiple images into a single image file and use CSS to display the desired image.
+  ![css-sprites](./img/css-sprites-1.jpg)
+
 - **CSS sprites** are commonly used for icons.
+- How to use CSS sprites:
+
+  - **Step 1**: Create a single image that contains all the icons you need.
+    - This can be done using a:
+      - Build tool like **Gulp** or **Grunt** or **Webpack**
+      - Icon library like [icomoon](https://icomoon.io/), [fontello](http://fontello.com/), or [fontastic](http://fontastic.me/)
+  - **Step 2**: Use `<svg>` element with `<use>` element to display the desired icon.
+
+    ```html
+    <svg class="icon">
+      <use xlink:href="assets/icons-sprites.svg#icon-name"></use>
+    </svg>
+    ```
+
+    - This will display the icon with the `icon-name` from the `icons-sprites.svg` file.
+
+- Notes:
+
+  - This only works on web servers, not on local files.
+  - We use the `sprite` file only in the `HTML` file, not in the `CSS` file (if you want to use it in the `CSS` file, you should use `background-image` property and manually define the position of the icon)
+
+    ```css
+    .icon {
+      background: url('icons-sprites.svg') -16px -27px;
+    }
+    ```
 
 ---
 
@@ -1009,6 +1042,7 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
   - Relative link -> `href="about.html"` -> link to a page in the same directory
   - External link -> `href="https://www.google.com"` -> link to a page on the web
   - Anchor link -> `href="#top"` -> link to a specific part of the same page
+  - Empty link -> `href="#"` -> link that doesn't go anywhere
 - `<hr/>`
   - It's an element used to create a horizontal rule (a line that separates content).
 
@@ -1027,20 +1061,15 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
 
   - **radio** => for only one option
 
-    - so we need to make the multiple radio inputs have the same `name` attribute
+    - so we need to make the multiple radio inputs have the same value in the `name` attribute
 
-    ```html
-    <input type="radio" name="language" value="javascript" />
-    javascript
-    </input>
-    <input type="radio" name="language" value="python" />
-    python
-    </input>
-    <input type="radio" name="language" value="c++" />
-    c++
-    </input>
+      ```html
+      <input type="radio" name="language" value="javascript" />javascript</input>
 
-    ```
+      <input type="radio" name="language" value="python" />python</input>
+
+      <input type="radio" name="language" value="c++" />c++</input>
+      ```
 
   - **checkbox** => for one/more options
 

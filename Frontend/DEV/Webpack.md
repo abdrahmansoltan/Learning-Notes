@@ -33,6 +33,7 @@
     - [Working with SASS](#working-with-sass)
     - [Working with modern Javascript (Babel)](#working-with-modern-javascript-babel)
   - [Environment Variables in Webpack](#environment-variables-in-webpack)
+  - [Monitoring Webpack Build Performance speed](#monitoring-webpack-build-performance-speed)
   - [Webpack Notes](#webpack-notes)
 
 ---
@@ -1229,6 +1230,39 @@ Webpack doesn't know on its own how to transform javascript code. This task is o
     ```
 
     - This will replace `process.env.BUILD_ENV` with the string `production` in the code
+
+---
+
+## Monitoring Webpack Build Performance speed
+
+To monitor the performance of the webpack build, we can use the `speed-measure-webpack-plugin` package, which will give us a report of the time taken by each plugin and loader to process the files
+![speed-measure-webpack](./img/speed-measure-webpack.png)
+
+- How to use it
+
+  - 1 - install the package
+
+  ```sh
+  npm i speed-measure-webpack-plugin --save-dev
+  ```
+
+  - 2 - add it to the `webpack.config.js` file
+
+    ```js
+    // webpack.config.js
+    const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+    const smp = new SpeedMeasurePlugin();
+
+    module.exports = smp.wrap({
+      // ...
+    });
+    ```
+
+  - 3 - run the build script
+
+    ```sh
+    npm run build
+    ```
 
 ---
 

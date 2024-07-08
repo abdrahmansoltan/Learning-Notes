@@ -151,7 +151,7 @@ They let us define variables in CSS that can be reused throughout the stylesheet
 
 > **Parse time** (specified values), it's When the actual CSS code is `read`, `parsed`, and `converted` to a tree of objects (**CSSOM**). One and done operation.
 >
-> **computed value**: An intermediate runtime representation where most relative values are absolutized but not all.
+> **computed value**: An intermediate runtime representation where most relative values are `absolute` but not all.
 >
 > - this is when relative units are resolved to `px`
 >
