@@ -62,7 +62,6 @@
   - [Calculations Built in Functions](#calculations-built-in-functions)
     - [`calc()`](#calc)
     - [`clamp()`](#clamp)
-  - [icons - SVG](#icons---svg)
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
@@ -531,15 +530,31 @@ Pseudo classes are used to apply styles to an element based on its current state
   - `:only-child` -> for the only child of an element
   - `:only-of-type` -> for the only child of a type
 
-- pseudo class that handles different **states of an element**
+- pseudo class that handles different **states of an element** -> they are used to style multiple elements that are in a certain state
 
-  - `:not()` -> selects every element that is not a certain selector
-  - `:empty` -> selects every element that has no children
-  - `:target` -> selects the current active target element
-  - `:has()` -> selects elements that have a specific descendant
-  - `:where()` -> selects elements that match a list of selectors
-  - `:is()` -> selects elements that match one of the selectors
-  - `:selection` -> selects the portion of an (element / text) that is selected by a user
+  - Examples:
+
+    - `:not()` -> selects every element that is not a certain selector
+    - `:empty` -> selects every element that has no children
+    - `:target` -> selects the current active target element
+    - `:has()` -> selects elements that have a specific descendant
+    - `:where()` -> selects elements that match a list of selectors
+    - `:is()` -> selects elements that match one of the selectors
+    - `:selection` -> selects the portion of an (element / text) that is selected by a user
+
+  - They can be combined with other selectors to create complex rules
+
+    ```css
+    /* selects every h2 element inside a div or a section */
+    div h2,
+    section h2 {
+      color: red;
+    }
+    /* the same as the above using :is() */
+    :is(div, section) h2 {
+      color: red;
+    }
+    ```
 
 ---
 
@@ -660,7 +675,6 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
     - another way is to use `box-shadow` with `inset` and `blur-radius` to create gradient border
 
   - Animating buttons background
-    ![button gradient](./img/button-gradient.png)
 
     ```css
     .btn::before {
@@ -1005,7 +1019,9 @@ It's used to create rounded corners for an element.
   }
   ```
 
-- `outline` is an animated property
+  ![outline-offset](./img/outline-offset.png)
+
+- `outline` is an **animated property**
 - Notes:
 
   - **Never** apply `outline: none;` to get rid of the default outline on focus, instead, style it to match your design
@@ -1210,6 +1226,8 @@ It's a way to create a gradient that changes color smoothly from one color to an
   ```css
   div {
     background-image: linear-gradient(to right, red, yellow);
+    /* or with multiple colors */
+    background-image: linear-gradient(to right, red, yellow, green, blue);
   }
   ```
 
@@ -1254,7 +1272,7 @@ It's a way to create a gradient that changes color smoothly from one color to an
   - Here, the linear-gradient is on top of the background-image, which gives an overlay look.
 
 - **Notes:**
-  - linear-gradient is a `background-image` property, so it can be applied only with either `background` or `background-image` properties.
+  - linear-gradient is a `background-image` property, so it can be applied only with either [background](#background-properties) or `background-image` properties.
     - `background-color` won't work ❌
   - you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
   - There's also `radial-gradient` which is a gradient from the center to the outside
@@ -1287,6 +1305,36 @@ It's a way to create a gradient that changes color smoothly from one color to an
     border: 2px solid currentColor;
   }
   ```
+
+- If you want colors to adapt with the changing the light/dark mode of the browser, you can:
+
+  - Use `canvas` color instead of `white`
+
+    ```css
+    :root {
+      color-scheme: light dark;
+    }
+
+    body {
+      color: canvas;
+    }
+    ```
+
+  - use the `prefers-color-scheme` media query.
+
+    ```css
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: black;
+        color: white;
+      }
+    }
+    ```
+
+    ![color-scheme](./img/color-scheme.png)
+
+- **Color Recourses**
+  - [Happy Hues](https://www.happyhues.co/) -> color palettes for your projects
 
 ---
 
@@ -1326,12 +1374,14 @@ It's a way to create a gradient that changes color smoothly from one color to an
     - in the HTML `head`:
 
       ```html
+      <!-- Must be before the styles files -->
       <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto" />
       ```
 
     - in the CSS file:
 
       ```css
+      /* Must be at the top of the CSS file */
       @import url('https://fonts.googleapis.com/css?family=Roboto');
       ```
 
@@ -1577,12 +1627,13 @@ When text overflows the container, you can control how it behaves using the `ove
     }
     ```
 
-- For more fun font use => [Rubik](https://fonts.google.com/specimen/Rubik)
-- For font-size scales -> [type-scale.com](https://type-scale.com/)
 - If you're getting your fonts from a service like [https://fonts.google.com](https://fonts.google.com), note that there may be some tracking of **IP-Addresses** of the users when the `HTML` page is downloaded in the browser
   - to avoid this, you can download the font files locally and refer to it in the `HTML` file
   - more info [here](https://blog.runcloud.io/google-fonts-gdpr/)
 - to make text `uppercase / lowercase / capitalize`, you can use `text-transform` property
+- **Font Recourses**
+  - [Typescale.com](https://typescale.com/) -> allows you to see how different font sizes look together, and modify the scale to fit your design, and then copy the CSS code for the font sizes you want to use in your project 🚀
+  - For more fun font use => [Rubik](https://fonts.google.com/specimen/Rubik)
 
 ---
 
@@ -1932,7 +1983,7 @@ The `background` properties are used to set the background for an element, which
 
       ```css
       div {
-        background-image: url('img_flwr.png');
+        background-image: url('img_flower.png');
         background-size: 100px 50px;
         /* or */
         background-size: 100% 50%;
@@ -1941,7 +1992,7 @@ The `background` properties are used to set the background for an element, which
 
 - `background-position`
 
-  - When an image is not being repeated, It's likely that the image is bigger than the element, so we can control the position of the image inside the element using `background-position` property
+  - When an image is not being repeated, It's likely that the image is (bigger or smaller) than the element, so we can control the position of the image inside the element using `background-position` property
     ![background-position](./img/background-position.png)
   - It specifies where in the element container the background image should be placed.
 
@@ -1991,7 +2042,9 @@ The `background` properties are used to set the background for an element, which
 
 - `background-attachment`
 
-  - It specifies whether a background image should stay in one position or move as the user scrolls up and down the page. It can have one of two values:
+  - It specifies whether a background image should stay in one position or move as the user scrolls up and down the page (adds a **parallax effect**).
+    ![background-attachment](./img/background-attachment.png)
+  - It can have one of two values:
 
     - `fixed`
     - `scroll`
@@ -2173,14 +2226,13 @@ div {
 - Usually when using images, it's better to use it inside a wrapper `div` to control the image size and position and to avoid the image to overflow the container
 - `img` is an **inline element**, so:
   - it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
-  - it will have a spacing at the bottom
-    ![img](./img/img-inline.jpeg)
-    - This is because the browser treats inline-elements as if the're typography, so it adds a space at the bottom as if it's a letter.
-    - To fix this, you can:
-      - make the image a **block or inline-block** element
-      - set the `line-height` of the wrapper to `0`
-- if you have an empty space between the image and the bottom-border, make the img has the `display: block;` property
-  - you can also make sure that you're using `box-sizing: border-box;`
+- if you have an empty space between the image and the bottom-border, This is because the browser treats inline-elements as if the're typography, so it adds a space at the bottom as if it's a letter.
+  ![img](./img/img-inline.jpeg)
+  - To fix this, you can:
+    - make the image a **block or inline-block** element
+    - set the `line-height` of the wrapper to `0`
+    - make sure that you're using `box-sizing: border-box;`
+- `img` element can't have `::before` or `::after` pseudo-elements because it's a **replaced element** (it's not a real element in the DOM, it's replaced by the image)
 - In order to change color or `svg` image color, you can use `stroke` or `fill` properties
 
   ```css
@@ -2256,13 +2308,6 @@ The `clamp()` CSS function clamps a middle value within a range of values betwee
 ```css
 font-size: clamp(1rem, 2.5vw, 2rem);
 ```
-
----
-
-## icons - SVG
-
-- [Hero Icons](https://heroicons.com/) here we use `stroke` or `fill` properties **not** color
-- [Ionicons](https://ionic.io/ionicons) here we use `color` property
 
 ---
 
@@ -2529,8 +2574,10 @@ They're a way for browser makers to add support for new CSS features before thos
   - You can check if you need to use prefixes for a certain property by checking the browser support for that property
     ![css-prefixes](./img/css-prefixes-1.png)
 
-- you can check what prefixes you need to apply for certain properties from [shouldiprefix.com](https://shouldiprefix.com/)
-- You can auto prefix your styles using module-bundler or an extension like [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
+- you can check what prefixes you need to apply for certain properties from:
+  - [shouldiprefix.com](https://shouldiprefix.com/)
+- You can auto prefix your styles using module-bundler or an extension like:
+  - [Autoprefixer](https://marketplace.visualstudio.com/items?itemName=mrmlnc.vscode-autoprefixer)
 
 ---
 
@@ -2567,7 +2614,7 @@ It's the practice of building your web functionality so that it provides a certa
 | It's a CSS property that defines the type of box used for an HTML element.      | It's a CSS property that determines whether an element is visible or hidden.   |
 | It can have values like `block`, `inline`, `inline-block`, `flex`, `grid`, etc. | It can have values like `visible`, `hidden`, `collapse`, `initial`, `inherit`. |
 
-- `visibility:hidden` => hide the element but reserves it's place (leaves a space where the element would have been)
+- (`visibility:hidden` or `opacity: 0`) => hide the element but preserves it's place (leaves a space where the element would have been)
 - `display: none` => remove element from the flow, hide element and collapse its space
 
   - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
@@ -2598,7 +2645,21 @@ It's the practice of building your web functionality so that it provides a certa
 
 To center an element vertically and horizontally in a container, we have these options:
 
-1. Using `margin: auto`:
+1. If the element is `inline`, you can use `text-align: center` on the parent element
+
+   ```css
+   .container {
+     text-align: center;
+   }
+   .element {
+     display: inline;
+   }
+   ```
+
+   - This will center the element horizontally in the container
+   - To center it vertically, you can use `vertical-align: middle` on the element if it's
+
+2. Using `margin: auto`:
 
    ```css
    .container {
@@ -2608,7 +2669,7 @@ To center an element vertically and horizontally in a container, we have these o
    /* This will center the container horizontally on the page */
    ```
 
-2. using `flexbox`:
+3. using `flexbox`:
 
    ```css
    .container {
@@ -2618,7 +2679,7 @@ To center an element vertically and horizontally in a container, we have these o
    }
    ```
 
-3. using `position: absolute`:
+4. using `position: absolute`:
 
    ```css
    .container {
@@ -2641,7 +2702,7 @@ To center an element vertically and horizontally in a container, we have these o
    ![center element](./img/center-element-1.png)
    ![center element](./img/center-element-2.png)
 
-4. using `grid`:
+5. using `grid`:
 
    - center a container:
 
@@ -2999,10 +3060,10 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 
 - When styling `<a>` elements, it's recommended to style them with pseudo-classes in this order:
 
-  1. `:link`
-  2. `:visited`
-  3. `:hover`
-  4. `:active`
+  1. `:link` -> for unvisited links with `href` attribute
+  2. `:hover` -> when the mouse is over the link
+  3. `:active` -> when the link is being clicked
+  4. `:visited` -> for visited links
 
   ```css
   a,
@@ -3055,7 +3116,26 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 
 - To have a **video** playing as a background of elements:
 
+  ```html
+  <section>
+    <div class="content">Content</div>
+
+    <div class="bg-video">
+      <video class="bg-video__content" autoplay muted loop>
+        <source src="video.mp4" type="video/mp4" />
+        <source src="video.webm" type="video/webm" />
+        Your browser is not supported!
+      </video>
+    </div>
+  </section>
+  ```
+
   ```css
+  section {
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
   .bg-video {
     /* 1. make the video cover full container and positioned absolutely */
     position: absolute;

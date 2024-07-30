@@ -51,6 +51,8 @@ Here are some guidelines (CSS triggers):
 
 ![transition vs Animation](./img/transition-vs-keyframes.webp)
 
+`animation` property is similar to `transition` property, but with `animation` we're not limited to just 2 states (start and end), we can define multiple states/keyframes and steps between them which gives us more control over the animation.
+
 | Transition                                                                                        | Animation                                                                                                              |
 | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | It's used for simple animations, like hover effects                                               | It's used for more complex animations, like loading spinners                                                           |
@@ -61,7 +63,7 @@ Here are some guidelines (CSS triggers):
 
 ## `transform` property
 
-It's used to change the shape, size, and position of an element (usually for animation purposes)
+It's used to control the change in properties values of an element **over time**
 
 - It's the best way to animate elements in CSS, because it's more efficient as it doesn't trigger layout or paint
 - It's used for `translate()`, `scale()`, `rotate()`, `skew()`

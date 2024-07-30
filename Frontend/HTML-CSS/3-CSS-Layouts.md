@@ -147,9 +147,15 @@ It's a CSS property that allows an element to be pushed to the left or right (re
     - `None` is the default (Elements can touch either side)
       ![clear](./img/clear.webp)
   - we use `clear` property when we want the surrounding element to not be floated around element with a `float` property
-  - Tricks:
 
     - To clear `float` for the elements next to the (container element that has the floating elements), we can use a class `clearfix` like this --> **clearfix hack**
+
+      - before:
+        ![clearfix](./img/clearfix1.png)
+      - after:
+        ![clearfix](./img/clearfix2.png)
+
+    - Example of `clearfix` class:
 
       ```scss
       .clearfix::after,
@@ -173,11 +179,6 @@ It's a CSS property that allows an element to be pushed to the left or right (re
         @include clearfix;
       }
       ```
-
-      - before:
-        ![clearfix](./img/clearfix1.png)
-      - after:
-        ![clearfix](./img/clearfix2.png)
 
     - There's a new way to clear float --> `display: flow-root`
 
@@ -221,9 +222,11 @@ In CSS, the `position` property is used to control the layout of an element. It 
     ![absolute](./img/position-2.png)
 
 - `fixed`
-  - Here, element is removed from the normal flow and positioned relative to the root container element. (no space is reserved for it in the normal flow)
+
+  - Here, element is removed from the normal flow and positioned relative to the root container element **(viewport)**. (no space is reserved for it in the normal flow)
     ![fixed](./img/position-6.png)
   - When you scroll the page, the element stays in the same place **(because it's fixed/relative to the viewport)**
+
 - `sticky`
 
   - It toggles between `relative` and `fixed` once the `position` value is met in the viewport, then it sticks
@@ -234,6 +237,10 @@ In CSS, the `position` property is used to control the layout of an element. It 
       top: 0; /* once it reaches the top=0 with the viewport, then it will stick  */
     }
     ```
+
+  - It's used for **sticky navigation bars** (when you want the navigation bar to stick to the top of the page when you scroll down)
+  - It differs from `fixed` in that it is only fixed within the container it's in until a certain point, then it becomes `fixed` to the viewport.
+    ![sticky](./img/position-7.gif)
 
 - Notes:
 
@@ -358,7 +365,7 @@ It defines whether the flex items are forced in a single line (default) or can b
 > The `cross axis` is the axis perpendicular to the main axis.
 
 - `nowrap` (default)
-  - single-line(doesn't make flex go(wrap) into a new line) which may cause the container to overflow if couldn't squeeze and fit the flex-items
+  - single-line(doesn't make flex go(wrap) into a new line) which may cause the container to **overflow** if couldn't squeeze and fit the flex-items
     ![wrap](./img/nowrap.PNG)
   - It means that when the end of line is reached, make the items smaller to fit the line together
 - `wrap`
@@ -806,7 +813,7 @@ It's used to position the grid items using values to specify which grid lines th
 
 - `fr`
 
-  - It stands for **fraction** of the available space of the grid container and used to specify the size of the columns and rows in the grid by dividing the available space into fractions (instead of using `px` or `%`)
+  - It stands for (**fraction** of the available space) of the grid-container and used to specify the size of the columns and rows in the grid by dividing the available space into fractions (instead of using `px` or `%`)
     ![grid fr](./img/grid-fr-1.webp)
 
   - If we have multiple columns with `fr` unit, the space will be divided equally between them or based on the value of the `fr` unit
@@ -837,8 +844,8 @@ It's used to position the grid items using values to specify which grid lines th
 
 - `auto`
 
-  - is greedy (take the required space available for its content)
-    - for example, if we have a grid container with 2 columns, and the first column has a width of `auto`, then the first column will take the width of its content, and the second column will take the remaining space.
+  - is greedy (take the required space available for its content + the remaining space)
+    - for example, if we have a grid container with 2 columns, and the first column has a width of `200px` and the second column has a width of `auto`, the second column will take the remaining space available in the grid container.
       ![grid auto](./img/grid-auto.webp)
   - it makes the cell responsive as it takes the remaining space
   - it's the default behavior in **implicit grids**
@@ -930,6 +937,7 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
   ```css
   .container {
     display: grid;
+
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     /* or */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

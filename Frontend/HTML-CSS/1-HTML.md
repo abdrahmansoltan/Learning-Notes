@@ -31,6 +31,7 @@
       - [SVG icons](#svg-icons)
       - [PNG icons](#png-icons)
       - [CSS sprites](#css-sprites)
+    - [icons and SVG resources](#icons-and-svg-resources)
   - [Video](#video)
   - [Tables](#tables)
     - [Table Structure](#table-structure)
@@ -277,6 +278,19 @@ Why do we need to tell the browser what our HTML elements represent?
   <time datetime="2021-09-01">September 1, 2021</time>
   ```
 
+- `<details>` and `<summary>`
+  ![details](./img/details-tag.webp)
+
+  - `<details>` element is used to create a disclosure widget in which information is visible only when the widget is toggled into an "open" state.
+  - `<summary>` element is used to specify a summary, caption, or legend for the `<details>` element's disclosure box.
+
+  ```html
+  <details>
+    <summary>Click me</summary>
+    <p>Here is some text that is hidden by default.</p>
+  </details>
+  ```
+
 - `role` attribute can be used to also specify the role of the element in the page (specially for **screen readers**)
   - `<header role="banner">`
 
@@ -497,7 +511,9 @@ Why do we need to tell the browser what our HTML elements represent?
 
 ### Form submission
 
-- You can use service like [formspree.io](https://formspree.io/)
+- You can use services like:
+
+  - [formspree.io](https://formspree.io/)
 
 - you can use [netlify](https://docs.netlify.com/forms/setup/?_ga=2.17094910.693790722.1649686633-761975974.1648039605) to manage your forms without `Js` => by inserting `name` attribute to each `input` element and writing this at at the `form` element:
 
@@ -816,6 +832,13 @@ for that we use media queries as we put each image in each media
       background: url('icons-sprites.svg') -16px -27px;
     }
     ```
+
+---
+
+### icons and SVG resources
+
+- [Hero Icons](https://heroicons.com/) here we use `stroke` or `fill` properties **not** color
+- [Ionicons](https://ionic.io/ionicons) here we use `color` property
 
 ---
 

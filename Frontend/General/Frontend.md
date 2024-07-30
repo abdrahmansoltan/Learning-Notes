@@ -475,6 +475,8 @@ Some JS frameworks have the ability to use web components inside them by importi
     <my-element name="Lit"></my-element>
     ```
 
+- [Shoelace](https://shoelace.style/)
+
 ---
 
 ## Gulp.js
