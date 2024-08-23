@@ -3,7 +3,7 @@
 - [INDEX](#index)
   - [Browser environment, specs](#browser-environment-specs)
   - [Document Object Model (DOM)](#document-object-model-dom)
-    - [object model](#object-model)
+    - [Object Model](#object-model)
     - [Steps for creating an element](#steps-for-creating-an-element)
     - [`insertAdjacentHTML()`](#insertadjacenthtml)
     - [DOM collections: (`HTMLCollection` vs `NodeList`)](#dom-collections-htmlcollection-vs-nodelist)
@@ -21,8 +21,6 @@
   - [Styles and classes](#styles-and-classes)
     - [Element Style](#element-style)
     - [Element Classes](#element-classes)
-      - [`className`](#classname)
-      - [`classList`](#classlist)
   - [Element/Window size and scrolling](#elementwindow-size-and-scrolling)
     - [Geometry Properties (element size)](#geometry-properties-element-size)
     - [Window sizes](#window-sizes)
@@ -34,13 +32,9 @@
     - [steps](#steps)
   - [Events](#events)
     - [Event Handling](#event-handling)
-      - [HTML EVENT HANDLERS (HTML-attribute) (bad practice ❌)](#html-event-handlers-html-attribute-bad-practice-)
-      - [TRADITIONAL DOM EVENT HANDLERS (in Js for a DOM property ❌)](#traditional-dom-event-handlers-in-js-for-a-dom-property-)
-      - [DOM LEVEL EVENT LISTENERS (addEventListener) ✅](#dom-level-event-listeners-addeventlistener-)
-      - [The `Event` object](#the-event-object)
+    - [The `Event` object](#the-event-object)
     - [Event Flow (Bubbling and capturing)](#event-flow-bubbling-and-capturing)
       - [Event Bubbling](#event-bubbling)
-        - [Stopping Bubbling](#stopping-bubbling)
       - [Event Capturing](#event-capturing)
       - [Event Delegation](#event-delegation)
         - [`data` attribute with Event Delegation](#data-attribute-with-event-delegation)
@@ -51,6 +45,10 @@
     - [UI Events](#ui-events)
     - [Events Notes](#events-notes)
   - [Storage](#storage)
+  - [Lifecycle of an HTML page](#lifecycle-of-an-html-page)
+    - [`DOMContentLoaded`](#domcontentloaded)
+    - [`load`](#load)
+    - [`beforeunload` / `unload`](#beforeunload--unload)
 
 ---
 
@@ -96,7 +94,7 @@ The JavaScript language was initially created for **web browsers**. Since then, 
 
 - `Dom` is not a part of `javascript` language, it is a part of `browser` environment -> `Web API`
 
-### object model
+### Object Model
 
 is a group of objects, each of which represent related things from the real world. Together they form a model of something larger.
 
@@ -129,11 +127,18 @@ is a group of objects, each of which represent related things from the real worl
     alert(window.currentUser.name); // John
     ```
 
-- **DOCUMENT OBJECT MODEL**: uses objects to create a representation of the current page. It creates a new object for each element (and each individual section of text) within the page.
-  ![object-model](./img/object-model2.png)
+- **DOCUMENT OBJECT MODEL**:
+
+  - It's an interface that allows Javascript to interact with the HTML content of a webpage in browsers.
+    ![object-model](./img/object-model-1.png)
+  - It's a structured representation of an HTML document. Allowing javascript to **access**, **manipulate** and **delete** HTML elements; set **styles**, **attributes**; **listen** and **respond** to events.
+    ![DOM](./img/dom-1.png)
+  - uses objects to create a representation of the current page. It creates a new object for each element (and each individual section of text) within the page.
+    ![object-model](./img/object-model2.png)
 
   - specifies how browsers should create a model of an HTML page and how JavaScript can access and update the contents of a web page while it is in the browser window.
-  - The DOM is neither part of HTML, nor part of JavaScript; it is a separate set of rules. It is implemented by all major browser makers
+  - The DOM is not a part of HTML or Javascript, It's a part of the **WEB APIs**, and it contains lots of methods and properties that we can use to interact with the DOM tree.
+    ![DOM](./img/dom-2.png)
   - The DOM is called an object model because the model (the DOM tree) is made of objects.
 
     - All these objects are accessible using JavaScript, and we can use them to modify the page.
@@ -246,7 +251,8 @@ message.remove();
 - parses a piece of HTML-string and inserts the resulting nodes into the DOM tree at a specified position same manner as `elem.innerHTML`
 
   ```js
-  elem.insertAdjacentHTML(where, htmlEl);
+  // elem.insertAdjacentHTML(where, htmlEl);
+  listEl.insertAdjacentHTML('afterbegin', '<li>HTML</li>');
   ```
 
   ![insertAdjacentHTML](./img/JavaScript-insertAdjacentHTML.png)
@@ -444,8 +450,19 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
   - Their name is case-insensitive (`id` is same as `ID` or `Id`).
   - Their values are always strings.
 - Note:
+
   - **Attributes** – is what’s written in HTML.
   - **Properties** – is what’s in DOM objects.
+
+- to get a non standard Attribute :
+
+  - Before you work with an attribute, it is good practice to check whether it exists. This will save resources if the attribute cannot be found. -> `.hasAttribute()`
+
+  ```js
+  const designer = logo.getAttribute('designer'); // returns the value of the "designer" attribute,
+  // also you can set an Attribute
+  logo.setAttribute('company', 'Bankist'); //(attribute_name,value)
+  ```
 
 #### Property-attribute synchronization
 
@@ -532,89 +549,74 @@ There may be a possible problem with custom attributes. What if we use a non-sta
 
 The property `elem.style` is an **object** that corresponds to what’s written in the "`style`" attribute **(inline styles)**.
 
-- For multi-word property the `camelCase` is used:
+- **Reading style values:**
 
-  ```js
-  background-color  => elem.style.backgroundColor
-  z-index           => elem.style.zIndex
-  border-left-width => elem.style.borderLeftWidth
-  ```
-
-- to change a property (css-variable) in the `:root` element
-
-  ```javascript
-  document.documentElement.style.setProperty('--color-primary', 'orangered');
-  ```
-
-- `style` property is acceptable and used if we calculate coordinates of an element dynamically and want to set them from JavaScript, like this:
-
-  ```js
-  let top = /* complex calculations */;
-  let left = /* complex calculations */;
-
-  elem.style.left = left; // e.g '123px', calculated at run-time
-  elem.style.top = top; // e.g '456px'
-  ```
-
-- to add multiple(full) styles (css text block) :
-
-  - This property is rarely used, because such assignment removes all existing styles: it does not add, but replaces them.
-
-  ```javascript
-  // we can set special style flags like "important" here
-  element.style.cssText = `
-    color: red !important;
-    background-color: yellow;
-    width: 100px;
-    text-align: center;
-  `;
-  // or using (setAttribute)
-  element.setAttribute('style', 'color:red; height:50px; ...');
-  ```
-
-- **Reading styles values:**
-
-  - we can’t read anything that comes from CSS classes using `elem.style`, because it reflects only the value from the "`style`" attribute, not the effective & computed style.
+  - `elem.style` only reflects inline styles, not CSS classes.
 
     ```js
     alert(document.body.style.color); // empty
     ```
 
-  - to read/change style based on previous value of a style property : use `getComputedStyle()`
+  - Use `getComputedStyle()` to read/change styles based on computed values.
 
     ```js
-    // getComputedStyle(element, [pseudo])
     let computedStyle = getComputedStyle(document.body);
     alert(computedStyle.marginTop); // 5px
     ```
 
-  - **Computed and resolved values**
-    - There are two concepts in CSS:
-      - `computed style` value is the value after all CSS rules and CSS inheritance is applied, as the result of the CSS cascade. It can look like height:1em or font-size:125%.
-      - `resolved style` value is the one finally applied to the element. Values like 1em or 125% are relative. The browser takes the computed value and makes all units fixed and absolute, for instance: height:20px or font-size:16px. For geometry properties resolved values may have a floating point, like width:50.5px.
-        A long time ago getComputedStyle was created to get computed values, but it turned out that resolved values are much more convenient, and the standard changed.
+  - For multi-word property the `camelCase` is used:
 
-So nowadays getComputedStyle actually returns the resolved value of the property, usually in px for geometry.
+    ```js
+    background-color  => elem.style.backgroundColor
+    z-index           => elem.style.zIndex
+    ```
 
-- to get a non standard Attribute :
+  - **Computed vs. Resolved values:**
+    - `Computed style`: Value after CSS rules and inheritance (e.g., `height: 1em`).
+    - `Resolved style`: Final applied value with fixed units (e.g., `height: 20px`).
+  - `getComputedStyle` returns resolved values, usually in `px` for geometry.
 
-  - Before you work with an attribute, it is good practice to check whether it exists. This will save resources if the attribute cannot be found. -> `.hasAttribute()`
+- **Writing style values:**
 
-  ```js
-  const designer = logo.getAttribute('designer'); // returns the value of the "designer" attribute,
-  // also you can set an Attribute
-  logo.setAttribute('company', 'Bankist'); //(attribute_name,value)
-  ```
+  - `elem.style.property = value` : to change a style, assign a new value to a property.
+
+    ```js
+    document.body.style.backgroundColor = 'red';
+    document.body.style.width = '100px'; // string with units
+    ```
+
+  - to change a **(css-variable)** in the `:root` element, use the `documentElement` as the target, and `setProperty` method to change the value:
+
+    ```js
+    document.documentElement.style.setProperty('--color-primary', 'orangered');
+    ```
+
+  - `cssText` property
+
+    - This property is rarely used, because such assignment removes all existing styles: it does not add, but replaces them.
+
+    ```js
+    // we can set special style flags like "important" here
+    element.style.cssText = `
+      color: red !important;
+      background-color: yellow;
+      width: 100px;
+      text-align: center;
+    `;
+    // or using (setAttribute)
+    element.setAttribute('style', 'color:red; height:50px; ...');
+    ```
 
 ---
 
 ### Element Classes
 
-#### `className`
+In javascript, classes are represented by the `classList` object. It provides methods to add, remove and toggle classes. or a `cl
 
-- In the ancient time, there was a limitation in JavaScript: a reserved word like "`class`" could not be an object property. That limitation does not exist now, but at that time it was impossible to have a "`class`" property, like `elem.class`.
+- `className`
 
-  - So for classes the property "`className`" was introduced: the `elem.className` corresponds to the "`class`" attribute.
+  - `className` was introduced because `class` was a reserved word in JavaScript.
+  - `elem.className` corresponds to the `class` attribute.
 
     ```html
     <body class="main page">
@@ -624,41 +626,39 @@ So nowadays getComputedStyle actually returns the resolved value of the property
     </body>
     ```
 
-- If we assign something to `elem.className`, **it replaces the whole string of classes**. Sometimes that’s what we need, but often we want to add/remove a single class.
-  - that is when we use the other property: `classList`
+  - Assigning to `elem.className` replaces all classes.
 
-#### `classList`
+- `classList`:
 
-The `elem.classList` is a **special object** with methods to add/remove/toggle a single class.
+  - It's a special object to manage classes.
 
-```html
-<body class="main page">
-  <script>
-    // add a class
-    document.body.classList.add('article');
+    ```html
+    <body class="main page">
+      <script>
+        document.body.classList.add('article');
+        alert(document.body.className); // main page article
+      </script>
+    </body>
+    ```
 
-    alert(document.body.className); // main page article
-  </script>
-</body>
-```
+  - Methods of `classList`:
 
-- Methods of `classList`:
+    - `add/remove("class")`: Adds/removes a class.
+    - `toggle("class")`: Adds
+      if absent, removes if present.
+    - `contains("class")`: Checks for a class, returns `true`/`false`.
 
-  - `elem.classList.add/remove("class")` – adds/removes the class.
-  - `elem.classList.toggle("class")` – adds the class if it doesn’t exist, otherwise removes it.
-  - `elem.classList.contains("class")` – checks for the given class, returns true/false.
+  - Iterable: Use `for..of` to list all classes.
 
-- `classList` is iterable, so we can list all classes with `for..of`, like this:
-
-  ```html
-  <body class="main page">
-    <script>
-      for (let name of document.body.classList) {
-        alert(name); // main, and then page
-      }
-    </script>
-  </body>
-  ```
+    ```html
+    <body class="main page">
+      <script>
+        for (let name of document.body.classList) {
+          alert(name); // main, page
+        }
+      </script>
+    </body>
+    ```
 
 ---
 
@@ -996,169 +996,145 @@ newElements.forEach((newEl, i) => {
 
 An event is a signal that something has happened. All DOM nodes generate such signals (but events are not limited to DOM).
 
-- Here’s a list of the most useful DOM events:
-  - **Mouse events**
-    - `click` – when the mouse clicks on an element (touchscreen devices generate it on a tap).
-    - `contextmenu` – when the mouse right-clicks on an element
-    - `mouseover` / `mouseout` – when the mouse cursor comes over / leaves an element.
-    - `mousedown` / `mouseup` – when the mouse button is pressed / released over an element.
-    - `mousemove` – when the mouse is moved.
-  - **Keyboard events**
-    - `keydown` and `keyup` – when a keyboard key is pressed and released.
-  - **Form element events**
-    - `submit` – when the visitor submits a `<form>`.
-    - `focus` – when the visitor focuses on an element, e.g. on an `<input>`.
-  - **Document events**
-    - `DOMContentLoaded` – when the HTML is loaded and processed, DOM is fully built.
-  - **CSS events**
-    - `transitionend` – when a CSS-animation finishes.
+- **DOM Events**:
+  - **Mouse**: `click`, `contextmenu`, `mouseover`, `mouseout`, `mousedown`, `mouseup`, `mousemove`
+  - **Keyboard**: `keydown`, `keyup`
+  - **Form**: `submit`, `focus`
+  - **Document**: `DOMContentLoaded`
+  - **CSS**: `transitionend`
 
 ### Event Handling
 
-- **binding event to a DOM node**: Indicate which event on the selected node(s) will trigger the response.
-- There are 3 ways to assign event handlers:
-  1. HTML attribute: `onclick="..."`
-  2. DOM property: `elem.onclick = function`
-  3. Methods: `elem.addEventListener(event, handler[, phase])` to add, removeEventListener to remove ✅
+- **Binding events**:
 
-#### HTML EVENT HANDLERS (HTML-attribute) (bad practice ❌)
+  - 3 ways to assign handlers:
+    1. HTML: `onclick="..."`
+    2. DOM property: `elem.onclick = function`
+    3. Method: `elem.addEventListener(event, handler)` (recommended ✅)
 
-```html
-<input type="button" id="button" onclick="sayThanks()" />
-```
+- **HTML Event Handlers (Bad Practice ❌)**
 
-- here we add parentheses `()` for the handler method
+  ```html
+  <input type="button" id="button" onclick="sayThanks()" />
+  ```
 
-  - The difference is easy to explain. When the browser reads the attribute, it creates a handler function with body from the attribute content. So the markup generates this property:
+  - here we add parentheses `()` for the handler method
+  - Browser creates a handler function from the attribute content:
 
     ```js
     button.onclick = function (event) {
-      sayThanks(); // <-- the attribute content goes here
+      sayThanks(); // attribute content
     };
     ```
 
-- This method of event handling is **no longer used** because it is better to separate the JavaScript from the HTML.
-- as we know, HTML attribute names are not case-sensitive, so "ONCLICK" works as well as "onClick" and "onCLICK" But usually attributes are lowercased: "onclick".
-- Don’t use `setAttribute()` for handlers. - because attributes are always strings, handler-function becomes a string
+  - This method of event handling is **no longer used** because it is better to separate the JavaScript from the HTML.
+  - HTML attribute names are case-insensitive, so all these work! `onclick`, `ONCLICK`, `onClick`.
 
-#### TRADITIONAL DOM EVENT HANDLERS (in Js for a DOM property ❌)
+  - Don’t use `setAttribute()` for handlers; it converts functions to strings.
 
-- The main drawback is that you can only attach a single function to any event
-- here, we omit the parentheses
-- here, Assign a handler to `elem.onclick`, not `elem.ONCLICK`, because DOM properties are case-sensitive.
+- **Traditional DOM Event Handlers (❌)**
 
-  ```js
-  el.onblur = checkUsername; // the parentheses are omitted
-  ```
-
-#### DOM LEVEL EVENT LISTENERS (addEventListener) ✅
-
-- They **can deal with more than one function at a time**, but they are not supported in older browsers.
-- Also, here we can use `removeEventListener` to remove a handler. unlike the other 2 methods
-
-- syntax:
-
-  ```js
-  element.addEventListener(event, handler, [options]);
-  ```
-
-  - `options`: An additional optional object with properties:
-
-    - `once`: if true, then the listener is automatically removed after it triggers.
-    - `capture`: the phase where to handle the event (Bubbling and capturing). For historical reasons, options can also be false/true, that’s the same as {capture: false/true}.
-    - `passive`: if true, then the handler will not call `preventDefault`
-
-- `this` in callbacks refers to the selected element in the event but => `this` doesn't work like that if you used an `arrow function`, and if so, you should use `.bind()`
-
-- To remove a handler:
-
-  ```js
-  elem.onclick = null;
-  element.removeEventListener(event, handler, [options]);
-  ```
-
-  - **To remove a handler we should pass exactly the same function as was assigned.**
+  - Only one function per event.
+  - Assign handler without parentheses.
+  - Use `elem.onclick` (case-sensitive).
 
     ```js
-    // ------ This won't work ------ //
-    elem.addEventListener('click', () => alert('Thanks!'));
-    // ....
-    elem.removeEventListener('click', () => alert('Thanks!'));
+    el.onblur = checkUsername; // no parentheses
+    ```
 
-    // ------ This will ------ //
+- **`addEventListener` ✅**
+
+  - Syntax:
+
+    ```js
+    element.addEventListener(event, handler, [options]);
+
+    element.removeEventListener(event, handler, [options]);
+    ```
+
+    - `options`: An additional optional object with properties:
+
+      - `once`: Auto-removes after trigger.
+      - `capture`: Event phase (bubbling/capturing).
+      - `passive`: Prevents preventDefault.
+
+  - `this` in callbacks refers to the element. Use `.bind()` with arrow functions.
+
+  - Supports multiple functions per event.
+
+    ```js
+    ['click', 'load'].forEach(event => window.addEventListener(event, callback_function));
+    ```
+
+  - Removing Handlers:
+
+    - Must pass the exact same function.
+
+    ```js
     function handler() {
       alert('Thanks!');
     }
-    input.addEventListener('click', handler);
-    // ....
-    input.removeEventListener('click', handler);
+    element.addEventListener('click', handler);
+    element.removeEventListener('click', handler);
     ```
 
 - `addEventListener()` vs `onclick()`
 
-  | addEventListener                                                                                       | onclick                                                                                     |
-  | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------- |
-  | addEventListener can add multiple events to a particular element.                                      | can add only a single event to an element. It is basically a property, so gets overwritten. |
-  | addEventListener can take a third argument that can control the event propagation.                     | Event propagation cannot be controlled by onclick.                                          |
-  | addEventListener can only be added within `<script>` elements or in external JavaScript file.          | onclick can be added as an HTML attribute also.                                             |
-  | addEventListener does not work in older versions of Internet explorer, which uses attachEvent instead. | onclick works in all browsers.                                                              |
-  | addEventListener can do multiple things when event is triggered                                        | onclick can only do one task when event is triggered                                        |
-  | can be on an element that doesn't exist yet (ex : `event.target`)                                      | can't do that                                                                               |
-
-- to make a callback function listen to more that one event :
-
-  ```js
-  ['click', 'load'].forEach(event => window.addEventListener(event, callback_function));
-  ```
-
-- with event handlers and listeners, you wrap the function call (with the arguments) in an **anonymous function**.
+  | Feature                   | `addEventListener`                  | `onclick`                |
+  | ------------------------- | ----------------------------------- | ------------------------ |
+  | Multiple events           | Yes                                 | No                       |
+  | Event propagation control | Yes (third argument)                | No                       |
+  | Placement                 | Only in `<script>` or external JS   | Can be an HTML attribute |
+  | Browser compatibility     | Not in older IE (use `attachEvent`) | Works in all browsers    |
+  | Multiple actions          | Yes                                 | No                       |
+  | Non-existent elements     | Yes (e.g., `event.target`)          | No                       |
 
 ---
 
-#### The `Event` object
+### The `Event` object
 
-When an event occurs, the event object tells you information about the event, and the element it happened upon.
+When an event occurs, the `event` object tells you information about the event, and the element it happened upon.
 
-- Every time an event fires, the The event object is passed to event object contains helpful any function that is the event data about the event, such as:
-  - `Which element the event happened on`
-  - `Which key was pressed for a keypress event`
-  - `What part of the viewport the user clicked`
-    ![event-object](./img/event-object.png)
-- **`event.currentTarget`**: Element that handled the event. That’s exactly the same as `this` keyword in the handler-function, unless the handler is an arrow function, or its `this` is bound to something else, then we can get the element from `event.currentTarget`
+- The `event` object is passed to any function that is the event handler or listener as an argument
+  ![event-object](./img/event-object2.png)
 
-  ```js
-  // this is the same as event.currentTarget
-  elem.addEventListener('click', function (event) {
-    alert(this === event.currentTarget); // true
-    alert(this); // HTMLElement (the same as event.currentTarget)
-  });
-  ```
+- Key Properties:
+  ![event-object](./img/event-object.png)
 
-- **`event.target` vs (`this` | `event.currentTarget`)**:
+  - `event.currentTarget`: Element that handled the event (same as this in non-arrow functions).
+  - `event.target`: Element that triggered the event.
+  - `event.key`: Key pressed (for keyboard events).
+  - `event.clientX`, `event.clientY`: Coordinates of the click in the viewport.
 
-  - `event.target`: is the “target” element that **initiated** the event, it doesn’t change through the bubbling process.
+- `event.target` vs (`this` | `event.currentTarget`):
 
-    - identifies the element on which the event occurred
-
-      ```js
-      navEl.addEventListener('click', function (e) {
-        console.log(e.target); // the element that was clicked
-        console.log(e.currentTarget); // the element that the event listener is attached to -> navEl
-      });
-      ```
-
-  - `this` or `event.currentTarget`: is the **“current”** element, the one that has a currently running handler on it.
-    - always refers to the element to which the event handler has been attached to
-  - ex:
+  - `event.target`: Element that **initiated** the event, unchanged through bubbling.
 
     ```js
-    form.onclick;
-    // this-keyword (=event.currentTarget) is the <form> element, because the handler runs on it.
-    // event.target is the actual element inside the form that was clicked.
+    navEl.addEventListener('click', function (e) {
+      console.log(e.target); // Clicked element
+      console.log(e.currentTarget); // navEl
+    });
     ```
 
-- the event-object is passed to any function that is the event handler or listener as an argument
-  ![event-object](./img/event-object2.png)
+  - `this` or `event.currentTarget`: Element with the currently running handler.
+
+    ```js
+    form.onclick = function (e) {
+      console.log(this === e.currentTarget); // true
+      console.log(e.currentTarget); // <form>
+      console.log(e.target); // Clicked element inside the form
+    };
+    ```
+
+    - unless the handler is an arrow function, or its `this` is bound to something else, then we can get the element from `event.currentTarget`
+
+      ```js
+      elem.addEventListener('click', event => {
+        alert(this === event.currentTarget); // false
+        alert(this); // Window (or whatever this is)
+      });
+      ```
 
 ---
 
@@ -1166,49 +1142,46 @@ When an event occurs, the event object tells you information about the event, an
 
 HTML elements nest inside each other elements. if you hover or click on a link, you will also be hovering or clicking on its parent elements.
 
-![event flow](./img/event-flow.png)
-
 Event handlers/listeners can be bound to the containing `<li>`, `<ul>`, `<body>` and `<html>` elements, plus the document object and the window object. **The order in which the events fire is known as "event flow"**
 
-- the flow of events only matters when your code has event handlers on an element and one of its ancestor or descendant elements
-- events flow in 2 directions: Bubbling & Capturing
+- Events flow in two directions: [Bubbling](#event-bubbling) & [Capturing](#event-capturing).
+  ![event flow](./img/event-flow.png)
 
 #### Event Bubbling
 
-- When an event happens on an element, it first runs the handlers on it, then on its parent, then all the way up on other ancestors.
-- Ex: clicking on `<p>` will alert `"p"` then `"div"` then `"form"`
+- Events trigger handlers on the target element, then bubble up to ancestors.
+
+  - Most events bubble, but some like `focus` do not.
+
+- Example: Clicking `<p>` alerts `"p"`, then `"div"`, then `"form"`.
 
   ```html
   <form onclick="alert('form')">
-    FORM
     <div onclick="alert('div')">
-      DIV
       <p onclick="alert('p')">P</p>
     </div>
   </form>
   ```
 
-- Almost all events bubble, For instance, a `focus` event does not bubble.
+- **Stopping Bubbling**
 
-##### Stopping Bubbling
+  - A bubbling event goes from the target element up, calling all handlers on the path. Any handler can stop this with **`event.stopPropagation()`**.
 
-A bubbling event goes from the target element straight up. Normally, calling all handlers on the path. But any handler may decide that the event has been fully processed and stop the bubbling. -> **`event.stopPropagation()`**
+    ```html
+    <body onclick="alert('bubbling stopped')">
+      <button onclick="event.stopPropagation()">Click me</button>
+    </body>
+    ```
 
-```html
-<!-- here body.onclick doesn’t work if you click on <button> -->
-<body onclick="alert(`the bubbling doesn't reach here`)">
-  <button onclick="event.stopPropagation()">Click me</button>
-</body>
-```
+  > `"Propagation"` means jumping from one element to another, visiting parents and ancestors.
 
-> `"Propagation"` means jumping from one element to another, visiting parents and ancestors.
+  - `event.stopPropagation()`: Stops the event from moving up, but other handlers on the current element will run.
+  - `event.stopImmediatePropagation()`: Stops bubbling and prevents handlers on the current element from running.
 
-- `event.stopPropagation()` stops the move upwards, but on the current element all other handlers will run.
-- `event.stopImmediatePropagation()` To stop the bubbling and prevent handlers on the current element from running.
-- Cases when not to stop bubbling?
-  - We create a nested menu. Each submenu handles clicks on its elements and calls `stopPropagation` so that the outer menu won’t trigger.
-  - catching clicks on the whole window, to track users’ behavior (where people click). Some analytic systems do that. Usually the code uses `document.addEventListener('click'…)` to catch all clicks.
-    - analytic won’t work over the area where clicks are stopped by stopPropagation
+  - When not to stop bubbling:
+
+    - Nested menus: Submenus handle clicks and stop propagation to prevent outer menu triggers.
+    - Analytics: Track user clicks across the window using `document.addEventListener('click', ...)`.
 
 ---
 
@@ -1430,5 +1403,87 @@ More reference and info about (mouse events, drag & drop, pointer events, keyboa
 
 - `local storage` : always stays
 - `session storage` : gets closed when window or tab are closed
+
+---
+
+## Lifecycle of an HTML page
+
+The lifecycle of an HTML page has three important events:
+
+### `DOMContentLoaded`
+
+The `DOMContentLoaded` event happens on the **document** object.
+
+- the browser fully loaded HTML, and the DOM tree is built, but external resources like pictures `<img>` and stylesheets may not yet have loaded.
+- DOM is ready, so the handler can lookup DOM nodes, initialize the interface.
+
+  ```html
+  <script>
+    function ready() {
+      alert('DOM is ready');
+
+      // image is not yet loaded (unless it was cached), so the size is 0x0
+      alert(`Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+    }
+
+    document.addEventListener('DOMContentLoaded', ready);
+  </script>
+
+  <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0" />
+  ```
+
+- `<script>` tags block `DOMContentLoaded`
+
+  - When the browser processes an HTML-document and comes across a `<script>` tag, it needs to execute before continuing building the DOM. That’s a precaution, as scripts may want to modify DOM, and even `document.write()` into it, so `DOMContentLoaded` has to wait. So `DOMContentLoaded` definitely happens after such scripts
+
+  - There are two exceptions from this rule:
+    1. Scripts with the `async` attribute don’t block DOMContentLoaded.
+    2. Scripts that are generated dynamically with `document.createElement('script')` and then added to the webpage also don’t block this event.
+
+- External style sheets don’t affect DOM, so DOMContentLoaded does not wait for them.
+
+  - But there’s a pitfall. If we have a `script` after the `style`, then that script must wait until the stylesheet loads:
+
+    ```html
+    <link type="text/css" rel="stylesheet" href="style.css" />
+    <script>
+      // the script doesn't execute until the stylesheet is loaded
+      alert(getComputedStyle(document.body).marginTop);
+    </script>
+    ```
+
+---
+
+### `load`
+
+The `load` event happens on the **window** object.
+
+- not only HTML is loaded, but also all the external resources: images, styles etc.
+- external resources are loaded, so styles are applied, image sizes are known etc.
+
+  ```html
+  <script>
+    window.onload = function () {
+      // can also use window.addEventListener('load', (event) => {
+      alert('Page loaded');
+
+      // image is loaded at this time
+      alert(`Image size: ${img.offsetWidth}x${img.offsetHeight}`);
+    };
+  </script>
+
+  <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0" />
+  ```
+
+---
+
+### `beforeunload` / `unload`
+
+The `beforeunload` / `load` events happen on the **window** object.
+
+- the user is leaving: we can check if the user saved the changes and ask them whether they really want to leave.
+- Naturally, unload event is when the user leaves us, and we’d like to save the data on our server.
+- the user almost left, but we still can initiate some operations, such as sending out statistics.
+- The `event.preventDefault()` doesn’t work from a `beforeunload` handler
 
 ---

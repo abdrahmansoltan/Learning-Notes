@@ -17,7 +17,7 @@
 
 ## Modules
 
-Angular uses modules to `bundle` different components into packages
+Angular uses modules to **bundle** different components into packages
 
 It's a way to organize the code into different modules based on their functionality
 ![module](./img/modules-0.png)
@@ -26,6 +26,7 @@ It's a way to organize the code into different modules based on their functional
   ![structure](./img/modules-1.png)
 
 - It's where we import components so that Angular knows that they exist
+- There're built-in modules in Angular like:
 
   - `BrowserModule`
     - provides services that are essential to launch the app in the browser

@@ -1283,5 +1283,12 @@ To monitor the performance of the webpack build, we can use the `speed-measure-w
   - `Parcel` is good for teaching and small examples as it doesn't require configuration
   - `Webpack` is better for large production
 - Webpack support both `ESM` and `common.js` but the rule is that they shouldn't be in the same file
+- When using `build` commands with apple silicon, you may face some issues, so you can modify the `max-old-space-size` in the `NODE_OPTIONS` to a higher value
+
+  ```sh
+  export NODE_OPTIONS="--max-old-space-size=3000"
+  # then
+  npm run build
+  ```
 
 ---

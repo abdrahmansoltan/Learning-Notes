@@ -79,6 +79,7 @@ JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchrono
 `Concurrency model` and the `event loop` are the **most** important concepts in `javascript` and they are part of the **browser** not `javascript`
 
 > **Concurrency model** is how javascript engine handles multiple tasks happening at the same time and how it decides which piece of code to run next.
+> ![Concurrency model](./img/concurrency-model.png)
 
 All this happens in the javascript engine which is part of the browser (javascript runtime)
 ![Event Loop](./img/event-loop-1.png)
@@ -144,12 +145,11 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
 
 ## Scheduling: setTimeout and setInterval
 
-- There are two methods for it:
+- Methods:
 
-  - `setTimeout` allows us to run a function once after the interval of time.
-  - `setInterval` allows us to run a function repeatedly, starting after the interval of time, then repeating continuously at that interval.
-
-- **Note:** Javascript doesn't have a timer, as the timer-function is **Web-browser feature**
+- `setTimeout`: Runs a function once after a delay.
+- `setInterval`: Repeats a function at specified intervals.
+- Note: JavaScript timers are a **web-browser feature** not a javascript feature.
 
 ### `setTimeout()`
 
@@ -158,52 +158,45 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
 let timerId = setTimeout(func|code, [delay], [arg1], [arg2], ...)
 ```
 
-**Notes:**
+- **Notes:**
 
-- To pass `arguments` into the function, we can add them after the `delay`. These arguments will be passed into the function when it is run.
+  - To pass `arguments` into the function, we can add them after the `delay`. These arguments will be passed into the function when it is run.
 
-  ```js
-  function sayHi(phrase, who) {
-    alert(phrase + ', ' + who);
-  }
-  setTimeout(sayHi, 1000, 'Hello', 'John'); // Hello, John
-  ```
+    ```js
+    function sayHi(phrase, who) {
+      alert(phrase + ', ' + who);
+    }
+    setTimeout(sayHi, 1000, 'Hello', 'John'); // Hello, John
+    ```
 
-- If the first argument is a **string**, then JavaScript creates a function from it.
+  - If the first argument is a **string**, then JavaScript creates a function from it. But it's not recommended ❌.
 
-  ```js
-  setTimeout("alert('Hello')", 1000); // This will work
-  ```
+    ```js
+    setTimeout("alert('Hello')", 1000); // This will work
+    ```
 
-- But using **strings** is not recommended, use arrow functions instead of them, like this:
-
-  ```js
-  setTimeout(() => alert('Hello'), 1000);
-  ```
-
-- Pass a function, but don’t run it
+- Pass a function reference and not a function call:
 
   ```js
   // wrong! ❌
   setTimeout(sayHi(), 1000);
+
+  // correct ✅
+  setTimeout(sayHi, 1000);
   ```
 
-  - That doesn’t work, because `setTimeout` expects a **reference to a function**. And here `sayHi()` runs the function, and the result of its execution is passed to setTimeout. In our case the result of `sayHi()` is undefined (the function returns nothing), so nothing is scheduled.
+  - `setTimeout` expects a function reference. `sayHi()` runs the function immediately, passing its result (`undefined`) to `setTimeout`.
 
-- **Time goes on while `alert` is shown**
+- **Time continues during `alert`**
 
-  - In most browsers, the internal timer continues while showing `alert`/`confirm`/`prompt`.
-  - this is as `alert` blocks the Synchronous operations and not the Async ones
-
-- The method `setTimeout` in-browser is a little special:
-  - it sets `this = window` for the function call
-    - for `Node.js`, `this` becomes the **timer object**.
+  - Browsers keep the internal timer running during `alert`/`confirm`/`prompt`.
+  - `alert` blocks synchronous operations, not asynchronous ones.
 
 ---
 
 ### Canceling with `clearTimeout()`
 
-A call to `setTimeout` returns a “timer identifier” **timerId** that we can use to cancel the execution.
+Use the `timerId` from `setTimeout` to cancel:
 
 ```js
 let timerId = setTimeout(...);

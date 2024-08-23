@@ -37,6 +37,8 @@
     - [Auto Scaling](#auto-scaling)
   - [Networking Services](#networking-services)
     - [Virtual Private Cloud (VPC)](#virtual-private-cloud-vpc)
+      - [VPC Connections](#vpc-connections)
+      - [How do you monitor the network?](#how-do-you-monitor-the-network)
     - [Route 53](#route-53)
   - [Sequrity](#sequrity)
     - [Web Application Firewall (WAF)](#web-application-firewall-waf)
@@ -590,14 +592,66 @@ They're servers that forward internet traffic to multiple servers (EC2 instances
 
 ### Virtual Private Cloud (VPC)
 
-VPC is a service that allows you to create a secure private network in the AWS cloud where you launch your resources.
-
-![vpc](./img/vpc.PNG)
-![vpc](./img/vpc1.1.PNG)
+It's a logically isolated and private section of the AWS cloud **within a region**, where you can deploy your AWS resources.
 
 - A VPC spans Availability Zones in a Region
+- Each VPC is a separate network with its own IP address range. and consists of `subnets` and `security groups` connected via `route tables`
+  ![vpc](./img/vpc1.1.PNG)
+
+- **How VPC works?**
+  ![vpc](./img/vpc.PNG)
+  - `Subnets` are a range of IP addresses in your VPC, they can be public or private.
+  - `Route tables` are used to determine where network traffic is directed **within a VPC**.
+    - private subnet: is not accessible from the internet
+  - `Internet Gateway` it enables internet connectivity for instances in a VPC.
+    - public subnet: is accessible from the internet, it's configured with a route to the internet gateway for external traffic.
+  - So, **Any traffic that is going from the internet to the VPC and vice versa has to go through the internet gateway, and traffic between subnets in the VPC goes through the route tables.**
 - VPC peering allows you to connect 2 VPCs together.
   ![vpc2](./img/vpc2.PNG)
+
+- **Network ACL & Security Groups**
+
+  - Network ACLs
+
+    - act as a firewall for controlling traffic in and out of one or more subnets. and attached at the subnet level.
+    - support `allow` and `deny` rules. and rules are based on IP address
+
+  - Security Groups
+    - act as a firewall for controlling traffic to and from an EC2 instance.
+    - only allow supported rules, and rules are based on `security group` and `port`
+
+#### VPC Connections
+
+- **VPC Peering**: Connects two VPCs together, allowing traffic to flow between them as if they were in the same network.
+- **VPC Endpoints**: Allows you to privately connect your VPC to supported AWS services without requiring an internet gateway (S3, DynamoDB, etc).
+- **AWS PrivateLink**: Allows you to privately access services hosted on AWS or by third parties.
+
+  - It's the most secure and scalable way to expose a service to thousands of VPCs
+  - It requires a Network Load Balancer (`NLB`) in the service VPC and an Elastic Network Interface (`ENI`) in the customer VPC.
+
+- **Site to Site VPN**: Connects your on-premises network to your VPC using a VPN connection.
+  - The connection is automatically encrypted and traffic goes over the public internet
+- **Direct Connect**: Establishes a dedicated network connection between your network and AWS.
+  - It's a private connection that bypasses the public internet and provides more consistent network performance.
+  - Traffic goes over a private network connection between your network and AWS.
+- **AWS Transit Gateway**: Allows you to connect multiple VPCs and on-premises networks together.
+  - It acts as a hub that allows you to connect multiple VPCs and VPNs together.
+  - It simplifies network architecture and reduces operational overhead.
+
+---
+
+#### How do you monitor the network?
+
+**VPC Flow Logs**: Capture information about the **IP** traffic going to and from network interfaces in your VPC.
+
+- It's a feature that enables you to capture information about the **IP** traffic going to and from network interfaces in your VPC
+
+  - The flow logs data can be sent to S3, cloudwatch, or a third-party tool for analysis.
+
+- It helps you monitor the traffic and troubleshoot connectivity issues, such as:
+  - Subnets to the internet
+  - Subnets to other subnets
+  - Instances to Subnets
 
 ---
 

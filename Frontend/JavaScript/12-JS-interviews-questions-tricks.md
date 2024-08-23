@@ -14,6 +14,7 @@
     - [Create a function that moves an element **(Rendering Performance)**](#create-a-function-that-moves-an-element-rendering-performance)
     - [Given this function, how can you convert it into a `Promise` ?](#given-this-function-how-can-you-convert-it-into-a-promise-)
     - [what does double brackets mean in properties, ex: `[[prototype]]`?](#what-does-double-brackets-mean-in-properties-ex-prototype)
+    - [How to get the last element in the array in multiple ways?](#how-to-get-the-last-element-in-the-array-in-multiple-ways)
     - [What will happen if you used `forEach` on a `Set`?](#what-will-happen-if-you-used-foreach-on-a-set)
     - [Why do we get these results?](#why-do-we-get-these-results)
     - [Why we don't use asthmatic comparison with strings?](#why-we-dont-use-asthmatic-comparison-with-strings)
@@ -94,6 +95,16 @@
 
       user.go(); // John
       ```
+
+- How to skip parameters when calling functions:
+
+  ```js
+  function myfunc(x, y = 2, z = 6) {}
+  // use (undefined) when calling it
+  myfunc(5, undefined, 17);
+  ```
+
+- only one `rest parameter` is allowed in one function and it must be the last parameter.
 
 ---
 
@@ -300,23 +311,36 @@ function getData() {
 
 - These are **internal properties** that are not accessible directly from the code, but only indirectly through other internal mechanisms.
 
-- How to get the last element in the array in multiple ways?
+### How to get the last element in the array in multiple ways?
 
-  ```js
-  const arr = [1, 2, 3, 4, 5];
+```js
+const arr = [1, 2, 3, 4, 5];
 
-  // 1. using length
-  const lastElement = arr[arr.length - 1];
+// 1. using length
+const lastElement = arr[arr.length - 1];
 
-  // 2. using slice
-  const lastElement = arr.slice(-1)[0];
+// 2. using slice
+const lastElement = arr.slice(-1)[0];
 
-  // 3. using at
-  const lastElement = arr.at(-1);
+// 3. using at
+const lastElement = arr.at(-1);
 
-  // 4. using pop
-  const lastElement = arr.pop();
-  ```
+// 4. using pop
+const lastElement = arr.pop();
+```
+
+- Difference between `at` and indexing:
+
+  - `at` method can be used for method-chaining, while indexing cannot.
+  - `at` method can be used to access elements from the end of the array by using negative indices.
+
+    ```js
+    const arr = [1, 2, 3, 4, 5];
+
+    arr[arr.length - 1]; // 5
+    // or
+    arr.at(-1); // 5 ✅
+    ```
 
 ### What will happen if you used `forEach` on a `Set`?
 
@@ -403,7 +427,7 @@ let arr = [1, 2, 3, 4];
    }
    ```
 
-3. You can use `Object.assign()` to copy the properties of the object to a new object.
+3. You can use `Object.assign()` to copy the properties of the object to a new object. **(but it will be shallow copy, not deep copy)**
 
    ```js
    const obj = { a: 1, b: { c: 2 } };

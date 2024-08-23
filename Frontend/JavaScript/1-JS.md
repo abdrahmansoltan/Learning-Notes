@@ -2,44 +2,61 @@
 
 - [INDEX](#index)
   - [JavaScript](#javascript)
+    - [ECMA Script (ES)](#ecma-script-es)
+    - [Adding javascript file in html](#adding-javascript-file-in-html)
+    - [Loading scripts: `async`, `defer`](#loading-scripts-async-defer)
+      - [`defer`](#defer)
+      - [`async`](#async)
   - [Variables](#variables)
+    - [`Var` vs `const` \& `let`](#var-vs-const--let)
     - [Garbage collection](#garbage-collection)
-  - [Operators](#operators)
   - [Function](#function)
+    - [Function declaration vs Function expression](#function-declaration-vs-function-expression)
+    - [Arrow function](#arrow-function)
     - [IIFE](#iife)
-    - [`this` keyword in functions](#this-keyword-in-functions)
     - [Function binding](#function-binding)
-      - [Losing "this"](#losing-this)
+      - [Losing "`this`" keyword](#losing-this-keyword)
       - [Solution 1: Wrapper](#solution-1-wrapper)
       - [Solution 2 (better): bind](#solution-2-better-bind)
         - [`bindAll()`](#bindall)
+      - [Solution 3 (better): Arrow functions](#solution-3-better-arrow-functions)
     - [Arguments](#arguments)
-  - [Loop](#loop)
-    - [For..in loop](#forin-loop)
-    - [For..of loop](#forof-loop)
+  - [Iteration \& Loops](#iteration--loops)
+    - [For loop](#for-loop)
+    - [For..of loop (looping over iterables)](#forof-loop-looping-over-iterables)
+    - [For..in loop (looping over object keys) (Old way)](#forin-loop-looping-over-object-keys-old-way)
+  - [Data Structures](#data-structures)
+    - [Strings](#strings)
+      - [String Methods](#string-methods)
+      - [Operations on strings](#operations-on-strings)
+      - [Regular expressions](#regular-expressions)
+    - [Arrays](#arrays)
+      - [Array Destructuring](#array-destructuring)
+      - [Array methods](#array-methods)
+        - [Array Data Transformation Methods (`map`, `filter`, `reduce`)](#array-data-transformation-methods-map-filter-reduce)
+    - [Object](#object)
+      - [Object Methods](#object-methods)
+      - [Object.keys, values, entries](#objectkeys-values-entries)
+      - [Transforming objects (operations on objects)](#transforming-objects-operations-on-objects)
+      - [Object Destructuring](#object-destructuring)
+    - [Sets](#sets)
+      - [WeakSet](#weakset)
+    - [Maps](#maps)
+      - [WeakMap](#weakmap)
   - [Numbers](#numbers)
     - [Math operations](#math-operations)
     - [Special numbers](#special-numbers)
+    - [Numbers Internationalization](#numbers-internationalization)
   - [Date](#date)
-    - [Autocorrelation](#autocorrelation)
     - [Operations with Dates](#operations-with-dates)
-      - [Date to number, date diff](#date-to-number-date-diff)
-      - [Date.parse from a string](#dateparse-from-a-string)
-    - [international Date Api](#international-date-api)
-  - [Strings](#strings)
-    - [String Methods](#string-methods)
-    - [Operations on strings](#operations-on-strings)
-    - [Regular expressions](#regular-expressions)
-  - [Arrays](#arrays)
-    - [Array methods](#array-methods)
-      - [`reduce` method](#reduce-method)
-  - [Object](#object)
-    - [Object.keys, values, entries](#objectkeys-values-entries)
-    - [Transforming objects (operations on objects)](#transforming-objects-operations-on-objects)
-  - [Sets](#sets)
-    - [WeakSet](#weakset)
-  - [Maps](#maps)
-    - [WeakMap](#weakmap)
+    - [Dates Internationalization](#dates-internationalization)
+    - [Dates Third-party Libraries](#dates-third-party-libraries)
+  - [Operators](#operators)
+    - [Types of Operators](#types-of-operators)
+    - [Operator Precedence](#operator-precedence)
+    - [Spread Operator](#spread-operator)
+    - [Rest Parameters](#rest-parameters)
+    - [Short circuiting - Nullish coalescing operator `??`](#short-circuiting---nullish-coalescing-operator-)
   - [Errors](#errors)
     - [Error object](#error-object)
       - [Custom Errors](#custom-errors)
@@ -58,47 +75,324 @@
     - [Defending against CROSS-SITE SCRIPTING](#defending-against-cross-site-scripting)
   - [Lazy loading](#lazy-loading)
   - [Slider (pagination)](#slider-pagination)
-  - [Document and resource loading (adding js in html)](#document-and-resource-loading-adding-js-in-html)
-    - [Lifecycle of an HTML page](#lifecycle-of-an-html-page)
-      - [`DOMContentLoaded`](#domcontentloaded)
-      - [`load`](#load)
-      - [`beforeunload` / `unload`](#beforeunload--unload)
-    - [Loading scripts: `async`, `defer`](#loading-scripts-async-defer)
-      - [`defer`](#defer)
-      - [`async`](#async)
   - [Writing Documentation](#writing-documentation)
 
 ---
 
 ## JavaScript
 
-JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded** programming language. It is **weakly typed** and **dynamically typed** language.
+JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded**, **Object-oriented** programming language. It is **weakly typed** and **dynamically typed** language.
 
-- **high-level** : it provides abstractions that allow us to ignore the details of the machine where the program runs.
+- **high-level** : it provides abstractions that allow us to ignore machine-level details like memory-management.
 - **interpreted** : it doesn't need to be compiled, it's executed directly by the browser (line by line);
 - **dynamic** : it executes at runtime many common programming behaviors that static programming languages perform during compilation. ex: allocating memory for variables, determining the type of a variable or object, determining the scope of variables, etc.
 - **single-threaded** : it means that only one task can be executed at a time.
+- **Object-oriented**: it's based on objects, for storing most kinds of data.
 - **weakly typed** : it doesn't require us to declare the type of variables. ex: `let x = 5;` or `let x = "John";`
 - **dynamically typed** : it means that the type of a variable is checked during runtime rather than in advance. ex: `let x = 5;` or `let x = "John";`
+- **Multi-paradigm** : it supports different styles of programming like **procedural programming**, **object-oriented programming**, and **functional programming**.
+
+---
+
+### ECMA Script (ES)
+
+**ECMAScript** is a standard for scripting languages, It was created to standardize JavaScript to help foster multiple independent implementations. It is the standard that defines what JavaScript is.
+
+![ECMA](./img/ecma-1.png)
+
+- The new versions of ECMAScript is released every year, and they're backward compatible with the previous versions.
+  ![ECMA](./img/ecma-2.png)
+
+- How to use modern JavaScript
+  ![ECMA](./img/ecma-3.png)
+
+---
+
+### Adding javascript file in html
+
+To add a script to an HTML page, we use the `<script>` tag. The `type` attribute is not required. The `src` attribute is used to include an external script file.
+
+```html
+<script src="script.js"></script>
+```
+
+- There're 2 ways to include JavaScript in an HTML document:
+
+  - **Inline script**: The script is directly written in the HTML document in the `<script>` tag
+
+    ```html
+    <script>
+      alert('Hello, World!');
+    </script>
+    ```
+
+  - **External script**: The script is written in an external file and included in the HTML document.
+
+    ```html
+    <script src="script.js"></script>
+    ```
+
+- Why use separate `js` file in `<script>` tags
+
+  - The benefit of a separate file is that the browser will download it and store it in its **cache**.
+  - Other pages that reference the same script will take it from the cache instead of downloading it, so the file is actually downloaded only once. --> That reduces traffic and makes pages faster.
+
+- A single `<script>` tag can’t have both the **src** attribute and code inside.
+
+  ```html
+  <script src="file.js">
+    alert(1); // the content is ignored, because src is set
+  </script>
+
+  <!-- You can separate the 2 scripts -->
+  <script src="file.js"></script>
+  <script>
+    alert(1);
+  </script>
+  ```
+
+---
+
+### Loading scripts: `async`, `defer`
+
+> In modern websites, scripts are often “heavier” than HTML: their download size is larger, and processing time is also longer.
+
+When the browser loads HTML and comes across a `<script>...</script>` tag, it can’t continue building the `DOM`. It must execute the script right now. The same happens for external scripts `<script src="..."></script>`: the browser must wait for the script to download, execute the downloaded script, and only then it can process the rest of the page.
+
+- That leads to two important issues:
+
+  1. Scripts can’t see DOM elements below them, so they can’t add handlers etc.
+  2. If there’s a bulky script at the top of the page, it “blocks the page”. Users can’t see the page content till it downloads and runs:
+
+     ```html
+     <p>...content before script...</p>
+
+     <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
+
+     <!-- This isn't visible until the script loads -->
+     <p>...content after script...</p>
+     ```
+
+- There are some workarounds to that, we can put a `script` at the **bottom of the page**. Then it can see elements above it, and it doesn’t block the page content from showing:
+
+  ```html
+  <body>
+    ...all content is above the script...
+
+    <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
+  </body>
+  ```
+
+  - **Note:** this solution is far from perfect. For example, the browser notices the script (and can start downloading it) only after it downloaded the full HTML document. For long HTML documents, that may be a noticeable delay.
+    - Such things are invisible for people using very fast connections, but many people in the world still have slow internet speeds and use a far-from-perfect mobile internet connection.
+    - Luckily, there are two `<script>` attributes that solve the problem for us: **`defer`** and **`async`**.
+
+#### `defer`
+
+The `defer` attribute tells the browser not to wait for the script. Instead, the browser will continue to process the HTML, build DOM. The script loads “in the background”, and then runs(**executes**) when the DOM is fully built.
+
+![defer](./img/defer2.PNG)
+![defer](./img/defer.PNG)
+
+- in other words:
+
+  - Scripts with `defer` never block the page.
+  - Scripts with defer always execute when the DOM is ready (but before `DOMContentLoaded` event).
+
+- Deferred scripts keep their relative order, just like regular scripts.
+
+  ```html
+  <script defer src="https://javascript.info/article/script-async-defer/long.js"></script>
+  <script defer src="https://javascript.info/article/script-async-defer/small.js"></script>
+  ```
+
+  - steps:
+    1. Browsers scan the page for scripts and download them in parallel, to improve performance. So in the example above both scripts download in parallel. The `small.js` probably finishes first.
+    2. the `defer` attribute, besides telling the browser “not to block”, ensures that the relative order is kept. So even though `small.js` loads first, it still waits and runs after `long.js` executes.
+  - > That may be important for cases when we need to load a JavaScript library and then a script that depends on it.
+
+- The defer attribute is only for external scripts
+  - The `defer` attribute is ignored if the `<script>` tag has no `src`.
+
+> In practice, **defer** is used for scripts that need the whole DOM and/or their relative execution order is important.
+
+---
+
+#### `async`
+
+The async attribute is somewhat like `defer`. It also makes the script non-blocking. But it has important differences in the behavior.
+
+- The `async` attribute means that a **script is completely independent**:
+  - The browser doesn’t block on `async` scripts (like `defer`).
+  - Other scripts don’t wait for `async` scripts, and `async` scripts don’t wait for them.
+  - `DOMContentLoaded` and `async` scripts don’t wait for each other:
+    - `DOMContentLoaded` may happen both before an `async` script (if an `async` script finishes loading after the page is complete)
+    - …or after an `async` script (if an `async` script is short or was in HTTP-cache)
+- In other words, `async` scripts load in the background and run when ready. The DOM and other scripts don’t wait for them, and they don’t wait for anything. A fully independent script that runs when loaded.
+
+- async scripts don't keep their relative order (They don’t wait for each other. Whatever loads first)
+
+  ```html
+  <p>...content before scripts...</p>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => alert('DOM ready!'));
+  </script>
+
+  <script async src="https://javascript.info/article/script-async-defer/long.js"></script>
+  <script async src="https://javascript.info/article/script-async-defer/small.js"></script>
+
+  <p>...content after scripts...</p>
+  ```
+
+  - steps:
+    1. The page content shows up immediately: `async` doesn’t block it.
+    2. `DOMContentLoaded` may happen both before and after `async`, no guarantees here.
+    3. A smaller script `small.js` goes second, but probably loads before `long.js`, so `small.js` runs first. Although, it might be that `long.js` loads first, if cached, then it runs first. In other words, async scripts run in the “load-first” order.
+  - > Async scripts are great when we integrate an independent third-party script into the page: counters, ads and so on, as they don’t depend on our scripts, and our scripts shouldn’t wait for them:
+
+    ```html
+    <!-- Google Analytics is usually added like this -->
+    <script async src="https://google-analytics.com/analytics.js"></script>
+    ```
+
+- **Dynamic scripts** behave as “`async`” by default.
+
+  - They don’t wait for anything, nothing waits for them.
+  - The script that loads first – runs first (“load-first” order).
+
+  ```js
+  let script = document.createElement('script');
+  script.src = '/article/script-async-defer/long.js';
+  document.body.append(script); // The script starts loading as soon as it’s appended to the document
+  ```
+
+  - This can be changed if we explicitly set script.`async=false`. Then scripts will be executed in the document order, just like defer.
+
+> in practice, **async** is used for independent scripts, like counters or ads. And their relative execution order does not matter.
 
 ---
 
 ## Variables
 
-- `var` vs `let` vs `const` &nbsp; &nbsp; &nbsp; &nbsp; (also look at the hoisting section in the pdf)
-  ![var-let-const](./img/var-let-const.png)
-  ![var-let-const](./img/var-let-const-2.jpg)
-- variable defined with `var` is an `window` object property
+- When naming variables, there are some guidelines:
+  - must not start with a digit
+  - must not be a reserved keyword (like `new`, `class`, ...)
+  - uppercase names are for **constants** (variables that should not be changed)
+
+---
+
+### `Var` vs `const` & `let`
+
+![var-let-const](./img/var-let-const.png)
+![var-let-const](./img/var-let-const-2.jpg)
+
+- **Var**
+
+  - is function-scoped (`“var”` has no block scope) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
+
+    - Variables, declared with `var`, are either function-scoped or global-scoped. They are visible through blocks.
+
+      ```js
+      function f() {
+        // It can be accessible any where (within) this function
+        //
+        var a = 10;
+        console.log(a); // 10
+      }
+      f();
+
+      // A cannot be accessible
+      // outside of function
+      console.log(a); // ReferenceError: a is not defined
+
+      // ---------------------------------------------------------------
+
+      if (true) {
+        // It can be accessible any where
+        var a = 10;
+        console.log(a); // 10
+      }
+      console.log(a); // 10
+
+      // ---------------------------------------------------------------
+
+      for (var i = 0; i < 10; i++) {
+        var one = 1;
+        // ...
+      }
+      alert(i); // 10, "i" is visible after loop, it's a global variable
+      alert(one); // 1, "one" is visible after loop, it's a global variable
+      ```
+
+  - `“var”` tolerates re-declarations
+
+    ```js
+    let user;
+    let user; // SyntaxError: 'user' has already been declared
+
+    var user = 'Pete';
+    var user = 'John'; // this "var" does nothing (already declared)
+    // ...it doesn't trigger an error
+
+    alert(user); // John
+    ```
+
+  - `var` is the old way to declare a variable in JavaScript (before ES6), it's not used anymore, it's better to use `let` and `const` instead.
+  - variable defined with `var` is an `window` object property, meaning that it can be accessed from anywhere in the code **(global scope)**
+
+  - `“var”` variables can be declared below their use
+
+    - `var` declarations are processed when the function starts (or script starts for globals). In other words, `var` variables are defined from the beginning of the function, no matter where the definition is
+
+      ```js
+      function sayHi() {
+        phrase = 'Hello';
+
+        alert(phrase);
+
+        var phrase;
+      }
+      sayHi();
+      ```
+
+    - **Important Note**: Declarations are hoisted, but assignments are not.
+
+      - Because all `var` declarations are processed at the function start, we can reference them at any place. But variables are `undefined` until the assignments.
+
+        ```js
+        function sayHi() {
+          var phrase; // declaration works at the start...
+
+          alert(phrase); // undefined
+
+          phrase = 'Hello'; // ...assignment - when the execution reaches it.
+        }
+
+        sayHi();
+        ```
+
+  - `var` variable can be **re-declared (re-defined)** without errors:
+
+    ```js
+    var num = 20;
+    num = 15; // Ok
+    var num = 50; // Ok
+    ```
+
+- **let & const** are both function-scoped and block-scoped (anything within `{}`), **means you can't use it outside the function-scope & block-scope**
 
 ---
 
 ### Garbage collection
 
-- Garbage collection is performed automatically. We cannot force or prevent it.
-- Objects are retained in memory while they are **reachable**.
-- Being referenced is not the same as being reachable (from a **root**): a pack of interlinked objects can become unreachable as a whole
-- Modern engines implement advanced algorithms of garbage collection.
-- if something becomes unreached, its garbage-collected
+Javascript has a built-in garbage collector that automatically removes the old, unused objects from memory to free up space.
+
+- Garbage collection is automatic.
+- Objects stay in memory while **reachable**.
+- Interlinked objects can become unreachable together.
+- Modern engines use advanced garbage collection algorithms.
+- Unreachable objects become garbage-collected.
   ![unreachable](./img/unreachable.png)
 
   - to remove something from memory in garbage-collection, we need to make it **unreachable**, ex:
@@ -114,127 +408,121 @@ JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded*
 
 ---
 
-## Operators
+## Function
 
-> NOTE: **operand** is what operators are applied to
+It's a block of code that can be reused and called by name. The code inside a function is executed when the function is invoked.
 
-- **Binary** operators -> is for 2 operands
-  - `5 + 4`
-- **unary** operators -> is for 1 operand
+![function](./img/function-1.png)
 
-  - it's a `+` or `-` before the string number =>
+- when you use a function that do a calculation process, you should put the invocation of this function in a variable and not invoking it many time => **for performance**
+
+- **Default parameters**:
+
+  - If a parameter is not provided, then its value becomes `undefined`.
+  - We can set a default value for a parameter if it's not provided.
 
     ```js
-    // It actually does the same thing as Number(), but is shorter.
-    console.log(+'565'); // 565
-    console.log(+true); // 1
-    console.log(+''); // 0
-    ```
+    function showMessage(from, text = 'no text given') {
+      alert(from + ': ' + text);
+    }
 
-  - it's a `!` before something => `console.log(! (x > 4) )`
+    showMessage('Ann'); // Ann: no text given
+    ```
 
 ---
 
-## Function
+### Function declaration vs Function expression
 
-- **function declaration vs function expression**
-  ![function declaration vs function expression](./img/function%20declaration%20vs%20function%20expression.png)
+![function declaration vs function expression](./img/function-declaration-vs-function-expression.png)
 
-  - The main practical **difference** is that you can call `function declaration` before you define it and your code will work just fine but with function expression, it's impossible and JavaScript will throw an error at you.
-    - This works because the interpreter runs through a script before executing each statement, so it will know that a `function declaration` appears later in the script
-    - the interpreter always looks for **variables** and **function declarations** before going through each section of a script, line-by-line. This means that a function created with a **function declaration** can be called before it has even been declared.
-      - The difference is that a **"Function Declaration is instantly fully initialized"**.
-        - When a Lexical Environment is created, a Function Declaration immediately becomes a ready-to-use function (unlike `let`, that is unusable till the declaration).
-          ![function-declaration](./img/function-declaration.png)
-      - as for `Function expression`, You put a function where the interpreter would expect to see an **expression** (returned value), then it is treated as an expression, and it is known as a function expression
-  - **Function expression** forces you to define all my functions at the top of my code. this makes you write cleaner and more readable codes this way.
+- **Function Declarations**:
 
-    - here, the name is usually omitted. A function with no name is called an **anonymous function**.
-
-      - It can be `anonymous` or `named` function expression
-
-        ```js
-        // anonymous function expression
-        let sayHi = function () {
-          alert('Hello');
-        };
-
-        // named function expression
-        let sayHi = function func(who) {
-          alert(`Hello, ${who}`);
-        };
-        ```
-
-        - Difference is that `func` is only visible inside of itself, so it can only be used to call itself, while `sayHi` is visible everywhere in the code.
-        - So, use `Named function expression` when you need to self-call the function inside itself (`recursion`, etc..), otherwise use `anonymous function expression`
-
-    - also this enables you to have **reliable self-reference (recursion, etc)**
-    - and have **more debuggable stack traces** -> the name of function is shown in `stack trace`
-    - also this makes **more self-documenting code**
-
-  - **Function declarations** are not part of the regular top-to-bottom flow of control. They are conceptually moved to the top of their scope and can be used by all the code in that scope.
+  - Can be called before they are defined.
+  - Interpreter processes them before executing the script.
+  - Instantly fully initialized when the Lexical Environment is created.
+    ![function-declaration](./img/function-declaration.png)
+  - Example:
 
     ```js
-    console.log('The future says:', future()); // this works!
+    console.log('The future says:', future()); // this works! ✅ (even though the function is defined below)
+
     function future() {
       return "You'll never have flying cars";
     }
+
+    console.log('The future says:', future()); // this also works! ✅
     ```
 
-- _note_ :
-  - `arrow function`
-    - if you used `{}` then you should use the word `return` to return something
-    - know that it's shorter but at a cost of it will be **anonymous function** and not a **named function**, which means that it will need you to read the function body to understand what it does instead of figuring out this from its name
-- when you use a function that do a calculation process, you should put the invocation of this function in a variable and not invoking it many time => **for performance**, ex:
+- **Function Expressions**:
 
-  - use this
+  - Cannot be called before they are defined.
+  - Treated as expressions and known as function expressions.
+  - Can be anonymous or named which is used for recursion or self-calling.
+  - Example:
 
-    ```javascript
-    for (let i = 0; i < bills.length; i++) {
-      const tip = calcTip(bills[i]);
-      tips.push(tip);
-      totals.push(tip + bills[i]);
-    }
+    ```js
+    console.log('The future says:', future()); // Error ❌: future is not a function
+
+    let sayHi = function () {
+      alert('Hello');
+    };
+
+    console.log('The future says:', future()); // Works ✅
     ```
 
-  - not this
+  - Use named function expressions for recursion or self-calling.
 
-    ```javascript
-    for (let i = 0; i < bills.length; i++) {
-      tips.push(calcTip(bills[i]));
-      totals.push(calcTip(bills[i]) + bills[i]);
-    }
+    ```js
+    let counter = function count() {
+      // ...
+      count();
+    };
     ```
 
-- Each function has its own **Execution context**
-  ![execution context](./img/execution-context-2.png)
-  - The `execution context` is the environment in which javascript code is executed, it stores all the necessary info for some code to be executed:
-    - where the control flow is now (the “current line”)
-    - `the current variables` (local variables and arguments)
-    - `the value of "this"` keyword
-  - has these parts:
-    ![execution context](./img/execution%20context.png)
-    - Local **Thread of execution** -> code that is being executed
-    - Local **Memory** -> `local variables`, `arguments passed to the function`
-    - **Scope chain** -> where the function was written
-    - **`this`** -> how the function was called (not in `arrow functions`)
-  - They correspond to variable scope
-  - each function has its own **execution context** in the **call stack**
-    - when finishing all the functions in the call stack, the **global execution context** will be popped out of the call stack (which is the main execution context that is created when the script is loaded)
-      ![execution context](./img/execution-context-1.png)
+  - Benefits:
+    - Reliable self-reference.
+    - More debuggable stack traces.
+    - Self-documenting code.
+
+---
+
+### Arrow function
+
+It's a shorter syntax for writing function expressions. It's a more concise way to write function expressions.
+
+```js
+let func = (arg1, arg2) => expression;
+
+// equivalent to
+let func = function (arg1, arg2) {
+  return expression;
+};
+```
+
+- if you use declaration block `{}` then you should use the word `return` to return something
+- **Arrow functions** have no `this`:
+
+  - They don’t have their `own this`. If we reference `this` from an arrow function, it’s taken from the outer “normal” function.
+  - There’s a difference between an `arrow function` => and a regular function called with `.bind(this)`:
+    - `.bind(this)` creates a “bound version” of the function.
+    - The `arrow =>` doesn’t create any binding. The function simply doesn’t have `this`. The lookup of this is made exactly the same way as a regular variable search: in the outer lexical environment.
+
+- **Limitations:**
+  - It's shorter but at a cost of it will be **anonymous function** and not a **named function**, which means that it will need you to read the function body to understand what it does instead of figuring out this from its name
+  - It doesn't have `arguments` variable
+  - Can’t be called with `new`
+  - Doesn’t have `super`
 
 ---
 
 ### IIFE
 
-**Immediately Invoked Function Expression** (IIFE) is a JavaScript function that runs as soon as it is defined - It is an inline function expression. which create its own scope
+**Immediately Invoked Function Expression** (IIFE) is a function that runs as soon as it is defined - It is an inline function expression. which create its own scope
 
 - In the past, as there was only `var`, and it has no **block-level** visibility, programmers invented a way to emulate it to create a separate scope.
   - So, **It's a simple approach to avoid global scope pollution**
 - It's an old approach for creating `modules`
 - [ `anonymous function` / `IIFE` ] are **inline function expressions**.
-
-  - Remember that any function that doesn't start with `function` is an **expression** not a **declaration**.
 
 - Ways to create `IIFE`
 
@@ -248,18 +536,17 @@ JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded*
   })(argument);
   ```
 
-- when you want to turn **block-scope** into a **functional-scope** -> use **IIFE**
+- **IIFE**: Turns block-scope into functional-scope.
 
-  - usually used to prevent variable to be in the global scope like with (variables declared with `var`) here:
-    ![IIFE](./img/iife.PNG)
-  - Often used to ensure that the variable names do not conflict with each other (especially if the page uses more than one script).
-  - also used for
-    - code that only needs to run once within a task, rather than repeatedly being called by other parts of the script.
-    - As an argument when a function is called
-    - In event handlers and listeners
-    - To prevent conflicts between two scripts that might use the same variable names
+  - Prevents global scope pollution (`var`).
+  - Avoids variable name conflicts.
+  - Runs code once within a task.
+  - Used in:
+    - Function arguments
+    - Event handlers
+    - Preventing conflicts between scripts
 
-- It's not used anymore as we have `let` and `const` which have **block-level** visibility, or we can create a `block` with `{}`
+- Less common now due to `let` and `const` with block-level scope.
 
   ```js
   {
@@ -272,66 +559,13 @@ JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded*
 
 ---
 
-### `this` keyword in functions
-
-- in `arrow functions` =>
-
-  - **Arrow functions have no `“this”`**
-
-    - If `this` is accessed, it is taken from the outside -> global scope -> `window` object
-    - even if you use a method inside an object, it will still point to the global object, because object literals don't define a scope
-      - if you insist on using `arrow functions` as a method, then you can use `this` keyword from the outer scope -> `self  = this` or `that = this`
-
-  - `this` is **Elastically lexical scoped**, as they define `this` based on **where it was written** and **not where/who it was called with**
-  - `this` refers to the global object ( `window` object ) which why it's called : `Lexical this` , so **DON'T EVER USE `arrow functions` AS A METHOD** as they don't define a `this` keyword so it will point to (**where the function was born**) --> the upper scope which usually where this refers to the global object:
-    - The global object has a universal name -> `globalThis`.
-    - ( `window` object ) -> In the browser
-    - ( `global` object ) -> In Node.js
-
-- in `normal functions` =>
-
-  - `this` refers to who the function was invoked (called) by --> (dynamic scope)
-  - `this` refers to the `undefined` if it's a global function and not a method to an object.
-
-- if you want to chain multiple methods (functions) that uses `this` keyword, you can return `this` at the end:
-
-  ```js
-  let ladder = {
-    step: 0,
-    up() {
-      this.step++;
-      return this;
-    },
-    down() {
-      this.step--;
-      return this;
-    },
-    showStep() {
-      alert(this.step);
-      return this;
-    }
-  };
-
-  ladder.up().up().down().showStep().down().showStep(); // shows 1 then 0
-  ```
-
-- each function has its own **execution context** in the **call stack**
-- only one `rest parameter` is allowed in one function and it must be the last parameter.
-- skip default parameter :
-
-  ```js
-  function myfunc(x, y = 2, z = 6) {}
-  // use (undefined) when calling it
-  myfunc(5, undefined, 17);
-  ```
-
----
-
 ### Function binding
 
 When passing object methods as callbacks, there’s a known problem: **"losing "this""**.
 
-#### Losing "this"
+> You can find more about `this` keyword here: [this-keyword-in-functions-execution-context](./9-JS_Advanced_concepts.md#this-keyword-in-functions-execution-context)
+
+#### Losing "`this`" keyword
 
 - EX for explanation:
 
@@ -346,14 +580,16 @@ When passing object methods as callbacks, there’s a known problem: **"losing "
   setTimeout(user.sayHi, 1000); // Hello, undefined!
   ```
 
-  - That’s because `setTimeout` got the function `user.sayHi`, separately from the object. The last line can be rewritten as:
+  - `setTimeout` separates `sayHi` from `user` object, losing context of `this`. because now the `sayHi` is a function is being called by `setTimeout` and not by `user` object.
 
     ```js
     let f = user.sayHi;
     setTimeout(f, 1000); // lost user context
     ```
 
-  - so now `this` is equal to the `window` object, So for `this.firstName` it tries to get `window.firstName`, which does not exist. In other similar cases, usually `this` just becomes **undefined**.
+  - `this` becomes `window`, so `this.firstName` is undefined.
+
+  **undefined**.
 
 #### Solution 1: Wrapper
 
@@ -448,6 +684,20 @@ When passing object methods as callbacks, there’s a known problem: **"losing "
 
 - or you can use the [\_.bindAll(object, methodNames)](https://lodash.com/docs#bindAll) in **lodash**.
 
+#### Solution 3 (better): Arrow functions
+
+- Arrow functions get the value of `this` from the outer function that **contains** it (where it was created). So it's a good solution for our case. and usually it's used in the case of **callbacks** for **event handlers**.
+
+  ```js
+  let func = () => alert(this);
+  let func2 = function () {
+    alert(this);
+  };
+
+  button.addEventListener('click', func); // shows the window object
+  button.addEventListener('click', func2); // shows the button object (not usually what we want)
+  ```
+
 ---
 
 ### Arguments
@@ -456,36 +706,11 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
 
 - If you pass too many, the extra ones are ignored.
 - If you pass too few, the missing parameters get assigned the value **undefined**.
-- **Rest Parameters**:
 
-  - The rest of the parameters (using the rest operator (**`...`**)) can be included in the function definition by using three dots `...` followed by the name of the array that will contain them. The dots literally mean “gather the remaining parameters into an array”.
+- **The `arguments` keyword**:
 
-    ```js
-    function sumAll(...args) {
-      // args is the name for the array
-      let sum = 0;
-
-      for (let arg of args) sum += arg;
-
-      return sum;
-    }
-
-    alert(sumAll(1)); // 1
-    alert(sumAll(1, 2)); // 3
-    alert(sumAll(1, 2, 3)); // 6
-    ```
-
-    - The rest parameters must be **at the end**
-
-      ```js
-      function f(arg1, ...rest, arg2) { // arg2 after ...rest ?!
-      // error
-      }
-      ```
-
-- **The “arguments” variable**
-
-  - There is also a special array-like object named arguments that contains all arguments by their index.
+  - Special array-like object containing all function arguments by index.
+  - Example:
 
     ```js
     function showName() {
@@ -493,26 +718,16 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
       alert(arguments[0]);
       alert(arguments[1]);
     }
-
-    showName('Julius', 'Caesar'); // shows: 2, Julius, Caesar
+    showName('Julius', 'Caesar'); // 2, Julius, Caesar
     ```
 
-  - In old times, `rest` parameters did not exist in the language, and using `arguments` was the only way to get all arguments of the function. And it still works
-  - The downside is that although arguments is both array-like and iterable, it’s not an array. It does not support array methods, so we can’t call `arguments.map(...)` for example.
-  - Also, it always contains all arguments. We can’t capture them partially, like we did with **rest parameters**.
-    - So when we need these features, then `rest` parameters are preferred.
-  - **Arrow functions do not have "arguments"**
+  - Before `rest` parameters, `arguments` was used to get all function arguments.
+  - Downsides:
+    - Not a true array; lacks array methods like `map`.
+    - Always contains all arguments; can't capture partially like `rest` parameters.
+  - **Arrow functions**:
 
-    - If we access the arguments object from an arrow function, it takes them from the **outer** “normal” function.
-
-    ```js
-    function f() {
-      let showArg = () => alert(arguments[0]);
-      showArg();
-    }
-
-    f(1); // 1
-    ```
+    - No `arguments` object; inherits from the outer function.
 
 - **Spread syntax**
 
@@ -532,22 +747,74 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
 
 ---
 
-## Loop
+## Iteration & Loops
 
-| For                                                                                                                                             | While                                                                                                                                                                                  | Do While                                                                                                           |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| if you need to run code a specific number of times, usually the condition is a counter which is used to tell how many times the loop should run | if you don't know how many times the code should run. here the condition can be something other that a counter and the code will continue to loop for as long as the condition is true | it will always run the statements inside the curly braces at least once, even if the condition evealuates to false |
+| For Loop                                                | While Loop                                                                           | Do While Loop                                                       |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| Runs a specific number of times, usually with a counter | Runs as long as a condition is true, useful when the number of iterations is unknown | Always runs at least once, even if the condition is false initially |
 
-- in `for` block we can use `const` as each time it will make a new variable :
+- Examples
 
-  ```javascript
-  for (let i = 0; i < bills.length; i++) {
-    const tip = calcTip(bills[i]);
-    tips.push(tip);
+  ```js
+  // For loop
+  for (let i = 0; i < 3; i++) {
+    alert(i); // 0, 1, 2
+  }
+
+  // While loop
+  let i = 0;
+  while (i < 3) {
+    alert(i); // 0, 1, 2
+    i++;
+  }
+
+  // Do While loop
+  let i = 0;
+  do {
+    alert(i); // 0, 1, 2
+    i++;
+  } while (i < 3);
+  ```
+
+- We can also use methods like `forEach` but note that it doesn't support `break` or `continue`.
+
+---
+
+### For loop
+
+It's used when you know the number of iterations.
+
+```js
+for (let i = 0; i < 3; i++) {
+  alert(i); // 0, 1, 2
+}
+```
+
+- in `for` block we use `let` and not (`const` or `var`) because:
+
+  - `let` is block-scoped, so it's better to use it in loops
+  - `var` is function-scoped, so it's better to avoid it in loops, as it will be available outside the loop
+  - `const` is not suitable for loops, as it can't be reassigned
+
+  ```js
+  // Using let ✅
+  for (let i = 0; i < 3; i++) {
+    console.log(i); // 0, 1, 2
+  }
+
+  // Using var ❌
+  for (var i = 0; i < 3; i++) {
+    console.log(i); // 0, 1, 2
+  }
+  console.log(i); // 3 (it's available outside the loop)
+
+  // Using const ❌
+  for (const i = 0; i < 3; i++) {
+    console.log(i); // 0, then error: Assignment to constant variable.
   }
   ```
 
-- ex of for loop without any thing in `()` :
+- Example of `for` loop without any thing in `()` :
 
   ```javascript
   let p = ['sample1','sample2','sample3','sample4','sample5'];
@@ -556,26 +823,53 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
   for (;;;) {
     console.log(p[i]);
     i++;
-    if (i===p.length) break;
-  }
-  ```
-
-- `for of loop` with index :
-
-  ```javascript
-  for (const item of menu) console.log(item);
-
-  // with index
-  for (const [i, el] of menu.entries()) {
-    console.log(`${i + 1}: ${el}`);
+    if (i === p.length) break;
   }
   ```
 
 ---
 
-### For..in loop
+### For..of loop (looping over iterables)
+
+It's a modern way to iterate over **iterables** like (`Array`, `Map`, `Set`, `String`, etc), except `objects`.
+
+> An **iterator** must have the method named `next()` that returns an object `{done: Boolean, value: any}`, here `done:true` denotes the end of the iteration process, otherwise the value is the next value.
+
+- It doesn't give access to the index of the current element by default, but in case you need it, you can use the `Array.prototype.entries()` method.
+
+  ```js
+  let fruits = ['Apple', 'Orange', 'Plum'];
+
+  for (let fruit of fruits) {
+    alert(fruit); // Apple, Orange, Plum
+  }
+
+  // with index
+  for (let [i, fruit] of fruits.entries()) {
+    alert(`${i + 1}: ${fruit}`); // 1: Apple, 2: Orange, 3: Plum
+  }
+  ```
+
+---
+
+### For..in loop (looping over object keys) (Old way)
 
 To walk over all **keys of an object**, there exists a special form of the loop: `for..in`.
+
+```js
+let user = {
+  name: 'John',
+  age: 30,
+  isAdmin: true
+};
+
+for (let key in user) {
+  // keys
+  alert(key); // name, age, isAdmin
+  // values for the keys
+  alert(user[key]); // John, 30, true
+}
+```
 
 - it can be used with arrays to loop through the indexes
 
@@ -591,318 +885,162 @@ To walk over all **keys of an object**, there exists a special form of the loop:
 
 ---
 
-### For..of loop
+## Data Structures
 
-used with `Arrays`, `strings`, `Map`, `Set`, etc **(except `objects`)**,
+They are a way of organizing and storing data so that we can access and modify it efficiently.
 
-- It doesn’t give access to the number of the current element, just its value.
-- Objects that can be used in `for..of` are called **iterable**.
-- An **iterator** must have the method named `next()` that returns an object `{done: Boolean, value: any}`, here `done:true` denotes the end of the iteration process, otherwise the value is the next value.
+![data-structures](./img/data-structures.png)
 
----
+### Strings
 
-## Numbers
-
-- More ways to write a number:
+- `.length` returns the number of bytes, not characters (e.g., emojis require 2 bytes).
 
   ```js
-  let billion = 1_000_000_000; // JavaScript engine simply ignores "_" between digits -> syntactic sugar
-  // note: if it's a string, it won't be type-casted to a number
-  let num = +'1_00'; // NaN
-
-  let billion = 1e9; // 1 billion, literally: 1 and 9 zeroes
+  alert('Hello'.length); // 5
+  alert('😂'.length); // 2
   ```
 
-- to check if a number is a `number` or `NaN`, use `Number.isFinite()` as it's better than `Number.inNaN()` (as it support most cases)
+- **Multiline strings**:
 
   ```js
-  alert(Number.isFinite('15')); // false, because a string
-  alert(Number.isNaN(NaN)); // true
-  alert(Number.isNaN(INFINITY)); // false ❌
+  // Using backticks
+  let guestList = `
+    Guests:
+    * John
+    * Pete
+    * Mary
+  `;
 
-  alert(isFinite(INFINITY)); // false, because Infinity is not a finite number ✅
+  // Using special characters
+  let guestList = 'Guests:\n * John\n * Pete\n * Mary';
+
+  // "\n" is a newline character, and it counts as one character.
+  console.log('a\n b'.length); // 4 (a, newline, space, b)
   ```
 
-- to get `random` number between two values :
+#### String Methods
 
-  ```javascript
-  // Returns a random number between min (inclusive) and max (exclusive)
-  function getRandomNum(min, max) {
-    return Math.random() * (max - min) + min;
-  }
+- Strings have methods like `length`, `toUpperCase()`, and `indexOf` despite being primitive types.
 
-  // Returns a random integer between min (inclusive) and max (inclusive)
-  function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-    // here we use floor as it works well if number is negative
-  }
-  ```
+  - This is due to **"Boxing"**: JavaScript temporarily converts the string to a `String` object to access its methods and properties using the `prototype` chain.
+    ![string-methods](./img/string-methods.avif)
 
-- **Format/Parse Numbers**
-
-  - Parse numbers:
-
-    ```js
-    // base 10
-    alert(parseInt('100px')); // 100
-
-    // base 2 (binary)
-    alert(parseInt('111', 2)); // 7
-    ```
-
-  - Format currency : [Formatting](https://www.samanthaming.com/tidbits/30-how-to-format-currency-in-es6/)
-
-- _Notes_ :
-
-  - `toFixed()` returns a `string`
-  - `Math.round()` and `toFixed()` both round to the nearest number: `0..4` **lead down** while `5..9` **lead up**.
-  - `toString()` can take a base to convert to (The base can vary from `2` to `36`. By default it’s `10`)
-  - If we want to call a method directly on a number, then we need to place **two dots** `..` after it.
-
-    ```js
-    // prettier-ignore
-    alert(123456..toString(36)); // 2n9c
-    // or
-    alert((123456).toString(36)); // 2n9c
-    ```
-
-  - **calculations**:
-
-    ```js
-    alert(0.1 + 0.2 == 0.3); // false (javascript is bad at math)
-    alert(0.1 + 0.2); // 0.30000000000000004
-    ```
-
-    - why? -> because A **number is stored in memory in its binary form**, a sequence of `bits` (`ones` and `zeroes`). But fractions like `0.1`, `0.2` that look simple in the decimal numeric system are actually unending fractions in their `binary` form.
-    - So `0.1` is one divided by ten `1/10`, In decimal numeral system such numbers are easily representable. Compare it to one-third: `1/3`. It becomes an endless fraction `0.33333`.
-    - So, division by powers `10` is guaranteed to work well in the decimal system, but division by `3` is not.
-    - Solution:
-
-      ```js
-      alert((0.1 * 10 + 0.2 * 10) / 10); // 0.3
-      // OR
-      alert(+(0.1 + 0.2).toFixed(2)); // 0.3
-      ```
-
----
-
-### Math operations
-
-```js
-// Rounding
-alert(Math.floor(3.1)); // 3 (round down)
-alert(Math.ceil(3.1)); // 4
-alert(Math.round(3.1)); // 3 (round to nearest integer (up or down)()
-alert(Math.trunc(3.1)); // 3 (remove anything after the decimal point)
-
-alert(Math.sqrt(9)); // 3
-alert(Math.pow(2, 3)); // 8
-alert(Math.abs(-5)); // 5
-
-alert(Math.max(1, 2, 3, 4, 5)); // 5
-alert(Math.min(1, 2, 3, 4, 5)); // 1
-
-alert(Math.random()); // random number from 0 to 1
-```
-
----
-
-### Special numbers
-
-- `Infinity`, `-Infinity`
-- `NaN`
-  - `0 / 0` = `NaN`
-  - `Infinity - Infinity` = `NaN`
-  - `console.log("five" * 2)` ->`NaN`
-
-> There is only one value in JavaScript that is not equal to itself, and that is **NaN** > `console.log(NaN == NaN)` -> false
-
----
-
-## Date
-
-To create a new Date object call: `new Date()`
-
-- `new Date()` -> Without arguments – create a Date object for the current date and time:
+- **convert number to a string**
 
   ```js
-  let now = new Date(); // current date and time
-
-  // new Date(milliseconds)
-  let d0 = new Date(3 * 24 * 3600 * 1000); // 3 days from 01.01.1970
-
-  // new Date(year, month, date, hour, minute, second, millisecond)
-  let d1 = new Date(2012, 1, 20, 3, 12); // 20 Feb 2012, 3:12am
-
-  // new Date(datastring)
-  let d2 = new Date('2012-02-20T03:12'); // 20 Feb 2012, 3:12am
-  ```
-
-- `date.getTime()` -> returns the number of milliseconds from the beginning of time `(Jan 1, 1970)`
-
-  ```js
-  // 0 means 01.01.1970 UTC+0
-  let Jan01_1970 = new Date(0);
-  Jan01_1970.getTime(); // 0
-  ```
-
-- **Date methods**
-  ![date](./img/date.png)
-
-- **Notes**:
-
-  - Don't use `getYear()`, but use `getFullYear()`, because `getYear()` is deprecated and it returns 2-digit year sometimes.
-    - `getYear()` returns year minus `1900`. This has been deprecated for a while now, it's best to use `getFullYear()`.
-  - `month` is **zero-based** so we add `1` to it to get the correct month
-
-  ```js
-  let date = new Date(2012, 0, 3); // 3 Jan 2012
-  ```
-
-  - when you perform operations on `dates`, the result is in form of `milliSeconds`
-
----
-
-### Autocorrelation
-
-The **Autocorrelation** is a very handy feature of `Date` objects. We can set out-of-range values, and it will auto-adjust itself.
-
-- if the `month` is specified with more days than it already has, we go to next month:
-
-  ```js
-  let date = new Date(2013, 0, 32); // 32 Jan 2013 -> 1 Feb 2013
-  ```
-
----
-
-### Operations with Dates
-
-#### Date to number, date diff
-
-When a Date object is converted to number, it becomes the timestamp same as `date.getTime()`:
-
-```js
-let date = new Date();
-alert(+date); // the number of milliseconds, same as date.getTime()
-```
-
----
-
-#### Date.parse from a string
-
-The method `Date.parse(str)` can read a date from a string.
-
-- The call to `Date.parse(str)` parses the string in the given format and returns the timestamp **(number of milliseconds from 1 Jan 1970 UTC+0)**.
-  - If the format is invalid, returns **NaN**.
-- The string format should be: `YYYY-MM-DDTHH:mm:ss.sssZ`, where:
-
-  - `YYYY-MM-DD` – is the date: year-month-day.
-  - `The character "T"` is used as the delimiter.
-  - `HH:mm:ss.sss` – is the time: hours, minutes, seconds and milliseconds.
-  - `The optional 'Z'` part denotes the time zone in the format
-  - `+-hh:mm`. A single letter Z would mean UTC+0.
-
-```js
-let ms = Date.parse('2012-01-26T13:51:50.417-07:00');
-alert(ms); // 1327611110417  (timestamp)
-```
-
----
-
-### international Date Api
-
-The `Intl.DateTimeFormat` object enables language-sensitive date and time formatting.
-
-- [`Intl.DateTimeFormat` cheatsheet](https://devhints.io/wip/intl-datetime)
-- It uses `toLocaleString()` method to format the date and time. it returns a string with a language sensitive representation of the date and time portion of this date.
-
-```js
-const event = new Date(Date.UTC(2012, 11, 20, 3, 0, 0));
-
-// request a weekday along with a long date
-
-// toLocaleString(locales, options)
-const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-console.log(event.toLocaleDateString('de-DE', options));
-// → "Donnerstag, 20. Dezember 2012"
-```
-
-- To get the user's locale, use `navigator.language` or `navigator.languages` (for an array of locales)
-
-  ```js
-  const locale = navigator.language; // "en-US"
-  ```
-
----
-
-## Strings
-
-### String Methods
-
-- we are calling object methods on a "string" such as "length", "toUpperCase()" and "indexOf", however we know "strings" are primitive types and yet these methods are available on a "string".
-  - this is because the process called `"Boxing"` which JavaScript perform behind the scene.
-  - When ever we call these methods on a "string", JavaScript will convert the "`string primitive`" into "`string objects`" without losing its content, therefore at that object these methods become available.
-- convert number to a string :
-
-  ```javascript
   const str = number + '';
   // or
   const str = String(number);
   ```
 
-- allow a string to span multiple lines:
+- **Access characters using index**
 
-  ```js
-  // using backticks
-  let guestList = `Guests:
-  * John
-  * Pete
-  * Mary
-  `;
+  - Use `[]` or `charAt(pos)`:
 
-  // or using special characters:
-  let guestList = 'Guests:\n * John\n * Pete\n * Mary';
-  ```
+    ```js
+    let str = 'Hello';
+    alert(str[0]); // H
+    alert(str.charAt(0)); // H
+    ```
 
-  - Note that `\n` is a single **“special” character**, so the length of a string includes it as one character.
+  - Difference: if no character is found, indexing `[]` returns `undefined`, and `charAt()` returns an empty string:
 
-- The only difference between them is that if no character is found, indexing `[]` returns `undefined`, and `charAt()` returns an empty string:
+    ```js
+    let str = `Hello`;
 
-  ```js
-  let str = `Hello`;
+    alert(str[1000]); // undefined
+    alert(str.charAt(1000)); // '' (an empty string)
+    ```
 
-  alert(str[1000]); // undefined
-  alert(str.charAt(1000)); // '' (an empty string)
-  ```
+- **Slicing and Substrings**
 
-- `substring()` -> is almost the same as `slice()`, but it allows start to be greater than end.
+  - `substring(start, end)`: Similar to `slice()`, but allows `start` to be greater than `end`.
+
+    ```js
+    let str = 'stringify';
+
+    // these are same for substring
+    alert(str.substring(2, 6)); // "ring"
+    alert(str.substring(6, 2)); // "ring"
+
+    // ...but not for slice:
+    alert(str.slice(2, 6)); // "ring" (the same)
+    alert(str.slice(6, 2)); // "" (an empty string)
+    ```
+
+  - Usually `slice` is used with `indexOf` to get a substring from a string
+
+    ```js
+    let str = 'stringify';
+    alert(str.slice(0, str.indexOf('i'))); // str
+    ```
+
+- **Split & Join**
+
+  - `split(separator, limit)`: Splits a string into an array of substrings using a separator.
+
+    - `separator` is a string or a regular expression.
+    - `limit` is the number of splits to make.
+    - If `separator` is an empty string, the string is split into an array of characters.
+
+      ```js
+      let names = 'John, Pete, Mary';
+      let arr = names.split(', '); // ["John", "Pete", "Mary"]
+      ```
+
+  - `join(separator)`: Creates a string from an array by joining all elements with a separator.
+
+    - If `separator` is omitted, the array elements are separated with a comma.
+
+      ```js
+      let arr = ['John', 'Pete', 'Mary'];
+      let str = arr.join(', '); // John, Pete, Mary
+      ```
+
+- **Capitalizing the first letter**
 
   ```js
   let str = 'stringify';
-
-  // these are same for substring
-  alert(str.substring(2, 6)); // "ring"
-  alert(str.substring(6, 2)); // "ring"
-
-  // ...but not for slice:
-  alert(str.slice(2, 6)); // "ring" (the same)
-  alert(str.slice(6, 2)); // "" (an empty string)
+  alert(str[0].toUpperCase() + str.slice(1)); // "Stringify"
+  // or
+  alert(str.replace(str[0], str[0].toUpperCase())); // "Stringify"
   ```
 
-- `substr(start [, length])` -> Returns the part of the string from start, with the given **length**.
+- **Padding a string**
+  ![padding](./img/padding-1.avif)
 
-  ```js
-  let str = 'stringify';
-  alert(str.substr(2, 4)); // 'ring', from the 2nd position get 4 characters
-  ```
+  - `padStart(targetLength, padString)`: Pads the current string with another string (repeated, if needed) so that the resulting string reaches the given length.
 
-- `.length` property returns the number of **Bytes** rather that the number of characters, --> unicode characters like **emoji requires 2 bytes**
+    ```js
+    let str = '5';
+    alert(str.padStart(4, '0')); // "0005"
+
+    let cardNumber = '2034399002125581';
+    let last4Digits = cardNumber.slice(-4);
+    let maskedNumber = last4Digits.padStart(cardNumber.length, '*'); // "************5581"
+    ```
+
+  - `padEnd(targetLength, padString)`: Pads the current string with another string (repeated, if needed) so that the resulting string reaches the given length.
+
+    ```js
+    let str = '5';
+    alert(str.padEnd(4, '0')); // "5000"
+    ```
+
+    ![padding](./img/padding-2.png)
+
+- **Chaining methods**
+
+  - String methods can be chained because they return a string.
+
+    ```js
+    let str = ' stRinGify';
+    alert(str.toLowerCase().trim()); // "stringify"
+    ```
 
 ---
 
-### Operations on strings
+#### Operations on strings
 
 - The binary `+` is the only operator that supports strings in such a way (concatenation) `2 + '1' --> "21"`
 
@@ -920,148 +1058,223 @@ console.log(event.toLocaleDateString('de-DE', options));
 
 ---
 
-### Regular expressions
+#### Regular expressions
 
 Regular expressions search for characters that form a pattern. They can also replace those characters with new ones.
 
 - Regular expressions do not just search for matching letters; they can check for sequences of upper/lowercase characters, numbers, punctuation, and other symbols.
+  ![regular expressions](./img/regular-expressions.png)
 
-![regular expressions](./img/regular-expressions.png)
+- We use `match()` method to match a string with a regular expression.
+
+  ```js
+  let str = 'We will, we will rock you';
+  let result = str.match(/we/gi); // ["We", "we", "we"]
+  ```
 
 ---
 
-## Arrays
+### Arrays
 
-![array-methods](./img/array-methods00.PNG)
-![array](./img/array.jpg)
+**Array** is a data structure that can store a collection of items. The items can be of any type.
 
-- arrays are **immutable**
-- `slice` (makes a copy) vs `splice` (change original array) ![slice-splice](./img/slice-splice.jpg)
-- `delete` vs `splice`
+- It's a special kind of object, with numbered indexes.
 
-  - always use `slice` to remove element from an array
+- To check if a value is an array, use `Array.isArray(value)`.
+
+#### Array Destructuring
+
+It's a way to extract multiple values from an array or object and assign them to variables in a single statement.
+
+```js
+let arr = ['Ilya', 'Kantor'];
+
+const [firstName, surname] = arr;
+// instead of
+// let firstName = arr[0];
+// let surname = arr[1];
+```
+
+- default values in **destructuring** -> (it's usually when we don't know the array is complete or not, like from API)
 
   ```js
-  // delete
-  let arr = ['I', 'go', 'home'];
-  delete arr[1]; // remove "go"
-  alert(arr[1]); // undefined
-  // now arr = ["I",  , "home"];
-  alert(arr.length); // 3
-
-  //splice
-  let arr = ['I', 'study', 'JavaScript'];
-  arr.splice(1, 1); // from index 1 remove 1 element
-  alert(arr); // ["I", "JavaScript"]
-  alert(arr.length); // 2
-  ```
-
-- switching values of 2 variables :
-
-  ```javascript
-  let a = 5;
-  let b = 8;
-  [x, y] = [y, x];
-  ```
-
-- default values in **destructuring**
-
-  ```javascript
-  // Default values
   const [p = 1, q = 1, r = 1] = [8, 9];
+  // now -> r will have a value
   ```
 
 - skipping items when **destructuring**:
 
   ```js
-  // skipping "two"
+  // skipping the second array-item
   const [one, , three] = [1, 2, 3];
   ```
 
-- **forEach vs for of**
-  | `forEach` | `for of` |
-  | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
-  | It iterates from initial to end | It is flexible to iterate array both ascending and descending order |
-  | Keeps execution until last element get executed (**can't break**) | It runs until given condition become false (**can break**) |
-  | It use iteration | It use index |
+- Use cases:
 
-- To check if a value is an array, use `Array.isArray(value)`.
+  - switching values of 2 variables :
+
+    ```js
+    let a = 5;
+    let b = 8;
+    [x, y] = [y, x]; // note that we don't use const / let here
+    ```
 
 ---
 
-### Array methods
+#### Array methods
 
-![methods](./img/array%20methods.jpg)
+![array-methods](./img/array-methods00.PNG)
 
-- **`filter` vs `find`**
-  ![filtervsfind](./img/filtervsfind.webp)
-  - usually `find()` is used in logins when you want to get the first element that matches a condition
-    - if no element found, it returns `undefined`
-  - `findIndex` is usually used when you want to get index of item to delete it from a list
-- **`indexOf` vs `findIndex`**
+- When we call these methods on a "Array", JavaScript will use the properties and methods in the `Array` object to perform the operation and then return the result (using `prototype` chain).
+  ![array-methods](./img/array-methods-1.png)
 
-  - `indexOf` expects a value as first parameter. This makes it a good choice to find the index in arrays of primitive types (like string, number, or boolean).
-    - it returns `-1` if nothing can be found.
-  - `findIndex` expects a callback as first parameter. Use this if you need the index in arrays with non-primitive types (e.g. objects) or your find condition is more complex than just a value.
+- **`slice` vs `splice`**
+  ![slice-splice](./img/slice-splice.jpg)
 
-- **`flat` and `flatMap`**
-  - **`flat`** : It creates a new array with all sub-array elements concatenated into it recursively up to the specified depth.
+  - `slice()` (makes a copy)
+
+    - the slicing happens from `start` to `end` **(not including `end`)**, so `end` is not included in the result.
+    - `-1` in `slice` means the last element, but in `splice` it means the last element will be removed.
+
+    ```js
+    let arr = ['t', 'e', 's', 't'];
+
+    arr.slice(1, 3); // e,s (copy from 1 to 3)
+    arr.slice(-2); // s,t (copy from -2 to the end)
+    arr.slice(1, -1); // e,s (copy from 1 to -1) not including -1
+    arr.slice(); // t,e,s,t (copy the whole array)
+    ```
+
+  - `splice()` (modifies the array)
+
+    - `splice` returns an array of removed elements.
+    - `splice` can remove and insert elements at the same time.
+    - `splice` can remove elements from the beginning and end of an array.
+    - it takes `start` and `deleteCount` as parameters. and not `end`.
+
+    ```js
+    let arr = ['I', 'study', 'JavaScript'];
+
+    // from index 1 remove 1 element
+    arr.splice(1, 1); // ["study"]
+
+    // from index 0 remove 3 elements and replace them with another
+    arr.splice(0, 3, "Let's", 'dance'); // ["I", "study", "JavaScript"] -> ["Let's", "dance"]
+    ```
+
+- **Adding / Removing elements from beginning and end**
+
+  ```js
+  let arr = ['I', 'study', 'JavaScript'];
+
+  // remove 2 first elements
+  arr.shift();
+  arr.shift();
+
+  // add the new element at the beginning
+  arr.unshift("Let's", 'dance');
+
+  console.log(arr); // now ["Let's", "dance", "JavaScript"]
+  ```
+
+  - `push()` and `unshift()` methods are used to add elements to the end and beginning of an array.
+    - These methods return the new length of the array.
+  - `pop()` and `shift()` methods are used to remove elements from the end and beginning of an array.
+    - These methods return the removed element.
+
+- **(`delete` vs `splice`)**
+
+  - always use `slice` to remove element from an array, because `delete` will leave an empty slot in the array.
+
+  ```js
+  const arr1 = ['I', 'go', 'home'];
+  const arr2 = ['I', 'go', 'home'];
+
+  // delete
+  delete arr1[1]; // remove "go"
+  console.log(arr1[1]); // undefined
+  // now arr1 = ["I",  , "home"];
+  console.log(arr1.length); // 3
+
+  //splice
+  arr2.splice(1, 1); // from index 1 remove 1 element
+  console.log(arr2); // ["I", "home"]
+  console.log(arr2.length); // 2
+  ```
+
+- **`indexOf` vs `findIndex`**:
+
+  - `indexOf(value)`: Finds index of a primitive value, returns `-1` if not found.
+  - `findIndex(callback)`: Finds index using a callback function, useful for objects or complex conditions.
+
+- **`flat` and `flatMap`**:
+
+  - `flat(depth)`: Flattens nested arrays up to the specified depth **recursively**.
     ![flat](./img/flat.png)
-  - **`flatMap`** : It is identical to a `map()` followed by a `flat()` of **depth 1**
+  - `flatMap(callback)`: Maps and flattens the array **one level deep** with customization of the mapping.
     ![flatmap](./img/flatmap.png)
-    - Notes: it does not flatten the array recursively (only 1 level deep)
-- **`sort`** (for array of numbers only)
 
-  - without condition, it will sort based on the default comparator which assumes **string operations** (all values are coerced and compared as string)
+- **Sorting**
 
-  - with condition, it will sort based on the condition
+  - The `.sort()` method works as follows:
 
-    ```js
-    // default behavior
-    arr = [1, 30, 4, 21].sort(); // results: [1, 21, 30, 4]
+    - without condition -> it will sort based on the default comparator which assumes **string operations** (all values are coerced and compared as string)
 
-    // ------------------------------------------------------ //
+      ```js
+      [1, 30, 4, 21].sort(); // results: [1, 21, 30, 4]
 
-    // if return is (< 0), show A before B
-    // if return is (> 0), show B before A
-    // if return is (0), items should remain in the same order
+      ['John'];
+      ```
 
-    // Ascending
-    // movements.sort((a, b) => {
-    //   if (a > b) return 1;
-    //   if (a < b) return -1;
-    // });
-    // or
-    movements.sort((a, b) => a - b);
+    - with condition -> it will sort based on the provided comparator function
 
-    // Descending
-    // movements.sort((a, b) => {
-    //   if (a > b) return -1;
-    //   if (a < b) return 1;
-    // });
-    // or
-    movements.sort((a, b) => b - a);
-    ```
+      - **Comparator function** should return a negative value if `a` should come before `b`, a positive value if `b` should come before `a`, and `0` if they are equal.
 
-  - sorting dates:
+        ```js
+        // compare function
+        const compare_1 = (a, b) => {
+          if (a > b) return 1;
+          if (a == b) return 0;
+          if (a < b) return -1;
+        };
+        // or
+        const compare_2 = (a, b) => a - b;
 
-    ```js
-    var holidays = ['2014-12-25', '2014-01-01'];
-    holidays.sort(function (a, b) {
-      var dateA = new Date(a);
-      var dateB = new Date(b);
-      return dateA - dateB;
-    });
-    ```
+        // if return is (< 0), show A before B
+        // if return is (> 0), show B before A
+        // if return is (0), items should remain in the same order
+        ```
 
-  - sorting strings:
+      - Example:
 
-    ```js
-    const data = ['t', 'A', 'a', 'B', 'b'];
-    data.sort((a, b) => {
-      return a.localeCompare(b);
-    });
-    ```
+        - sorting numbers:
+
+          ```js
+          [1, 30, 4, 21].sort((a, b) => a - b); // results: [1, 4, 21, 30]
+          // 1 - 30 = -29 (negative) -> `a` should come before `b` -> [1, 30]
+          // 30 - 4 = 26 (positive) -> `b` should come before `a` -> [1, 4, 30]
+          // 30 - 21 = 9 (positive) -> `b` should come before `a` -> [1, 4, 21, 30]
+          ```
+
+        - sorting dates:
+
+          ```js
+          const holidays = ['2014-12-25', '2014-01-01'];
+          holidays.sort(function (a, b) {
+            const dateA = new Date(a);
+            const dateB = new Date(b);
+            return dateA - dateB;
+          });
+          ```
+
+        - sorting string characters:
+
+          ```js
+          const data = ['t', 'A', 'a', 'B', 'b'];
+          data.sort((a, b) => {
+            return a.localeCompare(b);
+          }); // ["a", "A", "b", "B", "t"]
+          ```
 
 - methods for creating arrays with filled values
 
@@ -1073,11 +1286,9 @@ Regular expressions search for characters that form a pattern. They can also rep
     x.fill(1, 3, 5); // [empty × 3, 1, 1, empty × 2]
     ```
 
-  - `Array.from()`: creates an array from an iterable object
+  - `Array.from()`: creates an array from an iterable object and an optional mapping function.
 
     ```js
-    // main advantage here that it can take a mapping-callback-function as a second parameter
-
     const y = Array.from({ length: 3 }, () => 1); // [1,1,1]
     const z = Array.from({ length: 3 }, (_, i) => i + 1); // [1, 2, 3]
     ```
@@ -1089,36 +1300,109 @@ Regular expressions search for characters that form a pattern. They can also rep
       // or you can use spread operator [...document.querySelectorAll(".movements__value")]
       ```
 
-- operations on array:
+- `some` & `every` methods
 
-  ```js
-  alert([] + 1); // "1"
-  alert([1] + 1); // "11"
-  alert([1, 2] + 1); // "1,21"
-  ```
+  - `some` : returns `true` if at least one element in the array passes the test implemented by the provided function.
+  - `every` : returns `true` if all elements in the array pass the test implemented by the provided function.
+
+    ```js
+    const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+    // some
+    const anyDeposits = movements.some(mov => mov > 0); // true
+
+    // every
+    const allDeposits = movements.every(mov => mov > 0); // false
+    ```
+
+- Notes:
+
+  - operations on array:
+
+    ```js
+    alert([] + 1); // "1"
+    alert([1] + 1); // "11"
+    alert([1, 2] + 1); // "1,21"
+    ```
+
+  - Methods cheat sheets
+    ![array](./img/array.jpg)
+    ![methods](./img/array%20methods.jpg)
 
 ---
 
-#### `reduce` method
+##### Array Data Transformation Methods (`map`, `filter`, `reduce`)
 
-It's a method used to **reduce** an array to a single value by **executing a reducer function** for each element of the array.
+![methods](./img/array-methods-2.png)
 
-![reduce](./img/reduce-method-1.png)
+- `map`
 
-- it uses an **accumulator** and **current value** to return a single value
+  - It's a method used to **transform** an array by **applying a function** to each element of the array.
 
-  ```js
-  const arr = [1, 2, 3, 4];
-  const sum = arr.reduce((acc, cur) => acc + cur, 0); // 10
-  // 0 is the initial value of the accumulator
-  // acc = 0, cur = 1 => acc = 1
-  ```
+    - it creates a new array with the results of calling a provided function on every element in the calling array.
 
-  ![reduce](./img/reduce-method-2.png)
+      ```js
+      const arr = [1, 2, 3, 4];
+      const double = arr.map(num => num * 2); // [2, 4, 6, 8]
+      ```
+
+- `filter`
+
+  - It's a method used to **filter** an array by **applying a function** to each element of the array.
+
+    - it creates a new array with all elements that pass the test implemented by the provided function.
+
+      ```js
+      const arr = [1, 2, 3, 4];
+      const even = arr.filter(num => num % 2 === 0); // [2, 4]
+      ```
+
+  - `filter` vs `find` vs `findIndex`
+    ![filtervsfind](./img/filtervsfind.webp)
+    - `filter`: Returns an array of all items matching a condition.
+    - `find`: Returns the **first** item matching a condition or `undefined`.
+    - `findIndex`: Returns the index of the **first** item matching a condition or `-1`.
+
+- `reduce`
+
+  - It's a method used to **reduce** an array to a single value by **executing a reducer function** for each element of the array.
+
+    ![reduce](./img/reduce-method-1.png)
+
+    - it uses an **accumulator** and **current value** to return a single value
+
+  - Examples:
+
+    - Sum of all elements in an array
+
+      ```js
+      const arr = [1, 2, 3, 4];
+      const sum = arr.reduce((acc, cur) => acc + cur, 0); // 10
+      // 0 is the initial value of the accumulator
+      ```
+
+      ![reduce](./img/reduce-method-2.png)
+
+    - Get the maximum value in an array
+
+      ```js
+      const arr = [20, 45, -40, 30, -65];
+      const max = arr.reduce((acc, cur) => (acc > cur ? acc : cur), arr[0]);
+      // use arr[0] as the initial value of the accumulator and not 0 to handle negative numbers
+      ```
+
+  - It has 4 parameters: `accumulator`, `currentValue`, `currentIndex`, `array`
+
+    ```js
+    const arr = [1, 2, 3, 4];
+    const sum = arr.reduce((acc, cur, i, arr) => acc + cur, 0); // 10
+    ```
 
 ---
 
-## Object
+### Object
+
+It's a data structure that can store a collection of **key-value pairs**.
 
 - There're 2 ways to create an object:
 
@@ -1136,6 +1420,51 @@ It's a method used to **reduce** an array to a single value by **executing a red
     // Don't forget the "new" keyword
     var hotel_1 = new Hotel('park', 120);
     ```
+
+- Object access rules
+  ![objectRules](./img/objectRules.png)
+
+- To create a new object from an existing object: [How to deep copy an object](./12-JS-interviews-questions-tricks.md#how-to-deep-copy-an-object)
+
+- **Enhanced object literals** :
+
+  - It's a way to simplify the creation of objects by allowing us to use **shorthand property names** and **shorthand method names**.
+
+  ```js
+  const name = 'Jonas';
+  const age = 46;
+
+  const jonas = {
+    name, // instead of name: name ✅
+    age // instead of age: age ✅
+
+    // also the ability to write methods like this
+    greet() {
+      console.log(`Hey ${this.name}`);
+    }
+    // instead of greet: function() {...}
+  };
+  ```
+
+---
+
+#### Object Methods
+
+- Object methods are functions that are stored as object properties, and have access to the object's data through the `this` keyword.
+
+  ```js
+  const jonas = {
+    firstName: 'Jonas',
+    birthYear: 1991,
+
+    calcAge: function () {
+      this.age = 2037 - this.birthYear;
+      return this.age;
+    }
+  };
+
+  jonas.calcAge();
+  ```
 
 - we use `function expression` in objects to declare `methods` because it's better for performance as it's not re-created every time we create a new object
 
@@ -1155,86 +1484,33 @@ It's a method used to **reduce** an array to a single value by **executing a red
       this.age = 2037 - this.birthYear;
       return this.age;
     }
-  };
-  ```
 
-- to create a new object from an existing object =>
-
-  ```js
-  // jessica is an existing object
-  const jessicaCopy = Object.assign({}, jessica);
-  // or
-  const jessicaCopy = { ...jessica };
-  ```
-
-- remember that objects that may look the same to you are actually not
-  ![object equality](./img/objectEquality.png)
-- **Destructuring**
-
-  ```js
-  // destructuring with changing variable name
-  const { name: restaurantName, openingHours: hours, categories: tags } = restaurant;
-  console.log(restaurantName, hours, tags);
-
-  // Default values
-  const { menu = [], starterMenu: starters = [] } = restaurant;
-
-  // Mutating variables
-  let a = 111;
-  let b = 999;
-  const obj = { a: 23, b: 7, c: 14 };
-  ({ a, b } = obj); // we have to wrap it in a ( because js expects a block when we are starting with a {})
-  ```
-
-  - it can also be used to **swap variables value** easier:
-
-    ```js
-    var a = 1;
-    var b = 1;
-    [a, b] = [b, a];
-    ```
-
-- **Enhanced object literals** :
-
-  ```js
-  const name = 'Jonas';
-  const age = 46;
-
-  const jonas = {
-    name, // instead of name: name
-    age // instead of age: age
-
-    // also the ability to write methods like this
-    greet() {
-      console.log(`Hey ${this.name}`);
+    // using function declaration (won't work ❌)
+    function calcAge() {
+      this.age = 2037 - this.birthYear;
+      return this.age;
     }
-    // instead of greet: function() {...}
   };
   ```
-
-- Object access rules
-  ![objectRules](./img/objectRules.png)
-
-- to convert object to its primitive value --> `.toPrimitive`
 
 ---
 
-### Object.keys, values, entries
+#### Object.keys, values, entries
 
 - `Object.keys(obj)` – returns an array of keys.
 - `Object.values(obj)` – returns an array of values.
-- `Object.entries(obj)` – returns an array of [key, value] pairs.
+- `Object.entries(obj)` – returns an array of `[key, value]` pairs.
 
 - Please note the distinctions (compared to map for example):
 
-  |             | **Map**      | **Object**                                |
-  | ----------- | ------------ | ----------------------------------------- |
-  | Call syntax | `Map.keys()` | `Object.keys(obj)` , but not `obj.keys()` |
-  | Returns     | iterable     | “real” Array                              |
+  |             | **Map**      | **Object**         |
+  | ----------- | ------------ | ------------------ |
+  | Call syntax | `Map.keys()` | `Object.keys(obj)` |
+  | Returns     | iterable     | “real” Array       |
 
 ---
 
-### Transforming objects (operations on objects)
+#### Transforming objects (operations on objects)
 
 Objects lack many methods that exist for arrays, e.g. `map`, `filter` and others.
 
@@ -1256,28 +1532,83 @@ Objects lack many methods that exist for arrays, e.g. `map`, `filter` and others
 
 ---
 
-## Sets
+#### Object Destructuring
 
-A **Set** is a special type collection – “set of values” (without keys), where each value may occur only once (No duplicates)
+It's a way to extract multiple values from an object and assign them to variables in a single statement.
 
-- there's no way to get data out of a `set` because all values are unique and order doesn't matter
+- Destructuring with changing variable name
 
-- `Set` methods:
+  ```js
+  const { name: restaurantName, openingHours: hours, categories: tags } = restaurant;
+  console.log(restaurantName, hours, tags);
+  ```
 
-  - `new Set(iterable)` – creates the set, and if an iterable object is provided (usually an array), copies values from it into the set.
-  - `set.add(value)`
-  - `set.delete(value)` – removes the value
-    - returns `true` if value existed at the moment of the call, otherwise `false`.
-  - `set.has(value)`
-    - returns `true` if the value exists in the set, otherwise `false`.
-  - `set.clear()` – removes everything from the set.
-  - `set.size` – returns the element count (set `length`).
+- Destructuring with default values
 
-- convert `map` / `set` to `array`:
+  ```js
+  const { menu = [], starterMenu: starters = [] } = restaurant;
+  ```
+
+- Destructuring values from nested objects
+
+  ```js
+  const obj = {
+    name: 'Jonas',
+    age: 33,
+    job: 'teacher',
+    friends: ['Michael', 'Peter'],
+    // nested object
+    location: {
+      lat: 36.5,
+      lng: -12.3
+    }
+  };
+
+  const {
+    location: { lat, lng }
+  } = obj;
+  const {
+    friends: [friend1, friend2]
+  } = obj;
+  ```
+
+- Use cases:
+
+  - extracting function parameters
+
+    ```js
+    const calcAge = function ({ birthYear }) {
+      return 2037 - birthYear;
+    };
+
+    console.log(calcAge({ birthYear: 1991 }));
+    ```
+
+---
+
+### Sets
+
+A **Set** is a collection of unique values (no duplicates).
+
+- **Methods**:
+
+  - `new Set(iterable)`: Creates a set, optionally from an iterable (e.g., array).
+  - `set.add(value)`: Adds a value.
+  - `set.delete(value)`: Removes a value, returns `true` if it existed.
+  - `set.has(value)`: Checks if a value exists, returns `true` if it does.
+  - `set.clear()`: Removes all values.
+  - `set.size`: Returns the number of elements.
+
+- To convert `map` / `set` to `array`: use `Array.from()` or `spread operator`
 
   ```js
   let arr = [1, 2, 2, 3];
-  console.log([...new Set(arr)]); // -> [1,2,3]
+  const set = new Set(arr); // {1, 2, 3}
+
+  // convert set to array
+  arr = Array.from(set); // [1, 2, 3]
+  // or
+  arr = [...set]; // [1, 2, 3]
   ```
 
 - We can loop over a set either with `for..of` or using `forEach`
@@ -1285,17 +1616,19 @@ A **Set** is a special type collection – “set of values” (without keys), w
   ```js
   let set = new Set(['oranges', 'apples', 'bananas']);
 
-  for (let value of set) alert(value);
+  for (let value of set) {
+    console.log(value);
+  }
 
   // the same with forEach:
   set.forEach((value, valueAgain, set) => {
-    alert(value);
+    console.log(value);
   });
   ```
 
 ---
 
-### WeakSet
+#### WeakSet
 
 - It is similar to Set, but we may **only add objects** to `WeakSet` (not primitives).
 - An object exists in the set **while it is reachable from somewhere else**.
@@ -1323,63 +1656,71 @@ A **Set** is a special type collection – “set of values” (without keys), w
 
 ---
 
-## Maps
+### Maps
 
 **Map** is data structure that allows to map `keys` to `values` without the drawbacks of using objects as keys.
 
-- The main difference is that:
+![map](./img/map.png)
 
-  - `Map` allows keys of **any type** and
-  - it is **ordered** (the keys are iterated in the same order as they were inserted).
-
-  ![map](./img/map.png)
-
-- you can use `arrays` as a key for a map but you must put it first in a variable as if not you then will create multiple arrays in the memory and can't access one -- Same for any `reference type` key
+- The `Map()` constructor creates a new `Map` object in JavaScript, and takes an iterable object as an argument (e.g., an `array`).
 
   ```js
-  // this is the right way ✅
+  const map = new Map();
+  map.set('1', 'str1'); // a string key
+
+  // or
+  const map2 = new Map([
+    ['1', 'str1'], // array of [key, value] pairs
+    [1, 'num1'],
+    [true, 'bool1']
+  ]);
+
+  // or
+  const obj = {
+    name: 'Jonas',
+    age: 33
+  };
+  const map3 = new Map(Object.entries(obj)); // convert object to map
+  ```
+
+- Use **variables** for `arrays` as keys in a `Map` to avoid multiple memory allocations and access issues.
+
+  ```js
+  // Correct way ✅
   const arr = [1, 2];
   const map = new Map();
-  map.set(arr, 'test'); // now we can use arr as a key
-  map.get(arr); // test
+  map.set(arr, 'test');
+  map.get(arr); // 'test'
 
-  // this is the wrong way ❌
-  map.set([1, 2], 'test'); // now we can't access this array
-  map.get([1, 2]); // undefined
+  // Incorrect way ❌
+  map.set([1, 2], 'test');
+  map.get([1, 2]); // undefined -> because it's a different array in memory
   ```
+
+- The main differences with `Objects` are:
+
+  - `Map` allows keys of **any type**
+  - `Map` is **ordered** (the keys are iterated in the same order as they were inserted).
 
 - `Maps` vs `Objects`
   ![objects](./img/maps-vs-obj.jpg)
-- Converting `Object` to `Map` (create a map from an object)
 
-  ```js
-  // openingHours is an existing object
-  const hoursMap = new Map(Object.entries(openingHours));
-  ```
+- **Map Methods**:
 
-- Methods and properties are:
+  - `new Map()`: Creates a map.
+  - `map.set(key, value)`: Adds a key-value pair. Can chain calls:
 
-  - **`map[key]`** - isn’t the right way to use a Map
+    ```js
+    map.set('1', 'str1').set(1, 'num1').set(true, 'bool1');
+    ```
 
-    - as this is treating map as a plain JavaScript object, so it implies all corresponding limitations (only string/symbol keys and so on).
+  - `map.get(key)`: Returns the value by key.
+  - `map.has(key)`: Checks if a key exists.
+  - `map.delete(key)`: Removes a key-value pair.
+  - `map.clear()`: Clears the map.
+  - `map.size`: Returns the number of elements.
 
-  - `new Map()` – creates the map.
-  - `map.set(key, value)` – stores the value by the key.
-
-    - Every `map.set` call returns the map itself, so we can “chain” the calls:
-
-      ```js
-      map.set('1', 'str1').set(1, 'num1').set(true, 'bool1');
-      // results: Map(3) {"1" => "str1", 1 => "num1", true => "bool1"}
-      ```
-
-  - `map.get(key)` – returns the `value` by the `key`, `undefined` if key doesn’t exist in `map`.
-  - `map.has(key)` – returns `true` if the key exists, `false` otherwise.
-  - `map.delete(key)` – removes the `value` by the `key`.
-  - `map.clear()` – removes everything from the `map`.
-  - `map.size` – returns the current element `count`.
-
-- create an object from a map
+- **Convert Map to Object**:
 
   ```js
   // Object.fromEntries method that does the reverse: given an array of [key, value] pairs, it creates an object from them
@@ -1396,7 +1737,7 @@ A **Set** is a special type collection – “set of values” (without keys), w
 
 ---
 
-### WeakMap
+#### WeakMap
 
 ![WwakMap](./img/weakMap.png)
 
@@ -1411,7 +1752,7 @@ A **Set** is a special type collection – “set of values” (without keys), w
   // we can get it by using map.keys()
   ```
 
-**WeakMap** is fundamentally different in this aspect. **It doesn’t prevent garbage-collection of key objects**.
+- **WeakMap** is fundamentally different in this aspect. **It doesn’t prevent garbage-collection of key objects**.
 
 - The first difference between **Map** and **WeakMap** is that keys must be objects, not primitive values:
 
@@ -1443,6 +1784,660 @@ A **Set** is a special type collection – “set of values” (without keys), w
   > weakMap.set(john, 'secret documents');
   > // if john dies, secret documents will be destroyed automatically
   > ```
+
+---
+
+## Numbers
+
+- All numbers in JavaScript are of type `Number`, whether integer or floating-point.
+
+  ```js
+  132 === 132.0; // true
+  ```
+
+- Use `Number.isFinite()` or `Number.isNaN()` to check if a number is a finite number or `NaN`.
+
+  ```js
+  // checks if the value is a number
+  Number.isFinite(15); // true
+  Number.isFinite('15'); // false
+  Number.isFinite(Infinity); // false
+  Number.isFinite(23 / 0); // false
+
+  // checks if the value is NaN
+  Number.isNaN('15'); // false
+  Number.isNaN(NaN); // true
+  Number.isNaN(Infinity); // false
+  ```
+
+- Get a random number between two values:
+
+  ```js
+  function getRandomNum(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + Math.ceil(min);
+  }
+  ```
+
+- **Format/Parse Numbers**
+
+  - Parse numbers:
+
+    ```js
+    // parseInt -> returns an integer
+    parseInt('12.34'); // 12 (base 10)
+    parseInt('100px'); // 100 (base 10)
+    parseInt('year2020'); // NaN (no digits at the beginning)
+    parseInt('111', 2); // 7 (base 2)
+
+    // parseFloat -> returns a floating-point number
+    parseFloat('12.34'); // 12.34
+    parseFloat('100px'); // 100
+    ```
+
+  - Format currency: [Formatting](https://www.samanthaming.com/tidbits/30-how-to-format-currency-in-es6/)
+
+- **Notes**
+
+  - `toFixed()`
+
+    - returns a `string`, so if you need a number, use `+` or `Number()` to convert it.
+
+      ```js
+      let num = 12.34;
+      alert(num.toFixed(1)); // 12.3 -> type: string
+      alert(+num.toFixed(1)); // 12.3 -> type: number
+      ```
+
+  - `Math.round()` and `toFixed()`
+    - both round to the nearest number: `0..4` **lead down** while `5..9` **lead up**.
+  - `toString()`
+
+    - can take a base to convert to (The base can vary from `2` to `36`. By default it’s `10`)
+
+  - **calculations**:
+
+    - floating-point numbers are not precise, so it's better to use `toFixed()` to round the result.
+
+      ```js
+      alert(0.1 + 0.2 == 0.3); // false
+      alert(0.1 + 0.2); // 0.30000000000000004
+      ```
+
+      - why? -> because A **number is stored in memory in its binary form**, a sequence of `bits` (`ones` and `zeroes`). But fractions like `0.1`, `0.2` that look simple in the decimal numeric system are actually unending fractions in their `binary` form.
+      - So `0.1` is one divided by ten `1/10`, In decimal numeral system such numbers are easily representable. Compare it to one-third: `1/3`. It becomes an endless fraction `0.33333`.
+      - So, division by powers `10` is guaranteed to work well in the decimal system, but division by `3` is not.
+      - Solution:
+
+        ```js
+        alert((0.1 * 10 + 0.2 * 10) / 10); // 0.3
+        // OR
+        alert(+(0.1 + 0.2).toFixed(2)); // 0.3
+        ```
+
+    - (square / cube) root of a value:
+
+      ```js
+      alert(Math.sqrt(9)); // 3
+      // or
+      alert(9 ** (1 / 2)); // 3
+      alert(27 ** (1 / 3)); // 3 -> cube root
+      ```
+
+---
+
+### Math operations
+
+```js
+// Rounding
+alert(Math.floor(3.1)); // 3 (round down)
+alert(Math.ceil(3.1)); // 4
+alert(Math.round(3.1)); // 3 (round to nearest integer (up or down)()
+alert(Math.trunc(3.1)); // 3 (remove anything after the decimal point)
+
+alert(Math.sqrt(9)); // 3
+alert(Math.pow(2, 3)); // 8
+alert(Math.abs(-5)); // 5
+
+alert(Math.max(1, 2, 3, 4, 5)); // 5
+alert(Math.min(1, 2, 3, 4, 5)); // 1
+
+alert(Math.random()); // random number from 0 to 1
+```
+
+---
+
+### Special numbers
+
+- `Infinity`, `-Infinity`
+- `NaN`
+
+  - `0 / 0` = `NaN`
+  - `Infinity - Infinity` = `NaN`
+  - `console.log("five" * 2)` ->`NaN`
+
+- Numeric Separators:
+
+  - It's a syntactic sugar to write big numbers.
+
+  ```js
+  let num = 1_000_000; // 1 million -> JavaScript ignores underscores (_)
+  let numFromStr = +'1_00'; // NaN ❌ (string with `_` is not a number)
+  let numFromStr = num + 20; // 1000020 ✅
+  ```
+
+- Ways to write big numbers:
+
+  - `1e3` = `1 * 10^3` = `1000`
+  - `1e-6` = `1 * 10^-6` = `0.000001`
+  - `1_000_000` = `1000000`
+  - `BigInt` = `9007199254740991n` (ends with `n`)
+
+    - `BigInt` is a special numeric type that provides support for integers of arbitrary length.
+
+    ```js
+    1n + 2n; // 3n
+    BigInt(352); // 352n
+    typeof 1n; // bigint
+    20n === 20; // false -> strict equality
+    20n == 20; // true -> loose equality
+    ```
+
+- `MAX_SAFE_INTEGER` and `MIN_SAFE_INTEGER`:
+
+  - JavaScript can’t represent all numbers precisely. There’s a limit for the maximum number that can be represented precisely, and it’s called `Number.MAX_SAFE_INTEGER`.
+
+    ```js
+    alert(Number.MAX_SAFE_INTEGER); // 9007199254740991
+    alert(Number.MIN_SAFE_INTEGER); // -9007199254740991
+    ```
+
+> There is only one value in JavaScript that is not equal to itself, and that is **NaN** > `console.log(NaN == NaN)` -> false
+
+---
+
+### Numbers Internationalization
+
+It's a modern way to work with numbers that adapts to the user's locale (country & language).
+
+- **Intl.NumberFormat**:
+
+  - It's a constructor for objects that enable language-sensitive number formatting.
+
+- Currency formatting:
+
+  ```js
+  let num = 123456.789;
+
+  let options = {
+    style: 'currency',
+    currency: 'EUR'
+  };
+
+  alert(new Intl.NumberFormat('de-DE', options).format(num)); // 123.456,79 €
+  alert(new Intl.NumberFormat('en-US', options).format(num)); // €123,456.79
+  ```
+
+- Temperature formatting:
+
+  ```js
+  let num = -40;
+
+  let options = {
+    style: 'unit',
+    unit: 'celsius'
+  };
+
+  alert(new Intl.NumberFormat('en-US', options).format(num)); // -40°C
+  alert(new Intl.NumberFormat('ar-EG', options).format(num)); // -٤٠°C
+  ```
+
+---
+
+## Date
+
+To create a new Date object call: `new Date()`
+
+- `new Date()` -> Without arguments – create a Date object for the current date and time:
+
+  ```js
+  let now = new Date(); // 2021-09-01T12:00:00.000Z
+
+  // new Date(milliseconds)
+  let d0 = new Date(3 * 24 * 3600 * 1000); // 3 days from 01.01.1970
+
+  // new Date(year, month, date, hour, minute, second, millisecond)
+  let d1 = new Date(2012, 1, 20, 3, 12); // 20 Feb 2012, 3:12am
+
+  // new Date(datastring)
+  let d2 = new Date('2012-02-20T03:12'); // 20 Feb 2012, 3:12am
+  ```
+
+- `date.getTime()` -> returns the number of milliseconds from the beginning of time `(Jan 1, 1970)`
+
+  ```js
+  // 0 means 01.01.1970 UTC+0
+  let Jan01_1970 = new Date(0);
+  Jan01_1970.getTime(); // 0
+  ```
+
+- **Date methods**
+  ![date](./img/date.png)
+
+- **Notes**:
+
+  - Don't use `getYear()`, but use `getFullYear()`, because `getYear()` is deprecated and it returns 2-digit year sometimes.
+    - `getYear()` returns year minus `1900`. This has been deprecated for a while now, it's best to use `getFullYear()`.
+  - `month` is **zero-based** so we add `1` to it to get the correct month
+
+  ```js
+  let date = new Date(2012, 0, 3); // 3 Jan 2012
+  let date = new Date(2012, 1, 3); // 3 Feb 2012
+  let date = new Date(2012, 2, 3); // 3 Mar 2012
+  ```
+
+  - when you perform operations on `dates`, the result is in form of `milliSeconds`
+
+- **Dates Autocorrelation**
+
+  - It's a very handy feature of `Date` objects. We can set out-of-range values, and it will auto-adjust itself.
+
+    ```js
+    let date = new Date(2013, 0, 32); // 32 Jan 2013 -> 1 Feb 2013
+    // Here, the "month" is specified with more days than it already has, so it goes to the next month.
+    ```
+
+---
+
+### Operations with Dates
+
+- **Date to number, date diff**
+
+  - When a Date object is converted to number, it becomes the timestamp same as `date.getTime()`:
+
+    ```js
+    let date = new Date();
+    alert(+date); // the number of milliseconds, same as date.getTime()
+    ```
+
+- **Parsing date from a string**
+
+  - `Date.parse(str)` reads a date from a string and returns the timestamp (milliseconds since 1 Jan 1970 UTC+0).
+    - Returns **NaN** if the format is invalid.
+  - Format: `YYYY-MM-DDTHH:mm:ss.sssZ`
+    - `YYYY-MM-DD` – year-month-day.
+    - `T` – delimiter.
+    - `HH:mm:ss.sss` – time: hours, minutes, seconds, milliseconds.
+    - `Z` – optional time zone in `+-hh:mm` or `Z` for UTC+0.
+
+  ```js
+  let ms = Date.parse('2012-01-26T13:51:50.417-07:00');
+  alert(ms); // 1327611110417 (timestamp)
+  ```
+
+---
+
+### Dates Internationalization
+
+It's a modern way to work with dates and times that adapts to the user's locale (country & language).
+
+> [`Intl.DateTimeFormat` cheatsheet](https://devhints.io/wip/intl-datetime)
+
+- **Intl.DateTimeFormat**:
+
+  - It's a constructor for objects that enable language-sensitive date and time formatting.
+
+  ```js
+  let date = new Date(Date.UTC(2012, 11, 20, 3, 0, 0));
+
+  let options = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  };
+
+  new Intl.DateTimeFormat('en-US', options).format(date); // Thursday, December 20, 2012
+  new Intl.DateTimeFormat('ar-EG', options).format(date); // الخميس، ٢٠ ديسمبر، ٢٠١٢
+  ```
+
+- To get the user's locale, use `navigator.language` or `navigator.languages` (for an array of locales)
+
+  ```js
+  const locale = navigator.language; // "en-US"
+  ```
+
+---
+
+### Dates Third-party Libraries
+
+- **Moment.js**:
+
+  - It's a popular library for parsing, validating, manipulating, and formatting dates.
+
+    ```js
+    const moment = require('moment');
+    moment().format('MMMM Do YYYY, h:mm:ss a'); // September 1st 2021, 12:00:00 pm
+    ```
+
+- **Day.js**:
+
+  - It's a minimalist JavaScript library that parses, validates, manipulates, and displays dates and times.
+
+    ```js
+    const dayjs = require('dayjs');
+    dayjs().format('YYYY-MM-DD'); // 2021-09-01
+    ```
+
+---
+
+## Operators
+
+- **Operator** is a special symbol that performs specific operations on one, two, or three operands, and then returns a result.
+- **operand** is what operators are applied to
+
+### Types of Operators
+
+- There're many types of operators in JavaScript, but we can classify them into 3 main types:
+
+  - **Unary** operators -> is for 1 operand
+
+    ```js
+    // Increment/decrement a variable
+    let x = 1;
+    x++; // 2
+    x--; // 1
+
+    // Unary plus/minus
+    let y = -2;
+    console.log(+y); // -2
+    console.log(-y); // 2
+
+    // Logical NOT
+    console.log(!true); // false
+    console.log(!0); // true
+    ```
+
+  - **Binary** operators -> is for 2 operands
+
+    ```js
+    // Addition
+    console.log(5 + 2); // 7
+
+    // Logical / Boolean operators
+    console.log(true && false); // false
+    console.log(true || false); // true
+    ```
+
+  - **Ternary** operators -> is for 3 operands
+
+    ```js
+    // Conditional (ternary) operator
+    let result = condition ? value1 : value2;
+    ```
+
+- **Notes:**
+
+  - logical operators (like `&&`) allow you to compare the results of more than one comparison operator (like `===`).
+  - The values `undefined` & `NaN` shouldn’t be compared to other values:
+
+    ```js
+    alert(undefined > 0); // false
+    alert(undefined < 0); // false
+    alert(undefined == 0); // false
+
+    // "null" only equals "undefined"
+    alert(undefined == null); // true
+    alert(undefined === null); // false
+
+    // NaN is incomparable with any value
+    alert('NaN' > 0); // false
+    alert('NaN' < 0); // false
+    alert('NaN' == 0); // false
+    alert('NaN' == NaN); // false (NaN is special)
+    ```
+
+---
+
+### Operator Precedence
+
+**Operator precedence** determines the order in which operators are evaluated in an expression. Operators with higher precedence are evaluated first.
+
+- Order:
+
+  - **Parentheses** have the highest precedence and can be used to force an expression to evaluate in the order you want.
+
+  - **Unary operators**
+
+  - **Multiplication, division, and modulo**
+
+  - **Addition and subtraction**
+
+  - **Relational operators**
+
+  - **Equality operators**
+
+  - **Logical `AND`**
+
+  - **Logical `OR`** has lower precedence than the logical `AND` operator.
+
+  - **Assignment operators** have the lowest precedence.
+
+- Example
+
+  ```js
+  let x = 2 + 3 * 4; // 2 + 12 = 14
+
+  let y = (2 + 3) * 4; // 5 * 4 = 20
+  ```
+
+---
+
+### Spread Operator
+
+The spread operator `...` allows an **iterable** to expand in places where `0+` arguments are expected.
+
+```js
+let arr = [3, 5, 1];
+alert(Math.max(...arr)); // 5
+```
+
+- It's used for [Object destructuring](#object-destructuring) and [Array destructuring](#array-destructuring).
+- It's used on the **right side** of an assignment to spread an iterable into the elements of the array.
+
+  ```js
+  let arr = [3, 5, 1];
+  let arr2 = [8, 9, 15];
+  let merged = [0, ...arr, 2, ...arr2];
+  // merged = [0, 3, 5, 1, 2, 8, 9, 15]
+  ```
+
+- Use cases:
+
+  - **Copying an array**
+
+    ```js
+    let arr = [1, 2, 3];
+    let arrCopy = [...arr]; // like arr.slice()
+    ```
+
+  - **Concatenating arrays**
+
+    ```js
+    let arr1 = [1, 2, 3];
+    let arr2 = [4, 5, 6];
+    let merged = [...arr1, ...arr2];
+    ```
+
+  - **Passing an array to a function that normally requires a list of many arguments**
+
+    ```js
+    let arr = [3, 5, 1];
+    Math.max(...arr); // 5
+    ```
+
+  - **Converting from `string` to `array`**
+
+    ```js
+    let str = 'Hello';
+    let chars = [...str]; // ['H', 'e', 'l', 'l', 'o']
+    ```
+
+  - **Merging objects**
+
+    ```js
+    let mergedObj = { ...obj1, ...obj2 };
+    ```
+
+  - **Copying an object**
+
+    ```js
+    let obj = { a: 1, b: 2 };
+    let objCopy = { ...obj };
+    ```
+
+---
+
+### Rest Parameters
+
+It's used to **collect** a **variable number of arguments** into an array.
+
+- It's used on the **left side** of a function parameter to collect all the remaining arguments into an array.
+
+  ```js
+  const [a, b, ...others] = [1, 2, 3, 4, 5];
+  console.log(a, b, others); // 1 2 [3, 4, 5]
+  ```
+
+- Use cases:
+
+  - Collect elements that aren't used in destructuring
+
+    ```js
+    let [name, age, ...titles] = ['Julius', 41, 'Consul', 'Imperator'];
+    alert(titles); // ['Consul', 'Imperator']
+    ```
+
+    - It must be the **last** in the list of parameters, as it collects the **rest** of the parameters.
+
+  - **Function that accepts any number of arguments**
+
+    ```js
+    function sumAll(...args) {
+      let sum = 0;
+
+      args.forEach(arg => (sum += arg));
+
+      return sum;
+    }
+
+    alert(sumAll(1)); // 1
+    alert(sumAll(1, 2)); // 3
+    alert(sumAll(1, 2, 3)); // 6
+    ```
+
+  - **Function that accepts a fixed number of arguments**
+
+    ```js
+    function showName(firstName, lastName, ...titles) {
+      alert(firstName + ' ' + lastName); // Julius Caesar
+
+      // the rest go into titles array
+      // i.e. titles = ["Consul", "Imperator"]
+      alert(titles[0]); // Consul
+      alert(titles[1]); // Imperator
+      alert(titles.length); // 2
+    }
+
+    showName('Julius', 'Caesar', 'Consul', 'Imperator');
+    ```
+
+    - The rest parameters must be **at the end** of the parameters list for a function.
+
+---
+
+### Short circuiting - Nullish coalescing operator `??`
+
+- **Short-circuiting**
+
+  - It's a technique used to avoid unnecessary work or evaluation.
+  - It's used in logical operations to skip the evaluation of the right-hand operand when the left-hand operand is enough to determine the outcome of the operation.
+
+    ```js
+    let x = 1;
+    x > 0 && console.log('Hello'); // Hello
+    ```
+
+  - It's also used when we have complex conditions
+
+    ```js
+    let x = 1;
+    let y = 2;
+
+    if (x > 0 && y > 0) {
+      console.log('Hello');
+    }
+    ```
+
+  - The result of this is not a `boolean`, but the value of the last evaluated expression.
+
+    - `OR` -> returns the first truthy value or the last value if no truthy value is found.
+
+    ```js
+    console.log(3 || 'Jonas'); // 3
+    console.log('' || 'Jonas'); // Jonas
+    console.log(undefined || null); // null
+    ```
+
+    - `AND` -> returns the first falsy value or the last value if no falsy value is found.
+
+      ```js
+      console.log(3 && 'Jonas'); // Jonas
+      console.log('' && 'Jonas'); // ''
+      console.log(undefined && null); // undefined
+      ```
+
+- **Nullish coalescing operator**
+
+  - It's a logical operator that returns its right-hand side operand when its left-hand side operand is `null` or `undefined`, and otherwise returns its left-hand side operand.
+    ![nullish coalescing operator](./img/nullish%20coalescing%20operator.webp)
+    - if `a` is defined, then `a`.
+    - if `a` isn’t defined, then `b`.
+  - Example:
+
+    ```js
+    let height = 0;
+    console.log(height || 100); // 100
+    console.log(height ?? 100); // 0 -> because height is 0
+
+    let width;
+    console.log(width || 100); // 100
+    console.log(width ?? 100); // 100 -> because width is undefined
+    ```
+
+  - It's a good replacement for `||` when we want to treat `0` or `''` as a valid value.
+
+  - It's used to provide a default value for a variable that may be `null` or `undefined`.
+
+- **Optional chaining** `?.`
+  ![Optional chaining](./img/Optional%20chaining.webp)
+
+  - It's a safe way to access nested object properties, even if an intermediate property doesn’t exist.
+  - enables you to read the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
+
+    ```js
+    let user = null;
+
+    console.log(user.address.street); // error ❌
+    console.log(user?.address?.street); // undefined ✅
+    ```
+
+  - We can use `?.` for safe reading and deleting, but not writing
+
+  - it works well with `nullish coalescing operator` `??`:
 
 ---
 
@@ -1849,229 +2844,6 @@ const data = Object.fromEntries(dataArr); // convert arrays into key-value-pairs
 
 - `pagination` comes from `multiple pages`
 - see `slider` section in => [BANKIST-Home_Page-js](https://github.com/abdrahmansoltan/Practicing-Javascript/blob/main/3_BANKIST/Home_Page/script.js)
-
----
-
-## Document and resource loading (adding js in html)
-
-- Why use separate js file in `<script>` tags
-
-  - The benefit of a separate file is that the browser will download it and store it in its **cache**.
-  - Other pages that reference the same script will take it from the cache instead of downloading it, so the file is actually downloaded only once. --> That reduces traffic and makes pages faster.
-
-- A single `<script>` tag can’t have both the **src** attribute and code inside.
-
-  ```html
-  <script src="file.js">
-    alert(1); // the content is ignored, because src is set
-  </script>
-
-  <!-- You can separate the 2 scripts -->
-  <script src="file.js"></script>
-  <script>
-    alert(1);
-  </script>
-  ```
-
-### Lifecycle of an HTML page
-
-The lifecycle of an HTML page has three important events:
-
-#### `DOMContentLoaded`
-
-The `DOMContentLoaded` event happens on the **document** object.
-
-- the browser fully loaded HTML, and the DOM tree is built, but external resources like pictures `<img>` and stylesheets may not yet have loaded.
-- DOM is ready, so the handler can lookup DOM nodes, initialize the interface.
-
-  ```html
-  <script>
-    function ready() {
-      alert('DOM is ready');
-
-      // image is not yet loaded (unless it was cached), so the size is 0x0
-      alert(`Image size: ${img.offsetWidth}x${img.offsetHeight}`);
-    }
-
-    document.addEventListener('DOMContentLoaded', ready);
-  </script>
-
-  <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0" />
-  ```
-
-- `<script>` tags block `DOMContentLoaded`
-
-  - When the browser processes an HTML-document and comes across a `<script>` tag, it needs to execute before continuing building the DOM. That’s a precaution, as scripts may want to modify DOM, and even `document.write()` into it, so `DOMContentLoaded` has to wait. So `DOMContentLoaded` definitely happens after such scripts
-
-  - There are two exceptions from this rule:
-    1. Scripts with the `async` attribute don’t block DOMContentLoaded.
-    2. Scripts that are generated dynamically with `document.createElement('script')` and then added to the webpage also don’t block this event.
-
-- External style sheets don’t affect DOM, so DOMContentLoaded does not wait for them.
-
-  - But there’s a pitfall. If we have a `script` after the `style`, then that script must wait until the stylesheet loads:
-
-    ```html
-    <link type="text/css" rel="stylesheet" href="style.css" />
-    <script>
-      // the script doesn't execute until the stylesheet is loaded
-      alert(getComputedStyle(document.body).marginTop);
-    </script>
-    ```
-
----
-
-#### `load`
-
-The `load` event happens on the **window** object.
-
-- not only HTML is loaded, but also all the external resources: images, styles etc.
-- external resources are loaded, so styles are applied, image sizes are known etc.
-
-  ```html
-  <script>
-    window.onload = function () {
-      // can also use window.addEventListener('load', (event) => {
-      alert('Page loaded');
-
-      // image is loaded at this time
-      alert(`Image size: ${img.offsetWidth}x${img.offsetHeight}`);
-    };
-  </script>
-
-  <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0" />
-  ```
-
----
-
-#### `beforeunload` / `unload`
-
-The `beforeunload` / `load` events happen on the **window** object.
-
-- the user is leaving: we can check if the user saved the changes and ask them whether they really want to leave.
-- Naturally, unload event is when the user leaves us, and we’d like to save the data on our server.
-- the user almost left, but we still can initiate some operations, such as sending out statistics.
-- The `event.preventDefault()` doesn’t work from a `beforeunload` handler
-
----
-
-### Loading scripts: `async`, `defer`
-
-> In modern websites, scripts are often “heavier” than HTML: their download size is larger, and processing time is also longer.
-
-When the browser loads HTML and comes across a `<script>...</script>` tag, it can’t continue building the `DOM`. It must execute the script right now. The same happens for external scripts `<script src="..."></script>`: the browser must wait for the script to download, execute the downloaded script, and only then it can process the rest of the page.
-
-- That leads to two important issues:
-
-  1. Scripts can’t see DOM elements below them, so they can’t add handlers etc.
-  2. If there’s a bulky script at the top of the page, it “blocks the page”. Users can’t see the page content till it downloads and runs:
-
-     ```html
-     <p>...content before script...</p>
-
-     <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
-
-     <!-- This isn't visible until the script loads -->
-     <p>...content after script...</p>
-     ```
-
-- There are some workarounds to that, we can put a `script` at the **bottom of the page**. Then it can see elements above it, and it doesn’t block the page content from showing:
-
-  ```html
-  <body>
-    ...all content is above the script...
-
-    <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
-  </body>
-  ```
-
-  - **Note:** this solution is far from perfect. For example, the browser notices the script (and can start downloading it) only after it downloaded the full HTML document. For long HTML documents, that may be a noticeable delay.
-    - Such things are invisible for people using very fast connections, but many people in the world still have slow internet speeds and use a far-from-perfect mobile internet connection.
-    - Luckily, there are two `<script>` attributes that solve the problem for us: **`defer`** and **`async`**.
-
-#### `defer`
-
-The `defer` attribute tells the browser not to wait for the script. Instead, the browser will continue to process the HTML, build DOM. The script loads “in the background”, and then runs(**executes**) when the DOM is fully built.
-
-![defer](./img/defer2.PNG)
-![defer](./img/defer.PNG)
-
-- in other words:
-
-  - Scripts with `defer` never block the page.
-  - Scripts with defer always execute when the DOM is ready (but before `DOMContentLoaded` event).
-
-- Deferred scripts keep their relative order, just like regular scripts.
-
-  ```html
-  <script defer src="https://javascript.info/article/script-async-defer/long.js"></script>
-  <script defer src="https://javascript.info/article/script-async-defer/small.js"></script>
-  ```
-
-  - steps:
-    1. Browsers scan the page for scripts and download them in parallel, to improve performance. So in the example above both scripts download in parallel. The `small.js` probably finishes first.
-    2. the `defer` attribute, besides telling the browser “not to block”, ensures that the relative order is kept. So even though `small.js` loads first, it still waits and runs after `long.js` executes.
-  - > That may be important for cases when we need to load a JavaScript library and then a script that depends on it.
-
-- The defer attribute is only for external scripts
-  - The `defer` attribute is ignored if the `<script>` tag has no `src`.
-
-> In practice, **defer** is used for scripts that need the whole DOM and/or their relative execution order is important.
-
----
-
-#### `async`
-
-The async attribute is somewhat like `defer`. It also makes the script non-blocking. But it has important differences in the behavior.
-
-- The `async` attribute means that a **script is completely independent**:
-  - The browser doesn’t block on `async` scripts (like `defer`).
-  - Other scripts don’t wait for `async` scripts, and `async` scripts don’t wait for them.
-  - `DOMContentLoaded` and `async` scripts don’t wait for each other:
-    - `DOMContentLoaded` may happen both before an `async` script (if an `async` script finishes loading after the page is complete)
-    - …or after an `async` script (if an `async` script is short or was in HTTP-cache)
-- In other words, `async` scripts load in the background and run when ready. The DOM and other scripts don’t wait for them, and they don’t wait for anything. A fully independent script that runs when loaded.
-
-- async scripts don't keep their relative order (They don’t wait for each other. Whatever loads first)
-
-  ```html
-  <p>...content before scripts...</p>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => alert('DOM ready!'));
-  </script>
-
-  <script async src="https://javascript.info/article/script-async-defer/long.js"></script>
-  <script async src="https://javascript.info/article/script-async-defer/small.js"></script>
-
-  <p>...content after scripts...</p>
-  ```
-
-  - steps:
-    1. The page content shows up immediately: `async` doesn’t block it.
-    2. `DOMContentLoaded` may happen both before and after `async`, no guarantees here.
-    3. A smaller script `small.js` goes second, but probably loads before `long.js`, so `small.js` runs first. Although, it might be that `long.js` loads first, if cached, then it runs first. In other words, async scripts run in the “load-first” order.
-  - > Async scripts are great when we integrate an independent third-party script into the page: counters, ads and so on, as they don’t depend on our scripts, and our scripts shouldn’t wait for them:
-
-    ```html
-    <!-- Google Analytics is usually added like this -->
-    <script async src="https://google-analytics.com/analytics.js"></script>
-    ```
-
-- **Dynamic scripts** behave as “`async`” by default.
-
-  - They don’t wait for anything, nothing waits for them.
-  - The script that loads first – runs first (“load-first” order).
-
-  ```js
-  let script = document.createElement('script');
-  script.src = '/article/script-async-defer/long.js';
-  document.body.append(script); // The script starts loading as soon as it’s appended to the document
-  ```
-
-  - This can be changed if we explicitly set script.`async=false`. Then scripts will be executed in the document order, just like defer.
-
-> in practice, **async** is used for independent scripts, like counters or ads. And their relative execution order does not matter.
 
 ---
 

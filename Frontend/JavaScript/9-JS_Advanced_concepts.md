@@ -8,15 +8,16 @@
     - [How the engine works ?](#how-the-engine-works-)
     - [call-stack \& Memory-heap](#call-stack--memory-heap)
   - [Types](#types)
+    - [Primitive Types vs Reference Types](#primitive-types-vs-reference-types)
     - [`null` vs `undefined`](#null-vs-undefined)
-    - [Double (loose) equal (`==`) vs Triple (strict) equal (`===`)](#double-loose-equal--vs-triple-strict-equal-)
+    - [Strict vs Loose Equality (`===` \& `==`)](#strict-vs-loose-equality---)
+    - [Type Conversion](#type-conversion)
     - [Type Coercion](#type-coercion)
-      - [Coercion Corner Cases](#coercion-corner-cases)
-  - [Implicit vs Explicit](#implicit-vs-explicit)
-  - [Scope](#scope)
-    - [Lexical scope](#lexical-scope)
-  - [Hoisting](#hoisting)
-    - [How hoisting works ?](#how-hoisting-works-)
+  - [Execution context](#execution-context)
+    - [Scope](#scope)
+      - [Lexical scope](#lexical-scope)
+    - [Hoisting](#hoisting)
+    - [`this` keyword in functions (execution context)](#this-keyword-in-functions-execution-context)
   - [Functional Programming](#functional-programming)
     - [currying \& partial Application](#currying--partial-application)
       - [Currying](#currying)
@@ -40,7 +41,6 @@
     - [Generators in Async Code](#generators-in-async-code)
   - [JS : The weird parts](#js--the-weird-parts)
     - [Numbers](#numbers)
-    - [short circuiting - nullish coalescing operator `??`](#short-circuiting---nullish-coalescing-operator-)
   - [Miscellaneous](#miscellaneous)
     - [Mutation observer](#mutation-observer)
     - [Selection and Range](#selection-and-range)
@@ -77,10 +77,12 @@
 
 ## JavaScript Engine
 
+The JavaScript engine is a program or an interpreter that reads and executes the JavaScript code. The most popular JavaScript engines is **V8** which is used in **Google Chrome** and **Node.js**.
+
 - javascript uses best of (**Interpreted** & **Compiled**) languages ---> **Jit Compiler**
 
   ![alt](./img/js-engine-1.png)
-  ![alt](./img/js-engine.png)
+  ![alt](./img/js-engine-2.png)
 
 - is `javascript` an interpreted language ?
   - yes **initially**, but it evolved to use compilers as well based on the implementation, as the code is compiled to machine code first then it's executed by the engine with optimizations to the initial compiled code
@@ -115,15 +117,26 @@
 
 ## Types
 
-Javascript has 2 main types of values:
+### Primitive Types vs Reference Types
 
-1. **primitive values** : they are the most basic data types in the language. They are **immutable** (cannot be changed) and **copied by value** (when assigning or passing). There are 7 primitive types: `string`, `number`, `bigint`, `boolean`, `null`, `undefined`, `symbol`.
-2. **reference values** : they are more complex data types. They are **mutable** (can be changed), **copied by reference** (when assigning or passing). There are 3 types of objects: `object`, `function`, `array`.
+- Javascript has 2 main types of values
+  ![types](./img/types-1.png)
 
-- **permatives** & **reference**
-  ![pvr](./img/permatives%20vs%20reference.PNG)
-  - `value` at a specific `address` (**in the `call stack`**) is immutable ,,, but in the `Heap` its mutable
-  - `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack`
+- `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack` which has a limited size (`4-8MB`)
+  ![types](./img/types-3.png)
+
+- Types:
+
+  1. **primitive values** : they are the most basic data types in the language. They are **immutable** (cannot be changed) and **copied by value** (when assigning or passing).
+     - There are 7 primitive types
+       ![types](./img/types-2.png)
+  2. **reference values** : they are more complex data types. They are **mutable** (can be changed), **copied by reference** (when assigning or passing).
+     - There are 3 types of objects: `object`, `function`, `array`.
+
+- **Memory allocation** for `primitive` vs `reference` types:
+  ![types](./img/types-4.png)
+
+  - There's a difference in how memory is allocated for `primitive` and `reference` types. In the case of `primitive` types, the value is stored directly in the memory location, while in the case of `reference` types, the memory location stores a reference to the actual value in the `heap`.
 
 ---
 
@@ -148,33 +161,20 @@ To remember the difference, use the song "I want it that way"
 - `undefined` means a variable has been declared but **has not yet been assigned a value**
 - `null` is an assignment value. It can be assigned to a variable as a representation of **no value**.
 
+- Notes:
+
+  ```js
+  typeof null; // object (a bug in JS)
+  ```
+
 ---
 
-### Double (loose) equal (`==`) vs Triple (strict) equal (`===`)
+### Strict vs Loose Equality (`===` & `==`)
 
-- Because of **type coercion**, the strict equality operators `===` and `!==` result in fewer unexpected values than `==` and `!=` do.
-- If you know the types in comparison: prefer `==` as it's faster
+The difference is that `==` will do **type coercion** before comparing, whereas `===` will not do any type coercion (it will only return `true` if both values and types are the same).
+
+- Because of [Type coercion](#type-coercion), the strict equality operators `===` and `!==` result in fewer unexpected values than `==` and `!=` do.
 - if `===` would always be equivalent to `==` in your code, using it everywhere sends a wrong semantic signal : **protecting myself since I don't know'trust the types**
-- NOTES:
-
-  - logical operators (like `&&`) allow you to compare the results of more than one comparison operator (like `===`).
-  - The values `undefined` & `NaN` shouldn’t be compared to other values:
-
-    ```js
-    alert(undefined > 0); // false
-    alert(undefined < 0); // false
-    alert(undefined == 0); // false
-
-    // "null" only equals "undefined"
-    alert(undefined == null); // true
-    alert(undefined === null); // false
-
-    // NaN is incomparable with any value
-    alert('NaN' > 0); // false
-    alert('NaN' < 0); // false
-    alert('NaN' == 0); // false
-    alert('NaN' == NaN); // false (NaN is special)
-    ```
 
 - How "Double equal" works:
 
@@ -193,30 +193,73 @@ To remember the difference, use the song "I want it that way"
     false;
     ```
 
-  - So when comparing to `true` or `false`, use `===` to avoid confusion or use `ToBoolean()` to convert it to boolean first
-  - Same for that you shouldn't use `==` with `""`, `0` or `non-primitive` values as it will convert it to `false` and compare it with the other value
-
-> **Note:** sometimes it's said that you shouldn't use `===` if you already know the types, because it's slower than `==` but it's not true as it's not the case in modern browsers
+> **Note:** It's a myth that `===` is slower than `==` in modern browsers.
 >
-> - Also some people may say: "using `===` everywhere sends a wrong signal that you're using it protecting yourself because you don't know what is happening regarding the types or you don't trust your code"
-> - So, making types known and obvious leads to better code. So if types are known, `==` is best, otherwise, fall back to `===`
+> - Some argue that using `===` everywhere implies a lack of understanding or trust in your code's types.
+>
+> - Clear and obvious types lead to better code. Use `==` when types are known, otherwise use `===`.
+
+---
+
+### Type Conversion
+
+**Explicit Type Conversion (Type Casting)**: is when data type is converted by the programmer using type casting.
+
+- Here are some examples of explicit type conversion:
+
+  - `Number()`, `String()`, `Boolean()`
+  - `parseInt()`, `parseFloat()`
+  - `toString()`, `toFixed()`
+  - `JSON.stringify()`, `JSON.parse()`
+
+- When the conversion fails, the result is `NaN` (Not a Number).
+
+  ```js
+  Number('123'); // 123
+  Number('hello'); // NaN
+  ```
+
+- **Truthy & Falsy values:**
+
+  - **Falsy values**: `false`, `0`, `""`, `null`, `undefined`, `NaN`
+  - **Truthy values**: `true`, `1`, `"hello"`, `[]`, `{}`, `function(){}`
+
+  ```js
+  Boolean(0); // false
+  Boolean(''); // false
+  Boolean('0'); // true -> because it's a string (any string that is not empty is true)
+  Boolean(1); // true
+  Boolean({}); // true
+  ```
 
 ---
 
 ### Type Coercion
 
-it's the automatic or implicit conversion of values from one data type to another
+**Type coercion** is the process of implicitly converting value from one type to another.
+
+> **Implicit vs Explicit**
+>
+> ![implicit Explicit](./img/Implicit-vs-Explicit.jpg)
+>
+> - **type coercion** is implicit whereas **type conversion** can be either implicit or explicit
+
 ![type coercion](./img/TypeCoercion.png)
 
-- empty object `{}` /array `[]` => `true`
-- empty string `""` => `false`
+- **Truthy & Falsy values:**
+
+  ```js
+  if (0) {
+    // this code will not run
+  }
+  ```
 
 - **Operator overloading:** `+` vs `-` :
 
   ![type coercion](./img/TypeCoercion2.PNG)
 
-  - `-` : if one of the operands is not a number, it is converted to one
-  - `+` : if one of the operands is a string, the other one is converted to a string too
+  - `-` : if one of the operands is not a number, it tries to convert it to a number and subtracts it
+  - `+` : if one of the operands is a string, it converts the other operand to a string and concatenates them
 
 - convert string to number using :
 
@@ -226,76 +269,84 @@ it's the automatic or implicit conversion of values from one data type to anothe
   - `parseint()` or `parsefloat()` => `parseint(100Ahmed)` = 100
 
 - `string to boolean`: ![coercion](./img/coercion2.png)
+
   - `Boolean("0");` --> **true**
 
-#### Coercion Corner Cases
+- **Coercion Corner Cases**
 
-```js
-1 < 2; // true
-2 < 3; // true
-1 < 2 < 3; // true (1 < 2 = true => true < 3 => 1 < 3 = true)
+  ```js
+  1 < 2; // true
+  2 < 3; // true
+  1 < 2 < 3; // true (1 < 2 = true => true < 3 => 1 < 3 = true)
 
-3 > 2; // true
-2 > 1; // true
-3 > 2 > 1; // false (3 > 2 = true => true > 1 => 1 > 1 = false)
-```
+  3 > 2; // true
+  2 > 1; // true
+  3 > 2 > 1; // false (3 > 2 = true => true > 1 => 1 > 1 = false)
 
----
-
-## Implicit vs Explicit
-
-![implicit Explicit](./img/Implicit-vs-Explicit.jpg)
-
-- **type coercion** is implicit whereas **type conversion** can be either implicit or explicit
+  { x: 1 } == { x: 1 }; // false
+  { x: 1 } === { x: 1 }; // false
+  ```
 
 ---
 
-## Scope
+## Execution context
 
-It's how our program's variables are organized and accessed.
+It's the environment in which javascript code is executed, it stores all the necessary info for some code to be executed.
+![execution context](./img/execution-context-2.png)
 
-- It's the space or environment in which a variable is declared. There are the types of scopes:
-  1. **Global scope:** The global scope is the outermost scope. It's the space where variables are declared outside of functions. These variables are called **global variables**. They can be accessed from anywhere in the program.
-  2. **Function scope:** Variables declared inside a function are in the function scope. These variables are called **local variables**. They can be accessed only from inside the function.
-  3. **Block scope (ES6):** Variables declared inside a block using `let` or `const` are in the block scope. These variables are called **block variables**. They can be accessed only from inside the block.
-     - `functions` are also `block-scoped` in `strict mode`
+- Each function has its own Execution context, and it's created when the function is called. and all execution contexts together make the **call stack**.
+  ![execution context](./img/execution-context-4.png)
+
+  - The default execution context is the **global execution context** which is created when the script is loaded (top-level)
+
+- It consists of these parts:
+  ![execution context](./img/execution-context-3.png)
+
+  - Local **Thread of execution** -> code that is being executed
+  - Local **Memory** -> `local variables`, `arguments passed to the function`
+  - **Scope chain** -> where the function was written
+  - **`this`** keyword -> how the function was called (not in `arrow functions`)
+
+- Example
+  ![execution context](./img/execution%20context.png)
+
+---
+
+### Scope
+
+It's the environment in which a variable is declared and accessible.
+
+- Types of scopes:
+
+  1. **Global scope**: Variables declared outside functions, accessible anywhere.
+  2. **Function scope**: Variables declared inside a function, accessible only within.
+  3. **Block scope (ES6)**: Variables declared inside a block, accessible only within.
+     - `let` or `const` inside a block, accessible only within. But `var` is accessible outside the block.
+     - `functions` are also `block-scoped` in `strict mode`, otherwise they are `function-scoped`.
+
 - Types of variables based on scope:
 
-  1. **local variables:** The interpreter creates local variables when the function is run, and removes them as soon as the function has finished its task.
-     - Two different functions can use variables with the same name without any kind of naming conflict
-  2. **global variables:**: Global variables are stored **in memory** for as long as the web page is loaded into the web browser. This means they take up more memory than local variables, and it also increases the risk of naming conflicts
+  - **Local variables**: Created and removed within a function, no naming conflicts between functions.
+  - **Global variables**: Persist in memory while the page is loaded, higher memory usage, risk of naming conflicts.
 
-  - For these reasons, **You should use local variables wherever possible**
+- **Scope chain**: The order the interpreter searches for variables, from innermost to global scope.
+  ![scope](./img/scope-1.png)
 
-- **Scope chain:** The scope chain is the order in which the interpreter looks for variables. It starts from the `innermost` scope and goes all the way to the `global` scope. The interpreter stops as soon as it finds the variable.
-  - The process of searching for a variable's value in the scope chain is called **variable lookup (or resolution)**.
+  - Scope chain has nothing to do with the order of function calls in the code.
+    ![scope](./img/scope-2.png)
+    - Here, even though the `third()` function is called in the `second()` function's body, it won't have access to the `first()` function's variables, because it's not in the `scope chain` of the `third()` function.
 
----
+- **Scope Variables** are properties of a special internal object.
 
-### Lexical scope
+  - Accessing a variable means accessing a property of this object.
 
-It's where the function was **defined** (Functions are linked to the object they were defined within)
+- Variables defined outside a function are accessible inside functions defined after them even if they are called before the function definition.
+  ![scope](./img/fig2.png)
 
-Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope.
+  - This is called a **Backpack** or **Persistent Lexical Scope Referenced Data (PLSRD)**.
+  - Each function execution gets its own Backpack.
 
-> (range of functionality) of a variables + Data that it may only be called (referenced) from **within the block of code in which it is defined in (its current surrounding scope)**.
-
-- The Lexical Environment object consists of two parts:
-
-  1. Environment Record – an object that stores all local variables as its properties (and some other information like the value of this).
-  2. A reference to the outer lexical environment, the one associated with the outer code.
-
-- A **“variable”** is a property of a special internal object, associated with the currently executing block/function/script.
-
-  - “To get or change a variable” means “to get or change a property of that object”.
-
-- it determines our available variables
-- variable defined outside a function can be accessible inside another function defined after the variable declaration.
-  - this accessible item is sometimes called a **Backpack** or **Persistent lexical scope referenced data (PLSRD)**
-  - each execution of the function gets its own separated **Backpack**
-- the opposite is **dynamic scope** --> It doesn't exist in JavaScript
-
-![lexical](./img/fig2.png)
+- **Dynamic scope** does not exist in JavaScript.
 
 > **Note**: (if not in strict mode) -> if variable is assign a value but never declared in a scope or block -> it automatically gets declared in the global scope
 
@@ -316,67 +367,160 @@ Each local scope can also see all the local scopes that contain it, and all scop
   // The function sayHi is declared inside the if, so it only lives inside it. There is no sayHi outside.
   ```
 
+- The global object has a universal name -> `globalThis`.
+  - ( `window` object ) -> In the browser
+  - ( `global` object ) -> In Node.js
+
 ---
 
-## Hoisting
+#### Lexical scope
 
-It makes some types of variables accessible/usable in the code before they are actually declared in the code.
+It's the scope that is defined at the time of writing the code, and it doesn't change when the code is executed.
+
+- It's where the function was **defined** (Functions are linked to the object they were defined within)
+- Lexical Environment has two parts:
+  1. **Environment Record**: Stores local variables.
+  2. **Outer Reference**: Points to the outer lexical environment.
+
+---
+
+### Hoisting
+
+It's a JavaScript mechanism where variables and function declarations are moved to the top of their containing scope before code execution.
+
+- It makes some types of variables accessible/usable in the code before they are actually declared.
 
 - It's to make space in memory for a variable to be able to:
 
   - Call functions before they have been declared
   - Assign a value to a variable that has not yet been declared
 
-This is because any **variables and functions** within each execution context are created before they are executed.
+- **variables and functions** within each execution context are created before they are executed.
+  ![hoisting](./img/hoisting-1.png)
 
-- `var` hoisting: usually bad, as **with `var`, you can access declaration, but not the value**
-
-  ```js
-  console.log(name); // undefined
-  var name = 'John';
-  ```
-
-- `function` hoisting: actually pretty useful --> **must be a function declaration**
-
-  ```js
-  display(); // "hello world"
-  function display() {
-    console.log('hello world');
-  }
-  ```
-
-- `let / const` hoisting:
-
-  - it gets **hoisted but not initialized** (it's not assigned a value) -> so you can't access it before the initialization -> `TDZ (Temporal Dead Zone) Error`
-    ![let-hoisting](./img/let-hoisting.png)
-
-    - Javascript knows that the variable is declared but not initialized, so it throws an error, if the variable wasn't declared, it would have thrown a `ReferenceError (not defined)`
+  - `var` hoisting: usually bad, as **with `var`, you can access declaration, but not the value**
 
     ```js
-    // or
-    let x = 1;
-
-    function func() {
-      console.log(x); // ReferenceError: Cannot access 'x' before initialization
-      let x = 2;
-    }
-
-    func();
+    console.log(name); // undefined
+    var name = 'John';
     ```
 
-- Why `TDZ`?
-  - it's to prevent the `var` problem (accessing a variable before it's initialized) to make it easier to catch bugs
+  - `function` hoisting: actually pretty useful --> **must be a function declaration**
 
-> **function expression** is not hoisted as its variable is the one that is hoisted and not the function (the variable's value)
+    ```js
+    display(); // "hello world" ✅
+    function display() {
+      console.log('hello world');
+    }
+
+    display2(); // ReferenceError: Cannot access 'display2' before initialization ❌
+    let display2 = function () {
+      console.log('hello world');
+    };
+    ```
+
+  - `let / const` hoisting:
+
+    - it gets **hoisted but not initialized** (it's not assigned a value) -> so you can't access it before the initialization -> `TDZ (Temporal Dead Zone) Error`
+      ![let-hoisting](./img/let-hoisting.png)
+
+      - Javascript knows that the variable is declared but not initialized, so it throws an error, if the variable wasn't declared, it would have thrown a `ReferenceError (not defined)`
+
+- **How hoisting works ?**
+
+  - Before the code is executed, code is scanned for variable declarations, and for each variable, a new property is created in the variable environment object and added to the memory
+    ![hoisting](./img/hoisting.png)
+
+- Why Hoisting is useful ?
+
+  - Using functions before actual declaration
+  - `var` hoisting can be useful in some cases, but it's usually better to use `let` or `const` instead.
+
+- **Temporal Dead Zone (TDZ)**
+
+  - It's the time between the variable creation and initialization, where you can't access the variable.
+  - It only happens with `let` and `const` variables, not with `var` variables. because `var` is initialized with `undefined` by default.
+    ![hoisting](./img/hoisting-2.png)
+
+  - Why TDZ is useful ?
+
+    - It helps to catch errors in the code, as it throws an error if you try to access a variable before it's initialized.
 
 ---
 
-### How hoisting works ?
+### `this` keyword in functions (execution context)
 
-Before the code is executed, the JavaScript engine goes through the code and does the following:
+It's a special variable that is created for every execution context (every function), which takes the value of (points to) the “owner” of the function in which the `this` keyword is used.
 
-- it scans for (variable / function) declarations and adds them to the memory
-  ![hoisting](./img/hoisting.png)
+- It's not static. It depends on **how the function is called**, and its value is only assigned when the function is called.
+  ![this keyword](./img/this-1.png)
+
+- **Arrow functions**:
+
+  - Lexical `this`: Defined by where it was written, not called.
+  - No `this`: Taken from the outer scope (global scope, `window` object).
+  - Object methods: Still point to the global object.
+  - **Avoid using arrow functions as methods inside objects**: `this` will refer to the upper scope, usually the global object.
+
+- **Normal functions**:
+
+  - `this` refers to the caller (dynamic scope).
+  - `this` is `undefined` if called globally if in strict mode, otherwise it points to the global `window` object.
+
+- **Notes**
+
+  - When chaining multiple methods (functions) that uses `this` keyword, you can return `this` at the end to make it chainable.
+
+    ```js
+    let ladder = {
+      step: 0,
+      up() {
+        this.step++;
+        return this; // return the object itself to be able to chain the methods
+      },
+      down() {
+        this.step--;
+        return this;
+      },
+      showStep() {
+        alert(this.step);
+        return this;
+      }
+    };
+
+    ladder.up().up().down().showStep().down().showStep(); // shows 1 then 0
+    ```
+
+  - When you want to write a function inside object method, (use `arrow function` or use `self` reference variable ) to avoid `this` confusion.
+
+    ```js
+    let user = {
+      name: 'John',
+      sayHi_1() {
+        let func = () => alert(this.name); ✅
+        func();
+      },
+      sayHi_2() {
+        function func() {
+          alert(this.name); // Error ❌: Cannot read property 'name' of undefined
+        }
+        func();
+      },
+      sayHi_3() {
+        const self = this; // use self reference variable
+        function normal2() {
+          alert(self.name); ✅
+        }
+        normal2();
+      },
+    };
+
+    user.sayHi_1(); // John
+    user.sayHi_2(); // Error, because `this` is undefined
+    user.sayHi_3(); // John
+    ```
+
+  - without `strict mode`, `this` will point to the global object => `window`
 
 ---
 
@@ -452,7 +596,7 @@ alert(curriedSum(1)(2)); // 3
 
 #### Partial Application
 
-It's the process of applying a function to some of its arguments. The partially applied function gets returned for later use
+It's the process of applying a function to **some/part of** its arguments. The partially applied function gets returned for later use
 
 > see it's use in [`bind` section](#examples-of-higher-order-functions-call-apply-bind)
 
@@ -531,15 +675,29 @@ It's the process of applying a function to some of its arguments. The partially 
 
 ### Closure
 
-It's the ability to make the function remember all the variables that were accessible at the time of creation (lexical environment / execution context) even after the outer function has returned.
+A closure allows a function to remember variables from its creation context, even after the outer function has returned.
 
-> **a function remembers where it was born in the special property `[[Environment]]` or `[[Scope]]`. It references the Lexical Environment from where it’s created**
->
-> But when a function is created using **new Function()** have `[[Environment]]` referencing the global Lexical Environment, not the outer one. Hence, they can't use outer variables. But that’s actually good, because it insures us from errors. Passing parameters explicitly is a much better method architecturally and causes no problems with minifiers.
+- It's a closed-over **(variable environment)** of the execution context in which the function was created, even after that execution context is gone.
 
-- A closure gives you an access to an outer function's scope from an inner function (even after the outer function has returned and was popped off the call stack)
+  - **Function's `[[Environment]]` property**:
 
-  - **It's done by returning a function from another function**
+    - References the Lexical Environment (in the scope chain) where the function was created.
+    - functions created with `new Function()` always references the global Lexical Environment, not the outer one, preventing access to outer variables.
+    - **Benefit**: Access outer function's scope from an inner function, even after the outer function has returned.
+
+- How does it work ?
+
+  - When a function is created, it keeps a reference to its outer lexical environment (where it was created), even if the outer function has finished executing.
+    - The function keeps a reference to its outer lexical environment in a hidden property `[[Environment]]`.
+  - Then, the function is returned and assigned to a variable. The variable becomes a function reference that keeps the reference to the outer lexical environment.
+    - It's done by **returning a function from another function**
+  - When the function is called, it uses the outer lexical environment to access the variables. (even if the outer function has finished executing)
+  - Steps:
+    ![closure](./img/closure-1.png)
+    ![closure](./img/closure-2.png)
+    ![closure](./img/closure-3.png)
+
+  - EX:
 
     ```js
     function makeCounter() {
@@ -552,29 +710,61 @@ It's the ability to make the function remember all the variables that were acces
     // using it
     let counter = makeCounter();
     // now, counter() gives the next number each time it is called
-    // `count` variable is in the backpack of the counter function (in [[Environment]] property)
-    alert(counter()); // 0
-    alert(counter()); // 1
+    // `count` variable is in the "backpack" of the counter function (in [[Environment]] property)
+    counter(); // 0
+    counter(); // 1
     ```
-
-> When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work (Where the function was created, not where it was called).
 
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
 
-- one of the biggest examples of closures is **timers**:
+- **Notes:**
 
-  ```js
-  function sayHi() {
-    let phrase = 'Hello';
-    setTimeout(function () {
-      alert(phrase);
-    }, 1000);
-  }
+  - One of the biggest examples of closures are:
 
-  sayHi(); // Hello after 1 second
-  // it remembers the phrase variable even after the function has finished and was popped off the call stack
-  ```
+    - **timers**
+
+      ```js
+      function sayHi() {
+        let phrase = 'Hello';
+        setTimeout(function () {
+          alert(phrase);
+        }, 1000);
+      }
+
+      sayHi(); // Hello after 1 second
+      // it remembers the phrase variable even after the function has finished and was popped off the call stack
+      ```
+
+    - **event listeners**
+
+      ```js
+      (function () {
+        let count = 0;
+        document.getElementById('button').addEventListener('click', function () {
+          alert(count++); // we can access count variable even after the IIFE function has finished executing
+        });
+      })();
+      ```
+
+  - When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work (Where the function was created, not where it was called).
+  - We can't manually create closures, they are a natural part of the language that happens automatically when a function is created.
+    - Because we can't access the `[[Environment]]` property directly, but it's there in the engine internals.
+  - To manually read the variables in the closure of a function:
+
+    ```js
+    function g() {
+      let b = 777;
+      return function () {
+        alert(value);
+      };
+    }
+
+    let f = g(); // while g() is called, the value is remembered
+    console.dir(f); // look at the [[Scopes]] property
+    ```
+
+    ![closure](./img/closure-4.png)
 
 ---
 
@@ -726,36 +916,32 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 ![first class functions](./img/first-class-functions.png)
 
-- **first class objects** is just a feature that a programming language either has or does not have. (All it means is that all functions are values):
+- **First-class objects**: Functions are values that can:
 
-  - can be assigned to variables
-  - can be passed as arguments to another function
-  - can be returned as values from another function --> **closure**
-    ![first class objects](./img/first%20class%20objects.png)
+  - Be assigned to variables
+  - Be passed as arguments
+  - Be returned from functions (enables **closures**)
 
-- There are however **higher order functions** in practice, which are possible because the language supports "first class functions".
-
-  - it's a function that accepts another function as an argument or returns another function as a result.
-    ![higher order functions](./img/higher%20order%20functions.png)
-
-  - Easier to add features, more readable, easier to debug
-  - makes code more **DRY**, as we can use the same function with different `arguments`
-  - we can **chain** these higher order functions (pass the output of one as the input of the next)
-
-- The ability to pass functions as arguments to other functions is a powerful feature of JavaScript and it's the core of **functional programming** and **asynchronous programming**.
-  - even if we use `promises` or `async/await` we still use **higher order functions** as we pass a function as an argument to another function
+- **Higher Order Functions**: Functions that accept or return other functions (e.g., `map`, `filter`, `reduce`, `sort`, `forEach`).
+  - Benefits: More readable, easier to debug, and makes code DRY.
+  - Allows chaining functions by passing the output of one as the input to another.
+- Core of **functional** and **asynchronous programming**: Passing functions as arguments is key, even with `promises` or `async/await`.
 
 ---
 
 #### Examples of higher order functions (`call`, `apply`, `bind`)
 
-`call`, `apply`, `bind` are higher order functions used to set the `this` keyword and arguments of a (function / method)
+`call`, `apply`, `bind` are higher order functions **used to set the `this` keyword and arguments of a (function / method) manually**.
 
 ![call-apply-bind](./img/call-apply-bind.webp)
 
-- `call` => calls a function with the given lexical context as parameter (`call` it's like calling the `this` of the one object that calls the function)
+> More [Here](https://javascript.plainenglish.io/quick-guide-to-call-apply-and-bind-methods-in-javascript-5c00cd856cfa)
 
-  ```javascript
+- `call`
+
+  - Invokes a function with a specified `this` context.
+
+  ```js
   let human = { name: 'Ahmed' };
   function sayName(greeting) {
     console.log(greeting + ' ' + this.name);
@@ -763,11 +949,11 @@ recursion sometimes take long time as it calls multiple functions at the same ti
   sayName.call(human, 'Hi!'); // Outputs Hi! Ahmed
   ```
 
-- `apply` => is just like `call()`, **the difference is how we pass the arguments to the method** -> it accepts arguments in array
+- `apply`
 
-  - it's not used in modern javascript because we can instead use `spread operator (...)` with `call()`
+  - Similar to `call`, but takes arguments as an **array**.
 
-    ```javascript
+    ```js
     let human = { name: ‘Ahmed’ }
     function sayName(greeting, city) {
       console.log(greeting + ' ' + this.name + ' from ' + city)
@@ -775,15 +961,23 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     sayName.apply(human, ['Hi', 'Cairo']) // Outputs Hi! Ahmed from Cairo
     ```
 
-- `bind` => is somewhat special. It is a higher-order function which means when you invoke it => **it returns a new function where `this` keyword is bound**. The function returned is curried, meaning you can call it multiple times to provide different arguments in each call.
+  - it's not used in modern javascript because we can instead use `spread operator (...)` with `call()`
 
-  - > it's used for later-use and not immediate invocation
-  - It takes a list of arguments like `call`
+    ```js
+    sayName.call(human, ...['Hi', 'Cairo']);
+    // instead of
+    sayName.apply(human, ['Hi', 'Cairo']);
+    ```
 
-  - _note_ => `bind` doesn't call the function that's why it's used in `eventListeners`
-  - it's also used to set arguments so that we won't have to write them each time
+- `bind`
 
-    ```javascript
+  - Returns a new function with `this` bounded to a specified context.
+  - Used for later use, not immediate invocation.
+  - Takes arguments like `call`.
+  - Doesn't call the function, useful in `eventListeners`.
+  - Allows setting arguments for reuse.
+
+    ```js
     let human = { name: 'Ahmed' };
     function sayName(greeting, city) {
       console.log(greeting + ' ' + this.name + ' from ' + city);
@@ -793,23 +987,35 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     greet('Hi!', 'Cairo'); // Outputs Hi! Ahmed from Cairo
     ```
 
-  - Using `bind` for **partial application**:
+- **Notes:**
 
-    - "Partial application" is a way of constructing functions that allows us to pre-set one or more arguments.
+  - These functions are accessible from `Function.prototype`.
 
-      ```js
-      function multiply(a, b) {
-        return a * b;
-      }
-      let multiplyByTwo = multiply.bind(this, 2); // now we don't need to write the first argument each time as it's now "pre-set"
-      multiplyByTwo(4); // Outputs 8
-      multiplyByTwo(5); // Outputs 10
-      ```
+  - There're other higher order functions like (`map`, `filter`, `reduce`, `sort`, `forEach`).
+  - You can use these methods with functions that don't have a `this` keyword used inside them. by passing `null` or `undefined` as the first argument.
 
-- We can access these built-in functions from the `Function.prototype` object
-- **reducer function** is the process (function) of taking 2 elements and do an operation on them and returning only one thing
+    ```js
+    function sayHello(name) {
+      console.log('Hello' + name);
+    }
 
-> More [Here](https://javascript.plainenglish.io/quick-guide-to-call-apply-and-bind-methods-in-javascript-5c00cd856cfa)
+    sayHello.call(null, 'Ahmed'); // Hello Ahmed
+    ```
+
+  - We can call these methods with **arrow functions** but they will not work as expected because arrow functions don't have their own `this` keyword.
+  - We can call these methods with part of the arguments, this is called **partial application**.
+
+    ```js
+    function multiply(a, b) {
+      return a * b;
+    }
+
+    let multiplyByTwo = multiply.bind(this, 2);
+    // now we don't need to write the first argument each time as it's now "pre-set"
+
+    multiplyByTwo(4); // Outputs 8
+    multiplyByTwo(5); // Outputs 10
+    ```
 
 ---
 
@@ -1108,32 +1314,6 @@ They differ from Regular functions which return only single value (or nothing). 
 
 ---
 
-### short circuiting - nullish coalescing operator `??`
-
-- it's like (or `||`) but works in a different way and can actually return `false value` ![nullish coalescing operator](./img/nullish%20coalescing%20operator.webp)
-  - if `a` is defined, then `a`.
-  - if `a` isn’t defined, then `b`.
-- **Optional chaining** `?.` :
-  ![Optional chaining](./img/Optional%20chaining.webp)
-
-  - is a safe way to access nested object properties, even if an intermediate property doesn’t exist.
-  - enables you to read the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
-  - We can use `?.` for safe reading and deleting, but not writing
-
-  ```js
-    let user = null;
-
-    user?.name = "John"; // Error, doesn't work
-    // because it evaluates to: undefined = "John"
-  ```
-
-  - it works well with `nullish coalescing operator` `??`:
-
-- without `strict mode`, `this` will point to the global object => `window`
-  - **this is important to note before start thinking**
-
----
-
 ## Miscellaneous
 
 ### Mutation observer
@@ -1197,18 +1377,17 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 - **Statements Vs Expressions** :
   - `Expression`: it's a piece of code that produces a value and expected to be used in places where values are expected
     - Ex: `5+4` or `Ternary Operator` or `short circuiting` and then you can use it in a `${}`
-  - `Statements` doesn't return a value
-- **Strict mode** :
-  - It is a literal expression, ignored by earlier versions of JavaScript.
-  - The purpose of `"use strict"` is to indicate that the code should be executed in "strict mode". which help us write **secure code**.
-    - > Make sure that `"use strict"` is **at the top of your scripts**, otherwise strict mode may not be enabled.
-  - Strict mode changes the (previously accepted "bad syntax") into real errors by:
-    1. forbidding some operations
-    2. throwing more visible error exceptions instead of failing silently (blocking execution)
-    - as an example, in normal JavaScript, mistyping a variable name creates a new global variable. In strict mode, this will throw an error, making it impossible to accidentally create a global variable.
-    - If a variable is not found anywhere, that’s an error in strict mode (without `use strict`, an assignment to a non-existing variable creates a new **global** variable, for compatibility with old code).
-  - **Should we write it ?**
-    - Modern JavaScript supports `“classes”` and `“modules”`, that enable `use strict` automatically. So we don’t need to add the `"use strict"` directive.
+  - `Statements`: it's a piece of code that does something and doesn't produce a value
+    - Ex: `if` statement or `for` loop
+- **Strict mode**:
+  - `"use strict"` enables secure coding by enforcing stricter parsing and error handling.
+  - Place `"use strict"` at the top of your scripts to enable it.
+  - Benefits:
+    1. Forbids certain operations.
+    2. Throws errors for bad syntax instead of failing silently.
+    - Example: Mistyping a variable name throws an error instead of creating a global variable.
+  - **Usage**:
+    - Modern JavaScript classes and modules enable strict mode automatically, so explicit `"use strict"` is often unnecessary.
 - `Refactoring the code` : means the process of restructuring code without changing or adding to its external behavior and functionality.
 - in `DOM` => `:root` element is called `document.documentElement`
 - to make anything `immutable` : `Object.freeze(obj)`
@@ -1228,100 +1407,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 
   // or anything because everything is an "object"
   ```
-
-- **Var** vs **const** & **let**
-
-  - **Var**
-
-    - is function-scoped (`“var”` has no block scope) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
-
-      - Variables, declared with `var`, are either function-scoped or global-scoped. They are visible through blocks.
-
-      ```js
-      function f() {
-        // It can be accessible any where (within) this function
-        //
-        var a = 10;
-        console.log(a); // 10
-      }
-      f();
-
-      // A cannot be accessible
-      // outside of function
-      console.log(a); // ReferenceError: a is not defined
-
-      // ---------------------------------------------------------------
-
-      if (true) {
-        // It can be accessible any where
-        var a = 10;
-        console.log(a); // 10
-      }
-      console.log(a); // 10
-
-      // ---------------------------------------------------------------
-
-      for (var i = 0; i < 10; i++) {
-        var one = 1;
-        // ...
-      }
-      alert(i); // 10, "i" is visible after loop, it's a global variable
-      alert(one); // 1, "one" is visible after loop, it's a global variable
-      ```
-
-    - `“var”` tolerates re-declarations
-
-      ```js
-      let user;
-      let user; // SyntaxError: 'user' has already been declared
-
-      var user = 'Pete';
-      var user = 'John'; // this "var" does nothing (already declared)
-      // ...it doesn't trigger an error
-
-      alert(user); // John
-      ```
-
-    - `“var”` variables can be declared below their use
-
-      - `var` declarations are processed when the function starts (or script starts for globals). In other words, `var` variables are defined from the beginning of the function, no matter where the definition is
-
-        ```js
-        function sayHi() {
-          phrase = 'Hello';
-
-          alert(phrase);
-
-          var phrase;
-        }
-        sayHi();
-        ```
-
-      - **Important Note**: Declarations are hoisted, but assignments are not.
-
-        - Because all `var` declarations are processed at the function start, we can reference them at any place. But variables are `undefined` until the assignments.
-
-        ```js
-        function sayHi() {
-          var phrase; // declaration works at the start...
-
-          alert(phrase); // undefined
-
-          phrase = 'Hello'; // ...assignment - when the execution reaches it.
-        }
-
-        sayHi();
-        ```
-
-    - `var` variable can be **re-declared (re-defined)** without errors:
-
-      ```js
-      var num = 20;
-      num = 15; // Ok
-      var num = 50; // Ok
-      ```
-
-  - **let & const** are both function-scoped and block-scoped (anything within `{}`), **means you can't use it outside the function-scope & block-scope**
 
 - if you used **const** in a `for loop` -> `for ( i = 0; i < 3; i++) {}` you will get error, as you won't be able to re-assign `i`
 
@@ -1434,14 +1519,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
     > - A zero-argument function, which is only called when the user gives a positive answer.
     > - A function with arguments, which is called in either case and returns an answer.
 
-- **Arrow functions:**
-  - Do not have `this`
-  - Do not have `arguments` variable
-  - Can’t be called with `new`
-  - They also don’t have `super`
-  - There’s a difference between an `arrow function` => and a regular function called with `.bind(this)`:
-    - `.bind(this)` creates a “bound version” of the function.
-    - The `arrow =>` doesn’t create any binding. The function simply doesn’t have this. The lookup of this is made exactly the same way as a regular variable search: in the outer lexical environment.
 - **eval()** built-in function
 
   - it allows to execute a string of code.

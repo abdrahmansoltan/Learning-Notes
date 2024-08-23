@@ -22,6 +22,8 @@ Guide: [Angular Typescript](https://angular.io/guide/typescript-configuration)
 
 ## Decorators
 
+They're a typescript feature that allows you to **enhance or modify** classes and their properties and methods. They're used to add metadata to classes, methods, and properties.
+
 - Decorators are a design pattern that is used to separate modification or decoration of a class without modifying the original class.
 - Decorators are used to add metadata to a class, method, or property.
 - Angular has a set of decorators that attach metadata to classes so that the Angular framework knows what to do with them.

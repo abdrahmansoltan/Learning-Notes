@@ -4,8 +4,7 @@
   - [Angular](#angular)
     - [How Angular works (Compilation)](#how-angular-works-compilation)
     - [Folders and files Structure](#folders-and-files-structure)
-  - [Installation](#installation)
-    - [Angular CLI](#angular-cli)
+  - [Installation (Angular CLI)](#installation-angular-cli)
   - [Components](#components)
     - [Creating Components](#creating-components)
     - [Component example](#component-example)
@@ -47,7 +46,7 @@
       - [Input masking in Angular](#input-masking-in-angular)
     - [Forms](#forms)
       - [Reactive Forms](#reactive-forms)
-      - [Template Forms](#template-forms)
+      - [Template Forms (`ngModel` \& `ngForm`)](#template-forms-ngmodel--ngform)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
   - [Notes](#notes)
@@ -63,7 +62,7 @@ Angular is a `framework` for building **reactive** web applications.
 > "reactive" means that the app responds to user input and changes in the environment in real-time (by manipulating the **DOM**)
 
 - It's a **framework** because it provides a lot of things out of the box like `routing`, `forms`, `http` libraries, etc.
-- Code is written in `Typescript`, and Templates are written in Angular template syntax (which is a superset of HTML with Angular-specific syntax).
+- Code is written in `Typescript`, and Templates are written in Angular template syntax (which is a superset of `HTML` with Angular-specific syntax).
 
 ---
 
@@ -122,7 +121,7 @@ In Angular, the `src` folder is the main folder that contains all the files of t
   - `styles.css` : contains the global styles for the app
   - `index.html` : the main html file for the app
   - `main.ts` : the main typescript file that starts the app
-    - it starts up `app.module.ts`
+    - it contains the `bootstrapModule` function that bootstraps the `AppModule` -> starts up `app.module.ts`, So we need to register the main module here.
   - `polyfills.ts` : contains the polyfills for the app
   - `tsconfig.json` : contains the typescript configuration for the app
 
@@ -145,9 +144,7 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 
 ---
 
-## Installation
-
-### Angular CLI
+## Installation (Angular CLI)
 
 it's a utility tool for managing projects
 
@@ -165,7 +162,7 @@ it's a utility tool for managing projects
   # Creating new project
   ng new <project_name>
 
-  # Create new project with flags
+  # Create new project with flags (routing, style, strict)
   ng new <project_name> --routing --style=scss --no-strict
 
   # Starting development server
@@ -203,7 +200,14 @@ it's a utility tool for managing projects
 - In order to create a component, you can use the `Angular CLI` to generate a new component
 
   ```bash
-  ng generate component <component-name>
+  ng generate component <component-name> # or ng g c
+
+  # Ex: creating a component named "nav" in the app folder
+  ng generate component nav
+  # Ex: creating a sub-component named "nav-item" in the nav folder
+  ng generate component nav/nav-item
+
+
   ```
 
   - this will create a folder with the name of the component in the `app` folder
@@ -255,7 +259,7 @@ it's a utility tool for managing projects
 
   ```ts
   // nav.component.ts
-  import { Component } from '@angular/core';
+  import { Component } from '@angular/core'; // import the Component decorator
 
   @Component({
     selector: 'app-nav', // the html selector that will be represent this component
@@ -505,6 +509,18 @@ The `style` attribute can be used to add inline styles to an element
 
 - You can also add styles to the `app.component.css` file to apply them only to the `app.component` (scoped styles)
 
+  ```ts
+  // in app.component.ts
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'] // add the css file here ✅
+    // or
+    // styles: [`h1 { color: red; }`] // add the styles directly here ✅
+  })
+  export class AppComponent {}
+  ```
+
   ```css
   /* in app.component.css */
   button {
@@ -582,7 +598,7 @@ The `style` attribute can be used to add inline styles to an element
 
 ## Data-Binding
 
-**Data-binding** is a way to pass data from the component class to the component template
+**Data-binding** is a way to pass data from the component class to the component template and vice versa (Communication between the component class and the template)
 
 ![data binding](./img/databinding2.PNG)
 ![data binding](./img/databinding.PNG)
@@ -684,26 +700,26 @@ It sets up an event handler on an HTML element. It's a one-way data binding from
 **Angular directives** are extended `HTML attributes` with the prefix `"ng-"`.
 ![directives](./img/directives-0.png)
 
+> [Directives Resource](https://angular.io/api?type=directive)
+
 - They're **instructions** in the DOM that tell Angular to do something to a DOM element
-- [Directives Resource](https://angular.io/api?type=directive)
 - **Directives Types**
   ![Directives](./img/Directives.png)
   ![Directives](./img/Directives-1.png)
   ![Directives](./img/Directives-2.png)
 
-- Angular has multiple built-in directives like:
-  - **Structural directives** : they change the structure of the DOM
-    - `*ngIf` : it removes or recreates a portion of the DOM tree based on an expression
-    - `*ngFor` : it repeats a portion of the DOM tree once for each item in a list
-    - `*ngSwitch` : it conditionally swaps the contents of the DOM based on a match expression
-  - **Attribute directives** : they change the appearance or behavior of an element, component, or another directive
-    - `ngStyle` : it sets inline styles on an HTML element
-    - `ngClass` : it adds and removes CSS classes on an HTML element
-    - `ngModel` : it creates a two-way data binding on form elements
-  - **Multiple directives** : they can be used together to create more complex behavior
-    - `<ng-container>` : it's a grouping element that doesn't interfere with styles or layout
-    - `<ng-template>` : it's a grouping element that doesn't interfere with styles or layout
-    - They're usually used with structural directives
+- Angular has built-in directives:
+  - **Structural directives**: Change the DOM structure.
+    - `*ngIf`: Conditionally remove/recreate DOM.
+    - `*ngFor`: Repeat DOM for each list item.
+    - `*ngSwitch`: Swap DOM based on expression.
+  - **Attribute directives**: Change element appearance/behavior.
+    - `ngStyle`: Set inline styles.
+    - `ngClass`: Add/remove CSS classes.
+    - `ngModel`: Two-way data binding.
+  - **Multiple directives**: Combine for complex behavior.
+    - `<ng-container>`: Grouping element, no style/layout impact.
+    - `<ng-template>`: Grouping element, no style/layout impact.
 
 ---
 
@@ -1299,6 +1315,7 @@ its a word that you use to mark an element and get access to it in the template 
   ```ts
   onInput(event: Event) {
     const input = event.target as HTMLInputElement;
+    // or const input = <HTMLInputElement>event.target;
     let value = input.value.replace(/\D/g, '');
     if (value.length > 8) {
       value = value.substr(0, 8);
@@ -1603,7 +1620,7 @@ Angular has **two different approaches** to handling user input through forms: `
 
 ---
 
-#### Template Forms
+#### Template Forms (`ngModel` & `ngForm`)
 
 - Here, we use `ngModel` directive **with 2-way-binding** added to the `input element`
 
