@@ -4,9 +4,6 @@
   - [JavaScript](#javascript)
     - [ECMA Script (ES)](#ecma-script-es)
     - [Adding javascript file in html](#adding-javascript-file-in-html)
-    - [Loading scripts: `async`, `defer`](#loading-scripts-async-defer)
-      - [`defer`](#defer)
-      - [`async`](#async)
   - [Variables](#variables)
     - [`Var` vs `const` \& `let`](#var-vs-const--let)
     - [Garbage collection](#garbage-collection)
@@ -73,8 +70,9 @@
     - [FormData API](#formdata-api)
   - [CROSS-SITE SCRIPTING (XSS) ATTACKS](#cross-site-scripting-xss-attacks)
     - [Defending against CROSS-SITE SCRIPTING](#defending-against-cross-site-scripting)
-  - [Lazy loading](#lazy-loading)
-  - [Slider (pagination)](#slider-pagination)
+  - [Implementations](#implementations)
+    - [Lazy loading](#lazy-loading)
+    - [Slider (pagination)](#slider-pagination)
   - [Writing Documentation](#writing-documentation)
 
 ---
@@ -150,126 +148,6 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
     alert(1);
   </script>
   ```
-
----
-
-### Loading scripts: `async`, `defer`
-
-> In modern websites, scripts are often “heavier” than HTML: their download size is larger, and processing time is also longer.
-
-When the browser loads HTML and comes across a `<script>...</script>` tag, it can’t continue building the `DOM`. It must execute the script right now. The same happens for external scripts `<script src="..."></script>`: the browser must wait for the script to download, execute the downloaded script, and only then it can process the rest of the page.
-
-- That leads to two important issues:
-
-  1. Scripts can’t see DOM elements below them, so they can’t add handlers etc.
-  2. If there’s a bulky script at the top of the page, it “blocks the page”. Users can’t see the page content till it downloads and runs:
-
-     ```html
-     <p>...content before script...</p>
-
-     <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
-
-     <!-- This isn't visible until the script loads -->
-     <p>...content after script...</p>
-     ```
-
-- There are some workarounds to that, we can put a `script` at the **bottom of the page**. Then it can see elements above it, and it doesn’t block the page content from showing:
-
-  ```html
-  <body>
-    ...all content is above the script...
-
-    <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
-  </body>
-  ```
-
-  - **Note:** this solution is far from perfect. For example, the browser notices the script (and can start downloading it) only after it downloaded the full HTML document. For long HTML documents, that may be a noticeable delay.
-    - Such things are invisible for people using very fast connections, but many people in the world still have slow internet speeds and use a far-from-perfect mobile internet connection.
-    - Luckily, there are two `<script>` attributes that solve the problem for us: **`defer`** and **`async`**.
-
-#### `defer`
-
-The `defer` attribute tells the browser not to wait for the script. Instead, the browser will continue to process the HTML, build DOM. The script loads “in the background”, and then runs(**executes**) when the DOM is fully built.
-
-![defer](./img/defer2.PNG)
-![defer](./img/defer.PNG)
-
-- in other words:
-
-  - Scripts with `defer` never block the page.
-  - Scripts with defer always execute when the DOM is ready (but before `DOMContentLoaded` event).
-
-- Deferred scripts keep their relative order, just like regular scripts.
-
-  ```html
-  <script defer src="https://javascript.info/article/script-async-defer/long.js"></script>
-  <script defer src="https://javascript.info/article/script-async-defer/small.js"></script>
-  ```
-
-  - steps:
-    1. Browsers scan the page for scripts and download them in parallel, to improve performance. So in the example above both scripts download in parallel. The `small.js` probably finishes first.
-    2. the `defer` attribute, besides telling the browser “not to block”, ensures that the relative order is kept. So even though `small.js` loads first, it still waits and runs after `long.js` executes.
-  - > That may be important for cases when we need to load a JavaScript library and then a script that depends on it.
-
-- The defer attribute is only for external scripts
-  - The `defer` attribute is ignored if the `<script>` tag has no `src`.
-
-> In practice, **defer** is used for scripts that need the whole DOM and/or their relative execution order is important.
-
----
-
-#### `async`
-
-The async attribute is somewhat like `defer`. It also makes the script non-blocking. But it has important differences in the behavior.
-
-- The `async` attribute means that a **script is completely independent**:
-  - The browser doesn’t block on `async` scripts (like `defer`).
-  - Other scripts don’t wait for `async` scripts, and `async` scripts don’t wait for them.
-  - `DOMContentLoaded` and `async` scripts don’t wait for each other:
-    - `DOMContentLoaded` may happen both before an `async` script (if an `async` script finishes loading after the page is complete)
-    - …or after an `async` script (if an `async` script is short or was in HTTP-cache)
-- In other words, `async` scripts load in the background and run when ready. The DOM and other scripts don’t wait for them, and they don’t wait for anything. A fully independent script that runs when loaded.
-
-- async scripts don't keep their relative order (They don’t wait for each other. Whatever loads first)
-
-  ```html
-  <p>...content before scripts...</p>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => alert('DOM ready!'));
-  </script>
-
-  <script async src="https://javascript.info/article/script-async-defer/long.js"></script>
-  <script async src="https://javascript.info/article/script-async-defer/small.js"></script>
-
-  <p>...content after scripts...</p>
-  ```
-
-  - steps:
-    1. The page content shows up immediately: `async` doesn’t block it.
-    2. `DOMContentLoaded` may happen both before and after `async`, no guarantees here.
-    3. A smaller script `small.js` goes second, but probably loads before `long.js`, so `small.js` runs first. Although, it might be that `long.js` loads first, if cached, then it runs first. In other words, async scripts run in the “load-first” order.
-  - > Async scripts are great when we integrate an independent third-party script into the page: counters, ads and so on, as they don’t depend on our scripts, and our scripts shouldn’t wait for them:
-
-    ```html
-    <!-- Google Analytics is usually added like this -->
-    <script async src="https://google-analytics.com/analytics.js"></script>
-    ```
-
-- **Dynamic scripts** behave as “`async`” by default.
-
-  - They don’t wait for anything, nothing waits for them.
-  - The script that loads first – runs first (“load-first” order).
-
-  ```js
-  let script = document.createElement('script');
-  script.src = '/article/script-async-defer/long.js';
-  document.body.append(script); // The script starts loading as soon as it’s appended to the document
-  ```
-
-  - This can be changed if we explicitly set script.`async=false`. Then scripts will be executed in the document order, just like defer.
-
-> in practice, **async** is used for independent scripts, like counters or ads. And their relative execution order does not matter.
 
 ---
 
@@ -2786,7 +2664,9 @@ const data = Object.fromEntries(dataArr); // convert arrays into key-value-pairs
 
 ---
 
-## Lazy loading
+## Implementations
+
+### Lazy loading
 
 - is a strategy to identify resources as non-blocking (non-critical) and load these only when needed. It's a way to shorten the length of the critical rendering path, which translates into reduced page load times.
 - `Steps`
@@ -2794,56 +2674,31 @@ const data = Object.fromEntries(dataArr); // convert arrays into key-value-pairs
   - HTML :
 
     ```html
-    <img <!-- img 1 (low quality) -- />
-    src="img/digital-lazy.jpg"
-    <!-- img 2 (high quality) -->
-    data-src="img/digital.jpg" alt="Computer" class="features__img lazy-img" />
+    <!-- img 1 (low quality) is loaded first using the src attribute -->
+    <!-- img 2 (high quality) is loaded only when the user scrolls to the img position using the data-src attribute -->
+    <img
+      src="img/digital-lazy.jpg"
+      data-src="img/digital.jpg"
+      alt="Computer"
+      class="features__img lazy-img" />
     ```
 
   - CSS
 
-  ```css
-  .lazy-img {
-    filter: blur(20px);
-  }
-  ```
+    ```css
+    .lazy-img {
+      filter: blur(20px);
+    }
+    ```
 
-  - JS -> Example of loading images when the user scrolls to the img position
-
-  ```javascript
-  // Lazy loading images
-  const imgTargets = document.querySelectorAll('img[data-src]');
-
-  const loadImg = function (entries, observer) {
-    const [entry] = entries;
-
-    if (!entry.isIntersecting) return;
-
-    // Replace src with data-src
-    entry.target.src = entry.target.dataset.src;
-    // show the high quality img without filter class (ONLY) when it loads
-    entry.target.addEventListener('load', function () {
-      entry.target.classList.remove('lazy-img');
-    });
-
-    observer.unobserve(entry.target);
-  };
-
-  const imgObserver = new IntersectionObserver(loadImg, {
-    root: null,
-    threshold: 0,
-    rootMargin: '200px' // so that it happens before the user reach the img by 200px so that he doesn't notice it
-  });
-
-  imgTargets.forEach(img => imgObserver.observe(img));
-  ```
+  - JS -> [Example of loading images when the user scrolls to the img position](./3-DOM.md#examples-of-using-the-intersection-observer-api)
 
 ---
 
-## Slider (pagination)
+### Slider (pagination)
 
 - `pagination` comes from `multiple pages`
-- see `slider` section in => [BANKIST-Home_Page-js](https://github.com/abdrahmansoltan/Practicing-Javascript/blob/main/3_BANKIST/Home_Page/script.js)
+- see `slider` section in => [BANKIST-Home_Page-js](https://github.com/abdrahmansoltan/Practicing-Javascript/blob/34fdec9c799cb49e84c4aedeffed3ca9a4b6cbe7/3_BANKIST/Home_Page/script.js#L195)
 
 ---
 

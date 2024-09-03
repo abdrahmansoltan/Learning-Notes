@@ -1,15 +1,8 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Notes](#notes)
-  - [APIs Resources](#apis-resources)
+  - [API](#api)
   - [HTML5 APIs](#html5-apis)
-  - [Geolocation API](#geolocation-api)
-  - [Leaflet API](#leaflet-api)
-    - [installation](#installation)
-    - [code](#code)
-  - [JSON](#json)
-    - [JSON Methods](#json-methods)
   - [Storing Data in the Browser](#storing-data-in-the-browser)
     - [Cookies](#cookies)
     - [LocalStorage \& SessionStorage](#localstorage--sessionstorage)
@@ -19,19 +12,72 @@
     - [IndexedDB](#indexeddb)
   - [History API](#history-api)
     - [History Object](#history-object)
+  - [Third-party APIs](#third-party-apis)
+    - [Geolocation API](#geolocation-api)
+    - [Leaflet API](#leaflet-api)
+      - [installation](#installation)
+      - [code](#code)
+    - [Public APIs for free](#public-apis-for-free)
+  - [Notes](#notes)
 
 ---
 
-## Notes
+## API
 
-- if you are using hosted version of an Api => don't forget to put `defer` in the `<script>` part of it in the HTML `<head>`
-- **API key** is a set of letters and numbers that uniquely identify you to the application so the owners of the site can track how much you use the API and what you use it for.
+**API** stands for Application Programming Interface. It is a set of rules that allows one piece of software application to talk to another. It defines the methods for communication between different software components.
 
----
+or, it's a piece of software that can be used by another piece of software, in order to allow applications to talk to each other.
 
-## APIs Resources
+- There're many types of APIs in web development, such as:
 
-- [puplic-Api repo](https://github.com/public-apis/public-apis)
+  - **DOM API**: to manipulate the DOM.
+  - **Fetch API**: to make network requests.
+  - **Web Storage API**: to store data in the browser.
+  - **Online APIs**: to interact with online services.
+    - It's an application running on a server, that receives requests for data, and sends data back as a response.
+
+- **Endpoints**: are the locations (URL) where APIs can send and receive data.
+
+  - Request: is the data sent to the API.
+  - Response: is the data sent back from the API.
+
+- **API data format**
+
+  - `XML`
+    - stands for "eXtensible Markup Language". It's a markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
+    - It's not used as much as it used to be. ❌
+  - `JSON`
+
+    - stands for "JavaScript Object Notation". It's a lightweight data-interchange format that is easy for humans to read and write, and easy for machines to parse and generate.
+    - It's the most popular data format used in APIs. ✅
+    - JSON is ideal for data exchange between JavaScript clients and servers in any language (e.g., Ruby, PHP, Java).
+
+      - **No Comments**: JSON does not support comments. Use [JSON5](http://json5.org/) for features like comments and unquoted keys.
+      - **Key Concepts**:
+        - **Serialize**: Convert objects to JSON.
+        - **Deserialize**: Convert JSON to objects.
+
+    - JSON Methods
+
+      - `JSON.stringify`: Converts objects to JSON.
+
+        - Syntax: `JSON.stringify(value, replacer, space)`
+        - Parameters:
+          - `value`: The object to convert.
+          - `replacer`: Optional function to transform values.
+          - `space`: Optional spaces for indentation.
+
+      - `JSON.parse`: Converts JSON back to an object.
+
+        - Syntax: `JSON.parse(str, reviver)`
+        - Parameters:
+          - `str`: The JSON string to parse.
+          - `reviver`: Optional function to transform values.
+
+        ```js
+        let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
+        let meetup = JSON.parse(str, (key, value) => (key === 'date' ? new Date(value) : value));
+        ```
 
 ---
 
@@ -47,106 +93,6 @@ a set of APls define that describe how to interact with features of web browsers
 | local Storage  | Store information in the browser (even when user closes tab/window) | sessionStorage |
 | sessionStorage | Store information in the browser while a **tab/window** is open     |
 | history        | How to access items from the browser's history                      |
-
----
-
-## Geolocation API
-
-- [documentation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API#examples)
-- The Geolocation API allows the user to provide their location to web applications if they so desire. For privacy reasons, the user is asked for permission to report location information.
-- retrieve a user's location information in your web app, for example to plot their location on a map, or display personalized information relevant to their location.
-- The developer can now access this location information in a couple of different ways:
-  - `Geolocation.getCurrentPosition()`: Retrieves the device's current location.
-  - `Geolocation.watchPosition()`: Registers a handler function that will be called automatically each time the position of the device changes, returning the updated location.
-- In both cases, the method call takes up to three arguments:
-  - A **mandatory** `success callback`: If the location retrieval is successful, the callback executes with a `GeolocationPosition` object as its only parameter, providing access to the location data.
-  - An **optional** `error callback`: If the location retrieval is unsuccessful, the callback executes with a `GeolocationPositionError` object as its only parameter, providing access information on what went wrong.
-  - **optional** object which provides options for retrieval of the position data.
-
-```javascript
-// getCurrentPosition{success, fail)
-
-navigator.geolocation.getCurrentPosition(
-  function (position) {
-    console.log(position);
-
-    const { latitude } = position.coords;
-    const { longitude } = position.coords;
-    // console.log(`https://www.google.pt/maps/@${latitude},${longitude}`);
-  },
-  function () {
-    alert('Could not get your position');
-  }
-);
-```
-
----
-
-## Leaflet API
-
-- [documentation](https://leafletjs.com/SlavaUkraini/)
-- it's a library for mobile-friendly interactive `maps`
-
-### installation
-
-- go to [download](https://leafletjs.com/SlavaUkraini/download.html) page and choose to ues hosted version or `NPM`
-- go to [tutorial](https://leafletjs.com/SlavaUkraini/examples.html) page and follow the steps
-
-### code
-
-```javascript
-// map from (L) object
-map = L.map('map').setView(coords, zoomLevel);
-// setView method takes 2 parameters :
-// 1. coords => array of [latitude, longitude]
-// 2. zoomLevel => number of how much to set the zoom of the view
-
-L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-  attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-// the href can be change for different looks of the map
-
-// see (marker) on the documentation
-
-// Handling clicks on map
-map.on('click', callbackFunction);
-```
-
----
-
-## JSON
-
-So it’s easy to use JSON for data exchange when the client uses JavaScript and the server is written on `Ruby`/`PHP`/`Java`/Whatever.
-
-- **JSON** does not support comments. Adding a comment to JSON makes it invalid.
-  - There’s another format named [JSON5](http://json5.org/), which allows unquoted keys, comments etc. But this is a standalone library, not in the specification of the language.
-- Important JSON concepts:
-  - **Serialize**: convert data from an object into some save-able format `json` -> (convert objects into `json`)
-  - **Deserialize**: put data on object using some previously saved data `json` -> (convert `json` into objects)
-
----
-
-### JSON Methods
-
-- `JSON.stringify` to convert objects into JSON.
-  - The resulting json string is called a **JSON-encoded or serialized or stringified or marshalled object**. We are ready to send it over the wire or put into a plain data store.
-  - this method has other parameters other than the object value
-    - `JSON.stringify(value, replacer, spaceIndents)`
-- `JSON.parse` to convert JSON back into an object (decode a JSON-string).
-
-  - `JSON.parse(str, [reviver])`
-
-    - `reviver`: is an Optional function(key,value) that will be called for each (key, value) pair and can transform the value.
-
-    ```js
-    let str = '{"title":"Conference","date":"2017-11-30T12:00:00.000Z"}';
-
-    let meetup = JSON.parse(str, function (key, value) {
-      if (key == 'date') return new Date(value);
-      return value;
-    });
-    ```
 
 ---
 
@@ -223,6 +169,11 @@ Cookies are strings of data that are stored in the browser. They are a part of t
 ### LocalStorage & SessionStorage
 
 Web storage objects `localStorage` and `sessionStorage` allow to save key/value pairs in the browser.
+
+- Persistence:
+
+  - The data stored in `localStorage` persists even after the browser is closed and reopened.
+  - `sessionStorage` is similar to `localStorage`; the difference is that while data stored in `localStorage` has no expiration time, data stored in `sessionStorage` gets cleared when the page session ends. A page session lasts as long as the browser is open, and survives over page reloads and restores.
 
 > What’s interesting about them is that the data survives a page refresh (for `sessionStorage`) and even a full browser restart (for `localStorage`).
 
@@ -392,3 +343,89 @@ If you move from one page to another, the browser's history remembers which page
 The HTML5 history API describes the functionality of the history object in modern web browsers. It lets you access and update the browser history (but only for pages the user visited on your site).
 
 ![history object](./img/history-object.png)
+
+---
+
+## Third-party APIs
+
+### Geolocation API
+
+- [Documentation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API/Using_the_Geolocation_API#examples)
+- **Installation**: Native API, available in the browser as part of the global `navigator` object.
+- **Purpose**: Allows web apps to access user location with permission for privacy.
+- **Usage**:
+  - `Geolocation.getCurrentPosition()`: Gets the current location.
+  - `Geolocation.watchPosition()`: Calls a handler whenever the device's position changes.
+- **Arguments**:
+  - **Mandatory** `success callback`: Executes with `GeolocationPosition` object on success.
+  - **Optional** `error callback`: Executes with `GeolocationPositionError` object on failure.
+  - **Optional** `options` object for position retrieval settings.
+
+```js
+// getCurrentPosition{success, fail)
+
+navigator.geolocation.getCurrentPosition(
+  function (position) {
+    console.log(position);
+
+    const { latitude } = position.coords;
+    const { longitude } = position.coords;
+    // console.log(`https://www.google.pt/maps/@${latitude},${longitude}`);
+  },
+  function () {
+    alert('Could not get your position');
+  }
+);
+```
+
+---
+
+### Leaflet API
+
+- [documentation](https://leafletjs.com/SlavaUkraini/)
+- it's a library for mobile-friendly interactive `maps`
+
+#### installation
+
+- go to [download](https://leafletjs.com/SlavaUkraini/download.html) page and choose to ues hosted version or `NPM`
+- go to [tutorial](https://leafletjs.com/SlavaUkraini/examples.html) page and follow the steps
+
+#### code
+
+```html
+<div id="map-element"></div>
+```
+
+```js
+// map from (L) object
+map = L.map('map-element').setView(coords, zoomLevel);
+// setView method takes 2 parameters :
+// 1. coords => array of [latitude, longitude]
+// 2. zoomLevel => number of how much to set the zoom of the view
+
+L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+// the href can be change for different looks of the map
+
+// see (marker) on the documentation
+
+// Handling clicks on map
+map.on('click', callbackFunction);
+```
+
+---
+
+### Public APIs for free
+
+- [puplic-Api repo](https://github.com/public-apis/public-apis)
+
+---
+
+## Notes
+
+- if you are using hosted version of an Api => don't forget to put `defer` in the `<script>` part of it in the HTML `<head>`
+- **API key** is a set of letters and numbers that uniquely identify you to the application so the owners of the site can track how much you use the API and what you use it for.
+
+---

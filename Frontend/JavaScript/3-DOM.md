@@ -8,32 +8,31 @@
     - [`insertAdjacentHTML()`](#insertadjacenthtml)
     - [DOM collections: (`HTMLCollection` vs `NodeList`)](#dom-collections-htmlcollection-vs-nodelist)
     - [Node.cloneNode()](#nodeclonenode)
-    - [DOM Traversing ( relation between elements )](#dom-traversing--relation-between-elements-)
-      - [Siblings and the parent](#siblings-and-the-parent)
-      - [Element-only navigation (Commonly used) ✅](#element-only-navigation-commonly-used-)
+    - [DOM Traversing](#dom-traversing)
     - [Searching: `getElement(s)By*`, `querySelector*`](#searching-getelementsby-queryselector)
   - [Node properties: type, tag and contents](#node-properties-type-tag-and-contents)
     - [`innerHTML` vs `innerText`](#innerhtml-vs-innertext)
     - [HTML attributes](#html-attributes)
       - [Property-attribute synchronization](#property-attribute-synchronization)
       - [Creating connection with non-standard attributes](#creating-connection-with-non-standard-attributes)
-        - [data-\* Attributes](#data--attributes)
+        - [`data-` Attributes](#data--attributes)
   - [Styles and classes](#styles-and-classes)
     - [Element Style](#element-style)
     - [Element Classes](#element-classes)
   - [Element/Window size and scrolling](#elementwindow-size-and-scrolling)
     - [Geometry Properties (element size)](#geometry-properties-element-size)
     - [Window sizes](#window-sizes)
-    - [Coordinates](#coordinates)
+    - [Coordinates of Elements](#coordinates-of-elements)
     - [Scrolling](#scrolling)
-    - [intersection observer (Detecting when an element is in the viewport)](#intersection-observer-detecting-when-an-element-is-in-the-viewport)
-  - [virtual DOM](#virtual-dom)
+    - [Intersection observer](#intersection-observer)
+      - [Examples of using the Intersection Observer API](#examples-of-using-the-intersection-observer-api)
+  - [Virtual DOM](#virtual-dom)
     - [methods to compare nodes](#methods-to-compare-nodes)
     - [steps](#steps)
   - [Events](#events)
-    - [Event Handling](#event-handling)
+    - [Event Handling / Binding](#event-handling--binding)
     - [The `Event` object](#the-event-object)
-    - [Event Flow (Bubbling and capturing)](#event-flow-bubbling-and-capturing)
+    - [Event Propagation (Bubbling and capturing)](#event-propagation-bubbling-and-capturing)
       - [Event Bubbling](#event-bubbling)
       - [Event Capturing](#event-capturing)
       - [Event Delegation](#event-delegation)
@@ -44,11 +43,12 @@
       - [Event constructor](#event-constructor)
     - [UI Events](#ui-events)
     - [Events Notes](#events-notes)
-  - [Storage](#storage)
-  - [Lifecycle of an HTML page](#lifecycle-of-an-html-page)
-    - [`DOMContentLoaded`](#domcontentloaded)
-    - [`load`](#load)
-    - [`beforeunload` / `unload`](#beforeunload--unload)
+  - [HTML page script loading and lifecycle](#html-page-script-loading-and-lifecycle)
+    - [Loading scripts: `async`, `defer`](#loading-scripts-async-defer)
+      - [`defer`](#defer)
+      - [`async`](#async)
+    - [Comparison of `async` and `defer`](#comparison-of-async-and-defer)
+    - [Page lifecycle: DOMContentLoaded, load, beforeunload, unload](#page-lifecycle-domcontentloaded-load-beforeunload-unload)
 
 ---
 
@@ -206,7 +206,7 @@ header.append(message); // inside the element (will be a its child)
 // or
 header.insertAdjacentHTML('beforeend', message);
 // or
-header.before(message); // before the element (will be a its sibling)
+header.before(message); // before the element (will be a sibling not a child)
 
 //--------------Removing element from the document--------------//
 message.remove();
@@ -301,58 +301,79 @@ let p_prime = p.cloneNode(true);
 
 ---
 
-### DOM Traversing ( relation between elements )
+### DOM Traversing
+
+It's a way to navigate between elements in the DOM tree based on their relationship to each other.
 
 - Traversing the DOM can be difficult because some browsers add a **text node** whenever they come across **whitespace** between elements.
   ![dom-white-space](./img/dom-white-space.png)
 
-#### Siblings and the parent
+- **Siblings and the parent**
 
-```js
-// parent of <body> is <html>
-alert(document.body.parentNode === document.documentElement); // true
+  ```js
+  // parent of <body> is <html>
+  alert(document.body.parentNode === document.documentElement); // true
 
-// after <head> goes <body>
-alert(document.head.nextSibling); // HTMLBodyElement
+  // after <head> goes <body>
+  alert(document.head.nextSibling); // HTMLBodyElement
 
-// before <body> goes <head>
-alert(document.body.previousSibling); // HTMLHeadElement
-```
+  // before <body> goes <head>
+  alert(document.body.previousSibling); // HTMLHeadElement
+  ```
 
----
+- **Element-only navigation**
 
-#### Element-only navigation (Commonly used) ✅
+  - Standard properties include all nodes (text, element, comment).
 
-Navigation properties listed above refer to all nodes. For instance, in childNodes we can see both `text` nodes, `element` nodes, and even `comment` nodes if they exist. But for many tasks we don’t want text or comment nodes. We want to manipulate element nodes that represent tags and form the structure of the page.
+  - navigation links that only take element nodes into account:
 
-- navigation links that only take element nodes into account:
+    ![element-only-navigation](./img/element-only-navigation.png)
 
-  ![element-only-navigation](./img/element-only-navigation.png)
+- **Closest parent**
 
-- The `parentElement` property returns the “element” parent, while `parentNode` returns “any node” parent. These properties are usually the same: they both get the parent.
-- Questions:
+  - The `closest` method looks up the DOM tree and returns the first element that matches the selector.
+  - It's instead of going up the tree multiple times with `parentNode`.
 
-  - Is it true that `elem.lastChild.nextSibling` is always `null`?
+    ```html
+    <div id="elem">
+      <div class="page">
+        <div class="content">
+          <div class="button">Click me</div>
+        </div>
+      </div>
+    </div>
 
-    - **Yes**, true. The `element elem.lastChild` is always the last one, it has no `nextSibling`.
+    <script>
+      let elem = document.getElementById('elem');
+      let button = elem.querySelector('.button');
 
-  - Is it true that `elem.children[0].previousSibling` is always `null` ?
-    - **No**, wrong, because `elem.children[0]` is the first child among elements. But there may exist non-element nodes before it. So `previousSibling` may be a **text node**.
+      // the closest ancestor that has class "page"
+      let page = button.closest('.page');
+      alert(page.className); // page
+    </script>
+    ```
 
 ---
 
 ### Searching: `getElement(s)By*`, `querySelector*`
 
-![dom-search](./img/dom-search.png)
+There are many methods to search for nodes in the DOM tree: by their `id`, `tag`, `class`, etc.
 
-- The `id` must be unique
-  - If there are multiple elements with the same `id`, then the behavior of methods that use it is unpredictable, e.g. `document.getElementById()` **may return any of such elements at random**. So please stick to the rule and keep id unique.
-- `getElementsBy*` is another method to look for nodes by a `tag`, `class`, etc.
-  - Today, they are mostly history (old), as `querySelector` is more powerful and shorter to write.
-  - **Note:** Don’t forget the "`s`" letter!
-    - The "`s`" letter is absent in `getElementById`, because it returns a single element. But `getElementsByTagName` returns a collection of elements, so there’s "`s`" inside.
-- `elem.matches(css)` to check if elem matches the given CSS selector.
-- `elem.closest(css)` to look for the nearest **ancestor(parent)** that matches the given CSS-selector. The elem itself is also checked.
+- **Methods**:
+  ![dom-search](./img/dom-search.png)
+
+  - `document.getElementById(id)`: Returns the element with the specified `id`.
+    - The `id` must be unique.
+  - `document.getElementsByTagName(name)`: Returns a `NodeList` of elements with the specified tag name.
+  - `document.getElementsByClassName(name)`: Returns a `NodeList` of elements with the specified class name.
+  - `document.getElementsByName(name)`: Returns a `NodeList` of elements with the specified name attribute.
+  - `document.querySelector(selectors)`: Returns the first element matching the specified CSS selector(s).
+  - `document.querySelectorAll(selectors)`: Returns a static `NodeList` of elements matching the specified CSS selector(s).
+
+- **Notes**:
+  - The "`s`" letter is absent in `getElementById` because it returns a single element. Methods like `getElementsByTagName` return collections, hence the "`s`".
+  - `elem.matches(css)`: Checks if `elem` matches the given CSS selector.
+  - `elem.closest(css)`: Finds the nearest ancestor (including `elem` itself) matching the given CSS selector.
 
 ---
 
@@ -420,11 +441,14 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
   - if an attribute is **non-standard**, there won’t be a DOM-property for it.
 
   ```html
-  <body id="test" something="non-standard">
+  <body id="test" class="container" something="non-standard">
     <script>
-      alert(document.body.id); // test
+      // standard attribute yields a property
+      alert(document.body.id); // test ✅
+      alert(document.body.className); // container ✅
+
       // non-standard attribute does not yield a property
-      alert(document.body.something); // undefined
+      alert(document.body.something); // undefined ❌
     </script>
   </body>
   ```
@@ -463,6 +487,36 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
   // also you can set an Attribute
   logo.setAttribute('company', 'Bankist'); //(attribute_name,value)
   ```
+
+- Difference between getting an attribute through `getAttribute` and `element.attribute`:
+
+  - `src` attribute
+
+    - `element.src` returns the full URL, while `element.getAttribute('src')` returns the URL as it was written in the HTML.
+
+      ```html
+      <img src="images/logo.png" id="logo" />
+
+      <script>
+        let logo = document.getElementById('logo');
+        alert(logo.src); // full URL -> http://127.0.0.1:5500/images/logo.png
+        alert(logo.getAttribute('src')); // relative URL -> images/logo.png
+      </script>
+      ```
+
+  - `href` attribute
+
+    - `element.href` returns the full URL, while `element.getAttribute('href')` returns the URL as it was written in the HTML.
+
+      ```html
+      <a href="#" id="link">link</a>
+
+      <script>
+        let link = document.getElementById('link');
+        alert(link.href); // full URL -> http://example.com/#
+        alert(link.getAttribute('href')); // relative URL -> #
+      </script>
+      ```
 
 #### Property-attribute synchronization
 
@@ -525,21 +579,21 @@ Sometimes `non-standard` attributes are used to pass custom data from HTML to Ja
   <div class="order" order-state="canceled">A canceled order.</div>
   ```
 
-##### data-\* Attributes
+##### `data-` Attributes
 
-There may be a possible problem with custom attributes. What if we use a non-standard attribute for our purposes and later the standard introduces it and makes it do something? The HTML language is alive, it grows, and more attributes appear to suit the needs of developers. There may be unexpected effects in such case. **To avoid conflicts, there exist `data-*` attributes**.
+It's a standard way to store custom data in HTML, and it's a good practice to use `data-*` attributes for custom data.
 
-- All attributes starting with “`data-`” are reserved for programmers’ use. They are available in the `dataset` property.
+- All attributes starting with `data-` are reserved for programmers’ use. They are available in the `dataset` property.
 
-```html
-<body data-about="Elephants">
-  <script>
-    alert(document.body.dataset.about); // Elephants
-  </script>
-</body>
-```
+  ```html
+  <body data-about="Elephants">
+    <script>
+      alert(document.body.dataset.about); // Elephants
+    </script>
+  </body>
+  ```
 
-- MultiWord attributes like `data-order-state` become **camel-cased**: `dataset.orderState`.
+  - MultiWord attributes like `data-order-state` become **camel-cased**: `dataset.orderState`.
 
 ---
 
@@ -551,10 +605,10 @@ The property `elem.style` is an **object** that corresponds to what’s written 
 
 - **Reading style values:**
 
-  - `elem.style` only reflects inline styles, not CSS classes.
+  - `elem.style` only reflects **inline styles**, not CSS classes.
 
     ```js
-    alert(document.body.style.color); // empty
+    alert(document.body.style.color); // ⚠️ empty, even if color is set in CSS through a class
     ```
 
   - Use `getComputedStyle()` to read/change styles based on computed values.
@@ -585,7 +639,7 @@ The property `elem.style` is an **object** that corresponds to what’s written 
     document.body.style.width = '100px'; // string with units
     ```
 
-  - to change a **(css-variable)** in the `:root` element, use the `documentElement` as the target, and `setProperty` method to change the value:
+  - To change a **(CSS variable value)** in the `:root` element, use the `documentElement` as the target, and `setProperty` method to change the value:
 
     ```js
     document.documentElement.style.setProperty('--color-primary', 'orangered');
@@ -787,105 +841,136 @@ In javascript, classes are represented by the `classList` object. It provides me
 
 ---
 
-### Coordinates
+### Coordinates of Elements
 
-- Most JavaScript methods deal with one of two coordinate systems:
+- **Coordinate Systems**:
   ![coordinates](./img/coordinates1.png)
 
-  1. **Relative to the window** – similar to `position:fixed`, calculated from the window top/left edge.
-     - we denote these coordinates as `clientX`/`clientY`
-  2. **Relative to the document** – similar to `position:absolute` in the document root, calculated from the document top/left edge.
-     - we denote them pageX/pageY.
+  1. **Window-relative** (`clientX`/`clientY`): From the window's top/left edge.
+  2. **Document-relative** (`pageX`/`pageY`): From the document's top/left edge.
 
-- **Element coordinates: `getBoundingClientRect`**
-
-  - The method `elem.getBoundingClientRect()` returns window coordinates for a minimal rectangle that encloses elem as an object of built-in `DOMRect` class.
-  - Main `DOMRect` properties: [x, y, width, height, top, buttom, left, right]
-    - If you scroll the page and repeat, you’ll notice that as window-relative element position changes, its window coordinates (y/top/bottom if you scroll vertically) change as well.
-    - Coordinates may be decimal fractions, such as 10.5. That’s normal, internally browser uses fractions in calculations. We don’t have to round them when setting to style.`left`/`top`.
-    - Coordinates may be negative. For instance, if the page is scrolled so that elem is now above the window, then `elem.getBoundingClientRect().top` is negative.
+- **Element Coordinates: `getBoundingClientRect`**:
+  - `elem.getBoundingClientRect()`: Returns the coordinates of the element's bounding rectangle relative to the browser's `window` as a `DOMRect` object.
+  - Main properties: [`x`, `y`, `width`, `height`, `top`, `bottom`, `left`, `right`].
+    - Window-relative coordinates change with scrolling.
+    - Coordinates can be decimal fractions or negative.
 
 ---
 
 ### Scrolling
 
-> **Note**: To scroll the page with JavaScript, its DOM must be fully built ( if we try to scroll the page with a script in `<head>`, it won’t work.)
+> **Note**: Ensure the DOM is fully built before scrolling with JavaScript.
 
-- Regular elements can be scrolled by changing `scrollTop`/`scrollLeft`. Alternatively, there’s a simpler, universal solution: special methods **window.scrollBy(x,y)** and **window.scrollTo(pageX,pageY)**
+- **OLD WAY**: Use `scrollTop`/`scrollLeft` or:
 
-  - The method `scrollBy(x,y)` scrolls the page relative to its current position. For instance, `scrollBy(0,10)` scrolls the page 10px down.
-  - The method `scrollTo(pageX,pageY)` scrolls the page to absolute coordinates, so that the top-left corner of the visible part has coordinates (pageX, pageY) relative to the document’s top-left corner. It’s like setting `scrollLeft`/`scrollTop`.
-
-- **scrollIntoView**
-  - The call to `elem.scrollIntoView(top)` scrolls the page to make elem visible. It has one argument:
-    - If `top=true` (that’s the default), then the page will be scrolled to make elem appear on the top of the window. The upper edge of the element will be aligned with the window top.
-    - If `top=false`, then the page scrolls to make elem appear at the bottom. The bottom edge of the element will be aligned with the window bottom.
-- **Forbid the scrolling**
-
-  - Sometimes we need to make the document “unscrollable”. For instance, when we need to cover the page with a large message requiring immediate attention, and we want the visitor to interact with that message, not with the document.
-  - To make the document unscrollable, it’s enough to set `document.body.style.overflow = "hidden"`. The page will “freeze” at its current scroll position.
+  - `scrollBy(x,y)`: Scrolls relative to current position.
+  - `scrollTo(pageX,pageY)`: Scrolls to absolute coordinates.
 
     ```js
-    document.body.style.overflow = 'hidden'; // to prevent scrolling (freezes the scroll)
-    document.body.style.overflow = ''; // to enable scrolling (release the scroll)
+    window.scrollBy(0, 10); // scroll down by 10px
+    window.scrollTo(0, 10); // scroll to the 10th pixel from the top
     ```
 
-  - The drawback of the method is that the scrollbar disappears. If it occupied some space, then that space is now free and the content “jumps” to fill it.
-    - That looks a bit odd, but can be worked around if we compare clientWidth before and after the freeze. If it increased (the scrollbar disappeared), then add padding to document.body in place of the scrollbar to keep the content width the same.
+  - `scrollTo` with options:
+
+    ```js
+    window.scrollTo({ top: 10, left: 0, behavior: 'smooth' }); // smooth scroll with animation
+    ```
+
+- **NEW WAY**: `scrollIntoView`
+
+  - `elem.scrollIntoView(top)`: Scrolls to make element visible.
+
+    - `top=true` (default): Aligns element with the window top.
+    - `top=false`: Aligns element with the window bottom.
+
+    ```js
+    elem.scrollIntoView(true); // scroll to make elem visible at the top
+    ```
+
+  - Prefer `scrollIntoView` for ease and user-friendliness instead of calculating coordinates in `scrollBy`/`scrollTo`.
+
+    ```js
+    document.querySelector('.section--1').scrollIntoView({ behavior: 'smooth' });
+    ```
+
+- **Forbid Scrolling**
+
+  - To make the document unscrollable:
+
+    ```js
+    document.body.style.overflow = 'hidden'; // prevent scrolling
+    document.body.style.overflow = ''; // enable scrolling
+    ```
+
+  - ⚠️ Note: To avoid content jump when scrollbar disappears, add padding to `document.body`.
 
 ---
 
-### intersection observer (Detecting when an element is in the viewport)
+### Intersection observer
 
-[More Info](https://blog.arnellebalane.com/the-intersection-observer-api-d441be0b088d)
+It's a browser API that allows you to **detect when an element is visible in the viewport**. It's useful for lazy loading images, infinite scrolling, and more.
 
-- The Intersection Observer API is a Web platform API that allows for **observing changes to how much of a `target` element’s area intersects with that of an ancestor element or the `viewport`**.
+> [More Info](https://blog.arnellebalane.com/the-intersection-observer-api-d441be0b088d)
+
+- It allows for **observing changes to how much of a `target` element’s area intersects with that of another element or the `viewport`**.
   ![intersection](./img/intersection4.png)
 
-  - The need for such information has a lot of use cases, such as implementing lazy-loading and infinite scrolling !
+- **Use Cases**: Lazy-loading, infinite scrolling.
+- **Efficient**: Replaces the `scroll` event on `window`.
 
-- By default, the Intersection Observer API uses the viewport as the intersection root, and only executes the callback when the target element enters and exits the viewport.
+- By default, the Intersection Observer API uses the **viewport** as the **intersection root**, and only executes the callback when the target element enters and exits the viewport.
   ![intersection](./img/intersection1.avif)
-- A `threshold` is a value in which the Intersection Observer will execute the callback function whenever the intersection ratio reaches that value (either as it increases or decreases), and is also expressed as a value between 0 and 1, inclusive.
+- A `threshold` is a value in which the Intersection Observer will execute the callback function whenever the intersection ratio reaches that value (the percentage of the target element that is visible in the intersection root).
   ![intersection](./img/intersection2.png)
   ![intersection](./img/intersection3.png)
 
-  - It is also possible to set multiple threshold values by passing an array of threshold values
+  - It is also possible to set multiple threshold values by passing an array of threshold values in the `options` object.
 
-  ```javascript
-  const observer = new IntersectionObserver(function (changes) {
-    threshold: [0, 0.25, 0.5, 0.75, 1];
-  });
+  ```js
+  const options = {
+    threshold: [0, 0.25, 0.5, 0.75, 1]
+  };
+  const observer = new IntersectionObserver(handlerFunction, options);
   // executes the callback function when the target element enters/exits the intersection root (i.e. intersection ratio of 0), then again when its intersection ratio crosses 0.25, then 0.5, etc.
   ```
 
-```js
-const observer = new IntersectionObserver(function (changes) {
-  // do something with the changes   });
-});
+- **Creating an Intersection Observer**:
 
-// Use the observer to observe a target element
-observer.observe(targetElement);
-```
+  ```js
+  const observer = new IntersectionObserver(function (changes, observer) {
+    // do something with the changes   });
+  });
 
-- The `callback function`, when executed, is passed an array of entries, each an instance of `IntersectionObserverEntry`. This is an `array` because the Intersection Observer object can be used to observe multiple target elements
+  // Use the observer to observe a target element
+  observer.observe(targetElement);
+  ```
+
+- The `callback function`, when executed, is automatically passed with:
+  - array of `entries`, which are objects that contain information about the intersection between the target element and the intersection root.
+  - the `observer` object itself. which can be used to unobserve the target element.
 - it is possible to adjust the intersection root’s rectangle by setting `root margin`
-- Example of using the Intersection Observer API to apply **sticky navigation**:
+
+---
+
+#### Examples of using the Intersection Observer API
+
+- **Sticky navigation**:
 
   ```js
   const nav = document.querySelector('.nav'); // selecting the nav element that we want to make sticky
   const navHeight = nav.getBoundingClientRect().height; // to get the exact height without hard-coding it (instead of writing "-90px")
 
   // callback function
-  const stickyNav = function (entries) {
+  const stickyNavHandler = function (entries) {
     const [entry] = entries; // destructuring : same as entry =  entries[0]
 
-    // if the entry is not intersecting, add the sticky class to the nav element, otherwise remove it
+    // if the entry is not intersecting (i.e. the target element is not visible in the viewport), make the nav sticky, otherwise remove the sticky class
     if (!entry.isIntersecting) nav.classList.add('sticky');
     else nav.classList.remove('sticky');
   };
 
-  const headerObserver = new IntersectionObserver(stickyNav, {
+  const headerObserver = new IntersectionObserver(stickyNavHandler, {
     root: null, // as we are observing the viewport
     threshold: 0, // from intersection ratio
     rootMargin: `-${navHeight}px` //(instead of writing "-90px")
@@ -907,8 +992,9 @@ observer.observe(targetElement);
     // Replace src with data-src
     entry.target.src = entry.target.dataset.src;
 
+    // Remove the blur effect when the new high-resolution image is loaded
     entry.target.addEventListener('load', function () {
-      entry.target.classList.remove('lazy-img');
+      entry.target.classList.remove('lazy-img'); // class that applies a blur effect to the image
     });
 
     // stop observing the target element
@@ -924,14 +1010,67 @@ observer.observe(targetElement);
   imgTargets.forEach(img => imgObserver.observe(img));
   ```
 
+- **Reveal Sections on Scroll**
+
+  ```js
+  const revealSection = function (entries, observer) {
+    const [entry] = entries;
+
+    if (!entry.isIntersecting) return; // exit the function if the entry is not intersecting
+
+    entry.target.classList.remove('section--hidden');
+
+    // stop observing the target element
+    observer.unobserve(entry.target);
+  };
+
+  const sectionObserver = new IntersectionObserver(revealSection, {
+    root: null, // as we are observing the viewport
+    threshold: 0.15 // from intersection ratio
+  });
+
+  allSections.forEach(function (section) {
+    sectionObserver.observe(section);
+    section.classList.add('section--hidden');
+  });
+  ```
+
+- **Infinite Scrolling**
+
+  ```js
+  const loadMore = function (entries) {
+    const [entry] = entries;
+
+    if (!entry.isIntersecting) return; // exit the function if the entry is not intersecting
+
+    // Load more content
+    loadMoreContent();
+
+    // stop observing the target element
+    observer.unobserve(entry.target);
+  };
+
+  const observer = new IntersectionObserver(loadMore, {
+    root: null, // as we are observing the viewport
+    threshold: 0, // from intersection ratio
+    rootMargin: '200px' // to load more content 200px before the user reaches the bottom of the page
+  });
+
+  observer.observe(document.querySelector('.sentinel'));
+  ```
+
 ---
 
-## virtual DOM
-
-Virtual DOM is in-memory representation of Real DOM. It is lightweight JavaScript object which is `copy` of Real DOM.
-
 - The `virtual DOM` is a tree based on JavaScript objects created with `React` that resembles a DOM tree. Each time you need to change something in the DOM, `React` employs a different algorithm that exclusively re-renders the DOM nodes that have changed. Meaning, `React` allows developers to write code as if the entire page is rendered on each change while in the underhood `React` ONLY renders sub-components that have actually changed.
-- Virtual DOM duty among other things is to abstract real DOM operations we would need to do
+
+## Virtual DOM
+
+The Virtual DOM is an in-memory representation of the Real DOM. It is a lightweight JavaScript object that acts as a `copy` of the Real DOM.
+
+- The `Virtual DOM` is a tree of JavaScript objects created with `React` that resembles a DOM tree.
+- `React` re-renders only the DOM nodes that have changed, optimizing performance.
+- Developers can write code as if the entire page is re-rendered on each change.
+- The Virtual DOM abstracts real DOM operations.
 
 ### methods to compare nodes
 
@@ -994,7 +1133,7 @@ newElements.forEach((newEl, i) => {
 
 ## Events
 
-An event is a signal that something has happened. All DOM nodes generate such signals (but events are not limited to DOM).
+Events signal that something has happened. All DOM nodes generate such signals.
 
 - **DOM Events**:
   - **Mouse**: `click`, `contextmenu`, `mouseover`, `mouseout`, `mousedown`, `mouseup`, `mousemove`
@@ -1003,72 +1142,78 @@ An event is a signal that something has happened. All DOM nodes generate such si
   - **Document**: `DOMContentLoaded`
   - **CSS**: `transitionend`
 
-### Event Handling
+### Event Handling / Binding
 
-- **Binding events**:
+- **Binding events** -> 3 ways to assign handlers:
 
-  - 3 ways to assign handlers:
-    1. HTML: `onclick="..."`
-    2. DOM property: `elem.onclick = function`
-    3. Method: `elem.addEventListener(event, handler)` (recommended ✅)
+  - **HTML Event Handlers (Bad Practice ❌)**
 
-- **HTML Event Handlers (Bad Practice ❌)**
-
-  ```html
-  <input type="button" id="button" onclick="sayThanks()" />
-  ```
-
-  - here we add parentheses `()` for the handler method
-  - Browser creates a handler function from the attribute content:
-
-    ```js
-    button.onclick = function (event) {
-      sayThanks(); // attribute content
-    };
+    ```html
+    <input type="button" id="button" onclick="sayThanks()" />
     ```
 
-  - This method of event handling is **no longer used** because it is better to separate the JavaScript from the HTML.
-  - HTML attribute names are case-insensitive, so all these work! `onclick`, `ONCLICK`, `onClick`.
+    - Add parentheses `()` for the handler method
+    - Browser creates a handler function from the attribute content:
 
-  - Don’t use `setAttribute()` for handlers; it converts functions to strings.
+      ```js
+      button.onclick = function (event) {
+        sayThanks(); // attribute content
+      };
+      ```
 
-- **Traditional DOM Event Handlers (❌)**
+    - Notes:
+      - Not recommended: mixes HTML and JavaScript.
+      - HTML attribute names are case-insensitive: `onclick`, `ONCLICK`, `onClick`.
+      - Avoid `setAttribute()` for handlers; it converts functions to strings.
 
-  - Only one function per event.
-  - Assign handler without parentheses.
-  - Use `elem.onclick` (case-sensitive).
+  - **DOM Property Event Handlers (❌)**
 
-    ```js
-    el.onblur = checkUsername; // no parentheses
-    ```
+    - Only one function per event.
+    - Assign handler without parentheses.
+    - Use `elem.onclick` (case-sensitive).
 
-- **`addEventListener` ✅**
+      ```js
+      el.onblur = checkUsername; // no parentheses
+      ```
 
-  - Syntax:
+  - **`addEventListener` ✅**
 
-    ```js
-    element.addEventListener(event, handler, [options]);
+    - Syntax:
 
-    element.removeEventListener(event, handler, [options]);
-    ```
+      ```js
+      // element.addEventListener(event, handler, [options]);
+      // element.removeEventListener(event, handler, [options]);
 
-    - `options`: An additional optional object with properties:
+      // Examples
+      button.addEventListener('click', () => alert('Thanks!'));
+      button.removeEventListener('click', () => alert('Thanks!'), { once: true }); // remove after trigger
+      ```
 
-      - `once`: Auto-removes after trigger.
-      - `capture`: Event phase (bubbling/capturing).
-      - `passive`: Prevents preventDefault.
+      - `options`: An additional optional object with properties:
 
-  - `this` in callbacks refers to the element. Use `.bind()` with arrow functions.
+        - `once`: Auto-removes after trigger.
+        - `capture`: Event phase (bubbling/capturing).
+        - `passive`: Prevents preventDefault.
 
-  - Supports multiple functions per event.
+      - Notes:
 
-    ```js
-    ['click', 'load'].forEach(event => window.addEventListener(event, callback_function));
-    ```
+        - It's the only way that supports multiple functions per event.
 
-  - Removing Handlers:
+          ```js
+          ['click', 'load'].forEach(event => window.addEventListener(event, callback_function));
+          ```
 
-    - Must pass the exact same function.
+        - It's the only way that supports removing an event listener.
+
+- `this` in callbacks:
+
+  - if callback function is a regular function, `this` refers to the element that the event listener was attached to.
+  - if callback function is an arrow function, `this` refers to the window object. So we can use `event.currentTarget` instead of `this` or use `.bind(this)`.
+
+- Removing Event Listeners:
+
+  - It's important to remove event listeners when they are no longer needed to prevent memory leaks.
+  - Must pass the exact same function.
 
     ```js
     function handler() {
@@ -1136,13 +1281,40 @@ When an event occurs, the `event` object tells you information about the event, 
       });
       ```
 
+- To pass arguments to an event handler, we can:
+
+  - Use a wrapper function.
+
+    ```js
+    elem.addEventListener('click', function (e) {
+      handler(e, arg1, arg2);
+    });
+    ```
+
+  - Use `bind` method.
+
+    ```js
+    elem.addEventListener('click', handler.bind(null, arg1, arg2));
+    ```
+
+- **Prevent Default Action**:
+
 ---
 
-### Event Flow (Bubbling and capturing)
+### Event Propagation (Bubbling and capturing)
 
-HTML elements nest inside each other elements. if you hover or click on a link, you will also be hovering or clicking on its parent elements.
+It's the process of event flow from the root element to the target element and back.
 
-Event handlers/listeners can be bound to the containing `<li>`, `<ul>`, `<body>` and `<html>` elements, plus the document object and the window object. **The order in which the events fire is known as "event flow"**
+> `"Propagation"` means jumping from one element to another, visiting parents and ancestors.
+
+- HTML elements nest. Hovering or clicking a link also affects its parent elements.
+
+- The standard DOM Events describes 3 phases of event propagation:
+
+  1. Capturing phase – the event goes down to the element.
+  2. Target phase – the event reached the target element.
+  3. Bubbling phase – the event bubbles up from the element.
+     ![delegation](./img/javascript-event-propagation-5.webp)
 
 - Events flow in two directions: [Bubbling](#event-bubbling) & [Capturing](#event-capturing).
   ![event flow](./img/event-flow.png)
@@ -1167,13 +1339,11 @@ Event handlers/listeners can be bound to the containing `<li>`, `<ul>`, `<body>`
 
   - A bubbling event goes from the target element up, calling all handlers on the path. Any handler can stop this with **`event.stopPropagation()`**.
 
-    ```html
-    <body onclick="alert('bubbling stopped')">
-      <button onclick="event.stopPropagation()">Click me</button>
-    </body>
+    ```js
+    elem.addEventListener('click', function (e) {
+      e.stopPropagation(); // stops bubbling
+    });
     ```
-
-  > `"Propagation"` means jumping from one element to another, visiting parents and ancestors.
 
   - `event.stopPropagation()`: Stops the event from moving up, but other handlers on the current element will run.
   - `event.stopImmediatePropagation()`: Stops bubbling and prevents handlers on the current element from running.
@@ -1187,14 +1357,9 @@ Event handlers/listeners can be bound to the containing `<li>`, `<ul>`, `<body>`
 
 #### Event Capturing
 
-> It is rarely used in real code, but sometimes can be useful.
+> It is not commonly used in real code, but sometimes can be useful.
 
-- The standard DOM Events describes 3 phases of event propagation:
-
-  1. Capturing phase – the event goes down to the element.
-  2. Target phase – the event reached the target element.
-  3. Bubbling phase – the event bubbles up from the element.
-     ![delegation](./img/javascript-event-propagation-5.webp)
+It's the opposite of bubbling. The event goes down to the element, then triggers handlers on the way up.
 
 - the final parameter in the `addEventListener()` method lets you choose the direction to trigger events
 
@@ -1207,47 +1372,53 @@ Event handlers/listeners can be bound to the containing `<li>`, `<ul>`, `<body>`
   elem.addEventListener(..., true)
   ```
 
-- The `event.stopPropagation()` during the capturing also prevents the bubbling
-
 ---
 
 #### Event Delegation
 
-Capturing and bubbling allow us to implement one of the most powerful event handling patterns called event delegation.
+It's a technique to add a single event listener to a parent element to handle all events that happen inside it instead of multiple listeners to child elements.
 
 > Creating event listeners for a lot of elements can slow down a page, but event flow allows you to listen for an event on a parent element.
 
-The idea is that if we have a lot of elements handled in a similar way, then instead of assigning a handler to each of them – we put a single handler on their common ancestor (parent).
+- It's like that we are **delegating** the job of the event listener to a parent of the elements. because the event bubbles up to the parent element.
 
-- In the handler we get `event.target` to see where the event actually happened and handle it.
-- like that we are **delegating** the job of the event listener to a parent of the elements.
-- **Advantages:**
+- **Advantages**:
 
-  - Simplifies initialization and saves memory: no need to add many handlers.
-    - used to `prevent` event listener to create a lot of callback functions listening to all the items in `forEach`, so we use `event.target` as it shows **where the event happened**
-    - This will improve performance because we only need one event listener instead of multiple event listeners.
-  - Less code: when adding or removing elements, no need to add/remove handlers.
-  - DOM modifications: we can mass add/remove elements with innerHTML and the like.
+  - Simplifies initialization and saves memory.
+  - Improves performance with fewer event listeners.
+  - Less code for adding/removing elements.
+  - Easy DOM modifications.
 
-- **limitations:**
-  - the event must be bubbling. Some events do not bubble. Also, low-level handlers should not use `event.stopPropagation()`
-  - the delegation may add CPU load, because the container-level handler reacts on events in any place of the container, no matter whether they interest us or not. But usually the load is negligible, so we don’t take it into account.
-- **Steps:**
+- **Limitations**:
 
-  1. Add event listener to common parent element
-  2. Determine what element originated the event => `e.target`
-  3. if the element has children inside it => use `.closest(element)` to prevent wrong selection
+  - Requires bubbling events.
+  - May add CPU load due to container-level handling.
 
-     - The method `elem.closest(selector)` returns the nearest ancestor that matches the selector.
+- **Steps**:
 
-  ```javascript
+  1. Add event listener to common parent.
+  2. Use `e.target` to find the event origin (where it happened).
+  3. Use `.closest(element)` to prevent wrong selection.
+     - it returns the nearest ancestor that matches the selector.
+
+  ```js
+  // Event Delegation ✅
   tabsContainer.addEventListener('click', function (e) {
-    const clickedElement = e.target.closest('.operations__tab'); // goes up from the element and checks each of parents. If it matches the selector, then the search stops, and the ancestor is returned.
-    // Don't use `e.target.parentElement`
+    const clickedElement = e.target.closest('.operations__tab');
+    if (!clickedElement) return; // early return if clicked on other element
 
-    // Guard clause (as if you clicked on other than '.operations__tab' element )
-    if (!clickedElement) return;
-    }
+    // handle the event if the clicked element is the one we are looking for
+    // ...
+  });
+
+  // It's instead of adding event listeners to each tab element ❌
+  const tabs = document.querySelectorAll('.operations__tab');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function () {
+      // handle the event
+      // ...
+    });
+  });
   ```
 
 ##### `data` attribute with Event Delegation
@@ -1399,67 +1570,146 @@ More reference and info about (mouse events, drag & drop, pointer events, keyboa
 
 ---
 
-## Storage
+## HTML page script loading and lifecycle
 
-- `local storage` : always stays
-- `session storage` : gets closed when window or tab are closed
+### Loading scripts: `async`, `defer`
+
+Scripts are often heavier than HTML, causing delays in DOM building. When the browser encounters a `<script>` tag, it must execute it immediately, blocking further DOM processing.
+
+- **Issues**:
+
+  - Scripts can't see DOM elements below them.
+  - Bulky scripts at the top block page content and DOM building.
+
+    ```html
+    <p>...content before script...</p>
+
+    <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
+
+    <!-- This isn't visible until the script loads -->
+    <p>...content after script...</p>
+    ```
+
+  - **Workaround**: Place scripts at the bottom to avoid blocking content.
+
+    ```html
+    <body>
+      <!-- ...all content is above the script... -->
+
+      <script src="https://javascript.info/article/script-async-defer/long.js?speed=1"></script>
+    </body>
+    ```
+
+- Placing the script at the bottom isn't perfect as the script starts downloading only after the full HTML is loaded, causing delays on slow connections. - Solution: Use `defer` and `async` attributes to load scripts without blocking.
+
+- `async` and `defer`
+  - They're boolean attributes influencing how the scripts are fetched (loaded) and executed.
+    ![script-loading](./img/script-loading-1.png)
+
+#### `defer`
+
+The `defer` attribute allows the browser to continue processing HTML and building the DOM while the script loads in the background.
+
+- **Key Points**:
+
+  - Scripts with `defer` never block the page.
+  - They execute when the DOM is ready, before `DOMContentLoaded`.
+  - Deferred scripts maintain their order.
+
+    ```html
+    <script defer src="long.js"></script>
+    <script defer src="small.js"></script>
+    ```
+
+    - the `defer` attribute, besides telling the browser “not to block”, ensures that the relative order is kept. So even though `small.js` loads first, it still waits and runs after `long.js` executes.
+      > That is important for cases when we need to load a JavaScript library and then a script that depends on it.
+
+- Notes:
+
+  - The `defer` attribute is only for external scripts
+  - The `defer` attribute is ignored if the `<script>` tag has no `src`.
 
 ---
 
-## Lifecycle of an HTML page
+#### `async`
 
-The lifecycle of an HTML page has three important events:
+The `async` attribute makes scripts non-blocking and independent.
 
-### `DOMContentLoaded`
+- **Behavior**:
 
-The `DOMContentLoaded` event happens on the **document** object.
-
-- the browser fully loaded HTML, and the DOM tree is built, but external resources like pictures `<img>` and stylesheets may not yet have loaded.
-- DOM is ready, so the handler can lookup DOM nodes, initialize the interface.
+  - Scripts load and run **independently** (load in the background and run when ready).
+  - The browser doesn’t block the page on `async` scripts.
+  - Other scripts and `DOMContentLoaded` don't wait for `async` scripts.
+  - `async` scripts don't wait for each other or the DOM.
 
   ```html
+  <p>...content before scripts...</p>
   <script>
-    function ready() {
-      alert('DOM is ready');
-
-      // image is not yet loaded (unless it was cached), so the size is 0x0
-      alert(`Image size: ${img.offsetWidth}x${img.offsetHeight}`);
-    }
-
-    document.addEventListener('DOMContentLoaded', ready);
+    document.addEventListener('DOMContentLoaded', () => alert('DOM ready!'));
   </script>
-
-  <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0" />
+  <script async src="long.js"></script>
+  <script async src="small.js"></script>
+  <p>...content after scripts...</p>
   ```
 
-- `<script>` tags block `DOMContentLoaded`
+  - Steps:
+    1. Page content shows immediately; `async` doesn't block it.
+    2. `DOMContentLoaded` can occur before or after `async`.
+    3. Scripts run in the order they load, not their sequence in HTML.
 
-  - When the browser processes an HTML-document and comes across a `<script>` tag, it needs to execute before continuing building the DOM. That’s a precaution, as scripts may want to modify DOM, and even `document.write()` into it, so `DOMContentLoaded` has to wait. So `DOMContentLoaded` definitely happens after such scripts
+- **Use Cases:**
 
-  - There are two exceptions from this rule:
-    1. Scripts with the `async` attribute don’t block DOMContentLoaded.
-    2. Scripts that are generated dynamically with `document.createElement('script')` and then added to the webpage also don’t block this event.
-
-- External style sheets don’t affect DOM, so DOMContentLoaded does not wait for them.
-
-  - But there’s a pitfall. If we have a `script` after the `style`, then that script must wait until the stylesheet loads:
+  - Ideal for independent third-party scripts (e.g., ads, analytics). **(where the relative execution order doesn't matter)**.
 
     ```html
-    <link type="text/css" rel="stylesheet" href="style.css" />
-    <script>
-      // the script doesn't execute until the stylesheet is loaded
-      alert(getComputedStyle(document.body).marginTop);
-    </script>
+    <script async src="https://google-analytics.com/analytics.js"></script>
+    ```
+
+- **Dynamic scripts**
+
+  - Default to `async`, but can be changed to `defer` by setting `script.async = false`.
+
+    ```js
+    let script = document.createElement('script');
+    script.src = '/article/script-async-defer/long.js';
+    document.body.append(script); // The script starts loading as soon as it’s appended to the document
     ```
 
 ---
 
-### `load`
+### Comparison of `async` and `defer`
 
-The `load` event happens on the **window** object.
+![script-loading](./img/script-loading-2.png)
 
-- not only HTML is loaded, but also all the external resources: images, styles etc.
-- external resources are loaded, so styles are applied, image sizes are known etc.
+---
+
+### Page lifecycle: DOMContentLoaded, load, beforeunload, unload
+
+The lifecycle of an HTML page has three important events:
+
+- `DOMContentLoaded`
+
+  - Fires on the `document` when **(HTML & External JS scripts)** is fully loaded and the DOM tree is built, but external resources may not be loaded.
+    - `<script>` tags block `DOMContentLoaded` unless they have `async` or are dynamically created.
+    - External CSS stylesheets don't block `DOMContentLoaded`, but scripts after stylesheets wait for them to load.
+  - Handlers can access and initialize the DOM.
+
+    ```html
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        alert('DOM is ready');
+
+        // can access DOM
+        let elem = document.getElementById('elem'); // elem exists ✅
+      });
+    </script>
+    ```
+
+- `load`
+
+  - Fires on the `window` when the entire page, including all resources (images, styles etc), is fully loaded.
+    - so styles are applied, image sizes are known etc.
+  - Handlers can access fully loaded resources.
 
   ```html
   <script>
@@ -1472,18 +1722,33 @@ The `load` event happens on the **window** object.
     };
   </script>
 
-  <img id="img" src="https://en.js.cx/clipart/train.gif?speed=1&cache=0" />
+  <img id="img" src="https://en.js.cxclipart/train.gif?speed=1&cache=0" />
   ```
 
----
+- `beforeunload` / `unload`
 
-### `beforeunload` / `unload`
+  - Fires on the `window` when the user is leaving the page.
+  - `beforeunload`: Check if the user saved changes and confirm leaving.
 
-The `beforeunload` / `load` events happen on the **window** object.
+    - `event.preventDefault()` doesn't work in `beforeunload` to prevent the user from leaving the page.
 
-- the user is leaving: we can check if the user saved the changes and ask them whether they really want to leave.
-- Naturally, unload event is when the user leaves us, and we’d like to save the data on our server.
-- the user almost left, but we still can initiate some operations, such as sending out statistics.
-- The `event.preventDefault()` doesn’t work from a `beforeunload` handler
+  - `unload`: Perform cleanup or send data to the server.
+
+- Notes:
+
+  - We can see how much time it took to load the page by:
+
+    - Measuring the time between `DOMContentLoaded` and `load` events.
+
+      ```js
+      let start = Date.now();
+
+      document.addEventListener('DOMContentLoaded', () => {
+        alert(`Loaded in ${Date.now() - start}ms`);
+      });
+      ```
+
+    - Or, in the network tab of the browser's developer tools.
+      ![network](./img/page-life-cycle-1.png)
 
 ---

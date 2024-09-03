@@ -66,9 +66,16 @@
       - [Mutating Object / Array Props](#mutating-object--array-props)
     - [Component Events (Event emitter)](#component-events-event-emitter)
       - [`model-value` event: using `v-model` with custom components](#model-value-event-using-v-model-with-custom-components)
-    - [Provide / Inject](#provide--inject)
+    - [Provide / Inject (Dependency Injection)](#provide--inject-dependency-injection)
       - [Provide](#provide)
       - [Inject](#inject)
+      - [Working with Reactivity in Provide / Inject (Dependency Injection)](#working-with-reactivity-in-provide--inject-dependency-injection)
+      - [Working with symbol keys in Provide / Inject (Injection keys)](#working-with-symbol-keys-in-provide--inject-injection-keys)
+      - [Employing Provide/Inject Pattern with Composition API](#employing-provideinject-pattern-with-composition-api)
+      - [The Interplay Between Provide/Inject and Larger State Management Patterns](#the-interplay-between-provideinject-and-larger-state-management-patterns)
+      - [Best Practices and Common Pitfalls with Provide/Inject](#best-practices-and-common-pitfalls-with-provideinject)
+      - [Use Cases for Provide/Inject](#use-cases-for-provideinject)
+      - [Helpful packages for Provide/Inject](#helpful-packages-for-provideinject)
   - [Slots](#slots)
     - [named-slots](#named-slots)
       - [Dynamic Slot Names](#dynamic-slot-names)
@@ -88,6 +95,7 @@
   - [Plugins](#plugins)
     - [Installing a plugin](#installing-a-plugin)
     - [Plugins use cases](#plugins-use-cases)
+      - [Provide / Inject with Plugins](#provide--inject-with-plugins)
   - [Notes \& Guidelines](#notes--guidelines)
     - [Vue guidelines and best practices](#vue-guidelines-and-best-practices)
     - [Vue Notes](#vue-notes)
@@ -566,16 +574,14 @@ Note from **stackoverflow**:
     v-on="
       mousedown: func1,
       mouseup: func2
-    "
-  ></div>
+    "></div>
 
   <!-- OR -->
   <div
     @="
       mousedown: func1,
       mouseup: func2
-    "
-  ></div>
+    "></div>
   ```
 
 #### Accessing Event Argument
@@ -1477,11 +1483,9 @@ Local registration scopes the availability of the registered components to the c
 
 [Guide](https://dev.to/sanchithasr/how-to-communicate-between-components-in-vue-js-kjc)
 
-1. Using **Props** (Parent to Child Communication)
-2. Using **Events-emitter** (Child to Parent Communication)
-3. Using **Event Bus** (Communication between any components)
-4. Using **provide/inject** (Parent to Child Communication)
-5. Using **this.$refs** (Parent to Child Communication)
+1. Using [Props](#props) (Parent to Child Communication)
+2. Using [Events-emitter](#component-events-event-emitter) (Child to Parent Communication)
+3. Using [provide/inject](#provide--inject-dependency-injection) (Parent to Child Communication)
 
 ---
 
@@ -1728,88 +1732,735 @@ Custom events can also be used to create custom inputs that work with **v-model*
 
 ---
 
-### Provide / Inject
+### Provide / Inject (Dependency Injection)
 
-They can be used instead of passing props, or emitting events(different implementation)
+It's a way to provide data to all descendants of a component without having to pass it down through props manually at every level.
 
-- instead of:
-  - If there is a longer parent chain, more components would be affected along the way. This is called **"props drilling"** and definitely isn't fun to deal with.
-    ![provide-inject](./img/provide1.png)
-- We can solve props drilling with `provide` and `inject`. A parent component can serve as a dependency provider for all its descendants. Any component in the descendant tree, regardless of how deep it is, can inject dependencies provided by components up in its parent chain.
+> - This feature wasn't available in Vue from the beginning, it was added in Vue **2.2.0**
+>
+> - It's a topic that sometimes causes confusion for developers that don't have experience with dependency injection. and requires a good understanding of the component tree structure and the relationship between components in order to use it effectively.
+
+- **Prop Drilling**:
+  ![provide-inject](./img/provide1.png)
+
+  - Passing props through multiple nested components can be cumbersome.
+  - Intermediate components may not use the prop but must pass it down.
+  - Accessing parent data directly (`this.$parent`) creates tight coupling and maintenance issues.
+    - It is not recommended because it creates a tight coupling between components and makes the code harder to maintain and test if for example (if you changed the structure of the components, the code will break).
+
+- **Solution**: Provide / Inject
   ![provide-inject](./img/provide2.png)
+
+  - Parent components provide data to all descendants.
+  - Descendants inject dependencies from any ancestor.
+  - Avoids issues with `this.$parent` and maintains flexibility if the component structure changes.
+  - Different from traditional props/events method (props **down** and events **up**)
+
+- **Usage**:
+
+  - `provide` and `inject` allow an ancestor to serve as a dependency injector for all descendants.
+  - Similar to React's Context API but handled automatically by Vue.
 
 #### Provide
 
-- To provide data to a component's descendants, use the provide option:
+It's an option that have a value of **(an object or a function that returns an object)**. The object contains the data that we want to provide to the descendants.
+
+- To provide data to a component's descendants, use the `provide()` function
+  - The `provide()` function accepts 2 arguments:
+    - The first argument is the key (string or symbol) that will be used to access the provided value in the child components.
+    - The second argument is the value that will be provided to the child components. (it can be any type of value including reactive state such as a `refs` or `reactive objects`)
+      - Providing reactive values allows the descendant components using the provided value to establish a **reactive connection** to the provider component.
+
+    ```js
+    // Vue 2
+    export default {
+      provide() {
+        return { message: 'hello!', name: 'John', age: 30 };
+      }
+    };
+
+    // Vue 3
+    import { provide } from 'vue';
+    provide('message', 'hello!');
+    provide('name', 'John');
+    provide('age', 30);
+    ```
+  
+- The providing happens after the component is created, so when we call the `provide()` function, the component has already been created and the `data`, `computed`, and `methods` properties are available.
+
+- **Provider hierarchy**
+
+  - The provider hierarchy rule states that if the same provider key is used in multiple providers in the dependency tree of a component, then **the provider of the closest parent to the child component will override other providers higher in the hierarchy**.
+
+    ```sh
+    ParentComponent # provide('message', 'hello!')
+      ├── ChildComponent # provide('message', 'hi!')
+          ├── GrandchildComponent # inject('message') // 'hi!'
+    ```
+
+- **App-level Provides**:
+
+  - Provide data at the app level to be injected into all descendant components.
+
+    ```js
+    import { createApp } from 'vue';
+    const app = createApp({});
+    app.provide(/* key */ 'message', /* value */ 'hello!');
+    ```
+
+  - The use case for app-level provides is when we need to provide a value that can be injected in all descendant components within the application. This is especially useful when writing **plugins** -> [Provide / Inject with Plugins](#provide--inject-with-plugins)
+
+#### Inject
+
+It's an option that accepts either: **(array of strings, object, or a function that returns an object)**, where the keys are the names of the values that we want to inject.
+
+- To inject a provided value in a component, use the `inject` option:
 
   ```js
-  // in the upper component
+  // in the lower component
   export default {
-    provide: {
-      message: 'hello!'
+    inject: ['message'],
+
+    created() {
+      console.log(this.message); // injected value
+    }
+  };
+
+  // Or in vue3
+  import { inject } from 'vue';
+  export default {
+    setup() {
+      const message = inject('message');
+      console.log(message); // injected value
     }
   };
   ```
 
-- For each property in the `provide` object, the key is used by child components to locate the correct value to inject, while the value is what ends up being injected.
+  - in Vue2 -> The `inject` option accepts:
+    - an array of strings, or
+    - an object where the keys are the local binding name and the value is either:
+      - the key (string or symbol) of the provided value, or
+      - an object with the following properties:
+        - `from`: the key of the provided value
+        - `default`: the default value as a fallback if the provided value is not found
+  - in Vue3 -> The `inject` function accepts a single argument, which is the key of the provided value that we want to inject.
+  - The injected value can be accessed in the component's `data()`, `computed`, `methods`, and `lifecycle hooks`.
+    - The injected value is **reactive** if it is a reactive object or a ref. as it's not unwrapped in the child component, it's still reactive
 
-**Note**: If we need to provide per-instance dynamic/state property, for example data declared via the `data()`, then provide must use a function value:
+- The injection happens **synchronously**:
 
-```js
-export default {
-  data() {
-    return {
-      message: 'hello!'
-    };
-  },
+  - in Vue2 -> during the parent component's `beforeCreate` and `created` lifecycle hooks, so it's guaranteed to be available in the child component's `created` hook (in early versions of Vue2, the injected values were only resolved after the child component's `created` hook, which caused some issues when trying to access them in the `props` or `data` options of the child component to be a default prop or a data value)
+  - in Vue3 -> during the parent component's `setup` function, with its order of execution
 
-  provide() {
-    // use function syntax so that we can access `this`
-    return {
-      message: this.message
-    };
-  }
-};
-```
+- You can only inject what has been provided on a higher-up level. This basically means, that in a parent component, or an ancestor component.
 
-- In addition to providing data in a component, we can also provide at the **app level**:
+  - injection must be in a `child-relationship` component to the component that `provide` and can't be between neighbors components
 
-  - Provide a value that can be injected in all descendant components within the application.
-  - Expects the `injection` key as the first argument, and the `provided` value as the second.
+- **Injection default values**
+
+  - If the injected value is not found, Vue will throw a warning in the console. To provide a default value for the injected value, we can pass an object to the `inject` option with the `default` property, and for non-primitive values, we must use a **factory function** to return the default value. (Similar to providing default values for props)
+  - the return type of inject will always be **nullable** because there is always a possibility that provide was not called for that injection up the parent tree. That's why we can provide a default value to inject.
+
+    ```js
+    // vue 2
+    inject: {
+      message: {
+        default: 'default message'
+      },
+      // non-primitive value
+      messages: {
+        default: () => ['first message', 'second message']
+      }
+    }
+
+    // vue 3
+    const message = inject('message', 'default message');
+    // non-primitive value
+    const messages = inject('messages', () => ['first message', 'second message'], true); // the last argument is to make it reactive
+    ```
+
+  - But that’s not good enough, just like props this only works when the value isn’t needed and you can make do with the default value. But in the case of injecting complex context objects that won’t work. You need a way to require the provide call before anyone attempts to use this component. by **throwing an error** if the value is not provided
+
+    ```js
+    import { inject } from 'vue';
+    import { USER_CART_KEY } from '@/injectionKeys';
+    const cart = inject(USER_CART_KEY);
+    if (!cart) {
+      throw new Error('WHERE IS THE CART INJECTION???');
+    }
+    // Here is safe to access `cart.items.map`
+    cart.items.map(...);
+    ```
+
+    - we can create a reusable utility function to make this check for us
+
+      ```js
+      import { inject } from 'vue';
+      export function useInject(key, fallback = null) {
+        const value = inject(key, fallback);
+        if (!value) {
+          throw new Error(`Could not find injected value with key ${key}`);
+        }
+        return value;
+      }
+      ```
+
+      - and then use it in the component
+
+        ```js
+        import { useInject } from '@/utils/useInject';
+        import { USER_CART_KEY } from '@/injectionKeys';
+        const cart = useInject(USER_CART_KEY, 'WHERE IS THE CART INJECTION???');
+        ```
+
+- **Aliasing Injected Values** -> We can also alias the injected value by providing an object with the `from` property:
 
   ```js
-  import { createApp } from 'vue';
+  // vue 2
+  inject: {
+    message: {
+      from: 'messageKey'; // Here, 'message' is the local binding name, and 'messageKey' is the key of the provided value
+    }
+  }
 
-  const app = createApp({});
-
-  // EX: app.provide(key, value);
-  app.provide(/* key */ 'message', /* value */ 'hello!');
+  // vue 3
+  const message = inject('messageKey');
   ```
 
-  > App-level **provides** are available to all components rendered in the app. This is especially useful when writing plugins, as plugins typically wouldn't be able to provide values using components.
+- When to inject:
 
-#### Inject
+  - It's similar to "when to use a data store".
+  - When you find yourself doing the following:
+    - Pass a piece of object data to a lot of deeply nested child components
+    - Needing global level read/write access to a piece of data
 
-- injection must be in a `child-relationship` component to the component that `provide` and can't be between neighbors components
+- **Props vs Injections**
+  - Props
+    - Props are used to pass data from a parent component to a child component. (direct dependency you need to pass data from parent to child)
+    - Used with component that we want to be generic and reusable, by displaying different data passed to it, ex: a `UserCard` component that displays user information
+    - Props are reactive, meaning that if the prop value changes in the parent component, the change will be reflected in the child component.
+  - Injections
+    - Injections are used to provide data to all descendants of a component without having to pass it down through props manually at every level.
+    - Used when we have a shared logic or state that needs to be accessed by multiple components in the component tree. ex: `logoutButton` component that needs to access the `user` object and the `logout` method, which both can be encapsulated in a `UserProviderContext` component.
+    - Injections are only reactive if the provided value is a reactive object or a ref. This means that if the provided value changes in the parent component, the change will be reflected in the child component.
 
-```js
-// in the lower component
-export default {
-  inject: ['message'],
+#### Working with Reactivity in Provide / Inject (Dependency Injection)
 
-  created() {
-    console.log(this.message); // injected value
-  },
+> **Dependency Injection** is:
+>
+> - a design pattern that allows us to inject dependencies into a component from an external source, promoting loose coupling and enhancing code reusability.
+>
+> - or a design pattern in which classes are not allowed to create dependencies. Rather, they request dependencies from external sources. This design pattern strongly holds that a class should not configure its dependencies statically.
+>
+> Meaning that when we have a piece of code inside a piece of code, we can inject the dependency from the outside instead of creating it inside the code
+> ![dependency injection](./img/dependency-injection-1.png)
+>
+> ![dependency injection](./img/dependency-injection-2.png)
+>
+> - When we pass something into the code, we call it **"injection"**
+> - This pattern is used to make the code more **testable** and **maintainable** by allowing us to easily swap out dependencies and mock them in tests making components more **reusable** and **flexible** and loosely coupled because the components don't need to know how to create their dependencies
+>
+>   - By injecting the something as a dependency, we make the injectable component more flexible, reusable, and decoupled from the specific implementation details of the provided logic. It allows us to easily substitute or mock the provided logic during testing, without modifying the component itself.
+>
+> - it's used using **Higher-Order Components (HOC)** which is a function that takes a component and returns a new component with additional functionality
+>
+> - It was used a lot with React class components, but with the introduction of hooks, it's not used as much as before, and now context API is used more than dependency injection.
 
-  // Injections are resolved before the component's own state, so you can access injected properties in `data()`:
-  data() {
-    return {
-      // initial data based on injected value
-      fullMessage: this.message
+The `provide` and `inject` bindings **are NOT reactive in Vue 2**, but they **are reactive in Vue 3**. This means that if you provide a reactive object or a ref in a parent component, the child component will have a reactive connection to the provided value. To make the injected value reactive in Vue 2, you can use a `ref` or a `computed` property to wrap the value before providing it.
+
+- When a property is injected, Vue automatically treats it as a dependency, and any changes to the provided reactive data will trigger the necessary updates in the consumer components.
+- When using reactive provide / inject values, **It's recommended to keep any mutations to reactive state inside of the provider whenever possible**. This is because the reactivity system in Vue is designed to work with the component instance that owns the reactive state.
+
+  - Thus the application will have a unidirectional data flow, where changes to the state are always initiated from a consistent origin, enhancing traceability within Vue’s reactivity system.
+  - Under the hood, Vue's **dependency injection system** manages the interplay between provided and injected properties. When a property is injected, Vue automatically treats it as a dependency, and any changes to the provided reactive data will trigger the necessary updates in the consumer components. These relationships are established using the provide and inject options within the setup function or through the methods utilized by the options API.
+  - In more dynamic scenarios, providers can pass down not just reactive state but also computed properties or functions, which introduce an extra layer of flexibility and control over the data consumed by descendant components. For instance, a computation of a value based on a prop can be provided and reactively
+
+    ```js
+    import { provide, computed } from 'vue';
+
+    export default {
+      props: ['value'],
+      setup(props) {
+        provide(
+          'dynamicValue',
+          computed(() => props.value * 2)
+        );
+      }
     };
+    ```
+
+  - Through the nuanced interweaving of the provide/inject pattern with Vue.js 3's reactivity system, developers have the capability to construct highly interactive, maintainable UIs. Components become simpler and their interface with the broader application clearer, as they directly access the state they require. Moreover, this architecture minimizes performance overhead and better aligns with the application’s lifecycle. By applying this shared-state technique judiciously, Vue.js 3 allows for efficient and precise component synchronization. -> **This is why someone can use dependency injection in Vue.js**
+    - **to also answer the question of why we can't use `Vuex`**:
+      - Vuex is a state management library that is designed to manage the state of an entire application. It is not designed to manage the state of individual components. Vuex is best suited for managing global state that needs to be shared across multiple components. If you only need to manage the state of a single component or a few related components, using the provide/inject pattern is a more lightweight and flexible solution.
+    - Another question is: **Why not create a store for each component?**:
+      - Creating a store for each component would be overkill and would lead to unnecessary complexity. Vuex is designed to manage global state that needs to be shared across multiple components. If you create a store for each component, you would end up with a lot of duplicated state and logic, which would make your application harder to maintain. The provide/inject pattern is a more lightweight and flexible solution for managing the state of individual components or a small group of related components.
+
+- So, when you want to update the data from an injector component, you can:
+
+  - Emit an event from the injector component to the provider component, and let the provider component update the reactive state.
+  - Pass a function to the provider component that can be called from the injector component to update the reactive state. (this is the best way ✅)
+
+    - Example in Vue 3
+
+      ```js
+      // --------- in the provider component ------------ //
+      import { provide, ref } from 'vue';
+
+      const location = ref('North Pole');
+
+      function updateLocation() {
+        location.value = 'South Pole';
+      }
+
+      provide('location', {
+        location,
+        updateLocation
+      });
+
+      // --------- in the injector component ------------ //
+      import { inject } from 'vue';
+
+      const { location, updateLocation } = inject('location');
+
+      updateLocation();
+      ```
+
+    - Example in Vue 2
+
+      ```js
+      // --------- in the provider component ------------ //
+      data() {
+        return {
+          location: 'North Pole',
+        };
+      },
+      methods: {
+        updateLocation() {
+          this.location = 'South Pole';
+        }
+      },
+
+      provide() {
+        return {
+          location: this.location, // this might not work as expected because the value is not reactive, try this;
+          location: ref(this.location), // or:
+          location: () => this.location,
+
+          updateLocation: this.updateLocation
+        };
+      }
+
+      // --------- in the injector component ------------ //
+      inject: ['location', 'updateLocation'],
+
+      created() {
+        this.updateLocation();
+      }
+      ```
+
+- **Note**: You can wrap the provided value with `readonly` to prevent the injected component from mutating the value.
+
+  - With `readonly`, the injected component will not be able to mutate the value directly, but it can still call functions that mutate the value.
+
+    ```js
+    provide('location', {
+      location: readonly(location),
+      updateLocation
+    });
+
+    // in the injector component
+    const { location, updateLocation } = inject('location');
+
+    // This will throw an error because the value is read-only ❌
+    location.value = 'South Pole';
+    // This will work
+    updateLocation();
+    ```
+
+  - without `readonly`, the injected component can mutate the value directly
+
+    ```js
+    provide('location', {
+      location,
+      updateLocation
+    });
+
+    // in the injector component
+    const { location, updateLocation } = inject('location');
+
+    // This will work (side effect -> not recommended) ❌
+    location.value = 'South Pole';
+    // This will work
+    updateLocation();
+    ```
+
+#### Working with symbol keys in Provide / Inject (Injection keys)
+
+When we work in a large application, we may want to avoid key name conflicts when using provide / inject. We can use `Symbol` keys to avoid this issue.
+
+> **Symbols** were introduced in ES6, They are unique and immutable data types that can be used as object keys. They are guaranteed to be unique, even if they have the same value. which will **prevent collisions** with other keys.
+>
+> ```js
+> Symbol('foo') === Symbol('foo'); // false
+> ```
+
+- In the first example, you’ve seen using a string key is a simple way to declare the injection keys for a dependency. However, there are a few things you should adhere to here.
+
+  - Using inline strings will not scale well, as a single **typo** will either cause the app to run incorrectly or simply crash it.
+
+    ```js
+    // ❌ OOps!
+    provide('AUTH_USR', ctx);
+    ```
+
+  - So do yourself a favor and declare a root `injectionKeys.js` file that contains all the injection keys you use in your app and prevent the usage of inline key values. Then whenever you need them you will have to import them, which ensures that all the developers in your team don’t get a key name wrong and thus will ensure everything is injected/provided correctly.
+
+    ```js
+    // injectionKeys.js
+    export const AUTH_USER_KEY = 'Authenticated User';
+    export const CART_KEY = 'User Cart';
+    ```
+
+  - Another problem is when you use more injections, you will have to create more keys and you will need to make sure each has a truly unique value. This can be a non-issue for you but if you have around 100 injections in your app you can fall into that problem easily. That's where `Symbol` keys come in.
+
+- For superior namespacing, we encapsulate providers' identities using Symbol-based keys. This adds an extra layer of protection by reducing the risk of naming conflicts between independent modules or libraries. It is pivotal for library authors to export these symbols in a dedicated file, making it easier for consumers to import and reuse them across their application.
+
+  - This is especially useful when we are working with third-party libraries or plugins that may use the same key names as our application.
+  - It's recommended to place the injection key in a separate file so that it can be imported in multiple components.
+
+- **Example**:
+
+  - Vue 2
+
+    ```js
+    // --------- keys.js ------------ //
+    export const locationKey = Symbol();
+
+    // --------- in the provider component ------------ //
+    import { locationKey } from './keys';
+
+    // ...
+    provide() {
+      return {
+        [locationKey]: this.location,
+      };
+    }
+    ```
+
+  - Vue 3
+
+    ```js
+    // --------- keys.js ------------ //
+    export const locationKey = Symbol();
+
+    // --------- in the provider component ------------ //
+    import { provide } from 'vue';
+    import { locationKey } from './keys';
+
+    const location = ref('North Pole');
+    provide(locationKey, location);
+
+    // --------- in the injector component ------------ //
+    import { inject } from 'vue';
+    import { locationKey } from './keys';
+
+    const location = inject(locationKey);
+    ```
+
+  - Another way would be to use upper-case strings as keys (similar to action types in Vuex) to avoid key name conflicts.
+
+- **Advantages**:
+  - The advantage of this approach is that the keys are guaranteed to be unique, thus the consumer components won't accidentally inject the wrong data due to duplicate naming. However, this can introduce a certain level of opaqueness since symbols are not as explicit and searchable as strings are. Symbols also cannot be enumerated over (as in a for…in loop), which can be a disadvantage for debugging purposes.
+  - It also makes the code more readable and maintainable, as the keys are defined in a separate file and can be imported in multiple components.
+- **Disadvantages**:
+
+  - The main disadvantage of using `Symbol` keys is that they are not human-readable, which can make it difficult to understand the purpose of the key when reading the code.
+
+    > In the realm of performance, memory, and complexity, the differences between symbols and strings are usually negligible in the context of Vue's provide/inject pattern. The main consideration should be readability and maintainability. While symbols furnish a level of protection and namespacing, they can abstract away the nature of what is being provided, leading to a steeper learning curve for new developers on the project.
+
+  - Another disadvantage is that `Symbol` keys are not enumerable, which means that they cannot be accessed using `Object.keys()` or `for...in` loops.
+  - also it can make debugging more difficult, as the keys are not easily visible in the code.
+
+#### Employing Provide/Inject Pattern with Composition API
+
+Employing the provide/inject pattern with the Composition API is a powerful way to manage shared state and dependencies across components. By providing reactive state and functions to child components, you can create a more flexible and maintainable architecture for your Vue.js applications.
+
+- This pattern's efficacy shines in complex scenarios, such as providing a function to modify the state encapsulated behind the reactive references. This modularizes state manipulation logic, preserving encapsulation and enhancing readability.
+
+  > **modularizes state manipulation logic**: by providing a function to modify the state encapsulated behind the reactive references. This modularizes state manipulation logic, preserving encapsulation and enhancing readability, meaning that the state is only modified in one place, making it easier to maintain and debug.
+
+  ```js
+  // ------------- context.js ------------ //
+  import { provide, reactive } from 'vue';
+
+  function useSharedState() {
+    const state = reactive({
+      message: 'Hello, Vue!',
+      count: 0
+    });
+
+    function increment() {
+      state.count++;
+    }
+
+    provide('sharedState', {
+      state,
+      increment
+    });
+
+    return { state, increment };
   }
-};
-```
+
+  // ------------- in the parent component ------------ //
+  import { useSharedState } from './context';
+
+  export default {
+    setup() {
+      useSharedState();
+    }
+  };
+
+  // ------------- in the child component ------------ //
+  import { inject } from 'vue';
+
+  export default {
+    setup() {
+      const { state, increment } = inject('sharedState');
+
+      return { state, increment };
+    }
+  };
+  ```
+
+- To further optimize this pattern, `computed` properties are introduced to encapsulate derived state, fortifying efficient data consumption. For example, a computed property could provide a filtered list based on some reactive search criteria. Upon injecting, components receive a performant reference that **only recalculates when necessary**.
+
+  ```js
+  // ------------- provider component ------------ //
+  import { provide, ref, computed } from 'vue';
+
+  function useStateWithComputed() {
+      const state = reactive({ searchQuery: '', items: [...] });
+      const filteredItems = computed(() =>
+          state.items.filter(item =>
+              item.name.includes(state.searchQuery)
+          )
+      );
+      provide('searchState', { filteredItems });
+  }
+
+  // ------------- consumer component ------------ //
+  import { inject } from 'vue';
+
+  export default {
+      setup() {
+          const { filteredItems } = inject('searchState');
+          return { filteredItems };
+      }
+  };
+  ```
+
+- **Notes:**
+  - Considerations must, however, be given to the structure and size of the provided state. Excessive or improperly managed reactive state can lead to performance bottlenecks. Hence, judicious sculpting of what to provide and what to maintain locally is paramount, ensuring the correct balance between global state management and local state encapsulation. This pattern, when orchestrated with the precision of a seasoned developer, results in a robust and maintainable structure, bolstering the longevity and scalability of complex Vue.js applications
+  - it is very similar to stores but and is also the mechanism that allows you to create your own powerful versions of them. as it allows you to create a store for a specific component or a group of components, and it's more flexible and lightweight than Vuex. and doesn't require explicit store creation or registration as Vuex does.
+  - The idea of having “contexts” that other components can access or change is not new. In the React world, “contexts” are more exposed and used frequently than I would say for the Vue world and usually, it is hidden away by lib authors to manage their complexities and caveats.
+
+#### The Interplay Between Provide/Inject and Larger State Management Patterns
+
+- In the Vue.js 3 ecosystem, while `Vuex` and `Pinia` provide comprehensive solutions for managing global state, the provide/inject pattern offers a more focused and nuanced approach. **It acts as an alternative or an adjunct to these state management libraries by allowing for scoped state management**. This enhances performance by reducing the reactivity scope, thus limiting state change updates to the relevant subtree of components instead of the entire application, as can occur with global stores.
+
+  ```js
+  // ------------- Example with Vuex ------------ //
+  export default {
+    name: 'ProviderComponent',
+    computed: {
+      ...mapState(['sharedState'])
+    },
+    provide() {
+      // Providing sharedState to descendant components
+      return { localSharedState: this.sharedState };
+    }
+  };
+  ```
+
+- The provide/inject pattern becomes especially advantageous when isolated state needs to be managed within a specific area of an application. By handling the state locally, this pattern avoids unnecessary notifications and re-renders that may occur with global state management tools, streamlining performance when only a segment of components requires access to particular pieces of state.
+
+  ```js
+  // ------------- Example with Provide/Inject ------------ //
+  export default {
+    name: 'ProviderComponent',
+    data() {
+      return {
+        localState: {
+          /* ... */
+        }
+      };
+    },
+    provide() {
+      // Providing localState to descendants
+      return { localState: this.localState };
+    }
+    // ... descendant components can now inject localState
+  };
+  ```
+
+- When needing to inject global state or actions into specific areas of a component structure, the provide/inject pattern can seamlessly introduce global dependencies. This enables developers to make pinpointed parts of the global state or certain actions available to a cluster of components without reshaping the overall architecture.
+
+  ```js
+  // ------------- Example integrating Vuex with Provide/Inject ------------ //
+  export default {
+    name: 'ProviderComponent',
+    computed: {
+      ...mapGetters(['globalStateGetter'])
+    },
+    provide() {
+      // Providing access to global state via getter
+      return { globalState: this.globalStateGetter };
+    }
+    // ... descendant components can then inject globalState
+  };
+  ```
+
+  - However, it is critical for developers to carefully select the appropriate scenarios for using provide/inject vis-à-vis global state libraries. The indiscriminate fusion of these mechanisms can add complexity and reduce the transparency of the state management system. The design should aim for child components to remain oblivious to whether their state is locally scoped or globally managed.
+
+- Thoughtfully orchestrating the use of the provide/inject pattern with Vue.js 3’s global state management practices promotes a harmonious and coherent state strategy. When applied with precision, this pattern can coexist with global state, allowing the app to scale gracefully while meeting its specific state management needs.
+
+#### Best Practices and Common Pitfalls with Provide/Inject
+
+- Advantages & Caveats
+
+  - Advantages:
+
+    - Improves code reusability
+    - Eases the unit testing of applications through mocking/stubbing injected dependencies
+    - Reduces boilerplate code because dependencies are initialized by their injector component
+    - Decouples component logic
+    - Makes it easier to extend the application classes
+    - Enhances the configuration of applications
+
+  - Caveats:
+    - Dependency injection in Vue does not support constructor injection. This is a major drawback for developers using class-based components because the constructor will not initialize the component class properties
+    - Many compile-time errors are pushed to runtime because the injected dependencies are not type-checked
+    - With Vue dependency injection, code refactoring can be very tedious because the injected dependencies are not easily discoverable, so it must be well-documented
+    - Vue’s dependency injection is not reactive in Vue 2, which can lead to unexpected behavior when the injected dependencies are reactive
+
+- Best practices:
+  - **Leveraging Default Values and Fallbacks**:
+    - A common oversight when working with the provide/inject pattern is neglecting to define sensible defaults for injected values. This can surface as an issue when a descendant component expects certain data, but the ancestor providing it isn't present or has yet to provide the data. To prevent this pitfall, always provide default values or fallback mechanisms using a factory function or an object with default properties. This ensures that descendant components behave predictably even in the absence of expected data.
+  - **Reactivity Awareness**:
+    - Injected properties within Vue are not reactive by default. This leads to a prevalent mistake where developers assume that any change in the provided data will propagate to the injectors. If your component logic relies upon reactivity, you must utilize constructions like ref or reactive within the provider to establish a reactive link. Without this, updates to the data would not trigger re-rendering in the components that depend on it, leading to inconsistency in the user interface.
+  - **Strategic Employment of Provide/Inject (Avoid overuse)**:
+    - A strategic approach to the use of provide and inject can mitigate inflexibility and cognitive load issues. Best practice entails using this pattern sparsely and primarily in scenarios where it simplifies the component hierarchy by removing unnecessary props or events. Resort to provide/inject when you have a clear use case where multiple descendants, often scattered deep within the component tree, rely on common data or functionality. Otherwise, the overuse can result in a confusing mess where it becomes difficult to track the flow of data and the dependencies between components.
+  - **Debugging and Traceability**:
+    - One of the challenges you might encounter is the traceability of provided/injected data during debugging. Since this pattern abstracts the manual passing of props, it can obfuscate the data's source and understanding the application's flow can become arduous. To maintain the clarity and traceability of your codebase, carefully document the use of provide and inject, clearly stating what is being provided and where it is intended to be injected. Incremental, component-level testing might reveal hidden dependencies that are otherwise difficult to spot in a larger context.
+  - **Optimize Performance and Memory Usage**:
+    - Developers must stay vigilant about the performance and memory implications of their choices with provide/inject. Although it shields the system from prop drilling, indiscriminate use can introduce unnecessary reactivity and dependency **tracking overhead**. Monitor your app's performance and consider the impact of each injected dependency. In some cases, leaning on global state management or embracing more modular component designs is not only favorable but necessary to maintain a performant application. Therefore, evaluate each case on its own merits, ensuring that the trade-offs you make are consciously aligned with the application’s performance and architecture ideals.
+  - **Use vue devtools to debug provide/inject**:
+    - Vue Devtools is a powerful tool that can help you debug provide/inject relationships in your Vue application. You can inspect the provide/inject bindings of a component and see which values are being provided and injected. This can help you identify issues with your provide/inject setup and ensure that the correct values are being passed down the component tree.
+  - **Document data flow**:
+    - When using provide/inject, it's important to document the data flow in your application. This includes documenting which values are provided by which components, and which components are injecting those values.
+    - By documenting the data flow, you can ensure that other developers working on the application understand how the data is passed between components and how it is used in different parts of the application.
+
+#### Use Cases for Provide/Inject
+
+- **Theme Configuration**:
+
+  - You can provide global settings, themes, or configuration options at the root level of your Vue.js application and inject them into any component that needs them.
+
+- **User Authentication**:
+
+  - Share user authentication information, such as user details or authentication tokens, with components that require them without passing them down through props.
+
+- **Localization / Internationalization**:
+
+  - Store translation data at the root level and inject it into components that need to display text in different languages.
+  - why not use Vuex for this?
+    - Vuex is a state management library that is designed to manage the state of an entire application. It is not designed to manage the state of individual components. If you only need to manage the state of a single component or a few related components, using the provide/inject pattern is a more lightweight and flexible solution.
+
+- **API Configuration**:
+
+  - API configuration is another use case for provide/inject. By providing an API object at the root of the application, you can inject it into any component that needs to make API calls. This allows you to easily switch between different API endpoints or authentication tokens by updating the API object at the root level.
+
+    ```js
+    // in the provider component
+    provide('api', {
+      baseUrl: 'https://api.example.com',
+      token: '1234'
+    });
+
+    // in the consumer component
+    const { baseUrl, token } = inject('api');
+    ```
+
+- **Dark Mode**:
+
+  - Dark mode is another common use case for provide/inject. By providing a dark mode flag at the root of the application, you can inject it into any component that needs to toggle between light and dark mode. This allows you to easily switch between light and dark mode by updating the dark mode flag at the root level.
+
+- **Websockets**:
+
+  - Websockets are another use case for provide/inject. By providing a websocket object at the root of the application, you can inject it into any component that needs to establish a websocket connection. This allows you to easily manage websocket connections across multiple components by updating the websocket object at the root level.
+  - But actually this is not a good use case for provide/inject, because websockets are usually managed at the application level and not at the component level. In this case, it would be better to use a global state management library like Vuex to manage the websocket connection.
+  - But in some cases, you may want to manage the websocket connection at the component level, for example if you have a chat component that needs to establish a websocket connection. and you have **translating logic** in the parent component and you want to pass it to the child component, you can use provide/inject in combination with a global state management library like Vuex to manage the websocket connection at the component level.
+
+- **Form validation messages**:
+
+  - If we have a form component that contains multiple smaller components (like input fields, checkboxes, etc.), we can provide the form validation messages at the root level and inject them into the smaller components that need to display the validation messages.
+    - This is different from the local validation of each input field, as it's a global validation message resulted by tightly coupling the form fields together. thus, it's better to be provided at the root level.
+
+- **Watching for changes in the parent component**:
+
+  - This is one of the patterns that I see a lot in the Vue.js community. When you have a parent component that needs to watch for changes in its children, you can use either:
+
+    - provide/inject to pass a function from the parent to the children that allows the children to notify the parent when something changes.
+
+      ```js
+      // in the parent component
+      provide('notifyChange', () => {
+        console.log('Something changed in the child component');
+      });
+
+      // in the child component
+      const notifyChange = inject('notifyChange');
+      notifyChange();
+      ```
+
+    - use a watcher in the consumer component to watch for changes in the injected value.
+
+      ```js
+      // in the parent component
+      provide('isProcessingReady', isProcessingReady);
+
+      // in the child component
+      const isProcessingReady = inject('isProcessingReady');
+      watch(isProcessingReady, (newValue, oldValue) => {
+        if (newValue) {
+          console.log('Processing is ready');
+          // do something when the processing (e.g. decode data or extract zip file) is ready and we have all the data needed ✅
+        }
+      });
+      ```
+
+      - Personally, I like this pattern because it allows you to keep the logic for watching for changes in the parent component, and the child component doesn't need to know about it. It only needs to be notified when something changes (which will be handled by the parent component). I think this was discussed in the "watchers" episode.
+
+- **Library Development**:
+
+  - Library authors use provide/inject all the time to pass complex contextual information around their components and composition functions. But in contrast to props, they can pass those dependencies without you “the consumer” noticing. Meaning they are invisible to you and it abstracts away the pain of forcing you “the consumer” to pass these dependencies around.
+    - Ex: [vee-validate](https://vee-validate.logaretm.com/v4/) library passes something called `FormContext` to all of its fields. This allows all input fields to be associated automatically with the form without you having to pass it around every single one.
+
+- **When data is expected to be available, like in compound components**:
+
+  - **Compound components** are components that are designed to be used together (tightly-coupled components), and they often rely on each other to function correctly. In this case, it's better to use provide/inject to pass data between the components, rather than passing the data through props.
+    - Here the children components only work inside the parent component, and they are not designed to be used outside the parent component, so it's better to use provide/inject to pass data between the components.
+  - Ex: [Vue Formulate](https://vueformulate.com/) is a good example of a library that uses the provide/inject pattern to pass data between the form and its fields.
+
+#### Helpful packages for Provide/Inject
+
+Most of these packages are used to enhance the provide/inject pattern in Vue.js by adding additional features like **reactivity**, type checking, and more.
+
+- [vue-reactive-provide](https://github.com/LinusBorg/vue-reactive-provide)
+  - While Vue's native provide implemention is very useful on its own, if you're like me you quickly found that the lack of reactivity limits it in many situations.
+  - So, this package provides a simple wrapper around Vue's provide function that makes the provided values reactive.
+- [convext](https://github.com/fimion/convext)
+  - This package creates mixins for dependency injection in Vue js components. Other ContextAPI attempt to mimic the original functionality. This module attempts to leverage the Provide/Inject api of Vue and creates Mixins so you can quickly add reactive data to your Vue app.
 
 ---
 
@@ -1977,8 +2628,7 @@ When dealing with forms on the frontend, we often need to sync the state of form
         :id="organization"
         v-model="selectedOrganizations"
         :value="organization"
-        type="checkbox"
-      />
+        type="checkbox" />
       ```
 
 - single checkbox ex: `confirm to terms` -> `true/false`
@@ -2133,7 +2783,7 @@ vue add <name of the plugin>
 common scenarios where plugins are useful include:
 
 - Register one or more global components or custom directives with `app.component()` and `app.directive()`.
-- Make a resource injectable throughout the app by calling `app.provide()`. --> [provide / inject](#provide--inject)
+- Make a resource injectable throughout the app by calling `app.provide()`. --> [provide / inject](#provide--inject-dependency-injection)
 - Add some global instance properties or methods by attaching them to `app.config.globalProperties`.
 
   - EX: `$translate` function will take a string such as greetings.hello, look inside the user provided configuration and return the translated value.
@@ -2161,11 +2811,47 @@ common scenarios where plugins are useful include:
         hello: 'Bonjour!'
       }
     });
+
+
+    // in a component
+    export default {
+      created() {
+        console.log(this.$translate('greetings.hello')); // Bonjour!
+      }
+    };
     ```
 
 - A library that needs to perform some combination of the above (e.g. **vue-router**).
 
 > More on Plugins here -> [How to build your own VUE PLUGINS](https://www.youtube.com/watch?v=ar1fJECxbyU)
+
+#### Provide / Inject with Plugins
+
+- Plugins can also use `provide` and `inject` to make a value available to all components in the app.
+
+  ```js
+  // plugins/myPlugin.js
+  export default {
+    install(app, options) {
+      app.provide('myPlugin', options);
+    }
+  };
+
+  // main.js
+  import myPlugin from './plugins/myPlugin';
+
+  app.use(myPlugin, { someValue: 'Hello!' });
+
+  // in a component
+  export default {
+    inject: ['myPlugin'],
+    created() {
+      console.log(this.myPlugin.someValue); // Hello!
+    }
+  };
+  ```
+
+- This allows us to inject the plugin's `options` into any component in the app.
 
 ---
 

@@ -4,6 +4,7 @@
   - [Web Dev Fundamentals](#web-dev-fundamentals)
     - [How web development works (High level overview)](#how-web-development-works-high-level-overview)
     - [Static vs Dynamic websites](#static-vs-dynamic-websites)
+    - [What happens when we access a web server?](#what-happens-when-we-access-a-web-server)
     - [Building Good Websites](#building-good-websites)
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
@@ -52,6 +53,37 @@
 - **Dynamic websites** are websites that are dynamically generated on the server. They usually use a database to store the data and the files are generated on the server before sending them to the browser.
   ![Dynamic](./img/dynamic-websites.png)
   - Here, the server processes the files before sending them
+
+---
+
+### What happens when we access a web server?
+
+This is what happens when we access a webpage or accessing a wep API:
+![how web API works](./img/how-web-api-works.png)
+
+1. **URL Access**: User types a URL (e.g., `https://www.google.com/maps`).
+
+   - **DNS Lookup**: Converts domain to server address via ISP (e.g., `https://216.58.211.206:443`).
+   - **Port**: Identifies specific service on the server.
+
+2. **TCP/IP Connection**: Established between browser and server.
+
+   - **TCP**: Breaks data into packets for transmission and reassembles them at the destination.
+   - **IP**: Routes packets to ensure they reach the destination.
+
+3. **HTTP Request**: Sent by the browser to the server.
+
+   - **HTTP**: Protocol for client-server communication via requests and responses.
+   - The request includes the method (e.g., `GET`, `POST`), path, headers and body (only for `POST` requests).
+
+4. **HTTP Response**: Server sends data back to the browser.
+
+   - It includes the status code (e.g., `200 OK`, `404 Not Found`), headers and body.
+
+5. **Request/Response Cycle**: Multiple requests for assets (e.g., `js`, `css`, `img`) are made.
+   - Browser makes new HTTP requests for each asset/file
+   - Limited simultaneous requests to avoid slowing down the connection.
+   - Files are rendered once all assets are received.
 
 ---
 

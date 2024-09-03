@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Vue](#vue)
     - [Props](#props)
+    - [Typing Provide / Inject](#typing-provide--inject)
   - [Mock functions in Tests](#mock-functions-in-tests)
   - [Testing Vuex](#testing-vuex)
     - [Mutations](#mutations)
@@ -49,6 +50,94 @@ export default {
   }
 };
 ```
+
+---
+
+### Typing Provide / Inject
+
+> Using provide/inject in your production app automatically forces you to use TypeScript. You and your teammates won’t memorize what each injection will give you.
+
+- Problems of not using Typescript with provide/inject:
+
+  - Let's say your teammates worked on the user cart feature, and just added it to the project. You are using JavaScript in that project. You want to use that injection to display the product count. For example:
+
+    ```vue
+    <template>
+      <p>You have {{ cart.items.length }} in your cart</p>
+    </template>
+    <script setup>
+    import { inject } from 'vue';
+    import { USER_CART_KEY } from '@/injectionKeys';
+    const cart = inject(USER_CART_KEY);
+    // does `cart.items` actually exist?
+    // what if the injected user cart is the array itself?
+    </script>
+    ```
+
+    - Even though you are using constant keys to refer to your injection, it has 0 information about the injection value itself. It can be anything.
+    - So you will be forced to hunt down the `provide(USER_CART, ...)` line in your codebase to figure out what is being injected. From a productivity concern, this is a nightmare and If you plan to use them a lot in your project it will backfire and waste a lot of your time figuring stuff out. Honestly, if you want to use injections in your project use TypeScript or don’t use them.
+
+- So how to use TypeScript with injections?
+
+  - Vue exposes a type called `InjectionKey<TValue>` which magically lets `provide/inject` infer and check the type of the values passed around. Here is a simple example:
+
+    ```ts
+    // types.ts
+    interface UserCartContext {
+      items: CartItem[];
+      total: number;
+    }
+    // injectionKeys.ts
+    import { InjectionKey } from 'vue';
+    import { UserCartContext } from '@/types';
+    const CART_KEY: InjectionKey<UserCartContext> = Symbol('User Cart Context');
+    ```
+
+  - This will give you type checks at both the provide and inject levels, which is not something you should give up.
+
+    ```ts
+    import { provide, inject, reactive } from 'vue';
+    import { CART_KEY } from '@/injectionKeys';
+    // ❌ Type Error
+    provide(CART_KEY, {});
+    const cart = reactive({ items: [], total: 0 });
+    // ✅
+    provide(CART_KEY, cart);
+    
+    const cart = inject(CART_KEY);
+    // ❌ Type Error
+    cart?.map(...);
+    // ✅
+    cart?.items.map(...)
+    ```
+
+- Provide and inject are usually performed in separate components. To properly type injected values, Vue provides an `InjectionKey` interface, which is a generic type that extends `Symbol`. It can be used to sync the type of the injected value between the provider and the consumer:
+
+  ```ts
+  import { provide, inject } from 'vue';
+  import type { InjectionKey } from 'vue';
+
+  const key = Symbol() as InjectionKey<string>;
+
+  provide(key, 'foo'); // providing non-string value will result in error ⚠️
+
+  const foo = inject(key); // type of foo: string | undefined
+  ```
+
+- When using string injection keys, the type of the injected value will be unknown, and needs to be explicitly declared via a `generic` type argument:
+
+  ```ts
+  const foo = inject < string > 'foo'; // type: string | undefined
+
+  // and with a default value will only be string
+  const foo = inject<string>('foo', 'default'); // type: string
+  ```
+
+- If you are sure that the value is always provided, you can also force **cast** the value:
+
+  ```ts
+  const foo = inject('foo') as string;
+  ```
 
 ---
 

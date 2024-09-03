@@ -5,8 +5,9 @@
     - [OOP Principles](#oop-principles)
   - [Object](#object)
     - [Object / Accessor properties](#object--accessor-properties)
-      - [Smarter getters/setters](#smarter-getterssetters)
+    - [Smarter getters/setters](#smarter-getterssetters)
   - [Prototypes (OOP in Javascript)](#prototypes-oop-in-javascript)
+    - [How Prototypal Inheritance Works](#how-prototypal-inheritance-works)
     - [Why we do this?](#why-we-do-this)
     - [Functions Prototype](#functions-prototype)
     - [Native (Default) Prototypes](#native-default-prototypes)
@@ -20,6 +21,7 @@
     - [Using `Constructor / Factory Function` (OLD)](#using-constructor--factory-function-old)
     - [Using `new` keyword (OLD)](#using-new-keyword-old)
     - [Using `ES6 Classes` (NEW)](#using-es6-classes-new)
+    - [Using `Object.create()`](#using-objectcreate)
     - [Mixins](#mixins)
   - [Class Fields](#class-fields)
     - [Static Methods and Properties](#static-methods-and-properties)
@@ -33,38 +35,46 @@
 
 ## Object Oriented Paradigm
 
-> The word **Paradigm** means an approach to to something in an organized way with clear structure
+> **Paradigm**: An organized approach with clear structure.
 
-- **OOP Paradigm** is a replacement of "procedural paradigm" by making each different thing in an object and then using it as a whole.
-  - This paradigm is developed to organize the code and make it:
-    - More readable and maintainable (Solution to "Spaghetti Code")
-    - Easy to add features and functionality
-    - Performant and scalable (efficient in memory)
-  - By doing this, we **organize** our code to prevent complexity and to make it more readable and maintainable -> **By encapsulating the data and the methods that work on the data into a single unit called an object**.
-- In `OOP`, objects are self-contained pieces/blocks of code and data.
+- **OOP Paradigm** replaces the "procedural paradigm" by encapsulating data and methods into objects.
+  - Benefits:
+    - More readable and maintainable code
+    - Easier to add features
+    - Efficient in memory usage (be)
+- Objects are **self-contained** units of code and data.
 
-  - Objects are the building blocks of `OOP` applications and they interact with one another.
-  - Objects store functions with their associated data (properties).
-  - Interactions happen through public interfaces that are exposed by the objects.
+  - They're the building blocks of OOP applications.
+  - They interact through public interfaces.
+
+- **Class**: A blueprint for objects. It describes the properties and methods that objects created from it will have.
+  ![class](./img/class-1.png)
 
 ### OOP Principles
 
-- In order to design an `OOP` application using `classes`, we need to follow these 4 principles:
+To design an `OOP` application using `classes`, follow these 4 principles:
 
-  - **Abstraction**
-    - ignore or hide details that don't matter, allowing us to get an overview perspective of the thing we're implementing, instead of messing with details that don't really matter to our implementation.
-      ![Abstraction](./img/oop-1.png)
-  - **Encapsulation**
-    - keep some properties and methods `private` inside the class, so that they are not accessible from outside the class. Other code can only access what we expose in the public interface (API).
-      ![Encapsulation](./img/oop-2.png)
-  - **Inheritance**
-    - make all properties and methods of a certain class available to a child class, forming a hierarchical relationship between classes. This allows us to reuse common logic and to model real-world relationships.
-      ![Inheritance](./img/oop-3.png)
-  - **Polymorphism**
-    - a child class can **overwrite** a method it inherited from a parent class.
-      ![Polymorphism](./img/oop-4.png)
+- **Abstraction**
+  - Hide unnecessary details to focus on the big picture.
+    ![Abstraction](./img/oop-1.png)
+- **Encapsulation**
 
-- Javascript object oriented way is very different from other OOP languages as in the background javascript is actually **faking** the implementation as **Javascript is a prototypal-language and not object-oriented-language**
+  - Keep some properties and methods `private` within the class, exposing only the public interface (API).
+    ![Encapsulation](./img/oop-2.png)
+
+- **Inheritance**
+
+  - Allow a child class to inherit properties and methods from a parent class, enabling code-reuse and modeling real-world relationships.
+    ![Inheritance](./img/oop-3.png)
+
+- **Polymorphism**
+
+  - Enable a child class to override methods inherited from a parent class.
+    ![Polymorphism](./img/oop-4.png)
+
+> JavaScript's OOP approach differs from other languages as it uses prototypal inheritance rather than classical inheritance.
+>
+> ![OOP](./img/oop-5.png)
 
 ---
 
@@ -141,7 +151,12 @@
     alert(user.fullName); // Alice Cooper
     ```
 
-#### Smarter getters/setters
+- Note:
+  - What will happen if you use the `fullName` setter to add a new object property also called `fullName`?
+    - It will cause an infinite loop, because `this.fullName = value` will call the setter again and again.
+    - To fix this issue, we can use another variable name, e.g. `this._fullName = value`.
+
+### Smarter getters/setters
 
 `Getters`/`setters` can be used as wrappers over “real” property values to **gain more control** over operations with them.
 
@@ -175,44 +190,59 @@ user.name = ''; // Name is too short...
 
 ## Prototypes (OOP in Javascript)
 
+### How Prototypal Inheritance Works
+
 Each object has a `prototype`, which contains **methods** and **properties** that are **shared** among all instances of that object.
+![prototype](./img/prototypal-inheritance-1.png)
 
 - `Objects` are linked to a `prototype` object -> "Prototypal Inheritance / Delegation"
-  ![prototype](./img/prototype.png)
+
   ![prototype](./img/protoType%20chain.PNG)
+
+  - The top of the chain is `null`, which means that the chain ends there.
+  - The one before the top is `Object.prototype`, which is the default prototype for all objects. because all things in javascript are objects.
+
 - Ways to implement `prototypal inheritance` in Javascript:
 
-  - `Constructor Functions`
-  - `ES6 Classes`
-  - `Object.create()`
+  - [Constructor Functions](#constructor-function)
+  - [ES6 Classes](#es6-classes)
+  - [Object.create()](#objectcreate)
 
-- In JavaScript, each (`constructor-function`/`class`) has a special hidden property `[[Prototype]]` that is shared by every instance of the `constructor`/`class`, that is either `null` or references another object. That object is called “a prototype”
+- In JavaScript, each `constructor-function`/`class` has a hidden `[[Prototype]]` property shared by all instances, referencing another object or `null`.
 
-  - The property `[[Prototype]]` is internal and hidden, but there are many ways to set it:
+  - `[[Prototype]]` is internal and hidden but can be set using `__proto__`:
 
-    - One of them is to use the special name `__proto__`, which is a "setter" for the `[[prototype]]` object
+    ```js
+    rabbit.__proto__ = animal; // sets rabbit.[[Prototype]] = animal
+    ```
 
-      ```js
-      rabbit.__proto__ = animal; // sets rabbit.[[Prototype]] = animal
-      ```
+    - It's advised to use `Object.getPrototypeOf`/`Object.setPrototypeOf` instead of `__proto__`. -> it can be `null` or an `object`.
+    - It's added by browsers for easier prototype access.
 
-- **Notes**
+- **`"this"` is not affected by prototypes**.
 
-  - The value of `__proto__` can be either an `object` or `null`. Other types are ignored.
-  - `__proto__` is a historical **getter**/**setter** for `[[Prototype]]`
-  - The `__proto__` property is a bit outdated. It exists for historical reasons, modern JavaScript suggests that we should use `Object.getPrototypeOf`/`Object.setPrototypeOf` functions instead that `get`/`set` the prototype.
+  - In a method call, `this` is always the object before the dot, regardless of where the method is found.
+  - Inherited methods modify only the inheriting object's state.
 
-    - `Object.getPrototypeOf(obj)` – returns the `[[Prototype]]` of `obj`.
-    - `Object.setPrototypeOf(obj, proto)` – sets the `[[Prototype]]` of `obj` to `proto`.
+- To add something to the `prototype` of something, we can use the `prototype` property of the `constructor function`.
 
-  - `__proto__` actually is invisible in javascript, it's added by the browser to make it easier to access the prototype of an object (debugging).
-    - That's one of the reasons why when we want to add things to the prototype of an object, we don't use `__proto__` instead we use `Object.getPrototypeOf`/`Object.setPrototypeOf` functions.
-  - The `for..in` loop iterates over both its own and its inherited properties. All other key/value-getting methods only operate on the object itself.
+  ```js
+  function Rabbit() {}
 
-- **`"this"` is not affected by prototypes at all**.
+  // Replace the default Rabbit.prototype
+  Rabbit.prototype = {
+    jumps: true
+  };
 
-  - No matter where the method is found: in an object or its prototype. In a method call, `this` is always the object before the dot.
-  - so, when the inheriting objects run the inherited methods, they will modify only their own states, not the state of the big object.
+  // --------------- or --------------- //
+
+  // Add to the existing one
+  Rabbit.prototype.jumps = true;
+
+  // now all rabbits can jump
+  let rabbit = new Rabbit();
+  alert(rabbit.jumps); // true
+  ```
 
 ---
 
@@ -291,7 +321,7 @@ why we do this instead of declaring the function with the class properties each 
 
 ## Constructor Function
 
-That's the main purpose of constructors – to implement reusable object creation code.
+It's a function that creates an object type, and prepares the object for use. which implements a reusable object creation code.
 
 - Usually, constructors do not have a `return` statement. Their task is to write all necessary stuff into `this`, and it automatically becomes the result. But if there is a `return` statement, then:
 
@@ -312,21 +342,28 @@ That's the main purpose of constructors – to implement reusable object creatio
   - So, we can add properties to the function itself.
   - This is the most important part of the `constructor function` because we can add methods to the `prototype` of the `constructor function` and then all objects created from that `constructor function` will inherit those methods.
 
+- This is how build-in objects like `Array`, `Map` or `Set` are actually implemented
+- This only works with functions created with the `function` keyword, not with arrow functions (because arrow functions don't have their own `this` keyword)
+
 ---
 
 ### The "`new`" keyword
 
 It's a keyword that automates the hard work (process of creating an object and linking it to the `prototype` of the `constructor function`).
 
-- When a function is executed with **`new`** keyword, it does the following steps:
+![new-keyword](./img/new-keyword.png)
 
-  - Creating a new empty object and assigning it to `this` keyword.
-  - creating a new hidden property `__proto__` and setting it to the `prototype` property of the `constructor function`.
-  - The function body executes. Usually it modifies `this`, adds new properties to it.
-  - The value of `this` is returned. (The new object is returned)
-  - All is that is possible because (functions in JS are both **function & objects combo**)
-    ![new-keyword](./img/new-keyword-1.png)
-    - That's why we can use the "dot notation" to add properties to the function (constructor function) and also to the object created from it.
+- When a function is executed with **`new`** keyword, it does the following **steps**:
+
+  - 1️⃣ Creating a new empty object and assigning it to `this` keyword.
+  - 2️⃣ creating a new hidden property `__proto__` and setting it to the `prototype` property of the `constructor function`.
+  - 3️⃣ The function body executes. Usually it modifies `this`, adds new properties to it.
+  - 4️⃣ The value of `this` is returned. (The new object is returned)
+
+- All is that is possible because (functions in JS are both **function & objects combo**)
+  ![new-keyword](./img/new-keyword-1.png)
+
+  - That's why we can use the "dot notation" to add properties to the function (constructor function) and also to the object created from it.
 
 - So, the `new` keyword behind the scenes does all the prototype stuff for us.
 
@@ -355,12 +392,13 @@ It's a keyword that automates the hard work (process of creating an object and l
   }
 
   User.prototype.sayHello = function () {
-    console.log('Hello!');
+    console.log('Hello!' + this.name);
   };
 
   const user1 = new User('Phil');
-  user1.sayHello();
+  user1.sayHello(); // Hello! Phil
 
+  // --------- Steps behind the scenes --------- //
   // the `new` keyword does the following:
   // 1. create a new function + an empty object with the hidden property (prototype)
   // 2. assign the new object to the (`this`) keyword
@@ -405,9 +443,9 @@ It's a keyword that automates the hard work (process of creating an object and l
 
 ### Constructor function methods
 
-- **You should never create a method inside of a constructor function**.
-  - That's because imagine we were gonna create a hundred of instants using this constructor function, Then what would happen, is that each of these objects would carry around this function here. So we would essentially create a hundred copies of this function. This is bad for performance
-- instead use `prototypal inheritance`
+- **⚠️ You should never create a method inside of a constructor function**.
+  - Creating methods inside constructors leads to multiple copies of the method for each instance, which is bad for performance.
+- **Use prototypal inheritance instead**:
 
   ```js
   function Person(firstName, birthYear) {
@@ -430,21 +468,19 @@ It's a keyword that automates the hard work (process of creating an object and l
   jonas.calcAge(); // 46
   ```
 
-- **IMPORTANT:** Avoiding duplication with Prototype
-
-  - Here, notice that it says that you shouldn't create a method inside of a constructor function, but instead you should use `prototypal inheritance` to add methods to the prototype of the constructor function.
-
-    - **Why?** because if we create a method inside of a constructor function, then that method will be attached to each object that we create using that constructor function. So, if we create a hundred objects using that constructor function, then we would essentially create a hundred copies of that method in memory. This is bad for performance.
-
-  - Instead, we should use `prototypal inheritance` to add methods to the prototype of the constructor function. This way, all objects created using that constructor function will inherit the method from the `prototype`. So, we only have one copy of the method that is shared among all objects created using that constructor function.
-    - summary: store the `calcAge` function in just one object and have the interpreter (if it doesn't find the function on `jonas` object) look up the `prototype chain` to find the function.
+- **Why?** because if we create a method inside of a constructor function, then that method will be attached to each object that we create using that constructor function. So, if we create a hundred objects using that constructor function, then we would essentially create a hundred copies of that method in memory. This is bad for performance.
+- **Use** prototypal inheritance to add methods to the constructor's prototype.
+  - This ensures only one copy of the method is shared among all instances.
 
 ---
 
 ## `object.create()`
 
-It's another way to create objects in JS, it's a bit more modern than using `new` keyword with `constructor functions`.
+It's another way to implement prototypal inheritance in JavaScript. It's a bit more modern than using `new` keyword with `constructor functions`.
 
+![object.create](./img/object-create.png)
+
+- It's the easiest and most straightforward way to link an object to a prototype object.
 - It works by passing in an object that will be the `prototype` of the new object that we create.
 - So, It enables us to create `prototypes` from other objects.
 
@@ -465,6 +501,7 @@ const PersonProto = {
 // method-1
 // make (PersonProto) to be the prototype of (steven)
 const steven = Object.create(PersonProto);
+console.log(steven.__proto__ === PersonProto); // true
 steven.name = 'Steven';
 steven.birthYear = 2002;
 steven.calcAge();
@@ -488,9 +525,11 @@ sarah.calcAge();
 
 > In object-oriented programming, a `class` is an extensible program-code-template for creating objects, providing initial values for state (member variables) and implementations of behavior (member functions or methods).
 
+It's a modern alternative to `constructor functions` syntax. which is more readable and easier to understand. (It doesn't behave like classes in other languages)
+
 ![class](./img/es6-class.png)
 
-- The problem with the previous way of creating objects using `constructor functions` is that we're writing our shared methods separately from the constructor function, and then we're manually adding them to the prototype of the constructor function. Other languages let us do this all in one place, and that's what `classes` in JavaScript are all about.
+- The problem with [the previous way of creating objects using constructor functions](#constructor-function) is that we're writing our shared methods separately from the constructor function, and then we're manually adding them to the prototype of the constructor function. Other languages let us do this all in one place, and that's what `classes` in JavaScript are all about.
   ![class](./img/es6-class-1.png)
   - Both are the same under the hood, but the `class` syntax is just a more modern and cleaner way to work with `prototypal inheritance` in JavaScript.
 - ES6 classes are just a new way to write `constructor functions` and `prototypal inheritance` in JavaScript. **(Syntactic sugar)**
@@ -569,7 +608,7 @@ sarah.calcAge();
 
     - Class methods are non-enumerable. A class definition sets `enumerable` flag to `false` for all methods in the "prototype".
       - That’s good, because if we `for..in` over an object, we usually don’t want its class methods.
-    - Classes always **use strict**. All code inside the class construct is automatically in strict mode.
+    - Classes are always executed in **strict mode**. All code inside the class construct is automatically in strict mode.
 
   - In JavaScript, a `class` is a kind of (has `type` equal to) **function**.
   - There're no commas between class methods
@@ -648,79 +687,123 @@ They're used to add an extra layer of security to our data, and to do some extra
 
 ## Class Inheritance (Sub-Classing)
 
+It's a way to create a new class that inherits from an existing class.
+
 ### Using `Constructor / Factory Function` (OLD)
 
 Here, inherence works by using the parent's factory function inside the child's factory function. and then linking the prototypes manually.
 
-- parent factory function
+- Complex example with explanation
 
-  ```js
-  // Parent
-  const UserCreator = function (name, score) {
-    const newUser = Object.create(userFunction);
-    newUser.name = name;
-    newUser.score = score;
-    return newUser;
-  };
-  const userFunction = {
-    sayName: function () {
-      console.log("I'm " + this.name);
-    },
-    increment: function () {
-      this.score++;
-    }
-  };
+  - parent factory function
 
-  const user1 = UserCreator('Phil', 5);
-  user1.sayName(); // My name is Phil
-  ```
+    ```js
+    // Parent
+    const UserCreator = function (name, score) {
+      const newUser = Object.create(userFunction);
+      newUser.name = name;
+      newUser.score = score;
+      return newUser;
+    };
 
-  ![inheritance](./img/inheritance-3.png)
+    const userFunction = {
+      sayName: function () {
+        console.log("I'm " + this.name);
+      },
+      increment: function () {
+        this.score++;
+      }
+    };
 
-- child factory function
+    const user1 = UserCreator('Phil', 5);
+    user1.sayName(); // My name is Phil
+    ```
 
-  ```js
-  // Child
-  const PaidUserCreator = function (paidName, paidScore, accountBalance) {
-    // 1. use the parent factory function
-    const newPaidUser = UserCreator(paidName, paidScore);
-    // 2. set the prototype of the new object to the parent object
-    Object.setPrototypeOf(newPaidUser, paidUserFunction);
-    // 3. add new properties to the new object
-    newPaidUser.accountBalance = accountBalance;
-    return newPaidUser;
-  };
-  paidUserFunction = {
-    increaseBalance: function () {
-      this.accountBalance++;
-    }
-  };
-  Object.setPrototypeOf(paidUserFunction, userFunction); // Linking prototypes (manually)
+    ![inheritance](./img/inheritance-3.png)
 
-  const paidUser1 = paidUserCreator('Alyssa', 8, 25);
-  paidUser1.increaseBalance(); // 26 (from paidUserFunction)
-  paidUser1.sayName(); // I'm Alyssa (from userFunctionStore)
-  ```
+  - child factory function
 
-  ![inheritance](./img/inheritance-4.png)
+    ```js
+    // Child
+    const PaidUserCreator = function (paidName, paidScore, accountBalance) {
+      // 1. use the parent factory function
+      const newPaidUser = UserCreator(paidName, paidScore);
+      // 2. set the prototype of the new object to the parent object
+      Object.setPrototypeOf(newPaidUser, paidUserFunction);
+      // 3. add new properties to the new object
+      newPaidUser.accountBalance = accountBalance;
+      return newPaidUser;
+    };
+    paidUserFunction = {
+      increaseBalance: function () {
+        this.accountBalance++;
+      }
+    };
+    Object.setPrototypeOf(paidUserFunction, userFunction); // Linking prototypes (manually)
 
-- Steps:
+    const paidUser1 = paidUserCreator('Alyssa', 8, 25);
+    paidUser1.increaseBalance(); // 26 (from paidUserFunction)
+    paidUser1.sayName(); // I'm Alyssa (from userFunctionStore)
+    ```
 
-  1. use the parent factory function
-  2. set the prototype of the new object to the parent object before adding new properties to the new object or returning it.
-  3. add new properties to the new object
-  4. return the new object
-  5. Linking prototypes (manually) by using `Object.setPrototypeOf()` for the child object's prototype to the parent object's prototype. So that now the child object will inherit the methods from the parent object if it doesn't find the method on itself.
-  6. Now, the child object will inherit the methods from the parent object.
+    ![inheritance](./img/inheritance-4.png)
 
-- These steps and images show how sub-classing works in JavaScript under the hood (low-level). which might be asked in a technical interview. **"Tell me how sub-classing works in JavaScript under the hood?"**
-- This way of sub-classing is not used anymore, instead we use `ES6 classes` to do the same thing.
+  - Steps:
+
+    1. use the parent factory function
+    2. set the prototype of the new object to the parent object before adding new properties to the new object or returning it.
+    3. add new properties to the new object
+    4. return the new object
+    5. Linking prototypes (manually) by using `Object.setPrototypeOf()` for the child object's prototype to the parent object's prototype. So that now the child object will inherit the methods from the parent object if it doesn't find the method on itself.
+    6. Now, the child object will inherit the methods from the parent object.
+
+  - These steps and images show how sub-classing works in JavaScript under the hood (low-level). which might be asked in a technical interview. **"Tell me how sub-classing works in JavaScript under the hood?"**
+
+- **Note:** This way of sub-classing is not used anymore, instead we use `ES6 classes` to do the same thing.
 
 ---
 
 ### Using `new` keyword (OLD)
 
 Here, inheritance works by using the `call` or `apply` methods to call the `Parent` constructor function with the `this` keyword set to the `Child` object.
+
+![inheritance](./img/inheritance-0.png)
+
+- Simple example
+
+  ```js
+  // Parent
+  const Person = function (firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  };
+  Person.prototype.calcAge = function () {
+    console.log(2037 - this.birthYear);
+  };
+
+  // Child
+  const Student = function (firstName, birthYear, course) {
+    Person.call(this, firstName, birthYear); // calling the parent function with setting the "this" keyword to the child object
+    this.course = course;
+  };
+
+  // Linking prototypes
+  Student.prototype = Object.create(Person.prototype);
+
+  // Adding new method to the child object
+  Student.prototype.introduce = function () {
+    console.log(`My name is ${this.firstName} and I study ${this.course}`);
+  };
+
+  // Creating an object from the child object
+  const mike = new Student('Mike', 2020, 'Computer Science');
+  mike.introduce(); // My name is Mike and I study Computer Science
+  ```
+
+  ![inheritance](./img/inheritance-9.png)
+
+  - We use `Object.create()` to manually set the prototype of the `Parent` object to the `Child` prototype, and not to point to the `Parent` prototype directly.
+    ![inheritance](./img/inheritance-1.png)
 
 - We use `new` keyword to create a new object from the `Parent` constructor function and then we use `call` method to call the `Parent` constructor function with the `this` keyword set to the `Child` object.
 
@@ -765,8 +848,6 @@ Here, inheritance works by using the `call` or `apply` methods to call the `Pare
 
 - **Notes:**
 
-  - We use `Object.create()` to manually set the prototype of the `Parent` object to the `Child` prototype.
-    ![inheritance](./img/inheritance-1.png)
   - Here, inheritance works by using the `call` method to call the `Person` constructor function with the `this` keyword set to the `Student` object.
 
     > Remember that `call` and `apply` allow us to manually control what the `this` keyword is in any function.
@@ -774,7 +855,7 @@ Here, inheritance works by using the `call` or `apply` methods to call the `Pare
     ```js
     const Student = function (firstName, birthYear, course) {
       Person.call(this, firstName, birthYear);
-      // here we are not using the (new) word and we are using (Person) as a normal function and not a class
+      // here we are not using the (new) word and we are using (Person) as a normal function and not a class, we just want to call the function and set the (this) keyword to the (Student) object
 
       this.course = course;
     };
@@ -820,6 +901,8 @@ Here, inheritance works by using the `call` or `apply` methods to call the `Pare
 ### Using `ES6 Classes` (NEW)
 
 Here, inheritance works by using the `extends` keyword to set the `__proto__` property of the `Student` class to the `Person` class.
+
+> Behind the scenes, it does the same thing as the previous way of creating objects using constructor functions, but it's just a more modern and cleaner way to work with prototypal inheritance in JavaScript -> **It's just an abstraction over the constructor function way**
 
 - Parent class
 
@@ -879,6 +962,36 @@ Here, inheritance works by using the `extends` keyword to set the `__proto__` pr
 
     - The `extends` keyword is used to create a class as a child of another class.
     - `prototypes` are automatically inherited with the `extends` word.
+
+---
+
+### Using `Object.create()`
+
+Here, inheritance works by using the `Object.create()` method to manually set the `__proto__` property of the Child object to the Parent object.
+
+```js
+// Parent
+const PersonProto = {
+  calcAge() {
+    console.log(2037 - this.birthYear);
+  },
+  init(firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+  }
+};
+
+// Child
+const StudentProto = Object.create(PersonProto);
+StudentProto.init = function (firstName, birthYear, course) {
+  PersonProto.init.call(this, firstName, birthYear);
+  this.course = course;
+};
+
+const jay = Object.create(StudentProto);
+```
+
+![inheritance](./img/inheritance-2.png)
 
 ---
 
@@ -1107,7 +1220,7 @@ class Account {
 
   // 3) Public methods
 
-  // Public interface
+  // Public interface that will call the private method -> API provides access to the private property
   getMovements() {
     return this.#movements;
   }
@@ -1129,6 +1242,10 @@ class Account {
   }
 }
 ```
+
+- **Notes:**
+
+  - In TypeScript, we have class access modifiers like `public`, `private`, and `protected` that are used to control the access to the class members. But in JavaScript, we don't have these access modifiers.
 
 ---
 
@@ -1179,7 +1296,7 @@ account1.deposit(250).withdraw(140);
 
   - Another problem with functions is that they use the `[[Environment]]` property to store the outer lexical environment reference. That’s needed to access outer variables. But here we don’t need it at all.
 
-- if you want a class method to be automatically called when an instance of the class is created, then you should put this method in the constructor function
+- if you want a class method to be automatically called when an instance of the class is created, then you should put this method in the `constructor` function
 
   ```js
   class User {
@@ -1216,3 +1333,23 @@ account1.deposit(250).withdraw(140);
 
 - Values `null` and `undefined` have no object wrappers (are not Objects like other types)
 - the `prototypal` nature of JavaScript means that when an object can't find a property in itself, it will look up the `prototype` chain to see if the property is defined on the object's `prototype`. If it can't find the property in the `prototype` either, it will look up the `prototype` chain again, until it reaches the end of the `prototype` chain. If it still can't find the property, it will return `undefined`.
+
+- When you use event listeners inside a class, you need to bind the `this` keyword to the class instance, because the `this` keyword will point to the element that triggered the event, not the class instance.
+
+  ```js
+  class Counter {
+    constructor() {
+      this.count = 0;
+      this.btn = document.querySelector('button');
+      // this.btn.addEventListener('click', this.increment); // ❌
+      this.btn.addEventListener('click', this.increment.bind(this));
+    }
+
+    increment() {
+      this.count++;
+      console.log(this.count);
+    }
+  }
+
+  new Counter();
+  ```

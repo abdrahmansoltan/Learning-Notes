@@ -23,6 +23,8 @@
     - [How to check if a value is a number?](#how-to-check-if-a-value-is-a-number)
     - [What is a closure?](#what-is-a-closure)
     - [What is the difference between classical and prototypal inheritance?](#what-is-the-difference-between-classical-and-prototypal-inheritance)
+    - [How is it possible to call methods on functions?](#how-is-it-possible-to-call-methods-on-functions)
+    - [Exercise: Refactor a function for improved readability](#exercise-refactor-a-function-for-improved-readability)
 
 ---
 
@@ -408,6 +410,7 @@ let arr = [1, 2, 3, 4];
    ```
 
    - But, this method has some limitations:
+     - ⚠️ It won't store the `prototype` of the object. **(which is important for objects created with `new` keyword or with objects instantiated from a class)**
      - It will not work with functions, `undefined`, or `symbol` properties.
      - It will not work with circular references (an object that references itself).
 
@@ -535,3 +538,87 @@ The difference between classical and prototypal inheritance is how objects inher
 
   - In JavaScript, objects inherit from other objects through the prototype chain. Each object has a prototype object, which acts as a template for the object. When a property or method is accessed on an object, JavaScript looks for it on the object itself, and if it's not found, it looks for it on the object's prototype, and so on up the prototype chain.
   - Prototypal inheritance is more flexible than classical inheritance because objects can inherit from multiple prototypes, and objects can be created dynamically at runtime.
+
+### How is it possible to call methods on functions?
+
+- because functions are objects in JavaScript, they can have properties and methods in the `prototype` object.
+
+### Exercise: Refactor a function for improved readability
+
+- Let’s imagine you found this function below in a very large production codebase. It’s in use in many places. The codebase is well-tested and all of the tests are passing. However, many folks have complained that they don’t understand what this function is doing and they’d like you to refactor it for improved readability. Could you please explain your thought process behind your refactor and share both the process and outcome? We will evaluate your response for clarity, accuracy, and thoroughness. Please limit the time you spend on this to 30 minutes and be sure to select "reply all" when responding.
+
+  ```js
+  function sort(a, ...rest) {
+    const check = Array.isArray;
+    if (typeof a === 'string') {
+      var arr = a.split(',');
+      arr.sort(...rest);
+      return arr;
+    } else if (a === undefined) {
+      return [];
+    } else if (a === null) {
+      return [];
+    } else if (check(a)) {
+      // Original array is not modified.
+      let cpy = a.slice();
+      cpy.sort(...rest);
+      return cpy;
+    }
+  }
+  ```
+
+- Solution:
+
+  - **Step 1:** Identify the purpose of the function and its input/output.
+    - The function `sort` takes an array `a` and optional arguments `rest` and sorts the array based on the optional arguments.
+    - The function first checks if the input `a` is a string, and if so, it splits the string into an array and sorts it.
+    - The function returns the sorted array or an empty array if the input is `undefined`, `null`, or not an array.
+  - **Step 2:** Refactor the function for improved readability.
+
+    - Rename the function to `sortArrayOrString` to better reflect its purpose.
+    - Use more descriptive variable names and remove unnecessary checks.
+    - Simplify the logic and remove redundant code by using early returns and logical operators.
+    - Add comments to explain the purpose of each section of the code.
+    - Handle the case where the input is not a sortable (string or an array) by throwing an error.
+
+    ```js
+    function sortArrayOrString(data, ...rest) {
+      // Early return if data is undefined or null
+      if (data === undefined || data === null) {
+        return [];
+      }
+
+      // Check if data is a string or an array
+      const isString = typeof data === 'string';
+      const isArray = Array.isArray(data);
+
+      // Throw an error if data is not a string or an array
+      if (!isString && !isArray) {
+        throw new Error('data must be a string or an array');
+      }
+
+      // prepare the array to be sorted based on the data type
+      const arr = isString ? data.split(',') : data.slice();
+
+      // Sort the array based on the optional arguments
+      arr.sort(...rest);
+
+      return arr;
+    }
+
+    // or with changing the argument name from input to a discriptive name like value or sortable
+    ```
+
+  - **Step 3:** Test the refactored function with different inputs to ensure it works as expected.
+
+    ```js
+    console.log(sortArrayOrString([3, 1, 2])); // [1, 2, 3]
+    console.log(sortArrayOrString('3,1,2')); // ['1', '2', '3']
+    console.log(sortArrayOrString([100, 2, 36, 7])); // [100, 2, 36, 7]
+    console.log(sortArrayOrString([100, 2, 36, 7], (a, b) => a - b)); // [2, 7, 36, 100]
+
+    console.log(sortArrayOrString(undefined)); // []
+    console.log(sortArrayOrString(null)); // []
+    console.log(sortArrayOrString({})); // Error: Input must be a string or an array
+    console.log(sortArrayOrString(123)); // Error: Input must be a string or an array
+    ```

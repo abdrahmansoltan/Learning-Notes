@@ -10,6 +10,7 @@
     - [Python](#python)
   - [Networking](#networking)
   - [Frontend](#frontend)
+    - [General Frontend Topics](#general-frontend-topics)
     - [HTML \& CSS](#html--css)
     - [CSS Methodologies \& Frameworks](#css-methodologies--frameworks)
     - [JavaScript](#javascript)
@@ -20,17 +21,19 @@
       - [Next js](#next-js)
       - [Angular](#angular)
       - [Vue](#vue)
+    - [Development Topics](#development-topics)
   - [Backend](#backend)
+    - [General Backend Topics](#general-backend-topics)
     - [Node.js](#nodejs)
     - [Databases](#databases)
   - [Git](#git)
   - [Testing](#testing)
     - [Unit Testing](#unit-testing)
     - [Automation (E2E) Testing](#automation-e2e-testing)
-  - [Development Tools](#development-tools)
-  - [Cloud](#cloud)
+  - [DevOps](#devops)
   - [Security](#security)
   - [System Design](#system-design)
+  - [Interviews Preparations](#interviews-preparations)
 
 ---
 
@@ -46,7 +49,8 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [CS Fundamentals](./Computer%20Science/CS%20Fundamentals/1-CS.md)
 - [Computer Architecture](./Computer%20Science/CS%20Fundamentals/2-Computer-architecture.md)
-- [Programming-foundation-Fundamentals](./Computer%20Science/CS%20Fundamentals/3-Programming-Foundations.md)
+- [Programming Foundation Fundamentals](./Computer%20Science/CS%20Fundamentals/3-Programming-Foundations.md)
+- [Advanced Programming Foundations](./Computer%20Science/CS%20Fundamentals/4-Advanced-Programming-Foundations.md)
 
 ### Object Oriented Programming
 
@@ -58,7 +62,6 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Data-Structures](./Computer%20Science/Data%20Structures%20&%20Algorithms/1-Data-Structures.md)
 - [Algorithms](./Computer%20Science/Data%20Structures%20%26%20Algorithms/2-Algorithms.md)
 - [Problem-solving](./Computer%20Science/Data%20Structures%20%26%20Algorithms/3-Problem-solving.md)
-- [System-Design](./Computer%20Science/Data%20Structures%20%26%20Algorithms/4-System-Design.md)
 - [Problem-solving-Arrays](./Computer%20Science/Data%20Structures%20%26%20Algorithms/5-PS-Arrays.md)
 - [Problem-solving-Strings](./Computer%20Science/Data%20Structures%20%26%20Algorithms/6-PS-Strings.md)
 - [Problem-solving-Stacks-Queues](./Computer%20Science/Data%20Structures%20%26%20Algorithms/7-PS-Stacks-Queues.md)
@@ -81,6 +84,10 @@ This repository contains notes from my learning Journey to be a reference for an
 
 - [Python](./Programming%20Languages/Python/01-Python.md)
 - [OOP](./Programming%20Languages/Python/02-Object-Oriented-Programming.md)
+- [APIs](./Programming%20Languages/Python/03-APIs.md)
+- [Unit-Testing](./Programming%20Languages/Python/04-Unit-Test.md)
+- [File-IO](./Programming%20Languages/Python/05-File-IO.md)
+- [Regex](./Programming%20Languages/Python/06-Regex.md)
 
 ---
 
@@ -93,7 +100,12 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ## Frontend
 
+### General Frontend Topics
+
 - [Frontend](./Frontend/General/Frontend.md)
+- [Performance](./Frontend/General/FE-Performance.md)
+- [Rendering-Methods](./Frontend/General/FE-Rendering-Methods.md)
+- [PWA](./Frontend/General/FE-PWA.md)
 
 ### HTML & CSS
 
@@ -109,6 +121,7 @@ This repository contains notes from my learning Journey to be a reference for an
 ### CSS Methodologies & Frameworks
 
 - [CSS Methodologies](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/CSS%20Methodologies.md)
+- [CSS-Preprocessor-and-Build-process](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/CSS-Preprocessor-and-Build-process.md)
 - [Sass](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/Sass.md)
 - [Bootstrap](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/Bootstrap.md)
 - [Tailwind](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/Tailwind.md)
@@ -142,6 +155,8 @@ This repository contains notes from my learning Journey to be a reference for an
 - [TypeScript](./Frontend/TypeScript/1-TypeScript.md)
 - [TypeScript Types](./Frontend/TypeScript/2-TS-Types.md)
 - [TypeScript with the DOM](./Frontend/TypeScript/3-TS-DOM.md)
+- [Typescript Patterns](./Frontend/TypeScript/4-TS-Patterns.md)
+- [Typescript Development Process](./Frontend/TypeScript/5-TS-Dev.md)
 
 ---
 
@@ -159,10 +174,12 @@ This repository contains notes from my learning Journey to be a reference for an
 - [React Router](./Frontend/Frameworks/React/4-React-router.md)
 - [Redux](./Frontend/Frameworks/React/5-Redux.md)
 - [Redux-toolkit](./Frontend/Frameworks/React/6-Redux-toolkit.md)
-- [performance](./Frontend/Frameworks/React/7-performance.md)
-- [React-Typescript](./Frontend/Frameworks/React/8-React-Typescript.md)
-- [React Interview Questions](./Frontend/Frameworks/React/9-React-Interview.md)
-- [React-Testing](./Frontend/Frameworks/React/10-React-Testing.md)
+- [React-Query](./Frontend/Frameworks/React/7-React-Query.md)
+- [performance](./Frontend/Frameworks/React/8-performance.md)
+- [React-Patterns](./Frontend/Frameworks/React/9-React-Patterns.md)
+- [React-Typescript](./Frontend/Frameworks/React/10-React-Typescript.md)
+- [React-Testing](./Frontend/Frameworks/React/11-React-Testing.md)
+- [React Interview Questions](./Frontend/Frameworks/React/12-React-Interview.md)
 
 ---
 
@@ -175,7 +192,12 @@ This repository contains notes from my learning Journey to be a reference for an
 #### Angular
 
 - [Angular](./Frontend/Frameworks/Angular/1-Angular.md)
-- [AngularJS](./Frontend/Frameworks/Angular/2-AngularJS.md)
+- [Angular-Modules](./Frontend/Frameworks/Angular/2-Angular-Modules.md)
+- [Angular-Router](./Frontend/Frameworks/Angular/3-Angular-Router.md)
+- [Angular-Services](./Frontend/Frameworks/Angular/4-Angular-Services.md)
+- [RxJS](./Frontend/Frameworks/Angular/5-Angular-RxJS.md)
+- [Angular-Typescript](./Frontend/Frameworks/Angular/6-Angular-Typescript.md)
+- [AngularJS](./Frontend/Frameworks/Angular/7-AngularJS.md)
 
 ---
 
@@ -192,9 +214,21 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ---
 
+### Development Topics
+
+- [Linters](./Frontend/DEV/Linters.md)
+- [Modules & Bundlers](./Frontend/DEV/Modules%20%26%20Bundlers.md)
+- [Webpack](./Frontend/DEV/Webpack.md)
+- [Authentication](./Frontend/DEV/Authentication.md)
+
+---
+
 ## Backend
 
-- [Backend](./Backend/Backend.md)
+### General Backend Topics
+
+- [Backend](./Backend/General/Backend.md)
+- [Backend Performance](./Backend/General/BE-Performance.md)
 
 ### Node.js
 
@@ -202,6 +236,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Express](./Backend/Node.js/2-Express.md)
 - [Node-FileSystem](./Backend/Node.js/3-Node-FileSystem.md)
 - [Node-Security](./Backend/Node.js/4-Node-Sequrity%26Authentication.md)
+- [Node-Typescript](./Backend/Node.js/5-Node-Typescript.md)
 
 ---
 
@@ -212,8 +247,9 @@ This repository contains notes from my learning Journey to be a reference for an
 - [SQL](./Backend/Databases/SQL.md)
 - [PostgreSQL](./Backend/Databases/PostgreSQL.md)
 - [MongoDB](./Backend/Databases/MongoDB.md)
-- [Redis](./Backend/Databases/Redis.md)
 - [GraphQL](./Backend/Databases/GraphQL.md)
+- [Redis](./Backend/Databases/Redis.md)
+- [Supabase](./Backend/Databases/Supabase.md)
 
 ---
 
@@ -239,16 +275,12 @@ This repository contains notes from my learning Journey to be a reference for an
 
 ---
 
-## Development Tools
+## DevOps
 
-- [Linters](./DEV/Linters.md)
-- [Modules & Bundlers](./DEV/Modules%20%26%20Bundlers.md)
-
----
-
-## Cloud
-
-- [AWS](./Cloud/1-AWS.md)
+- [Cloud-Computing](./Devops/1-Cloud-Computing.md)
+- [AWS](./Devops/2-AWS.md)
+- [Docker](./Devops/3-Docker.md)
+- [CI-CD](./Devops/4-CI-CD.md)
 
 ---
 
@@ -264,3 +296,10 @@ This repository contains notes from my learning Journey to be a reference for an
 - [System Design](./System%20Design/1-System-design.md)
 - [API-Design](./System%20Design/2-API-Design.md)
 - [Data](./System%20Design/3-Data.md)
+- [System-design-interviews](./System%20Design/4-System-design-interviews.md)
+
+---
+
+## Interviews Preparations
+
+- [Interviews](./Interviews/Interviews.md)

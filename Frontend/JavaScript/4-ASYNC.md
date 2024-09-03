@@ -16,7 +16,8 @@
   - [consume promise : (Old Way)](#consume-promise--old-way)
     - [AJAX Call : `XMLHttpRequest`](#ajax-call--xmlhttprequest)
     - [Callback Hell (Callback in callback)](#callback-hell-callback-in-callback)
-  - [consume promise : (Modern Way) `fetch()`](#consume-promise--modern-way-fetch)
+  - [Promises](#promises)
+    - [consume promise : (Modern Way) `fetch()`](#consume-promise--modern-way-fetch)
     - [How `fetch()` works behind the scenes](#how-fetch-works-behind-the-scenes)
     - [Consumers: `then`, `catch`](#consumers-then-catch)
     - [Cleanup: `finally` method](#cleanup-finally-method)
@@ -32,7 +33,7 @@
     - [Error Handling With try...catch](#error-handling-with-trycatch)
       - [try…catch…finally](#trycatchfinally)
     - [Global Error Handling (Global catch)](#global-error-handling-global-catch)
-  - [Sequence promises vs Parallel promises](#sequence-promises-vs-parallel-promises)
+  - [Promise Chaining: (Sequence vs Parallel) Promises](#promise-chaining-sequence-vs-parallel-promises)
     - [Sequence promises](#sequence-promises)
     - [Parallel promises](#parallel-promises)
       - [`Promise.all()`](#promiseall)
@@ -60,7 +61,10 @@
 
 ## Asynchronous JavaScript
 
-- `Asynchronous` means that things can happen independently of the main program flow. `Asynchronous` code is executed after a task that runs in the `background` finishes.
+- **"Synchronous"** means that things happen one at a time. When you call a function that performs a long-running action, it returns only when the action has finished and it can return the result.
+  ![Synchronous](./img/sync-1.png)
+
+- **"Asynchronous"** means that things can happen independently of the main program flow (not happening at the same time). `Asynchronous` code is executed after a task that runs in the `background` finishes.
   ![Asynchronous](./img/async-1.png)
 
 ### Is JavaScript `synchronous` or `asynchronous` ?
@@ -322,6 +326,7 @@ lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 ### AJAX Call : `XMLHttpRequest`
 
 **AJAX (Asynchronous JavaScript And XML)** allows us to communicate with remote web servers in an **asynchronous way**. This means that we can make requests to the server without having to reload the page.
+![AJAX](./img/ajax-1.png)
 
 - It's a technique for loading data into part of a page without having to refresh the entire page. The data is often sent in a format called JavaScript Object Notation `JSON`.
 
@@ -330,14 +335,18 @@ lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
 - Partial page loading improves user experience by updating specific sections without requiring the entire page to load. This has led to the rise of **single page web applications** with software-like functionality in a browser.
 - Historically, **AJAX** was an acronym for the technologies used in asynchronous requests like this. It stood for **Asynchronous JavaScript And XML**. Since then, technologies have moved on and the term **Ajax** is now used to refer to a group of technologies that offer asynchronous functionality in the browser.
 - **Data formats:** Servers typically send back `HTML`, `XML`(which the browser turns into `HTML`), or `JSON`
+
   - Browsers only let Ajax load `HTML` and `XML` from the **same domain name** as the rest of the page,
     - but `JSON` can be called from any domain **(JSON-P/CORS)**
   - **XML** -> The tags in an `XML` file should describe the data they contain. As a result, even if you have never seen the code to the left. you can see that the data describes information about several events. The `<events>` element contains several individual events. Each individual event is represented in its own `<event>` element.
   - **JSON** :
+
     - When `JSON` data is sent from a server to a web browser, it is transmitted as a **string**.
     - When it reaches the browser, your script must then convert the string into a JavaScript object. This is known as **deserializing an object**.
       - This is done using the `parse()` method of a built-in object called `JSON`. This is a global object, so you can use it without creating an instance of it first.
     - The JSON object also has a method called `stringify()`, which converts objects into a string using `JSON` notation so it can be sent from the browser back to a server. This is also known as serializing an object.
+
+  - The data returned are in form of **Array of Objects**, each object represents a country with its properties.
 
 > To create an Ajax request, browsers use the `XMLHttpRequest` object.
 > When the server responds to the browser's request, the same `XMLHttpRequest` object will process the result.
@@ -354,7 +363,7 @@ request.send(); // sends the prepared request to the server
 
 // we add eventListener on it for when it (loads)
 request.addEventListener('load', function () {
-  const [data] = JSON.parse(this.responseText);
+  const [data] = JSON.parse(this.responseText); // "this" refers to the request object
 });
 ```
 
@@ -364,83 +373,86 @@ request.addEventListener('load', function () {
 
 ### Callback Hell (Callback in callback)
 
-> That’s called a **“callback-based” style of asynchronous programming**. A function that does something asynchronously should provide a callback argument where we put the function to run after it’s complete.
+It's when you have a lot of nested callbacks to execute asynchronous code in a certain order/sequence, which makes the code hard to read and maintain (hard to debug).
 
-- As calls become more nested, the code becomes deeper and increasingly more difficult to manage.
-- Callback Hell: It's when we have a lot of nested callbacks in order to execute asynchronous tasks in sequence (**Pyramid of Doom**).
-- in fact, this happens for all asynchronous tasks, which are handled by callbacks And not just AJAX calls.
+> **"Callback-based" style of asynchronous programming**. A function that does something asynchronously should provide a callback argument where we put the function to run after it’s complete.
 
-```js
-// example of callback hell using xmlHttpRequest
-const request = new XMLHttpRequest();
-request.open('GET', `https://restcountries.eu/rest/v2/name/Usa`);
-request.send();
+- Deeply nested callbacks make code hard to manage (**Pyramid of Doom**).
+- Occurs with all asynchronous tasks, not just AJAX calls.
 
-request.addEventListener('load', function () {
-  const [data] = JSON.parse(this.responseText);
-  console.log(data);
+- Examples
 
-  // Get neighbor country (2)
-  const [neighbor] = data.borders;
-  if (!neighbor) return;
+  - Callback hell using `xmlHttpRequest`
 
-  // AJAX call country 2
-  const request2 = new XMLHttpRequest();
-  request2.open('GET', `https://restcountries.eu/rest/v2/alpha/${neighbor}`);
-  request2.send();
+    ```js
+    const request = new XMLHttpRequest();
+    request.open('GET', `https://restcountries.eu/rest/v2/name/Usa`);
+    request.send();
 
-  request2.addEventListener('load', function () {
-    const data2 = JSON.parse(this.responseText);
-    console.log(data2);
+    request.addEventListener('load', function () {
+      const [data] = JSON.parse(this.responseText);
+      console.log(data);
 
-    // Get neighbor country (3)
-    // ...
-  });
-});
-```
+      // Get neighbor country (2)
+      const [neighbor] = data.borders;
+      if (!neighbor) return;
 
-```js
-// another example ( we do this to maintain order of execution  ... then ... then ...)
-setTimeout(() => {
-  console.log('1 second passed');
-  setTimeout(() => {
-    console.log('2 seconds passed');
+      // AJAX call country 2
+      const request2 = new XMLHttpRequest();
+      request2.open('GET', `https://restcountries.eu/rest/v2/alpha/${neighbor}`);
+      request2.send();
+
+      request2.addEventListener('load', function () {
+        const data2 = JSON.parse(this.responseText);
+        console.log(data2);
+
+        // Get neighbor country (3)
+        // ...
+      });
+    });
+    ```
+
+  - Callback hell using `setTimeout`
+
+    ```js
     setTimeout(() => {
-      console.log('3 second passed');
+      console.log('1 second passed');
       setTimeout(() => {
-        console.log('4 second passed');
+        console.log('2 seconds passed');
+        setTimeout(() => {
+          console.log('3 second passed');
+          setTimeout(() => {
+            console.log('4 second passed');
+          }, 1000);
+        }, 1000);
       }, 1000);
     }, 1000);
-  }, 1000);
-}, 1000);
-```
+    ```
 
 ---
 
-## consume promise : (Modern Way) `fetch()`
+## Promises
 
-- **Promise** : An object that is used as a placeholder for the future result of an asynchronous operation.
-  - or: it's an object that may produce a single value some time in the future, either a resolved-value or a (reason that it's rejected)
+**Promise**: An object representing the future result of an asynchronous operation
 
-> By using promises, we no longer need to rely on `events` and callbacks passed into asynchronous functions to handle asynchronous results. Instead, we can **chain promises together** using the `then()` method, and handle errors using the `catch()` method. -> **Escape from callback hell**
+- Avoids callback hell by chaining `then()` and handling errors with `catch()` instead of passing callbacks to asynchronous functions like `xmlHttpRequest`.
 
-- The function passed to new Promise is called the **"executor"**.
+- **Executor Function**
   ![executor](./img/promises-1.png)
 
-  - When new Promise is created, the executor runs automatically. It contains the producing code which should eventually produce the result.
-  - Its arguments `resolve` and `reject` are callbacks provided by JavaScript itself. Our code is only inside the executor.
-  - When the `executor` obtains the result, be it soon or late, doesn’t matter, it should call one of these callbacks:
-
-    - `resolve(value)` — if the job is finished successfully, with result value.
-    - `reject(error)` — if an error has occurred, error is the error object.
+  - Runs automatically when a new Promise is created (passed to the `Promise` constructor).
+  - Contains 2 parameters: `resolve` and `reject` which are callback-functions that control the fate of the promise.
+    - `resolve(value)` on success.
+    - `reject(error)` on failure.
       - it's internally the same as `throw new Error()`
 
+- **Promise Object**
+
   - The promise object returned by the new Promise constructor has these internal properties:
+  - `state`: Initially `pending`, then `fulfilled` or `rejected`.
+  - `result`: Initially `undefined`, then changes to `value` or `error`.
 
-    - `state` — initially "`pending`", then changes to either "`fulfilled`" when resolve is called or "`rejected`" when reject is called.
-    - `result` — initially `undefined`, then changes to `value` when `resolve(value)` is called or `error` when `reject(error)` is called.
-
-- The constructor syntax for a promise object is:
+- **Syntax**
 
   ```js
   let promise = new Promise(function (resolve, reject) {
@@ -451,31 +463,36 @@ setTimeout(() => {
   ![promise](./img/promise.png)
   ![promise](./img/promise_state_inspect.png)
 
+- Notes
+
+  - The executor should call only one `resolve` or one `reject`. Any state change is final.
+
+    ```js
+    // The executor should call only one resolve or one reject. Any state change is final.
+    let promise = new Promise(function (resolve, reject) {
+      resolve('done');
+
+      reject(new Error('…')); // ignored
+      setTimeout(() => resolve('…')); // ignored
+    });
+    ```
+
+---
+
+### consume promise : (Modern Way) `fetch()`
+
+It's a modern way to do `AJAX` calls, but it's not part of `javascript` but it's a **browser API** that we can use in `javascript` to make `AJAX` calls.
+
 - In frontend programming, promises are often used for network requests. and we use the `fetch()` method to load the information from the server.
-- **Note:** `fetch()` is not part of `javascript` but it's a **browser API** that we can use in `javascript` to make `AJAX` calls
+- returns a `promise` that resolves to the`Response to that request, whether it is successful or not using the`then()`method. or rejects with an error using the`catch()` method.
 
-  - `fetch()` returns a promise that resolves to the `Response` to that request, whether it is successful or not. You can also `reject` this promise, but that is not shown in the above example.
-
-- clean code :
-
-  ```javascript
+  ```js
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
     .then(response => response.json())
     .then(data => {
       console.log(data);
-    });
-  ```
-
-- There can be only a single result or an error:
-
-  ```js
-  // The executor should call only one resolve or one reject. Any state change is final.
-  let promise = new Promise(function (resolve, reject) {
-    resolve('done');
-
-    reject(new Error('…')); // ignored
-    setTimeout(() => resolve('…')); // ignored
-  });
+    })
+    .catch(err => console.error(err));
   ```
 
 ---
@@ -510,6 +527,10 @@ A Promise object serves as a link between the executor (the “producing code”
 
 - `.then`
 
+  - it takes 2 callback functions as parameters
+    - the first one is for the `fulfilled` value
+    - the second one is for the `rejected` value -> Optional
+
   ```js
   promise.then(
     function (result) {
@@ -532,7 +553,23 @@ A Promise object serves as a link between the executor (the “producing code”
   );
   ```
 
+  - There's a limitation in the second parameter of `.then()` method, that it can only handle any rejection that happens in the `executor function` (the `producing code`), but if there's an error in the `then()` method itself, it won't be handled by the second parameter of `.then()`. **To fix this, we can use the `.catch()` method**.
+
+    ```js
+    fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+      .then(
+        response => response.json(),
+        error => console.error(error)
+      )
+      .then(data => {
+        console.log(data);
+        Promise.reject(new Error('💥')); // This won't be handled in the function above
+      });
+    ```
+
 - `.catch`
+
+  - This a replacement for the second parameter of `.then(null, f)`. that is chained to the end of the promise call.
 
   - If we’re interested only in errors, then we can use `null` as the first argument: `.then(null, errorHandlingFunction)`. Or we can use `.catch(errorHandlingFunction)`, which is exactly the same:
 
@@ -545,23 +582,63 @@ A Promise object serves as a link between the executor (the “producing code”
   promise.catch(alert); // shows "Error: Whoops!" after 1 second
   ```
 
-- **Note:** Are these code fragments equal? In other words, do they behave the same way in any circumstances, for any handler functions?
+- **Notes**
 
-  ```js
-  promise.then(f1).catch(f2); // 1
-  promise.then(f1, f2); // 2
-  ```
+  - Are these code fragments equal? In other words, do they behave the same way in any circumstances, for any handler functions?
 
-  - answer is **NO**, The difference is that:
+    ```js
+    promise.then(f1).catch(f2); // 1
+    promise.then(f1, f2); // 2
+    ```
 
-    - in `1`: if an error happens in `f1`, then it is handled by `.catch`
-    - in `2`: .then passes results/errors to the next `.then`/`catch`. So in the first example, there’s a `catch` below, and in the second one there isn’t, so the error is unhandled.
+    - answer is **NO**, The difference is that:
 
-      - so it should be:
+      - in `1`: if an error happens in `f1`, then it is handled by `.catch`
+      - in `2`: .then passes results/errors to the next `.then`/`catch`. So in the first example, there’s a `catch` below, and in the second one there isn’t, so the error is unhandled.
 
-        ```js
-        promise.then(f1).then(null, f2);
-        ```
+        - so it should be:
+
+          ```js
+          promise.then(f1).then(null, f2);
+          ```
+
+  - Why do we use `.json()` method in the `fetch()` method?
+
+    - The `response` object returned by `fetch()` is a **stream**. To extract the `JSON` body content from the response, we use the `json()` method, **which also returns a `promise`** that resolves with the result of parsing the body text as `JSON`.
+
+      ```js
+      fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+        .then(response => response.json())
+        .then(data => {
+          console.log(data);
+        });
+      ```
+
+  - To avoid **callback hell**, we can chain multiple `.then()` methods instead of nesting them.
+
+    ```js
+    // BAD ❌
+    fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+      .then(response => response.json())
+      .then(data => {
+        fetch(`https://restcountries.eu/rest/v2/name/${data[0].borders[0]}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log(data);
+          });
+      });
+
+    // GOOD ✅
+    fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+      .then(response => response.json())
+      .then(data => {
+        return fetch(`https://restcountries.eu/rest/v2/name/${data[0].borders[0]}`); // return the promise to handle it in the next `.then()`
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+      });
+    ```
 
 ---
 
@@ -985,7 +1062,7 @@ window.onerror = function (message, url, line, col, error) {
 
 ---
 
-## Sequence promises vs Parallel promises
+## Promise Chaining: (Sequence vs Parallel) Promises
 
 ### Sequence promises
 
@@ -1558,3 +1635,22 @@ Asynchronous tasks need proper management. For that, the **ECMA** standard speci
     ```
 
 - Promises, web-api, the callback & microTasks queue, and event-loop are all part of the **browser** not `javascript` and enable us to write `asynchronous` code in `javascript` (non-blocking applications)
+
+- `addEventListener` and `callback functions` don't make the code asynchronous, it just adds the event to the `event-loop` and waits for the `event` to happen.
+
+- setting the `src` of an image is an **asynchronous** operation, but the browser loads it **asynchronously** (it doesn't block the code) as the browser downloads the image in the background.
+
+  - Once the image has finished downloading, the browser will fire the `load` event on the image, and then the `onload` event handler will be called.
+
+    ```js
+    const img = document.querySelector('.img');
+    img.src = 'image.jpg';
+
+    img.onload = () => {
+      console.log('image loaded');
+    };
+    // OR
+    img.addEventListener('load', () => {
+      console.log('image loaded');
+    });
+    ```
