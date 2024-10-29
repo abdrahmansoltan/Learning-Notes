@@ -254,6 +254,13 @@ ReactDOM.createPortal(child, container);
 
 - when you want to make the modal appear where you are currently and not in the beginning of the page, use `position: fixed` instead of `absolute`
 
+- One of the reasons to use portals is to avoid CSS conflicts between the parent and the child components and make sure that the **stacking context** of the modal is not affected by the parent component -> [more on stacking context](../../HTML-CSS/3-CSS-Layouts.md#z-index-stacking-context)
+
+- This concept of moving elements outside the parent component is also used in other frameworks:
+  - Vue: `teleport`
+  - Angular: `cdkPortal`
+  - Svelte: `portal`
+
 ---
 
 ## Best Practices

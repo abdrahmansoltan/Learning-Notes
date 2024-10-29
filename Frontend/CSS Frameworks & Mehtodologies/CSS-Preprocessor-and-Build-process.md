@@ -4,7 +4,8 @@
   - [CSS Preprocessors](#css-preprocessors)
     - [Reasons to use a CSS Preprocessor](#reasons-to-use-a-css-preprocessor)
     - [The Value and Limitations of Preprocessors](#the-value-and-limitations-of-preprocessors)
-  - [SASS vs Less vs Stylus](#sass-vs-less-vs-stylus)
+    - [Pros and Cons of CSS Preprocessors](#pros-and-cons-of-css-preprocessors)
+    - [SASS vs Less vs Stylus](#sass-vs-less-vs-stylus)
   - [CSS Build Process](#css-build-process)
     - [Compilation](#compilation)
     - [Concatenation](#concatenation)
@@ -60,7 +61,25 @@ Most CSS developers are familiar with preprocessors. Tools including `Sass`, `Le
 
 ---
 
-## SASS vs Less vs Stylus
+### Pros and Cons of CSS Preprocessors
+
+- **Pros**
+
+  - Includes powerful tools like for-loops, mixins, and nesting
+  - Has really high developer satisfaction compared with vanilla CSS.
+
+- **Cons**
+
+  - Requires a build step (and it's pretty slow in development compared with hot-reloading)
+  - Because it compiles to CSS, it remains global by nature, and isn't scoped to specific components. It inherits a lot of "cons" from vanilla CSS, such as not automatically vendor-prefixing.
+  - Everything happens at build time, so it can't react to things in real-time. Sass variables are nowhere near as powerful as CSS variables for this reason.
+  - Requires native dependencies that can fail or get out-of-date. I can't access my old Sass projects without spending hours dealing with native dependency issues. I can't just`npm install`, it's a real pain.
+  - CSS has added a bunch of new features over the years, and there have been naming clashes. CSS has a native `min` function now, and it's way better than Sass' `min` function, but the keyword is already reserved. There are workarounds, but it's added friction.
+  - It's becoming less and less popular in the JS scene. While popularity isn't everything, a fading solution will have less community resources, less support, and more potential for trouble.
+
+---
+
+### SASS vs Less vs Stylus
 
 - **Sass**
 
@@ -71,7 +90,7 @@ Most CSS developers are familiar with preprocessors. Tools including `Sass`, `Le
   - It runs inside `Node.js`, in the browser.
   - The main difference between `LESS` and other CSS preprocessors is that `LESS` allows **real-time compilation** via `less.js` in the browser.
 
-- Stylus
+- **Stylus**
   - It is built on `node.js`, `Stylus` really strips down all of the extra characters that clog up your CSS. `Stylus` allows freedom in terms of syntax – you can omit braces, semicolons and even colons. Stylus incorporates powerful in-language functions and conditionals.
 
 ---

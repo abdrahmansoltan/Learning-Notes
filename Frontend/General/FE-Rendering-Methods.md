@@ -12,6 +12,8 @@
 
 ### SSR: Server Side Rendering
 
+It's a technique in which the HTML is pre-generated.
+
 - The server renders the HTML code and sends it to the client, and the client renders the HTML code and display UI content with little or no activity
   - Once any activity happens, the client sends a request to the server to get the new HTML code and the server renders the HTML code and sends it to the client, and the client renders the HTML code and display UI content with little or no activity
     ![SSR](./img/SSR.png)

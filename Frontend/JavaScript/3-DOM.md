@@ -24,8 +24,11 @@
     - [Window sizes](#window-sizes)
     - [Coordinates of Elements](#coordinates-of-elements)
     - [Scrolling](#scrolling)
+      - [Manual Scrolling](#manual-scrolling)
+      - [Styled Scrolling (Smooth Scrolling with effects)](#styled-scrolling-smooth-scrolling-with-effects)
     - [Intersection observer](#intersection-observer)
       - [Examples of using the Intersection Observer API](#examples-of-using-the-intersection-observer-api)
+    - [Scrolling Libraries](#scrolling-libraries)
   - [Virtual DOM](#virtual-dom)
     - [methods to compare nodes](#methods-to-compare-nodes)
     - [steps](#steps)
@@ -42,6 +45,7 @@
     - [Dispatching custom events](#dispatching-custom-events)
       - [Event constructor](#event-constructor)
     - [UI Events](#ui-events)
+      - [CSS Animation Events](#css-animation-events)
     - [Events Notes](#events-notes)
   - [HTML page script loading and lifecycle](#html-page-script-loading-and-lifecycle)
     - [Loading scripts: `async`, `defer`](#loading-scripts-async-defer)
@@ -262,12 +266,13 @@ message.remove();
 ### DOM collections: (`HTMLCollection` vs `NodeList`)
 
 - Both interfaces are collections of DOM nodes. They differ in the methods they provide and in the type of nodes they can contain.
-  | HTMLCollection | NodeList |
-  | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
-  | supposed to only contain Element nodes | can contain any node type ( including text nodes ) |
-  | HTMLCollection items can be accessed by their `name`, `id`, or `index number`. | NodeList items can only be accessed by their `index number`. |
+
+  | HTMLCollection                                                                                                               | NodeList                                                                                                                                            |
+  | ---------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | supposed to only contain Element nodes                                                                                       | can contain any node type ( including `text nodes, comments, white-spaces, ...`)                                                                    |
+  | HTMLCollection items can be accessed by their `name`, `id`, or `index number`.                                               | NodeList items can only be accessed by their `index number`.                                                                                        |
   | HTMLCollection is always a **live collection**, when your script updates the page, the NodeList is updated at the same time. | NodeList is most often a **static collection**, If the script changes the content of the page, the NodeList is not updated to reflect those changes |
-  | `getElementsByClassName()` `getElementsByTagName()` `children` | `querySelectorAll()` `childNodes` |
+  | `getElementsByClassName()` `getElementsByTagName()` `children`                                                               | `querySelector()` `querySelectorAll()` `childNodes`                                                                                                 |
 
 - **Notes:**
 
@@ -285,6 +290,15 @@ message.remove();
 
   - DOM collections are read-only
     - We can’t replace a child by something else by assigning `childNodes[i] = ....`
+  - Remember that `querySelector()` is **static**, it doesn’t update when the document changes. So if we want a “live” collection, we should use `getElementsBy...` or `children`.
+
+    ```js
+    const todoList = document.querySelector('.todo-list'); // static
+
+    const todoItems = todoList.children; // live ✅
+    // or
+    const todoItems = todoList.getElementsByClassName('todo-item'); // live ✅
+    ```
 
 ---
 
@@ -368,6 +382,7 @@ There are many methods to search for nodes in the DOM tree: by their `id`, `tag`
   - `document.getElementsByClassName(name)`: Returns a `NodeList` of elements with the specified class name.
   - `document.getElementsByName(name)`: Returns a `NodeList` of elements with the specified name attribute.
   - `document.querySelector(selectors)`: Returns the first element matching the specified CSS selector(s).
+    - it can be any single selector or a **combination of selectors**.
   - `document.querySelectorAll(selectors)`: Returns a static `NodeList` of elements matching the specified CSS selector(s).
 
 - **Notes**:
@@ -618,7 +633,7 @@ The property `elem.style` is an **object** that corresponds to what’s written 
     alert(computedStyle.marginTop); // 5px
     ```
 
-  - For multi-word property the `camelCase` is used:
+  - For multi-word property the **camelCase** is used:
 
     ```js
     background-color  => elem.style.backgroundColor
@@ -720,29 +735,32 @@ In javascript, classes are represented by the `classList` object. It provides me
 
 ### Geometry Properties (element size)
 
+To get the size of an element and its position relative to the window, the document, or the parent element. There are several properties that provide information about the element size and its position.
+
 ![Geometry](./img/geometry1.png)
-![Geometry](./img/geometry2.png)
 
 - **offsetParent**
+  ![Geometry](./img/geometry2.png)
 
   - Properties `offsetLeft`/`offsetTop` provide x/y coordinates relative to `offsetParent` upper-left corner
 
     ```html
     <main style="position: relative" id="main">
       <article>
-        <div id="example" style="position: absolute; left: 180px; top: 180px">...</div>
+        <div id="element" style="position: absolute; left: 180px; top: 180px">...</div>
       </article>
     </main>
+
     <script>
-      alert(example.offsetParent.id); // main
-      alert(example.offsetLeft); // 180 (note: a number, not a string "180px")
-      alert(example.offsetTop); // 180
+      alert(element.offsetParent.id); // main
+      alert(element.offsetLeft); // 180 (note: a number, not a string "180px")
+      alert(element.offsetTop); // 180
     </script>
     ```
 
   - There are several occasions when `offsetParent` is `null`:
     - For not shown elements (`display:none` or not in the document).
-    - For `<body>` and `<html>`
+    - For `<body>` and `<html>` (as they don’t have an offset parent).
     - For elements with `position:fixed`
 
 - Geometry properties are `zero`/`null` for elements that are not displayed
@@ -861,6 +879,8 @@ In javascript, classes are represented by the `classList` object. It provides me
 
 > **Note**: Ensure the DOM is fully built before scrolling with JavaScript.
 
+#### Manual Scrolling
+
 - **OLD WAY**: Use `scrollTop`/`scrollLeft` or:
 
   - `scrollBy(x,y)`: Scrolls relative to current position.
@@ -907,6 +927,63 @@ In javascript, classes are represented by the `classList` object. It provides me
 
 ---
 
+#### Styled Scrolling (Smooth Scrolling with effects)
+
+Sometimes we find websites & landing pages with beautiful scrolling effects. This is achieved by using `scroll-behavior` property in CSS,or by using JavaScript to do some effects on scrolling.
+
+- **Smooth Scrolling**:
+
+  - With CSS
+
+    - `scroll-behavior: smooth` property in CSS provides smooth scrolling.
+
+      ```css
+      html {
+        scroll-behavior: smooth;
+      }
+      ```
+
+  - With JavaScript
+
+    - `scrollIntoView` method with `behavior: 'smooth'` option provides smooth scrolling.
+
+      ```js
+      document.querySelector('.section--1').scrollIntoView({ behavior: 'smooth' });
+      ```
+
+- **Parallax Scrolling**:
+
+  - Parallax scrolling is a technique where the background content moves at a different speed than the foreground content while scrolling.
+
+    ```css
+    .section {
+      background-image: url('img.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed; /* parallax effect */
+    }
+    ```
+
+- **Effects on Scroll**:
+
+  - We can add effects on scroll by listening to the `scroll` event and changing the styles of elements.
+
+    ```js
+    window.addEventListener('scroll', function () {
+      let scroll = window.scrollY;
+      if (scroll > 100) {
+        // do something
+      }
+    });
+    ```
+
+    - **Notes**: We shouldn't use `scroll` event for performance reasons. Instead, use [Intersection Observer](#intersection-observer) for such effects.
+
+  - Instead, we can use a library like [ScrollMagic](https://scrollmagic.io/) or [AOS](https://michalsnik.github.io/aos/) for more advanced effects. **(Most common to use)**
+    - More [here](#scrolling-libraries)
+
+---
+
 ### Intersection observer
 
 It's a browser API that allows you to **detect when an element is visible in the viewport**. It's useful for lazy loading images, infinite scrolling, and more.
@@ -916,29 +993,56 @@ It's a browser API that allows you to **detect when an element is visible in the
 - It allows for **observing changes to how much of a `target` element’s area intersects with that of another element or the `viewport`**.
   ![intersection](./img/intersection4.png)
 
-- **Use Cases**: Lazy-loading, infinite scrolling.
+- **Use Cases**:
+  - Lazy-loading.
+  - infinite scrolling.
 - **Efficient**: Replaces the `scroll` event on `window`.
 
 - By default, the Intersection Observer API uses the **viewport** as the **intersection root**, and only executes the callback when the target element enters and exits the viewport.
   ![intersection](./img/intersection1.avif)
-- A `threshold` is a value in which the Intersection Observer will execute the callback function whenever the intersection ratio reaches that value (the percentage of the target element that is visible in the intersection root).
-  ![intersection](./img/intersection2.png)
-  ![intersection](./img/intersection3.png)
+- It takes 2 parameters:
 
-  - It is also possible to set multiple threshold values by passing an array of threshold values in the `options` object.
+  - A `callback function` that is executed whenever the intersection between the target element and the intersection root changes.
 
-  ```js
-  const options = {
-    threshold: [0, 0.25, 0.5, 0.75, 1]
-  };
-  const observer = new IntersectionObserver(handlerFunction, options);
-  // executes the callback function when the target element enters/exits the intersection root (i.e. intersection ratio of 0), then again when its intersection ratio crosses 0.25, then 0.5, etc.
-  ```
+    - It takes 2 parameters:
+
+      - An array of `entries` that contain information about the intersection between the target element and the intersection root. **Why?** Because the Intersection Observer can observe multiple target elements at once.
+
+        ```js
+        const handlerFunction = function (entries) {
+          entries.forEach(entry => {
+            // do something with the entry
+          });
+        };
+
+        const observer = new IntersectionObserver(handlerFunction, options);
+
+        // Observing multiple target elements at the same time, not just one
+        observer.observe(targetElement1);
+        observer.observe(targetElement2);
+        observer.observe(targetElement3);
+        ```
+
+  - An `options` object that specifies the configuration of the Intersection Observer.
+
+    - A `threshold` is a value in which the Intersection Observer will execute the callback function whenever the intersection ratio reaches that value (the percentage of the target element that is visible in the intersection root).
+      ![intersection](./img/intersection2.png)
+      ![intersection](./img/intersection3.png)
+
+      - It is also possible to set multiple threshold values by passing an array of threshold values in the `options` object.
+
+      ```js
+      const options = {
+        threshold: [0, 0.25, 0.5, 0.75, 1]
+      };
+      const observer = new IntersectionObserver(handlerFunction, options);
+      // executes the callback function when the target element enters/exits the intersection root (i.e. intersection ratio of 0), then again when its intersection ratio crosses 0.25, then 0.5, etc.
+      ```
 
 - **Creating an Intersection Observer**:
 
   ```js
-  const observer = new IntersectionObserver(function (changes, observer) {
+  const observer = new IntersectionObserver(function (entries, observer) {
     // do something with the changes   });
   });
 
@@ -1061,11 +1165,38 @@ It's a browser API that allows you to **detect when an element is visible in the
 
 ---
 
-- The `virtual DOM` is a tree based on JavaScript objects created with `React` that resembles a DOM tree. Each time you need to change something in the DOM, `React` employs a different algorithm that exclusively re-renders the DOM nodes that have changed. Meaning, `React` allows developers to write code as if the entire page is rendered on each change while in the underhood `React` ONLY renders sub-components that have actually changed.
+### Scrolling Libraries
+
+We use them to create advanced scrolling effects like parallax scrolling, sticky navigation, and more. Because they are more efficient and easier to use than writing custom JavaScript code.
+
+- **ScrollMagic**:
+
+  - A popular JavaScript library for creating scroll animations.
+  - It allows you to create animations that trigger based on the scroll position of the user.
+  - [ScrollMagic](https://scrollmagic.io/)
+
+  ```js
+  // Create a new ScrollMagic controller
+  const controller = new ScrollMagic.Controller();
+
+  // Create a new scene
+  new ScrollMagic.Scene({
+    triggerElement: '.section--1',
+    triggerHook: 0.5
+  })
+    .setClassToggle('.nav', 'sticky')
+    .addTo(controller);
+  ```
+
+  - See [animated-landing-page project](https://github.com/abdrahmansoltan/aminated-landing-page) for a full working example.
+
+---
 
 ## Virtual DOM
 
-The Virtual DOM is an in-memory representation of the Real DOM. It is a lightweight JavaScript object that acts as a `copy` of the Real DOM.
+The Virtual DOM is an **in-memory** representation of the Real DOM. It is a lightweight JavaScript object that acts as a `copy` of the Real DOM.
+
+- The `virtual DOM` is a tree based on JavaScript objects created with `React` that resembles a DOM tree. Each time you need to change something in the DOM, `React` employs a different algorithm that exclusively re-renders the DOM nodes that have changed. Meaning, `React` allows developers to write code as if the entire page is rendered on each change while in the underhood `React` ONLY renders sub-components that have actually changed.
 
 - The `Virtual DOM` is a tree of JavaScript objects created with `React` that resembles a DOM tree.
 - `React` re-renders only the DOM nodes that have changed, optimizing performance.
@@ -1103,17 +1234,17 @@ newDOM = newDOM.createContextualFragment(newMarkup);
 const newDOM = document.createRange().createContextualFragment(newMarkup);
 // now newDOM is like a big object of (virtual-DOM) that lives in memory NOT tha page
 
-// (5) selecting all elements that lives in our virtual-DOM and converting it to an array so that we can compare it with the real-DOM
+// (3) selecting all elements that lives in our virtual-DOM and converting it to an array so that we can compare it with the real-DOM
 const newElements = Array.from(newDOM.querySelectorAll('*'));
 
-// (6) selecting all elements that lives in our real-DOM and converting it to an array so that we can compare it with the virtual-DOM
-const curElements = Array.from(this._parentElement.querySelectorAll('*'));
+// (4) selecting all elements that lives in our real-DOM and converting it to an array so that we can compare it with the virtual-DOM
+const curElements = Array.from(document.querySelectorAll('*'));
 
-// (7) looping over the 2 arrays at the same time so that we can compare them
+// (5) looping over the 2 arrays at the same time so that we can compare them
 newElements.forEach((newEl, i) => {
   const curEl = curElements[i];
 
-  // (8) Updates changed TEXT
+  // Updates changed Text content
   if (
     // comparing the (content) of the 2 nodes
     !newEl.isEqualNode(curEl) &&
@@ -1123,7 +1254,7 @@ newElements.forEach((newEl, i) => {
     curEl.textContent = newEl.textContent;
   }
 
-  // (9) Updates changed Attributes
+  // Updates changed Attributes
   if (!newEl.isEqualNode(curEl))
     Array.from(newEl.attributes).forEach(attr => curEl.setAttribute(attr.name, attr.value));
 });
@@ -1140,7 +1271,7 @@ Events signal that something has happened. All DOM nodes generate such signals.
   - **Keyboard**: `keydown`, `keyup`
   - **Form**: `submit`, `focus`
   - **Document**: `DOMContentLoaded`
-  - **CSS**: `transitionend`
+  - **CSS**: `transitionend` (CSS transition end)
 
 ### Event Handling / Binding
 
@@ -1353,6 +1484,21 @@ It's the process of event flow from the root element to the target element and b
     - Nested menus: Submenus handle clicks and stop propagation to prevent outer menu triggers.
     - Analytics: Track user clicks across the window using `document.addEventListener('click', ...)`.
 
+  - We can also stop bubbling for elements by using the `pointer-events` CSS property.
+
+    ```css
+    .no-bubble {
+      pointer-events: none;
+    }
+    ```
+
+    ```html
+    <button>
+      <i class="fas fa-volume-mute no-bubble" />
+      <!-- now, clicking the icon won't trigger the button's click event -->
+    </button>
+    ```
+
 ---
 
 #### Event Capturing
@@ -1561,12 +1707,39 @@ More reference and info about (mouse events, drag & drop, pointer events, keyboa
 
 ---
 
+#### CSS Animation Events
+
+- **`transitionend`**:
+
+  - Fires when a CSS transition completes.
+  - The event object has the `propertyName` property.
+  - It’s useful for animations that change properties over time.
+
+- Example: remove element after transition ends
+
+  ```js
+  function deleteTodo(e) {
+    const todo = e.target;
+    if (todo.classList.contains('trash-btn')) {
+      todo.parentElement.classList.add('fall');
+      todo.parentElement.addEventListener('transitionend', function () {
+        todo.parentElement.remove(); // remove after transition ends
+      });
+    }
+  }
+  ```
+
+---
+
 ### Events Notes
 
 - The `mousedown` and `mouseup` events separate out the press and release of a mouse button. They are commonly used for adding **drag and drop functionality**, or to add controls in game development.
 - the **event** object can tell you where the cursor was positioned when an event was triggered
   ![event-position](./img/event-position.png)
   ![event-position](./img/event-position2.png)
+- for `<input type="range">` elements:
+  - the `input` event is triggered whenever the value of the input changes, even if the user is still dragging the slider (bad for performance, but good for real-time updates).
+  - the `change` event is triggered only when the user releases the slider (good for performance, but not real-time updates).
 
 ---
 

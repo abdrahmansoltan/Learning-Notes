@@ -9,27 +9,26 @@
       - [Module Map](#module-map)
       - [Dependency Resolution](#dependency-resolution)
       - [Packing](#packing)
-    - [Webpack \& Vite](#webpack--vite)
-  - [Babel (`transpiling` \& `Polyfilling`)](#babel-transpiling--polyfilling)
-    - [Transpiling code for new language features](#transpiling-code-for-new-language-features)
-      - [Configuring Webpack to use Babel](#configuring-webpack-to-use-babel)
-    - [Polyfilling](#polyfilling)
+    - [Webpack \& Vite \& Parcel](#webpack--vite--parcel)
+  - [Babel](#babel)
+    - [Configuring Webpack to use Babel](#configuring-webpack-to-use-babel)
+    - [Configuring Babel to use polyfilling](#configuring-babel-to-use-polyfilling)
 
 ---
 
 ## Module Bundler
 
-It's a tool that takes pieces of javascript and their dependencies and bundles them into a single file, usually for use in the browser.
+A tool that combines JavaScript files and their dependencies into a single file for browser use.
 
-- It's an optimization technique you can use to reduce the number of **server requests** for JavaScript files. Bundling accomplishes this by merging multiple JavaScript files together into one file to reduce the number of page requests.
+- **Optimization**: Reduces server requests by merging multiple JavaScript files into one.
 
 ### History
 
-Most programming languages provide a way to import code from one file into another. JavaScript wasn’t originally designed with this feature, because JavaScript was designed to only run in the browser, with no access to the file system of the client’s computer (for security reasons). So for the longest time, organizing JavaScript code in multiple files required you to load each file with variables shared globally.
+JavaScript initially lacked a module system due to its browser-only design. Code organization required loading each file with globally shared variables.
 
-In 2009, a project named `CommonJS` was started with the goal of specifying an ecosystem for JavaScript outside the browser. A big part of CommonJS was its specification for modules, which would finally allow JavaScript to import and export code across files like most programming languages, without resorting to global variables. The most well-known of implementation of `CommonJS` modules is `node.js`.
+In 2009, `CommonJS` introduced a module system for JavaScript outside the browser, enabling import/export without global variables. `node.js` is a well-known implementation of `CommonJS`.
 
-- `node.js` is a JavaScript runtime designed to run on the server. Here’s what the earlier example would look like using `node.js` modules. Instead of loading all of `moment.min.js` with an `HTML` script tag, you can load it directly in the JavaScript file as follows:
+- **Example**: Using `node.js` modules:
 
   ```js
   // index.js
@@ -39,24 +38,33 @@ In 2009, a project named `CommonJS` was started with the goal of specifying an e
   console.log(rightNow);
   ```
 
-- This is how module loading works in `node.js`, which is a server-side JavaScript runtime. However, this module syntax doesn’t work in the browser, because the browser doesn’t have access to the file system to load modules. **This is where a module bundler comes in**
+  - Instead of loading all of `moment.min.js` with an `HTML` script tag, you can load it directly in the JavaScript file.
+
+- **Browser Limitation**: This syntax doesn't work in browsers, which lack file system access. **Module bundlers** solve this problem.
 
 ---
 
 ### Modern JavaScript Module Bundlers
 
-**Javascript Module bundler:** is a tool that gets around the problem with a build step (which has access to the file system) to create a final output that is browser compatible (which doesn’t need access to the file system)
+- **Why**:
+  - In modern web development, projects are built package managers like `npm` and `yarn`, which use `CommonJS` modules. These modules can't be used directly in browsers (we can't use `require` in browsers when importing modules).
+  - That's where module bundlers come in. They take `CommonJS` modules and convert them into a format that can be used in browsers.
+- **Purpose**: Replaces `require` statements with actual file contents (that doesn't work in browsers) to create a single JavaScript bundle.
+- **Process**:
 
-- we need a module bundler to find all require statements (which is invalid browser JavaScript syntax) and replace them with the actual contents of each required file. The final result is a single bundled JavaScript file (with no `require` statements)
-- It usually starts with an **entry file**, and from there it bundles up all of the code needed for that entry file.
-  ![module-bundler](./img/module-bundler.png)
+  - It usually starts with an **entry file**, and from there it bundles up all of the code needed for that entry file.
+    ![module-bundler](./img/module-bundler.png)
+  - This is done in the **build process** of a project, and the output is a single JavaScript file that can be included in an HTML file.
 
-- Here are some huge advantages to this workflow:
+- **Advantages**:
 
-  - We are no longer loading external scripts via global variables. Any new JavaScript libraries will be added using `require` statements in the JavaScript, as opposed to adding new `<script>` tags in the `HTML`.
-  - Having a single JavaScript bundle file is often better for performance. And now that we added a `build` step, there are some other powerful features we can add to our development workflow!
+  - Eliminates the need for global variables and multiple `<script>` tags.
+  - Improves performance with a single JavaScript bundle.
+  - Enables powerful build features like **minification**, **tree shaking**, and **code splitting**.
 
-> The most popular module bundler was [Browserify](https://browserify.org/), Around 2015, [webpack](https://webpack.js.org/) eventually became the more widely used module bundler (fueled by the popularity of the **React** frontend framework, which took full advantage of webpack’s various features).
+- Popular Bundlers:
+  - [Browserify](https://browserify.org/) : The first popular module bundler.
+  - [Webpack](https://webpack.js.org/) : The most widely used module bundler.
 
 ---
 
@@ -138,42 +146,62 @@ In the browser, there is no such thing as modules (kind of). But this means that
 
 ---
 
-### Webpack & Vite
+### Webpack & Vite & Parcel
 
 - [Webpack](../DEV/Modules%20&%20Bundlers.md#webpack)
 - [Vite](../DEV/Modules%20&%20Bundlers.md#vite)
+- [Parcel](../DEV/Modules%20&%20Bundlers.md#parcel)
 
 ---
 
-## Babel (`transpiling` & `Polyfilling`)
+## Babel
 
-How to make our modern code work on older engines that don’t understand recent features yet? -> There are two tools for that:
+**Babel** is a tool to convert modern JavaScript (ES6+) into a version compatible with older browsers.
 
-### Transpiling code for new language features
+- `Babel` can just convert normal `syntax` like `arrow funtion` to `function expression/declaration` (**transpiling**), **but** it can't convert new ES6 features like `class`,`promise`, so we use => (**polyfilling**).
 
-**Transpiling** code means converting the code in one language to code in another similar language. This is an important part of frontend development — since browsers are slow to add new features, new languages were created with experimental features that transpile to browser compatible languages.
+  - **Transpiling**:
 
-**Transpilers** : special piece of software that translates source code to another source code. It can parse (“read and understand”) modern code and rewrite it using older syntax constructs, so that it’ll also work in outdated engines.
+    - Converts new syntax to old syntax that can be run by older JavaScript engines.
+    - Examples: Arrow functions to regular functions, nullish coalescing operator to ternary operator.
 
-- **Babel** is not a new language but a transpiler that transpiles next generation JavaScript with features not yet available to all browsers (ES2015 and beyond) to older more compatible JavaScript (ES5).
-- **Typescript** is a language that is essentially identical to next generation JavaScript, but also adds optional static typing. Many people choose to use babel because it’s closest to vanilla JavaScript.
+      ```js
+      // Before
+      height = height ?? 100;
+      // After
+      height = height !== undefined && height !== null ? height : 100;
+      ```
 
-```js
-// before running the transpiler
-height = height ?? 100;
+  - **Polyfilling**:
 
-// after running the transpiler
-height = height !== undefined && height !== null ? height : 100;
-```
+    - Adds new features to older engines that may lack them.
+    - Examples: `Promise` to callback functions, `Math.trunc` to `Math.ceil` and `Math.floor`.
 
-- Usually, a developer runs the transpiler on their own computer, and then deploys the transpiled code to the server.
-- **Babel** is one of the most prominent transpilers out there.
+      ```js
+      if (!Math.trunc) {
+        Math.trunc = function (number) {
+          return number < 0 ? Math.ceil(number) : Math.floor(number);
+        };
+      }
 
-#### Configuring Webpack to use Babel
+      if (!Promise) {
+        // Polyfill Promise
+      }
+      ```
+
+- Babel works with **plugins** and **presets**.
+  - **Plugins**: Small pieces of code that tell Babel how to transform your code (specific javascript feature that you want to transpile).
+    - Example: `@babel/plugin-transform-arrow-functions` is a plugin that converts arrow functions to regular functions.
+  - **Presets**: A set of plugins that work together to transform your code.
+    - Example: `@babel/preset-env` is a preset that includes all the plugins needed to convert modern JavaScript to an older version.
+
+---
+
+### Configuring Webpack to use Babel
 
 Modern project build systems, such as **webpack**, provide a means to run a transpiler automatically on every code change, so it’s very easy to integrate into the development process.
 
-- We can configure webpack to use babel-loader by editing the webpack.`config.js` file as follows:
+- We can configure webpack to use `babel-loader` by editing the webpack.`config.js` file as follows:
 
 ```js
 // webpack.config.js
@@ -206,41 +234,30 @@ module.exports = {
 
 ---
 
-### Polyfilling
+### Configuring Babel to use polyfilling
 
-**Polyfills** : is a piece of code (usually JavaScript on the Web) used to provide modern **functionality** on older browsers that do not natively support it.
+- **Polyfilling** is the process of adding new features to older engines that may lack them.
+- We can use the `@babel/preset-env` preset to include polyfills for features that are missing in the target environment.
 
-- New language features may include not only syntax constructs and operators, but also built-in **functions**. As we’re talking about new functions, not syntax changes, there’s no need to transpile anything here. We just need to declare the missing function.
-- For example, `Math.trunc(n)` is a function that “cuts off” the decimal part of a number, e.g `Math.trunc(1.23)` returns 1.
+```js
+// babel.config.js
+module.exports = {
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'usage', // tells Babel to include polyfills for features that are missing in the target environment
+        corejs: 3
+      }
+    ]
+  ]
+};
+```
+
+- Importing polyfills libraries in your entry file:
 
   ```js
-  if (!Math.trunc) {
-    // if no such function
-
-    Math.trunc = function (number) {
-      // Math.ceil and Math.floor exist even in ancient JavaScript engines
-      // they are covered later in the tutorial
-      return number < 0 ? Math.ceil(number) : Math.floor(number);
-    };
-  }
+  // index.js
+  import 'core-js/stable'; // polyfills for ES6+ features
+  import 'regenerator-runtime/runtime'; // polyfills for async/await
   ```
-
-- `Babel` is a JavaScript `transcompiler` that is mainly used to convert ECMAScript 2015+ (ES6+) code into a backwards compatible version of JavaScript that can be run by older JavaScript engines. Babel is a popular tool for using the newest features of the JavaScript programming language.
-
-  - `Babel` can just convert normal `syntax` like `arrow funtion` to `function expression/declaration`, **but** it can't convert new ES6 features like `class`,`promise`, so we use => `polyfilling`.
-
-- `polyfill` is a piece of code (usually JavaScript on the Web) used to provide modern functionality on older browsers that do not natively support it.
-
-  - for it we use a library : `core-js`, `regenerator-runtime`
-
-    ```javascript
-    // in js file
-    import 'core-js/stable';
-
-    // Polifilling async functions
-    import 'regenerator-runtime/runtime';
-
-    // if they are not installed automatically, install them manually
-    ```
-
----

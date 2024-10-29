@@ -7,6 +7,7 @@
       - [CommonJS](#commonjs)
       - [EcmaScript Modules (ESM)](#ecmascript-modules-esm)
   - [Parcel](#parcel)
+  - [Webpack](#webpack)
   - [Vite](#vite)
     - [Why Vite](#why-vite)
       - [The Problems](#the-problems)
@@ -95,15 +96,18 @@ export const uniqConst = uniq([1, 2, 2, 4]);
 - results will be in `dist` folder
 - [parcel installation](https://parceljs.org/getting-started/webapp/)
 
-  ```shell
-  npm i parcel --save-dev
-  // or
+  ```sh
+  npm i parcel --save-dev # or
   npm i parcel -D
 
   npx parcel index.html  # this will run parcel in development mode
   ```
 
-  - we specify an entry point => `index.html`
+  - It's a dev dependency not a production one
+
+- Using it
+
+  - run `npx parcel index.html` in the terminal, we specify an entry point `index.html` which is the main file of our project (it's the file that we want to start with).
   - you can import something from a `package` and parcel will automatically find the path for the module, and even more : if `package` isn't installed => parcel will install it
 
     ```js
@@ -119,7 +123,16 @@ export const uniqConst = uniq([1, 2, 2, 4]);
     ```js
     import icons from '../img/icons.svg'; // Parcel version 1
     import icons from 'url:../../img/icons.svg'; // Parcel version 2 (now)
+
+    // using it
+    const markup = `
+      <svg>
+        <use xlink:href="${icons}#icon-${iconName}"></use>
+      </svg>
+    `;
     ```
+
+    - This is to solve the problem of the path of the image when bundling the files, as the path of the image will change when bundling the files to be in the `dist` folder and not in the `src` folder
 
 - `parcel` is also capable of bundling `sass` files into `css` files
 
@@ -128,6 +141,32 @@ export const uniqConst = uniq([1, 2, 2, 4]);
     ```html
     <link rel="stylesheet" href="src/sass/main.scss" />
     ```
+
+- Results
+
+  - `parcel` will create a `dist` folder that contains the bundled files (`html` file with `js` script tag (module) and `css` link tag)
+
+    - starter files will be like this:
+
+      ```html
+      <script type="module" src="src/index.js"></script>
+      <link rel="stylesheet" href="src/sass/main.scss" />
+      ```
+
+    - build files will be like this:
+
+      ```html
+      <script type="module" src="src.1e7b7b7e.js"></script>
+      <link rel="stylesheet" href="src.1e7b7b7e.css" />
+      ```
+
+  - `parcel` will also create a `cache` folder that contains the cache files that are used to speed up the bundling process
+
+---
+
+## Webpack
+
+[Webpack](./Webpack.md)
 
 ---
 

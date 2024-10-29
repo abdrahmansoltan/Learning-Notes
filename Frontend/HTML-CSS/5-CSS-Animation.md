@@ -14,6 +14,7 @@
   - [Animation Examples](#animation-examples)
     - [Loading spinner](#loading-spinner)
     - [Converting hamburger-menu icon to close icon](#converting-hamburger-menu-icon-to-close-icon)
+  - [Animation Libraries](#animation-libraries)
   - [Animation Notes](#animation-notes)
 
 ---
@@ -382,6 +383,20 @@ You can use `data-state` attribute to define state and make css values establish
     top: 22px;
   }
   ```
+
+---
+
+## Animation Libraries
+
+Instead of re-inventing the wheel, you can use libraries to animate elements:
+
+- [Animate.css](https://animate.style/)
+- [Hover.css](https://ianlunn.github.io/Hover/)
+- [Magic Animations](https://www.minimamente.com/project/magic/)
+- [Bounce.js](http://bouncejs.com/)
+- [Anime.js](https://animejs.com/)
+- [GreenSock Animation Platform (GSAP)](https://greensock.com/gsap/) -> it's the most powerful and flexible animation library
+  - Here's an entire notes file for it: [FE-Animation](../General/FE-Animaiton.md#gsap)
 
 ---
 

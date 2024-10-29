@@ -223,6 +223,7 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<section>` and `<article>` are workmates, not relatives.
   - These elements were not conceived to be part of a hierarchy (parent & child elements), in fact, they are made for working together.
   - you can use them one inside another without any problem.
+  - You might think that `<article>` is for news articles and `<section>` is for the rest of the content, but that's not the case. `<article>` is for content that can be **independently distributed** or **reused** (like a blog post, a forum post, a comment, a card, etc.), while `<section>` is for grouping content that is **related** to each other.
   - usually they're used in a **cards/skills section**
 - `<nav>`
   - It's a container for navigation links, and usually contains **unordered list** element `ul` with `li` elements.
@@ -241,12 +242,23 @@ Why do we need to tell the browser what our HTML elements represent?
     ![figure](./img/figure-1.png)
   - its sidekick `<figcaption>` element, which is placed as first or last child of figure element and contains the caption text.
 
-  ```html
-  <figure>
-    <img src="logo.png" alt="" />
-    <figcaption>Slogan</figcaption>
-  </figure>
-  ```
+    ```html
+    <figure>
+      <img src="logo.png" alt="" />
+      <figcaption>Slogan</figcaption>
+    </figure>
+    ```
+
+  - It can also be used to group a blockquote and its author (this is important for SEO and accessibility, because `<blockquote>` element only takes the quote itself and we want to link the author to the quote)
+
+    ```html
+    <figure>
+      <blockquote>
+        <p>Quote</p>
+      </blockquote>
+      <figcaption>Author</figcaption>
+    </figure>
+    ```
 
 - `<iframe>`
 
@@ -281,15 +293,17 @@ Why do we need to tell the browser what our HTML elements represent?
 - `<details>` and `<summary>`
   ![details](./img/details-tag.webp)
 
-  - `<details>` element is used to create a disclosure widget in which information is visible only when the widget is toggled into an "open" state.
-  - `<summary>` element is used to specify a summary, caption, or legend for the `<details>` element's disclosure box.
-
   ```html
   <details>
     <summary>Click me</summary>
     <p>Here is some text that is hidden by default.</p>
   </details>
   ```
+
+  - `<details>` element is used to create a disclosure widget in which information is visible only when the widget is toggled into an "open" state.
+  - `<summary>` element is used to specify a summary, caption, or legend for the `<details>` element's disclosure box.
+
+  > **💡 We can use them to create an accordion menu, a dropdown menu, or a collapsible list instead of using JavaScript.**
 
 - `role` attribute can be used to also specify the role of the element in the page (specially for **screen readers**)
   - `<header role="banner">`

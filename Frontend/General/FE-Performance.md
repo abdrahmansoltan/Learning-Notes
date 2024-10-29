@@ -19,6 +19,7 @@
   - [Avoid blocking main thread](#avoid-blocking-main-thread)
   - [Avoid memory leaks](#avoid-memory-leaks)
   - [Avoid multiple re-rendering](#avoid-multiple-re-rendering)
+  - [Reducing number of concurrent requests](#reducing-number-of-concurrent-requests)
   - [Caching](#caching)
     - [Why do we need caching?](#why-do-we-need-caching)
     - [HTTP cache (`cache-control` headers)](#http-cache-cache-control-headers)
@@ -543,6 +544,16 @@ It's an optimization technique to improve the performance of the web application
 ---
 
 ## Avoid multiple re-rendering
+
+---
+
+## Reducing number of concurrent requests
+
+- **HTTP/2**: It's a major revision of the `HTTP` network protocol used by the `World Wide Web`. It's designed to reduce the latency of web pages by allowing multiple requests and responses to be sent and received at the same time over a single connection.
+
+- But it's not always possible to use `HTTP/2` because it requires `HTTPS` and it's not supported by all browsers
+- `HTTP/1.1` has a limit of `6` concurrent requests per domain, so we need to reduce the number of requests to the server to improve the performance of the website
+  - because if you have more than `6` requests, the browser will queue the requests and wait for the previous requests to finish before sending the next requests which will increase the time needed to fetch the data from the server
 
 ---
 

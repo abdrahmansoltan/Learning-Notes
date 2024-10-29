@@ -232,7 +232,7 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
   Boolean({}); // true
   ```
 
----
+- ***
 
 ### Type Coercion
 
@@ -294,10 +294,25 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
 It's the environment in which javascript code is executed, it stores all the necessary info for some code to be executed.
 ![execution context](./img/execution-context-2.png)
 
-- Each function has its own Execution context, and it's created when the function is called. and all execution contexts together make the **call stack**.
+- Each function has its own Execution context, and it's created when the function is called/invoked. and all execution contexts together make the **call stack**.
   ![execution context](./img/execution-context-4.png)
 
-  - The default execution context is the **global execution context** which is created when the script is loaded (top-level)
+- **Global Execution Context**:
+
+  - It's the default execution context, and it's created when the script is loaded.
+  - It has 2 phases:
+    1. **Creation phase**:
+       - Creation of the `global object` ( `window` object in the browser)
+       - Creation of the `this` keyword (points to the `global object`)
+       - Memory allocation for `variables` and `functions` **(hoisting)**
+         - This is super important when understanding hoisting in JavaScript.
+    2. **Execution phase**:
+       - where the code is executed line by line.
+  - It consists of these parts:
+    - Local **Thread of execution** -> code that is being executed
+    - Local **Memory** -> `local variables`, `arguments passed to the function`
+    - **Scope chain** -> where the function was written
+    - **`this`** keyword -> how the function was called (not in `arrow functions`)
 
 - It consists of these parts:
   ![execution context](./img/execution-context-3.png)
@@ -386,7 +401,7 @@ It's the scope that is defined at the time of writing the code, and it doesn't c
 
 ### Hoisting
 
-It's a JavaScript mechanism where variables and function declarations are moved to the top of their containing scope before code execution.
+It's a JavaScript mechanism where (variables and function) **declarations** are moved to the top of their containing scope before code execution by saving them in memory before the code is executed.
 
 - It makes some types of variables accessible/usable in the code before they are actually declared.
 
@@ -394,6 +409,13 @@ It's a JavaScript mechanism where variables and function declarations are moved 
 
   - Call functions before they have been declared
   - Assign a value to a variable that has not yet been declared
+
+- Note that the declaration is hoisted, but the initialization/value is not.
+
+  ```js
+  console.log(name); // undefined
+  var name = 'John';
+  ```
 
 - **variables and functions** within each execution context are created before they are executed.
   ![hoisting](./img/hoisting-1.png)
@@ -526,6 +548,12 @@ It's a special variable that is created for every execution context (every funct
 
 ## Functional Programming
 
+- Imperative vs Declarative programming:
+  ![imperative vs declarative](./img/imperative-vs-declarative.png)
+
+- Functional programming principles
+  ![functional programming](./img/functional-programming.png)
+
 - Functional programming is about **Verbs** (actions)
 
   - it's like a black box that takes something in and returns something out
@@ -549,8 +577,6 @@ It's a special variable that is created for every execution context (every funct
     - Easier to debug
 
 - object oriented programming is about **pronouns** (objects and things) -> "keep state to yourself and send/receive messages"
-
-**functions :**
 
 - Reduce the potential impact of any given line to maybe 10 other lines (inside the function)
 - structure our code into individual pieces where almost every single line is **self-contained**
@@ -1372,7 +1398,15 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 ## Notes
 
 - `console` is not built in js, but it's from the `webApi`
-- The saying that: "Everything in JavaScript is an object" is not true. There are 8 basic data types in JavaScript. They are `Boolean`, `Null`, `Undefined`, `Number`, `BigInt`, `String`, `Symbol`, and `Object`.
+- The saying that: "Everything in JavaScript is an object" is not true. **There are 8 basic data types in JavaScript**:
+  - `Boolean`
+  - `Null`
+  - `Undefined`
+  - `Number`
+  - `Object`.
+  - `String`
+  - `BigInt`
+  - `Symbol` -> (new in ES6)
   - some of them may have object-like features, but they are not objects. An object is a collection of key-value pairs. And the value can be accessed by using the key of the object.
 - **Statements Vs Expressions** :
   - `Expression`: it's a piece of code that produces a value and expected to be used in places where values are expected

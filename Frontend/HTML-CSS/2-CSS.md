@@ -39,6 +39,8 @@
     - [Alignment](#alignment)
     - [Line \& Letter Spacing](#line--letter-spacing)
     - [Text-Wrap and Overflow](#text-wrap-and-overflow)
+      - [`overflow` property](#overflow-property)
+      - [`text-overflow` property](#text-overflow-property)
     - [Multi-column Text](#multi-column-text)
     - [Font Notes](#font-notes)
   - [Units](#units)
@@ -82,6 +84,9 @@
       - [Custom Audio Player](#custom-audio-player)
       - [Double Border Corners](#double-border-corners)
       - [Rotating elements (perspective)](#rotating-elements-perspective)
+      - [Hamburger menu that opens navbar from the right as a growing circle](#hamburger-menu-that-opens-navbar-from-the-right-as-a-growing-circle)
+      - [Floating Cursor Animation](#floating-cursor-animation)
+      - [Chat Messages](#chat-messages)
     - [General Notes](#general-notes)
     - [Questions](#questions)
 
@@ -161,9 +166,15 @@
 
 ### Starter CSS Code (Global Reset / Normalize)
 
-in this repo, you will find source for [CSS Default Starter / Global Styles / Tools](https://github.com/john-smilga/default-starter)
+**CSS Reset** is a set of styles that are have 2 primary jobs: **Remove** any strange default styles that browsers apply to HTML elements to make sure that the code runs the same on all browsers, and **Flatten the CSS** to make it easier to style by removing any default margins, paddings, and other styles that can make it difficult to style.
 
-> read the README.md file for instructions
+- **References to use:**
+
+  - [John Smilga CSS Default Starter / Global Styles / Tools](https://github.com/john-smilga/default-starter)
+
+    - read the README.md file for instructions
+
+  - [A (more) Modern CSS Reset](https://piccalil.li/blog/a-more-modern-css-reset/)
 
 - Notes:
 
@@ -591,6 +602,7 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
 - Note that they're not part of the DOM, so:
   - they can't be selected by JavaScript.
   - they aren't accessible by screen readers.
+  - they can't be selected by the user when selecting text. **(Super useful when you want to add visual content to the text without affecting the text itself when selecting it)**
 - When using it, we must provide a `content` property to it in order to work (even if it's empty string `""`)
 
   ```css
@@ -699,7 +711,9 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
     ![toggle checkbox](./img/toggle-checkbox.webp)
 
 - Notes:
-  - sometimes you will find it used with single colon `":"` instead of 2 `"::"`, because in **CSS 2** there were no difference between pseudo-classes and pseudo-elements, but in **CSS 3** the `"::"` was introduced
+  - sometimes you will find it used with single colon `":"` instead of 2 `"::"`
+    - because in **CSS 2** there were no difference between pseudo-classes and pseudo-elements, but in **CSS 3** the `"::"` was introduced
+    - Most browsers will still support the single colon syntax for backward compatibility, but it's recommended to use the double colon syntax as some pseudo-elements require it like `::placeholder`.
 
 ---
 
@@ -854,6 +868,10 @@ The **CSS Box Model** is a set of rules that describe how elements on a web page
   ![box-model](./img/box-model-4.png)
   ![box-model](./img/box-model-5.png)
 
+  - Interview question: **What is the difference between `box-sizing: content-box;` and `box-sizing: border-box;`?**
+
+    - `content-box` includes only the content of the element in the width and height calculation, while `border-box` includes the content, padding, and border in the width and height calculation. So when you use `border-box`, we want to set the `width` and `height` of the element to include the entire box (border box) not just the content (content box).
+
 ---
 
 ### Padding
@@ -901,6 +919,9 @@ It's the inner space between the content and the border of an element.
   ```
 
   - This pattern is shared amongst other CSS properties that have shorthand values. like `margin`, `border`, `outline`, `background`, `font`, `list-style`, `animation`, `transition`, `grid`, `flex`
+
+- Notes
+  - You will often find usage of **Asymmetric Padding** in elements that contain text, to give more space at the top and bottom of the text. This gives optical illusion that the text is more centered and easier to read. because if we didn't use it, the text will look like it's sticking to the top of the element because of the text's line-height.
 
 ---
 
@@ -1432,6 +1453,7 @@ It's a way to create a gradient that changes color smoothly from one color to an
     - `overline` -> overlines the text
     - `line-through` -> draws a line through the text
     - `blink` -> makes the text blink
+    - `revert` -> reverts to the default decoration **(usually when you want to remove/show the underline of a link when hovering)**
 
     ```css
     p {
@@ -1554,19 +1576,33 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
 When text overflows the container, you can control how it behaves using the `overflow` property or by controlling how it wraps when it reaches the end of the container.
 
-- `overflow` property:
+#### `overflow` property
+
+- It specifies what should happen if content overflows an element's box.
+- Values:
   ![overflow](./img/overflow.jpg_large)
-
-  - `visible` -> the text will overflow the container
+  - `visible` -> the text will overflow the container **(Default)**
   - `hidden` -> the text will be hidden
+    - Usually used when we want to truncate the text with ellipsis `(...)`
   - `scroll` -> the text will be hidden but a scrollbar will appear
-  - `auto` -> the text will be hidden but a scrollbar will appear only if needed
+    - Usually used when we are sure that the text will overflow the container, and we want to show the scrollbar from the beginning
+  - `auto` -> the text will be hidden but a scrollbar will appear (only if needed)
+    - Usually used when we are not sure if the text will overflow the container, and we want to show the scrollbar only if needed
+- **Notes**:
 
-- `text-overflow` property:
-  ![text-overflow](./img/text-overflow.png)
+  - Why use `overflow: scroll` instead of `overflow: auto`?
+    - In most cases, `overflow: auto` is a better choice than `overflow: scroll`, but as with everything, there are tradeoffs involved.
+      - Inside an `auto` container, a **layout shift** will occur when the content grows to exceed the available space; the content box shrinks by `~15 pixels`, the width of the scrollbar.
+      - This can be a bit jarring, so if you know that a container will need to scroll, using `overflow-y: scroll` can make for a smoother experience.
+  - If you set `overflow-x` to `hidden` and `overflow-y` to `visible`, the text will be hidden horizontally but will show a vertical scrollbar as if it has `overflow-y: scroll`.
+    - This behavior occurs because the element becomes a scroll container, and its children are confined within its bounds. The `overflow-x: hidden` removes the horizontal scrollbar, while `overflow-y: visible` allows vertical scrolling, but the content is still confined within the container.
 
-  - `clip` -> the text will be clipped
-  - `ellipsis` -> the text will be clipped and an ellipsis will be shown to indicate that there is more text
+#### `text-overflow` property
+
+![text-overflow](./img/text-overflow.png)
+
+- `clip` -> the text will be clipped
+- `ellipsis` -> the text will be clipped and an ellipsis will be shown to indicate that there is more text
 
 - `text-wrap` property:
   - `normal` -> the text will wrap to the next line
@@ -2674,6 +2710,8 @@ To center an element vertically and horizontally in a container, we have these o
    ```css
    .container {
      display: flex;
+     min-height: 100vh; /* to make the container full height */
+     flex-direction: column;
      justify-content: center;
      align-items: center;
    }
@@ -2899,6 +2937,203 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 
   ![backface-visibility](./img/backface-visibility.webp)
   ![backface-visibility](./img/backface-visibility2.png)
+
+---
+
+#### Hamburger menu that opens navbar from the right as a growing circle
+
+- The trick here is to use `clip-path` property to create a circle that grows from the center of the button to cover the whole screen
+
+```css
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1;
+  opacity: 1;
+  clip-path: circle(50px at 100% -10%); /* Masking the content of the nav-bar to be a circle */
+  -webkit-clip-path: circle(50px at 100% -10%);
+}
+```
+
+---
+
+#### Floating Cursor Animation
+
+- The idea here is to create a floating cursor that follows the mouse movement on the page
+- It's just a simple div with a background color that follows the mouse movement using `mousemove` event
+
+- Floating Cursor when moving the mouse
+
+  ```html
+  <!-- Down in the end of the body -->
+  <div class="cursor"></div>
+  ```
+
+  - Approach 1: using absolute positioning
+
+    ```css
+    .cursor {
+      width: 3rem;
+      height: 3rem;
+      border: 2px solid white;
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      transition: all 0.5s ease-in-out;
+      transition-property: background, transform;
+      transform-origin: 75% 75%;
+    }
+    ```
+
+    ```js
+    function cursor(e) {
+      let mouse = document.querySelector('.cursor');
+      mouse.style.top = e.pageY + 'px';
+      mouse.style.left = e.pageX + 'px';
+    }
+
+    window.addEventListener('mousemove', cursor);
+    ```
+
+  - Approach 2: using (fixed positioning & `transform` property)
+
+    ```css
+    .cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 30px;
+      height: 30px;
+      opacity: 1;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid transparent;
+      transition: width 0.3s cubic-bezier(0.3, 0, 0.3, 1), height 0.3s cubic-bezier(0.3, 0, 0.3, 1),
+        background 0.3s cubic-bezier(0.3, 0, 0.3, 1), margin 0.3s cubic-bezier(0.3, 0, 0.3, 1),
+        opacity 0.7s cubic-bezier(0.3, 0, 0.3, 1);
+      -webkit-transition: width 0.3s cubic-bezier(0.3, 0, 0.3, 1), height 0.3s cubic-bezier(0.3, 0, 0.3, 1),
+        background 0.3s cubic-bezier(0.3, 0, 0.3, 1), margin 0.3s cubic-bezier(0.3, 0, 0.3, 1),
+        opacity 0.7s cubic-bezier(0.3, 0, 0.3, 1);
+      z-index: 999;
+      pointer-events: none;
+      border-radius: 100%;
+      -moz-border-radius: 100%;
+      -webkit-border-radius: 100%;
+      -khtml-border-radius: 100%;
+    }
+    ```
+
+    ```js
+    function cursor(e) {
+      let mouse = document.querySelector('.cursor');
+      mouse.style.transform = `translate(${e.pageX}px, ${e.pageY}px)`;
+    }
+
+    window.addEventListener('mousemove', cursor);
+    ```
+
+- Growing Cursor when hovering over an element
+
+  - The idea here is to create a circle that grows from the center of the button to cover the whole button
+
+  ```css
+  .cursor {
+    width: 3rem;
+    height: 3rem;
+    border: 2px solid white;
+    border-radius: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: all 0.5s ease-in-out;
+    transition-property: background, transform;
+    transform-origin: 75% 75%;
+  }
+  .cursor.nav-active {
+    background: rgb(86, 124, 228);
+    transform: scale(3);
+  }
+  .cursor.explore-active {
+    background: white;
+    transform: scale(3);
+  }
+  .cursor-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 0.5rem;
+    transform: translate(-50%, -50%);
+  }
+  ```
+
+  ```js
+  let mouse = document.querySelector('.cursor');
+  let mouseTxt = mouse.querySelector('span');
+
+  function activeCursor(e) {
+    const item = e.target;
+
+    // If the item is a link, the cursor will be a pointer
+    if (item.id === 'logo' || item.classList.contains('burger')) {
+      mouse.classList.add('nav-active');
+    } else {
+      mouse.classList.remove('nav-active');
+    }
+
+    // If the item is an explore link, the cursor will be a circle
+    if (item.classList.contains('explore')) {
+      mouse.classList.add('explore-active');
+      mouseTxt.innerText = 'Tap';
+      gsap.to('.title-swipe', 1, { y: '0%' });
+    } else {
+      mouse.classList.remove('explore-active');
+      mouseTxt.innerText = '';
+      gsap.to('.title-swipe', 1, { y: '100%' });
+    }
+  }
+
+  // Event Listeners
+  window.addEventListener('mouseover', activeCursor);
+  ```
+
+- Notes:
+  - It's important to set `pointer-events: none;` to prevent the cursor from blocking the mouse events on the page (like clicking on items)
+
+---
+
+#### Chat Messages
+
+![chat-messages](./img/chat-messages.png)
+
+- The idea here is to create a chat interface with messages that have different styles based on the sender or the receiver
+- Also we can move the messages container to the bottom of the page so that it feels like a real chat interface
+
+```html
+<style>
+  ol {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .message.sent {
+    align-self: flex-end;
+  }
+</style>
+
+<body>
+  <ol>
+    <li class="message sent">Can you get me a big salad?</li>
+    <li class="message received">What big salad? I'm going to the coffee shop.</li>
+  </ol>
+</body>
+```
 
 ---
 
@@ -3149,6 +3384,30 @@ Double borders on just the corner of some boxes may seem impossible to start wit
     object-fit: cover;
   }
   ```
+
+- If you have multiple flex items that you want tem to have the same width (space in the container), you can use `flex: 1` for both of them
+
+  ```css
+  .container {
+    display: flex;
+  }
+
+  .item {
+    flex: 1;
+  }
+  ```
+
+  ![flex-items](./img/flex-items-1.png)
+  ![flex-items](./img/flex-items-2.png)
+
+  - Why Use flex: 1 Instead of Just flex-grow: 1?
+
+    - `flex: 1` is a shorthand for `flex-grow: 1`, `flex-shrink: 1`, `flex-basis: 0`
+    - `flex-grow: 1` will make the item grow to fill the container, but it won't make the items have the same width.
+    - **The Key Trick**: Setting `flex-basis: 0` ensures that items have the same **hypothetical width**. This means the container will have a lot of free space since all items start with a width of `0`. The free space is then distributed equally among the items because `flex-grow: 1` is set for all of them.
+
+  - **Summary:**
+    - What `flex: 1` does is that it resets all of the items' widths to `0` and then makes them grow to fill the container equally.
 
 ---
 

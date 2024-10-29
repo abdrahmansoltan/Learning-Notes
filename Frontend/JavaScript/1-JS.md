@@ -203,7 +203,7 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
       alert(one); // 1, "one" is visible after loop, it's a global variable
       ```
 
-  - `“var”` tolerates re-declarations
+  - `var` tolerates re-declarations
 
     ```js
     let user;
@@ -796,6 +796,25 @@ They are a way of organizing and storing data so that we can access and modify i
   console.log('a\n b'.length); // 4 (a, newline, space, b)
   ```
 
+- quotes inside strings:
+
+  - In order to use quotes inside a string, you can use the **opposite** quotes or use the **backslash** `\` to escape the quotes.
+
+    ```js
+    let str = "I'm the Walrus!";
+    let str2 = "I'm the Walrus!";
+
+    let str3 = 'Steve Jobs once said: "something"';
+    let str4 = 'Steve Jobs once said: "something"';
+    ```
+
+  - or use **backticks** ` "``" ` to avoid using quotes inside the string.
+
+    ```js
+    let str = `I'm the Walrus!`;
+    let str2 = `Steve Jobs once said: "something"`;
+    ```
+
 #### String Methods
 
 - Strings have methods like `length`, `toUpperCase()`, and `indexOf` despite being primitive types.
@@ -1100,8 +1119,6 @@ const [firstName, surname] = arr;
 
       ```js
       [1, 30, 4, 21].sort(); // results: [1, 21, 30, 4]
-
-      ['John'];
       ```
 
     - with condition -> it will sort based on the provided comparator function
@@ -1153,6 +1170,15 @@ const [firstName, surname] = arr;
             return a.localeCompare(b);
           }); // ["a", "A", "b", "B", "t"]
           ```
+
+  - Note that `sort` method modifies the original array. If you want to keep the original array unchanged, you can use `slice` method to create a copy of the array and then sort the copy.
+
+    ```js
+    const arr = [1, 30, 4, 21];
+    const sorted = arr.slice().sort((a, b) => a - b);
+    // or
+    const sorted = [...arr].sort((a, b) => a - b);
+    ```
 
 - methods for creating arrays with filled values
 

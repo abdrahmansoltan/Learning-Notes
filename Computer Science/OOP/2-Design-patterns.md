@@ -18,7 +18,6 @@ They're best practices for solving common problems in software design.
 - **Design Patterns** are general reusable solutions to commonly occurring problems within a given context in software design.
   - it is a description or **template** for how to solve a problem that can be used in many different situations.
   - it is a proven solution to a common problem in a specific context.
-  
 - **Design Patterns** are categorized into three groups:
   1. **Creational Patterns**: deal with the creation of objects.
   2. **Structural Patterns**: deal with the composition of classes or objects.
@@ -41,10 +40,13 @@ It states that a class should have one and only one reason to change, meaning th
 
 ![single-responsibility](./img/solid-4.webp)
 
+- This means that when something changes in the class, you're more likely to introduce bugs if the class has many responsibilities. also it may results **merge-conflicts** in the same class when working in a team.
 - If a Class has many responsibilities, it increases the possibility of bugs because making changes to one of its responsibilities, could affect the other ones without you knowing.
+
   - This principle aims to separate behaviours so that if bugs arise as a result of your change, it won't affect other unrelated behaviours.
 
 - Ex: a class that is responsible for sending emails should not be responsible for storing the email addresses.
+
   - because if we change the way we store the email addresses, we'll have to change this class. and this is a violation of the S.R.P.
 
   ```py
@@ -92,29 +94,71 @@ It states that a class should have one and only one reason to change, meaning th
 
 ### O - Open-Closed Principle (O.C.P)
 
-It states that classes should be open for extension but closed for modification.
+It states that classes should be **open for extension but closed for modification**.
 
 ![open-closed](./img/solid-5.webp)
 
 - If you want the Class to perform more functions, the ideal approach is to add to the functions that already exist NOT change them.
   ![open-closed](./img/solid-1.avif)
 
+- Why?
+  - Because if you change the existing functions, you might break the code that depends on those functions. So we will guarantee that the existing code will not break.
+  - Also by modifying the existing functions, you might break the code that depends on those functions or cause unit tests to fail. So we will guarantee that the existing code will not break.
+
 > **"extension"** means adding new functionality.
 > ![extension](./img/solid-2.png)
 
 - It's usually done on `Abstract Classes` or `Interfaces`.
   ![open-closed](./img/solid-9.png)
+
   - `Abstract Classes` are classes that cannot be instantiated. They can only be used as a base class for other classes that extend them.
   - `Interfaces` are classes that contain only abstract methods. They are used to define the operations that the high-level classes should use.
 
-- Why?
-  - Because if you change the existing functions, you might break the code that depends on those functions. So we will guarantee that the existing code will not break.
+- One way to achieve the O.C.P. is by using **Decorator Pattern**.
+
+  - The Decorator Pattern is a structural design pattern that lets you attach new behaviors to objects by placing these objects inside special wrapper objects that contain the new behaviors.
+  - It allows behavior to be added to individual objects, either statically or dynamically, without affecting the behavior of other objects from the same class.
+  - It's a way to add new functionality to an object without changing its structure.
+
+  ```py
+  class Shape:
+    def draw(self):
+      pass
+
+  class Circle(Shape):
+    def draw(self):
+      # code to draw a circle
+
+  class Square(Shape):
+    def draw(self):
+      # code to draw a square
+
+  class RedShapeDecorator(Shape):
+    def __init__(self, decoratedShape):
+      self.decoratedShape = decoratedShape
+
+    def draw(self):
+      self.decoratedShape.draw()
+      self.setRedBorder()
+
+    def setRedBorder(self):
+      print("Border Color: Red")
+
+  # Usage
+  circle = Circle()
+  redCircle = RedShapeDecorator(Circle())
+  redSquare = RedShapeDecorator(Square())
+
+  circle.draw()
+  redCircle.draw()
+  redSquare.draw()
+  ```
 
 ---
 
 ### L - Liskov Substitution Principle
 
-It states that objects in a program should be replaceable with instances of their subtypes without altering the correctness of that program. and the behavior should remain the same.
+It states that a child class should be able to do everything the parent class can do. Meaning that objects of a superclass shall be replaceable with objects of its subclasses without affecting the functionality of the program.
 
 ![liskov-substitution](./img/solid-6.webp)
 
@@ -127,6 +171,8 @@ It states that objects in a program should be replaceable with instances of thei
 ---
 
 ### I - Interface Segregation Principle
+
+> Interfaces provide a contract that a Class must implement.
 
 It states that many client-specific interfaces are better than one general-purpose interface.
 
@@ -173,19 +219,21 @@ class Square(IShape):
 
 ### D - Dependency Inversion Principle (D.I.P)
 
-It states that high-level modules should not depend (import from) on low-level modules. Both should depend on **abstractions** (e.g. `interfaces`). and abstractions should not depend on details. Details should depend on abstractions.
+It states that **high-level modules should not depend (import from) on low-level modules**. Both should depend on **abstractions**.
 
 ![dependency-inversion](./img/solid-8.webp)
 
 - This principle says a Class should not be fused with the tool it uses to execute an action. Rather, it should be fused to the interface that will allow the tool to connect to the Class.
 - High-level classes should not know the implementation details of the low-level classes.
-![dependency-inversion](./img/solid-3.png)
+  ![dependency-inversion](./img/solid-3.png)
+
   - `High-level classes` are classes that are closer to the user and contain complex business logic.
   - `Low-level classes` are classes that contain basic building blocks (Tools) that are used by the high-level classes.
   - `Abstractions` are `interfaces` that define the operations that the high-level classes should use. -> connects 2 classes together.
   - `Details` are the implementation of the low-level classes.
 
 - This principle aims at reducing the dependency(coupling) of a high-level Class on the low-level Class by introducing an interface.
+
   - It aims to make them **loosely coupled**.
 
 - Ex:

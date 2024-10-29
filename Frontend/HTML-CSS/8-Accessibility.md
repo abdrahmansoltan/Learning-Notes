@@ -7,8 +7,10 @@
   - [Screen readers](#screen-readers)
   - [Accessible HTML](#accessible-html)
     - [Labels](#labels)
+  - [Visually Hidden Elements](#visually-hidden-elements)
   - [ARIA Roles](#aria-roles)
     - [Live region roles](#live-region-roles)
+    - [Aria Label](#aria-label)
 
 ---
 
@@ -142,16 +144,12 @@ Limitations with the `<label>` tag:
 
 ---
 
-## ARIA Roles
+## Visually Hidden Elements
 
-ARIA roles provide **semantic meaning to content**, allowing screen readers and other tools to present and support interaction with object in a way that is consistent with user expectations of that type of object. ARIA roles can be used to describe elements that don't natively exist in HTML or exist but don't yet have full browser support.
-
-You can find more here along with roles to use -> [here](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles)
-
-> Bootstrap uses class `.sr-only` to only show the element to **screen readers**, what it does is it does every possible way to hide the element from the page like this:
+Sometimes you want to hide an element visually but still have it read out loud by screen readers. This is useful for things like skip links, or for providing additional context to screen reader users.
 
 ```css
-.sr-only {
+.visuallyhidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -162,6 +160,29 @@ You can find more here along with roles to use -> [here](https://developer.mozil
   border: 0;
 }
 ```
+
+- Bootstrap uses class `.sr-only` to only show the element to **screen readers**, what it does is it does every possible way to hide the element from the page like this:
+
+  ```css
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  ```
+
+---
+
+## ARIA Roles
+
+ARIA roles provide **semantic meaning to content**, allowing screen readers and other tools to present and support interaction with object in a way that is consistent with user expectations of that type of object. ARIA roles can be used to describe elements that don't natively exist in HTML or exist but don't yet have full browser support.
+
+You can find more here along with roles to use -> [here](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles)
 
 ### Live region roles
 
@@ -174,5 +195,17 @@ Live Region roles are used to define elements with **content that will be dynami
   ```html
   <div aria-live="assertive">Waiting for a ride</div>
   ```
+
+### Aria Label
+
+It's a way to add annotations for screen readers to read out loud. It's useful for elements that don't have a label, like `<div>` or `<span>`. It's also useful for elements that have a label but need additional context.
+
+```html
+<button aria-label="Contact support">
+  <HelpCircleIcon />
+</button>
+```
+
+- It's an alternative to [Visually Hidden Elements](#visually-hidden-elements)
 
 ---

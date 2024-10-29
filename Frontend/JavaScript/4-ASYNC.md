@@ -23,19 +23,19 @@
     - [Cleanup: `finally` method](#cleanup-finally-method)
   - [consume promises](#consume-promises)
     - [Promisification (promisify)](#promisification-promisify)
-    - [Consuming Promises with Async/Await](#consuming-promises-with-asyncawait)
+    - [Consuming Promises with `async / await` (Modern Way 🚀)](#consuming-promises-with-async--await-modern-way-)
   - [Error Handling](#error-handling)
     - [Handling uncaught error](#handling-uncaught-error)
     - [Handling Rejected Promises (2 ways)](#handling-rejected-promises-2-ways)
       - [1. Pass a second callback function in `.then()` method](#1-pass-a-second-callback-function-in-then-method)
       - [2. using `.catch()` at the end of the promise chain](#2-using-catch-at-the-end-of-the-promise-chain)
     - [Handling custom errors when fetching](#handling-custom-errors-when-fetching)
-    - [Error Handling With try...catch](#error-handling-with-trycatch)
+    - [Error Handling With try...catch (modern way)](#error-handling-with-trycatch-modern-way)
       - [try…catch…finally](#trycatchfinally)
     - [Global Error Handling (Global catch)](#global-error-handling-global-catch)
   - [Promise Chaining: (Sequence vs Parallel) Promises](#promise-chaining-sequence-vs-parallel-promises)
     - [Sequence promises](#sequence-promises)
-    - [Parallel promises](#parallel-promises)
+    - [Parallel promises (Promise Combinators)](#parallel-promises-promise-combinators)
       - [`Promise.all()`](#promiseall)
       - [`Promise.allSettled()`](#promiseallsettled)
       - [`Promise.race()`](#promiserace)
@@ -80,7 +80,7 @@ JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchrono
 
 ## How Asynchronous code works in JavaScript
 
-`Concurrency model` and the `event loop` are the **most** important concepts in `javascript` and they are part of the **browser** not `javascript`
+**Concurrency model** and the **event loop** are the most important concepts in `javascript` and they are part of the **browser** not `javascript`
 
 > **Concurrency model** is how javascript engine handles multiple tasks happening at the same time and how it decides which piece of code to run next.
 > ![Concurrency model](./img/concurrency-model.png)
@@ -92,17 +92,37 @@ All this happens in the javascript engine which is part of the browser (javascri
 
 Mainly its job is to always check "is the call stack empty?". If it is, then it checks the **callback queue** and **microtasks queue** and executes the oldest task (the task that is waiting the longest time to be executed) and then goes back to check the call stack again.
 
-![Event Loop](./img/event-loop-2.png)
+![Event Loop](./img/event-loop-0.png)
 
 - The general algorithm of the engine:
 
   1. While there are tasks: execute them, starting with the oldest task.
-  2. `microtasks` queue has higher priority than `callback` queue.
+  2. `microtasks` queue has higher priority than `callback` queue. (meaning that `microtasks` will be executed even if there are tasks in the `callback` queue)
   3. Sleep until a task appears, then go to **1**.
 
-- Notes for the `DOM`:
-  - Rendering never happens while the engine executes a task. It doesn’t matter if the task takes a long time. Changes to the DOM are painted only after the task is complete.
-  - If a task takes too long, the browser can’t do other tasks, such as processing user events. So after a time, it raises an alert like “Page Unresponsive”, suggesting killing the task with the whole page. That happens when there are a lot of complex calculations or a programming error leading to an infinite loop.
+- **Event Loop Tick**:
+
+  - Each time the event loop makes a round (takes a task from the queue and executes it), it’s called a “tick”.
+  - A “tick” is the completion of a single task from the queue.
+
+- The event loop does the **orchestration** of the code execution in the browser.
+
+- Example
+  ![Event Loop](./img/event-loop-2.png)
+  ![Event Loop](./img/event-loop-3.png)
+  ![Event Loop](./img/event-loop-4.png)
+  ![Event Loop](./img/event-loop-5.png)
+  ![Event Loop](./img/event-loop-6.png)
+  ![Event Loop](./img/event-loop-7.png)
+  ![Event Loop](./img/event-loop-8.png)
+
+- Notes
+  - For the `DOM`:
+    - DOM Events are not asynchronous. But they use a callback mechanism to handle events which is asynchronous.
+    - Rendering never happens while the engine executes a task. It doesn’t matter if the task takes a long time. Changes to the DOM are painted only after the task is complete.
+    - If a task takes too long, the browser can’t do other tasks, such as processing user events. So after a time, it raises an alert like “Page Unresponsive”, suggesting killing the task with the whole page. That happens when there are a lot of complex calculations or a programming error leading to an infinite loop.
+  - Timers are not guaranteed to run exactly after the time specified. They run approximately after the time specified. The exact delay depends on the CPU load. If the CPU is busy, the timer may run later.
+    - meaning that after the specified time, the timer will be added to the `callback queue` and will be executed when the `call stack` is empty, and if the `call stack` is busy, the timer will wait until the `call stack` is empty.
 
 ---
 
@@ -487,13 +507,30 @@ It's a modern way to do `AJAX` calls, but it's not part of `javascript` but it's
 - returns a `promise` that resolves to the`Response to that request, whether it is successful or not using the`then()`method. or rejects with an error using the`catch()` method.
 
   ```js
+  // GET request Example
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
     .then(response => response.json())
     .then(data => {
       console.log(data);
     })
     .catch(err => console.error(err));
+
+  // POST request Example
+  fetch(`https://restcountries.eu/rest/v2/name/Egypt`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: 'Egypt' })
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+    })
+    .catch(err => console.error(err));
   ```
+
+  - For `POST` requests, we must specify the `method` and the `headers` in the `fetch()` method. the `Content-Type` header is required for `POST` requests to specify the type of data being sent.
 
 ---
 
@@ -640,6 +677,40 @@ A Promise object serves as a link between the executor (the “producing code”
       });
     ```
 
+  - How different is error handling between `fetch()` and `axios`?
+
+    - `fetch()`
+
+      - Doesn't reject the promise if the response code is `404` or `500`, or if `response.ok` is `false`. It only rejects the promise if there's a network error.
+      - So, we need to check `response.ok` and throw an error if it's `false`.
+
+        ```js
+        fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+          .then(response => {
+            if (!response.ok) throw new Error(`Country not found (${response.status})`);
+            return response.json();
+          })
+          .then(data => {
+            console.log(data);
+          })
+          .catch(err => console.error(err.message));
+        ```
+
+    - `axios`
+
+      - Rejects the promise automatically if the response code is `404` or `500`, or if `response.ok` is `false`.
+      - So, we don't need to manually check errors.
+
+        ```js
+        axios
+          .get(`https://restcountries.eu/rest/v2/name/Egypt`)
+          .then(response => {
+            console.log(response.data);
+            // no need to check response.ok or to return response.json()
+          })
+          .catch(err => console.error(err.message));
+        ```
+
 ---
 
 ### Cleanup: `finally` method
@@ -679,6 +750,14 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 ### Promisification (promisify)
 
 “Promisification” is a long word for a simple transformation. It’s the conversion of a function that accepts a `callback` into a function that returns a `promise`.
+
+```js
+const promisified = function () {
+  return new Promise((resolve, reject) => {
+    // logic that uses a callback
+  });
+};
+```
 
 - Such transformations are often required in real-life, as many functions and libraries are callback-based. But promises are more convenient, so it makes sense to promisify them.
 - For instance, we have `loadScript(src, callback)`:
@@ -722,16 +801,71 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
   loadScriptPromise(...).then(...);
   ```
 
+- Examples
+
+  - To be able to use `.then` with timer-based functions, we can promisify them:
+
+    ```js
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    wait(2000).then(() => console.log('2 seconds passed'));
+    ```
+
+  - promisify creating an image
+
+    ```js
+    const imgContainer = document.querySelector('.images');
+
+    const createImage = function (imgPath) {
+      return new Promise(function (resolve, reject) {
+        const img = document.createElement('img');
+        img.src = imgPath;
+
+        img.addEventListener('load', function () {
+          imgContainer.append(img);
+          resolve(img); // Marking the promise as fulfilled
+        });
+
+        img.addEventListener('error', function () {
+          reject(new Error('Image not found')); // Marking the promise as rejected
+        });
+      });
+    };
+
+    let currentImg;
+    createImage('img/img-1.jpg')
+      .then(img => {
+        currentImg = img;
+        console.log('Image 1 loaded');
+        return wait(2);
+      })
+      .then(() => {
+        currentImg.style.display = 'none';
+        return createImage('img/img-2.jpg');
+      })
+      .then(img => {
+        currentImg = img;
+        console.log('Image 2 loaded');
+        return wait(2);
+      })
+      .then(() => {
+        currentImg.style.display = 'none';
+      })
+      .catch(err => console.error(err));
+    ```
+
 > **Note**: Promisification is a great approach, especially when you use async/await, but not a total replacement for callbacks.
 
 ---
 
-### Consuming Promises with Async/Await
+### Consuming Promises with `async / await` (Modern Way 🚀)
 
 They make us able to write `asynchronous code` that looks like `synchronous code`.
 ![await](./img/async_await.PNG)
 
-- by using the word `async` before a function, you convert it to an `asynchronous function`
+- By using the word `async` before a function, you convert it to an `asynchronous function`
 
   - which will keep running in the background while performing the code inside of it, than when it's done => **it returns a `promise`**
   - Other values are wrapped in a resolved promise automatically.
@@ -781,8 +915,22 @@ async function asyncCall() {
   resolveAfter2Seconds().then(res => console.log(result));
 }
 
-asyncCall(); // this returns a promise
+asyncCall(); // this returns a promise that we can handle it using .then() or .catch()
 ```
+
+- The return value of an `async function` is always a `promise`, even if you don't return a promise explicitly.
+
+  ```js
+  async function f() {
+    return Promise.resolve(1);
+  }
+
+  f(); // Promise {<pending>} ⚠️
+  f().then(alert); // 1
+  await f(); // 1
+  ```
+
+  - It's important to understand why calling `f()` returns a **pending promise**. because the `async` function always returns a promise, and the value of the promise is what the `async` function returns.
 
 - If we try to use `await` **in / without** a `non-async` function, there would be a `syntax error`,so => use `IIFE`
 
@@ -797,7 +945,38 @@ asyncCall(); // this returns a promise
   })();
   ```
 
-**Note:** `await` only works in `modules` and `async functions`, because it requires `block scoping`. So we need to specify `type="module"` in the `<script>` tag.
+- Using `async/await` with `fetch()`
+
+  ```javascript
+  async function getCountryData(country) {
+    try {
+      const response = await fetch(`https://restcountries.eu/rest/v2/name/${country}`);
+      const [data] = await response.json();
+      console.log(data);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  getCountryData('Egypt');
+  ```
+
+- **Notes**
+
+  - `await` only works in `modules` and `async functions`, because it requires `block scoping`. So we need to specify `type="module"` in the `<script>` tag.
+  - Starting from ES2020, **top-level `await`** is supported in modules.
+    It's a way to use `await` at the top level of a module without wrapping it in an `async function`.
+
+    ```js
+    // 📁 main.js
+    let response = await fetch(
+      'https://api.github.com/repos/javascript-tutorial/en.javascript.info/commits'
+    );
+
+    let commits = await response.json();
+    ```
+
+    - Note that this blocks the module execution until the promise is settled, so it’s not recommended to use it in the main thread, because it may freeze the page.
 
 ---
 
@@ -808,7 +987,7 @@ asyncCall(); // this returns a promise
 - this is usually used to customize the `error message`
   - what we write in `Error()` must be a string, so we use `template literals`
 
-```javascript
+```js
 // Throwing Errors Manually (as it may not consider it an error if (response) isn't "ok")
 if (!response.ok) throw new Error(`error is : (${response.status})`);
 ```
@@ -829,13 +1008,13 @@ if (!response.ok) throw new Error(`error is : (${response.status})`);
 
         return response.json();
       },
-      err => alert(err.message)
+      err => alert(err.message) // Here we handle the error
     )
     .then(
       data => {
         console.log(data);
       },
-      err => alert(err.message)
+      err => alert(err.message) // Here we handle the error
     );
   ```
 
@@ -846,7 +1025,7 @@ if (!response.ok) throw new Error(`error is : (${response.status})`);
 #### 2. using `.catch()` at the end of the promise chain
 
 - This is done when we want to handle all errors in one place, and not in every `.then()` method
-- the `.catch()` methods catches any `error` that occures anywhere in the `promise-chain`
+- the `.catch()` methods catches any `error` that occurs anywhere in the `promise-chain`
 
   ```javascript
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
@@ -905,7 +1084,7 @@ By default, the `fetch()` API doesn't consider `HTTP` status codes in the `4xx` 
 
 ---
 
-### Error Handling With try...catch
+### Error Handling With try...catch (modern way)
 
 `try...catch` can only handle errors that occur in valid code. Such errors are called **“runtime errors”** or, sometimes, **“exceptions”**.
 
@@ -1012,11 +1191,11 @@ By default, the `fetch()` API doesn't consider `HTTP` status codes in the `4xx` 
 
 ```js
 try {
-   ... try to execute the code ...
+  //  ... try to execute the code ...
 } catch (err) {
-   ... handle errors ...
+  //  ... handle errors ...
 } finally {
-   ... execute always ...
+  //  ... execute always ...
 }
 ```
 
@@ -1081,13 +1260,39 @@ const get3Countries = async function (c1, c2, c3) {
   }
 };
 get3Countries('portugal', 'canada', 'tanzania');
+
+// --------------------------------------------------------------- //
+
+// Another example
+const wait = seconds => {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+};
+
+wait(1)
+  .then(() => {
+    console.log('1 second passed');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('2 seconds passed');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('3 seconds passed');
+  });
 ```
+
+- **Notes:**
+
+  - We should only use this approach when the promises / requests depend on each other, and the order is important.
+  - This causes a problem, because the requests are made one after the other, so it's not efficient, because we are waiting for the first request to finish before starting the second one, and so on. **This is called `waterfall effect`**.
+    - To solve this problem, we can use [`Promise.all`](#promiseall) to make the requests in parallel.
 
 ---
 
-### Parallel promises
+### Parallel promises (Promise Combinators)
 
-There are 6 static methods in the `Promise` class. They are used to deal with multiple promises at once:
+There are 6 static methods in the `Promise` class. They are used to deal with multiple promises at once **(in parallel)**.
 
 - [Promise.all](#promiseall)
 - [Promise.allSettled](#promiseallsettled)
@@ -1099,14 +1304,14 @@ There are 6 static methods in the `Promise` class. They are used to deal with mu
 
 #### `Promise.all()`
 
-- It takes an **iterable** (usually, an array of `promises`) and returns a new `promise`. The new promise resolves when all listed promises are resolved, and the array of their results becomes its result.
+- It takes an **iterable** (usually, an array of `promises`) and returns a new `promise` that resolves when all listed promises are resolved, and returns **array of their results becomes its result**. Also it run all the promises **in parallel**.
 
   ```js
   Promise.all([
     new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
     new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
     new Promise(resolve => setTimeout(() => resolve(3), 1000)) // 3
-  ]).then(alert); // 1,2,3 when promises are ready: each promise contributes an array member
+  ]).then(data => console.log(data)); // [1, 2, 3]
   ```
 
   - > Note that the order of the resulting array members is the same as in its source promises. Even though the first promise takes the longest time to resolve, it’s still first in the array of results.
@@ -1129,10 +1334,21 @@ There are 6 static methods in the `Promise` class. They are used to deal with mu
   );
   ```
 
-- If any of the promises is rejected, the promise returned by `Promise.all` immediately rejects with that error.
+- If any of the promises is rejected, all will be rejected, and the first rejection will be passed into `catch`.
 
-  - > if one promise fails, the others will still continue to execute, but `Promise.all` won’t watch them anymore. They will probably settle, but their results will be ignored.
-  - > `Promise.all` does nothing to cancel them, as there’s no concept of “cancellation” in promises.
+  ```js
+  Promise.all([
+    new Promise((resolve, reject) => setTimeout(() => resolve(1), 1000)),
+    new Promise((resolve, reject) => setTimeout(() => reject(new Error('Whoops!')), 2000)),
+    new Promise((resolve, reject) => setTimeout(() => resolve(3), 3000))
+  ])
+    .then(data => console.log(data))
+    .catch(err => console.error(err.message)); // Whoops!
+  ```
+
+  > if one promise fails, the others will still continue to execute, but `Promise.all` won’t watch them anymore. They will probably settle, but their results will be ignored.
+  >
+  > `Promise.all` does nothing to cancel them, as there’s no concept of “cancellation” in promises.
 
 - `Promise.all(iterable)` allows non-promise “regular” values in iterable
 
@@ -1169,6 +1385,7 @@ There are 6 static methods in the `Promise` class. They are used to deal with mu
   - `{status:"rejected", reason:error}` for errors.
 
 - returns a promise that resolves after all of the given promises have either fulfilled or rejected, with an array of objects that each describes the outcome of each promise.
+- It's different from `Promise.all` in that `Promise.allSettled` waits for all promises to settle **(even if some of them reject)**, and returns an array of objects that each describes the outcome of each promise. Unlike `Promise.all` that will reject immediately if any of the promises are rejected.
 - It is typically used when you have multiple asynchronous tasks that are not dependent on one another to complete successfully, or you'd always like to know the result of each promise.
 
 ```javascript
@@ -1206,6 +1423,7 @@ Promise.allSettled(urls.map(url => fetch(url))).then(results => {
 Similar to `Promise.all`, but waits only for the first settled promise and gets its result (or error).
 
 - returns a promise that **fulfills or rejects** as soon as one of the promises in an iterable fulfills or rejects, with the value or reason from that promise.
+- When the first promise settles (either resolves or rejects), the fullfilled value of the promise will be the fullfilled value of the first promise to settle.
 
 ```javascript
 const promise1 = new Promise((resolve, reject) => {
@@ -1223,11 +1441,14 @@ Promise.race([promise1, promise2]).then(value => {
 // expected output: "two"
 ```
 
+- When to use it?
+  - When you want to run multiple promises in parallel and take the result of the first one. e.g. slow network requests, and you want to show the result of the first request that comes back.
+
 ---
 
 #### `Promise.any()`
 
-Similar to Promise.race, but waits only for the first fulfilled promise and gets its result. If all of the given promises are rejected, then the returned promise is rejected with `AggregateError`
+Similar to `Promise.all`, but waits only for the **first fulfilled** promise and gets its result and ignores the rejected promises (even if the rejected promise is the fastest one).
 
 - takes an iterable of Promise objects. It returns a single promise that resolves as soon as **any of the promises in the iterable fulfills**
 
@@ -1313,6 +1534,66 @@ const authFetch = axios.create({
 // using it:
 const response = await authFetch.get('/users');
 ```
+
+- Example of axios configuration file:
+
+  ```js
+  // api.js
+  import axios from 'axios';
+
+  // Create an Axios instance with a base URL
+  const api = axios.create({
+    baseURL: process.env.API_DOMAIN + '/api/'
+  });
+
+  // Request interceptor to add authorization headers
+  api.interceptors.request.use(config => {
+    const token = localStorage.getItem('auth_token');
+    const email = localStorage.getItem('user_email');
+
+    if (token && email) {
+      config.headers.Authorization = `Token token="${token}" , email="${email}"`;
+    }
+
+    return config;
+  });
+
+  // Response interceptor to handle errors
+  api.interceptors.response.use(
+    response => response,
+    error => {
+      if (error.response && error.response.status === 401) {
+        // If unauthorized, clear local storage and redirect to login
+        clearLocalStorage();
+        location.pathname = '/login';
+      } else if (error.response && error.response.status === 440) {
+        // If session expired, redirect to session-expired page
+        location.pathname = '/session-expired';
+      }
+
+      return Promise.reject(error);
+    }
+  );
+
+  // Clear local storage except for protected keys
+  function clearLocalStorage() {
+    const protectedKeys = ['onboarding_active'];
+
+    let savedValues = {};
+    protectedKeys.forEach(key => {
+      savedValues[key] = localStorage.getItem(key);
+    });
+
+    localStorage.clear();
+
+    // Restore protected keys
+    Object.keys(savedValues).forEach(key => {
+      localStorage.setItem(key, savedValues[key]);
+    });
+  }
+
+  export default api;
+  ```
 
 ---
 

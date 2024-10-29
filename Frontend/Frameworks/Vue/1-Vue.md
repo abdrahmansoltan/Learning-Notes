@@ -34,7 +34,7 @@
     - [Filters (old and deprecated)](#filters-old-and-deprecated)
   - [Watchers](#watchers)
     - [Deep Watchers](#deep-watchers)
-    - [Eager Watchers](#eager-watchers)
+    - [Immediate (Eager) Watchers](#immediate-eager-watchers)
     - [`this.$watch()`](#thiswatch)
     - [Watcher Notes](#watcher-notes)
   - [Styles](#styles)
@@ -177,6 +177,18 @@ More on the App configuration and methods, like `app.use()`, `app.config()`, `ap
   ```
 
   ![proxy](./img/proxy.png)
+
+- **Reactivity**
+
+  - it's the ability of a system to react to changes in its environment and to adjust its functioning accordingly
+  - it has a problem with **reference-types** like `objects` and `arrays` as it can't detect changes in them
+
+    - for that we use `Vue.set()` or `this.$set()` to add new properties to the object
+
+      ```js
+      Vue.set(this.someObject, 'b', 2);
+      // now someObject will change the `b` property + it will be reactive
+      ```
 
 - **How proxy works?** -> it's for reactivity
   ![proxy](./img/proxy2.png)
@@ -778,34 +790,24 @@ export default {
 };
 ```
 
-### Eager Watchers
+### Immediate (Eager) Watchers
 
-**`watch`** is lazy by default: the callback won't be called until the watched source has changed. But in some cases we may want the same callback logic to be run **eagerly**
-
-- We can force a watcher's callback to be executed immediately by declaring it using an object with a handler function and the `immediate: true` option:
+**`watch`** is lazy by default: the callback won't be called until the watched source has changed. But in some cases we may want the same callback logic to be run immediately after the component is created. We can achieve this by passing an object to the **`watch`** option instead of a function, and specifying the `immediate: true` option:
 
 ```js
 export default {
   // ...
   watch: {
     question: {
-      handler(newQuestion) {
-        // this will be run immediately on component creation.
-      },
-
-      // or when route has params and page is being created
-      () => this.$route.params,
-      // after getting the params, we make a fetch with the params in the payload
-      () => {
-        this.fetchData()
-      },
-      // force eager callback execution
-      { immediate: true }
+      handler: 'getAnswer',
+      immediate: true
     }
   }
   // ...
 };
 ```
+
+- This is instead of calling the function in the `created` lifecycle hook (if you already will watch the property anyway)
 
 ### `this.$watch()`
 
@@ -1766,7 +1768,9 @@ It's a way to provide data to all descendants of a component without having to p
 It's an option that have a value of **(an object or a function that returns an object)**. The object contains the data that we want to provide to the descendants.
 
 - To provide data to a component's descendants, use the `provide()` function
+
   - The `provide()` function accepts 2 arguments:
+
     - The first argument is the key (string or symbol) that will be used to access the provided value in the child components.
     - The second argument is the value that will be provided to the child components. (it can be any type of value including reactive state such as a `refs` or `reactive objects`)
       - Providing reactive values allows the descendant components using the provided value to establish a **reactive connection** to the provider component.
@@ -1785,7 +1789,7 @@ It's an option that have a value of **(an object or a function that returns an o
     provide('name', 'John');
     provide('age', 30);
     ```
-  
+
 - The providing happens after the component is created, so when we call the `provide()` function, the component has already been created and the `data`, `computed`, and `methods` properties are available.
 
 - **Provider hierarchy**
@@ -2861,6 +2865,7 @@ common scenarios where plugins are useful include:
 
 - use `kebab case` for event names -> `button-clicked` instead of `buttonClicked`
 - use `$_` prefix for private properties/methods in a Vue instance
+  - private properties/methods are properties/methods that are not meant to be used outside of the component
 - use `v-text` instead of (mustache syntax `{{}}`) for text interpolation
 
   ```html
@@ -2870,9 +2875,32 @@ common scenarios where plugins are useful include:
   <span>{{ message }}</span>
   ```
 
+- Always use a unique `key` attribute when using `v-for` on a component
+
+  ```html
+  <!-- ✅ -->
+  <template v-for="user in users" :key="user.id">
+    <User :user="user" />
+  </template>
+
+  <!-- ❌ -->
+  <template v-for="user in users">
+    <User :user="user" />
+  </template>
+  ```
+
 - instead of using `v-if` inside a `v-for`, compute a new array of items that should be rendered and use `v-if` on the parent element
 
   ```html
+  <!-- ❌ -->
+  <template>
+    <ul>
+      <li v-for="user in users" :key="user.id" v-if="user.isActive">{{ user.name }}</li>
+    </ul>
+  </template>
+
+  <!--------------------------------------------------------------------------->
+
   <!-- ✅ -->
   <template>
     <ul>
@@ -2887,15 +2915,6 @@ common scenarios where plugins are useful include:
       }
     }
   </script>
-  ```
-
-  ```html
-  <!-- ❌ -->
-  <template>
-    <ul>
-      <li v-for="user in users" :key="user.id" v-if="user.isActive">{{ user.name }}</li>
-    </ul>
-  </template>
   ```
 
 - Use `computed properties` instead of `methods` for data changes.
@@ -2933,13 +2952,31 @@ common scenarios where plugins are useful include:
     user: vueTypes.shape({
       name: vueTypes.string.isRequired,
       age: vueTypes.number
-    }).def({})
+    }).def({}),
+    tracesList: VueTypes.arrayOf(VueTypes.shape({
+      id: VueTypes.string.def(''),
+      name: VueTypes.string.def(''),
+      threshold_ms: VueTypes.number.def(0),
+    })).def([]),
   }
   ```
 
 - Do not change incoming `props`, either use `data` or `events`
 
-  - If you need to change the prop value, you should define a local data property and use it instead.
+  - In case you need to change the prop value globally, use an event that’s passed from a child to parent component, to induce a change in the parent component and reflect it everywhere else where the props are passed down
+
+    ```js
+    props: {
+      title: String
+    },
+    methods: {
+      changeTitle() {
+        this.$emit('update:title', 'New title');
+      }
+    }
+    ```
+
+  - In case the change is local, it’s helpful to assign the incoming prop to the data object and change that copy within the component, you should define a local data property and use it instead.
 
     ```js
     props: {
@@ -2964,7 +3001,7 @@ common scenarios where plugins are useful include:
     }
     ```
 
-  - Note that if the prop is an object or an array, you should use a **deep copy** to avoid mutating the original value.
+    - Note that if the prop is an object or an array, you should use a **deep copy** to avoid mutating the original value.
 
 - Don’t use multiple `v-if`’s. Use one `v-if` on a `template` instead of rendering multiple elements each time
 

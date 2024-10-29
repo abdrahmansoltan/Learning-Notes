@@ -1,7 +1,7 @@
 # INDEX
 
 - [INDEX](#index)
-  - [CSS Methodologies](#css-methodologies)
+  - [Modern Component Architecture \& Methodologies](#modern-component-architecture--methodologies)
   - [Object-Oriented CSS (OOCSS)](#object-oriented-css-oocss)
     - [OOCSS Example](#oocss-example)
   - [Block Element Modifier (BEM)](#block-element-modifier-bem)
@@ -26,7 +26,11 @@
 
 ---
 
-## CSS Methodologies
+## Modern Component Architecture & Methodologies
+
+There are a few “Hard Problems” when it comes to CSS. One of the very hardest has to do with CSS' global nature: how do we structure large applications to avoid specificity wars and naming collisions? How do we identify which styles affect a given element?
+
+As it turns out, this doesn't have to be a major pain point! With the right combination of tooling and methodology, these are solved problems.
 
 CSS is notoriously difficult to manage in large, complex, rapidly-iterated systems. One reason is **CSS lacks a built-in scoping mechanism**. Everything in CSS is global.
 
@@ -151,6 +155,11 @@ The idea behind it is to divide the user interface into independent blocks. This
 ```
 
 ![bem](./img/bem.jpg)
+
+
+- Why this is a popular pattern?
+  - It helps avoid specificity issues, where you're not reaching for `id` selectors or complicated selectors to get styling to apply. and you're only using class selectors with order of specificity.
+  - It helps with naming things. It's a very clear way to name things. You know exactly what you're looking at when you see a class name.
 
 ### Block
 

@@ -3,16 +3,19 @@
 - [INDEX](#index)
   - [Styled Components](#styled-components)
     - [Why Styled Components?](#why-styled-components)
-    - [Installation and Configuration](#installation-and-configuration)
-  - [Extending Styles](#extending-styles)
-  - [Props in Styled Components](#props-in-styled-components)
-    - [The `"as"` Polymorphic Prop](#the-as-polymorphic-prop)
+    - [Installation](#installation)
+    - [Syntax and Usage](#syntax-and-usage)
+    - [How it works?](#how-it-works)
+  - [Extending Styles (Composition)](#extending-styles-composition)
+  - [Props](#props)
+  - [Dynamic Tags (`"as"` prop)](#dynamic-tags-as-prop)
   - [Attributes in Styled Components](#attributes-in-styled-components)
   - [Themes](#themes)
   - [Animation](#animation)
   - [Global Styling](#global-styling)
   - [Other cases](#other-cases)
   - [Debugging](#debugging)
+  - [Styled Components with Server-side Rendering](#styled-components-with-server-side-rendering)
 
 ---
 
@@ -20,16 +23,18 @@
 
 [styled-components](https://styled-components.com/) package
 
-- `Styled-components` is a library built for React and React Native developers. It allows you to use component-level styles in your applications. Styled-components leverage a mixture of JavaScript and CSS using a technique called `CSS-in-JS`.
+It's a library built for React and React Native developers. It allows you to use component-level styles in your applications. Styled-components leverage a mixture of JavaScript and CSS using a technique called `CSS-in-JS`.
 
 > In React’s own words, styled components are “visual primitives for components”, and their goal is to give us a flexible way to style components. The result is a tight coupling between components and their styles.
 
-- `Styled-components` are based on `tagged template literals`, meaning actual CSS code is written between backticks when styling your components.
+- `Styled-components` are based on **tagged template literals**, meaning actual CSS code is written between backticks when styling your components.
+- They runs at **Runtime** (not at build time), This is different from `SASS` or `LESS` which are pre-processed at build time (compiled to CSS before the app runs).
+
+  - So it's not a performance issue.
 
 - With styled-components, there is no need to map your created components to external CSS styles.
 
-- [more info](https://www.section.io/engineering-education/working-with-styled-components-in-react/#what-are-Styled-components)
-- for pseudo elements/classes, we can use **"nesting"** using `&` like in `sass`
+> [more info](https://www.section.io/engineering-education/working-with-styled-components-in-react/#what-are-Styled-components)
 
 ### Why Styled Components?
 
@@ -38,6 +43,8 @@ Apart from helping you to scope styles, styled components include the following 
 - **Automatic vendor prefixing** (Browser Support)
   - You can use standard CSS properties, and styled components will add vendor prefixes should they be needed.
   - write your CSS to the current standard and let styled-components handle the rest.
+- **Preprocessing capabilities**
+  - Styled components uses Sass-like preprocessor behind the scenes called `stylis`. This means you can use Sass-like features such as nesting and mixins.
 - **Unique class names**
   - Styled components are independent of each other, and you do not have to worry about their names because the library handles that for you.
 - **Elimination of dead styles**
@@ -45,86 +52,205 @@ Apart from helping you to scope styles, styled components include the following 
 
 ---
 
-### Installation and Configuration
+### Installation
 
-```bash
-npm install --save styled-components
-# Or
-yarn add styled-components
-```
+- **Installation**
 
-```js
-// in file.styles.jsx
+  ```sh
+  npm install --save styled-components
+  # Or
+  yarn add styled-components
+  ```
 
-import styled from 'styled-components';
+- Babel Plugin (optional)
 
-// Create a Title component that'll render an <h1> tag with some styles
-export const Title = styled.h1`
-  font-size: 1.5em;
-  text-align: center;
-  color: palevioletred;
-`;
+  - This plugin helps display styled-component names in DevTools for easier debugging.
+  - It assigns meaningful class names in development, instead of random ones like `.a5gsgpzvq`. This behavior is for development only and does not affect production.
+    ![styled-components](./img/styled-components-1.png)
+    ![styled-components](./img/styled-components-2.png)
+  - Class names will be structured in the following format: `Filename_componentName_hash`. So if the HTML is `<header class="ShoeIndex__Header-sc-123">`, you can look for the `const Header` inside `ShoeIndex.js`.
+  - How to install:
 
-// Create a Wrapper component that'll render a <section> tag with some styles
-export const Wrapper = styled.section`
-  padding: 4em;
-  background: papayawhip;
-`;
+    ```sh
+    npm install --save-dev babel-plugin-styled-components
+    # Or
+    yarn add --dev babel-plugin-styled-components
+    ```
 
-//-------------------------------------------------------------//
+  - Then add the plugin to your `.babelrc` file:
 
-// in file.component.jsx
+    ```json
+    {
+      "plugins": ["babel-plugin-styled-components"]
+    }
+    ```
 
-// import {Title, Wrapper} from ..
+  - **Babel Macros** (optional)
 
-// Use Title and Wrapper like any other React component – except they're styled!
-render(
-  <Wrapper>
-    <Title>Hello World!</Title>
-  </Wrapper>
-);
-```
+    - In your React application, change all imports to match the following:
 
----
+      ```js
+      // From this:
+      import styled from 'styled-components';
 
-## Extending Styles
+      // ...to this:
+      import styled from 'styled-components/macro';
+      ```
 
-We can reuse and inherit and override styles. It’s more or less like how the spread operator works
+    - By importing from the macro, you get the benefits of the Babel plugin without needing to eject, or fuss with the build configuration.
 
-```js
-const StyledContainer = styled.section`
-  max-width: 1024px;
-  padding: 0 20px;
-  margin: 0 auto;
-`;
+- **Editor Integration**
 
-// Inherit StyledContainer in StyledSmallContainer
-const StyledSmallContainer = styled(StyledContainer)`
-  padding: 0 10px;
-`;
+  - For better syntax highlighting, install the `vscode-styled-components` extension in Visual Studio Code.
+    ![styled-components](./img/styled-components-3.png)
+  - It isn't just syntax-highlighting, either: you also get proper auto-complete, and all the other niceties of working in a modern editor:
 
-function Home() {
-  return (
-    <StyledContainer>
-      <h1>The secret is to be happy</h1>
-    </StyledContainer>
-  );
-}
-
-function Contact() {
-  return (
-    <StyledSmallContainer>
-      <h1>The road goes on and on</h1>
-    </StyledSmallContainer>
-  );
-}
-```
+    ![styled-components](./img/styled-components-4.png)
 
 ---
 
-## Props in Styled Components
+### Syntax and Usage
 
-> Styled components are **functional**, so we can easily style elements dynamically.
+- It uses **Tagged Template Literals** to style components. It's a way to style components with template strings in JavaScript.
+
+  ```js
+  const Title = styled.h1`
+    font-size: 1.5em;
+    color: palevioletred;
+  `;
+  ```
+
+- for pseudo elements/classes, we can use **"nesting"** using `&` like in `sass`
+
+  - One other reason for using `&` is that as styled-components do its magic by hashing the class names, it needs to know what the parent class name is. So, when you use `&`, it knows that the parent class name is the current class name. As we won't know the parent class name, we can't use `&` in a normal CSS file.
+
+- Example:
+
+  ```jsx
+  // in file.styles.jsx
+
+  import styled from 'styled-components';
+
+  // Create a Title component that'll render an <h1> tag with some styles
+  export const Title = styled.h1`
+    font-size: 1.5em;
+    text-align: center;
+    color: palevioletred;
+  `;
+
+  // Create a Wrapper component that'll render a <section> tag with some styles
+  export const Wrapper = styled.section`
+    padding: 4em;
+    background: papayawhip;
+  `;
+
+  //-------------------------------------------------------------//
+
+  // in file.component.jsx
+
+  // import {Title, Wrapper} from ..
+
+  // Use Title and Wrapper like any other React component – except they're styled!
+  render(
+    <Wrapper>
+      <Title>Hello World!</Title>
+    </Wrapper>
+  );
+  ```
+
+---
+
+### How it works?
+
+When you create a styled component, you’re creating a React component that has styles attached to it, then:
+
+- 1️⃣ It finds the targeted element in the DOM.
+
+  ```js
+  const Title = styled.h1`
+    font-size: 1.5em;
+    text-align: center;
+    color: red;
+  `;
+  ```
+
+  - The library uses javascript feature called **tagged template literals** to style the component. Here `sstyled.h1` is a function that takes a template string as an argument and returns a styled component.
+
+- 2️⃣ It attaches the styles to the element via a unique class name.
+  - When generating the class, it picks a unique hash every time, even for components with the same name.
+  - When inspecting the DOM, you’ll see that the styled component is rendered as a `div` with a **Hashed** class name that is unique to the styled component, e.g., `wIbYXb` class name.
+- 3️⃣ It injects the styles into the `head` of the document.
+
+  - It uses the generated unique class name for each styled component and add these styles as **internal styles** in the `head` of the document.
+
+    ```html
+    <style data-styled="active" data-styled-version="5.3.0">
+      /* sc-component-id: wIbYXb */
+      .wIbYXb {
+        font-size: 1.5em;
+        text-align: center;
+        color: red;
+      }
+    </style>
+    ```
+
+- 4️⃣ It renders the styled component in the DOM.
+
+> **Note**: this doesn't happen at build time, it happens at runtime only when the component is rendered. meaning that the styles are injected into the `head` of the document when the component is rendered.
+
+---
+
+## Extending Styles (Composition)
+
+It's a way to reuse styles in styled-components. We can extend styles from one styled component to another styled component. This is done by passing the styled component as an argument to the `styled` function.
+
+- We can reuse and inherit and override styles. It’s more or less like how the spread operator works
+- If we need multiple variants of a component, we can choose one component to serve as the base for another. For example:
+
+  ```jsx
+  const Base = styled.button`
+    font-size: 21px;
+  `;
+
+  const PrimaryButton = styled(Base)`
+    background: blue;
+    color: white;
+  `;
+
+  render(<PrimaryButton>Button</PrimaryButton>);
+  ```
+
+- If you inspect that element in the devtools, you'll notice that it's applying both styles:
+
+  ```css
+  /* Base */
+  .cIKpxU {
+    font-size: 21px;
+  }
+  /* PrimaryButton: */
+  .bhdLno {
+    background: #00f;
+    color: #fff;
+  }
+  ```
+
+---
+
+## Props
+
+> Styled components are **functional**, so we can easily style elements dynamically
+
+It's done by passing props to the styled component as an argument in a function. This way, we can change the styles of the component based on the props passed to it.
+
+- Example
+
+  ```js
+  const Button = styled.button`
+    background-color: ${props => (props.primary ? 'red' : 'white')};
+  `;
+  ```
+
+  - We can use any name for the argument not just `props`, like `p`.
 
 - Using props to determine the css property value instead of (using inline styles to use the props)
 
@@ -178,36 +304,86 @@ function Contact() {
   );
   ```
 
+- Pass color as a prop
+
+  ```jsx
+  const Button = styled.button`
+    background-color: ${props => props.color || 'white'};
+    font-size: 1em;
+    margin: 1em;
+    padding: 0.25em 1em;
+    border: 2px solid palevioletred;
+    border-radius: 3px;
+  `;
+
+  render(
+    <div>
+      <Button>Normal Color</Button>
+      <Button color='red'>Red Color</Button>
+    </div>
+  );
+  ```
+
+- Another trick like props to have dynamic styles is to use CSS variables
+
+  ```jsx
+  const Button = styled.button`
+    background-color: var(--button-color);
+    font-size: 1em;
+    margin: 1em;
+    padding: 0.25em 1em;
+    border: 2px solid palevioletred;
+    border-radius: 3px;
+  `;
+
+  render(
+    <div>
+      <Button>Normal Color</Button>
+      <Button style={{ '--button-color': 'red' }}>Red Color</Button>
+    </div>
+  );
+  ```
+
 ---
 
-### The `"as"` Polymorphic Prop
+## Dynamic Tags (`"as"` prop)
+
+Sometimes, we want to use a styled component with a different tag than the one it was created with. For example, we might want to use a `<a>` tag instead of a `<button>` tag (but with the same styles). This is where the `as` prop comes in.
 
 - With the `as` prop, you can swap the end element that gets rendered. One use case is (when you inherit styles), for example, you’d prefer a `div` to a `section` for a reusable styled-component, you can pass the as prop to your styled component with the value of your preferred element, like so:
 
   ```jsx
-  function Home() {
+  function Button({ href, children }) {
     return (
-      <StyledContainer>
-        <h1>It’s business, not personal</h1>
-      </StyledContainer>
+      <Wrapper href={href} as={href ? 'a' : 'button'}>
+        {children}
+      </Wrapper>
     );
   }
 
-  function Contact() {
-    return (
-      <StyledSmallContainer as='div'>
-        <h1>Never dribble when you can pass</h1>
-      </StyledSmallContainer>
-    );
-  }
+  const Wrapper = styled.button`
+    /* styles */
+  `;
+
+  render(<Button href='/'>Hello</Button>);
   ```
 
-- You could even have a custom component as your value
+- You could even have a custom component (like React Router’s `Link` component) as the `as` prop:
 
   ```jsx
-  <StyledSmallContainer as='{StyledContainer}'>
-    <h1>Never dribble when you can pass</h1>
-  </StyledSmallContainer>
+  import { Link } from 'react-router-dom';
+
+  function Button({ href, children }) {
+    return (
+      <Wrapper to={href} as={href ? Link : 'button'}>
+        {children}
+      </Wrapper>
+    );
+  }
+  const Wrapper = styled.button`
+    /* styles */
+  `;
+  render(<Button href='/'>Hello</Button>);
   ```
 
 ---
@@ -296,30 +472,54 @@ const Toast = styled.div`
 
 ## Global Styling
 
-We have a helper function — `createGlobalStyle` — whose sole reason for existence is global styling.
+With styled-components, the styles we write are indelibly bound to the elements created. In a component-driven framework like React, this is exactly what you want, most of the time.
+
+But what about global styles? Things like CSS resets, and some baseline styles for native HTML elements?
+
+styled-components has a specific API for creating global styles: `createGlobalStyle`.
 
 - One thing we can use `createGlobalStyle` for is to **normalize the CSS**:
-- We add it to the root of our application, and it will be available to all components in the application.
+
+- How it works
+
+  - We add it to the root of our application, and it will be available to all components in the application.
+
+    ```js
+    // 📄 GlobalStyles.js
+    import { createGlobalStyle } from 'styled-components';
+    const GlobalStyles = createGlobalStyle`
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 1.125rem;
+      }
+      body {
+        background-color: hsl(0deg 0% 95%);
+      }
+    `;
+    export default GlobalStyles;
+
+    // ------------------------------------------------------------- //
+
+    // 📄 App.js
+    import GlobalStyles from './GlobalStyles';
+    function App() {
+      return (
+        <div>
+          <GlobalStyles />
+          <Routes />
+        </div>
+      );
+    }
+    ```
 
   - **It's not a wrapper component, it's a component that injects styles into the DOM.**
 
-  ```js
-  import { createGlobalStyle } from 'styled-components';
+    - When the GlobalStyles component is rendered, it will inject all of its CSS into the `<head>` of the document, applying those styles.
 
-  const GlobalStyle = createGlobalStyle`
-      /* Your css reset here */
-  `;
-
-  // Use your GlobalStyle
-  function App() {
-    return (
-      <div>
-        <GlobalStyle />
-        <Routes />
-      </div>
-    );
-  }
-  ```
+  - It doesn't really matter where you render this component; there is no significant advantage to putting it above or below the rest of your app's content. It's common to include it in the top-level `App` component, so that we know it's always being rendered, and put it below the rest of the JSX in that component so that it's out of the way.
+    - ⚠️⚠️⚠️ `App` component is the root of the application, and it will always be rendered which means that the global styles will always be injected into the `head` of the document. But if you put it in a component that is conditionally rendered, the global styles will only be injected when that component is rendered.
 
 - Styles created with `createGlobalStyle` do not accept any children.
 - It enables us to use props in our global styles. This is a feature that is not available in CSS.
@@ -386,3 +586,12 @@ We have a helper function — `createGlobalStyle` — whose sole reason for exis
     ```
 
 You can find more [Here](https://styled-components.com/docs/tooling)
+
+---
+
+## Styled Components with Server-side Rendering
+
+- Styled-components can be used with server-side rendering (SSR) by using the `ServerStyleSheet` class.
+- More info here:
+  - [Here 1](https://medium.com/swlh/server-side-rendering-styled-components-with-nextjs-1db1353e915e)
+  - [Here 2](https://styled-components.com/docs/advanced#server-side-rendering)

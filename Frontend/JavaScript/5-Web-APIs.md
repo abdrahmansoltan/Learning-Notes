@@ -12,6 +12,8 @@
     - [IndexedDB](#indexeddb)
   - [History API](#history-api)
     - [History Object](#history-object)
+  - [Location API (Routing \& Navigation)](#location-api-routing--navigation)
+    - [Barba.js (Routing Library)](#barbajs-routing-library)
   - [Third-party APIs](#third-party-apis)
     - [Geolocation API](#geolocation-api)
     - [Leaflet API](#leaflet-api)
@@ -228,12 +230,20 @@ Web storage objects `localStorage` and `sessionStorage` allow to save key/value 
   - We can use JSON to store objects though: So to store the data structure correctly in localStorage, store it as a **JSON-strings** with `JSON.stringify()`
 
     ```js
-    localStorage.user = JSON.stringify({ name: 'John' });
+    localStorage.setItem('user', JSON.stringify({ name: 'John' }));
 
     // sometime later
     let user = JSON.parse(localStorage.user);
     alert(user.name); // John
     ```
+
+    - if you pass an array to the localStorage, it will be stored as a string, so you need to parse it back to an array when you get it back.
+
+      ```js
+      const workouts = ['running', 'swimming', 'cycling'];
+      localStorage.setItem('workouts', workouts);
+      const data = localStorage.getItem('workouts'); // "running,swimming,cycling" -> not an array ❌
+      ```
 
 - localStorage is `Blocking`, so it can slow down the app
 - _note_ : when you `get` items from `localStorage`, they lose the `prototype Chain` they had
@@ -343,6 +353,31 @@ If you move from one page to another, the browser's history remembers which page
 The HTML5 history API describes the functionality of the history object in modern web browsers. It lets you access and update the browser history (but only for pages the user visited on your site).
 
 ![history object](./img/history-object.png)
+
+---
+
+## Location API (Routing & Navigation)
+
+The Location interface represents the location (URL) of the object it is linked to. Changes done on it are reflected on the object it relates to. Both the Document and Window interface have such a linked Location, accessible via Document.location and Window.location respectively.
+
+- The `window.location` object can be used to get the current page address (URL) and to redirect the browser to a new page.
+
+  ```js
+  // get the current page URL
+  console.log(window.location.href);
+  // redirect the browser to a new page
+  window.location.href = 'https://www.google.com';
+  ```
+
+---
+
+### Barba.js (Routing Library)
+
+- [Barba.js](https://barba.js.org/) is a small (`7kb` minified) and easy-to-use library that helps you create fluid and smooth transitions between your website's pages.
+- It makes your website run like a SPA (Single Page Application) and help reduce the delay between your pages, minimize browser HTTP requests and enhance your user’s web experience.
+
+- Resources:
+  - [Video Tutorial](https://www.youtube.com/watch?v=aMucZErEdZg)
 
 ---
 

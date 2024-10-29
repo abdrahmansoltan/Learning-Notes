@@ -41,7 +41,9 @@
 
 ## Sass
 
-Sass is a CSS preprocessor, an extension of CSS that adds power and elegance to the basic language.
+Sass is a CSS preprocessor that compiles to vanilla CSS. It extends CSS with features like nesting, variables, and iteration.
+
+- It's similar in operation to TypeScript: all valid CSS is also valid Sass, and Sass compiles to CSS at **build-time**, just like TypeScript compiles to JavaScript.
 
 - Once Sass is installed, you can compile your Sass code to CSS code using the `sass` command. You'll need to tell Sass which file to build from, and where to output CSS to.
 

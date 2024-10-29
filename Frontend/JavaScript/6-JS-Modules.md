@@ -2,7 +2,7 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
-  - [Module](#module)
+  - [Modules](#modules)
     - [Module Features](#module-features)
     - [Module scripts](#module-scripts)
   - [Exporting \& Importing code](#exporting--importing-code)
@@ -27,78 +27,74 @@
 
 ---
 
-## Module
+## Modules
 
 > More on modules here -> [Modules & Bundlers](../DEV/Modules%20%26%20Bundlers.md)
 
-Modules let us split big codebase into multiple small files that can be loaded and executed on demand.
+Modules split a large codebase into smaller files that can be loaded on demand.
 
-![module](./img/modules-1.png)
+- **Module**: A reusable piece of code (file) that encapsulates implementation details.
+- **Directives**:
+  ![module](./img/modules-2.png)
 
-- A **module** is a reusable piece of code (file) that encapsulates implementation details.
-- Modules can load each other and use special directives `export` and `import` to interchange functionality, call functions of one module from another one:
+  - `export`: Labels variables/functions to be accessible outside the module.
+  - `import`: Imports functionality from other modules.
 
-  - `export` keyword labels variables and functions that should be accessible from outside the current module.
-  - `import` allows the import of functionality from other modules.
+- Browsers don't support modules, so we must do a **"Build Process"** after writing our code to convert it to a format that browsers.
+  ![module](./img/modules-1.png)
 
-- Browsers don't support modules, so we must do a "Build Process" after writing our code to convert it to a format that browsers understand. This includes 3 steps:
-  1. `Bundling` - Combining all the modules into a single file. -> `Webpack / Parcel`
-  2. `Transpiling` - Converting the code to a format that browsers understand. -> `Babel`
-     - This is done by changing the syntax of the code to an older version of JavaScript that is supported by all browsers.
-     - ex: `arrow functions` to `normal functions`
-  3. `Polyfilling` - Adding code to support older browsers. -> `Babel`
-     - This is done by adding a piece of code that adds the missing functionality to the browser.
-     - This is done with new features that wasn't available in older browsers. (new features and not syntax)
-     - ex: `Promise` to `callback functions`
-- As modules support special keywords and features, we **must** tell the browser that a script should be treated as a module, by using the attribute `<script type="module">`.
+  1. **Bundling**: Combine modules into a single file (e.g., `Webpack`, `Parcel`).
+  2. **Transpiling**: Convert code to an older JavaScript version that all browsers understand (e.g., `Babel`).
+     - ex: `arrow functions` to `normal functions` **(which is syntax)**
+  3. **Polyfilling**: Add code to support older browsers (e.g., `Babel`).
+     - ex: `Promise` to `callback functions` **(which is not syntax but a feature)**
 
-  - The browser automatically fetches and evaluates the imported module (and its imports if needed), and then runs the script.
+- **Usage**: Use `<script type="module">` to tell the browser to treat the script as a module.
 
   ```html
   <script type="module" defer src="script.js"></script>
   ```
 
-- Modules work only via **HTTP(s)**, not locally as it requires `CORS` access and other protocols
-  - That's why we use a local web-server, such as “live server” and can't open it locally without a server, as it pretends to be a real server and provides the `http` protocol
-    - This is because when sending a request to a server, the browser adds a special header `Origin` to it, with the current domain (origin) in it. The server then may reply with the header `Access-Control-Allow-Origin` with the allowed origin, or with the header `Access-Control-Allow-Origin: *` to allow access from everywhere.
-  - The `file://` protocol is not a part of the `origin`, so it can’t be used with modules.
-  - **Summary:** the modules files need to be sent from the same **origin** (`domain`, `protocol`, `port`), otherwise they won’t work.
+  - The browser automatically fetches and evaluates the imported module (and its imports if needed), and then runs the script.
+
+- **Modules require HTTP(s)**, not local files (`file://`), due to `CORS` restrictions.
+
+  - Use a local web server (e.g., "live server") to simulate a real server with `http`.
+  - Browsers add an `Origin` header to requests; servers must respond with `Access-Control-Allow-Origin`.
+  - **Summary**: Modules must be served from the same origin (domain, protocol, port).
 
 ---
 
 ### Module Features
 
-- Why modules?
-  1. **compose** software from separate modules that can be developed, updated, and maintained independently.
-  2. **isolate** components.
-  3. **abstract** code (low-level code in modules)
-  4. **organize** code
-  5. **re-use** code
+- **Why modules?**
+
+  - **Compose** software from independent modules.
+  - **Isolate** components.
+  - **Abstract** low-level code.
+  - **Organize** and **re-use** code.
+
 - Always **“use strict”**
-- Module-level scope (It creates a local scope in a module)
+- Module-level scope: Each module has its own top-level scope.
+  - Variables and functions from a module are not seen in other scripts/modules.
+- Module code is **evaluated only once**, even if imported multiple times.
 
-  - Each module has its own top-level scope. In other words, top-level variables and functions from a module are not seen in other scripts.
+  ```js
+  // 📁 alert.js
+  alert("Module is evaluated!");
 
-- A module code is evaluated only the first time when imported
+  // Import the same module from different files
 
-  - If the same module is imported into multiple other modules, its code is executed only once, upon the first `import`. Then its exports are given to all further `importers`.
+  // 📁 1.js
+  import `./alert.js`; // Alerts: "Module is evaluated!" ✅
 
-    ```js
-    // 📁 alert.js
-    alert("Module is evaluated!");
+  // 📁 2.js
+  import `./alert.js`; // Doesn't alert anything ❌
+  ```
 
-    // Import the same module from different files
+- In a module, **“this”** is `undefined`
 
-    // 📁 1.js
-    import `./alert.js`; // "Module is evaluated!"
-
-    // 📁 2.js
-    import `./alert.js`; // (shows nothing)
-    ```
-
-- In a module, **“this”** is undefined
-
-  - Compare it to non-module `scripts`, where this is a `window` object:
+  - In non-module scripts, **`this`** refers to the `window` object, but in modules, it’s `undefined`. (because modules are in **strict mode** by default)
 
     ```html
     <script>
@@ -109,6 +105,18 @@ Modules let us split big codebase into multiple small files that can be loaded a
       alert(this); // undefined
     </script>
     ```
+
+- **ES6 Modules vs Scripts**
+
+  | Comparison            | ES6 Modules              | Scripts        |
+  | --------------------- | ------------------------ | -------------- |
+  | **Scope**             | Module-level scope       | Global scope   |
+  | **Strict Mode**       | Strict mode by default   | No strict mode |
+  | `this`                | `undefined`              | `window`       |
+  | **Hoisting**          | No hoisting              | Hoisting       |
+  | **Imports & Exports** | ✅                       | ❌             |
+  | **HTML linking**      | `<script type="module">` | `<script>`     |
+  | **File downloading**  | Asynchronous             | Synchronous    |
 
 ---
 
@@ -162,6 +170,10 @@ Modules let us split big codebase into multiple small files that can be loaded a
 
 JavaScript initially lacked a code `import` feature due to its limited browser-based functionality. Organizing JavaScript code across multiple files required loading each file with globally shared variables. In 2009, the `CommonJS` project introduced modules to enable code `import`/`export` in JavaScript, bringing it in line with other programming languages. `Node.js` is a popular implementation of `CommonJS` modules.
 
+- Example
+  ![import-export](./img/import-export.png)
+  ![import-export](./img/import-export-1.png)
+
 ### Exporting
 
 - The `export` statement is used when creating JavaScript modules to export live bindings to functions, objects, or primitive values from the module so they can be used by other programs with the import statement.
@@ -194,13 +206,15 @@ export { totalPrice, totalQuantity as tq };
 
 // Exporting destructured assignments with renaming
 export const { name1, name2: bar } = obj;
+// or
+const { name1, name2 as bar } = obj;
 ```
 
 #### Default Exports (One per module)
 
 They're used with Modules that declare a single entity, e.g. a module `user.js` exports only `class User`.
 
-- This approach is preferred, so that every “thing” resides in its own module.
+- Used when the module exports a single value, which can be a function, object, or primitive.
 - Naturally, that requires a lot of files, as everything wants its own module, but that’s not a problem at all. Actually, code navigation becomes easier if files are well-named and structured into folders.
 - There may be only one export default per file. And then `import` it without curly braces
 - here we don't export `declaration` or `variables` but we export `values` or `(expressions that already return values)`
@@ -226,131 +240,183 @@ They're used with Modules that declare a single entity, e.g. a module `user.js` 
     new User('John');
     ```
 
+- Notes
+
+  - Exporting must happen at the top level of the module.
+
+    ```js
+    // This won't work ❌
+    if (true) {
+      export function sayHi() {
+        console.log('Hello!');
+      }
+    }
+
+    // Instead, export at the top level
+    export function sayHi() {
+      console.log('Hello!');
+    }
+    ```
+
 ---
 
 ### Importing
 
-[reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#dynamic_imports)
+- **How ES6 modules are imported**
+  ![import-export](./img/import-export-0.png)
 
-- How ES6 modules are imported: They're imported **asynchronously**
+  - **Synchronous**: Modules load fully before evaluation, allowing for better optimization and dead code elimination.
 
-  - which means that they wait for the imported module to load fully before they can be evaluated. (somehow **Hoisted**)
-  - Also this is done to make imports known before a script executes (at compile time), so that the compiler can better optimize code.
-    - This makes `bundling and`dead code elimination` possible.
+    - This means that the file that the imported module code **will be executed before** the importing file code.
+
+    - This makes bundling and dead code elimination (tree shaking) possible.
+
+    ```js
+    // 📁 module.js
+    console.log('Module is evaluated');
+
+    // ------------------------------
+
+    // 📁 main.js
+    import './module.js';
+    console.log('Main is evaluated');
+
+    // Result:
+    // Module is evaluated
+    // Main is evaluated
+    ```
+
+- **Live Connections**: "Imports" are bindings, not copies. Changes in the module reflect immediately in the import.
 
   ```js
-  // 📁 module.js
-  console.log('Module is evaluated');
+  // 📁 user.js
+  export let user = {
+    name: 'John',
+    age: 30
+  };
+
+  export function changeName() {
+    user.name = 'Pete';
+  }
+
+  // ------------------------------
 
   // 📁 main.js
-  console.log('Main is evaluated');
-  import './module.js';
+  import { user, changeName } from './user.js';
 
-  // Result:
-  // Module is evaluated
-  // Main is evaluated
+  console.log(user.name); // John
+  changeName();
+  console.log(user.name); // Pete -> changed by the function in the imported module and reflected in the main module
   ```
 
-- Imports are not copies of the exported values, they are **live connections** (bindings) to them.
+- Explicit Imports:
 
-  - When we import a value from a module, the connection is created, and we may use it, but the value itself is not copied.
-  - If the external module changes its value or exports something else, then the import gets the new value immediately.
+  - Importing everything from a module is not recommended. It’s better to explicitly list what to import.
+  - Use `import { sayHi } from './say.js'` for clarity and shorter names.
+  - Provides a better overview of code structure, aiding support and refactoring.
 
-![import-export](./img/import-export.png)
-![import-export](./img/import-export-1.png)
-
-- At first sight, “import everything” `import * as say from ./say.js` seems such a cool thing, short to write, why should we ever explicitly list what we need to import?
-  - Explicitly listing what to import gives shorter names: `sayHi()` instead of `say.sayHi()`.
-  - Explicit list of imports gives better overview of the code structure: what is used and where. It makes code support and refactoring easier.
 - Don’t be afraid to import too much
-  - Modern build tools, such as **webpack** and others, bundle modules together and optimize them to speedup loading. They also removed unused imports.
 
-1. for Named Exports
+  - Modern Tools: Tools like **webpack** optimize and remove unused imports
 
-   - It's preferred for large libraries like `lodash` and `reactDom` to reduce size, So you only import what you need from them.
-   - import needs curly braces for named exports
+- **Imports Types**:
 
-   ```javascript
-   // creating a `name-space` from importing => to use in the file
-   import * as myModule from 'module-name';
-   // now "myModule" will act as an object which has properties & methods we can use
-   myModule.moduleFunc();
+  1. **Default Imports**: Importing the default export from a module.
 
-   // Import a single export from a module
-   // "export1" must be the same name in the module
-   import { export1 } from 'module-name';
-   import { export1 as alias1 } from 'module-name';
+     ```js
+     import defaultExport from 'module-name';
+     // here we can name it whatever we want as it was exported without a name, But it's recommended to use the same name as the exported one
+     ```
 
-   // Import multiple exports from module
-   import { export1, export2 } from 'module-name';
-   ```
+     - The issue is that different names for the same import can cause inconsistency.
+     - To avoid that, Match import names to file names for consistency. or use named exports instead.
 
-2. Import a module for its **side effects** only
+  2. **Named Imports**: Importing specific exports from a module.
 
-   - This runs the module's global code, but doesn't actually import any values.
-   - you can do this with importing **css files** into javascript files
+     ```js
+     import { export1, export2 } from 'module-name';
+     import { export1 as alias1 } from 'module-name'; // alias for export1
+     ```
 
-   ```javascript
-   import 'module-name';
+     - It's preferred for large libraries like `lodash` and `reactDom` to reduce size, So you only import what you need from them.
 
-   // example : This works with dynamic imports
-   (async () => {
-     if (somethingIsTrue) {
-       // import module for side effects
-       await import('/modules/my-module.js');
-     }
-   })();
-   ```
+  3. **Mixed Imports**: Importing both default and named exports from a module.
 
-3. Importing defaults
+     ```js
+     import defaultExport, { export1, export2 } from 'module-name';
+     ```
 
-- team members may use different names to import the same thing, and that’s not good.
+     - This is not recommended, as it can lead to confusion.
+     - It's done by importing the default export first, then importing the named exports.
 
-  - Usually, to avoid that and keep the code consistent, there’s a rule that imported variables should correspond to file names, e.g:
+  4. **Namespace Imports**: Importing all exports from a module as an object.
 
-    ```js
-    import User from './user.js';
-    import LoginForm from './loginForm.js';
-    ```
+     ```js
+     import * as name from 'module-name';
 
-  - Still, some teams consider it a serious drawback of default exports. So they prefer to always use named exports. Even if only a single thing is exported, it’s still exported under a name, without default.
+     // usage
+     console.log(name.getFormattedName('john', 'doe'));
+     ```
 
-```javascript
-// here we can name it whatever we want as it was exported without a name
-import myDefault from '/modules/my-module.js';
-```
+     - This is useful when you want to import everything from a module and access it through a single object.
 
-1. Importing (defaults + named) exports
+  5. **Side effects Imports**: Importing a module for its side effects only.
 
-   ```javascript
-   import add, { addToCart, totalPrice as price, tq } from './shoppingCart.js';
-   // here (add) is the default import
-   ```
+     - This runs the module's global code, but doesn't actually import any values.
+     - you can do this with importing **css files** into javascript files
 
-2. Dynamic Imports
+     ```js
+     import 'module-name'; // runs the module's global code
+     ```
 
-   - The standard import syntax is static and will always result in all code in the imported module being evaluated at load time. In situations where you wish to load a module conditionally or on demand, you can use a dynamic import instead.
+  6. **Dynamic Imports**: Importing a module dynamically.
 
-   - To dynamically import a module, the `import` keyword may be called as a `function`. When used this way, it returns a `promise`.
+     ```js
+     import('./module-name').then(module => {
+       // Do something with the module.
+       module.loadPageInto(main);
+     });
 
-   ```javascript
-   import('/modules/my-module.js').then(module => {
-     // Do something with the module.
-     module.loadPageInto(main);
-   });
+     // or using "await" keyword
+     let module = await import('./module-name');
+     ```
 
-   // or using "await" keyword
-   let module = await import('/modules/my-module.js');
-   ```
+     - This is useful when you want to load a module conditionally or on demand.
+     - It returns a promise that resolves to the module object.
+     - It's not recommended to use `await` at the top level of a module, as it blocks the execution of the module until the promise is resolved.
 
-- No “bare” modules allowed
+- Notes
 
-  - In the browser, `import` must get either a relative or absolute URL. Modules without any path are called **“bare” modules**. Such modules are not allowed in `import`.
+  - **Avoid Bare Modules**
 
-    ```js
-    import { sayHi } from 'sayHi'; // Error, "bare" module
-    // the module must have a path, e.g. './sayHi.js' or wherever the module is
-    ```
+    - Always use a relative or absolute URL in the `import` statement.
+
+      ```js
+      import { sayHi } from './sayHi.js'; // OK ✅
+      import { sayHi } from 'sayHi'; // Error ❌
+      ```
+
+  - Omitting the file extension is allowed, but not recommended.
+
+    - It’s better to include the file extension for clarity. But some formatters and linters may remove it.
+
+      ```js
+      import { sayHi } from './sayHi.js'; // OK ✅
+      import { sayHi } from './sayHi'; // Also OK ✅
+      ```
+
+  - The variables imported from a module are **Read-Only**.
+
+    - They can be changed in the module, but not in the importing script.
+
+      ```js
+      // 📁 user.js
+      export let user = 'John';
+
+      // 📁 main.js
+      import { user } from './user.js';
+      user = 'Pete'; // Error ❌: Cannot assign to read only property 'user' of object '#<Object>'
+      ```
 
 ---
 

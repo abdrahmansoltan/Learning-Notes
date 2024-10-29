@@ -188,15 +188,19 @@ It's a CSS property that allows an element to be pushed to the left or right (re
 
 **Positioning** is the process of determining the location of an element on the page.
 
+- The difference between it and `margin` (when moving an element) is that `margin` will move the element but it will still take up the space in the normal flow, while `position` will move the element and remove it from the normal flow.
+
 #### `position` property
 
 In CSS, the `position` property is used to control the layout of an element. It has 5 possible values: (`static`, `relative`, `absolute`, `fixed`, `sticky`)
 ![position](./img/position-1.jpeg)
 
 - `static`
+
   - It's the **default value**
   - It means that the element is positioned according to the normal flow of the document.
   - Here, `top`, `right`, `bottom`, and `left` properties have no effect.
+
 - `relative`
 
   - It moves an element in relation to where it would have been in normal flow (relative to its current position).
@@ -214,18 +218,50 @@ In CSS, the `position` property is used to control the layout of an element. It 
 
 - `absolute`
 
-  - It's relative to nearest parent element with `relative` positioning until we reach the `<body>` element
+  - It makes the position of the element to be relative to nearest parent element with `relative` positioning (its container) until we reach the `<body>` element
     ![absolute](./img/position-5.png)
     ![absolute](./img/position-3.png)
   - It removes the element from the normal flow of the document, so it doesn't take up space in the normal flow.
+    - When the browser is laying out elements, it effectively pretends that absolutely-positioned elements don't exist. They're “incorporeal”: you can stick your hand right through them, like a hologram or a ghost.
+    - Being able to take elements out-of-flow is super handy. Any time you want an element to be "floating above" the content, like a **tooltip or a dropdown or a modal**, absolute positioning is your friend.
+    - It might cause the parent container to collapse (if all its children are absolutely positioned)
+  - it can also be used to center an element horizontally and vertically
+
+    ```css
+    .box {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 200px;
+      height: 200px;
+      margin: auto;
+    }
+    ```
+
+    ![absolute](./img/position-8.png)
+
+    - This works because `top: 0; left: 0; right: 0; bottom: 0;` will stretch the element to fill the entire parent container, and `margin: auto;` will try to add equal margins on all sides, which will center the element.
+
+  - How absolute positioning works:
+
+    - When deciding where to place an absolutely-positioned element, it crawls up through the tree, looking for a Positioned ancestor. The first one it finds will provide the containing block. If it doesn't find one, it will use the `<html>` element as the containing block.
+    - The containing block is the area in which the absolutely positioned element is positioned. It's like a little window into the world of the document. The absolutely positioned element is positioned within that window.
+      ![absolute](./img/position-9.png)
+    - The absoluted positioned element ignores the `padding` of the parent element, it sits right up against the edge (`border`) of the parent element (because `padding` is used in the normal flow calculations, and the absolutely positioned element is removed from the normal flow)
+
   - Normal vs Absolute positioning:
     ![absolute](./img/position-2.png)
+    - positioned elements will always render on top of non-positioned ones.
+    - What if we set both elements to use relative positioning? In that case, the DOM order wins.
 
 - `fixed`
 
-  - Here, element is removed from the normal flow and positioned relative to the root container element **(viewport)**. (no space is reserved for it in the normal flow)
+  - Here, element is removed from the normal flow and positioned relative to the **root container element (viewport)**. (no space is reserved for it in the normal flow)
     ![fixed](./img/position-6.png)
-  - When you scroll the page, the element stays in the same place **(because it's fixed/relative to the viewport)**
+  - The main advantage of fixed-position elements is that they're immune to scrolling.
+    - When you scroll the page, the element stays in the same place **(because it's fixed/relative to the viewport)**
 
 - `sticky`
 
@@ -238,9 +274,15 @@ In CSS, the `position` property is used to control the layout of an element. It 
     }
     ```
 
+  - In addition, you also need to pick at least one edge to stick to (`top`, `left`, `right`, `bottom`). Most commonly, this is done with `top: 0px`.
+    ![sticky](./img/position-10.png)
+
   - It's used for **sticky navigation bars** (when you want the navigation bar to stick to the top of the page when you scroll down)
-  - It differs from `fixed` in that it is only fixed within the container it's in until a certain point, then it becomes `fixed` to the viewport.
-    ![sticky](./img/position-7.gif)
+  - It differs from `fixed` in that:
+    - it is only fixed within the its container until a certain point, then it becomes `fixed` to the viewport **(But it stays in its container box)**
+      ![sticky](./img/position-7.gif)
+    - Sticky elements are considered "in-flow", while fixed elements aren’t.
+  - Usually used for **sticky headers** or **sticky sidebars** or [**sticky table headers**](https://x.com/chriscoyier/status/1400897989842030593)
 
 - Notes:
 
@@ -248,27 +290,53 @@ In CSS, the `position` property is used to control the layout of an element. It 
 
     - **inset**: The inset property in CSS is a shorthand for the four inset properties, `top`, `right`, `bottom` and `left` in one declaration. Just like the four individual properties themselves, inset has no effect on non-positioned (static) elements. In other words, an element must declare an explicit position value before inset properties can take effect.
 
+  - A common problem when using `sticky` is that: "There's a thin gap above my sticky header!"
+
+    - If you intend for an element to sit right against the edge of the viewport, you might discover a thin `1px` gap between the element and the edge in Chrome. We can fix this by adding `top: -1` to the sticky element.
+
+      ```css
+      .nav {
+        position: sticky;
+        top: -1px; /* -1px instead of 0px */
+      }
+      ```
+
 ---
 
 #### `z-index` (Stacking Context)
 
 It specifies the elevation of an element relative to other elements on the page.
 
-- **stacking context** --> `z-index` : as if the blocks have been stacked on top of each other on the **Z axis**
-  ![z-index](./img/z-index-1.png)
+- **stacking context** --> `z-index`:
 
-- by default, it's equal to `0`
+  - It's automatically created for each element when it has a position value other than `static` (like `relative`, `absolute`, `fixed`, `sticky`)
+
+  - It's as if the blocks have been stacked on top of each other on the **Z axis**
+    ![z-index](./img/z-index-1.png)
+
+  > **Note:** All the child elements of the parent element will be in the same stacking context as the parent element. meaning that even if the child element has a `z-index` value, it will be compared to the parent element's `z-index` value. and not to the other elements on the page. **(this might cause some issues for modals and dropdowns)**
+
+- by default, it's equal to `auto` which is equal to `0`.
 - if multiple elements have the same `z-index`, then the last one is higher than the others and so on.
   ![z-index](./img/z-index-2.png)
 - Notes:
+
   - ⚠️ In order to work, the element must have a `position` value other than `static` (because `z-index` only works on positioned elements)
   - you can't hover on something that have a negative `z-index`
+  - There's a CSS property called `isolation` that can be used to create a new stacking context for an element, which can be useful when you want to prevent an element from being affected by the `z-index` of its parent element.
+    ![z-index](./img/z-index-3.svg)
+
+    ```css
+    .parent {
+      isolation: isolate;
+    }
+    ```
 
 ---
 
 ## Flexbox
 
-It is a layout method for laying out items in a single dimension, either as a row or a column.
+It is a layout method for laying out (distributing) items in a single dimension, either as a row or a column.
 ![flexbox](./img/flexbox-1.png)
 
 - It allows us to distribute space dynamically across elements of an unknown size, **hence the term "flex"**.
@@ -318,6 +386,7 @@ You can use the `flex-direction` property to specify the direction in which the 
     ![flex-justify-content](./img/flex-justify-content-0.png)
     ![flex-justify-content](./img/flex-justify-content-1.png)
     ![flex-justify-content](./img/flex-justify-content-2.png)
+    ![flex-justify-content](./img/flex-justify-content-3.jpeg)
 
 - `align-items`
 
@@ -325,6 +394,10 @@ You can use the `flex-direction` property to specify the direction in which the 
     - `flex-direction: row` => aligns the items vertically
       ![flex-align-items](./img/flex-align-items-1.png)
       - `baseline` -> aligns the items to the baseline of the container which is the line where the text sits
+        ![flex-align-items](./img/flex-align-items-2.png)
+        ![flex-align-items](./img/flex-align-items-3.png)
+      - If you want to center nav items in a navbar, but you want the items words to be aligned to baseline, you can wrap the items in a `div` or `ul` and apply `align-items: center` to the flex container and `align-items: baseline` to the `div` or `ul` that wraps the items.
+        ![flex-align-items](./img/flex-align-items-4.png)
     - `flex-direction: column` => aligns the items horizontally
       ![flex-align-items](./img/flex-align-items.avif)
   - default value -> `align-items: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
@@ -355,6 +428,10 @@ You can use the `flex-direction` property to specify the direction in which the 
   - `stretch` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
   - `center` => center the items vertically
   - `baseline` => align the items to the baseline of the container (usually used in **Navbar**)
+  - Ex: align the first nav item to the right
+    ![align-self](./img/align-self-1.png)
+
+  > ⚠️ Note: we don't have `justify-self` in flexbox, because it's not needed. We can use `flex-grow`, `flex-shrink`, and `flex-basis` to control the alignment of the items along the main axis.
 
 ---
 
@@ -402,6 +479,8 @@ By default, all flex-items have `order: 0`, and are laid out in the order they a
 
 ### Grow & Shrink & Basis (`flex`)
 
+In Flexbox, `width` and `height` properties are not hard rules (mostly ignored), they are just **suggestions** (and it will be changed for some situations). The `flex` property is a shorthand property that sets the `flex-grow`, `flex-shrink`, and `flex-basis` properties.
+
 - `flex-grow`
 
   - Determines how much of the available space inside the flex container the item should take up.
@@ -418,6 +497,8 @@ By default, all flex-items have `order: 0`, and are laid out in the order they a
 
   - It represents the item's share of the container's empty space, not the item's own size. **(relative to the other flex items in the container)**
     ![flex-grow](./img/flex-grow-1.png)
+
+  - It won't have any effect if there's no extra space in the container (if the container is full)
 
 - `flex-shrink`
 
@@ -441,11 +522,16 @@ By default, all flex-items have `order: 0`, and are laid out in the order they a
 
     ![flex-shrink](./img/flex-shrink.avif)
 
+  - Notes
+    - It won't have any effect if there's enough space in the container (the container has extra space)
+    - the shrink value won't matter when we reach the minimum width of the item-content, as the item can't shrink anymore.
+
 - `flex-basis`
 
   - It sets the initial main size of a flex item unless `width`/`height` is set first.
     ![flex-basis](./img/flex-basis.avif)
-  - use it instead of `width` for **flex-items** if the direction is `row` or `height` if the direction is `column`
+    - It acts like `width` for flex-items if the direction is `row` or `height` if the direction is `column` **(it's agnostic to the main axis direction)**
+  - use it instead of `width` for flex-items if the direction is `row` or `height` if the direction is `column`
 
     ```css
     .flex-item {
@@ -461,7 +547,15 @@ By default, all flex-items have `order: 0`, and are laid out in the order they a
 
     - `flex-grow` is set to `0`
     - `flex-shrink` is set to `0`
-    - `width`/`height` are already set
+
+  - **It wins over `width` and `height` properties** if they are set together
+
+    ```css
+    .item {
+      width: 200px;
+      flex-basis: 100px; /* the item will have a width of 100px ✅ */
+    }
+    ```
 
   - **Trick:** How to control number of flex items in the row of the flex container:
 
@@ -503,6 +597,14 @@ By default, all flex-items have `order: 0`, and are laid out in the order they a
       flex: 1;
     }
     ```
+
+- **Takeaways**
+
+  - There are two important sizes when dealing with Flexbox: Minimum content size (smallest without overflow) and hypothetical size (suggested size).
+  - Width/Height in Flexbox: Sets hypothetical size, not guaranteed.
+  - `flex-basis`: Acts like width/height but takes priority.
+  - `flex-grow`: Expands to fill excess space.
+  - `flex-shrink`: Reduces size if container is too small, but not below minimum content size.
 
 ---
 
@@ -1083,3 +1185,8 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
     - It's useful when you want to create a layout where some items overlap with each other.
       ![overlapping grid items](./img/overlapping-grid-items-1.png)
       ![overlapping grid items](./img/overlapping-grid-items-2.png)
+
+- Question: when should you use flexbox and when should you use CSS Grid?
+
+  - Use **Flexbox** when you want to create a layout in one dimension (either a row or a column). ex: **Navbar** with a logo and links
+  - Use **CSS Grid** when you want to create a layout in two dimensions (both rows and columns). ex: **Main layout** of the page with a header, sidebar, main content, and footer (boxes or sections)

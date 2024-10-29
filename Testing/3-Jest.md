@@ -4,6 +4,7 @@
   - [Jest](#jest)
   - [Configuring](#configuring)
     - [Installation](#installation)
+    - [Configuration of Jest](#configuration-of-jest)
     - [Linting](#linting)
   - [Jest Syntax](#jest-syntax)
   - [Testing Asynchronous Code](#testing-asynchronous-code)
@@ -39,13 +40,46 @@ It's a testing framework that is used to test javascript code. It's a complete a
 npm install --save-dev jest
 ```
 
-- `json`
+---
 
-  ```json
-  "scripts": {
-    "test": "jest"
-  },
-  ```
+### Configuration of Jest
+
+- To write your tests you need to create your test files next to the components files, and to configure it to search into only the folder that contains the files (e.g. `app/modules/vue-components`) for `.spec.js` and `.test.js`, This restriction is important to avoid searching in the `node_modules` folder and other folders that contain libraries and dependencies.
+
+- Jest configurations:
+
+  - All jest configurations are locates inside `package.json` file under key `jest`, and this is an example of the configurations:
+
+    ```json
+      "jest": {
+      "moduleFileExtensions": [
+        "js",
+        "vue"
+      ],
+      "testMatch": [
+        "**/**/modules/vue-components/**/*.(spec|test).js" // search for test files in this folder
+      ],
+      "transform": {
+        ".*\\.(vue)$": "vue-jest",
+        "^.+\\.js$": "<rootDir>/node_modules/babel-jest"
+      },
+      "transformIgnorePatterns": [
+        "/node_modules/"
+      ],
+      "collectCoverage": true,
+      "coverageDirectory": "./vue-test-coverage",
+      "collectCoverageFrom": [
+        "**/**/modules/vue-components/**/*.vue",
+        "!**/node_modules/**"
+      ],
+      "coverageReporters": [
+        "html",
+        "text",
+        "text-summary",
+        "lcov"
+      ]
+    }
+    ```
 
 ---
 

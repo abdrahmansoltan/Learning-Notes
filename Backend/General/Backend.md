@@ -72,6 +72,10 @@ An API is the interface or gateway through which we interact with an external pr
 
 ![Query](./img/Query%20Parameters.jpg)
 
+- **Interview Question:** what is the difference query parameters and path parameters ? (e.g. `/articles?author=1` vs `/articles/1`)
+  - `Query parameters` are used to filter the data, and they are optional
+  - `Path parameters` are used to identify a specific resource, and they are required
+
 ---
 
 ### HTTP Request

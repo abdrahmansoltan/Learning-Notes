@@ -7,6 +7,7 @@
     - [What are `call()` and `apply()`?](#what-are-call-and-apply)
     - [How can you tell if an image element is loaded on a page?](#how-can-you-tell-if-an-image-element-is-loaded-on-a-page)
     - [What is event delegation?](#what-is-event-delegation)
+    - [How can we optimize the performance when adding styles to an element using JavaScript?](#how-can-we-optimize-the-performance-when-adding-styles-to-an-element-using-javascript)
     - [What is a worker? and when would you use one?](#what-is-a-worker-and-when-would-you-use-one)
     - [Can you implement a `bind()` function? (How to change scope)](#can-you-implement-a-bind-function-how-to-change-scope)
     - [What is **Debounce** and **Throttle**?](#what-is-debounce-and-throttle)
@@ -25,6 +26,8 @@
     - [What is the difference between classical and prototypal inheritance?](#what-is-the-difference-between-classical-and-prototypal-inheritance)
     - [How is it possible to call methods on functions?](#how-is-it-possible-to-call-methods-on-functions)
     - [Exercise: Refactor a function for improved readability](#exercise-refactor-a-function-for-improved-readability)
+    - [Implement a timeout handler for requests (so that the request doesn't hang forever)](#implement-a-timeout-handler-for-requests-so-that-the-request-doesnt-hang-forever)
+    - [Implement TODO list using vanilla JavaScript](#implement-todo-list-using-vanilla-javascript)
 
 ---
 
@@ -138,6 +141,46 @@
 ### What is event delegation?
 
 - It is a technique involving adding event listeners to a parent element instead of adding them multiple times to the descendant elements.
+
+### How can we optimize the performance when adding styles to an element using JavaScript?
+
+- First, here's the wrong approach: ❌
+
+  ```js
+  const element = document.getElementById('myElement');
+  element.style.color = 'red';
+  element.style.fontSize = '16px';
+  element.style.backgroundColor = 'yellow';
+  ```
+
+  - This will trigger a reflow for each style change, which can be inefficient.
+
+- Correct approaches: ✅
+
+  - Use the `classList` property to add, remove, or toggle CSS classes on an element. instead of directly manipulating the `style` property. This is because changing the `classList` property triggers a reflow only once, while changing the `style` property triggers a reflow every time it's changed.
+
+    ```js
+    const element = document.getElementById('myElement');
+    element.classList.add('myClass');
+    element.classList.remove('myClass');
+    element.classList.toggle('myClass');
+    ```
+
+  - Use the `style` property to change multiple styles at once by setting the `cssText` property. This is more efficient than changing each style individually.
+
+    ```js
+    element.style.cssText = 'color: red; font-size: 16px; background-color: yellow;';
+    ```
+
+  - Use the `requestAnimationFrame()` method to batch style changes and avoid layout thrashing. This method tells the browser that you wish to perform an animation and requests that the browser calls a specified function to update an animation before the next repaint.
+
+    ```js
+    requestAnimationFrame(() => {
+      element.style.color = 'red';
+      element.style.fontSize = '16px';
+      element.style.backgroundColor = 'yellow';
+    });
+    ```
 
 ### What is a worker? and when would you use one?
 
@@ -622,3 +665,78 @@ The difference between classical and prototypal inheritance is how objects inher
     console.log(sortArrayOrString({})); // Error: Input must be a string or an array
     console.log(sortArrayOrString(123)); // Error: Input must be a string or an array
     ```
+
+---
+
+### Implement a timeout handler for requests (so that the request doesn't hang forever)
+
+We can use a promise that will be rejected after a certain amount of time if the request doesn't complete., and then use `Promise.race()` to wrap this timeout and the original request promise.
+
+```js
+function timeout(ms) {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('Request timed out'));
+    }, ms);
+  });
+}
+
+const getJson = async url => {
+  try {
+    const res = await Promise.race([fetch(url), timeout(5000)]);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.message);
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+```
+
+---
+
+### Implement TODO list using vanilla JavaScript
+
+```html
+<body>
+  <input type="text" id="todoInput" placeholder="Enter a new todo" />
+  <button onclick="addTodo()">Add</button>
+  <br />
+  <h2>
+    Number of todos:
+    <span id="todoCount">0</span>
+  </h2>
+  <ul id="todoList"></ul>
+
+  <script>
+    const todoInput = document.getElementById('todoInput');
+    const todoList = document.getElementById('todoList');
+    const todoCount = document.getElementById('todoCount');
+
+    function addTodo() {
+      const todoText = todoInput.value.trim();
+      if (todoText) {
+        const todoItem = document.createElement('li');
+        todoItem.textContent = todoText;
+        todoList.appendChild(todoItem);
+        todoInput.value = '';
+        updateTodoCount();
+      }
+    }
+
+    function updateTodoCount() {
+      todoCount.textContent = todoList.children.length;
+    }
+
+    // Handling deleting elements
+    todoList.addEventListener('click', e => {
+      e.stopPropagation(); // prevent event bubbling
+      if (e.target.tagName === 'LI') {
+        e.target.remove();
+        updateTodoCount();
+      }
+    });
+  </script>
+</body>
+```

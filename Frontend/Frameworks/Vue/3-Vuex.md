@@ -19,6 +19,8 @@
   - [Actions](#actions)
     - [mapActions](#mapactions)
   - [Modules](#modules)
+  - [Notes](#notes)
+    - [Vuex guidelines](#vuex-guidelines)
 
 ---
 
@@ -38,6 +40,7 @@ A library for managing global-state in Vue, with rules that ensure that the stat
   - in a complex `SPA`, passing state between many components and especially deeply nested or sibling components, can get complicated quickly, having one centralized place to access your data can help you stay organized
     ![vuex](./img/vuex2.PNG)
     ![vuex-benefits](./img/vuex-benefits.PNG)
+  - Also, by using it, we no longer need prop-drilling, as the data will be stored in the store's `state` and can be accessed from any component, and will reflect the changes in real-time
 
 - **When** to use Vuex?
   - "You just Know :)"
@@ -102,6 +105,9 @@ export const store = new Vuex.Store({
   }
 });
 ```
+
+- `namespaced: true` option
+  - It ensures that your module is self-contained and reusable; this prevents multiple modules from reacting to the same mutation/action type.
 
 ---
 
@@ -392,9 +398,10 @@ export const actions = {
 };
 
 // in the component
-// import FETCH_JOBS
-this.$store.dispatch(action - name, payload);
+import FETCH_JOBS
+// this.$store.dispatch(actionName, payload);
 this.$store.dispatch(FETCH_JOBS);
+// or directly call the action using the mapActions
 ```
 
 ---
@@ -454,3 +461,49 @@ const store = createStore({
 store.state.a // -> `moduleA`'s state
 store.state.b // -> `moduleB`'s state
 ```
+
+---
+
+## Notes
+
+### Vuex guidelines
+
+- Use a modularized vuex store to manage state separately. Using store modules allows us to lazy-load sub-stores only when they’re needed in a certain component.
+- Do not change store state directly, use **mutations** instead
+
+  ```js
+  // bad
+  state.averageLatencyData = response.data;
+
+  // good
+  context.commit(SET_AVERAGE_RESPONSE_TIME, response.data);
+  //...
+  mutations: {
+    [SET_AVERAGE_RESPONSE_TIME](state, data) {
+      state.averageLatencyData = data;
+    }
+  }
+  ```
+
+- Use getters to access these state objects outside the store, they can act as reactive computed properties
+
+  ```js
+  // bad
+  const averageLatencyData = store.state.averageLatencyData;
+
+  // good
+  const averageLatencyData = store.getters.averageLatencyData;
+  ```
+
+- Register action and mutation names as constants as action/mutation types to avoid typos.
+
+- If you’re using a reusable module, ( a details page, for example) It’s a good idea to set the state as a function, to ensure a new instance of the module each time it’s reused. Each state variable will be reset every time the module is reused.
+
+  ```js
+  const MyReusableModule = {
+    state: () => ({
+      foo: 'bar'
+    })
+    //...
+  };
+  ```
