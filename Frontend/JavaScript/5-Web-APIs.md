@@ -47,6 +47,7 @@ or, it's a piece of software that can be used by another piece of software, in o
 
   - `XML`
     - stands for "eXtensible Markup Language". It's a markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
+    - it's a lightweight, text-based **format** that is used to store and transport data.
     - It's not used as much as it used to be. ❌
   - `JSON`
 

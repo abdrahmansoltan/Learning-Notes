@@ -3,9 +3,8 @@
 - [INDEX](#index)
   - [CSS Framework](#css-framework)
   - [Bootstrap](#bootstrap)
-  - [Examples](#examples)
-  - [Installation](#installation)
-    - [Download Files](#download-files)
+    - [Examples](#examples)
+    - [Installation](#installation)
   - [Colors](#colors)
     - [Font Color](#font-color)
     - [Background Color](#background-color)
@@ -26,7 +25,11 @@
   - [Box Model](#box-model)
     - [Borders](#borders)
     - [Margin \& Padding](#margin--padding)
+  - [Tables](#tables)
   - [Forms](#forms)
+    - [Form groups](#form-groups)
+    - [Form controls](#form-controls)
+    - [Input groups](#input-groups)
   - [Navbar](#navbar)
   - [Javascript Components](#javascript-components)
     - [Alerts](#alerts)
@@ -57,6 +60,8 @@ A CSS framework is a library allowing for easier, more standards-compliant web d
 
 ## Bootstrap
 
+It's a free and open-source CSS framework directed at responsive, mobile-first front-end web development. It contains CSS- and (optionally) JavaScript-based design templates for typography, forms, buttons, navigation, and other interface components.
+
 - **The Good:**
   - Fast Development -> They provide code that you just don’t need to write from scratch every time, like `resets`.
   - Browser Compatibility -> They relieve cross-browser concerns.
@@ -68,72 +73,101 @@ A CSS framework is a library allowing for easier, more standards-compliant web d
 - **The Bad:**
   - They can be bloat.
     - There may be CSS styles set up in a framework to accommodate tons of different layouts that you’ll never use. If you are concerned about every byte of a web page, you are going to end up doing a lot of stripping away of unused code, which ruins the point of the framework.
-- Bootstrap 4 vs 3
-  ![bootstrap](./img/bootstrap4.png)
+- Versions
+  - Bootstrap 4 vs 3
+    ![bootstrap](./img/bootstrap4.png)
+  - Bootstrap 5 vs 4
+    - Bootstrap 5 is the latest major release after Bootstrap 4. It has been rewritten from scratch and built on top of the latest version of the Bootstrap framework. It is a major rewrite of the entire project and has a lot of changes, new features, and improvements. It is a more powerful and faster version of the Bootstrap framework.
 
 ---
 
-## Examples
+### Examples
 
 [Bootstrap 5 Interactive CheatSheet](https://bootstrap-cheatsheet.themeselection.com/)
 [Bootstrap 5 Learning Kit](./Bootstrap-Learning%20Kit/index.html)
 
 ---
 
-## Installation
+### Installation
 
 ![installation](./img/bootstrap-installation.png)
 
-### Download Files
+- **Installation Option 1:** Download Files
 
-- Compiled CSS and JS
+  - Compiled CSS and JS
 
-  - ready-to-use compiled code to easily drop into the project.
-  - usually use:
-    - `bootstrap.min.css`
-    - `bootstrap.bundle.min.js`
+    - ready-to-use compiled code to easily drop into the project.
+    - usually use:
+      - `bootstrap.min.css`
+      - `bootstrap.bundle.min.js`
 
-- Source files
+  - Source files
 
-  - Compiling Bootstrap with your own asset pipeline by downloading our source Sass, JavaScript, and documentation files. This option requires some additional tooling
-  - here, we will need to manually select the files we want to copy to our project directory:
-    - css folder has different `.css` files to choose from
-    - js folder has different `.js` files to choose from
-    - sass folder has different `.scss` files to choose from
-  - ex:
+    - Compiling Bootstrap with your own asset pipeline by downloading our source Sass, JavaScript, and documentation files. This option requires some additional tooling
+    - here, we will need to manually select the files we want to copy to our project directory:
+      - css folder has different `.css` files to choose from
+      - js folder has different `.js` files to choose from
+      - sass folder has different `.scss` files to choose from
+    - ex:
 
-    ```sh
-    bootstrap/
-    ├── dist/
-    │   ├── css/
-    │   └── js/
-    ├── docs/
-    │   └── examples/
-    ├── js/
-    └── scss/
+      ```sh
+      bootstrap/
+      ├── dist/
+      │   ├── css/
+      │   └── js/
+      ├── docs/
+      │   └── examples/
+      ├── js/
+      └── scss/
 
-    # ------------------------------------------------------------ #
+      # ------------------------------------------------------------ #
 
-    bootstrap/
-    ├── css/
-    │   ├── bootstrap.css
-    │   ├── bootstrap.css.map
-    │   ├── bootstrap.min.css
-    │   ├── bootstrap.min.css.map
-    │   ├── bootstrap-grid.css
-    │   ├── bootstrap-grid.css.map
-    │   ├── bootstrap-grid.min.css
-    │   ├── bootstrap-grid.min.css.map
-    │   ├── bootstrap-reboot.css
-    │   ├── bootstrap-reboot.css.map
-    │   ├── bootstrap-reboot.min.css
-    │   └── bootstrap-reboot.min.css.map
-    └── js/
-        ├── bootstrap.bundle.js
-        ├── bootstrap.bundle.min.js
-        ├── bootstrap.js
-        └── bootstrap.min.js
+      bootstrap/
+      ├── css/
+      │   ├── bootstrap.css
+      │   ├── bootstrap.css.map
+      │   ├── bootstrap.min.css
+      │   ├── bootstrap.min.css.map
+      │   ├── bootstrap-grid.css
+      │   ├── bootstrap-grid.css.map
+      │   ├── bootstrap-grid.min.css
+      │   ├── bootstrap-grid.min.css.map
+      │   ├── bootstrap-reboot.css
+      │   ├── bootstrap-reboot.css.map
+      │   ├── bootstrap-reboot.min.css
+      │   └── bootstrap-reboot.min.css.map
+      └── js/
+          ├── bootstrap.bundle.js
+          ├── bootstrap.bundle.min.js
+          ├── bootstrap.js
+          └── bootstrap.min.js
+      ```
+
+- **Installation Option 2:** CDN
+
+  - Get CDN links from [here](https://www.bootstrapcdn.com/)
+  - Add the following code to your HTML file:
+
+    ```html
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-..."
+      crossorigin="anonymous" />
+
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-..."
+      crossorigin="anonymous"></script>
     ```
+
+- **Installation Option 3:** NPM
+
+  ```sh
+  npm install bootstrap
+  ```
 
 ---
 
@@ -237,24 +271,23 @@ Lightweight, flexible component for showcasing **hero** section unit style conte
 
 ## Layouts
 
+Bootstrap's mobile-first flexbox grid system uses a 12-column layout with multiple tiers for different screen sizes. It relies on breakpoints to adjust the layout, making columns responsive and rearranging them based on screen size. For example, content might be in three columns on a large screen but stacked on a small screen.
+
 ### Breakpoints
 
-Breakpoints are customizable widths that determine how your responsive layout behaves across device or viewport sizes in Bootstrap.
+Breakpoints are customizable widths that control responsive layout behavior across different device sizes in Bootstrap.
 
-- Breakpoints are the building blocks of responsive design. Use them to control when your layout can be adapted at a particular viewport or device size.
-- Use **media queries** to architect your CSS by breakpoint.
-  - Media queries are a feature of CSS that allow you to conditionally apply styles based on a set of browser and operating system parameters.
-  - We most commonly use `min-width` in our media queries.
-- **Mobile first**, responsive design is the goal. Bootstrap’s CSS aims to apply the bare minimum of styles to make a layout work at the smallest breakpoint, and then layers on styles to adjust that design for larger devices.
-
-  - This optimizes your CSS, improves rendering time, and provides a great experience for your visitors.
-
-- Bootstrap is broken into 6 different breakpoints sometimes referred to as **"grid tiers"**, for building responsively.
-
-  - These breakpoints can be customized if you’re using our source `Sass` files.
+- Building Blocks: Use breakpoints to adapt your layout at specific viewport sizes.
+- Media Queries: Apply styles conditionally using min-width media queries.
+- Mobile First: Bootstrap applies minimal styles for the smallest breakpoint and layers on styles for larger devices, optimizing CSS and rendering time.
+- Grid Tiers: Bootstrap has 6 breakpoints (grid tiers) that can be customized using Sass.
 
   ![Breakpoints](./img/breakpoints.PNG)
   ![breakpoints](./img/Bootstrap-4-Breakpoints.png)
+
+- **Important Notes:**
+  - Breakpoints specify what you want to do at **this size and above** (e.g., `lg`), not the size itself. For example, `.d-lg-none` sets `display: none` on both `lg` and `xl` screens.
+  - You will find a patterns that we write the default class without a breakpoint, then we write the class with a breakpoint, which will override the default class for that breakpoint and all the breakpoints above it, but not the breakpoints below it.
 
 #### Display Utility
 
@@ -289,10 +322,25 @@ responsively toggle the display-value of components by changing the value of the
 
 ### Container
 
+![container](./img/bootstrap-container.webp)
+
 inside it you determine the `max-width`
 
 - **fluid**: no max width -> will take `100%` of the width
   - ex: `class="container-fluid"`
+- if you don't specify a breakpoint, it will apply to all breakpoints
+- if you apply a breakpoint, it will apply to that breakpoint and all the breakpoints above it, but not the breakpoints below it making it take full width
+
+```html
+<!-- Default container: will have a max-width of 1140px -->
+<div class="container"></div>
+
+<!-- Fluid container: will take 100% of the width for all breakpoints -->
+<div class="container-fluid"></div>
+
+<!-- Container for medium screens and up, having a max-width of 960px -->
+<div class="container-md"></div>
+```
 
 ### FlexBox
 
@@ -309,6 +357,7 @@ Bootstrap’s grid system uses a series of containers, rows, and columns to layo
 
   - the grid must be inside a component with `.container` class
   - any element with a `col` class must be in a element with `row` class
+  - `row` class in bootstrap is a flex-container with `flex-wrap: wrap`
 
 - There're 12 Columns in the grid-row
   - **One Row = 12 Units of space**
@@ -331,17 +380,45 @@ Bootstrap’s grid system uses a series of containers, rows, and columns to layo
 ### Columns
 
 - to make all columns have equal width, give them all the class `"col"`
+
+  ```html
+  <div class="row">
+    <div class="col">One of three columns</div>
+    <div class="col">One of three columns</div>
+    <div class="col">One of three columns</div>
+  </div>
+  ```
+
 - You can specify column's width by how many cols you want it to occupy out of the 12 columns
 
-  - ex: `class="col-6"`
+```html
+<div class="row">
+  <div class="col-8">One of three columns</div>
+  <div class="col-4">One of three columns</div>
+  <div class="col">This column takes the remaining space</div>
+</div>
+```
 
-- you can **offset** the column by how many cols you want
+- you can **offset** the column by how many cols you want, which will push the column to the right by that amount of cols
   - ex: `class="col-3 offset-4"`
-- `col` classes with device-infixes and numbers -> **Breakpoint & with of column**
+- **Breakpoint & with of column**
 
-  - if not specified the col takes `1fr` **(entire row)**
-  - `"col-lg-3 col-md-6"`:
-    - means that the column will take 3 spans on **large screens** and 6 spans on **medium screens** and entire row on screens lower than `md`
+  - if you don't specify a breakpoint to the column, it will take the same width-percentage for all breakpoints
+    - if not specified the col takes `1fr` **(entire row)**
+  - But if you specify a breakpoint, it will take the specified width for that breakpoint and all the breakpoints above it, but not the breakpoints below it
+    - `"col-lg-3 col-md-6"`:
+      - means that the column will take 3 spans on **large screens** and 6 spans on **medium screens** and entire row on screens lower than `md`
+  - **Note that the classes with breakpoints will always override the classes without breakpoints**
+
+  ```html
+  <div class="row">
+    <!-- This column will take 3 spans on large screens and 6 spans on medium screens and entire row on screens lower than md -->
+    <div class="col-12 col-md-6 col-lg-3">One of three columns</div>
+    <div class="col-12 col-md-6 col-lg-3">One of three columns</div>
+    <div class="col-12 col-md-6 col-lg-3">One of three columns</div>
+    <div class="col-12 col-md-6 col-lg-3">One of three columns</div>
+  </div>
+  ```
 
 - Alignment, justify, wrapping, order, ...
 
@@ -364,6 +441,22 @@ Bootstrap’s grid system uses a series of containers, rows, and columns to layo
       </div>
     </div>
     ```
+
+- We can nest rows inside of columns
+
+  ```html
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col">Nested column</div>
+          <div class="col">Nested column</div>
+        </div>
+      </div>
+      <div class="col">Column</div>
+    </div>
+  </div>
+  ```
 
 ### Gutters (gaps)
 
@@ -426,41 +519,127 @@ The classes are named using the format `{property}{sides}-{size}` for `xs` and `
 
 ---
 
-## Forms
+## Tables
 
-- form groups
-
-  - it's used to group label with an input with proper margin, padding,...
-  - it's applied to the main `<form>` element or in a `<div>` that contains input and label to group them together
-
-- Form controls
-
-  - Textual form controls—like `<input>`s, `<select>`s, and `<textarea>`s—are styled with the `.form-control` class. Included are styles for general appearance, focus state, sizing, and more.
+Here, we can use the `.table` class to make the table responsive, and `.table-striped` to make the table with striped rows
 
 ```html
-<form>
-  <div class="form-group">
-    <label for="exampleFormControlInput1">Email address</label>
-    <input
-      type="email"
-      class="form-control"
-      id="exampleFormControlInput1"
-      placeholder="name@example.com"
-    />
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+      <th scope="col">Handle</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td>Larry</td>
+      <td>the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+- We can also use the `row` and `col` classes in the table rows and columns to make the table responsive
+- There're many variants of tables, like: `.table-dark`, `.table-light`, `.table-bordered`, `.table-borderless`, `.table-hover`, `.table-sm`, `.table-responsive`
+
+  - `.table-dark` and `.table-light` are used to change the background color of the table
+  - `.table-bordered` and `.table-borderless` are used to add or remove borders from the table
+  - `.table-hover` is used to add a hover effect to the table rows
+  - `.table-striped` is used to add zebra-striping to the table rows (odd rows are light and even rows are dark)
+  - `.table-sm` is used to create a smaller, more compact table by removing some of the padding on table cells
+
+- We can also use variants to the table rows like:
+
+  - `.table-active` to make the row active
+
+- There're classes that can only be applied to the table head
+
+  - `.table-group-divider` to make the cell a group divider, adding a border to the bottom of the header cells
+
+  ```html
+  <thead class="table-group-divider">
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">City</th>
+      <th scope="col">Country</th>
+    </tr>
+  </thead>
+  ```
+
+- If you have a big table and has a lot of values that will overflow the page and make the entire page horizontally scrollable, you can use the `.table-responsive` class to make the table horizontally scrollable
+
+  ```html
+  <!-- Wrap the table in a div with the class "table-responsive" -->
+  <div class="table-responsive">
+    <table class="table">
+      <!-- Table content -->
+    </table>
   </div>
-  <div class="form-group">
-    <label for="exampleFormControlSelect1">Example select</label>
-    <select class="form-control" id="exampleFormControlSelect1">
-      <option>1</option>
-      <option>2</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="exampleFormControlTextarea1">Example textarea</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
-  </div>
+  ```
+
+---
+
+## Forms
+
+![bootstrap-forms](./img/bootstrap-forms.png)
+
+Here, we can use the `.form-control` class to style the form controls, and `.form-group` to group the label with the input, and for the individual form controls, we can use `.form-label` to style the label, and `.form-control` to style the input
+
+```html
+<form class="form-group">
+  <label for="exampleFormControlInput1" class="form-label">Email address</label>
+  <input
+    type="email"
+    class="form-control"
+    id="exampleFormControlInput1"
+    placeholder="Enter your email address" />
+  <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 ```
+
+### Form groups
+
+- it's used to group label with an input with proper `margin`, `padding`,...
+- it's applied to the main `<form>` element or in a `<div>` that contains input and label to group them together
+- it's used to apply the proper spacing between the **label** and the **input**
+
+### Form controls
+
+- Textual form controls—like `<input>`s, `<select>`s, and `<textarea>`s—are styled with the `.form-control` class. Included are styles for general appearance, `focus` state, `sizing`, and more.
+  - The `.form-control` class is used to style the input, select, and textarea elements
+  - There're multiple variants of form controls, like: `.form-control-lg`, `.form-control-sm` which are used to change the size of the form control
+- For other form controls, like checkboxes, radios, and switches, we can use the corresponding classes
+
+  ```html
+  <label class="form-check-label" for="flexCheckDefault">Default checkbox</label>
+  <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
+
+  <label class="form-check-label" for="flexRadioDefault">Default radio</label>
+  <input class="form-range" type="range" />
+  ```
+
+- We can also add input controls like `.disapled`, `.readonly`, `.valid`, `.invalid`, `.is-valid`, `.is-invalid`, `.is-untouched`, `.is-touched`, `.is-pristine`, `.is-dirty`, `.is-validating`, `.is-validated`, `.is-invalidated`, `.is-untouched`, `.is-touched`, `.is-pristine`, `.is-dirty`, `.is-validating`, `.is-validated`, `.is-invalidated` classes to the form controls to change their state
+
+### Input groups
+
+- Input groups are used to add text or buttons to the left or right of an input field
 
 ---
 

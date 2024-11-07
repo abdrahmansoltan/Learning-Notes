@@ -87,6 +87,9 @@
       - [Hamburger menu that opens navbar from the right as a growing circle](#hamburger-menu-that-opens-navbar-from-the-right-as-a-growing-circle)
       - [Floating Cursor Animation](#floating-cursor-animation)
       - [Chat Messages](#chat-messages)
+      - [Facebook-style layout](#facebook-style-layout)
+      - [Spacer Component Trick](#spacer-component-trick)
+      - [Scrollable part of a container](#scrollable-part-of-a-container)
     - [General Notes](#general-notes)
     - [Questions](#questions)
 
@@ -2262,6 +2265,24 @@ div {
 - Usually when using images, it's better to use it inside a wrapper `div` to control the image size and position and to avoid the image to overflow the container
 - `img` is an **inline element**, so:
   - it's effected by `text-align`, so you can center it using this, unlike **block elements** where it just center the text inside the element
+- If you find that the image is big and missing up the layout, you can wrap it inside a `div` and give it a `width` of `100%` and set a width for the container
+
+  ```html
+  <div class="img-container">
+    <img src="img.jpg" alt="image" />
+  </div>
+  ```
+
+  ```css
+  .img-container {
+    width: 250px;
+  }
+
+  img {
+    width: 100%;
+  }
+  ```
+
 - if you have an empty space between the image and the bottom-border, This is because the browser treats inline-elements as if the're typography, so it adds a space at the bottom as if it's a letter.
   ![img](./img/img-inline.jpeg)
   - To fix this, you can:
@@ -3137,6 +3158,169 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 
 ---
 
+#### Facebook-style layout
+
+On their desktop application, Facebook has a 3-column layout. There're some added borders so we can see how the columns flex:
+
+![facebook-layout](./img/facebook-layout.png)
+
+- It's a 3 column layout, and below a certain threshold, the left-hand navigation disappears. It's interesting how things scale, though!
+- When shrinking the screen below `1100px`:
+
+  - the left-hand navigation disappears
+  - the right-hand sidebar starts to shrink before reaching a minimum width
+  - the center column appears to not shrink at all, as if it has more priority than the right-hand sidebar (until the right-hand sidebar reaches its minimum width, then they both shrink together)
+
+- Solution:
+
+  ```html
+  <style>
+    .wrapper {
+      display: flex;
+    }
+    nav,
+    aside.contacts {
+      min-width: 150px;
+      max-width: 250px;
+      flex-shrink: 9999999; /* This will make the element shrink more than the other elements */
+      flex-basis: 250px;
+    }
+    main {
+      flex: 1;
+      flex-basis: 500px;
+      /* Here it doesn't have `flex-shrink` property, meaning it has the default value of 1, so it will shrink 1 px for each 9999999 px shrunk by the other elements */
+    }
+  </style>
+
+  <div class="wrapper">
+    <nav></nav>
+    <main></main>
+    <aside class="contacts"></aside>
+  </div>
+  ```
+
+---
+
+#### Spacer Component Trick
+
+It's a common pattern to use a spacer component to add space between elements. This is especially useful when you want to add space between elements that are not direct siblings outside of the selector's styles to prevent overriding other styles.
+
+```jsx
+/* Spacer Component */
+const Spacer = ({ size }) => {
+  return <div style={{ height: size }} />;
+};
+
+/* Usage */
+<div>
+  <h1>Heading</h1>
+  <Spacer size='20px' />
+  <p>Paragraph</p>
+</div>;
+```
+
+The above is a vertical-spacer component. You can also create a horizontal-spacer component by changing the `height` to `width`.
+
+---
+
+#### Scrollable part of a container
+
+- The idea here is to create a scrollable part of a container that has a fixed height and a scrollbar and when we scroll (as the part B is overflowing), the part A will stay fixed and visible
+
+- Starter code
+
+  ```html
+  <style>
+    section {
+      display: flex;
+      gap: 32px;
+      border: 3px solid hotpink;
+    }
+
+    .col {
+      flex: 1;
+      padding: 16px;
+    }
+  </style>
+
+  <section>
+    <div class="col">
+      <h1>Growing Column</h1>
+      <p>
+        This column will grow very tall indeed, whilst the adjacent one will be clamped to whatever
+        height this one rests at!
+      </p>
+      <p>
+        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+        been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
+        galley of type and scrambled it to make a type specimen book.
+      </p>
+    </div>
+
+    <div class="col">
+      <p>Here is a list of all the letters in the English language:</p>
+      <ol>
+        <li>Item A</li>
+        <li>Item B</li>
+        <li>Item C</li>
+        <li>Item D</li>
+        <li>Item E</li>
+        <li>Item F</li>
+        <li>Item G</li>
+        <li>Item H</li>
+        <li>Item I</li>
+        <li>Item J</li>
+        <li>Item K</li>
+        <li>Item L</li>
+        <li>Item M</li>
+        <li>Item N</li>
+        <li>Item O</li>
+        <li>Item P</li>
+        <li>Item Q</li>
+        <li>Item R</li>
+        <li>Item S</li>
+        <li>Item T</li>
+        <li>Item U</li>
+        <li>Item V</li>
+        <li>Item W</li>
+        <li>Item X</li>
+        <li>Item Y</li>
+        <li>Item Z</li>
+      </ol>
+    </div>
+  </section>
+  ```
+
+- Expected output & constraints:
+  ![scrollable-part](./img/scrollable-part.png)
+
+  - Two equal width columns
+  - The container should be the height of the first column.
+  - The second column should scroll vertically, since it won't fit in the shorter container.
+
+- Solution:
+
+  ```css
+  section {
+    display: flex;
+    gap: 32px;
+    border: 3px solid hotpink;
+    overflow: hidden; /* new ✅ */
+  }
+
+  .col:first-of-type {
+    position: sticky; /* new ✅ */
+    top: 0; /* new ✅ */
+  }
+
+  .col:last-of-type {
+    height: 0; /* new ✅ */
+    /* This will make the second column scrollable */
+  }
+  ```
+
+---
+
 ### General Notes
 
 - To create a container for the whole page, we use `<div>` element with `id` attribute and give it a name like `container` or `wrapper` and then we put all the page content inside it. and to give the sections inside it a `max-width` and center them, we use:
@@ -3422,7 +3606,11 @@ Double borders on just the corner of some boxes may seem impossible to start wit
   - because by adding the `:hover` selector, you're increasing the specificity of the rule, so it will override the normal styles.
 
 - If you can't use flexbox or grid, how would you make 2 elements be in 2 columns in the container and vertically centered?
+
   - I would set the width for each row, then use:
     - `display: inline-block;` for the elements and `vertical-align: middle;` for them.
     - Or, `display: table` for the container and `display: table-cell;` for the elements, and `vertical-align: middle;` for them.
     - Or, use `float: left;` for the elements and `margin: auto;` for them.
+
+- As a general rule, elements can't participate in multiple layout modes at once. Either it's using flexbox, or it's using positioned layout. This is ultimately a very good thing, because CSS would be much more complicated if this wasn't true!
+  - When there is a conflict between layout modes, **positioned layout always wins**.

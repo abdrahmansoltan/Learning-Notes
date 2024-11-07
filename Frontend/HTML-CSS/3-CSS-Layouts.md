@@ -11,7 +11,7 @@
   - [Flexbox](#flexbox)
     - [Flex direction](#flex-direction)
     - [Aligning items in the flex container](#aligning-items-in-the-flex-container)
-    - [Wrapping](#wrapping)
+    - [Wrapping (`flex-wrap`)](#wrapping-flex-wrap)
     - [Order](#order)
     - [Grow \& Shrink \& Basis (`flex`)](#grow--shrink--basis-flex)
     - [Gap](#gap)
@@ -321,7 +321,6 @@ It specifies the elevation of an element relative to other elements on the page.
   ![z-index](./img/z-index-2.png)
 - Notes:
 
-  - ⚠️ In order to work, the element must have a `position` value other than `static` (because `z-index` only works on positioned elements)
   - you can't hover on something that have a negative `z-index`
   - There's a CSS property called `isolation` that can be used to create a new stacking context for an element, which can be useful when you want to prevent an element from being affected by the `z-index` of its parent element.
     ![z-index](./img/z-index-3.svg)
@@ -331,6 +330,12 @@ It specifies the elevation of an element relative to other elements on the page.
       isolation: isolate;
     }
     ```
+
+- Notes:
+
+  - ⚠️ `z-index` only works on positioned elements (elements with a `position` value other than `static`)
+  - the **Flexbox** algorithm also supports z-index. If our element is being laid out with Flexbox, it uses z-index as if it was rendered with Positioned layout.
+    - The same thing is true for **CSS Grid**; a child in Grid layout can use z-index without setting position: relative.
 
 ---
 
@@ -372,6 +377,24 @@ You can use the `flex-direction` property to specify the direction in which the 
 
 - `flex-direction: column-reverse;` -> means that the items are laid out vertically, from **bottom-to-top**
   ![flex-direction](./img/flex-direction-3.png)
+
+- `flex-direction: row-reverse;` -> useful when you want to align the items from left to right, which is needed for some languages like Arabic
+
+  ![flex-direction](./img/flex-direction-4.png)
+
+  - If we want to flip the order of children without changing their alignment, we can do so with justify-content:
+
+    ```css
+    .flex-container {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+    ```
+
+> **Note**: Visual order only!
+>
+> When we change the order of flex children using `row-reverse` or `column-reverse`, it only affects the visual presentation. Keyboard and screen reader users will still navigate items in the original DOM order. This can be beneficial, but be mindful not to inadvertently worsen accessibility.
 
 ---
 
@@ -430,16 +453,24 @@ You can use the `flex-direction` property to specify the direction in which the 
   - `baseline` => align the items to the baseline of the container (usually used in **Navbar**)
   - Ex: align the first nav item to the right
     ![align-self](./img/align-self-1.png)
+    - Notice here that by using `align-self: center;` on an item, it's instead of centering all the items, it centers only the item that has the `align-self` property, so it's a replacement for `align-items` but for a single item
 
   > ⚠️ Note: we don't have `justify-self` in flexbox, because it's not needed. We can use `flex-grow`, `flex-shrink`, and `flex-basis` to control the alignment of the items along the main axis.
 
+- Content vs Items:
+
+  - `align-content` is used to align the lines of items along the cross-axis (when there are multiple lines of flex items)
+  - `align-items` is used to align the items inside a flex container along the cross-axis.
+
 ---
 
-### Wrapping
+### Wrapping (`flex-wrap`)
 
-It defines whether the flex items are forced in a single line (default) or can be flowed into multiple lines (**wrapped into new line**). If set to multiple lines, it also defines the `cross-axis` which determines the direction new lines are stacked in.
+It defines whether the flex items are forced in a single line (default) or can be flowed into multiple lines (**wrapped into new line**). If set to multiple lines (when there's not enough space & overflow happens), it also defines the `cross-axis` which determines the direction new lines are stacked in.
 
 > The `cross axis` is the axis perpendicular to the main axis.
+
+**Note**: the wrapping happens when the item shrinks to its (width/basis) and not the minimum-content-size of the item (which is the handled by `flex-shrink`)
 
 - `nowrap` (default)
   - single-line(doesn't make flex go(wrap) into a new line) which may cause the container to **overflow** if couldn't squeeze and fit the flex-items
@@ -471,9 +502,33 @@ By default, all flex-items have `order: 0`, and are laid out in the order they a
 }
 ```
 
+- It works like `z-index` but in the **main axis** (a child with `order: 2` will show up after a child with `order: 1` but before a child with `order: 5`)
+
 - Why do we need to use `order` ?
+
   - It is useful when you want to change the order of the items in the source code, but you don't want to change the HTML structure
   - **Accessability**: with **screen-readers**, it is important to have the correct order in the source code so that the screen-reader can read the content in the correct order, So we can set the items order in the source code as we want the screen-reader to read it, and then use `order` to change the order of the items visually
+  - Example:
+
+    - if you have a **table of contents** in a blog post, you might want to have the table of contents at the start (left) of the post, but you want it to appear at the end (right) of the post visually, so you can use `order` to change the order of the items visually
+      ![flex-order](./img/flex-order-1.png)
+    - Solution:
+
+      ```html
+      <style>
+        .container {
+          display: flex;
+          flex-direction: row-reverse;
+        }
+      </style>
+
+      <div class="container">
+        <div class="toc">Table of Contents</div>
+        <div class="content">Main Content</div>
+      </div>
+      ```
+
+    - Another solution abviously is to change the `tabindex` of the items in the source code, but it's not recommended because it's not a good practice to change the `tabindex` of the items
 
 ---
 
@@ -525,6 +580,9 @@ In Flexbox, `width` and `height` properties are not hard rules (mostly ignored),
   - Notes
     - It won't have any effect if there's enough space in the container (the container has extra space)
     - the shrink value won't matter when we reach the minimum width of the item-content, as the item can't shrink anymore.
+    - Whenever you need to have an element takes `1/3` or `1/4` of the space, you can:
+      - Option 1: use `flex-grow: 1` for all the items and `flex-basis: 0` for the item you want to take `1/3` or `1/4` of the space
+      - Option 2: use `flex: 1` for the item you want to take `1/3` or `1/4` of the space and `flex: 2` for the other items (if you have 2 items)
 
 - `flex-basis`
 
@@ -578,6 +636,18 @@ In Flexbox, `width` and `height` properties are not hard rules (mostly ignored),
       /* the 2rem for the gap between flex items */
     }
     ```
+
+  - Notes:
+
+    - **Important Gotcha**: Always watch out when using the `flex` shorthand property with `width` or `height` properties, as the `flex` property will override the `width` or `height` properties. (because it has `flex-basis` in it which overrides the `width`/`height` properties)
+
+      ```css
+      /* This item will have a width of 0px */
+      .item {
+        width: 200px;
+        flex: 1; /* means flex: 1 1 0; -> so the flex-basis will be 0 and the width will be ignored */
+      }
+      ```
 
 - `flex` shorthand property
 

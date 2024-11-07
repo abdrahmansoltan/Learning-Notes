@@ -6,6 +6,7 @@
   - [How Asynchronous code works in JavaScript](#how-asynchronous-code-works-in-javascript)
     - [Event Loop](#event-loop)
     - [Macrotasks and Microtasks queues](#macrotasks-and-microtasks-queues)
+  - [Callbacks: How to do something after something else](#callbacks-how-to-do-something-after-something-else)
   - [Scheduling: setTimeout and setInterval](#scheduling-settimeout-and-setinterval)
     - [`setTimeout()`](#settimeout)
     - [Canceling with `clearTimeout()`](#canceling-with-cleartimeout)
@@ -117,12 +118,10 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
   ![Event Loop](./img/event-loop-8.png)
 
 - Notes
-  - For the `DOM`:
-    - DOM Events are not asynchronous. But they use a callback mechanism to handle events which is asynchronous.
-    - Rendering never happens while the engine executes a task. It doesn’t matter if the task takes a long time. Changes to the DOM are painted only after the task is complete.
-    - If a task takes too long, the browser can’t do other tasks, such as processing user events. So after a time, it raises an alert like “Page Unresponsive”, suggesting killing the task with the whole page. That happens when there are a lot of complex calculations or a programming error leading to an infinite loop.
-  - Timers are not guaranteed to run exactly after the time specified. They run approximately after the time specified. The exact delay depends on the CPU load. If the CPU is busy, the timer may run later.
-    - meaning that after the specified time, the timer will be added to the `callback queue` and will be executed when the `call stack` is empty, and if the `call stack` is busy, the timer will wait until the `call stack` is empty.
+  - **DOM Events**: These are not asynchronous but use asynchronous callbacks to handle events.
+  - **Rendering**: Occurs only after the current task completes, regardless of its duration. Long tasks can cause the browser to become unresponsive, leading to alerts like "Page Unresponsive."
+    - so changes to the DOM are painted only after the task is complete.
+  - **Timers**: They may not execute exactly on time due to CPU load. After the specified delay, timers enter the callback queue and execute once the call stack is clear.
 
 ---
 
@@ -164,6 +163,43 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
   - That’s a way to run code in another, parallel thread.
   - Web Workers can exchange messages with the main process, but they have their own variables, and their own event loop.
   - Web Workers do not have access to DOM, so they are useful, mainly, for calculations, to use multiple CPU cores simultaneously.
+
+---
+
+## Callbacks: How to do something after something else
+
+As Javascript runs synchronously, it can't do multiple things at the same time, but it can do things in a certain order, and this is where `callbacks` come in.
+
+- let's say that we have a `loginUser` function that logs the user and sends the `userEmail` and `userPassword` to the server to check if the user exists or not, and then it returns a `callback` function that will be executed after the server responds.
+
+  ```js
+  // --------------------------------- Won't work ❌ --------------------------------- //
+  function loginUser(userEmail, userPassword) {
+    setTimeout(() => {
+      console.log('User logged in');
+      return { userEmail };
+    }, 2000);
+  }
+
+  const user = loginUser('test@test.com', 123456);
+  console.log(user); // undefined
+  // after 2 seconds, it will log "User logged in"
+
+  // --------------------------------- Will work ✅ --------------------------------- //
+  function loginUser(userEmail, userPassword, callback) {
+    setTimeout(() => {
+      console.log('User logged in');
+      callback({ userEmail });
+    }, 2000);
+  }
+
+  loginUser('test@test.com', 123456, user => {
+    console.log(user);
+  });
+  // after 2 seconds, it will log "User logged in" and then log the user object
+  ```
+
+So, `callbacks` are functions that are passed as arguments to other functions and are executed after the completion of the task.
 
 ---
 
@@ -453,7 +489,7 @@ It's when you have a lot of nested callbacks to execute asynchronous code in a c
 
 ## Promises
 
-**Promise**: An object representing the future result of an asynchronous operation
+**Promise**: An object representing the future result of an asynchronous operation (failure or success).
 
 - Avoids callback hell by chaining `then()` and handling errors with `catch()` instead of passing callbacks to asynchronous functions like `xmlHttpRequest`.
 
@@ -550,6 +586,22 @@ It's a modern way to do `AJAX` calls, but it's not part of `javascript` but it's
 
   ```js
   fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+    .then(response => response.json())
+    .then(data => {
+      console.log(data);
+    });
+  ```
+
+- Fetch can take a second parameter, an object with options. The most common option is `method`, which can be `GET`, `POST`, `PUT`, `DELETE`, etc.
+
+  ```js
+  fetch(`https://restcountries.eu/rest/v2/name/Egypt`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name: 'Egypt' })
+  })
     .then(response => response.json())
     .then(data => {
       console.log(data);
@@ -1304,7 +1356,7 @@ There are 6 static methods in the `Promise` class. They are used to deal with mu
 
 #### `Promise.all()`
 
-- It takes an **iterable** (usually, an array of `promises`) and returns a new `promise` that resolves when all listed promises are resolved, and returns **array of their results becomes its result**. Also it run all the promises **in parallel**.
+- It takes an **iterable** (usually, an array of `promises`) and returns a new `promise` that resolves when all listed promises are resolved, and returns **array of their results becomes its result (in the same order)**. Also it run all the promises **in parallel**.
 
   ```js
   Promise.all([
@@ -1315,6 +1367,8 @@ There are 6 static methods in the `Promise` class. They are used to deal with mu
   ```
 
   - > Note that the order of the resulting array members is the same as in its source promises. Even though the first promise takes the longest time to resolve, it’s still first in the array of results.
+
+- It waits for all promises to resolve and not just the first one to resolve, and then it returns an array of the results of the promises.
 
 - takes an iterable (`array`) of promises as an input, and returns a single Promise that resolves to an `array` of the results of the input promises which you can use array methods like `map()` on it, **but** notice that in `map()` it returns array of `promises and not values`, so we should use `promise.all()` again on this array to get the values
 
