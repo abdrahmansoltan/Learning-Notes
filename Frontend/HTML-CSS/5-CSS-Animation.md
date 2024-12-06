@@ -1,12 +1,12 @@
 # INDEX
 
 - [INDEX](#index)
-  - [CSS Animation](#css-animation)
+  - [Animation](#animation)
     - [What to animate? (Animation Performance)](#what-to-animate-animation-performance)
     - [Transition vs Animation](#transition-vs-animation)
   - [`transform` property](#transform-property)
   - [Transition](#transition)
-  - [CSS Animation](#css-animation-1)
+  - [CSS Animation](#css-animation)
     - [Animation properties](#animation-properties)
     - [Animation Keyframes](#animation-keyframes)
     - [Animation choreograph](#animation-choreograph)
@@ -19,7 +19,7 @@
 
 ---
 
-## CSS Animation
+## Animation
 
 ### What to animate? (Animation Performance)
 
@@ -157,6 +157,8 @@ It's used to control the change in properties values of an element **over time**
 Applying animation to an element is done by 2 steps:
 
 1. Define the animation -> `@keyframes`
+
+   - `keyframes` is a rule which allows you to **define an animation sequence** with multiple steps
 
    ```css
    @keyframes move {

@@ -13,6 +13,7 @@
   - [CSS Performance](#css-performance)
   - [Minify / Minimize files](#minify--minimize-files)
     - [Minimize images](#minimize-images)
+    - [Font Optimization (minimize font files)](#font-optimization-minimize-font-files)
   - [Critical Render Path](#critical-render-path)
   - [Code Splitting (Lazy Loading)](#code-splitting-lazy-loading)
   - [Tree Shaking](#tree-shaking)
@@ -133,9 +134,7 @@ There's a cost to every optimization, so you need to measure to know if the opti
   - if you're measuring the performance of the website in **(Development mode)**, you will get different results because the code is not optimized and the files are not minified and the files are not compressed and the files are not cached
   - So, always measure the performance of the website in **(Production mode)** to get the real performance of the website
   - You can use `webpack` to build the website in **(Production mode)** by running `webpack --mode production` or by setting the `mode` property to `production` in the `webpack.config.js` file
--  
-
----
+- ***
 
 ## JavaScript Performance
 
@@ -442,6 +441,41 @@ To also improve the performance from the `css` side:
 - Images `metadata` contains information about the image such as the size, the color profile, the number of pixels, etc.
   - This information is not needed for the image to be displayed on the web page. Therefore, it can be removed to reduce the size of the image.
   - Also, it's sometimes removed by the frameworks automatically
+
+---
+
+### Font Optimization (minimize font files)
+
+The font file contains a lot of characters for different languages (which increases the size of the font file) but we don't need all of them in the website.
+
+- You can notice the size difference if you monitored the network tab in the browser while loading the website **from the main source and from the google fonts source**.
+  - `Inter` is a critically-acclaimed `sans-serif` font. It's free and open-source. When you download it from its [official website](https://rsms.me/inter/), each `.woff2` font file ranges from `99kb` to `151kb`. When I added 3 font weights to a sample product, it downloaded `427kb` worth of fonts.
+  - When I load the same 3 font weights through Google Fonts, it squeezes them all into 1 file that was only `37kb`. A savings of over `90%`!
+
+So, It's good to say that the `Google Fonts` service is doing a lot of optimizations to reduce the size of the font files 🚀
+
+- But what if you want to manually optimize the font files? or want to use google fonts optimization but also serve the font files from your server? That's where the `font subsetting` comes in.
+
+  - **Font subsetting**: It's the process of removing the unused characters from the font file to reduce the size of the font file
+
+    - It's used to reduce the size of the font file by removing the characters that are not used in the website (ex: `Arabic` characters in an `English` website)
+
+    - Google uses "unicode-range subsetting" to serve only the characters that are used on the website, as you will notice that when using font from google fonts, you will use 2 `<link>` tags one for the font file and one for the `css` file, and the `css` file contains the `unicode-range` property to serve only the characters that are used on the website (css file contains the optimization)
+
+      ```css
+      @font-face {
+        font-family: 'Inter';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('inter-latin-400.woff2') format('woff2');
+        unicode-range: U+000-5FF; /* if the website uses characters from U+000 to U+5FF, download this font file */
+      }
+      ```
+
+  - There's a helpful tool, [google-webfonts-helper](https://gwfh.mranftl.com/fonts). It allows you to quickly download optimized fonts from Google Fonts. It seems quite a bit more convenient, though there is a caveat: it doesn't support variable fonts.
+
+> Here's a good article about [font optimization](https://web.dev/articles/reduce-webfont-size), also this [article](https://www.sarasoueidan.com/blog/glyphhanger/) about `glyphhanger` tool to subset fonts.
 
 ---
 

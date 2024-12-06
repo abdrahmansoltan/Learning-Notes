@@ -34,15 +34,18 @@
     - [Animated gradient](#animated-gradient)
     - [Color Notes](#color-notes)
   - [Font \& Text](#font--text)
+    - [Text Rendering](#text-rendering)
     - [TypeFaces \& Font Families](#typefaces--font-families)
+      - [Font Loading Strategies (`font-display` property)](#font-loading-strategies-font-display-property)
     - [Text Formatting](#text-formatting)
     - [Alignment](#alignment)
     - [Line \& Letter Spacing](#line--letter-spacing)
-    - [Text-Wrap and Overflow](#text-wrap-and-overflow)
+    - [Text Overflow](#text-overflow)
       - [`overflow` property](#overflow-property)
+      - [`overflow-wrap` property](#overflow-wrap-property)
       - [`text-overflow` property](#text-overflow-property)
-    - [Multi-column Text](#multi-column-text)
-    - [Font Notes](#font-notes)
+      - [Multi-line ellipsis](#multi-line-ellipsis)
+    - [Font \& Text Notes](#font--text-notes)
   - [Units](#units)
     - [Pixels](#pixels)
     - [Percentages](#percentages)
@@ -54,9 +57,9 @@
     - [box-shadow](#box-shadow)
     - [text-shadow](#text-shadow)
   - [images](#images)
-    - [`object-fit` property](#object-fit-property)
+    - [Fit and Position of Images](#fit-and-position-of-images)
     - [Transforming Images](#transforming-images)
-    - [`background` properties](#background-properties)
+    - [`background` properties (Background Images)](#background-properties-background-images)
     - [filter property](#filter-property)
     - [clip-path](#clip-path)
     - [Masking](#masking)
@@ -64,6 +67,7 @@
   - [Calculations Built in Functions](#calculations-built-in-functions)
     - [`calc()`](#calc)
     - [`clamp()`](#clamp)
+    - [`min()` \& `max()`](#min--max)
   - [data attributes](#data-attributes)
   - [Table](#table)
   - [Form](#form)
@@ -77,6 +81,7 @@
     - [Tricks and Techniques](#tricks-and-techniques)
       - [Display vs Visibility](#display-vs-visibility)
       - [How to center an element](#how-to-center-an-element)
+        - [Centering a text](#centering-a-text)
       - [Scrolling](#scrolling)
         - [Scrolling using CSS](#scrolling-using-css)
         - [Scrolling using JavaScript](#scrolling-using-javascript)
@@ -90,6 +95,9 @@
       - [Facebook-style layout](#facebook-style-layout)
       - [Spacer Component Trick](#spacer-component-trick)
       - [Scrollable part of a container](#scrollable-part-of-a-container)
+      - [Tracking the scrollbar width](#tracking-the-scrollbar-width)
+      - [Filler Technique](#filler-technique)
+      - [Book Design](#book-design)
     - [General Notes](#general-notes)
     - [Questions](#questions)
 
@@ -1357,12 +1365,42 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
     ![color-scheme](./img/color-scheme.png)
 
+    > **Trick** to test it when developing, instead of changing the browser or the OS settings, you apply this code for `light` mode then after finishing, you change it to `dark` mode
+
+- To check if the element's color's contrast ratio is good for accessibility, you can use the devtools to check the contrast ratio between the text color and the background color. by selecting the element in the inspector and a **tooltip** will appear with the contrast ratio.
+
+  ![contrast-ratio](./img/contrast-ratio.png)
+
+  - Good contrast is above `4.5:1` for normal text and `3:1` for large text.
+
 - **Color Recourses**
   - [Happy Hues](https://www.happyhues.co/) -> color palettes for your projects
 
 ---
 
 ## Font & Text
+
+### Text Rendering
+
+- **Kerning**
+  ![kerning](./img/kerning-1.jpg)
+
+  - is the process of adjusting the spacing **between individual characters** in a proportional font, usually to achieve a visually pleasing result.
+  - Browsers use different kerning algorithms, so the text may look different in different browsers.
+    - Naturally, the browser doesn't do any kerning for `monospaced` fonts, since those characters need to align neatly into columns.
+  - How to control it in CSS -> [Line & Letter Spacing](#line--letter-spacing)
+
+- **Text Rasterization**
+
+  - is the process of converting text from a vector format (like a font file) into a raster format (like pixels on a screen).
+
+  > Modern fonts are vector-based (`ttf`, `otf`, `svg`, `woff/woff2`) rather than bitmap-based, allowing them to scale smoothly to any size. The browser converts these vector instructions into pixels through **rasterization**.
+
+- **Font Smoothing**
+  - is the process of anti-aliasing text to make it look smoother on screen.
+  - It's controlled by the browser and the operating system, so you can't control it with CSS.
+
+---
 
 ### TypeFaces & Font Families
 
@@ -1375,6 +1413,8 @@ It's a way to create a gradient that changes color smoothly from one color to an
   /* Here, "Georgia" is the preferred typeface, "Times" is the backup, and "serif" is the generic font family. */
   ```
 
+  - This acts as a sort of "preference list". We've given the browser a list of fonts we'd like to use, in priority order. Ideally, it'll pick the first one, but if it's not available, it can use the second, or the third, or the fourth.
+
 - `@font-face`
 
   - It allows you to use a font, even if it is not installed on the computer of the person browsing, by allowing you to specify a path to a copy of the font, which will be downloaded if it is not on the user's machine.
@@ -1384,6 +1424,8 @@ It's a way to create a gradient that changes color smoothly from one color to an
     @font-face {
       font-family: 'ChunkFiveRegular';
       src: url('fonts/chunkfive.eot');
+      font-weight: 400;
+      font-style: normal;
     }
 
     h1,
@@ -1416,6 +1458,91 @@ It's a way to create a gradient that changes color smoothly from one color to an
   2. use `@import url()`, **but it needs to be the first thing in your css file/s** to work correctly
 
      - This is useful when you want to use the same css file for multiple projects and you want to keep the font import in the same file
+
+- **Performance trade-offs:** Self-hosted fonts can be faster than Google Fonts because:
+
+  - Google Fonts requires multiple requests:
+    1. Request to get the CSS file from `fonts.googleapis.com`
+    2. Request to get the font file from `fonts.gstatic.com`
+  - These external requests add overhead and block page rendering due to "handshaking" with the server.
+  - With self-hosted fonts:
+
+    - CSS can be embedded directly in HTML
+    - Font files are served from same domain
+    - Fewer requests and less **overhead** of reaching out to external servers
+    - save a network request (instead of fetching the stylesheet from Google Fonts, then fetching the font files from Google's CDN), here we fetch the font files directly from our server.
+
+    ```css
+    /* Self-hosted font */
+    @font-face {
+      font-family: 'Roboto';
+      src: url('/fonts/roboto.woff2') format('woff2'); /* 👈👈👈  */
+      font-weight: 400;
+      font-style: normal;
+    }
+    ```
+
+  > If you're using Next.js 11 or higher, the framework will automatically optimize this for you.
+  >
+  > Angular v11+ has built-in support for Google Fonts, with configuration for inlining the fonts directly. You can [learn more in the Angular docs](https://angular.io/guide/workspace-config#fonts-optimization-options).
+
+---
+
+#### Font Loading Strategies (`font-display` property)
+
+- When a user visits a website using web fonts for the first time, they need to download the font files. During this download, browsers handle text rendering in two ways:
+
+  1. **FOIT (Flash Of Invisible Text)**
+
+     - Browser hides text until font loads
+     - User can't read content while waiting
+     - Default behavior in most browsers
+
+  2. **FOUT (Flash Of Unstyled Text)**
+
+     - Browser shows text in fallback font first
+     - Switches to web font when loaded
+     - Can cause layout shifts
+
+> **Note:** Font loading issues may not be noticeable during development because:
+>
+> - Fonts download instantly on localhost
+> - Browsers cache fonts after first visit
+> - The font may already be installed on your machine
+> - Fast internet connections mask loading delays
+>
+> Always test font loading behavior in production with various connection speeds.
+
+- To control this behavior, use the `font-display` property (It's included in our @font-face statement)
+
+  ```css
+  @font-face {
+    font-family: 'Great Vibes';
+    src: url('/fonts/great-vibes.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap; /* 👈👈👈 */
+  }
+  ```
+
+  - When we add the Google Font snippet, it includes a query parameter that sets this property:
+    ![font-display](./img/font-display.png)
+
+  - The `font-display` property controls how fonts load through 3 time periods:
+    1. **Block**: Text is invisible while waiting for font to load
+       - `font-display: block;` -> it priotizes the availability of the font over the speed of loading the page.
+       - It should only be used when the font is essential for the user experience (ex: icons, logos, etc.)
+    2. **Swap**: Fallback font shows until web font loads and swaps in
+       - `font-display: swap;` -> it priotizes the speed of loading the page over the availability of the font.
+       - It's the best option for most websites because it provides a good balance between performance and user experience.
+       - This is the value that Google Fonts uses. It's a good option, but I think there's a better one for most cases.
+    3. **Failure**: If font hasn't loaded by now, fallback font remains
+       - `font-display: fallback;` -> it's the preferred value. I use it in all of my projects. It prioritizes a smooth user experience above all else:
+       - It features a very-short block period (about `100ms`), and a moderate swap period (about `3s`).
+       - On speedy connections, it's likely that the font can be downloaded within the block period, preventing an uncomfortable flash between font families
+       - On very slow or intermittent connections, the fallback font is used forever, preventing a random flash between fonts seconds/minutes after the page has loaded.
+    4. **Optional**: Font is optional and won't block rendering
+       - `font-display: optional;` -> it's the least preferred value. It's not recommended because it doesn't guarantee that the font will be loaded at all. It's only useful for decorative fonts that don't affect the user experience.
 
 ---
 
@@ -1485,14 +1612,25 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
 ### Alignment
 
-- to indent text, use `text-indent`
+- to indent text, use:
+  ![text-indent](./img/text-indent.png)
 
-  ```css
-  div {
-    text-align: left;
-    text-indent: 6rem;
-  }
-  ```
+  - `text-indent`
+
+    ```css
+    div {
+      text-align: left;
+      text-indent: 6rem;
+    }
+    ```
+
+  - or select the first letter in the paragraph and give it a margin
+
+    ```css
+    p::first-letter {
+      margin-left: 1em;
+    }
+    ```
 
 - `text-align`:
 
@@ -1503,6 +1641,9 @@ It's a way to create a gradient that changes color smoothly from one color to an
     - `right` -> aligns the text to the right
     - `center` -> aligns the text to the center
     - `justify` -> aligns the text to both the left and right margins, adding extra space between words as necessary
+      - This is useful for paragraphs and other blocks of text where you want the text to be aligned on both sides.
+        ![justify](./img/text-justify-1.png)
+        ![justify](./img/text-justify-2.png)
     - `start` -> aligns the text to the start of the line (useful for languages that are read from right to left)
     - `end` -> aligns the text to the end of the line (useful for languages that are read from right to left)
 
@@ -1535,6 +1676,20 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
 ### Line & Letter Spacing
 
+- Line length
+
+  - The ideal line length is between `45` and `75` characters per line.
+  - fortunately, CSS has a build-in unit for this: `ch` (character width)
+
+    ```css
+    p {
+      max-width: 50ch;
+    }
+    ```
+
+  - Does setting a width of `50ch` for example mean that we'll get an average of `50` characters per line?
+    - **No**, because the width of each character is different, so it's just an approximation. It depends on the font and the characters used.
+
 - `line-height`
 
   - It's a term to control "Leading" (pronounced "ledding")
@@ -1553,8 +1708,45 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
 - `letter/word-spacing`
 
-  - **"Kerning"** is the term typographers use for the space between each letter. You can control the space between each letter with the letter-spacing property.
+  - **"Kerning"**
     ![kerning](./img/kerning.gif)
+
+    - is the term typographers use for the space between each letter.
+    - You can control the space between each letter with:
+
+      - `font-kerning` property, but it's not widely supported, instead, you can use the `letter-spacing` property which acts as a **"kerning multiplier"** (it amplifies or reduces whatever kerning the browser has set for the font).
+      - For **custom control**, follow these steps:
+
+        ```html
+        <p>
+          <span>H</span>
+          <span>e</span>
+          <span>l</span>
+          <span>l</span>
+          <span>o</span>
+        </p>
+
+        <style>
+          p {
+            font-size: 20px;
+            font-kerning: none;
+          }
+          span:nth-child(1) {
+            letter-spacing: 0.1em;
+          }
+          span:nth-child(2) {
+            letter-spacing: 0.2em;
+          }
+          span:nth-child(3) {
+            letter-spacing: 0.3em;
+          }
+        </style>
+        ```
+
+        1. disable the browser's default kerning by setting `font-kerning: none;`
+        2. wrap each letter in a `<span>` element
+        3. apply a `letter-spacing` value to the `<span>` elements, picking custom values for each letter
+
   - When you specify a value for these properties, it should be given in `em`
 
     ```css
@@ -1575,9 +1767,20 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
 ---
 
-### Text-Wrap and Overflow
+### Text Overflow
 
 When text overflows the container, you can control how it behaves using the `overflow` property or by controlling how it wraps when it reaches the end of the container.
+
+- How the browser identify that the text is overflowing the container?
+
+  - The browser identifies overflow by grouping characters into unbreakable "words" (like `"https://www.google.com"`) and looking for "soft wrap opportunities" (like `spaces` or `dashes`) where it can split content onto the next line when it would spill outside the container. **If there are no soft wrap opportunities, the browser will overflow the content.**
+  - Note that there're "non-breaking spaces" (`&nbsp;`) that the browser won't break on them (it's like a normal space but it won't break the line)
+
+    ```html
+    <p>That sandwich costs $10&nbsp;USD, or you can barter for it.</p>
+    ```
+
+  - Adobe has made a CSS proposal to support an alternative text-placement algorithm. They have a JavaScript polyfill you can use today, and the [results are pretty impressive](https://opensource.adobe.com/balance-text/demo/index.html)
 
 #### `overflow` property
 
@@ -1600,6 +1803,17 @@ When text overflows the container, you can control how it behaves using the `ove
   - If you set `overflow-x` to `hidden` and `overflow-y` to `visible`, the text will be hidden horizontally but will show a vertical scrollbar as if it has `overflow-y: scroll`.
     - This behavior occurs because the element becomes a scroll container, and its children are confined within its bounds. The `overflow-x: hidden` removes the horizontal scrollbar, while `overflow-y: visible` allows vertical scrolling, but the content is still confined within the container.
 
+#### `overflow-wrap` property
+
+with `overflow-wrap` property, you can control how the text wraps when it reaches the end of the container.
+
+- Values:
+  - `overflow-wrap: break-word` -> the text will wrap to the next line if it reaches the end of the container, even if it means breaking a word in half.
+    - this declaration gives the browser permission to break after any character
+    - Note that the split will happen without any visual indication that the word has been broken, but in **print mode**, the word will be hyphenated with `"-"` (it's also controllable with `hyphens` property)
+  - `overflow-wrap: normal` -> the text will wrap to the next line if it reaches the end of the container, but it will not break a word in half.
+- It's called `word-wrap` in some browsers (like IE)
+
 #### `text-overflow` property
 
 ![text-overflow](./img/text-overflow.png)
@@ -1614,32 +1828,27 @@ When text overflows the container, you can control how it behaves using the `ove
   - `pre-wrap` -> the text will wrap to the next line and will respect the line breaks in the text
   - `pre-line` -> the text will wrap to the next line and will respect the line breaks in the text but will collapse multiple spaces into one
 
----
+#### Multi-line ellipsis
 
-### Multi-column Text
+If you want to add an ellipsis to a multi-line text, you can use the following trick:
 
-- `column-count` property:
-  ![multi-column](./img/column-count-1.jpg_large)
+```css
+p {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden; /* we need to hide the lines that will be clamped off */
+}
+```
 
-  - It specifies the number of columns an element should be divided into.
-  - It can have the following values:
-
-    - `auto` -> the browser will determine the number of columns
-    - `2` -> the element will be divided into two columns
-    - `3` -> the element will be divided into three columns
-
-    ```css
-    p {
-      column-count: 3;
-      column-gap: 20px;
-    }
-    ```
-
-    ![multi-column](./img/column-count-2.png)
+- Notes:
+  - Apply this code to the element that contains the text you want to clamp. and not the container of the element.
+  - In certain cases, it can be buggy, because the element that we're applying this code is also a `flex` container, so it may not work as expected.
+    - To avoid possible issues, always apply line clamping to a paragraph tag that isn't being stretched or flexed as part of `flexbox` or `CSS Grid`. We can solve for this by using a wrapper `div`
 
 ---
 
-### Font Notes
+### Font & Text Notes
 
 - You can use the shorthand `font` property to set all the font properties at once.
 
@@ -1688,6 +1897,7 @@ Units are used to specify the size of elements or values of properties in CSS.
     - `auto`
     - `fit-content`
     - `min-content`
+    - `max-content`
 - The most popular unit for anything size-related is the pixel (`px`), but there are other units that can be used in CSS.
 - How units are converted to pixels:
   ![units](./img/css-units.png)
@@ -1782,6 +1992,11 @@ The `percentage %` unit is sometimes a value from the parent and other times it'
   - `vh` is useful for creating full-screen sections
   - `vw` is useful for creating layouts that depend on the screen size
 
+- There are also 2 more viewport units: `vmin` and `vmax` (not used as much)
+
+  - `vmin` -> the smaller of `vw` and `vh`
+  - `vmax` -> the larger of `vw` and `vh`
+
 ---
 
 ### Keywords
@@ -1795,12 +2010,18 @@ The `percentage %` unit is sometimes a value from the parent and other times it'
   - `width: min-content` -> the width of the element will be the minimum required to fit the content inside it (it will shrink to the minimum width of the content)
   - Here, we aren't sizing based on the space made available by the parent, we're sizing based on the element's children!
   - It checks for any chance that the content might overflow and makes sure it fits within the parent element (white space between words) forcing the text to wrap to the next line if needed
+  ![min-content](./img/min-content.png)
 
   - Use-cases:
     - With `block` elements, it will shrink to the minimum width of the content
     - `<figure>` element (to make the image and the caption fit together)
       ![figure](./img/figure-1.png)
 
+- `max-content`
+  - `width: max-content` -> the width of the element will be the maximum required to fit the content inside it (it will expand to the maximum width of the content)
+    ![max-content](./img/max-content.avif)
+    ![max-content](./img/max-content-1.png)
+  - It's useful when you want to make sure that the element takes up the maximum space required by the content, but no more.
 - `fit-content` value for width
 
   - `width: fit-content` -> the width of the element will be the minimum required to fit the content inside it (But it won't make block elements inline even if the content is small)
@@ -1900,35 +2121,75 @@ div {
 
 ## images
 
-### `object-fit` property
+### Fit and Position of Images
 
-It is used to specify how an `<img>` or `<video>` should be resized to fit its container and to maintain aspect ratio. **(specially when the image is bigger than the container or when resizing the browser window)**
+The `<img>` tag is a replaced element. The browser replaces it with the actual image, which behaves differently from regular DOM nodes. For example, images can have heights set, unlike most inline elements.
 
-- It prevent the image from being stretched or distorted
+Images have intrinsic sizes. These dimensions come from the image file itself, like a 400 × 300 resolution. This impacts how they interact with layouts.
 
-  ```css
-  img {
-    object-fit: cover;
-  }
-  ```
+- Images also have an intrinsic aspect ratio. This means that if we only supply one dimension, either `width` or `height`, the other dimension scales up or down as-needed, to preserve the aspect ratio: (if we set the `width` to `200px`, the `height` will be calculated automatically to preserve the aspect ratio)
 
-- Values:
-  ![object-fit](./img/object-fit.png)
-  - `fill` - This is the default value which stretches the image to fit the content box, regardless of its aspect-ratio.
-  - `contain` - This value will resize the image to fit the content box, maintaining its aspect ratio.
-  - `cover` - This value will resize the image to cover the content box, cropping the image if needed.
-  - `none` - This value will not resize the image at all.
-  - `scale-down` - This value will compare the difference between `none` and `contain`, and the smaller one will be used.
-- This property tells the content to fill the container in a variety of ways; such as "preserve that aspect ratio" or "stretch up and take up as much space as possible".
-- we use it to use images with specified `width`&`height` without distorting them
+  - What happens if we provide both a width and a height? What if it doesn't match the image's natural aspect ratio? By default, **the image will be distorted**, stretching like a sock being pulled over a foot
+  - That said, this default behaviour is almost never what we want it to do. A better alternative in most cases is to crop the image, trimming off any excess that can't fit in the specified rectangle.
+  - For many years, this was only possible with **background images**. Fortunately, modern CSS includes a couple tools that can help us out in this case. First, let's look at `object-fit`
 
-  ```css
-  img {
-    width: 200px;
-    height: 300px;
-    object-fit: cover;
-  }
-  ```
+- `object-fit` property
+
+  - It is used to specify how an `<img>` or `<video>` should be resized to fit its container and to maintain aspect ratio. **(specially when the image is bigger than the container or when resizing the browser window)**
+  - This property tells the content to fill the container in a variety of ways; such as "preserve that aspect ratio" or "stretch up and take up as much space as possible".
+  - Values:
+    ![object-fit](./img/object-fit.png)
+    - `fill` - This is the default value which stretches the image to fit the content box, regardless of its aspect-ratio.
+    - `contain` - This value will resize the image to fit the content box, maintaining its aspect ratio, even if it means leaving some empty space.
+    - `cover` - This value will resize the image to cover the content box, cropping the image if needed and maintaining its aspect ratio.
+    - `none` - This value will not resize the image at all.
+    - `scale-down` - This value will compare the difference between `none` and `contain`, and the smaller one will be used.
+  - we use it to use images with specified `width`&`height` without distorting them (prevent the image from being stretched or distorted)
+
+    ```css
+    img {
+      width: 200px;
+      height: 300px;
+      object-fit: cover;
+    }
+    ```
+
+- `object-position` property
+  ![object-position](./img/object-position-1.webp)
+  ![object-position](./img/object-position-2.jpg)
+
+  - When using an `object-fit` value like `cover`, the browser will crop our image so that we see the very center of the image, and trim off the edges. But in some cases, we'll want to use a different anchor point.
+  - `object-position` lets us specify how the image should be translated or cropped within its available space. It's very similar to `background-position` property.
+
+  - It takes 2 numbers: the first is the horizontal position, and the second is the vertical position. The values can be percentages, lengths, or keywords.
+
+    ```css
+    img {
+      object-fit: cover;
+
+      object-position: 50% 50%;
+      /* or */
+      object-position: 45px 10px;
+      /* or */
+      object-position: right bottom;
+    }
+    ```
+
+  - Note: you can normally use `object-position` without `object-fit`, but it won't have any effect unless you're using `object-fit: none;`
+
+- `aspect-ratio` property
+
+  - It is used to specify the aspect ratio of an element.
+  - It's a new property in CSS that allows you to set the aspect ratio of an element. It's useful when you want to maintain the aspect ratio of an element, like an image or a video, even when the size of the element changes (fluid layout).
+
+  - It's used when we don't want to specify fixed `width` and `height` for the image, but we want to maintain the aspect ratio of the image in fluid layouts where the size of the image changes based on the size of the container.
+
+    ```css
+    img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+    }
+    ```
 
 ---
 
@@ -1962,7 +2223,7 @@ It is used to specify how an `<img>` or `<video>` should be resized to fit its c
 
 ---
 
-### `background` properties
+### `background` properties (Background Images)
 
 The `background` properties are used to set the background for an element, which can be a color, an **image**, or a gradient.
 
@@ -1989,25 +2250,12 @@ The `background` properties are used to set the background for an element, which
     }
     ```
 
-- `background-repeat`
-
-  - By default, as the element gets bigger, if the background-image is not big enough, it will **repeat** to fill the entire element(box). to control that, you can use `background-repeat` property
-
-    ```css
-    body {
-      background-image: url('images/header.gif');
-      background-repeat: repeat-x;
-      /* or: The image is only shown once.
-      background-repeat: no-repeat;
-      */
-    }
-    ```
-
-    ![background-repeat](./img/background-repeat1.png)
-    ![background-repeat](./img/background-repeat2.png)
+  - In addition to accepting the URL to an image file, the background-image property also accepts gradients. Here is a neat generator tool: [“Magic Pattern” CSS background patterns](https://www.magicpattern.design/tools/css-backgrounds)
 
 - `background-size`
-  ![backgroundSize](./img/background-size-cover-contain.svg)
+
+  - It specifies the size of the background images same as `object-fit` for `<img>` elements
+    ![backgroundSize](./img/background-size-cover-contain.svg)
 
   - Values:
 
@@ -2028,6 +2276,25 @@ The `background` properties are used to set the background for an element, which
         background-size: 100% 50%;
       }
       ```
+
+- `background-repeat`
+
+  - By default, as the element gets bigger, if the background-image is not big enough, it will **repeat** to fill the entire element(box). to control that, you can use `background-repeat` property
+
+    ```css
+    body {
+      background-image: url('images/header.gif');
+      background-repeat: repeat-x;
+      /* or: The image is only shown once.
+      background-repeat: no-repeat;
+      */
+    }
+    ```
+
+    ![background-repeat](./img/background-repeat1.png)
+    ![background-repeat](./img/background-repeat2.png)
+
+    - `
 
 - `background-position`
 
@@ -2283,7 +2550,7 @@ div {
   }
   ```
 
-- if you have an empty space between the image and the bottom-border, This is because the browser treats inline-elements as if the're typography, so it adds a space at the bottom as if it's a letter.
+- if you have an empty space between the image and the bottom-border, This is because the browser treats **inline-elements** (`display: inline`) as if the're typography, so it adds a space at the bottom as if it's a letter. (This also happens for `SVG` elements because they're inline elements)
   ![img](./img/img-inline.jpeg)
   - To fix this, you can:
     - make the image a **block or inline-block** element
@@ -2299,13 +2566,53 @@ div {
   }
   ```
 
+- Images with Flexbox:
+
+  - Note that the default value of `align-items` is `stretch`, so the image will stretch to fill the height of the container, which will distort the image. To fix this, you can set `align-items: flex-start;` to make the image keep its original size. or use `min-width: 0;` to allow the image to shrink if needed
+
+    ```css
+    .container {
+      display: flex;
+
+      align-items: flex-start;
+      /* or */
+      min-width: 0;
+    }
+    ```
+
+  - The better solution is to wrap the image inside a `div` and set the `img` to `width: 100%` to make it responsive
+
+    ```html
+    <div class="flex-container">
+      <div class="img-container">
+        <img src="img.jpg" alt="image" />
+      </div>
+    </div>
+
+    <style>
+      .flex-container {
+        display: flex;
+      }
+
+      .img-container {
+        width: 250px;
+      }
+
+      img {
+        width: 100%;
+      }
+    </style>
+    ```
+
+    - You might think that this is not semantic, but it's okay as `div` is meant to "divide" the content, so it's okay to use it for this purpose
+
 ---
 
 ## Calculations Built in Functions
 
 ### `calc()`
 
-Gives us the ability to do math in css, usually used with `width` and `height` properties
+Gives us the ability to **do math in css**, usually used with `width` and `height` properties
 
 - compatible with `length`, `frequency`, `angle`, `time`, `number` and `integer`
 - commonly used with mixed units like percentages `%` and `vw` units together
@@ -2344,9 +2651,153 @@ Gives us the ability to do math in css, usually used with `width` and `height` p
 
     /* we can do this*/
     .column-1-7 {
-      width: calc(100% / 7);
+      width: calc(100% / 7); /* 1/7th of the available space */
     }
     ```
+
+  - It can be used with css-variables
+
+    ```css
+    :root {
+      --main-width: 100px;
+    }
+
+    div {
+      width: calc(var(--main-width) * 2);
+    }
+    ```
+
+  - Calculating colors and gradients
+
+    ```css
+    :root {
+      --red-hue: 0deg;
+      --intense: 100% 50%;
+
+      --red: hsl(var(--red-hue) var(--intense));
+      --orange: hsl(calc(var(--red-hue) + 20deg) var(--intense));
+      --pink: hsl(calc(var(--red-hue) - 40deg) var(--intense));
+    }
+    ```
+
+  - Doing complex and sequence animations
+
+    - Here, we can use `calc()` to calculate the properties of the animation
+      ![calc](./img/calc-animation.png)
+
+      ```html
+      <style>
+        html {
+          --box-size: 75px;
+        }
+
+        @keyframes slowtate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        .box {
+          width: var(--box-size);
+          height: var(--box-size);
+          background: linear-gradient(
+            calc(135deg - var(--index) * 33deg),
+            hsl(calc(275deg + var(--index) * -1deg) 100% 50%),
+            hsl(calc(340deg + var(--index) * -10deg) 100% 50%)
+          );
+          animation: slowtate calc(500ms + var(--index) * 100ms) 2 linear;
+        }
+
+        .box:nth-of-type(3n) {
+          border-radius: 25%;
+        }
+
+        .row {
+          display: flex;
+          flex-wrap: wrap;
+          width: calc(var(--box-size) * 4);
+          height: calc(var(--box-size) * 4);
+        }
+
+        /*
+          Attach a unique index to each box.
+          Normally, we would do this in JS.
+        */
+        .box:nth-of-type(1) {
+          --index: 1;
+        }
+        .box:nth-of-type(2) {
+          --index: 2;
+        }
+        .box:nth-of-type(3) {
+          --index: 3;
+        }
+        .box:nth-of-type(4) {
+          --index: 4;
+        }
+        .box:nth-of-type(5) {
+          --index: 5;
+        }
+        .box:nth-of-type(6) {
+          --index: 6;
+        }
+        .box:nth-of-type(7) {
+          --index: 7;
+        }
+        .box:nth-of-type(8) {
+          --index: 8;
+        }
+        .box:nth-of-type(9) {
+          --index: 9;
+        }
+        .box:nth-of-type(10) {
+          --index: 10;
+        }
+        .box:nth-of-type(11) {
+          --index: 11;
+        }
+        .box:nth-of-type(12) {
+          --index: 12;
+        }
+        .box:nth-of-type(13) {
+          --index: 13;
+        }
+        .box:nth-of-type(14) {
+          --index: 14;
+        }
+        .box:nth-of-type(15) {
+          --index: 15;
+        }
+        .box:nth-of-type(16) {
+          --index: 16;
+        }
+        * {
+          box-sizing: border-box;
+        }
+      </style>
+
+      <div class="row">
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+      </div>
+      ```
 
 - Tips when using `calc()`
 
@@ -2365,6 +2816,89 @@ The `clamp()` CSS function clamps a middle value within a range of values betwee
 ```css
 font-size: clamp(1rem, 2.5vw, 2rem);
 ```
+
+- It works quite a bit like the trio of `min-width`, `width`, and `max-width`, but it combines it into a single property value. In other words, these two rules are functionally identical:
+
+  ```css
+  /* Method 1 */
+  .column {
+    min-width: 500px;
+    width: 65%;
+    max-width: 800px;
+  }
+  /* Method 2 */
+  .column {
+    width: clamp(500px, 65%, 800px);
+  }
+  ```
+
+- **It works with other properties!**
+
+  - Historically, we've only been able to limit `width`s and `height`s. There is no `min-padding`/`max-padding` or `min-font-size`/`max-font-size`.
+  - The amazing thing about `clamp` is that it's a value, not a property. This means that it can be used with just about any property!
+
+- Common Use-cases:
+
+  - **Responsive Typography**:
+
+    ```css
+    font-size: clamp(1rem, 2.5vw, 2rem);
+    ```
+
+  - **Responsive Layouts**:
+
+    ```css
+    width: clamp(500px, 65%, 800px);
+    ```
+
+  - **Responsive Spacing**:
+
+    ```css
+    padding: clamp(1rem, 2.5vw, 2rem);
+    ```
+
+  - **Responsive Grid/Flex Gap**: (usually in navbar items)
+
+    ```css
+    gap: clamp(1rem, 2.5vw, 2rem);
+    ```
+
+- `clamp` allows us to specify a lower and upper bound. But what if we only want to limit one end?
+
+  - That's where [min & max](#min--max) come in!
+
+- You can use the [clamp-calculator](https://www.marcbacon.com/tools/clamp-calculator/) to calculate the values
+
+---
+
+### `min()` & `max()`
+
+The `min()` and `max()` CSS functions can be used to set the minimum or maximum value from a list of comma-separated expressions.
+
+```css
+width: min(100%, 500px);
+
+/* Instead of */
+width: 100%;
+min-width: 500px;
+```
+
+- Trick: we can use it with `min-width` and `max-width` to have multiple min-widths for different screen sizes and use the smaller/bigger one based on the screen size
+
+  ```css
+  .image {
+    margin: 0 auto;
+    mix-width: min(100%, 500px);
+    /* This means that for smaller screens, the image will be 100% of its container, but for larger screens, it will be a maximum of 500px so that it will be centered */
+  }
+  ```
+
+- **Note:** `min()`, `max()`, and `clamp()` will automatically resolve any `calc-`style equations inside them. This helps to keep the code clean and easy to read.
+
+  ```css
+  width: min(100%, calc(100% - 50px)); /* works ✅ */
+  width: min(100%, 100% - 50px); /* also works ✅ */
+  ```
 
 ---
 
@@ -2610,6 +3144,14 @@ They're a way for browser makers to add support for new CSS features before thos
   - `-o-` (old pre-WebKit versions of Opera)
   - `-ms-` (Internet Explorer and Microsoft Edge)
 
+> **What is `WebKit` anyway?**
+>
+> It's a browser rendering engine used by Safari, Chrome, and other browsers. It's known for its speed and efficiency.
+>
+> - This means that just about every major browser has its roots in the WebKit codebase. This history helps explain why `-webkit` prefixes are supported in many non-Safari browsers!
+>
+> Nowdays, `WebKit` is used as a prefix for Safari and Chrome browsers, and `Blink` is the new rendering engine for Chrome.
+
 - When adding them, make sure to add the standard property at the end, so that the standard property will override the vendor-prefixed properties.
 
 - Example:
@@ -2650,10 +3192,18 @@ It's the practice of building your web functionality so that it provides a certa
   ```css
   @supports (display: grid) {
     /* CSS rules for browsers that support grid layout */
+    .wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
   }
 
   @supports not (display: grid) {
     /* CSS rules for browsers that do not support grid layout */
+    .wrapper {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
   ```
 
@@ -2780,6 +3330,59 @@ To center an element vertically and horizontally in a container, we have these o
        place-self: center;
      }
      ```
+
+##### Centering a text
+
+There's a difference between `text-align: center` and centering using flexbox or grid:
+
+```html
+<!-- Using text-align -->
+<div class="with-text-align">
+  <p>
+    It is advisable to drain golfing land much more thoroughly and efficiently than ordinary farm
+    land, but, on the other hand, by exercising a little thought it can be done much more cheaply.
+    For the purpose of golf it is not only unnecessary to drain as deeply as is customary for
+    agricultural purposes, but it is much cheaper and more satisfactory to adopt a system of shallow
+    drains.
+  </p>
+</div>
+
+<hr />
+
+<!-- Using a Flex column -->
+<div class="with-flexbox">
+  <p>
+    It is advisable to drain golfing land much more thoroughly and efficiently than ordinary farm
+    land, but, on the other hand, by exercising a little thought it can be done much more cheaply.
+    For the purpose of golf it is not only unnecessary to drain as deeply as is customary for
+    agricultural purposes, but it is much cheaper and more satisfactory to adopt a system of shallow
+    drains.
+  </p>
+</div>
+
+<style>
+  .with-text-align {
+    text-align: center;
+  }
+
+  .with-flexbox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  p {
+    max-width: 50ch;
+    padding: 1rem;
+  }
+</style>
+```
+
+![center text](./img/center-text.png)
+
+- What's going on here?
+  - Well, `text-align: center` moves all of the individual characters to the middle of each line, the way you'd expect centering to work in a rich text editor.
+  - `align-items`, though, is more about layout alignment. It positions the paragraph as a block. It doesn't affect the individual characters within that block.
 
 ---
 
@@ -3321,6 +3924,214 @@ The above is a vertical-spacer component. You can also create a horizontal-space
 
 ---
 
+#### Tracking the scrollbar width
+
+When you have a scrollbar on the page, it can affect the layout of the page or cover some of the content. You can track the scrollbar width using JavaScript and then adjust the layout accordingly.
+
+```js
+const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+// window.innerWidth --> width of the window including the scrollbar
+// document.documentElement.clientWidth --> width of the document excluding the scrollbar
+```
+
+- Here's an example: Let's say our window is `500px` wide, and our scrollbar is taking up `20px`. `window.innerWidth` will be `500`, and `clientWidth` will be `480`. By subtracting, we get the difference of `20`. If there is no scrollbar, or the scrollbar is a non-blocking overlay, `scrollbarWidth` will be `0`, since our two width values will be identical.
+
+  - Now that we know how wide the scrollbar is, we can assign it to a CSS variable:
+
+  ```js
+  document.documentElement.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
+  // By attaching this CSS variable to the documentElement, we make it globally available (it's the same thing as targeting html in CSS).
+
+  // Now, in our CSS, we can use this variable to adjust our layout:
+  ```
+
+  ```css
+  .wrapper {
+    width: calc(100% - var(--scrollbar-width));
+  }
+  ```
+
+  ![scrollbar-width](./img/scrollbar-width.png)
+
+---
+
+#### Filler Technique
+
+It's a technique that is used for some designs where you need to have an element centered in the middle of the container that has 2 elements and we want the design to be like if the container has 3 elements.
+
+- The idea here is to create a filler element that takes up the remaining space in the container and pushes the centered element to the middle of the container. This way the element that we want to center will be squished to the middle of the container by its left from the filler element and by its right from the other element.
+- The idea here that we need to apply `flex: 1;` to the filler element and the other elements will take the space they need.
+
+- Example:
+
+  ```html
+  <div class="overlay">
+    <div class="container">
+      <div class="filler"></div>
+
+      <div class="nav"></div>
+        <a href="#">Sale</a>
+        <a href="#">New Releases</a>
+        <a href="#">Men</a>
+        <a href="#">Women</a>
+        <a href="#">Kids</a>
+        <a href="#">Collections</a>
+      </div>
+
+      <div class="footer">
+        <a href="/terms">Terms and Conditions</a>
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/contact">Contact Us</a>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .container {
+      width: 300px;
+      height: 100%;
+      background-color: white;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .filler {
+      flex: 1;
+    }
+
+    .footer {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      flex: 1;
+    }
+  ```
+
+  ![filler-technique](./img/filler-technique.png)
+
+---
+
+#### Book Design
+
+![book-design](./img/book-design.png)
+
+```html
+<main class="wrapper">
+  <h2>Chapter 1</h2>
+  <p>
+    Outside the space-warp chamber, Rizal's great green sun had already set. Thick olive dusk eddied
+    through the interplanetary transit center. I swore under my breath and slammed shut the
+    warp-hatch switch.
+  </p>
+  <p>
+    Locking bars whispered back. The hatch revolved on its axis, slow as an asteroid eroding. I
+    threw another quick glance at my chrono. It still read the same as before: six Earth hours more…
+    six hours to ferret out the truth or be forever reconditioned.
+  </p>
+  <p>—Six hours, that is, if Controller Alfred Kruze didn't cut it shorter.</p>
+  <p>
+    And if he did, Rizal might very well change status. Today, it was billed as the FedGov's
+    outermost bastion against the Kel. Tomorrow, it could prove man's fatal flaw, the Achilles heel
+    in our whole system of defenses.
+  </p>
+  <p>In which case—</p>
+  <p>Involuntarily, I shivered.</p>
+  <p>“Agent Traynor—?”</p>
+  <p>
+    The voice came from the shadows. A dull, phlegmatic, tranquilized, conditioned voice. I stopped
+    short; turned fast. “Who's asking?”
+  </p>
+  <p>
+    The man shrugged stolidly, not even picking up my tension. “I'm a port rep, Agent Traynor. Port
+    rep second, that is—”
+  </p>
+
+  <p>“So who told you to come out here? Who said you should meet me?”</p>
+  <p>
+    “Oh…” A pause. “Well, you see, there's this sigman, Agent Traynor. Up in the Interworld
+    Communications section. He had a regular 7-D clearance report that a FedGov Security
+    investigation agent was warping in—you have to file a 7-D on all warpings, you know, Agent
+    Traynor, on account of restrictives. So—well, the rep first was out to eat, so I just notified
+    Rizal Security, just a routine report, and the unit controller there, an Agent Gaylord, he said
+    for me to meet you, and—”
+  </p>
+  <p>
+    I bit down hard and shifted my weight, both at once, wondering if a broken jaw would interfere
+    with the work of a port rep second.
+  </p>
+  <p>Only then, all at once, I caught the unmistakable whish of a grav-car sweeping in.</p>
+  <p>
+    The lights hit us almost in the same instant. Two seconds later a man who said he was Agent
+    Gaylord was jumping down and locking wrists with me in Rizal's traditional greeting.
+  </p>
+  <p>
+    Even that wrist-lock set my teeth on edge. It was too solid, too stolid, too thorough a job of
+    conditioning.
+  </p>
+  <p>Or was it maybe, just a trifle over-done?</p>
+</main>
+```
+
+```css
+.wrapper {
+  column-count: 2;
+  column-gap: 150px;
+  max-width: 64rem;
+  margin: 32px auto;
+  border: 2px solid hsl(35deg 10% 40%);
+  padding: 50px;
+  background: linear-gradient(
+    to right,
+    hsl(35deg, 30%, 90%),
+    hsl(35deg, 30%, 90%) 47%,
+    hsl(35deg, 30%, 70%) 49.5%,
+    hsl(35deg, 20%, 50%) 50%,
+    hsl(35deg, 30%, 70%) 50.5%,
+    hsl(35deg, 30%, 90%) 53%,
+    hsl(35deg, 30%, 90%)
+  );
+}
+h2 {
+  font-size: 2rem;
+  margin-bottom: 2em;
+}
+p {
+  text-align: justify;
+}
+p:first-of-type:first-letter {
+  font-size: 3em;
+  float: left;
+  line-height: 1em;
+  margin-right: 0.2em;
+}
+p:not(:first-of-type) {
+  text-indent: 2em;
+}
+* {
+  font-family: 'Merriweather', serif;
+}
+```
+
+---
+
 ### General Notes
 
 - To create a container for the whole page, we use `<div>` element with `id` attribute and give it a name like `container` or `wrapper` and then we put all the page content inside it. and to give the sections inside it a `max-width` and center them, we use:
@@ -3592,6 +4403,25 @@ The above is a vertical-spacer component. You can also create a horizontal-space
 
   - **Summary:**
     - What `flex: 1` does is that it resets all of the items' widths to `0` and then makes them grow to fill the container equally.
+
+- **Scrollburglars**
+
+  - A scrollburglar is my cute made-up name for a common phenomenon: A webpage has an accidental **horizontal scrollbar** that allows you to scroll by a few pixels. (Usually happens on smaller screens (phones) or when the browser is not maximized)
+  - Frustratingly, there isn't a single cause for this phenonenon. They can be triggered by lots of different things. Some examples:
+
+    1. Elements with negative margins that pull content outside the viewport (usually with `!important`).
+    2. Absolute positioned elements that extend beyond their container's bounds, explicitly pulled outside of the parent (positioned elements with negative left/right values, elements with negative margin, etc).
+    3. Images or other media that are wider than their container
+    4. White space in HTML that gets interpreted as actual space, especially with inline-block elements
+    5. An element has an explicit width that is too large to fit in the parent container.
+    6. A really long word like `“disestablishmentarianism”` forces an element to be too wide for its parent container.
+
+  - When trying to find which reason is causing the issue, you can use **Divide and Conquer** technique:
+    1. Remove half of the page's content.
+    2. Check if the issue is still there.
+    3. If it is, remove half of the remaining content.
+    4. If it isn't, add back half of the removed content.
+    5. Repeat until you find the culprit.
 
 ---
 

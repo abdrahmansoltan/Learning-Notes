@@ -18,14 +18,12 @@
     - [Image Formats](#image-formats)
     - [fav-icon (favicon)](#fav-icon-favicon)
       - [Using manifest (Android and iOS)](#using-manifest-android-and-ios)
-    - [background img in css](#background-img-in-css)
-    - [image size optimization](#image-size-optimization)
+    - [Background images](#background-images)
     - [`<picture>` Element](#picture-element)
-      - [`srcset` and `sizes` attributes](#srcset-and-sizes-attributes)
-      - [Background images](#background-images)
-      - [Which to use ?](#which-to-use-)
+    - [image size optimization](#image-size-optimization)
   - [Canvas](#canvas)
   - [Icons](#icons)
+    - [Introduction](#introduction)
     - [How to use icons](#how-to-use-icons)
       - [Icon fonts](#icon-fonts)
       - [SVG icons](#svg-icons)
@@ -543,7 +541,17 @@ Why do we need to tell the browser what our HTML elements represent?
 
 - `src` -> source of the image (Required)
 - `alt` -> alternative text for the image (Required)
+
   - Don't forget to add the `alt` attribute, as it will be read by screen readers, instead, use `alt=""` to tell the screen reader to skip it.
+  - Also note that not all images require alternative text. If the image is purely decorative and has no semantic value, you can specify `alt=""` to indicate that screen readers can ignore it.
+    - How do we know if an image is semantically valuable? I try and imagine what the user experience would be like if the image failed to load. If I don't know what's depicted in the image, would it make the product harder to use? If so, it definitely requires alt text.
+    - In some cases, an image isn't critical to the user experience, but it still provides value. For example, Wikipedia articles include relevant photos. While the article still makes sense without these photos, they provide valuable context, and should be described with `alt` text.
+    - If you're not sure if an image qualifies as decorative or not, it's best to err on the safe side, and add `alt` text. Folks using screen readers can easily skip past images, so don't worry about "polluting" the experience for them!
+  - Writing effective `alt` text
+    - Alt text should convey meaning, not just describe the image. For example, a logo in the top-left corner linking to the homepage should have alt text like “Return home,” not “Abstract green octopus illustration.”
+      ![alt-text](./img/alt-text.png)
+    - Context matters. Tailor alt text to the image’s purpose, and avoid extra details like photo credits, which belong in a `<figcaption>` element.
+
 - `width` and `height` -> to specify the size of the image
 - `srcset` -> to specify multiple versions of the image based on the device's pixel density
   - `srcset="images/fm.jpg 1x, images/fm-2x.jpg 2x"` -> the browser will choose the first image for devices with a pixel density of 1x and the second image for devices with a pixel density of 2x.
@@ -615,7 +623,9 @@ It's a JSON file that tells the browser how to display the website on a mobile d
 
 ---
 
-### background img in css
+### Background images
+
+As CSS has evolved, the `<img>` tag has grown much more flexible and powerful, but there's one thing that it can't do: tile the image. When we have a repeating pattern, we'll need to use a [CSS background image](./2-CSS.md#background-properties-background-images) instead.
 
 - when you use **background img** in css and want it to be `Accessible` in `HTML` to write `alt` for screen readers
 
@@ -639,48 +649,57 @@ It's a JSON file that tells the browser how to display the website on a mobile d
 
 ---
 
-### image size optimization
-
-- Try to use images with **double the size** of the image on the website (for retina displays), because the browser will automatically scale the image down to the correct size.
-  ![retina](./img/retina.png)
-
-- why we use the built-in HTML `width` and `height` ?
-
-  - Images often take longer to load than the (HTML and css) code that makes up the rest of the page, therefore, a good idea to specify the size of the image (in html or css) so that the browser can render the rest of the text on the page while **leaving the right amount of space for the image that is still loading** which allows it to render the rest of the page without waiting for the image to download.
-
-  ```html
-  <img src="images/fm.jpg" alt="family" width="600" height="450" />
-  ```
-
-- if you use the only `width` attribute, then the HTML will automatically calculate the `height` to maintain the original image ratio
-- image size matter, as You should save the image at the same width and height it will appear on the website:
-  - If the image is smaller than the width or height that you have specified, the image can be distorted and stretched.
-  - If the image is larger than the width and height if you have specified, **the image will take longer to display on the page**.
-- to reduce size of images => [squoosh](https://squoosh.app/)
-
-  - use the `webp` format for images as it's smaller in size and better in quality
-  - but check `compatibility` with browsers **or** use it with `fallback img` and let the browsers choose by itself.
-    ![webp](./img/webp-support.png)
-
-    ```html
-    <picture>
-      <source srcset="images/fm.webp" type="image/webp" />
-      <img src="images/fm.jpg" alt="family" width="600" height="450" />
-    </picture>
-    ```
-
----
-
 ### `<picture>` Element
 
 It's used to provide multiple versions of an image based on different conditions, such as the device's pixel density, viewport width, or image format.
+
+> Structurally, this looks pretty similar to our `srcset` solution. We've essentially moved the `srcset` solution to a new `<source>` element, and wrapped the whole thing in a `<picture>`.
 
 - It contains one or more `<source>` elements, each referring to different image through the `srcset` attribute. This way the browser can choose the image that best fits the current view and/or device.
 
   - Each `<source>` element has a `media` attribute that defines when the image is the most suitable.
 
+- `srcset` and `sizes` attributes
+
+  - There're new attributes for `<img>` element used to provide several additional source images along with hints to help the browser pick the right one:
+
+  - `srcset`
+
+    - It's essentially a "plural" version of `src`. The browser will scan through the list and apply the first one that matches.
+    - you need to specify the image-path and the width of the condition that the image will be displayed in. (it can be in `pixels` or `w` for `width` or `x` for `pixel density`)
+
+      ```html
+      <img srcset="/images/fm.jpg 1x, /images/fm-2x.jpg 2x" src="/images/fm.jpg" alt="Family" />
+      <!-- Here, the browser will choose the first image for devices with a pixel density of 1x and the second image for devices with a pixel density of 2x. -->
+      ```
+
+    - The browser will choose the image that best fits the current view and/or device.
+
+    - Note: React expects all HTML attributes to be **camelCase**. This means that this attribute should be written as `srcSet`, not `srcset`.
+
+  - `sizes`
+
+  > - the names and width of images in **Pixels**
+  > - **sizes** -> represents the hole on the web page
+
+  ```html
+  <img
+    srcset="elva-fairy-480w.jpg 480w, elva-fairy-800w.jpg 800w"
+    sizes="(max-width: 600px) 480px,
+              800px"
+    src="elva-fairy-800w.jpg"
+    alt="Elva dressed as a fairy" />
+
+  <!-- same as : -->
+  <img src="elva-fairy-480w.jpg" width="480" />
+  ```
+
 - It's used to Render images conditionally (show one and hide the other)
+- `<picture>` allows us to use modern image formats (e.g. `.avif`) in a safe way, by providing fallbacks for other browsers.
+
 - **Notes:**
+
+  - **The order matters:** When the browser finds a match, it will download the image from the server and show it to the user. We want our smallest files to be on top.
 
   - Always specify a fallback `<img>` element as the **last child element** of the `<picture>` element.
   - The `<img>` element is used by browsers that do not support the `<picture>` element, or if none of the `<source>` tags match.
@@ -700,41 +719,66 @@ It's used to provide multiple versions of an image based on different conditions
 
 > Also see `<figure>` element [here](#semantic-tags)
 
----
+- **Styling and targeting `<picture>` element**
 
-#### `srcset` and `sizes` attributes
+  - Because `<picture>` breaks what was a single element (`img`) into multiple elements (`picture`, `source`, `img`), it may not be clear how to style it.
+    - First, we should ignore `<source>` tags from a styling perspective. They're essentially **metadata**: they aren't visible, and shouldn't be targeted.
+    - Next, it's important to understand that no matter which source is selected, the `<img>` tag will always be used, and it acts like any other image tag. The sources exist to "swap out" the src attribute. We want to add additional properties, like alt text, to the `<img>` tag, and not to `<picture>` or `<source>`.
+    - Finally, the `<picture>` element behaves like a `<span>`, an **inline** wrapper that wraps around the `<img>` tag.
+  - So, if you want to style the `<picture>` element, you can do so like this:
 
-There're new attributes for `<img>` element used to provide several additional source images along with hints to help the browser pick the right one:
+    ```css
+    picture {
+      display: block;
+      margin: 0 auto;
+    }
 
-- `srcset`
-- `sizes`
+    picture img {
+      border-radius: 50%;
+    }
+    ```
 
-> - the names and width of images in **Pixels**
-> - **sizes** -> represents the hole on the web page
+- Which to use ?
 
-```html
-<img
-  srcset="elva-fairy-480w.jpg 480w, elva-fairy-800w.jpg 800w"
-  sizes="(max-width: 600px) 480px,
-            800px"
-  src="elva-fairy-800w.jpg"
-  alt="Elva dressed as a fairy" />
-
-<!-- same as : -->
-<img src="elva-fairy-480w.jpg" width="480" />
-```
-
----
-
-#### Background images
-
-for that we use media queries as we put each image in each media
+  ![responsive-images](./img/responsive-images.png)
 
 ---
 
-#### Which to use ?
+### image size optimization
 
-![responsive-images](./img/responsive-images.png)
+- Try to use images with **double the size** of the image on the website (for retina displays), because the browser will automatically scale the image down to the correct size.
+  ![retina](./img/retina.png)
+
+- why we use the built-in HTML `width` and `height` ?
+
+  - Images often take longer to load than the (HTML and css) code that makes up the rest of the page, therefore, a good idea to specify the size of the image (in html or css) so that the browser can render the rest of the text on the page while **leaving the right amount of space for the image that is still loading** which allows it to render the rest of the page without waiting for the image to download.
+
+  ```html
+  <img src="images/fm.jpg" alt="family" width="600" height="450" />
+  ```
+
+- if you use the only `width` attribute, then the HTML will automatically calculate the `height` to maintain the original image ratio
+- image size matter, as You should save the image at the same width and height it will appear on the website:
+  - If the image is smaller than the width or height that you have specified, the image can be distorted and stretched.
+  - If the image is larger than the width and height if you have specified, **the image will take longer to display on the page**.
+- to reduce size of images:
+
+  - [squoosh](https://squoosh.app/)
+    - a webapp created by Google to allow comparison and conversion between modern image formats
+  - Use `avif` format for images (it's smaller in size and better in quality), more here [AVIF Has Landed](https://jakearchibald.com/2020/avif-has-landed/)
+
+  - use the `webp` format for images as it's smaller in size and better in quality
+  - but check `compatibility` with browsers **or** use it with `fallback img` and let the browsers choose by itself.
+    ![webp](./img/webp-support.png)
+
+    ```html
+    <picture>
+      <source srcset="images/fm.webp" type="image/webp" />
+      <img src="images/fm.jpg" alt="family" width="600" height="450" />
+    </picture>
+    ```
+
+    - Make sure to put the most optimized image format first in the `<picture>` element, so that the browser will choose it if it's supported.
 
 ---
 
@@ -743,6 +787,43 @@ for that we use media queries as we put each image in each media
 ---
 
 ## Icons
+
+### Introduction
+
+When it comes to the web, there are two common ways of implementing them: we can use an "icon font", where each character resolves to an icon instead of a letter, or we can use SVG, where each icon is an inline SVG DOM node.
+
+- Of the two, SVG is the more modern approach, because:
+
+  - SVGs tend to look more crisp and clear on high-resolution displays.
+  - They're easier to position and style with CSS (ex: use `width` instead of `font-size`).
+  - They can be more accessible to screen readers.
+  - They can be multi-colored.
+  - They can be animated.
+
+- What's an SVG?
+
+  - SVG is a vector image format. This means that instead of storing information about the colors of specific pixels, it stores the instructions for how to draw the image.
+
+  - It's written in XML, which means it looks an awful lot like HTML. Here's a "Hello world" SVG which draws a pink circle:
+
+    ```html
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="40" stroke="black" fill="pink" />
+    </svg>
+    ```
+
+  - You can save SVGs as separate files `<img src="/circle.svg" />`, or you can embed them directly into your HTML.
+
+    - When we embed them directly, we can have more control over their appearance and behavior by targeting individual elements with CSS and JavaScript.
+
+      ```css
+      /* This will change the circle from pink to green! */
+      .icon-wrapper circle {
+        fill: green;
+      }
+      ```
+
+---
 
 ### How to use icons
 
@@ -800,6 +881,25 @@ for that we use media queries as we put each image in each media
 
   - or, Use [CSS Sprites](#css-sprites) to display the icon (this is the most common way to use icons in professional web development)
 
+- If you use React, you'll also need to convert each of the `SVG` files to `JSX`, so that they can be used as React components.
+
+  - There are [online tools that can help with this](https://svg2jsx.com/), but if you have dozens or hundreds of icons, it winds up being quite a bit of work.
+  - Fortunately, there are NPM packages like [react-feather](https://www.npmjs.com/package/react-feather) that provide a collection of SVG icons that can be imported and rendered:
+
+    ```jsx
+    import React from 'react';
+    import { HelpCircle } from 'react-feather';
+    function Something() {
+      return (
+        <div>
+          <HelpCircle />
+        </div>
+      );
+    }
+    ```
+
+    - Similar packages exist for **Vue, Angular, and even Svelte**.
+
 ---
 
 #### PNG icons
@@ -851,6 +951,8 @@ for that we use media queries as we put each image in each media
 
 ### icons and SVG resources
 
+- [feathericons](https://feathericons.com/)
+- [material-design-icons](https://github.com/google/material-design-icons)
 - [Hero Icons](https://heroicons.com/) here we use `stroke` or `fill` properties **not** color
 - [Ionicons](https://ionic.io/ionicons) here we use `color` property
 
@@ -1082,6 +1184,30 @@ It defines the document `title`, `character set`, `styles`, `scripts`, and other
   - Empty link -> `href="#"` -> link that doesn't go anywhere
 - `<hr/>`
   - It's an element used to create a horizontal rule (a line that separates content).
+- What is the difference between **labels and Placeholders**?
+
+  - Placeholders and labels are two different things, with two different purposes.
+
+    - Labels explain what the field is
+    - placeholders provide an example input, to give users a hint about what's expected and show how to format the data. For example:
+
+      ```html
+      <label for="email">Email:</label>
+      <input type="email" id="email" placeholder="example@gmail.com" />
+      ```
+
+    - A common mistake is to use placeholders instead of labels. This is not recommended because placeholders disappear when the user starts typing, so the user can't see what the field is for.
+
+      ```html
+      <!-- This is not recommended ❌ -->
+      <input type="email" placeholder="Email" />
+      ```
+
+      - The trouble with using a placeholder as a label is that the placeholder disappears when something is entered into the input. We've all had the frustrating experience of our browser auto-filling a form, and then not being able to tell which fields are which, and having to empty out the fields to make sure the browser put the right data in the right fields.
+      - For folks who use screen-readers, this process is even more painful.
+
+    - Certain designs call for "floating" labels that are overlaid over the text input, and shift up above when the field is selected.
+      ![floating-labels](./img/floating-label.png)
 
 ---
 

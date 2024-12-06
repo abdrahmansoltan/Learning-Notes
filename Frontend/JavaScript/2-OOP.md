@@ -16,19 +16,21 @@
     - [Constructor function methods](#constructor-function-methods)
   - [`object.create()`](#objectcreate)
   - [ES6 Classes](#es6-classes)
+    - [ES6 Classes Constructor](#es6-classes-constructor)
     - [Getters \& Setters](#getters--setters)
+    - [Static Methods and Properties](#static-methods-and-properties)
+      - [Static Methods](#static-methods)
+      - [Static Properties](#static-properties)
+    - [Static Initialization Blocks](#static-initialization-blocks)
+    - [Encapsulation (Public, Private and protected properties and methods)](#encapsulation-public-private-and-protected-properties-and-methods)
+    - [Method Chaining](#method-chaining)
+    - [ES6 Classes Notes](#es6-classes-notes)
   - [Class Inheritance (Sub-Classing)](#class-inheritance-sub-classing)
     - [Using `Constructor / Factory Function` (OLD)](#using-constructor--factory-function-old)
     - [Using `new` keyword (OLD)](#using-new-keyword-old)
     - [Using `ES6 Classes` (NEW)](#using-es6-classes-new)
     - [Using `Object.create()`](#using-objectcreate)
     - [Mixins](#mixins)
-  - [Class Fields](#class-fields)
-    - [Static Methods and Properties](#static-methods-and-properties)
-      - [Static Methods](#static-methods)
-      - [Static Properties](#static-properties)
-    - [Encapsulation (Private and protected properties and methods)](#encapsulation-private-and-protected-properties-and-methods)
-  - [Method Chaining](#method-chaining)
   - [Notes](#notes)
 
 ---
@@ -49,6 +51,8 @@
 
 - **Class**: A blueprint for objects. It describes the properties and methods that objects created from it will have.
   ![class](./img/class-1.png)
+  - The name of the class can then be used to generate instances of the class (pattern of objects).
+  - It's a common convention to capitalize the first letter of a class name (UpperCamelCase).
 
 ### OOP Principles
 
@@ -443,6 +447,26 @@ It's a keyword that automates the hard work (process of creating an object and l
 
 ### Constructor function methods
 
+- **Enhanced object literals** :
+
+  - It's a way to simplify the creation of objects by allowing us to use **shorthand property names** and **shorthand method names**.
+
+  ```js
+  const name = 'Jonas';
+  const age = 46;
+
+  const jonas = {
+    name, // instead of name: name ✅
+    age // instead of age: age ✅
+
+    // also the ability to write methods like this
+    greet() {
+      console.log(`Hey ${this.name}`);
+    }
+    // instead of greet: function() {...}
+  };
+  ```
+
 - **⚠️ You should never create a method inside of a constructor function**.
   - Creating methods inside constructors leads to multiple copies of the method for each instance, which is bad for performance.
 - **Use prototypal inheritance instead**:
@@ -586,61 +610,73 @@ It's a modern alternative to `constructor functions` syntax. which is more reada
   1. Creates a function named `PersonCl`, that becomes the result of the class declaration. The function code is taken from the constructor method (assumed empty if we don’t write such method).
   2. Stores class methods, such as sayHi, in **`User.prototype`**.
 
-- **Notes:**
+### ES6 Classes Constructor
 
-  - There're no **classes** in Javascript, this is just **syntactic sugar**
+It's a special method for creating and initializing an object created with a class. It's called when we create a new instance of the class.
 
-    - Sometimes people say that class is a “syntactic sugar” (syntax that is designed to make things easier to read, but doesn’t introduce anything new), because we could actually declare the same thing without using the class keyword at all
-    - actually, It's "Not just a syntactic sugar"
+- It's a method that is called when we create a new object from a class.
+- It's usually used to:
 
-      - a function created by `class` is labelled by a special internal property `[[IsClassConstructor]]: true`. So it’s not entirely the same as creating it manually.
-
-        - The language checks for that property in a variety of places. For example, unlike a regular function, it must be called with `new` keyword:
-
-          ```js
-          class User {
-            constructor() {}
-          }
-
-          alert(typeof User); // function
-          User(); // Error: Class constructor User cannot be invoked without 'new'
-          ```
-
-    - Class methods are non-enumerable. A class definition sets `enumerable` flag to `false` for all methods in the "prototype".
-      - That’s good, because if we `for..in` over an object, we usually don’t want its class methods.
-    - Classes are always executed in **strict mode**. All code inside the class construct is automatically in strict mode.
-
-  - In JavaScript, a `class` is a kind of (has `type` equal to) **function**.
-  - There're no commas between class methods
-  - Classes are NOT hoisted
-    - Even if we declare a class using a `class` declaration, a `class` is **NOT** hoisted, unlike `functions`
-  - Classes are first-class citizens
-    - means that we can pass them into functions and also return them from functions
-  - Classes are executed in `strict mode`
-  - You can use **Computed methods names `[…]`**
+  - set up (initialize) the object's properties.
 
     ```js
     class User {
-      ['say' + 'Hi']() {
-        alert('Hello');
+      constructor(name) {
+        this.name = name;
       }
     }
 
-    new User().sayHi();
+    let user = new User('John');
+    alert(user.name); // John
     ```
+
+  - Validate the input data
+
+    ```js
+    class User {
+      constructor(name) {
+        if (!name) {
+          throw new Error('Name is required.');
+        }
+
+        if (typeof name !== 'string') {
+          throw new Error('Name must be a string.');
+        }
+
+        this.name = name;
+      }
+    }
+
+    let user = new User(); // Error: Name is required.
+    ```
+
+- Constructor functions return `this` by default, but in classes, we don't need to return `this` because it's done automatically. So **They return `undefined` by default**.
+
+  ```js
+  class User {
+    constructor(name) {
+      this.name = name;
+    }
+  }
+
+  let user = new User('John');
+  alert(user); // [object Object]
+  alert(user.constructor()); // undefined ⚠️
+  ```
 
 ---
 
 ### Getters & Setters
 
-They're special kind of methods that are used to `get` and `set` values of properties inside of an object, they're used as a `property` but they're actually a `method`
+They're special methods that are used to **define the way to retrieve or change** the values of an object's properties.
 
 They're used to add an extra layer of security to our data, and to do some extra things behind the scenes when we try to get or set a property.
 
 - `getter` :
 
-  - show a method as a property
+  - show a method as a property when we access it.
   - get value out of an object by writing a property instead of writing a method
+  - Note that when using it the value of it will be reactive (will always have the latest values of the properties)
 
     ```js
     class PersonCl {
@@ -658,10 +694,29 @@ They're used to add an extra layer of security to our data, and to do some extra
     console.log(jessica.age); // 41
     ```
 
+  - It can also be used to access private properties (without being able to change them)
+
+    ```js
+    class PersonCl {
+      constructor(fullName, birthYear) {
+        this._fullName = fullName;
+        this._birthYear = birthYear;
+      }
+      // ...
+      get age() {
+        return 2037 - this._birthYear;
+      }
+    }
+
+    const jessica = new PersonCl('Jessica Davis', 1996);
+    console.log(jessica.age); // 41
+    jessica.age = 23; // 41 (not changed)
+    ```
+
 - `setter` :
 
-  - used to change existing property
-  - define a property by setting it to a value instead of calling a method.
+  - Allows us to change the value of a property in an object (with some conditions/validations if we want)
+  - Usually used to set the value of private properties to make sure that the value is valid.
 
     ```js
     class PersonCl {
@@ -682,6 +737,380 @@ They're used to add an extra layer of security to our data, and to do some extra
     ```
 
   - if you have a setter for a property that is already defined in the constructor, then you need to create basically a new property with the `underscore ( _ )` in front of it.
+
+- Any class property can have a `getter` and a `setter`.
+
+  ```js
+  class User {
+    constructor(firstName, lastName) {
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+
+    get fullName() {
+      return `${this.firstName} ${this.lastName}`;
+    }
+
+    set fullName(value) {
+      const parts = value.split(' ');
+      this.firstName = parts[0];
+      this.lastName = parts[1];
+    }
+  }
+
+  let user = new User('John', 'Doe');
+  alert(user.fullName); // John Doe
+  this.fullName = 'Alice Cooper';
+  alert(user.firstName); // Alice
+  ```
+
+---
+
+### Static Methods and Properties
+
+#### Static Methods
+
+They're methods that are called on the class itself, not on the instances of the class.
+
+- They're not available for instances
+  - Usually, static methods are used to implement functions that belong to the class as a whole, but not to any particular object of it.
+- They can be called **without the need to create an instance of the class** (because they are not available for instances and they're factory methods)
+
+- it can't access the instance properties, only the class properties.
+
+  ```js
+  class User {
+    constructor(name) {
+      this.name = name;
+    }
+
+    static sayHi() {
+      alert(this.name); // undefined (because it's a static method and it can't access the instance properties)
+    }
+  }
+
+  User.sayHi(); // undefined
+  ```
+
+- **Use Cases**:
+
+  - It can be used to group utility functions together in a class without the need to create an instance of the class:
+
+    ```js
+    class MyMath {
+      // similar to Math object
+      static sum(a, b) {
+        return a + b;
+      }
+
+      static multiply(a, b) {
+        return a * b;
+      }
+
+      // ...
+    }
+
+    alert(MyMath.sum(1, 2)); // 3
+    ```
+
+  - It can be used as a "factory method" (a factory is an object for creating other objects (instantiate instance of the class); formally, it is a function or method that returns objects of a varying prototype or class from some method call, which is assumed to be "new" ):
+
+    ```js
+    class Article {
+      constructor(title, date) {
+        this.title = title;
+        this.date = date;
+      }
+
+      static createTodays() {
+        // remember, this = Article
+        return new this("Today's digest", new Date());
+      }
+    }
+
+    let article = Article.createTodays(); // without the need to create an instance of the class
+
+    alert(article.title); // Today's digest
+    ```
+
+#### Static Properties
+
+They're properties that are attached to the class itself, not to the instances of the class.
+
+- They look like regular class properties, but prepended by static
+
+  ```js
+  class Article {
+    static publisher = 'Ilya Kantor';
+  }
+
+  alert(Article.publisher); // Ilya Kantor
+  ```
+
+- Static properties are inherited using prototypes.
+  - But built-in classes are an exception. They don’t inherit statics from each other.
+  - For example, both `Array` and `Date` inherit from `Object`, so their instances have methods from `Object.prototype`. But `Array.[[Prototype]]` does not reference Object, so there’s no, for instance, `Array.keys()` (or `Date.keys()`) static method.
+- Note that they usually, static properties are used to store class-wide data. instead of creating this field/constant in all instances.
+
+### Static Initialization Blocks
+
+They're used to initialize static fields in a class.
+
+- It's a block of code that is executed when the class is loaded into memory.
+- It's used to initialize static fields in a class by **running only once** **when the class is loaded into memory (NOT the instance)**.
+
+  ```js
+  class User {
+    static count = 0;
+
+    static {
+      alert('Hello, the class is loaded');
+      this.count = 1;
+    }
+  }
+
+  alert(User.count); // 1
+  ```
+
+- What examples do you think of that could be useful for static initialization blocks?
+
+  - For example, you could use it to connect to a database, or to load some configuration data from a file, or to initialize some static fields in a class.
+  - Also if you want initialize some static fields in a class differently based on the environment (development, production, testing, etc.)
+
+    ```js
+    class User {
+      static count = 0;
+
+      static {
+        if (process.env.NODE_ENV === 'development') {
+          this.count = 1;
+        } else {
+          this.count = 2;
+        }
+      }
+    }
+    ```
+
+---
+
+### Encapsulation (Public, Private and protected properties and methods)
+
+It's a methodology used for **hiding information**. It is based on the concept that object properties should not be exposed publicly to the outside world. Implementing Encapsulation in JavaScript prevents access to the variables by adding public entities inside an object, which the callers can use to achieve specific results.
+
+- In JavaScript, there are two types of object fields (properties and methods):
+
+  - `Public`: accessible from anywhere. They comprise the external interface. Until now we were only using public properties and methods.
+  - `Private`: accessible only from inside the class (and subclasses). They are for internal operations.
+  - `static`: accessible from the class itself, not from instances or subclasses.
+
+- we use it to prevent the user from seeing specific properties or changing them
+- so we make these properties accessible from methods and not directly
+- They can be used to **clean up the constructor** and make it more readable
+- `Protected` properties are usually prefixed with an underscore `_` and Here we used getter/setter syntax **(It's just a convention unlike `#` for private fields)**
+
+  ```js
+  class CoffeeMachine {
+    _waterAmount = 0; // protected property
+
+    setWaterAmount(value) {
+      if (value < 0) value = 0;
+      this._waterAmount = value;
+    }
+
+    getWaterAmount() {
+      return this._waterAmount;
+    }
+  }
+
+  const coffeeMachine = new CoffeeMachine();
+  coffeeMachine.setWaterAmount(100);
+  alert(coffeeMachine.getWaterAmount()); // 100
+  ```
+
+- the new `Private` fields syntax `#`: is a recent addition to the language. Not supported in JavaScript engines, or supported partially yet, requires **polyfilling**.
+
+  - Privates should start with `#`. They are only accessible from inside the class.
+  - Unlike protected ones (with `_`), private fields are enforced by the language itself. That’s a good thing.
+
+  ```js
+  class CoffeeMachine {
+    #waterLimit = 200; // private property
+
+    #fixWaterAmount(value) {
+      if (value < 0) return 0;
+      if (value > this.#waterLimit) return this.#waterLimit;
+    }
+
+    setWaterAmount(value) {
+      this.#waterLimit = this.#fixWaterAmount(value);
+    }
+  }
+
+  let coffeeMachine = new CoffeeMachine();
+
+  // can't access privates from outside of the class
+  coffeeMachine.#fixWaterAmount(123); // Error ❌
+  coffeeMachine.#waterLimit = 1000; // Error ❌
+  ```
+
+  - `Private` fields do not conflict with `public` ones. We can have both private `#waterAmount` and public `waterAmount` fields at the same time.
+  - You can't use the private field before it's declared in the top of the class.
+
+    ```js
+    // Won't work ❌
+    class CoffeeMachine {
+      constructor() {
+        this.#waterAmount = 0; // Error: can't access before initialization
+      }
+    }
+
+    // Works ✅
+    class CoffeeMachine {
+      #waterAmount;
+      constructor() {
+        this.#waterAmount = 0;
+      }
+    }
+    ```
+
+- Example of all types of properties and methods:
+
+  ```js
+  // Encapsulation: Protected Properties and Methods
+  // 1) Public fields
+  // 2) Private fields
+  // 3) Public methods
+  // 4) Private methods
+  // (there is also the static version)
+
+  class Account {
+    // 1) Public fields
+    locale = navigator.language;
+
+    // 2) Private fields
+    #movements = []; // or _movements
+    #pin; // we define it like this without a value as its value will be set in the constructor
+
+    constructor(owner, currency, pin) {
+      this.owner = owner;
+      this.currency = currency;
+      this.#pin = pin;
+
+      // another way of Protected property (using (_) before property's name)
+      // this._movements = [];
+      // another way of Public property
+      // this.locale = navigator.language;
+    }
+
+    // 3) Public methods
+
+    // Public interface that will call the private method -> API provides access to the private property
+    getMovements() {
+      return this.#movements;
+    }
+
+    deposit(val) {
+      this.#movements.push(val); // that's how we modify a private property (through a public method)
+      return this;
+    }
+
+    withdraw(val) {
+      this.deposit(-val);
+      return this;
+    }
+
+    // 4) Private methods
+    // #approveLoan(val) {
+    _approveLoan(val) {
+      return true;
+    }
+  }
+  ```
+
+- **Notes:**
+
+  - In TypeScript, we have class access modifiers like `public`, `private`, and `protected` that are used to control the access to the class members. But in JavaScript, we don't have these access modifiers.
+
+---
+
+### Method Chaining
+
+- Method chaining is the mechanism of calling a method on another method of the same object. This ensures a cleaner and readable code.
+- Method chaining uses `this` keyword in the object's class to access its methods. When a method returns `this`, it simply returns an instance of the object in which it is returned. in another word, to chain methods together :
+
+```js
+class Account {
+  deposit(val) {
+    this.movements.push(val);
+    return this;
+  }
+  withdraw(val) {
+    this.deposit(-val);
+    return this;
+  }
+}
+
+const account1 = new Account('Jonas', 'EUR', 1111, []);
+account1.deposit(250).withdraw(140);
+```
+
+---
+
+### ES6 Classes Notes
+
+- There're no **classes** in Javascript, this is just **syntactic sugar**
+
+  - Sometimes people say that class is a “syntactic sugar” (syntax that is designed to make things easier to read, but doesn’t introduce anything new), because we could actually declare the same thing without using the class keyword at all
+  - actually, It's "Not just a syntactic sugar"
+
+    - a function created by `class` is labelled by a special internal property `[[IsClassConstructor]]: true`. So it’s not entirely the same as creating it manually.
+
+      - The language checks for that property in a variety of places. For example, unlike a regular function, it must be called with `new` keyword:
+
+        ```js
+        class User {
+          constructor() {}
+        }
+
+        alert(typeof User); // function
+        User(); // Error: Class constructor User cannot be invoked without 'new'
+        ```
+
+  - Class methods are non-enumerable. A class definition sets `enumerable` flag to `false` for all methods in the "prototype".
+    - That’s good, because if we `for..in` over an object, we usually don’t want its class methods.
+  - Classes are always executed in **strict mode**. All code inside the class construct is automatically in strict mode.
+
+- In JavaScript, a `class` is a kind of (has `type` equal to) **function**.
+- There're no commas between class methods
+- Classes are NOT hoisted
+  - Even if we declare a class using a `class` declaration, a `class` is **NOT** hoisted, unlike `functions`
+- Classes are first-class citizens
+  - means that we can pass them into functions and also return them from functions
+- Classes are executed in `strict mode`
+- You can use **Computed methods names `[…]`**
+
+  ```js
+  class User {
+    ['say' + 'Hi']() {
+      alert('Hello');
+    }
+  }
+
+  new User().sayHi();
+  ```
+
+- You can check if an object is an instance of a class using the `instanceof` operator.
+
+  ```js
+  class User {
+    constructor(name) {
+      this.name = name;
+    }
+  }
+
+  let user = new User('John');
+  alert(user instanceof User); // true
+  ```
 
 ---
 
@@ -904,7 +1333,7 @@ Here, inheritance works by using the `extends` keyword to set the `__proto__` pr
 
 > Behind the scenes, it does the same thing as the previous way of creating objects using constructor functions, but it's just a more modern and cleaner way to work with prototypal inheritance in JavaScript -> **It's just an abstraction over the constructor function way**
 
-- Parent class
+- Parent (super) class
 
   ```js
   // Parent
@@ -926,7 +1355,7 @@ Here, inheritance works by using the `extends` keyword to set the `__proto__` pr
 
   ![inheritance](./img/inheritance-7.png)
 
-- Child class
+- Child (sub) class
 
   ```js
   class PaidUserCreator extends UserCreator {
@@ -1059,216 +1488,6 @@ new User('Dude').sayHi(); // Hello Dude!
   // now User can say hi
   new User('Dude').sayHi(); // Hello Dude!
   ```
-
----
-
-## Class Fields
-
-> Class fields are a recent addition to the language (Old browsers may need a polyfill).
-
-- Previously, our classes only had methods and “Class fields” is a syntax that allows to add any properties.
-
-  ```js
-  class User {
-    name = 'John';
-
-    sayHi() {
-      alert(`Hello, ${this.name}!`);
-    }
-  }
-
-  new User().sayHi(); // Hello, John!
-
-  alert(user.name); // John
-  // class fields are set on individual objects, not User.prototype
-  alert(User.prototype.name); // undefined
-  ```
-
----
-
-### Static Methods and Properties
-
-#### Static Methods
-
-- `static methods` are not available for instances
-  - Usually, static methods are used to implement functions that belong to the class as a whole, but not to any particular object of it.
-- They can be called **without the need to create an instance of the class** (because they are not available for instances and they're factory methods)
-- It can be used as a "factory method" (a factory is an object for creating other objects (instantiate instance of the class); formally, it is a function or method that returns objects of a varying prototype or class from some method call, which is assumed to be "new" ):
-
-  ```js
-  class Article {
-    constructor(title, date) {
-      this.title = title;
-      this.date = date;
-    }
-
-    static createTodays() {
-      // remember, this = Article
-      return new this("Today's digest", new Date());
-    }
-  }
-
-  let article = Article.createTodays(); // without the need to create an instance of the class
-
-  alert(article.title); // Today's digest
-  ```
-
-#### Static Properties
-
-- Static properties are also possible, they look like regular class properties, but prepended by static
-
-  ```js
-  class Article {
-    static publisher = 'Ilya Kantor';
-  }
-
-  alert(Article.publisher); // Ilya Kantor
-  ```
-
-- Static properties are inherited using prototypes.
-  - But built-in classes are an exception. They don’t inherit statics from each other.
-  - For example, both `Array` and `Date` inherit from `Object`, so their instances have methods from `Object.prototype`. But `Array.[[Prototype]]` does not reference Object, so there’s no, for instance, `Array.keys()` (or `Date.keys()`) static method.
-
----
-
-### Encapsulation (Private and protected properties and methods)
-
-It's a methodology used for **hiding information**. It is based on the concept that object properties should not be exposed publicly to the outside world. Implementing Encapsulation in JavaScript prevents access to the variables by adding public entities inside an object, which the callers can use to achieve specific results.
-
-- In JavaScript, there are two types of object fields (properties and methods):
-
-  - `Public`: accessible from anywhere. They comprise the external interface. Until now we were only using public properties and methods.
-  - `Private`: accessible only from inside the class. These are for the internal interface.
-
-- we use it to prevent the user from seeing specific properties or changing them
-- so we make these properties accessible from methods and not directly
-- `Protected` properties are usually prefixed with an underscore `_` and Here we used getter/setter syntax:
-
-  ```js
-  class CoffeeMachine {
-    _waterAmount = 0; // protected property
-
-    setWaterAmount(value) {
-      if (value < 0) value = 0;
-      this._waterAmount = value;
-    }
-
-    getWaterAmount() {
-      return this._waterAmount;
-    }
-  }
-
-  const coffeeMachine = new CoffeeMachine();
-  coffeeMachine.setWaterAmount(100);
-  alert(coffeeMachine.getWaterAmount()); // 100
-  ```
-
-- the new `Private` fields syntax `#`: is a recent addition to the language. Not supported in JavaScript engines, or supported partially yet, requires **polyfilling**.
-
-  - Privates should start with `#`. They are only accessible from inside the class.
-  - Unlike protected ones (with `_`), private fields are enforced by the language itself. That’s a good thing.
-
-  ```js
-  class CoffeeMachine {
-    #waterLimit = 200; // private property
-
-    #fixWaterAmount(value) {
-      if (value < 0) return 0;
-      if (value > this.#waterLimit) return this.#waterLimit;
-    }
-
-    setWaterAmount(value) {
-      this.#waterLimit = this.#fixWaterAmount(value);
-    }
-  }
-
-  let coffeeMachine = new CoffeeMachine();
-
-  // can't access privates from outside of the class
-  coffeeMachine.#fixWaterAmount(123); // Error
-  coffeeMachine.#waterLimit = 1000; // Error
-  ```
-
-  - `Private` fields do not conflict with `public` ones. We can have both private `#waterAmount` and public `waterAmount` fields at the same time.
-
-```js
-// Encapsulation: Protected Properties and Methods
-// 1) Public fields
-// 2) Private fields
-// 3) Public methods
-// 4) Private methods
-// (there is also the static version)
-
-class Account {
-  // 1) Public fields
-  locale = navigator.language;
-
-  // 2) Private fields
-  #movements = []; // or _movements
-  #pin; // we define it like this without a value as its value will be set in the constructor
-
-  constructor(owner, currency, pin) {
-    this.owner = owner;
-    this.currency = currency;
-    this.#pin = pin;
-
-    // another way of Protected property (using (_) before property's name)
-    // this._movements = [];
-    // another way of Public property
-    // this.locale = navigator.language;
-  }
-
-  // 3) Public methods
-
-  // Public interface that will call the private method -> API provides access to the private property
-  getMovements() {
-    return this.#movements;
-  }
-
-  deposit(val) {
-    this.#movements.push(val); // that's how we modify a private property (through a public method)
-    return this;
-  }
-
-  withdraw(val) {
-    this.deposit(-val);
-    return this;
-  }
-
-  // 4) Private methods
-  // #approveLoan(val) {
-  _approveLoan(val) {
-    return true;
-  }
-}
-```
-
-- **Notes:**
-
-  - In TypeScript, we have class access modifiers like `public`, `private`, and `protected` that are used to control the access to the class members. But in JavaScript, we don't have these access modifiers.
-
----
-
-## Method Chaining
-
-- Method chaining is the mechanism of calling a method on another method of the same object. This ensures a cleaner and readable code.
-- Method chaining uses `this` keyword in the object's class to access its methods. When a method returns `this`, it simply returns an instance of the object in which it is returned. in another word, to chain methods together :
-
-```js
-class Account {
-  deposit(val) {
-    this.movements.push(val);
-    return this;
-  }
-  withdraw(val) {
-    this.deposit(-val);
-    return this;
-  }
-}
-
-const account1 = new Account('Jonas', 'EUR', 1111, []);
-account1.deposit(250).withdraw(140);
-```
 
 ---
 

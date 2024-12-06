@@ -11,6 +11,7 @@
   - [ARIA Roles](#aria-roles)
     - [Live region roles](#live-region-roles)
     - [Aria Label](#aria-label)
+  - [Accessibility Tools](#accessibility-tools)
 
 ---
 
@@ -161,6 +162,15 @@ Sometimes you want to hide an element visually but still have it read out loud b
 }
 ```
 
+- It's also common to use this technique with icons, to give screen reader users more context.
+
+  ```jsx
+  <button>
+    <HelpCircleIcon />
+    <span class='visually-hidden'>Visit the help center</span>
+  </button>
+  ```
+
 - Bootstrap uses class `.sr-only` to only show the element to **screen readers**, what it does is it does every possible way to hide the element from the page like this:
 
   ```css
@@ -209,3 +219,8 @@ It's a way to add annotations for screen readers to read out loud. It's useful f
 - It's an alternative to [Visually Hidden Elements](#visually-hidden-elements)
 
 ---
+
+## Accessibility Tools
+
+- [WAVE](https://wave.webaim.org/)
+  - Web Accessibility Evaluation Tool that helps developers make their web content more accessible.

@@ -4,7 +4,7 @@
   - [CSS Variables (custom properties)](#css-variables-custom-properties)
     - [How to use it](#how-to-use-it)
   - [Scope](#scope)
-  - [Fallbacks](#fallbacks)
+  - [Fallbacks (Default values)](#fallbacks-default-values)
   - [Variables inheritance](#variables-inheritance)
   - [Invalid At Computed Values Time (IACVT)](#invalid-at-computed-values-time-iacvt)
     - [Fallbacks IACVT](#fallbacks-iacvt)
@@ -60,6 +60,8 @@ They let us define variables in CSS that can be reused throughout the stylesheet
     - We do this so that the variable is available everywhere in the stylesheet **(Global scope)**
     - We can use them because they're **inherited** from the `root` element
 
+> `:root` is an alias for `html`, so by hanging CSS variables on the top-level element, they become globally available (every element, after all, is below the root HTML tag). But you can attach CSS variables to any element, not just the root one!
+
 - **Using** css variables is done by using the `var()` function:
 
   ```css
@@ -71,6 +73,8 @@ They let us define variables in CSS that can be reused throughout the stylesheet
 ---
 
 ## Scope
+
+> **"Not Global":** A common misconception is that CSS variables are "global". When we attach a CSS variable to an element, it's only available to that element and its children.
 
 Rules of **scope** like in Javascript also applies in css variables, but:
 
@@ -117,11 +121,11 @@ Rules of **scope** like in Javascript also applies in css variables, but:
 
 ---
 
-## Fallbacks
+## Fallbacks (Default values)
 
 It's a way to provide a default value for the variable **if it's not defined**, but if it's invalid, the browser will set the value to `unset` which is equivalent to `initial` and use the fallback value
 
-- when using the variable, We can use a **Fall-back variable/ value** after a **comma** (`,`) and you can make many fallbacks => ex:
+- when using the variable, We can use a **Fall-back variable/ value** after a **comma** (`,`) and you can make many fallbacks
 
   ```css
   div {
@@ -180,6 +184,8 @@ It's a way to provide a default value for the variable **if it's not defined**, 
 
 ## Variables inheritance
 
+By default, all CSS variables are inheritable. This is why CSS variables hung on :root are available globally.
+
 - css variables are **inherited** from the parent element if it's declared in the parent element to the (`classes` / `pseudo-elements` / `pseudo-classes` / `IDs`) in the same element
 
   ```css
@@ -206,19 +212,15 @@ It's a way to provide a default value for the variable **if it's not defined**, 
 
 - you can disable **inheritance** by:
 
-  - setting the property to `initial` on `*` selector:
+  - setting the property to `initial` on the element itself
 
     ```css
     :root {
       --corner-size: 2em;
     }
 
-    * {
-      --corner-size: initial;
-    }
-
     p {
-      border-radius: var(--corner-size); /* Won't be inherited */
+      border-radius: initial; /* won't inherit and will be initial value */
     }
 
     p .text {
@@ -228,15 +230,31 @@ It's a way to provide a default value for the variable **if it's not defined**, 
 
   - Or **register property** using: `@property`:
 
-    - `@property` allows us to register our `properties` / `variables` and control how they behave, but watch out for **browser support**
+    - `@property` allows us to register our `properties` / `variables` and control how they behave (configure it), but watch out for **browser support**
 
-    ```css
-    @property --corner-size {
-      syntax: '*';
-      inherits: false;
-      initial-value: 2em;
-    }
-    ```
+      ```html
+      <style>
+        @property --text-color {
+          syntax: '<color>';
+          inherits: false;
+          initial-value: black;
+        }
+
+        main {
+          --text-color: deeppink;
+          color: var(--text-color);
+        }
+
+        section {
+          color: var(--text-color);
+        }
+      </style>
+
+      <main>
+        This text will have a color of deeppink.
+        <section>This text will have a color of black (initial value).</section>
+      </main>
+      ```
 
 ---
 
@@ -390,6 +408,45 @@ In css variables, you can make the variable contains a number, a string, or an i
     root.style.setProperty('--mouse-y', y);
   });
   ```
+
+- **Reactivity**
+
+  - CSS variables are reactive—when their value changes, any properties that reference that value also change. In this case, clicking the button causes us to update the value for --inflated-size, which automatically updates the button's font-size property.
+
+    ```html
+    <button id="button">Click me!</button>
+    ```
+
+    ```css
+    :root {
+      --inflated-size: 1em;
+    }
+
+    button {
+      font-size: var(--inflated-size);
+    }
+    ```
+
+    ```js
+    const button = document.getElementById('button');
+    button.addEventListener('click', () => {
+      const inflatedSize = parseFloat(getComputedStyle(button).getPropertyValue('--inflated-size'));
+      button.style.setProperty('--inflated-size', inflatedSize * 1.1 + 'em'); // now the button will be 10% bigger as the value of the variable is increased by 10%
+    });
+    ```
+
+  - This is very useful when working with dynamic styles in JS frameworks like `React` or `Vue`
+
+    ```jsx
+    const App = () => {
+      const [color, setColor] = useState('red');
+      return (
+        <div style={{ '--color': color }}>
+          <button onClick={() => setColor('blue')}>Change color</button>
+        </div>
+      );
+    };
+    ```
 
 ---
 

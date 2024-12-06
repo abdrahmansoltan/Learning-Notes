@@ -10,6 +10,7 @@
   - [Props](#props)
   - [Dynamic Tags (`"as"` prop)](#dynamic-tags-as-prop)
   - [Attributes in Styled Components](#attributes-in-styled-components)
+  - [Media Queries](#media-queries)
   - [Themes](#themes)
   - [Animation](#animation)
   - [Global Styling](#global-styling)
@@ -412,6 +413,119 @@ An extended syntax lets us manage props using the `attrs` constructor.
     padding: ${props => (props.hasPadding && 'var(--container-padding)') || 'none'};
   `;
   ```
+
+---
+
+## Media Queries
+
+Here, we use nesting to create a media query inside the component definition.
+
+```js
+const SignUpButton = styled.button`
+  color: red;
+  font-size: 1em;
+
+  @media (min-width: 768px) {
+    font-size: 2em;
+  }
+`;
+```
+
+- Fortunately, this "nested media queries" thing is not unique to styled-components. CSS preprocessors like **Sass** also support nested media queries. I suggest using this pattern if your tool allows for it.
+
+- With styled-components, all of the declarations for an element are in the same spot, instead of regular-media queries where you group all the changes by the viewport size.
+
+  ```css
+  /* All mobile styles */
+  .wrapper {
+    padding: 8px;
+    border: 2px solid;
+  }
+  .button {
+    font-size: 1rem;
+  }
+  h2.title {
+    font-size: 2rem;
+  }
+  /* All tablet styles */
+  @media (min-width: 550px) {
+    .wrapper {
+      padding: 16px;
+      border: 3px solid;
+    }
+    h2.title {
+      font-size: 2.5rem;
+    }
+  }
+  /* All desktop styles */
+  @media (min-width: 1100px) {
+    .button {
+      font-size: 1.5rem;
+    }
+    h2.title {
+      font-size: 3em;
+    }
+  }
+  ```
+
+  ```js
+  // All Wrapper styles
+  const Wrapper = styled.div`
+    padding: 8px;
+    border: 2px solid;
+    @media (min-width: 550px) {
+      padding: 16px;
+      border: 3px solid;
+    }
+  `;
+  // All Button styles
+  const Button = styled.button`
+    font-size: 1rem;
+    @media (min-width: 1100px) {
+      font-size: 1.5rem;
+    }
+  `;
+  // All Title styles
+  const Title = styled.h2`
+    font-size: 2rem;
+    @media (min-width: 550px) {
+      font-size: 2.5rem;
+    }
+    @media (min-width: 1100px) {
+      font-size: 3rem;
+    }
+  `;
+  ```
+
+- Managing breakpoints
+
+  - we can use an object to manage breakpoints
+
+    ```js
+    // breakpoints file 📄
+    const breakpoints = {
+      tabletMin: 550,
+      laptopMin: 1100
+      desktopMin: 1500,
+    };
+
+    const queries = {
+      'tabletAndUp': `min-width: ${breakpoints.tabletMin}px`,
+      'laptopAndUp': `min-width: ${breakpoints.laptopMin}px`,
+      'desktopAndUp': `min-width: ${breakpoints.desktopMin}px`,
+    }
+
+    export { breakpoints, queries };
+
+    // in component file 📄
+    import { queries } from './breakpoints';
+
+    const Wrapper = styled.div`
+     @media (${queries.tabletAndUp}) {
+      /* styles */
+     }
+    `;
+    ```
 
 ---
 

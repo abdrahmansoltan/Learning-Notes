@@ -1308,7 +1308,7 @@ const [firstName, surname] = arr;
 
 It's a data structure that can store a collection of **key-value pairs**.
 
-- There're 2 ways to create an object:
+- There're 3 ways to create an object:
 
   - **Object Literals**: `let obj = {};`
   - **Constructor Literals**: `let obj = new Object();`
@@ -1330,25 +1330,15 @@ It's a data structure that can store a collection of **key-value pairs**.
 
 - To create a new object from an existing object: [How to deep copy an object](./12-JS-interviews-questions-tricks.md#how-to-deep-copy-an-object)
 
-- **Enhanced object literals** :
-
-  - It's a way to simplify the creation of objects by allowing us to use **shorthand property names** and **shorthand method names**.
+- All Object keys are "stringified" (converted to strings) except for Symbols.
 
   ```js
-  const name = 'Jonas';
-  const age = 46;
-
-  const jonas = {
-    name, // instead of name: name ✅
-    age // instead of age: age ✅
-
-    // also the ability to write methods like this
-    greet() {
-      console.log(`Hey ${this.name}`);
-    }
-    // instead of greet: function() {...}
-  };
+  obj[1] = 'hello';
+  obj['1'] = 'world';
+  console.log(obj[1]); // 'world' -> because the key is converted to a string and overwrites the previous value
   ```
+
+  - Note that it won't be type-coerced to a boolean, so `obj[true]` is converted to `obj['true']`.
 
 ---
 

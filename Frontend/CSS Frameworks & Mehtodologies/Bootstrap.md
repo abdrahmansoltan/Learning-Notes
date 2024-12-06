@@ -6,17 +6,12 @@
     - [Examples](#examples)
     - [Installation](#installation)
   - [Colors](#colors)
-    - [Font Color](#font-color)
-    - [Background Color](#background-color)
-  - [Buttons](#buttons)
-    - [Button size](#button-size)
   - [Typography](#typography)
     - [Headings](#headings)
     - [Text Alignment](#text-alignment)
-  - [Jumbotron](#jumbotron)
   - [Layouts](#layouts)
     - [Breakpoints](#breakpoints)
-      - [Display Utility](#display-utility)
+    - [Display Utility](#display-utility)
     - [Container](#container)
     - [FlexBox](#flexbox)
     - [Grid System](#grid-system)
@@ -30,9 +25,14 @@
     - [Form groups](#form-groups)
     - [Form controls](#form-controls)
     - [Input groups](#input-groups)
-  - [Navbar](#navbar)
-  - [Javascript Components](#javascript-components)
+    - [Form validation](#form-validation)
+  - [Components](#components)
+    - [Buttons](#buttons)
+    - [Navbar](#navbar)
     - [Alerts](#alerts)
+    - [Cards](#cards)
+    - [Jumbotron](#jumbotron)
+    - [Modals](#modals)
     - [Other JS Components](#other-js-components)
   - [Customizing Bootstrap](#customizing-bootstrap)
     - [File structure](#file-structure)
@@ -173,42 +173,33 @@ It's a free and open-source CSS framework directed at responsive, mobile-first f
 
 ## Colors
 
-### Font Color
+Bootstrap provides a wide range of predefined colors that can be used for various elements:
 
-- here colors-classes don't explicitly mention the color, but they mention the state, which then we can modify color for each state with utilities
-  ![bootstrap-colors](./img/bootstrap-colors.webp)
-- Ex:
+![bootstrap-colors](./img/bootstrap-colors.webp)
 
-  ```html
-  <h1 class="text-primary"></h1>
-  ```
+- **Theme Colors**
 
----
+  - `.text-primary` - Main brand color (typically blue)
+  - `.text-secondary` - Secondary color (usually gray)
+  - `.text-success` - Success state (green)
+  - `.text-danger` - Error/danger state (red)
+  - `.text-warning` - Warning state (yellow)
+  - `.text-info` - Informational state (light blue)
+  - `.text-light` - Light color (gray)
+  - `.text-dark` - Dark color (black)
 
-### Background Color
+- **Color Usage**
 
-![bootstrap-colors](./img/bootstrap-colors1.png)
-
----
-
-## Buttons
-
-![bootstrap-buttons](./img/bootstrap-buttons.png)
-Bootstrap includes several predefined styles, each serving its own semantic purpose, with a few extras thrown in for more control.
-
-- these classes also work with `<a>` tags
-- Ex:
-
-  ```html
-  <button class="btn btn-primary"></button>
-  ```
-
-### Button size
-
-Add `.btn-lg` or `.btn-sm` for additional sizes.
+- Can be used for:
+  - Text color (`.text-*`)
+  - Background color (`.bg-*`)
+    ![bootstrap-colors](./img/bootstrap-colors1.png)
+  - Border color (`.border-*`)
 
 ```html
-<button type="button" class="btn btn-primary btn-lg">Large button</button>
+<h1 class="text-primary">Primary Text</h1>
+<h1 class="text-secondary">Secondary Text</h1>
+<h1 class="text-success">Success Text</h1>
 ```
 
 ---
@@ -243,32 +234,6 @@ Use text utilities as needed to change the alignment of your text.
 
 ---
 
-## Jumbotron
-
-Lightweight, flexible component for showcasing **hero** section unit style content.
-
-```html
-<div class="jumbotron">
-  <h1 class="display-4">Hello, world!</h1>
-  <p class="lead">
-    This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
-    featured content or information.
-  </p>
-  <hr class="my-4" />
-  <p>
-    It uses utility classes for typography and spacing to space content out within the larger
-    container.
-  </p>
-  <p class="lead">
-    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-  </p>
-</div>
-```
-
-- To make the jumbotron full width, and without rounded corners, add the `.jumbotron-fluid` modifier class and add a `.container` or `.container-fluid` within.
-
----
-
 ## Layouts
 
 Bootstrap's mobile-first flexbox grid system uses a 12-column layout with multiple tiers for different screen sizes. It relies on breakpoints to adjust the layout, making columns responsive and rearranging them based on screen size. For example, content might be in three columns on a large screen but stacked on a small screen.
@@ -289,7 +254,7 @@ Breakpoints are customizable widths that control responsive layout behavior acro
   - Breakpoints specify what you want to do at **this size and above** (e.g., `lg`), not the size itself. For example, `.d-lg-none` sets `display: none` on both `lg` and `xl` screens.
   - You will find a patterns that we write the default class without a breakpoint, then we write the class with a breakpoint, which will override the default class for that breakpoint and all the breakpoints above it, but not the breakpoints below it.
 
-#### Display Utility
+### Display Utility
 
 responsively toggle the display-value of components by changing the value of the `display` property with our responsive display utility classes
 
@@ -472,6 +437,8 @@ it goes from **1** (smallest) to **5** (biggest)
 
 ### Borders
 
+Here, we can use the `.border` class to add a border to the element, and the `.border-{color}` class to add a border with the specified color to the element
+
 ```html
 <div class="border"></div>
 <div class="border border-danger"></div>
@@ -484,7 +451,9 @@ it goes from **1** (smallest) to **5** (biggest)
 
 ### Margin & Padding
 
-The classes are named using the format `{property}{sides}-{size}` for `xs` and `{property}{sides}-{breakpoint}-{size}` for `sm`, `md`, `lg`, `xl`, and `xxl`.
+Here, we can use the `.m-{size}` class to set the margin of the element, and the `.p-{size}` class to set the padding of the element
+
+> The classes are named using the format `{property}{sides}-{size}` for `xs` and `{property}{sides}-{breakpoint}-{size}` for `sm`, `md`, `lg`, `xl`, and `xxl`.
 
 - Where property is one of:
 
@@ -515,6 +484,12 @@ The classes are named using the format `{property}{sides}-{size}` for `xs` and `
 <div class="m-5"></div>
 <div class="m-lg-5"></div>
 <div class="p-5"></div>
+
+<!-- specify sides -->
+<div class="mt-5"></div>
+
+<!-- auto margin -->
+<div class="mx-auto"></div>
 ```
 
 ---
@@ -640,12 +615,86 @@ Here, we can use the `.form-control` class to style the form controls, and `.for
 ### Input groups
 
 - Input groups are used to add text or buttons to the left or right of an input field
+- We can use the `.input-group` class to create an input group, and the `.input-group-text` class to style the text inside the input group
+
+```html
+<div class="input-group">
+  <span class="input-group-text">@</span>
+  <input type="text" class="form-control" placeholder="Username" />
+
+  <span class="input-group-text">$</span>
+  <input type="text" class="form-control" placeholder="Amount" />
+</div>
+```
 
 ---
 
-## Navbar
+### Form validation
 
-It's one of the most used components in Bootstrap, but note that its markup is cluttered and you may copy & paste it from the [Docs](https://getbootstrap.com/docs/4.0/components/navbar/) then modify it as you want
+- We can use the `.is-valid` and `.is-invalid` classes to style the form controls based on their validation state
+- Also you can use `invalid-feedback` and `valid-feedback` classes to style the feedback message
+  - They are shown based on the validation state of the form control
+
+```html
+<form novalidate>
+  <div class="form-group">
+    <label type="email" id="email" class="form-label">Email address</label>
+    <input
+      type="email"
+      class="form-control is-valid"
+      id="email"
+      placeholder="Enter your email address" />
+    <div class="valid-feedback">Looks good!</div>
+    <div class="invalid-feedback">Please enter a valid email address</div>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+  const form = document.querySelector('form');
+
+  form.addEventListener('submit', e => {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      form.classList.add('was-validated'); // add the class to the form to apply the validation styles
+    }
+  });
+</script>
+```
+
+---
+
+## Components
+
+### Buttons
+
+![bootstrap-buttons](./img/bootstrap-buttons.png)
+Bootstrap includes several predefined styles, each serving its own semantic purpose, with a few extras thrown in for more control.
+
+- First, you need to add the `.btn` class to the `<button>` element to style it as a button, then you can add any variant class to change the color/style of the button
+
+  ```html
+  <button class="btn btn-primary"></button>
+  ```
+
+- these classes also work with `<a>` tags as well
+
+- **Button size**
+
+  - Add `.btn-lg` or `.btn-sm` for additional sizes.
+
+  ```html
+  <button type="button" class="btn btn-primary btn-lg">Large button</button>
+  ```
+
+---
+
+### Navbar
+
+![navbar](./img/bootstrap-navbar.png)
+
+It's one of the most used components in Bootstrap, but note that its markup is cluttered and you may copy & paste it from the **Docs** then modify it as you want
 
 - for toggler button, you have to provide these attributes: `data-toggle="collapse" data-target="#navbarSupportedContent"`, specially the `data-target` that needs to match the **id** of the collapsible component with contains the `nav`
 - navbar-sticky vs navbar-fixed
@@ -654,13 +703,9 @@ It's one of the most used components in Bootstrap, but note that its markup is c
 
 ---
 
-## Javascript Components
-
-The idea here, is to interact with components like an `alert` component
-
-- we usually assign a `role` attribute to the element that will be interacted by using bootstrap
-
 ### Alerts
+
+![alerts](./img/bootstrap-alerts.png)
 
 Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages.
 
@@ -699,26 +744,127 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 ---
 
-### Other JS Components
+### Cards
 
-- Usually in old versions, these components require activation using Jquery in the `<script></script>` tags:
+Here, it consists of a wrapper with `.card` class, and inside it, we can have a `.card-header`, `.card-body`, `.card-footer`, `.card-title`, `.card-text`, `.card-img-top`, `.card-img-bottom`, `.card-img-overlay`, `.card-subtitle`, `.card-link
+
+- Example: **Card with image**
+  ![card](./img/bootstrap-card.png)
 
   ```html
-  <script>
-    // Example: Enable popovers everywhere
-    // initialize all popovers on a page would be to select them by their data-toggle attribute:
-    $(function () {
-      $('[data-toggle="popover"]').popover();
-    });
-  </script>
+  <div class="card" style="width: 18rem;">
+    <img class="card-img-top" src="..." alt="Card image cap" />
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">
+        Some quick example text to build on the card title and make up the bulk of the card's
+        content.
+      </p>
+      <a href="#" class="btn btn-primary">Go somewhere</a>
+    </div>
+  </div>
   ```
 
-- [Tooltips](https://getbootstrap.com/docs/4.0/components/tooltips/)
-- [Popovers](https://getbootstrap.com/docs/4.0/components/popovers/)
-- [Dropdown](https://getbootstrap.com/docs/4.0/components/dropdowns/)
-- [Collapse & Accordion](https://getbootstrap.com/docs/4.0/components/collapse/)
-- [Modal](https://getbootstrap.com/docs/4.0/components/modal/)
-- [Carousel](https://getbootstrap.com/docs/4.0/components/carousel/)
+---
+
+### Jumbotron
+
+![jumbotron](./img/bootstrap-jumbotron.png)
+
+Lightweight, flexible component for showcasing **hero** section unit style content.
+
+```html
+<div class="jumbotron">
+  <h1 class="display-4">Hello, world!</h1>
+  <p class="lead">
+    This is a simple hero unit, a simple jumbotron-style component for calling extra attention to
+    featured content or information.
+  </p>
+  <hr class="my-4" />
+  <p>
+    It uses utility classes for typography and spacing to space content out within the larger
+    container.
+  </p>
+  <p class="lead">
+    <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
+  </p>
+</div>
+```
+
+- To make the jumbotron full width, and without rounded corners, add the `.jumbotron-fluid` modifier class and add a `.container` or `.container-fluid` within.
+
+---
+
+### Modals
+
+- Here, we can need to use these classes for the modal:
+
+  - `.modal` to create a modal
+  - `.modal-dialog` to create a modal dialog
+  - `.modal-content` to create a modal content
+  - `.modal-header` to create a modal header
+  - `.modal-body` to create a modal body
+  - `.modal-footer` to create a modal footer
+  - `.modal-title` to create a modal title
+  - `.modal-open` to open the modal
+
+- Also we need to control dismissing and showing the modal using the following attributes:
+  - `data-bs-toggle="modal"` to toggle the modal
+  - `data-bs-target="#exampleModal"` to specify the target modal
+  - `data-bs-dismiss="modal"` to dismiss the modal
+
+![modal](./img/bootstrap-modal.png)
+
+```html
+<div class="modal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
+
+---
+
+### Other JS Components
+
+- **Bootstrap 4 (old)**
+
+  - Usually in old versions, these components require activation using Jquery in the `<script></script>` tags:
+
+    ```html
+    <script>
+      // Example: Enable popovers everywhere
+      // initialize all popovers on a page would be to select them by their data-toggle attribute:
+      $(function () {
+        $('[data-toggle="popover"]').popover();
+      });
+    </script>
+    ```
+
+  - [Tooltips](https://getbootstrap.com/docs/4.0/components/tooltips/)
+  - [Popovers](https://getbootstrap.com/docs/4.0/components/popovers/)
+  - [Dropdown](https://getbootstrap.com/docs/4.0/components/dropdowns/)
+  - [Collapse & Accordion](https://getbootstrap.com/docs/4.0/components/collapse/)
+  - [Modal](https://getbootstrap.com/docs/4.0/components/modal/)
+  - [Carousel](https://getbootstrap.com/docs/4.0/components/carousel/)
+
+- **Bootstrap 5 (new)**
+
+  - In the new version, these components are already activated and you don't need to activate them using Jquery
+
+  - [docs link](https://getbootstrap.com/docs/5.3/components)
 
 ---
 
@@ -791,3 +937,5 @@ You can find more Here: [Bootstrap-customize-sass](https://getbootstrap.com/docs
   <!-- correct -->
   <div class="container container-fluid"></div>
   ```
+
+- Reference: [Bootstrap 5 Crash Course from "Web DevSimplified"](https://www.youtube.com/watch?v=Jyvffr3aCp0)

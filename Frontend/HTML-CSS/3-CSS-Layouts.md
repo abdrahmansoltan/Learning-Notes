@@ -18,7 +18,7 @@
     - [Flexbox notes](#flexbox-notes)
   - [CSS Grid](#css-grid)
     - [Grid terminology](#grid-terminology)
-    - [Aligning items in the grid (Rows \& Columns)](#aligning-items-in-the-grid-rows--columns)
+    - [Grid Construction](#grid-construction)
       - [Grid container](#grid-container)
         - [Display type](#display-type)
         - [Grid template](#grid-template)
@@ -32,6 +32,7 @@
     - [Responsive Grids (`auto-fill` vs `auto-fit`)](#responsive-grids-auto-fill-vs-auto-fit)
     - [Implicit vs Explicit Grids](#implicit-vs-explicit-grids)
     - [Grid Notes](#grid-notes)
+  - [Multi-column layout](#multi-column-layout)
 
 ---
 
@@ -426,6 +427,9 @@ You can use the `flex-direction` property to specify the direction in which the 
   - default value -> `align-items: stretch;` => stretch the items to fill the container **(if the items have a height, then it will be ignored)**
   - when to use `align-items: baseline;` ?
     - usually in **Navbar**, where we have a **logo** and you want the navbar links to be aligned with the logo
+  - **Trick:** When working with **navbars**, you can use:
+    - `align-items: baseline;` to align the items to the baseline of the container (usually the logo and the nav links) -> on desktop size
+    - `align-items: center;` to center the items (logo & icons) vertically -> on mobile size
 
 - `align-content`
 
@@ -726,11 +730,26 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
 ### Grid terminology
 
-- It consists of a **Grid container** and **Grid items**.
-  ![grid](./img/grid-2.png)
+It consists of a **Grid container** and **Grid items (Cells)**
+![grid](./img/grid-2.png)
+
 - **Grid lines**: These are horizontal and vertical lines dividing the grid into rows and columns. The numbers represent lines.
   ![grid](./img/grid-3.png)
+
+  - Every row needs to have the same number of columns (and vice-versa). We can't have a grid where the first row has 1 column, the second row has 2 columns. **But** how is this not possible as most of the websites have different number of columns in each row?
+    - The answer is that this is done by combining multiple cells into one cell using `grid-template-areas` property or `grid-column` and `grid-row` properties.
+  - CSS Grid is fundamentally different from the DOM, because the structure happens exclusively in CSS. There are no DOM nodes that represent the rows or columns in CSS Grid. Instead, **the rows and columns are invisible markers**, tools that our HTML elements can use to position themselves.
+    - **Rows and columns are like the lines painted on the ground in parking lots**. Drivers can use these lines to align their vehicles, but really they're just symbols. It's up to the driver to decide how to use them.
+
 - **Grid cells**: These are the spaces between the grid lines. They are the smallest unit of the grid that can hold an item. The gaps between the cells are called **gutters**.
+
+  - They must be symmetrical (same size) in the grid, as css grid doesn't support zig-zag rows/columns. Every cell in the same row/column needs to have the same height/width.
+    ![grid](./img/grid-5.png)
+    ![grid](./img/grid-6.png)
+    ![grid](./img/grid-7.png)
+  - A grid-child can choose to span multiple rows and columns, but it must always produce a **rectangle**. No **tetrominoes** allowed like this:
+    ![grid](./img/grid-8.png)
+    ![grid](./img/grid-9.png)
 
 - **Old Grid System (960 pixel grid)**
 
@@ -741,6 +760,21 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
   - Many CSS frameworks like **Bootstrap** and **Foundation** are based on this grid system, they provide a set of classes that you can use to create layouts.
 
+- In CSS Grid, there's no such thing as a "primary axis" or a "cross axis". The concept doesn't exist.
+
+  - Instead, CSS Grid has **rows and columns**. The rows are always arranged along the "block" axis. In English and other horizontal languages, this is the vertical axis. Rows are always stacked one on top of the other. Columns are always arranged along the "inline" axis (horizontally).
+
+  - When we change `grid-auto-flow` from `row` to `column`, we're not fundamentally changing the orientation of our grid; everything stays the same, except for the fact that our grid will have multiple columns instead of multiple rows.
+    ![grid](./img/grid-auto-flow-1.png)
+    ![grid](./img/grid-auto-flow-2.png)
+
+    ```css
+    .container {
+      display: grid;
+      grid-auto-flow: column; /* Now the remaining items will be placed in new columns */
+    }
+    ```
+
 - **Grid vs Flexbox**
 
   - Flexbox is a **one-dimensional** layout system, meaning that it can lay out items in rows or columns, but not both at the same time -> (Row or Column)
@@ -748,9 +782,13 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
 ---
 
-### Aligning items in the grid (Rows & Columns)
+### Grid Construction
 
 ![grid](./img/grid-4.png)
+It consists of two main parts:
+
+- **Grid container**: The parent element that contains the grid items.
+- **Grid items**: The children of the grid container.
 
 #### Grid container
 
@@ -763,7 +801,9 @@ It's a new layout system in CSS that allows you to create a grid of columns and 
 
 ##### Grid template
 
-- `grid-template-columns` => defines the columns of the grid
+- `grid-template-columns`
+  - defines the columns of the grid
+  - defines the individual widths of each column
 - `grid-template-rows` => defines the rows of the grid
   - It's common to only define the columns and let the rows be created implicitly
 - `grid-template-areas` => setup the layout of the grid in a(visually-friendly way) by referencing the names of the grid areas which are specified with the `grid-area` property
@@ -1010,6 +1050,10 @@ It's used to position the grid items using values to specify which grid lines th
   - It's similar to the `flex-grow` property in **Flexbox**
 
   - it makes the cells responsive as they take the remaining space available relative to the current viewport size
+  - It's used when we want our columns to grow and shrink based on the available space in the grid container, unlike percentage `%` which is based on the viewport size (fixed size)
+    - Example of percentage `%` vs `fr`:
+      ![grid fr](./img/grid-fr-3.png)
+      ![grid fr](./img/grid-fr-4.png)
   - beats `auto`, when they are together (as `auto` will take the required space available for its content)
     ![grid fr](./img/grid-fr-2.webp)
     - `auto` will take only its width and `fr` will take all remaining space left
@@ -1172,30 +1216,35 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
 
 ![grid](./img/imlicit-explicit-grid.png)
 
-- **Explicit Grid**: The grid that you define using `grid-template-columns` and `grid-template-rows` with explicit values.
+- **Explicit Grid**: The grid that you define using both `grid-template-columns` and `grid-template-rows` with explicit values.
 
   ```css
   .container {
     display: grid;
     grid-template-columns: 100px 150px 200px;
-    grid template rows: repeat(2, fr);
+    grid-template-rows: 50px 50px;
   }
   ```
 
   - But what will happen if the grid has `7` items and you defined the grid with (`3` columns and `2` rows) ?
-    - The grid will create **implicit rows** to accommodate the content, but they will have a height of `auto` (the height of the content inside them)
+    - The grid will create **implicit rows** to accommodate the content, but they will have a height of `auto` (the height of the content inside them or the explicit height of the items)
+    - so the browser creates a 4th row and squeezes it in. It doesn't cause an overflow, it just means that there's less available space for the other elements.
     - To control the height of the **implicit rows**, you can use the `grid-auto-rows` property
+
+    ```css
+    /* control the height of the implicit rows */
+    .container {
+      display: grid;
+      grid-template-columns: 100px 150px 200px;
+      grid-template-rows: 50px 50px;
+      grid-auto-rows: 100px; /* the height of the implicit rows */
+    }
+    ```
 
 - **Implicit Grid**: The grid that is created automatically to accommodate the content when there are more items than the number of columns/rows defined in the explicit grid.
 
-  - By default, the automatically created cells are rows with a height of `auto` (the height of the content inside them), if you want to make the cells in new columns instead of new rows, you can use the `grid-auto-flow` property
-
-    ```css
-    .container {
-      display: grid;
-      grid-auto-flow: column; /* Now the remaining items will be placed in new columns */
-    }
-    ```
+  - By default, it creates 1 new row for each element. if our grid parent has 3 children, we'll wind up with a **1x3** grid with 3 rows (auto height) and 1 column (auto width).
+  - Implicit grids want to fill the available space. Notice that the elements stretch across the horizontal space like block-level elements in Flow.
 
 ---
 
@@ -1260,3 +1309,59 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
 
   - Use **Flexbox** when you want to create a layout in one dimension (either a row or a column). ex: **Navbar** with a logo and links
   - Use **CSS Grid** when you want to create a layout in two dimensions (both rows and columns). ex: **Main layout** of the page with a header, sidebar, main content, and footer (boxes or sections)
+
+- If you want to apply grid in an old browser, you can use:
+  - a **fallback** layout using Flexbox or other layout techniques -> [Graceful Degradation](./2-CSS.md#graceful-degradation)
+  - [tricks here](https://css-tricks.com/css-grid-in-ie-debunking-common-ie-grid-misconceptions/)
+
+---
+
+## Multi-column layout
+
+This layout is used to divide the content of an element into multiple columns. It's useful when you want to create a **newspaper**-like layout.
+
+- `column-count` property:
+  ![multi-column](./img/column-count-1.jpg_large)
+
+  - It specifies the number of columns an element should be divided into.
+  - It can have the following values:
+
+    - `auto` -> the browser will determine the number of columns
+    - `2` -> the element will be divided into two columns
+    - `3` -> the element will be divided into three columns
+
+    ```css
+    p {
+      column-count: 3;
+      column-gap: 20px;
+    }
+    ```
+
+    ![multi-column](./img/column-count-2.png)
+
+- It's not only used for text, but also for images and other elements.
+
+  ```html
+  <ul>
+    <li><img src="image1.jpg" alt="image1" /></li>
+    <li><img src="image2.jpg" alt="image2" /></li>
+    <li><img src="image3.jpg" alt="image3" /></li>
+    <li><img src="image4.jpg" alt="image4" /></li>
+    <li><img src="image5.jpg" alt="image5" /></li>
+    <li><img src="image6.jpg" alt="image6" /></li>
+  </ul>
+
+  <style>
+    ul {
+      column-count: 3;
+      column-gap: 20px;
+    }
+
+    img {
+      width: 100%;
+      margin-bottom: 20px;
+    }
+  </style>
+  ```
+
+  ![multi-column](./img/column-count-3.png)

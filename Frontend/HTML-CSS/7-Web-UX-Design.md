@@ -125,6 +125,7 @@ It is the art and technique of arranging type to make written language **readabl
 
   - Don't use more than `75` characters per line.
     ![Lines](./img/typography-5.png)
+    - fortunately, CSS has a build-in unit for this: `ch` (character width)
   - For normal text, use `1.5` line-height.
   - For headings, use `2` line-height.
 
