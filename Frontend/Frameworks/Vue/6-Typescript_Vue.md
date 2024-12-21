@@ -103,7 +103,7 @@ export default {
     const cart = reactive({ items: [], total: 0 });
     // ✅
     provide(CART_KEY, cart);
-    
+
     const cart = inject(CART_KEY);
     // ❌ Type Error
     cart?.map(...);

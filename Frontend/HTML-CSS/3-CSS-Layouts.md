@@ -18,19 +18,19 @@
     - [Flexbox notes](#flexbox-notes)
   - [CSS Grid](#css-grid)
     - [Grid terminology](#grid-terminology)
-    - [Grid Construction](#grid-construction)
-      - [Grid container](#grid-container)
-        - [Display type](#display-type)
-        - [Grid template](#grid-template)
-        - [Grid gap](#grid-gap)
-      - [Grid items (Placing Grid items in the container)](#grid-items-placing-grid-items-in-the-container)
-        - [Grid Lines (start/end)](#grid-lines-startend)
-        - [Grid Areas](#grid-areas)
-        - [Grid item placement properties](#grid-item-placement-properties)
+    - [Grid container](#grid-container)
+      - [Display type](#display-type)
+      - [Grid template](#grid-template)
+      - [Grid Alignment](#grid-alignment)
+      - [Grid gap](#grid-gap)
+    - [Grid items (Placing Grid items in the container)](#grid-items-placing-grid-items-in-the-container)
+      - [Grid Lines (start/end)](#grid-lines-startend)
+      - [Grid item Alignment (self-alignment)](#grid-item-alignment-self-alignment)
+      - [Grid Areas](#grid-areas)
     - [Sizing Grid columns and rows (`auto` \& `fr` units)](#sizing-grid-columns-and-rows-auto--fr-units)
-    - [Grid functions](#grid-functions)
-    - [Responsive Grids (`auto-fill` vs `auto-fit`)](#responsive-grids-auto-fill-vs-auto-fit)
+    - [Fluid Grids \& Functions](#fluid-grids--functions)
     - [Implicit vs Explicit Grids](#implicit-vs-explicit-grids)
+    - [Subgrid](#subgrid)
     - [Grid Notes](#grid-notes)
   - [Multi-column layout](#multi-column-layout)
 
@@ -780,26 +780,27 @@ It consists of a **Grid container** and **Grid items (Cells)**
   - Flexbox is a **one-dimensional** layout system, meaning that it can lay out items in rows or columns, but not both at the same time -> (Row or Column)
   - Grid is a **two-dimensional** layout system, meaning that it can lay out items in rows and columns simultaneously -> (Row and Column)
 
+- **Grid Construction**
+
+  ![grid](./img/grid-4.png)
+
+  - It consists of two main parts:
+
+    - **Grid container**: The parent element that contains the grid items.
+    - **Grid items**: The children of the grid container.
+
 ---
 
-### Grid Construction
+### Grid container
 
-![grid](./img/grid-4.png)
-It consists of two main parts:
-
-- **Grid container**: The parent element that contains the grid items.
-- **Grid items**: The children of the grid container.
-
-#### Grid container
-
-##### Display type
+#### Display type
 
 - `display: grid;` => creates a grid container, this container will be a `block`-level element
 - `display: inline-grid;` => creates a grid container, this container will be an `inline`-level element
 
 ---
 
-##### Grid template
+#### Grid template
 
 - `grid-template-columns`
   - defines the columns of the grid
@@ -843,17 +844,6 @@ It consists of two main parts:
   }
   ```
 
-- `justify-items` => aligns the grid items along the row axis
-- `align-items` => aligns the grid items along the column axis
-- `place-items` => shorthand for `justify-items` and `align-items`
-- `justify-content` => aligns the grid tracks within the grid container along the row axis
-- `align-content` => aligns the grid tracks within the grid container along the column axis.
-
-  > Difference between `justify-content` and `justify-items`:
-  >
-  > - `justify-content` is used to align the **grid tracks within the grid container**
-  > - `justify-items` is used to align the **grid items within the row axis**
-
 - When you have more rows than explicitly defined in the `grid-template-rows`, the grid will create **implicit rows** to accommodate the content. but they will have a height of `auto` (the height of the content inside them)
 
   - To control the height of the **implicit rows**, you can use the `grid-auto-rows` property
@@ -870,7 +860,44 @@ It consists of two main parts:
 
 ---
 
-##### Grid gap
+#### Grid Alignment
+
+- **Aligning the grid itself in the container (to the grid structure, changing the columns/rows)**
+
+  - `justify-content` => aligns the grid along the row axis **(aligning columns)**
+    ![justify-content](./img/grid-justify-content.png)
+  - `align-content` => aligns the grid along the column axis
+    ![align-content](./img/grid-align-content.png)
+  - `place-content` => **shorthand** for `justify-content` and `align-content`
+
+- **Aligning grid items in the tracks (to child elements, without affecting the grid structure)**
+
+  - `justify-items` => aligns the grid items along the row axis **(aligning columns)**
+    ![justify-items](./img/grid-justify-items.png)
+    - default value -> `stretch` => stretch the items to fill the container
+    - You may think that this will violate one of our core principles: _"columns aren't supposed to change their width across different rows! A column should be a consistent width, for the entire length of the grid"_.
+      ![justify-items](./img/grid-justify-items-1.png)
+      - But this is not the case, because the `stretch` value only stretches the items to fill the container, but it doesn't change the width of the columns. **(So: The columns are actually full-width! But the items within the column have been shrunk down and centered.)**
+        ![justify-items](./img/grid-justify-items-2.png)
+  - `align-items` => aligns the grid items along the column axis
+    ![align-items](./img/grid-align-items.png)
+  - `place-items` => **shorthand** for `justify-items` and `align-items`
+
+- **Notes:**
+
+  - Difference between `justify-content` and `justify-items`:
+
+    - `justify-content` applies to the grid structure, changing the columns.
+    - `justify-items` applies to the child elements, without affecting the shape of the grid.
+    - Values
+      ![justify-items](./img/grid-justify-items-3.png)
+
+  - Note that the `-content` alignment only works when there's extra space in the grid container, while the `-items` alignment works all the time.
+    - if the grid container is smaller than the content, the `-content` alignment will have no effect, but the `-items` alignment will still work.
+
+---
+
+#### Grid gap
 
 - `gap` is a shorthand for `row-gap` and `column-gap`
 - It was called `grid-gap` before, but it was changed to `gap` in the new version of CSS Grid
@@ -890,12 +917,12 @@ It consists of two main parts:
 
 ---
 
-#### Grid items (Placing Grid items in the container)
+### Grid items (Placing Grid items in the container)
 
 - By default, a grid-item will take up one grid cell in the grid container following the source order in the HTML markup.
 - You can use different properties to position the grid items in the grid container.
 
-##### Grid Lines (start/end)
+#### Grid Lines (start/end)
 
 It's used to position the grid items using values to specify which grid lines the item should start and end on.
 ![grid-lines](./img/grid-lines.png)
@@ -953,7 +980,7 @@ It's used to position the grid items using values to specify which grid lines th
 
 - **Notes:**
 
-  - we can use negative values for row/column to point to the end of the explicit grid (not the implicit grid)
+  - we can use negative values for row/column to point to the end of the explicit grid (not the implicit grid), it's also a future-proof way to span the grid items to the end of the grid container if we decide to add more columns/rows in the future
 
     ```css
     .cell-4 {
@@ -968,7 +995,22 @@ It's used to position the grid items using values to specify which grid lines th
 
 ---
 
-##### Grid Areas
+#### Grid item Alignment (self-alignment)
+
+> In Flexbox, `align-items` is used on the parent to control the cross-axis position for all of the elements. But we also have `align-self`, which allows a specific child to overrule it.
+>
+> In CSS Grid, `align-self` works pretty much the same way. We apply it to specific grid children, and it changes their vertical position within the grid cell. We also have `justify-self`, which changes a particular element's horizontal position, within the grid cell
+
+- `justify-self` => aligns the grid item along the row axis
+  ![justify-self](./img/justify-self.png)
+  ![justify-self](./img/justify-self-1.png)
+- `align-self` => aligns the grid item along the column axis
+- `place-self` => shorthand for `justify-self` and `align-self`
+  ![place-self](./img/place-self.png)
+
+---
+
+#### Grid Areas
 
 `grid-area` property is used to assign a grid item to a grid area, or to create a named grid area.
 
@@ -1008,16 +1050,6 @@ It's used to position the grid items using values to specify which grid lines th
       grid-area: header;
     }
     ```
-
----
-
-##### Grid item placement properties
-
-- `justify-self` => aligns the grid item along the row axis
-  ![justify-self](./img/justify-self.png)
-- `align-self` => aligns the grid item along the column axis
-- `place-self` => shorthand for `justify-self` and `align-self`
-  ![place-self](./img/place-self.png)
 
 ---
 
@@ -1092,7 +1124,140 @@ It's used to position the grid items using values to specify which grid lines th
 
 ---
 
-### Grid functions
+### Fluid Grids & Functions
+
+They're used to create responsive grids that adapt to the size of the viewport and wrapping columns into new rows when needed.
+
+> They're used in the `grid-template-columns` and `grid-template-rows` properties
+
+- `auto-fill` & `auto-fit`
+
+  > They are used to create responsive grids that adapt to the size of the viewport and wrapping columns into new rows when needed.
+  >
+  > - They are used as a replacement for explicitly define **the size of the grid container and number of columns in the grid**, by trying to fit as many columns as possible in the available space.
+  > - Here, we don't define the grid container size (number of columns / rows), but we define the size of the columns and the number of columns will be created based on the available space.
+  > - Use them when you don't know the size of page or the number of items that will occupy the grid but you know the width of columns.
+  > - They can be used as the first argument in the `repeat()` function to create a responsive grid layout.
+
+  - `auto-fill`
+
+    - Generates as many columns as possible, even if they are empty (as long as there's space available).
+    - Keeps the available space reserved without altering the grid items' width.
+
+      ```css
+      .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+      ```
+
+      ![auto-fill](./img/auto-fill3.png)
+
+    - Ex:
+
+      - If the container is `450px` wide, we can fit exactly 3 columns at `150px`, and there's no leftover space.
+      - If the container is `480px` wide, we can still only fit 3 columns, but there's `30p`x of leftover space. Each column gets `10px` wider, so that we have 3 columns that are `160px` wide, perfectly filling the `480px`-wide container.
+      - If the container is `600px` wide, we can fit 4 columns at `150px`, and there's no leftover space.
+
+        > Note: This is a slight oversimplification. The real algorithm subtracts additional space like `gap` or `padding` from the calculations, and supports having different columns of different proportions. But this is the basic idea!
+
+  - `auto-fit`
+
+    - Expands the grid items to fill the available space.
+    - Might lead to grid items being too wide, especially when they are fewer than expected.
+
+      ```css
+      .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      }
+      ```
+
+      ![auto-fit](./img/auto-fit1.png)
+
+  - Difference between them:
+    ![auto-fill vs auto-fit](./img/grid-auto-fit.png)
+
+    - Let's suppose that we're rendering a dynamic list of data. We might have 20 items, or 40 items, or 2 items.
+
+      - In this particular case, we only have 2 items, but they're rendered in a very-wide grid. Let's say we have space for 6 columns
+      - What should happen? Should we create 4 additional empty columns, so that our 2 items stay approximately the same size as they would be if we had 20 items? Or should we create 2 super-wide columns that span the entire area?
+      - This is the fundamental difference between auto-fill (lots of empty columns) and auto-fit (stretched ultra-wide columns).
+
+    - People almost always use auto-fill. since it ensures consistency in my grid no matter how many items I have. But if you want to make sure the elements span 100% of the available space, auto-fit has you covered.
+
+    - `auto-fill`
+      - will keep the available space reserved without altering the grid items width.
+      - generates as many columns as possible, even if they are empty **(as long as there's space available)**
+    - `auto-fit` keyword will expand the grid items to fill the available space.
+
+      - That being said, using `auto-fit` might lead to grid items being too wide, especially when they are less than expected. Consider the following example.
+
+        ```css
+        .wrapper {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          grid-gap: 1rem;
+        }
+        ```
+
+        ![auto-fit](./img/auto-fit1.png)
+
+        - Most of the time, such behavior isn't needed, so using `auto-fill` is better.
+
+          ```css
+          .wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-gap: 1rem;
+          }
+          ```
+
+          ![auto-fill](./img/auto-fill3.png)
+
+- Another ways to make Grid responsive:
+
+  - The **responsive** way
+
+    - We can always use a media query to change the number of columns in the grid (grid structure) based on the viewport size.
+
+      ```css
+      @media (max-width: 600px) {
+        .container {
+          grid-template-columns: 1fr; /* when the viewport is smaller, we stick with one column */
+        }
+      }
+      ```
+
+  - The **fluid** ways
+
+    - Use combination of (`vh`, `vw`, `%`) units for the grid container size with `minmax()` function for the columns/rows and `auto-fill` or `auto-fit` for the number of columns/rows
+
+      ```css
+      .container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr));
+      }
+      ```
+
+      - Here's a breakdown of the code:
+
+        - `minmax(min(400px, 100%), 1fr)` => the column width will be at least `400px` and at most `100%` of the viewport width.
+
+          - 100% refers to the .grid element's width. If we're viewing this on a large monitor, .grid might be `800px` wide, so 100% resolves to `800px`.
+          - `min()` picks the smaller of the two values, so on a large monitor, `400px` is returned from this expression. **(We used it to handle the case when the viewport is smaller than `400px` to prevent the grid from overflowing)**
+          - On a smaller screen, however, 100% might only be `250px`. In this case, 100% is returned, since it's smaller than the alternative `400px` option.
+
+        - `repeat(auto-fill, ...)` => the grid will create as many columns as possible, even if they are empty, as long as there's space available.
+
+    - Set a fixed width / height for the grid, and use `fr` for the columns / rows
+
+      ```css
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+      ```
 
 - `minmax()`
 
@@ -1141,77 +1306,6 @@ It's used to position the grid items using values to specify which grid lines th
 
 ---
 
-### Responsive Grids (`auto-fill` vs `auto-fit`)
-
-Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create responsive grids that adapt to the size of the viewport and wrapping columns into new rows when needed.
-
-- They are used as a replacement for explicitly define **the size of the grid container and number of columns in the grid**, by trying to fit as many columns as possible in the available space.
-  - Here, we don't define the grid container size (number of columns / rows), but we define the size of the columns and the number of columns will be created based on the available space.
-- Use them when you don't know the size of page or the number of items that will occupy the grid but you know the width of columns.
-- They can be used as the first argument in the `repeat()` function to create a responsive grid layout.
-
-  ```css
-  .container {
-    display: grid;
-
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    /* or */
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  }
-  ```
-
-- Difference between them:
-  ![auto-fill vs auto-fit](./img/grid-auto-fit.png)
-
-  - `auto-fill` will keep the available space reserved without altering the grid items width.
-  - `auto-fit` keyword will expand the grid items to fill the available space.
-
-- That being said, using `auto-fit` might lead to grid items being too wide, especially when they are less than expected. Consider the following example.
-
-  ```css
-  .wrapper {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    grid-gap: 1rem;
-  }
-  ```
-
-  ![auto-fit](./img/auto-fit1.png)
-
-  - Most of the time, such behavior isn't needed, so using `auto-fill` is better.
-
-    ```css
-    .wrapper {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      grid-gap: 1rem;
-    }
-    ```
-
-    ![auto-fill](./img/auto-fill3.png)
-
-- Another ways to make Grid responsive:
-
-  - Use `vh` and `vw` units for the grid container size
-
-    ```css
-    .container {
-      display: grid;
-      grid-template-columns: repeat(4, 23vw);
-    }
-    ```
-
-  - Set a fixed width / height for the grid, and use `fr` for the columns / rows
-
-    ```css
-    .container {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    ```
-
----
-
 ### Implicit vs Explicit Grids
 
 ![grid](./img/imlicit-explicit-grid.png)
@@ -1227,6 +1321,7 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
   ```
 
   - But what will happen if the grid has `7` items and you defined the grid with (`3` columns and `2` rows) ?
+
     - The grid will create **implicit rows** to accommodate the content, but they will have a height of `auto` (the height of the content inside them or the explicit height of the items)
     - so the browser creates a 4th row and squeezes it in. It doesn't cause an overflow, it just means that there's less available space for the other elements.
     - To control the height of the **implicit rows**, you can use the `grid-auto-rows` property
@@ -1245,6 +1340,29 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
 
   - By default, it creates 1 new row for each element. if our grid parent has 3 children, we'll wind up with a **1x3** grid with 3 rows (auto height) and 1 column (auto width).
   - Implicit grids want to fill the available space. Notice that the elements stretch across the horizontal space like block-level elements in Flow.
+
+---
+
+### Subgrid
+
+It's a feature that allows you to create a grid within a grid. It's used to create a nested grid layout where the child grid inherits the tracks of the parent grid.
+
+- For example: let's say that we have a list of items, and we want each list item to be assigned to our CSS Grid:
+
+  ```html
+  <div class="grid">
+    <header>Header</header>
+    <aside>Sidebar</aside>
+    <ul>
+      <li>First Item</li>
+      <li>Second Item</li>
+    </ul>
+  </div>
+  ```
+
+  - Our 3 grid children will be `header`, `aside`, and `ul`. In the 1st version of CSS Grid, the `li` elements can't participate in the grid, since they're grandchildren, not children, of the grid container.
+
+  - CSS Grid v2 introduces subgrid, a keyword that allows us to let grandchildren access the grid structure.
 
 ---
 
@@ -1311,8 +1429,14 @@ Auto-placement keywords like `auto-fill` and `auto-fit` can be used to create re
   - Use **CSS Grid** when you want to create a layout in two dimensions (both rows and columns). ex: **Main layout** of the page with a header, sidebar, main content, and footer (boxes or sections)
 
 - If you want to apply grid in an old browser, you can use:
+
   - a **fallback** layout using Flexbox or other layout techniques -> [Graceful Degradation](./2-CSS.md#graceful-degradation)
   - [tricks here](https://css-tricks.com/css-grid-in-ie-debunking-common-ie-grid-misconceptions/)
+
+- When we position an element, either using `grid-area` or `grid-column`/`grid-row`, its DOM order doesn't matter. At least, it doesn't matter visually. But when it comes to keyboard navigation, the DOM order still calls the shots.
+
+- Good grid recourses:
+  - [The A to Z Guide of CSS Grid: From Fundamentals to Advanced Techniques](https://www.atatus.com/blog/css-grid/)
 
 ---
 

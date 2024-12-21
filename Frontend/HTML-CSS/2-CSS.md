@@ -98,6 +98,8 @@
       - [Tracking the scrollbar width](#tracking-the-scrollbar-width)
       - [Filler Technique](#filler-technique)
       - [Book Design](#book-design)
+      - [Grid shapes](#grid-shapes)
+      - [Full Bleed Layout](#full-bleed-layout)
     - [General Notes](#general-notes)
     - [Questions](#questions)
 
@@ -2010,7 +2012,7 @@ The `percentage %` unit is sometimes a value from the parent and other times it'
   - `width: min-content` -> the width of the element will be the minimum required to fit the content inside it (it will shrink to the minimum width of the content)
   - Here, we aren't sizing based on the space made available by the parent, we're sizing based on the element's children!
   - It checks for any chance that the content might overflow and makes sure it fits within the parent element (white space between words) forcing the text to wrap to the next line if needed
-  ![min-content](./img/min-content.png)
+    ![min-content](./img/min-content.png)
 
   - Use-cases:
     - With `block` elements, it will shrink to the minimum width of the content
@@ -3276,19 +3278,7 @@ To center an element vertically and horizontally in a container, we have these o
    /* This will center the container horizontally on the page */
    ```
 
-3. using `flexbox`:
-
-   ```css
-   .container {
-     display: flex;
-     min-height: 100vh; /* to make the container full height */
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
-   }
-   ```
-
-4. using `position: absolute`:
+3. using `position: absolute`:
 
    ```css
    .container {
@@ -3311,6 +3301,18 @@ To center an element vertically and horizontally in a container, we have these o
    ![center element](./img/center-element-1.png)
    ![center element](./img/center-element-2.png)
 
+4. using `flexbox`:
+
+   ```css
+   .container {
+     display: flex;
+     min-height: 100vh; /* to make the container full height */
+     flex-direction: column;
+     justify-content: center;
+     align-items: center;
+   }
+   ```
+
 5. using `grid`:
 
    - center a container:
@@ -3318,7 +3320,11 @@ To center an element vertically and horizontally in a container, we have these o
      ```css
      .container {
        display: grid;
-       place-items: center;
+
+       place-content: center; /* or place-items: center; */
+       /* or */
+       justify-content: center;
+       align-content: center;
      }
      ```
 
@@ -4132,6 +4138,320 @@ p:not(:first-of-type) {
 
 ---
 
+#### Grid shapes
+
+- "stairs" layout using CSS Grid:
+  ![stairs layout](./img/stairs-layout-1.png)
+  ![stairs layout](./img/stairs-layout-2.png)
+
+  ```html
+  <div class="wrapper">
+    <div class="box one"></div>
+    <div class="box two"></div>
+    <div class="box three"></div>
+  </div>
+
+  <style>
+    .wrapper {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      min-height: 100%;
+      justify-items: center; /* center the items horizontally on the grid row */
+    }
+    .box {
+      width: 50%;
+    }
+    .box.one {
+      background-color: pink;
+      justify-self: end; /* align the item to the end of the grid row */
+    }
+    .box.two {
+      background-color: lavender;
+    }
+    .box.three {
+      background-color: peachpuff;
+      justify-self: start; /* align the item to the start of the grid row */
+    }
+    html,
+    body {
+      height: 100%;
+    }
+  </style>
+  ```
+
+- Broken rectangles
+  ![broken rectangles](./img/broken-rectangles-1.png)
+
+  - The idea is that all rectangles are the same size, but they are broken in the middle to create a unique layout.
+    ![broken rectangles](./img/broken-rectangles-2.png)
+  - You might think that you need to use a lot of grid columns and rows to achieve this layout, but you can do it with just one row and 2 columns (one for the left side and one for the right side).
+  - We also need to store the desired full width of the shape in a CSS variable (`--rect-width`)
+
+  ```html
+  <div class="wrapper">
+    <div class="box one"></div>
+    <div class="box two"></div>
+    <div class="box three"></div>
+    <div class="box four"></div>
+    <div class="box five"></div>
+    <div class="box six"></div>
+  </div>
+  ```
+
+  - phase 1:
+    ![broken rectangles](./img/broken-rectangles-3.png)
+
+    ```css
+    .wrapper {
+      --rect-width: 100px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      min-height: 100%;
+    }
+
+    .box {
+      width: var(--rect-width);
+      height: 80px;
+    }
+
+    .box.one {
+      background-color: pink;
+    }
+    .box.two {
+      background-color: pink;
+    }
+    .box.three {
+      background-color: lavender;
+    }
+    .box.four {
+      background-color: lavender;
+    }
+    .box.five {
+      background-color: honeydew;
+    }
+    .box.six {
+      background-color: honeydew;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+    ```
+
+  - phase 2: move the odd boxes to the end of the grid row, then add a gap between the boxes, and finally, adjust the width of the boxes to create the broken rectangles
+
+    ```css
+    .wrapper {
+      --rect-width: 100px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      align-content: center; /* center the items vertically on the grid row */
+      gap: 4px; /* add a gap between the grid items */
+      min-height: 100%;
+    }
+    .box:nth-of-type(odd) {
+      justify-self: end; /* align the odd items to the end of the grid row */
+    }
+    .box {
+      width: var(--rect-width);
+      height: 80px;
+    }
+    .box.one {
+      background-color: pink;
+      width: calc(var(--rect-width) * 0.25); /* adjust the width of the first box */
+    }
+    .box.two {
+      background-color: pink;
+      width: calc(var(--rect-width) * 0.75); /* adjust the width of the second box */
+    }
+    .box.three {
+      background-color: lavender;
+      width: calc(var(--rect-width) * 0.5); /* adjust the width of the third box */
+    }
+    .box.four {
+      background-color: lavender;
+      width: calc(var(--rect-width) * 0.5); /* adjust the width of the fourth box */
+    }
+    .box.five {
+      background-color: honeydew;
+      width: calc(var(--rect-width) * 0.75); /* adjust the width of the fifth box */
+    }
+    .box.six {
+      background-color: honeydew;
+      width: calc(var(--rect-width) * 0.25); /* adjust the width of the sixth box */
+    }
+    html,
+    body {
+      height: 100%;
+    }
+    ```
+
+---
+
+#### Full Bleed Layout
+
+A common blog layout involves a single, centered column of text, with images that either span the full width of the column or are centered within it. This is known as a full-bleed layout.
+
+- **Type 1:** images are centered within the column
+  ![full-bleed-layout](./img/full-bleed-layout-1.png)
+
+  ```html
+  <style>
+    .max-width-wrapper {
+      max-width: 30ch; /* 30 characters wide, or whatever you prefer */
+      padding: 32px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+
+  <div class="max-width-wrapper">
+    <h1>Some Heading</h1>
+    <p>
+      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+      been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
+      galley of type and scrambled it to make a type specimen book. It has survived not only five
+      centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+    </p>
+    <img
+      alt="a satisfied-looking cute meerkat"
+      src="/course-materials/meerkat.jpg"
+      class="meerkat" />
+    <p>
+      It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum
+      passages, and more recently with desktop publishing software like Aldus PageMaker including
+      versions of Lorem Ipsum.
+    </p>
+  </div>
+  ```
+
+  - Using a `max-width` wrapper is a solid approach, but it does lock us in; every in-flow child will be constrained by that container. That's where **type 2** comes in.
+
+- **Type 2:** images span the full width of the column
+  ![full-bleed-layout](./img/full-bleed-layout-2.png)
+
+  > Having an element stretch from edge to edge is known as a **"full-bleed" element**, a term borrowed from the publishing world when magazine ads would be printed right to the edge of the page.
+
+  - Fortunately, **CSS Grid** offers a very clever solution to this problem.
+
+  ```html
+  <style>
+    .wrapper {
+      display: grid;
+      grid-template-columns:
+        1fr
+        min(30ch, 100%)
+        1fr;
+    }
+    .wrapper > * {
+      grid-column: 2;
+    }
+    .full-bleed {
+      grid-column: 1 / -1;
+    }
+
+    .meerkat {
+      display: block;
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+    }
+  </style>
+
+  <main class="wrapper">
+    <h1>Some Heading</h1>
+    <p>
+      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+      been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
+      galley of type and scrambled it to make a type specimen book. It has survived not only five
+      centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+    </p>
+    <div class="full-bleed">
+      <img
+        alt="a satisfied-looking cute meerkat"
+        src="/course-materials/meerkat.jpg"
+        class="meerkat" />
+    </div>
+    <p>
+      It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum
+      passages, and more recently with desktop publishing software like Aldus PageMaker including
+      versions of Lorem Ipsum.
+    </p>
+  </main>
+  ```
+
+  - Grid construction:
+    ![full-bleed-layout](./img/full-bleed-layout-3.png)
+
+    - We have 3 explicit columns: the first and last are `1fr` wide, and the middle column is `min(30ch, 100%)` wide.
+    - the `ch` unit is equal to the width of the 0 character, in the current font. Let's assume that in the current situation, our 0 character is `15px` wide. This means that our `30ch` value translates to `450px`.
+    - `450px` is too wide to fit on many mobile displays. That's why we have that min() function. It clamps this value so that it never grows above 100% of the available space. On a `375px`-wide phone, our center column will be `375px` wide, not 450px.
+    - Our two side columns will share whatever space remains. Like auto margins, this is a clever way to make sure the middle column is centered.
+
+  - Column assignment
+    ![full-bleed-layout](./img/full-bleed-layout-4.png)
+
+    - As we start adding children to this grid, they'll be assigned into the first available cell. This doesn't work for us: we want all of our content to be assigned to that middle column by default, That's where this CSS comes in:
+
+      ```css
+      .wrapper > * {
+        grid-column: 2; /* every direct child of .wrapper will be assigned to the second column */
+      }
+      ```
+
+  - Full-bleed children
+    ![full-bleed-layout](./img/full-bleed-layout-5.png)
+
+    - The `full-bleed` class is a simple way to make an element span the full width of the grid. It's a common pattern in CSS Grid to use a class like this to target full-bleed elements.
+
+      ```css
+      .full-bleed {
+        grid-column: 1 / -1; /* span from the first column to the last column */
+      }
+      ```
+
+    - This can lead to some very tall images, on very wide screens, so it's better to combine it with a fixed `height` and `object-fit`:
+
+      ```css
+      .meerkat {
+        display: block;
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+      }
+      ```
+
+  - Adding gutters (for small screens)
+    ![full-bleed-layout](./img/full-bleed-layout-6.png)
+
+    - We can add `padding` to create some space between the text and the image. This is a great way to add some breathing room to the layout.
+
+      ```css
+      .wrapper {
+        display: grid;
+        grid-template-columns:
+          1fr
+          min(30ch, 100%)
+          1fr;
+        padding: 0 16px; /* add padding to the grid container */
+      }
+      ```
+
+    - Note: this will create a problem for the "full-bleed" element, as it will not be full-bleed anymore. To fix this, we need to use "negative margin" to make the full-bleed element span the full width of the grid container:
+
+      ```css
+      .full-bleed {
+        grid-column: 1 / -1; /* span from the first column to the last column */
+        margin-left: -16px; /* add negative margin to the left */
+        margin-right: -16px; /* add negative margin to the right */
+      }
+      ```
+
+      - So, Our container has 16px of padding, but our full-bleed children will undo that, using the negative margin trick
+
+---
+
 ### General Notes
 
 - To create a container for the whole page, we use `<div>` element with `id` attribute and give it a name like `container` or `wrapper` and then we put all the page content inside it. and to give the sections inside it a `max-width` and center them, we use:
@@ -4422,6 +4742,26 @@ p:not(:first-of-type) {
     3. If it is, remove half of the remaining content.
     4. If it isn't, add back half of the removed content.
     5. Repeat until you find the culprit.
+
+- When you find that you want to make cards have the same height, or each card to have just enough height to fit the content, you can use `align-items` property both on flexbox and grid layouts.
+
+  ```css
+  /* cards have the same height */
+  .container {
+    display: flex;
+    align-items: stretch; /* 👈 */
+  }
+
+  /* each card has just enough height to fit the content */
+  .container {
+    display: flex;
+    align-items: flex-start; /* 👈 */
+  }
+  ```
+
+- **Wildcard (`*`) performance**
+  - You may have heard that using the wildcard selector (\*) is bad practice. Some will tell you that it is slow, and can affect the overall performance of your page.
+  - Happily, this is not true. It's been debunked again and again. Even in 2009, when computers were slower and browsers were less optimized, this wasn't an issue. Performance concerns around the wildcard selector are a particularly-resilient urban legend.
 
 ---
 
