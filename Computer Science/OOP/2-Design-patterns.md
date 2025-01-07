@@ -8,6 +8,8 @@
     - [L - Liskov Substitution Principle](#l---liskov-substitution-principle)
     - [I - Interface Segregation Principle](#i---interface-segregation-principle)
     - [D - Dependency Inversion Principle (D.I.P)](#d---dependency-inversion-principle-dip)
+  - [Other Patterns](#other-patterns)
+    - [Law of Demeter](#law-of-demeter)
 
 ---
 
@@ -36,10 +38,11 @@ They're best practices for writing clean and maintainable code. They're a set of
 
 ### S - Single Responsibility Principle (S.R.P)
 
-It states that a class should have one and only one reason to change, meaning that a class should have only one job.
+A class should have only one reason to change. meaning that a class should have only one job or responsibility.
 
 ![single-responsibility](./img/solid-4.webp)
 
+- This means that we should have multiple classes each responsible for a single task rather than having one class responsible
 - This means that when something changes in the class, you're more likely to introduce bugs if the class has many responsibilities. also it may results **merge-conflicts** in the same class when working in a team.
 - If a Class has many responsibilities, it increases the possibility of bugs because making changes to one of its responsibilities, could affect the other ones without you knowing.
 
@@ -94,10 +97,11 @@ It states that a class should have one and only one reason to change, meaning th
 
 ### O - Open-Closed Principle (O.C.P)
 
-It states that classes should be **open for extension but closed for modification**.
+(Classes / Entities) should be **open for extension but closed for modification**.
 
 ![open-closed](./img/solid-5.webp)
 
+- This means that the behavior of a (module / class) can be extended without modifying its source code.
 - If you want the Class to perform more functions, the ideal approach is to add to the functions that already exist NOT change them.
   ![open-closed](./img/solid-1.avif)
 
@@ -158,10 +162,11 @@ It states that classes should be **open for extension but closed for modificatio
 
 ### L - Liskov Substitution Principle
 
-It states that a child class should be able to do everything the parent class can do. Meaning that objects of a superclass shall be replaceable with objects of its subclasses without affecting the functionality of the program.
+Objects of a superclass should be able to be replaced with objects of a subclass without affecting the behavior of the program.
 
 ![liskov-substitution](./img/solid-6.webp)
 
+- This means that a child class should be able to do everything the parent class can do.
 - Meaning that when an instance of a class is replaced/extended with an instance of a subclass, the inheriting class should not change the behavior of the base class. Thus the program should not break.
 - It's an extension of the `O.C.P`.
 - When a child Class cannot perform the same actions as its parent Class, this can cause bugs.
@@ -172,12 +177,13 @@ It states that a child class should be able to do everything the parent class ca
 
 ### I - Interface Segregation Principle
 
-> Interfaces provide a contract that a Class must implement.
-
 It states that many client-specific interfaces are better than one general-purpose interface.
+
+> Interfaces provide a contract that a Class must implement.
 
 ![interface-segregation](./img/solid-7.webp)
 
+- A class should not be forced to implement interfaces it does not use. Meaning that a class should not have to implement methods it does not need.
 - Clients should not be forced to depend on methods that they do not use.
   - When a Class is required to perform actions that are not useful, it is wasteful and may produce unexpected bugs if the Class does not have the ability to perform those actions.
   - A Class should perform only actions that are needed to fulfil its role. Any other action should be removed completely or moved somewhere else if it might be used by another Class in the future.
@@ -223,6 +229,8 @@ It states that **high-level modules should not depend (import from) on low-level
 
 ![dependency-inversion](./img/solid-8.webp)
 
+- High-level modules (main application logic) should not depend on low-level modules (like specific tools or libraries). Both should depend on **abstractions** (interfaces or generic ideas).
+- **For summary**, you will pass the method as a parameter to the class. instead of importing the method or use it inside the class. This is called **Dependency Injection**.
 - This principle says a Class should not be fused with the tool it uses to execute an action. Rather, it should be fused to the interface that will allow the tool to connect to the Class.
 - High-level classes should not know the implementation details of the low-level classes.
   ![dependency-inversion](./img/solid-3.png)
@@ -241,3 +249,50 @@ It states that **high-level modules should not depend (import from) on low-level
     ![dependency-inversion](./img/dip-1.png)
   - better design. ✅ -> by using a middle Abstraction layer(interface) -> connects 2 classes together.
     ![dependency-inversion](./img/dip-2.png)
+
+---
+
+## Other Patterns
+
+### Law of Demeter
+
+It's a design guideline for developing software. It's also known as the **Principle of Least Knowledge**.
+
+- It's a principle that says that a module should not know about the internal workings of the objects it manipulates.
+- It's a way to **reduce the coupling** between objects, by **reducing the number of layers** of objects that need to be accessed. (Using one dot `.` to access an object is better than using multiple dots `.`).
+- **Ex:** Consider a scenario where "cats" have a favorite toy and each toy has a color. If you want to know the color of the favorite toy of a cat, you should ask the cat for the color of its favorite toy, not the toy itself.
+
+  ```py
+  # This is a violation of the Law of Demeter. ❌
+  class Cat:
+    def __init__(self, favorite_toy):
+      self.favorite_toy = favorite_toy
+
+  class Toy:
+    def __init__(self, color):
+      self.color = color
+
+  cat = Cat(Toy("red"))
+  print('The color of the cat\'s favorite toy is:', cat.favorite_toy.color) # we're asking the toy for the color of the cat's favorite toy. not the cat. (using multiple dots `.`)
+
+  # ------------------------------------------------------------ #
+
+  # This is a better design. ✅
+  class Cat:
+    def __init__(self, favorite_toy):
+      self.favorite_toy = favorite_toy
+
+    def get_favorite_toy_color(self):
+      return self.favorite_toy.color
+
+  class Toy:
+    def __init__(self, color):
+      self.color = color
+
+  cat = Cat(Toy("red"))
+  print('The color of the cat\'s favorite toy is:', cat.get_favorite_toy_color()) # we're asking the cat for the color of its favorite toy. not the toy. (using one dot `.`)
+  ```
+
+  - In the example above, we're asking the toy for the color of the cat's favorite toy. not the cat. this is a violation of the Law of Demeter.
+  - In the better design, we're asking the cat for the color of its favorite toy. not the toy. this is a better design.
+  - This is a better design because it reduces the coupling between objects.

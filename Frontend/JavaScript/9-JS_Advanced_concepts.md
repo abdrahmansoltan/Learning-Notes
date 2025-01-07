@@ -39,6 +39,7 @@
     - [Generator Methods](#generator-methods)
     - [Generators are Iterable](#generators-are-iterable)
     - [Generators in Async Code](#generators-in-async-code)
+    - [Generators in Real Life (use cases)](#generators-in-real-life-use-cases)
   - [JS : The weird parts](#js--the-weird-parts)
     - [Numbers](#numbers)
   - [Miscellaneous](#miscellaneous)
@@ -331,6 +332,8 @@ It's the environment in which javascript code is executed, it stores all the nec
 
 It's the environment in which a variable is declared and accessible.
 
+Javascript doesn't have **dynamic scope** (where the scope is determined by the calling context), it has **lexical (static) scope** (where the scope is determined by the location of the variable declaration).
+
 - Types of scopes:
 
   1. **Global scope**: Variables declared outside functions, accessible anywhere.
@@ -360,8 +363,6 @@ It's the environment in which a variable is declared and accessible.
 
   - This is called a **Backpack** or **Persistent Lexical Scope Referenced Data (PLSRD)**.
   - Each function execution gets its own Backpack.
-
-- **Dynamic scope** does not exist in JavaScript.
 
 > **Note**: (if not in strict mode) -> if variable is assign a value but never declared in a scope or block -> it automatically gets declared in the global scope
 
@@ -442,11 +443,10 @@ It's a JavaScript mechanism where (variables and function) **declarations** are 
     ```
 
   - `let / const` hoisting:
+    ![let-hoisting](./img/let-hoisting.png)
 
     - it gets **hoisted but not initialized** (it's not assigned a value) -> so you can't access it before the initialization -> `TDZ (Temporal Dead Zone) Error`
-      ![let-hoisting](./img/let-hoisting.png)
-
-      - Javascript knows that the variable is declared but not initialized, so it throws an error, if the variable wasn't declared, it would have thrown a `ReferenceError (not defined)`
+    - Javascript knows that the variable is declared but not initialized, so it throws an error, if the variable wasn't declared, it would have thrown a `ReferenceError (not defined)`
 
 - **How hoisting works ?**
 
@@ -476,6 +476,10 @@ It's a special variable that is created for every execution context (every funct
 
 - It's not static. It depends on **how the function is called**, and its value is only assigned when the function is called.
   ![this keyword](./img/this-1.png)
+
+> The reason `this` is so confusing because javascript doesn't really have a concept of `individual functions` like other languages, it has `objects` and `methods` that are called on objects. So any function can be called on any object, and `this` is what allows that to happen (even if the function is not a method of that object which is called using the global object (`window`))
+>
+> Remember the rule: **`this` is determined by the left of the dot at the call time**, if there's no dot, it points to the global object (`window`) as `someFunction()` is the same as `window.someFunction()`
 
 - **Arrow functions**:
 
@@ -548,8 +552,12 @@ It's a special variable that is created for every execution context (every funct
 
 ## Functional Programming
 
-- Imperative vs Declarative programming:
-  ![imperative vs declarative](./img/imperative-vs-declarative.png)
+It's the process of building software by composing **pure functions**, avoiding **shared state**, **mutable data**, and **side-effects**.
+
+- It's a **declarative** programming paradigm, which means that the program structure is based on the functions and what they return, not on the order of execution.
+
+  - Imperative vs Declarative programming:
+    ![imperative vs declarative](./img/imperative-vs-declarative.png)
 
 - Functional programming principles
   ![functional programming](./img/functional-programming.png)
@@ -581,6 +589,9 @@ It's a special variable that is created for every execution context (every funct
 - Reduce the potential impact of any given line to maybe 10 other lines (inside the function)
 - structure our code into individual pieces where almost every single line is **self-contained**
 - **No consequences** except on that line Each function’s only ‘consequence’ is to have its result given to specifically the next line of code (‘function call’) and not to any other lines
+- Famous functional programming libraries:
+  - [lodash](https://lodash.com/)
+  - [ramda](https://ramdajs.com/)
 
 ---
 
@@ -594,27 +605,61 @@ It's a special variable that is created for every execution context (every funct
 
 It's the process of converting a function that takes multiple arguments into a function that takes them one at a time.
 
+- A **curried function** can be called with any number of arguments, and it will return a new function that expects the rest of the arguments. as if you call it with fewer arguments, it returns a **smaller partial function** that expects the rest of the arguments.
+
+  ```js
+  // instead of this:
+  fn(a, b, c);
+  // you can do this:
+  fn(a)(b)(c);
+  ```
+
 - Currying allows us to easily get `partials`, which are functions that already have some of the parameters of the original function using `closures`.
 
-```js
-function curry(f) {
-  // curry(f) does the currying transform
-  return function (a) {
-    return function (b) {
-      return f(a, b);
+- Example:
+
+  ```js
+  function curry(fn) {
+    return function (a) {
+      return function (b) {
+        return fn(a, b);
+      };
     };
-  };
-}
+  }
+  // or const curry = (fn) => (a) => (b) => fn(a, b);
 
-// usage
-function sum(a, b) {
-  return a + b;
-}
+  // usage
+  function sum(a, b) {
+    return a + b;
+  }
+  let curriedSum = curry(sum);
 
-let curriedSum = curry(sum);
+  alert(curriedSum(1)(2)); // 3
+  // curriedSum(1); // returns a function (b) => fn(a, b)
+  ```
 
-alert(curriedSum(1)(2)); // 3
-```
+- Usually for complex and generic curry functions, we can use libraries like `lodash` or `ramda`, but here's a native generic example:
+
+  ```js
+  // create a function that converts this function into a curried function
+  function add3(a, b, c) {
+    return a + b + c;
+  }
+  // convert to curried function like this: add3(1)(2)(3)
+
+  // ----------------------- Solution ----------------------- //
+  function curry(fn) {
+    return function curried(...args) {
+      if (args.length >= fn.length) {
+        return fn.apply(this, args);
+      } else {
+        return function (...args2) {
+          return curried.apply(this, args.concat(args2));
+        };
+      }
+    };
+  }
+  ```
 
 - **Notes:**
   - The currying requires the function to have a fixed number of arguments.
@@ -623,6 +668,8 @@ alert(curriedSum(1)(2)); // 3
 #### Partial Application
 
 It's the process of applying a function to **some/part of** its arguments. The partially applied function gets returned for later use
+
+It's just a name for binding some of the function’s arguments to a specific value and returning a new function that takes the rest of the arguments. **(Binding arguments to a function)**
 
 > see it's use in [`bind` section](#examples-of-higher-order-functions-call-apply-bind)
 
@@ -703,6 +750,9 @@ It's the process of applying a function to **some/part of** its arguments. The p
 
 A closure allows a function to remember variables from its creation context, even after the outer function has returned.
 
+![closure](./img/closure.PNG)
+![closure](./img/closure1.png)
+
 - It's a closed-over **(variable environment)** of the execution context in which the function was created, even after that execution context is gone.
 
   - **Function's `[[Environment]]` property**:
@@ -741,9 +791,6 @@ A closure allows a function to remember variables from its creation context, eve
     counter(); // 1
     ```
 
-![closure](./img/closure.PNG)
-![closure](./img/closure1.png)
-
 - **Notes:**
 
   - One of the biggest examples of closures are:
@@ -773,6 +820,33 @@ A closure allows a function to remember variables from its creation context, eve
       })();
       ```
 
+    - **Private variables / Modules**
+
+      ```js
+      function counterModule() {
+        let count = 0; // private variable that will be unaccessible directly from outside the function
+
+        // returning an object with methods that can access the count variable
+        return {
+          increment() {
+            return count++;
+          },
+          decrement() {
+            return count--;
+          },
+          getCount() {
+            return count;
+          }
+        };
+      }
+
+      let counter = counterModule();
+      counter.increment(); // 0
+      counter.increment(); // 1
+      counter.getCount(); // 2
+      counter.count; // undefined (can't access count directly) ❌ (private variable)
+      ```
+
   - When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work (Where the function was created, not where it was called).
   - We can't manually create closures, they are a natural part of the language that happens automatically when a function is created.
     - Because we can't access the `[[Environment]]` property directly, but it's there in the engine internals.
@@ -797,6 +871,8 @@ A closure allows a function to remember variables from its creation context, eve
 #### Function returning Functions
 
 this is a form of **Closure**, as in this example:![func calls func](./img/closure4.png)
+
+> We can do this because javascript functions are **first-class citizens** (can be passed around like any other value), and **closures / backpacks** allow us to keep the variables in the function's scope even after the function has finished executing.
 
 - most importantly -> `generatedFunc` **doesn't have any connection to** `createFunction`, as:
   - here `generatedFunc` is not equal to `createFunction` function
@@ -835,12 +911,24 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 
 ### Pure Functions
 
-**Pure function**: Function **without side effects (predictable)**. Does not depend on external variables. Given the same inputs, always **returns** the same outputs
 ![pure function](./img/pure-functions.png)
+
+- It's a function that has the following properties:
+
+  - **Deterministic / Predictable**: Always returns the same result for the same input.
+  - **No side-effects**: Doesn't change anything outside of the function.
+  - **No shared state**: Doesn't depend on the state of the program.
+  - **Immutable**: Doesn't change its arguments.
 
 - pure function **must** return something
 - **side-effects**: are about MODIFICATION and doesn't count if we created new item
   - usually it's anything that the function does other that returning a value
+- **Benefits of pure functions**:
+
+  - **Self-documenting**: Easier to understand and debug.
+  - **Testable**: Easier to test, as they don't depend on external state.
+  - **Concurrency**: Easier to run in parallel, as they don't depend on shared state.
+  - **Memoization**: the return value can be cached or memoized for performance optimization.
 
 ---
 
@@ -977,7 +1065,8 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 - `apply`
 
-  - Similar to `call`, but takes arguments as an **array**.
+  - Similar to `call`, but different on how the arguments are passed.
+  - it takes arguments as an **array** which is useful when the method has multiple arguments.
 
     ```js
     let human = { name: ‘Ahmed’ }
@@ -985,6 +1074,7 @@ recursion sometimes take long time as it calls multiple functions at the same ti
       console.log(greeting + ' ' + this.name + ' from ' + city)
     }
     sayName.apply(human, ['Hi', 'Cairo']) // Outputs Hi! Ahmed from Cairo
+
     ```
 
   - it's not used in modern javascript because we can instead use `spread operator (...)` with `call()`
@@ -993,15 +1083,17 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     sayName.call(human, ...['Hi', 'Cairo']);
     // instead of
     sayName.apply(human, ['Hi', 'Cairo']);
+
+    // ------------------------------------------------
+
+    Math.max.apply(null, [1, 2, 3]); // Outputs 3
+    // instead of
+    Math.max(1, 2, 3);
     ```
 
 - `bind`
 
-  - Returns a new function with `this` bounded to a specified context.
-  - Used for later use, not immediate invocation.
-  - Takes arguments like `call`.
-  - Doesn't call the function, useful in `eventListeners`.
-  - Allows setting arguments for reuse.
+  - **Returns a new function** with `this` bounded to a specified context.
 
     ```js
     let human = { name: 'Ahmed' };
@@ -1012,6 +1104,56 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     let greet = sayName.bind(human);
     greet('Hi!', 'Cairo'); // Outputs Hi! Ahmed from Cairo
     ```
+
+  - Used for later use, not immediate invocation.
+  - Takes arguments like `call`.
+  - **Common use cases**:
+
+    - callbacks (event listeners or timers)
+
+      ```js
+      let button = document.getElementById('button');
+      function sayName(greeting, city) {
+        console.log(greeting + ' ' + this.name + ' from ' + city);
+      }
+
+      button.addEventListener('click', sayName); // Outputs undefined undefined
+      button.addEventListener('click', sayName.bind(human, 'Hi!', 'Cairo')); // Outputs Hi! Ahmed from Cairo
+      ```
+
+      - Note that we don't use `call` or `apply` here because we don't want to call the function immediately, we just want to bind the `this` keyword and the arguments to the function. as when we pass a function to an event listener, we pass it for future use, not for immediate invocation.
+
+    - partial application
+
+      - Allows setting arguments for reuse
+
+        ```js
+        const human = { name: 'Ahmed' };
+
+        function sayName(greeting, city) {
+          console.log(greeting + ' ' + this.name + ' from ' + city);
+        }
+        let greet = sayName.bind(human, 'Hi!');
+        greet('Cairo'); // Outputs Hi! Ahmed from Cairo
+        greet('London'); // Outputs Hi! Ahmed from London
+
+        // or
+        function multiply(a, b) {
+          return a * b;
+        }
+        const multiplyByTwo = multiply.bind(null, 2);
+        multiplyByTwo(4); // Outputs 8
+
+        // ------------------------------------------------
+
+        // just arguments
+        function greet(greeting, name) {
+          return `${greeting} ${name}`;
+        }
+
+        const sayHello = greet.bind(null, 'Hello'); // use null as we don't have a context
+        sayHello('Ahmed'); // Outputs Hello Ahmed
+        ```
 
 - **Notes:**
 
@@ -1056,7 +1198,9 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 
 ### Composition
 
-It is the **combination of two functions into one**, that when applied, returns the result of the chained functions **(using reduction of the result value)**.
+It's the combination of multiple functions to create a more complicated one. It's a way to combine functions where the output of one function is the input of another.
+
+- It is the **combination of two functions into one**, that when applied, returns the result of the chained functions **(using reduction of the result value)**.
 
 > In functional Programming, Composition **takes the place of inheritance in OOP**.
 >
@@ -1074,21 +1218,46 @@ It is the **combination of two functions into one**, that when applied, returns 
   console.log('finalStep', finalStep);
   ```
 
-  - **But that’s risky, people can overwrite**
+  - **But that’s risky, people can overwrite**, So we can use **composition** to make it more readable and less risky.
 
 - Composition is a fancy term which means "combining pure functions to build more complicated ones" (make complex programs out of simple functions).
 
-![composition](./img/composition.png)
+  ![composition](./img/composition.png)
 
-```js
-let compose = (fn1, fn2) => fn2(fn1);
-```
+  ```js
+  let compose = (fn1, fn2) => {
+    return function (value) {
+      return fn1(fn2(value));
+    };
+  };
 
-**Function composition:**
+  // or
+  const compose = (fn1, fn2) => fn1(fn2());
+  ```
 
-- **Easier to add features** -> This is the essential aspect of functional javascript - being able to list of our units of code by name and have them run one by one as independent, self-contained pieces
-- **More readable** -> `reduce` is often wrapped in compose to say ‘combine up’ the functions to run our data through them one by one. The style is ‘point free’
-- **Easier to debug** -> I know exactly the line of code my bug is in - it’s got a label!
+- **Example of generic compose function:**
+
+  ```js
+  function compose(...functions) {
+    return function (value) {
+      return functions.reduceRight((acc, fn) => fn(acc), value); // reduceRight to start from the right
+    };
+  }
+
+  // ---------------------------- Usage ---------------------------- //
+  const lowerCaseString = str => str.toLowerCase();
+  const splitWords = str => str.split(' ');
+  const joinWithDashes = arr => arr.join('-');
+
+  const transformString = compose(joinWithDashes, splitWords, lowerCaseString);
+  console.log(transformString('I Love JavaScript')); // i-love-javascript
+  ```
+
+- Why use composition?
+
+  - **Easier to add features**: We can list our units of code by name and have them run one by one as independent, self-contained pieces.
+  - **More readable**: `reduce` is often wrapped in compose to say ‘combine up’ the functions to run our data through them one by one. The style is ‘point free’.
+  - **Easier to debug**: I know exactly the line of code my bug is in - it’s got a label!
 
 ---
 
@@ -1290,6 +1459,30 @@ They differ from Regular functions which return only single value (or nothing). 
   }
   createFlow();
   console.log('Me second');
+  ```
+
+---
+
+### Generators in Real Life (use cases)
+
+- **Infinite Scrolling**: Generators are perfect for infinite scrolling. We can create a generator that fetches data from the server and yields it one by one. Then we can use the generator in a `for..of` loop to display the data.
+
+  ```js
+  // Get 10 images batch by each request
+  const allImages = Array.from({ length: 1000 }, (_, i) => `https://picsum.photos/id/${i}/200/200`);
+
+  function* getBatchOfImages(images, batchSize = 10) {
+    let index = 0;
+    while (index < images.length) {
+      yield images.slice(index, index + batchSize);
+      index += batchSize;
+    }
+  }
+
+  const imageGenerator = getBatchOfImages(allImages);
+
+  imageGenerator.next().value; // [1st 10 images]
+  imageGenerator.next().value; // [2nd 10 images]
   ```
 
 ---

@@ -44,7 +44,7 @@
       - [`overflow` property](#overflow-property)
       - [`overflow-wrap` property](#overflow-wrap-property)
       - [`text-overflow` property](#text-overflow-property)
-      - [Multi-line ellipsis](#multi-line-ellipsis)
+      - [Multi-line ellipsis (Text Clamping)](#multi-line-ellipsis-text-clamping)
     - [Font \& Text Notes](#font--text-notes)
   - [Units](#units)
     - [Pixels](#pixels)
@@ -100,6 +100,7 @@
       - [Book Design](#book-design)
       - [Grid shapes](#grid-shapes)
       - [Full Bleed Layout](#full-bleed-layout)
+      - [Specialty story grid (news website)](#specialty-story-grid-news-website)
     - [General Notes](#general-notes)
     - [Questions](#questions)
 
@@ -1116,9 +1117,10 @@ It's the space between the border of an element and the surrounding elements.
 
 It's a common issue in CSS when two **vertical margins** are overlapping, they will collapse (combine) into a single margin.
 
-> **Margins only collapse in Flow layout**
->
-> - Margin collapse is unique to [Flow layout](./3-CSS-Layouts.md#flow-layout-block-vs-inline). If you have children inside a `display: flex` parent, those children's margins will never collapse.
+- **Margins only collapse in Flow layout**
+
+  - Margin collapse is unique to [Flow layout](./3-CSS-Layouts.md#flow-layout-block-vs-inline). If you have children inside a `display: flex` parent, those children's margins will never collapse.
+  - It doesn't happen with `flexbox`, `grid`, or `inline-block` elements.
 
 - Here, only one of them will be visible to the page which is the larger one and **not** their sum (**The bigger margin wins**)
   ![Margin Collapse](./img/collapsing-margins-1.png)
@@ -1830,7 +1832,7 @@ with `overflow-wrap` property, you can control how the text wraps when it reache
   - `pre-wrap` -> the text will wrap to the next line and will respect the line breaks in the text
   - `pre-line` -> the text will wrap to the next line and will respect the line breaks in the text but will collapse multiple spaces into one
 
-#### Multi-line ellipsis
+#### Multi-line ellipsis (Text Clamping)
 
 If you want to add an ellipsis to a multi-line text, you can use the following trick:
 
@@ -1846,7 +1848,8 @@ p {
 - Notes:
   - Apply this code to the element that contains the text you want to clamp. and not the container of the element.
   - In certain cases, it can be buggy, because the element that we're applying this code is also a `flex` container, so it may not work as expected.
-    - To avoid possible issues, always apply line clamping to a paragraph tag that isn't being stretched or flexed as part of `flexbox` or `CSS Grid`. We can solve for this by using a wrapper `div`
+    - To avoid possible issues, always apply line clamping to a paragraph tag that isn't being **stretched** or flexed as part of `flexbox` or `CSS Grid`. We can solve for this by using a wrapper `div`
+    - This is because, `clamp` doesn't remove the text, it just hides it, by trying to figure out the height of the text and then hiding the rest of it. and if you specify a bigger height than the text, it might not work as expected.
 
 ---
 
@@ -4434,7 +4437,7 @@ A common blog layout involves a single, centered column of text, with images tha
           1fr
           min(30ch, 100%)
           1fr;
-        padding: 0 16px; /* add padding to the grid container */
+        padding: 0 16px; /*  add padding to the grid container */
       }
       ```
 
@@ -4449,6 +4452,113 @@ A common blog layout involves a single, centered column of text, with images tha
       ```
 
       - So, Our container has 16px of padding, but our full-bleed children will undo that, using the negative margin trick
+
+---
+
+#### Specialty story grid (news website)
+
+![specialty-story-grid](./img/specialty-story-grid.png)
+
+```jsx
+import React from 'react';
+import styled from 'styled-components/macro';
+
+import { MARKET_DATA, SPORTS_STORIES } from '../../data';
+
+import { QUERIES } from '../../constants';
+
+import MarketCard from '../MarketCard';
+import SectionTitle from '../SectionTitle';
+import MiniStory from '../MiniStory';
+
+const SpecialtyStoryGrid = () => {
+  return (
+    <Wrapper>
+      <MarketsSection>
+        <SectionTitle
+          cornerLink={{
+            href: '/markets',
+            content: 'Visit Markets data »'
+          }}>
+          Markets
+        </SectionTitle>
+        <MarketCards>
+          {MARKET_DATA.map(data => (
+            <MarketCard key={data.tickerSymbol} {...data} />
+          ))}
+        </MarketCards>
+      </MarketsSection>
+      <SportsSection>
+        <SectionTitle
+          cornerLink={{
+            href: '/sports',
+            content: 'Visit Sports page »'
+          }}>
+          Sports
+        </SectionTitle>
+        <SportsStories>
+          {SPORTS_STORIES.map(data => (
+            <SportsStoryWrapper key={data.id}>
+              <MiniStory {...data} />
+            </SportsStoryWrapper>
+          ))}
+        </SportsStories>
+      </SportsSection>
+    </Wrapper>
+  );
+};
+
+const Wrapper = styled.div`
+  display: grid;
+  gap: 48px;
+
+  @media ${QUERIES.tabletAndUp} {
+    gap: 64px;
+    grid-template-columns: minmax(0px, auto);
+  }
+  @media ${QUERIES.laptopAndUp} {
+    gap: 0px;
+    grid-template-columns: 1fr minmax(0px, 1fr);
+  }
+`;
+
+const MarketsSection = styled.section`
+  @media ${QUERIES.laptopAndUp} {
+    padding-right: 16px;
+    margin-right: 16px;
+    border-right: 1px solid var(--color-gray-300);
+  }
+`;
+
+const MarketCards = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 16px;
+`;
+
+const SportsSection = styled.section``;
+
+const SportsStories = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+  gap: 16px;
+
+  @media ${QUERIES.tabletAndUp} {
+    display: flex;
+    grid-template-columns: revert;
+    overflow: auto;
+  }
+`;
+
+const SportsStoryWrapper = styled.div`
+  min-width: 220px;
+`;
+
+export default SpecialtyStoryGrid;
+```
+
+- Here, the trick is using `auto-fill` in the `grid-template-columns` property to create a flexible grid that will automatically add as many columns as it can fit in the container. This is a great way to create a responsive grid that will adapt to the available space.
+- Also, Handling overflow on the `SportsStories` container is a great way to make sure that the grid will be scrollable on smaller screens. This is a common pattern for responsive grids that need to adapt to different screen sizes.
 
 ---
 

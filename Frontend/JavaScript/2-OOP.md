@@ -248,6 +248,19 @@ Each object has a `prototype`, which contains **methods** and **properties** tha
   alert(rabbit.jumps); // true
   ```
 
+- Trick: prototype chaining can also be done like this:
+
+  ```js
+  let animal = {
+    eats: true
+  };
+
+  function Rabbit(name) {
+    this.name = name;
+    __proto__: animal; // works, but not recommended as it's not standard
+  }
+  ```
+
 ---
 
 ### Why we do this?
@@ -327,6 +340,7 @@ why we do this instead of declaring the function with the class properties each 
 
 It's a function that creates an object type, and prepares the object for use. which implements a reusable object creation code.
 
+- Their name should start with a capital letter to indicate that they are constructors and not regular functions
 - Usually, constructors do not have a `return` statement. Their task is to write all necessary stuff into `this`, and it automatically becomes the result. But if there is a `return` statement, then:
 
   - If `return` is called with an object, then the object is returned instead of `this`.
@@ -494,7 +508,8 @@ It's a keyword that automates the hard work (process of creating an object and l
 
 - **Why?** because if we create a method inside of a constructor function, then that method will be attached to each object that we create using that constructor function. So, if we create a hundred objects using that constructor function, then we would essentially create a hundred copies of that method in memory. This is bad for performance.
 - **Use** prototypal inheritance to add methods to the constructor's prototype.
-  - This ensures only one copy of the method is shared among all instances.
+  - This ensures only one copy of the method is shared among all instances. (all instances of the object will share the same method)
+  - This is automatically done for **ES6 classes methods**.
 
 ---
 

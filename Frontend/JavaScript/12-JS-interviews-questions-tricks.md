@@ -10,7 +10,7 @@
     - [How can we optimize the performance when adding styles to an element using JavaScript?](#how-can-we-optimize-the-performance-when-adding-styles-to-an-element-using-javascript)
     - [What is a worker? and when would you use one?](#what-is-a-worker-and-when-would-you-use-one)
     - [Can you implement a `bind()` function? (How to change scope)](#can-you-implement-a-bind-function-how-to-change-scope)
-    - [What is **Debounce** and **Throttle**?](#what-is-debounce-and-throttle)
+    - [What is "Debounce" and "Throttle"?](#what-is-debounce-and-throttle)
     - [We have 2 identical `DOM` trees, `A` and `B`. For `DOM` tree `A` we have the `location` of an element. Create a function to find that element in `DOM` tree `B`](#we-have-2-identical-dom-trees-a-and-b-for-dom-tree-a-we-have-the-location-of-an-element-create-a-function-to-find-that-element-in-dom-tree-b)
     - [Create a function that moves an element **(Rendering Performance)**](#create-a-function-that-moves-an-element-rendering-performance)
     - [Given this function, how can you convert it into a `Promise` ?](#given-this-function-how-can-you-convert-it-into-a-promise-)
@@ -28,12 +28,14 @@
     - [Exercise: Refactor a function for improved readability](#exercise-refactor-a-function-for-improved-readability)
     - [Implement a timeout handler for requests (so that the request doesn't hang forever)](#implement-a-timeout-handler-for-requests-so-that-the-request-doesnt-hang-forever)
     - [Implement TODO list using vanilla JavaScript](#implement-todo-list-using-vanilla-javascript)
+    - [What is the difference between these 2 promises?](#what-is-the-difference-between-these-2-promises)
+    - [What will happen if you stored an array in the local storage?](#what-will-happen-if-you-stored-an-array-in-the-local-storage)
 
 ---
 
 ## `this` keyword
 
-- A dynamically evaluated method call can lose `this`.
+- **Question 1:** A dynamically evaluated method call can lose `this`.
 
   ```js
   let user = {
@@ -61,6 +63,75 @@
          - Any other operation like assignment `user.hi` discards the reference type as a whole, takes the value of `user.hi` (a `function`) and passes it on. So any further operation “loses” **`this`**.
   - Solution:
     - we can use `func.bind()`
+
+- **Question 2:** What will happen in these both cases?
+
+  ```js
+  const user = {
+    name: 'John',
+    hi() {
+      console.log(`Hi, ${this.name}!`);
+    }
+  };
+
+  const hiFromObj = user.hi;
+  hiFromObj(); // 'Hi, !'
+
+  // -----------------------------------------------
+
+  class Cat {
+    constructor(name) {
+      this.name = name;
+    }
+    hi() {
+      console.log(`Meow, ${this.name}!`);
+    }
+  }
+
+  const hiFromClass = new Cat('Tom').hi;
+  hiFromClass(); // Error!
+  ```
+
+  - Why are we getting empty string in the first case?, and an error in the second case?
+    - In the first case, `hiFromObj` is a reference to the `user.hi` method, but when it's called, it's called without an object before the dot, so `this` is not bound to `user` anymore. and `this` refers to the global object (in non-strict mode) or `undefined` (in strict mode). and here `this.name` is `undefined` because we're in "non-strict" mode.
+    - But in the second case, we get an error because `hiFromClass` is a reference to the `hi` method of the `Cat` class, and classes run in "strict" mode by default. So, `this` is `undefined` in the `hi` method, and `this.name` throws an error because `undefined` doesn't have a `name` property.
+  - **So the main difference is that in the first case, `this` is `undefined` because we're in "non-strict" mode, while in the second case, `this` is `undefined` because we're in "strict" mode.**
+
+- **Question 3:** How can we fix this
+
+  ```js
+  class Cat {
+    constructor(name) {
+      this.name = name;
+    }
+    superGreet() {
+      // 1. direct logging
+      console.log(`Meow, ${this.name}!`); // Meow, Tom! ✅
+
+      // 2. using timer
+      setTimeout(function () {
+        console.log(`Meow, ${this.name}!`); // Meow, undefined! ❌
+      }, 1000);
+    }
+  }
+  ```
+
+  - Solution:
+
+    - We can either use an **arrow function** instead of a regular function, because arrow functions don't have their own `this`, they inherit it from the surrounding context. **or** we can use `bind()` method to bind the `this` context to the function.
+
+      ```js
+      superGreet() {
+        setTimeout(() => {
+          console.log(`Meow, ${this.name}!`); // Meow, Tom! ✅
+        }, 1000);
+
+        // or
+        setTimeout(function () {
+          console.log(`Meow, ${this.name}!`); // Meow, Tom! ✅
+        }.bind(this), 1000);
+      }
+      ```
 
 ---
 
@@ -221,24 +292,46 @@ const myBoundFunction = myFunction.bind(myObject);
   };
   ```
 
-### What is **Debounce** and **Throttle**?
+---
 
-- **Debounce** and **Throttle** are two similar (but different!) techniques to control how many times we allow a function to be executed over time.
-- **Debounce** will fire only once every **n** milliseconds, while **Throttle** will fire every **n** milliseconds.
+### What is "Debounce" and "Throttle"?
 
-  - **Debounce** will wait **n** milliseconds after the last function call to actually call the function.
-  - **Throttle** will execute the function every **n** milliseconds, ignoring calls that happen in-between.
+**Debounce** and **Throttle** are techniques to control how many times we allow a function to be executed over time (rate of execution of a function over time).
+
+- They are particularly useful in scenarios where a (function / event-handler) is called frequently, such as during user input or scrolling.
+
+- **Debounce**
+
+  - Debounce ensures that a function is only called only after a certain amount of time has passed since the last function call.
+    - It waits for a specified amount of time after the last function call before executing the function.
+  - This is useful for scenarios like search bars, where you want to wait until the user has finished typing before making a search request.
 
   ```js
   // Debounce
-  function debounce(fn, time) {
+  function debounce(fn, delay) {
     let timeoutId;
-    return function () {
-      clearTimeout(timeoutId); // clear the previous timeoutId to avoid calling the function multiple times
-      timeoutId = setTimeout(() => fn.apply(this, arguments), time); // "this" is the context of the function
+    return function (...args) {
+      clearTimeout(timeoutId); // Clear the previous timeout to avoid multiple calls
+      timeoutId = setTimeout(() => fn.apply(this, args), delay); // Set a new timeout
     };
   }
 
+  // usage
+  const debouncedFn = debounce(name => console.log('debounced', name), 300); // partial application
+  debouncedFn('Alice');
+  ```
+
+  - What will happen if we did the debounce without clearing the timeout?
+    - If we don't clear the timeout, the function will be called multiple times after the delay has passed. which will defeat the purpose of debounce.
+
+- **Throttle**
+
+  - Throttle ensures that a function is called at most one time within a specified time interval (duration).
+    - It executes the function at regular intervals, **ignoring calls that happen in between**.
+  - This is useful for scenarios like scroll events, where you want to limit the number of times a function is called as the user scrolls.
+  - The idea here is to **set a flag that indicates whether the function can be called or not, and then reset the flag after a certain amount of time has passed**.
+
+  ```js
   // Throttle
   function throttle(fn, time) {
     let called = false;
@@ -254,9 +347,13 @@ const myBoundFunction = myFunction.bind(myObject);
   }
   ```
 
+  > Note that usually the `throttle` function in libraries use more complex logic to handle edge cases (like recursion) and ensure that the function is called at regular intervals.
+
 - Follow-up: where these techniques are used in real FE applications?
   - **Debounce** is used in `search` bars, so that the search function is not called every time the user types a letter, but only after the user stops typing for a certain amount of time.
   - **Throttle** is used in `scroll` events, so that the function is not called every time the user scrolls, but only after a certain amount of time has passed.
+
+---
 
 ### We have 2 identical `DOM` trees, `A` and `B`. For `DOM` tree `A` we have the `location` of an element. Create a function to find that element in `DOM` tree `B`
 
@@ -740,3 +837,47 @@ const getJson = async url => {
   </script>
 </body>
 ```
+
+---
+
+### What is the difference between these 2 promises?
+
+```js
+// 1
+async function getUser() {
+  const result = fetch('https://api.github.com/users/username');
+  console.log(result); // Promise {<pending>}
+}
+
+// 2
+async function getUser() {
+  const result = await fetch('https://api.github.com/users/username');
+  console.log(result); // Response {ok: true, ...}
+}
+```
+
+- The difference between the two promises is that the first one doesn't wait for the `fetch` request to complete before logging the result, while the second one does.
+
+  - In the first function, the `fetch` request is initiated, but the function continues to execute without waiting for the request to complete. So, when `console.log(result)` is called, the `fetch` request is still pending, and `result` is a `Promise` object in the pending state.
+    - Don't think that `result` will be `undefined` because `fetch` returns a promise, and the promise is an object that represents the eventual completion (or failure) of an asynchronous operation and its resulting value.
+  - In the second function, the `await` keyword is used to pause the execution of the function until the `fetch` request is complete. So, when `console.log(result)` is called, the `fetch` request has completed, and `result` is a `Response` object with the data from the request.
+
+---
+
+### What will happen if you stored an array in the local storage?
+
+- The array will be converted to a string using the `toString()` method before being stored in the local storage.
+
+  ```js
+  const arr = [1, 2, 3];
+  localStorage.setItem('myArray', arr);
+  console.log(localStorage.getItem('myArray')); // '1,2,3'
+  ```
+
+- The correct way to store an array in the local storage is to use `JSON.stringify()` to convert the array to a JSON string before storing it, and then use `JSON.parse()` to convert it back to an array when retrieving it.
+
+  ```js
+  const arr = [1, 2, 3];
+  localStorage.setItem('myArray', JSON.stringify(arr));
+  console.log(JSON.parse(localStorage.getItem('myArray'))); // [1, 2, 3]
+  ```

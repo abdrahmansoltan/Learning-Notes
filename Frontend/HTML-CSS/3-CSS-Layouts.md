@@ -1368,6 +1368,36 @@ It's a feature that allows you to create a grid within a grid. It's used to crea
 
 ### Grid Notes
 
+- **Grid Quirks**
+
+  - Grids are limited to `1000` rows, if a grid is given `1002` rows, the last `3` rows will occupy the same cell in the `1000th` row.
+    - **Update**: Starting in Chrome 96, expected to release in early 2022, the grid row limit will be bumped to `100,000` rows! That said, we shouldn't actually try and render that many items; Google recommends not exceeding `1500` DOM nodes, on the entire page! If you have a massive dataset that you want to render, you can use virtualization.
+  - "Margin collapse" doesn't work in CSS Grid. If you have a grid item with a margin, it won't collapse with the margins of its siblings. **(same as Flexbox)**
+    ![grid quirks](./img/grid-quirks.png)
+  - Z-index works with grid children: A grid child can use z-index even if it doesn't change the `position` property.
+  - Weirdness with “`fr`” unit on rows: The `fr` unit allows us to divvy up extra space in a grid container. This makes sense when we use it in our `columns`, and it makes sense when we use it on `rows` within a specified-height container… but things get a little strange in other situations:
+
+- If you have 3 items and you want to place the second item in the middle and the other items on the sides, you can use the following code:
+
+  ```css
+  .container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  .item-1 {
+    justify-self: start;
+  }
+
+  .item-3 {
+    justify-self: center;
+  }
+  ```
+
+  - by using `1fr` for the first and last columns, the middle column will be placed in the middle of the grid container
+  - by using `align-items: center;` the items will be centered vertically, and by using `justify-self: start;` and `justify-self: center;` the items will be placed on the (sides of their columns)
+
 - For tricky designs, always consider using more columns like `6` or `12` to make the layout more flexible and easier to manage.
 
 - To center a Grid-container, you can use these 2 options:

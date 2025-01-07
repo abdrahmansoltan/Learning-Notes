@@ -63,7 +63,7 @@
     - [Form Elements](#form-elements)
       - [input and textarea](#input-and-textarea)
       - [select and option](#select-and-option)
-    - [event handler in forms (submitting)](#event-handler-in-forms-submitting)
+    - [event handler in forms](#event-handler-in-forms)
     - [Form Validation](#form-validation)
       - [Focusing: focus/blur](#focusing-focusblur)
       - [Events: change, input, cut, copy, paste](#events-change-input-cut-copy-paste)
@@ -258,6 +258,16 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
     var num = 50; // Ok
     ```
 
+  - variables declared with `var` are in the global scope, and are accessible through the `window` object.
+
+    ```js
+    var x = 5;
+    console.log(window.x); // 5
+
+    let y = 10;
+    console.log(window.y); // undefined
+    ```
+
 - **let & const** are both function-scoped and block-scoped (anything within `{}`), **means you can't use it outside the function-scope & block-scope**
 
 ---
@@ -414,8 +424,9 @@ let func = function (arg1, arg2) {
   })(argument);
   ```
 
-- **IIFE**: Turns block-scope into functional-scope.
+- **Why IIFE ?**:
 
+  - Turns block-scope into functional-scope.
   - Prevents global scope pollution (`var`).
   - Avoids variable name conflicts.
   - Runs code once within a task.
@@ -679,6 +690,7 @@ for (let i = 0; i < 3; i++) {
   for (let i = 0; i < 3; i++) {
     console.log(i); // 0, 1, 2
   }
+  console.log(i); // ReferenceError: i is not defined
 
   // Using var ❌
   for (var i = 0; i < 3; i++) {
@@ -893,6 +905,17 @@ They are a way of organizing and storing data so that we can access and modify i
       let arr = ['John', 'Pete', 'Mary'];
       let str = arr.join(', '); // John, Pete, Mary
       ```
+
+- **Replacing words in a string**
+
+  ```js
+  const str = 'I really love cats. My cat is the best cat in the world.';
+
+  // replace all occurrences of 'cat' with 'dog'
+  const newStr = str.replace(/cat/g, 'dog'); // using regular expression
+  // or
+  const newStr = str.replaceAll('cat', 'dog'); // using replaceAll method
+  ```
 
 - **Capitalizing the first letter**
 
@@ -1195,6 +1218,16 @@ const [firstName, surname] = arr;
     ```js
     const y = Array.from({ length: 3 }, () => 1); // [1,1,1]
     const z = Array.from({ length: 3 }, (_, i) => i + 1); // [1, 2, 3]
+
+    const chars = Array.from('hello'); // ['h', 'e', 'l', 'l', 'o']
+
+    // copy an array
+    const arr = [1, 2, 3];
+    const arrCopy = Array.from(arr); // [1, 2, 3] (a new copy)
+
+    // convert set to array
+    const set = new Set(['foo', 'bar']);
+    const arr = Array.from(set); // ['foo', 'bar']
     ```
 
     - mainly used to convert `node list` to an array
@@ -1202,6 +1235,12 @@ const [firstName, surname] = arr;
       ```js
       const movementsUI = Array.from(document.querySelectorAll('.movements__value'));
       // or you can use spread operator [...document.querySelectorAll(".movements__value")]
+      ```
+
+    - Note that it takes a **mapping function** as a second argument.
+
+      ```js
+      const movementsUI = Array.from('abcd', x => x.toUpperCase()); // ['A', 'B', 'C', 'D']
       ```
 
 - `some` & `every` methods
@@ -1764,6 +1803,7 @@ A **Set** is a collection of unique values (no duplicates).
       - why? -> because A **number is stored in memory in its binary form**, a sequence of `bits` (`ones` and `zeroes`). But fractions like `0.1`, `0.2` that look simple in the decimal numeric system are actually unending fractions in their `binary` form.
       - So `0.1` is one divided by ten `1/10`, In decimal numeral system such numbers are easily representable. Compare it to one-third: `1/3`. It becomes an endless fraction `0.33333`.
       - So, division by powers `10` is guaranteed to work well in the decimal system, but division by `3` is not.
+      - This is important to know especially when we do financial calculations where precision is important. **(e.g. cryptocurrencies, banking, etc.)**
       - Solution:
 
         ```js
@@ -1840,13 +1880,23 @@ alert(Math.random()); // random number from 0 to 1
     20n == 20; // true -> loose equality
     ```
 
-- `MAX_SAFE_INTEGER` and `MIN_SAFE_INTEGER`:
+- Big numbers can't be used with normal numbers:
+
+  ```js
+  alert(1n + 2); // Error ❌  -> can't mix BigInt and other types
+  alert(1n + 2n); // 3
+  ```
+
+- Maximum numbers in JavaScript:
 
   - JavaScript can’t represent all numbers precisely. There’s a limit for the maximum number that can be represented precisely, and it’s called `Number.MAX_SAFE_INTEGER`.
 
     ```js
     alert(Number.MAX_SAFE_INTEGER); // 9007199254740991
     alert(Number.MIN_SAFE_INTEGER); // -9007199254740991
+
+    // also the maximum number
+    alert(Number.MAX_VALUE); // 1.7976931348623157e+308
     ```
 
 > There is only one value in JavaScript that is not equal to itself, and that is **NaN** > `console.log(NaN == NaN)` -> false
@@ -2094,6 +2144,8 @@ It's a modern way to work with dates and times that adapts to the user's locale 
     alert('NaN' == NaN); // false (NaN is special)
     ```
 
+  - There're new **"logical assignment operators"** like `**=`, `??=`, `&&=`, `||=` introduced in ES6, where `a ??= b` means `a = a ?? b`.
+
 ---
 
 ### Operator Precedence
@@ -2300,16 +2352,21 @@ It's used to **collect** a **variable number of arguments** into an array.
     ![nullish coalescing operator](./img/nullish%20coalescing%20operator.webp)
     - if `a` is defined, then `a`.
     - if `a` isn’t defined, then `b`.
+  - It's a way to handle default values more predictably than `||` operator.
   - Example:
 
     ```js
     let height = 0;
     console.log(height || 100); // 100
-    console.log(height ?? 100); // 0 -> because height is 0
+    console.log(height ?? 100); // 0 -> because height is 0 (and not `null` or `undefined`)
 
     let width;
     console.log(width || 100); // 100
     console.log(width ?? 100); // 100 -> because width is undefined
+
+    let condition = false;
+    console.log(condition || true); // true
+    console.log(condition ?? true); // false -> because condition is false (and not `null` or `undefined`)
     ```
 
   - It's a good replacement for `||` when we want to treat `0` or `''` as a valid value.
@@ -2320,13 +2377,17 @@ It's used to **collect** a **variable number of arguments** into an array.
   ![Optional chaining](./img/Optional%20chaining.webp)
 
   - It's a safe way to access nested object properties, even if an intermediate property doesn’t exist.
+  - It allows reading the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
   - enables you to read the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
 
     ```js
-    let user = null;
+    let user = undefined;
 
     console.log(user.address.street); // error ❌
     console.log(user?.address?.street); // undefined ✅
+
+    // this is better than using `&&` to check each property
+    console.log(user && user.address && user.address.street); // undefined ✅ but it's not clean
     ```
 
   - We can use `?.` for safe reading and deleting, but not writing
@@ -2491,24 +2552,49 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
 
 ---
 
-### event handler in forms (submitting)
+### event handler in forms
 
-The `submit` event triggers when the form is submitted, it is usually used to validate the form before sending it to the server or to abort the submission and process it in JavaScript.
+- **form input**:
 
-- There are two main ways to submit a form:
+  - The `input` event triggers when any of the form fields are changed, usually it's used to validate the form in real-time.
+  - It's a modern replacement for `change` event, as it triggers immediately after the value changes, not when the field is blurred.
 
-  1. click on `<input type="submit">` or `<input type="image">`
-  2. press **Enter** on an input field.
+  ```html
+  <form id="form">
+    <input type="text" name="login" id="inputLogin" />
+    <input type="password" name="password" id="inputPassword" />
+  </form>
 
-> **Default behavior for form-submission:**
->
-> - it creates a params string for the inputs in the form-body, then make a network request to the current address in the URL with these params
->   ![form submission](./img/form-submission.png)
+  <script>
+    const formEl = document.getElementById('form');
+    formEl.addEventListener('input', function (e) {
+      const { name, value } = e.target;
+      // saving to sessionStorage
+      const formData = JSON.parse(sessionStorage.getItem('formData')) || {};
+      formData[name] = value;
+      sessionStorage.setItem('formData', JSON.stringify(formData));
+    });
+  </script>
+  ```
 
-- always use `e.preventDefault();` on form buttons as it defaults to refresh the page
-- try not to give a name attribute with value `"submit"` to a button as it might conflict and override with a `form.submit()` method
-- to remove focus from input field : `inputLogin.blur();`
-- **Note:** always use `e.preventDefault();` on hyperlinks `<a>` which has a `href="#"` and you want it to do something like ( show pop-up window ) as it defaults to go to top
+- **form submission**:
+
+  - The `submit` event triggers when the form is submitted, it is usually used to validate the form before sending it to the server or to abort the submission and process it in JavaScript.
+
+  - There are two main ways to submit a form:
+
+    1. click on `<input type="submit">` or `<input type="image">`
+    2. press **Enter** on an input field.
+
+  > **Default behavior for form-submission:**
+  >
+  > - it creates a params string for the inputs in the form-body, then make a network request to the current address in the URL with these params
+  >   ![form submission](./img/form-submission.png)
+
+  - always use `e.preventDefault();` on form buttons as it defaults to refresh the page
+  - try not to give a name attribute with value `"submit"` to a button as it might conflict and override with a `form.submit()` method
+  - to remove focus from input field : `inputLogin.blur();`
+  - **Note:** always use `e.preventDefault();` on hyperlinks `<a>` which has a `href="#"` and you want it to do something like ( show pop-up window ) as it defaults to go to top
 
 ---
 

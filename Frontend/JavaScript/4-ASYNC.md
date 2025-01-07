@@ -47,6 +47,7 @@
     - [Custom Axios Instance](#custom-axios-instance)
   - [Network Requests](#network-requests)
     - [Fetch](#fetch)
+      - [Fetching with custom Headers](#fetching-with-custom-headers)
       - [Fetch: Abort (Canceling request)](#fetch-abort-canceling-request)
       - [Fetch: Cross-Origin Requests](#fetch-cross-origin-requests)
       - [Fetch API in depth](#fetch-api-in-depth)
@@ -71,6 +72,27 @@
 ### Is JavaScript `synchronous` or `asynchronous` ?
 
 JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability
+
+- Why not `asynchronous` by default?
+
+  ```js
+  // pause for a second
+  stopHere(1000);
+  // now we can continue
+
+  // get via AJAX
+  let data = getData('https://api.com/data');
+  // now we can use data
+  ```
+
+  - why the code above work like this?
+    - because `javascript` is `synchronous` and `single-threaded`, so it can't do multiple things at the same time, so it can't pause for a second and then continue, or get data via `AJAX` and then use it.
+    - if javascript actually stopped there, it couldn't do other things at the same time like:
+      - `AJAX` requests, `timers`.
+      - Respond to events like `click`, `hover`, `scroll`, etc.
+      - Repaint the DOM changes in the browser.
+    - so the code above will pause for a second and then get the data via `AJAX` and then use it.
+  - The solution is to use `callbacks`, `promises`, `async/await` to make `javascript` behave in an `asynchronous` way **(once async-thing is done, then do something)**
 
 - **But** when `javascript` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object in the **browser** or in **Node.js**
 - so **Javascript has no timer**, as the timer-function is **Web-browser feature**
@@ -263,6 +285,49 @@ let timerId = setTimeout(...);
 clearTimeout(timerId);
 ```
 
+- Note that the return value of `setTimeout` is a `timerId` that can be used to cancel the execution of the function using `clearTimeout`.
+
+  ```js
+  let timerId = setTimeout(() => alert('never happens'), 1000);
+  alert(timerId); // timer identifier
+
+  clearTimeout(timerId);
+  alert(timerId); // same identifier (doesn't become null after canceling)
+  ```
+
+  - ⚠️ That's why it's super important to store the `timerId` in a variable to be able to cancel it later. and not just use `setTimeout` without storing the `timerId`.
+
+- **Use cases:**
+
+  - Useful for cases when we want to cancel the execution of a function after a certain time.
+
+    ```js
+    let timerId = setTimeout(() => alert('never happens'), 1000);
+    setTimeout(() => clearTimeout(timerId), 500);
+    ```
+
+  - when unmounting (destroying) components to remove the timer from the memory.
+
+    ```js
+    useEffect(() => {
+      const timerId = setTimeout(() => {
+        console.log('This will run after 2 seconds');
+      }, 2000);
+
+      return () => clearTimeout(timerId);
+    }, []);
+    ```
+
+  - used with **"debouncing" and "throttling"** to prevent the execution of a function multiple times.
+
+    ```js
+    let timeout;
+    function debounce(func, wait) {
+      clearTimeout(timeout);
+      timeout = setTimeout(func, wait);
+    }
+    ```
+
 ---
 
 ### `setInterval()`
@@ -333,6 +398,17 @@ let timerId = setTimeout(function tick() {
 
   - The nested `setTimeout` guarantees the fixed delay (here `100ms`).
     - That’s because a new call is planned at the end of the previous one.
+
+-`clearInterval`
+
+- is used to stop the execution of `setInterval`:
+
+  ```js
+  let timerId = setInterval(() => alert('tick'), 2000);
+
+  // After doing something, stop the interval
+  clearInterval(timerId);
+  ```
 
 ---
 
@@ -491,6 +567,7 @@ It's when you have a lot of nested callbacks to execute asynchronous code in a c
 
 **Promise**: An object representing the future result of an asynchronous operation (failure or success).
 
+- It's a way for handling asynchronous code in a more readable and maintainable way.
 - Avoids callback hell by chaining `then()` and handling errors with `catch()` instead of passing callbacks to asynchronous functions like `xmlHttpRequest`.
 
 - **Executor Function**
@@ -505,7 +582,7 @@ It's when you have a lot of nested callbacks to execute asynchronous code in a c
 - **Promise Object**
 
   - The promise object returned by the new Promise constructor has these internal properties:
-  - `state`: Initially `pending`, then `fulfilled` or `rejected`.
+  - `state`: Initially `pending`, then `fulfilled` (resolved) or `rejected`.
   - `result`: Initially `undefined`, then changes to `value` or `error`.
 
 - **Syntax**
@@ -537,7 +614,7 @@ It's when you have a lot of nested callbacks to execute asynchronous code in a c
 
 ### consume promise : (Modern Way) `fetch()`
 
-It's a modern way to do `AJAX` calls, but it's not part of `javascript` but it's a **browser API** that we can use in `javascript` to make `AJAX` calls.
+`fetch` is a modern way to do `AJAX` calls, but it's not part of `javascript` but it's a **Browser API** that we can use in `javascript` to make `AJAX` calls.
 
 - In frontend programming, promises are often used for network requests. and we use the `fetch()` method to load the information from the server.
 - returns a `promise` that resolves to the`Response to that request, whether it is successful or not using the`then()`method. or rejects with an error using the`catch()` method.
@@ -693,7 +770,7 @@ A Promise object serves as a link between the executor (the “producing code”
 
   - Why do we use `.json()` method in the `fetch()` method?
 
-    - The `response` object returned by `fetch()` is a **stream**. To extract the `JSON` body content from the response, we use the `json()` method, **which also returns a `promise`** that resolves with the result of parsing the body text as `JSON`.
+    - The `response` object returned by `fetch()` is a **data stream**. To extract the `JSON` body content from the response, we use the `json()` method, **which also returns a `promise`** that resolves with the result of parsing the body text as `JSON`.
 
       ```js
       fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
@@ -859,7 +936,7 @@ const promisified = function () {
 
     ```js
     function wait(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise(resolve => setTimeout(resolve, ms)); // pass the resolve function to setTimeout to call it after the delay
     }
 
     wait(2000).then(() => console.log('2 seconds passed'));
@@ -917,9 +994,9 @@ const promisified = function () {
 They make us able to write `asynchronous code` that looks like `synchronous code`.
 ![await](./img/async_await.PNG)
 
-- By using the word `async` before a function, you convert it to an `asynchronous function`
+- `async`
 
-  - which will keep running in the background while performing the code inside of it, than when it's done => **it returns a `promise`**
+  - By using the word `async` before a function, you convert it to an `asynchronous function` which will keep running in the background while performing the code inside of it, than when it's done => **async function returns a `promise`**
   - Other values are wrapped in a resolved promise automatically.
   - It returns a promise, and we could explicitly return a promise, which would be the same.
 
@@ -936,12 +1013,32 @@ They make us able to write `asynchronous code` that looks like `synchronous code
   f().then(alert); // 1
   ```
 
-- the word `await` awaits the `result` of the promise (stops code-execution of the function until the promise is settled (fulfilled)) and give us the ability to store the fulfilled value in a variable without `then()/callbacks` 👌
+  - Note that we don't need to use `await` when calling an `async function` unless we want to get the `fulfilled` value of the promise.
 
-  ```js
-  // works only inside async functions
-  let value = await promise;
-  ```
+    ```js
+    async function f() {
+      return 1;
+    }
+    f().then(alert); // 1
+    // same as using await
+    const result = await f();
+
+    // -------------------------------------------------------------- //
+
+    async function f() {
+      await somethingThatDoSideEffects();
+    }
+    f(); // no need to use `await` or `then` here as we don't care about the result
+    ```
+
+- `await`
+
+  - it awaits the `result` of the promise (stops code-execution of the function until the promise is settled (fulfilled)) and give us the ability to store the fulfilled value in a variable without `then()/callbacks` 👌
+
+    ```js
+    // works only inside async functions
+    let value = await promise;
+    ```
 
   - `await` literally suspends the function execution until the promise settles, and then resumes it with the promise result. That doesn’t cost any CPU resources, because the JavaScript engine can do other jobs in the meantime: execute other scripts, handle events, etc.
   - If we try to use `await` in a `non-async` function, there would be a syntax error
@@ -1301,6 +1398,7 @@ They depend on each other in their order as if one failed, then all fail as well
 ![Sequence promises](./img/Sequence%20promises.PNG)
 
 ```javascript
+// using Async/Await
 const get3Countries = async function (c1, c2, c3) {
   try {
     const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
@@ -1312,6 +1410,25 @@ const get3Countries = async function (c1, c2, c3) {
   }
 };
 get3Countries('portugal', 'canada', 'tanzania');
+
+// --------------------------------------------------------------- //
+
+// using Promises
+const get3Countries = function (c1, c2, c3) {
+  getJSON(`https://restcountries.com/v3.1/name/${c1}`)
+    .then(data1 => {
+      console.log(data1[0].capital[0]);
+      return getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+    })
+    .then(data2 => {
+      console.log(data2[0].capital[0]);
+      return getJSON(`https://restcountries.com/v3.1/name/${c3}`);
+    })
+    .then(data3 => {
+      console.log(data3[0].capital[0]);
+    })
+    .catch(err => console.error(err)); // single catch block for all promises in the chain ✅
+};
 
 // --------------------------------------------------------------- //
 
@@ -1403,6 +1520,22 @@ There are 6 static methods in the `Promise` class. They are used to deal with mu
   > if one promise fails, the others will still continue to execute, but `Promise.all` won’t watch them anymore. They will probably settle, but their results will be ignored.
   >
   > `Promise.all` does nothing to cancel them, as there’s no concept of “cancellation” in promises.
+
+- Trick: we can filter out the successful promises using `.filter()` method using the `status` property of the response object.
+
+  ```js
+  Promise.all([
+    fetch(`https://restcountries.eu/rest/v2/name/egypt`),
+    fetch(`https://restcountries.eu/rest/v2/name/usa`),
+    fetch(`dummy-url`),
+    fetch(`https://restcountries.eu/rest/v2/name/germany`)
+  ])
+    .then(resArray => {
+      return resArray.filter(res => res.status === 'fulfilled').map(res => res.value);
+    })
+    .then(data => console.log(data))
+    .catch(err => console.error(err));
+  ```
 
 - `Promise.all(iterable)` allows non-promise “regular” values in iterable
 
@@ -1504,7 +1637,7 @@ Promise.race([promise1, promise2]).then(value => {
 
 Similar to `Promise.all`, but waits only for the **first fulfilled** promise and gets its result and ignores the rejected promises (even if the rejected promise is the fastest one).
 
-- takes an iterable of Promise objects. It returns a single promise that resolves as soon as **any of the promises in the iterable fulfills**
+- takes an iterable of Promise objects. It returns a single promise that resolves as soon as **any of the promises in the iterable fulfills** or rejects (if all of the promises are rejected), with the value of the fulfilled promise.
 
 ```javascript
 const promise1 = Promise.reject(0); // the fastest but isn't resolved :(
@@ -1512,8 +1645,10 @@ const promise2 = new Promise(resolve => setTimeout(resolve, 100, 'quick'));
 const promise3 = new Promise(resolve => setTimeout(resolve, 500, 'slow'));
 const promiseArr = [promise1, promise2, promise3];
 
-Promise.any(promiseArr).then(value => console.log(value));
-// expected output: "quick"
+Promise.any(promiseArr)
+  .then(value => console.log(value))
+  .catch(err => console.error('OH NO, this means all promises were rejected'));
+// expected output: "quick" -> because it's the first resolved promise
 ```
 
 ---
@@ -1715,6 +1850,44 @@ let promise = fetch(url, [options]);
       //  do what you want with data object in this function
     });
   ```
+
+---
+
+#### Fetching with custom Headers
+
+- We can add custom **headers** to the request by passing an object with `headers` to the `fetch()` method.
+
+  ```js
+  fetch('https://api.example.com', {
+    headers: {
+      'Content-Type': 'application/json', // meaning that the body is in JSON format
+      Authorization: 'Bearer ' + token // the token is a variable that holds the token value
+    }
+  });
+  ```
+
+- `Content-Type` is the type of the body of the request, and it can have different values depending on the type of the request body.
+
+  - `application/json` – the request body is in JSON format.
+  - `application/x-www-form-urlencoded` – the request body is in the standard URL-encoded form.
+  - `multipart/form-data` – the request body is in the form of a `FormData` object.
+
+    - This is commonly used when uploading files. The `FormData` object is used to hold the data that is sent to the server.
+
+      ```js
+      const formData = new FormData();
+      formData.append('name', 'John');
+      formData.append('age', 30);
+      formData.append('image', fileInputElement.files[0]); // fileInputElement is an input element of type file
+
+      fetch('https://api.example.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        body: formData
+      });
+      ```
 
 ---
 
