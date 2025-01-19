@@ -88,7 +88,7 @@
       - [Customizable font-size calculation](#customizable-font-size-calculation)
       - [Custom Audio Player](#custom-audio-player)
       - [Double Border Corners](#double-border-corners)
-      - [Rotating elements (perspective)](#rotating-elements-perspective)
+      - [Rotating elements (3D perspective)](#rotating-elements-3d-perspective)
       - [Hamburger menu that opens navbar from the right as a growing circle](#hamburger-menu-that-opens-navbar-from-the-right-as-a-growing-circle)
       - [Floating Cursor Animation](#floating-cursor-animation)
       - [Chat Messages](#chat-messages)
@@ -810,6 +810,7 @@ They're like [pseudo classes](#pseudo-classes) but they don't target a specific 
   - The universal selector `*` has no specificity and gets `0` points.
   - It's better to depend on specificity rather than the order of the rules to avoid conflicts.
   - Only depend on the order of the rules when you want to override a specific rule. Ex: using 3rd party stylesheets and you want to override some styles by adding your own stylesheet after it.
+  - **Keyframes animations have no specificity**, so they can't be overridden by adding `!important` to the styles. Instead, you can use the `animation-name` property to override it.
 
 ---
 
@@ -2196,6 +2197,23 @@ Images have intrinsic sizes. These dimensions come from the image file itself, l
     }
     ```
 
+  - Another use-case is when we have multiple images with different sizes and we want to make them have the same aspect ratio.
+
+    ```css
+    img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+    }
+    ```
+
+    - Here, we had multiple images with different widths & heights, and when we set the `width` to `100%`, the images had the same width but different heights, so we used `aspect-ratio` to make the images have the same aspect ratio.
+      ![aspect-ratio](./img/images-aspect-ratio-example-1.png)
+      ![aspect-ratio](./img/images-aspect-ratio-example-2.png)
+      ![aspect-ratio](./img/images-aspect-ratio-example-3.png)
+
+    - Another enhancement would be to only apply the `aspect-ratio` property if it's supported by the browser, so we can use the `@supports` rule.
+      ![aspect-ratio](./img/images-aspect-ratio-example-4.png)
+
 ---
 
 ### Transforming Images
@@ -3539,12 +3557,9 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 
 ---
 
-#### Rotating elements (perspective)
+#### Rotating elements (3D perspective)
 
 - when using 3d animation / transform => use `perspective` property on the parent element
-
-  - it's used to give the 3d effect to the child elements (the lower the value, the more the 3d effect)
-    ![perspective](./img/perspective-1.jpeg)
 
   ```css
   .card {
@@ -3555,6 +3570,10 @@ Double borders on just the corner of some boxes may seem impossible to start wit
     transform: rotateY(180deg);
   }
   ```
+
+  - it's used to give the 3d effect to the child elements (the lower the value, the more the 3d effect)
+    ![perspective](./img/perspective-1.jpeg)
+  - If the user is right next to the screen, small changes in position will appear huge. Imagine spinning a card that's only a few inches from your face. If the user is further away, though, that same motion will appear smaller and more subtle.
 
 - when rotating cards **180 degrees** and you want not the back of the card to be visible, we use the `backface-visibility` property:
 
@@ -3570,6 +3589,64 @@ Double borders on just the corner of some boxes may seem impossible to start wit
 
   ![backface-visibility](./img/backface-visibility.webp)
   ![backface-visibility](./img/backface-visibility2.png)
+
+- Example
+
+  ```html
+  <style>
+    .card-wrapper {
+      perspective: 500px; /* 3d effect */
+    }
+    .card {
+      position: relative;
+      display: block;
+    }
+    .front,
+    .back {
+      width: 200px;
+      height: 200px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 400ms;
+      will-change: transform;
+      backface-visibility: hidden; /* To hide the back of the card */
+      /* Vendor prefix for Safari */
+      -webkit-backface-visibility: hidden;
+    }
+    .back {
+      position: absolute; /* To make it appear behind the front */
+      top: 0;
+      left: 0;
+      transform: rotateY(
+        -180deg
+      ); /* To make it appear behind the front as it will be hidden because of backface-visibility */
+    }
+    .card:hover .front,
+    .card:focus .front {
+      transform: rotateY(180deg);
+    }
+    .card:hover .back,
+    .card:focus .back {
+      transform: rotateY(0deg);
+    }
+  </style>
+
+  <div class="card-wrapper">
+    <a href="/" class="card">
+      <div class="front">
+        <p>Hello World</p>
+      </div>
+      <div class="back">
+        <p>This is the back</p>
+      </div>
+    </a>
+  </div>
+  ```
+
+- Another example: [Folding the DOM](https://www.joshwcomeau.com/react/folding-the-dom/)
 
 ---
 

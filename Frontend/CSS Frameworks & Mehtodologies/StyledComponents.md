@@ -559,7 +559,7 @@ const SignUpButton = styled.button`
 
 ## Animation
 
-Styled components have a **keyframes** helper that assists with constructing (reusable) animation keyframes. The advantage here is that the keyframes will be detached from the styled components and can be exported and reused wherever needed.
+Styled components have a **`keyframes`** helper that assists with constructing (reusable) animation keyframes. The advantage here is that the keyframes will be detached from the styled components and can be exported and reused wherever needed.
 
 ```js
 import styled, { keyframes } from 'styled-components';
@@ -581,6 +581,17 @@ const Toast = styled.div`
   position: fixed;
 `;
 ```
+
+- The keyframes function is called using tagged template literals, just like the styled helper functions.
+
+- To apply our animation, we interpolate it within the styles for a specific component.
+
+  - This is a good thing! While it might seem like this is a pointless bit of added friction, it comes with a terrific **advantage: it removes the possibility for naming conflicts**.
+  - In vanilla CSS, `@keyframes` definitions are global. If we create a keyframe animation called fadeIn, any component anywhere in our application can use this animation. If another developer on our team also decides to name their animation fadeIn, one of the animations will overwrite the other.
+
+  - In styled-components, each animation is given a unique, random name, just like the component classes! Under the hood, this `slideIn` animation might actually be named `exvRVV` or `BozTiK`.
+
+  - Beyond this one difference, keyframe animations created in styled-components function exactly like `@keyframes` statements written in vanilla CSS.
 
 ---
 
