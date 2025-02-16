@@ -105,6 +105,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Frontend](./Frontend/General/Frontend.md)
 - [Performance](./Frontend/General/FE-Performance.md)
 - [Rendering-Methods](./Frontend/General/FE-Rendering-Methods.md)
+- [UI Components & Libraries](./Frontend/General/FE-UI-Components-Libraries.md)
 - [PWA](./Frontend/General/FE-PWA.md)
 
 ### HTML & CSS
@@ -117,6 +118,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Responsive-Web-Design](./Frontend/HTML-CSS/6-Responsive-Web-Design.md)
 - [Web-UX-Design](./Frontend/HTML-CSS/7-Web-UX-Design.md)
 - [Accessibility](./Frontend/HTML-CSS/8-Accessibility.md)
+- [CSS Tricks](./Frontend/HTML-CSS/9-CSS-Tricks.md)
 
 ### CSS Methodologies & Frameworks
 
@@ -127,6 +129,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [Tailwind](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/Tailwind.md)
 - [PostCSS](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/PostCSS.md)
 - [Styled Components](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/StyledComponents.md)
+- [CSS Modules](./Frontend/CSS%20Frameworks%20%26%20Mehtodologies/CSS-Modules.md)
 
 ---
 
@@ -137,6 +140,7 @@ This repository contains notes from my learning Journey to be a reference for an
 - [DOM](./Frontend/JavaScript/3-DOM.md)
 - [ASYNC](./Frontend/JavaScript/4-ASYNC.md)
 - [APIs](./Frontend/JavaScript/5-Web-APIs.md)
+- [Animation with JS](./Frontend/JavaScript/13-JS-Animation.md)
 - [JS-Modules](./Frontend/JavaScript/6-JS-Modules.md)
 - [JS-Bundlers](./Frontend/JavaScript/7-JS-Bundlers.md)
 - [Package-Managers](./Frontend/JavaScript/8-Package-Managers.md)
