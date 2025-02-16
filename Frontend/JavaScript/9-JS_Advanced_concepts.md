@@ -1,21 +1,21 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Compiled vs Interpreted Language](#compiled-vs-interpreted-language)
-    - [Compiled Language](#compiled-language)
-    - [Interpreted Language](#interpreted-language)
   - [JavaScript Engine](#javascript-engine)
-    - [How the engine works ?](#how-the-engine-works-)
-    - [call-stack \& Memory-heap](#call-stack--memory-heap)
+    - [Compiler vs Interpreter vs JIT](#compiler-vs-interpreter-vs-jit)
+    - [Inside of V8 Engine](#inside-of-v8-engine)
+      - [How the engine works ?](#how-the-engine-works-)
+      - [Call-stack \& Memory-heap](#call-stack--memory-heap)
   - [Types](#types)
     - [Primitive Types vs Reference Types](#primitive-types-vs-reference-types)
+    - [Pass by Value vs Pass by Reference (Memory Alocation)](#pass-by-value-vs-pass-by-reference-memory-alocation)
     - [`null` vs `undefined`](#null-vs-undefined)
     - [Strict vs Loose Equality (`===` \& `==`)](#strict-vs-loose-equality---)
     - [Type Conversion](#type-conversion)
     - [Type Coercion](#type-coercion)
   - [Execution context](#execution-context)
     - [Scope](#scope)
-      - [Lexical scope](#lexical-scope)
+      - [Lexical Scope (Environment)](#lexical-scope-environment)
     - [Hoisting](#hoisting)
     - [`this` keyword in functions (execution context)](#this-keyword-in-functions-execution-context)
   - [Functional Programming](#functional-programming)
@@ -49,46 +49,86 @@
 
 ---
 
-## Compiled vs Interpreted Language
-
-![compiled](./img/Compiled%20Language.png)
-
-### Compiled Language
-
-- Language is written and compiled to machine code inside of an application
-- Errors are detected during compiling
-- The code won’t compile until it’s error-free
-- it `optimizes` the code as it **cashes** any repeated function.
-  - if it say `add(2,3)` function it caches its result (5) and uses it if it found the same function-call again --> **improves performance**
-- Examples: C, C++, Erlang, Go
-
-### Interpreted Language
-
-- The interpreter translates and runs code **one statement at a time**
-  - each line of code is translated to machine-code one-by-one as the script is run.
-  - the interpreter always looks for **variables** and **function declarations** before going through each section of a script, line-by-line.
-- Errors found when the code is run
-- Interpreter starts running the code quickly
-- Interpreted code runs more slowly
-- it's more fit to `javascript` as JS runs on the browser
-
-> Node.js Is an Interpreter
-
----
-
 ## JavaScript Engine
 
 The JavaScript engine is a program or an interpreter that reads and executes the JavaScript code. The most popular JavaScript engines is **V8** which is used in **Google Chrome** and **Node.js**.
+
+> **V8** is not the only javascript engine, there are a lot of other engines like **SpiderMonkey** (used in **Firefox**), **Chakra** (used in **Microsoft Edge**), **JavaScriptCore** (used in **Safari**), and **Nashorn** (used in **Java**), ... etc.
+>
+> These are called **"ECMAScript engines"** because they implement the ECMAScript standard, which JavaScript is based on.
+>
+> Google created **V8** to power its Chrome browser, and open-sourced it in 2008. before it, most engines were weak and slow, but **V8 was a game-changer**.
+
+### Compiler vs Interpreter vs JIT
+
+![compiled](./img/Compiled%20Language.png)
+
+- **Compiled Language**
+
+  - The compiler works ahead of time to convert instructions into a machine-code or lower-level form so that they can be read and executed by a computer. It runs all of the code and tries to figure out what the code does and then compiles it down into another language that is easier for the computer to read.
+  - Language is written and compiled to machine code inside of an application (before it's run).
+  - Errors are detected during compiling
+  - The code won’t compile until it’s error-free
+  - it `optimizes` the code as it **cashes** any repeated function.
+    - if it say `add(2,3)` function it caches its result (`5`) and uses it if it found the same function-call again --> **improves performance**
+  - Examples: C, C++, Erlang, Go
+  - Examples used with javascript: **Babel** (transpiles `ES6` to `ES5`), **TypeScript** (transpiles `TS` to `JS`)
+    - Both of these do exactly what compilers do. Take one language and convert into a different one!
+
+- **Interpreted Language**
+
+  - An interpreter directly executes each line of code line by line, without requiring them to be compiled into a machine language program.
+  - The interpreter translates and runs code **one statement at a time (line-by-line)**.
+    - each line of code is translated to machine-code one-by-one as the script is run.
+    - the interpreter always looks for **variables** and **function declarations** before going through each section of a script, line-by-line.
+  - Interpreters can use different strategies to increase performance. They can parse the source code and execute it immediately, translate it into more efficient machine code, execute precompiled code made by a compiler, or some combination of these.
+    - In the V8 engine, the interpreter outputs bytecode.
+  - Errors found when the code is run
+  - Interpreter starts running the code quickly
+  - Interpreted code runs more slowly
+  - it's more fit to `javascript` as JS runs on the browser
+
+  > Node.js Is an Interpreter
+
+- **Just-In-Time (JIT) Compilation**
+
+  - It's a combination of both compilers and interpreters.
+  - It compiles the code into machine code at runtime, and then executes it immediately.
+  - It's a hybrid approach that combines the best of both worlds.
+  - In modern engines:
+    - the interpreter starts reading the code line by line while the profiler watches for frequently used code and flags then passes is to the compiler to be optimized.
+    - In the end, the JavaScript engine takes the bytecode the interpreter outputs and mixes in the optimized code the compiler outputs and then gives that to the computer. This is called "Just in Time" or JIT Compiler.
+  - For example this code:
+
+    ```js
+    function add(a, b) {
+      return a + b;
+    }
+
+    for (let i = 0; i < 1000; i++) {
+      add(2, 3);
+    }
+    ```
+
+    - Here, the `add(2, 3)` function is called 1000 times, so the JIT compiler will optimize this function and cache its result to be used in the next calls.
+      - This is not possible in a pure interpreter because it doesn't know what the code does until it runs it.
+      - But it's possible in a JIT compiler because it can see the code running and optimize it as it goes (compiling it to machine code).
+
+---
+
+### Inside of V8 Engine
 
 - javascript uses best of (**Interpreted** & **Compiled**) languages ---> **Jit Compiler**
 
   ![alt](./img/js-engine-1.png)
   ![alt](./img/js-engine-2.png)
 
-- is `javascript` an interpreted language ?
-  - yes **initially**, but it evolved to use compilers as well based on the implementation, as the code is compiled to machine code first then it's executed by the engine with optimizations to the initial compiled code
+- **is `javascript` an interpreted language ?**
+  - yes **initially**, but it evolved to use "compilers" as well based on the implementation, as the code is compiled to machine-code first then it's executed by the engine with optimizations to the initial compiled code
 
-### How the engine works ?
+#### How the engine works ?
+
+![alt](./img/js-engine-3.png)
 
 1. The engine (embedded if it’s a browser) reads (**“parses”**) the script.
 2. Then it converts (**“compiles”**) the script to machine code.
@@ -96,23 +136,115 @@ The JavaScript engine is a program or an interpreter that reads and executes the
 
 > the browser's **Console** is a live interpreter of the javascript engine
 
-### call-stack & Memory-heap
+- What is that `AST` step?
+
+  - it's the **Abstract Syntax Tree** which is a tree representation of the abstract syntactic structure of source code written in a programming language.
+  - It's a tree graph of the source code that does not show every detail of the original syntax, but contains structural or content-related details. Certain things are implicit in the tree and do not need to be shown, hence the title abstract.
+  - Each node of the tree denotes a construct occurring in the source code.
+    ![ast](./img/ast-1.png)
+    ![ast](./img/ast-2.png)
+
+- What is the `Profiler` step?
+
+  - It's a tool that helps to analyze the performance of the code and to identify the parts of the code that are slow and need to be optimized, and **pass them to the `compiler` to be optimized**.
+    - It's used to monitor the code execution and to identify the parts of the code that are executed frequently.
+  - For example, if a function is called many times, the profiler will flag it and pass it to the compiler to be optimized.
+
+- **Summary:** The `Interpreter` allows us to run the code quickly, but it's not optimized. The `Profiler` watches the code execution and flags the parts that are executed frequently and sends them to the `Compiler` to be optimized. The `Compiler` optimizes the code and passes it to the `JIT Compiler
+  - All this happens as the code is running, and it's called **Just-In-Time Compilation**.
+
+#### Call-stack & Memory-heap
 
 **Heap**: a much larger part of the memory that stores everything allocated dynamically, that allows a faster code execution, and protects it from corruption and makes the execution faster.
 
-- Memory-heap: boxes which store datatypes -->error-> `memory leak`:
+- Memory-heap:
 
+  ```js
+  // tell the memory heap to allocate memory for a number
+  const number = 11;
+  // allocate memory for a string
+  const string = 'some text';
+  // allocate memory for an object and it's values
+  const person = {
+    first: 'Brittney',
+    last: 'Postma'
+  };
+  ```
+
+  - It's a space in memory where the memory allocation (storage) happens (variables, objects, functions, ... etc)
   - usually when you have values that has place in memory but not used
   - also common in **event listeners** which are always listening(waiting) for an event
+  - error-> `memory leak`
 
-- call-stack -->error-> `stack overflow`: usually from **recursion**
+- **call-stack**
+
+  - It's a data structure that indicates where the program is in its execution.
+  - It keeps track of where the program is in its execution, and what functions are currently
+  - The call stack keeps track of where we are in the code, so we can run the program in order.
   - always the first thing in it is the **global execution context** (Top-level Code / variable declared outside a function)
     ![global-execution-context](./img/global-execution-context.PNG)
+  - error-> `stack overflow`: usually from **recursion** (function calling itself) and it's not stopping
+  - Example:
+
+    ```js
+    function subtractTwo(num) {
+      return num - 2;
+    }
+
+    function calculate() {
+      const sumTotal = 4 + 5;
+      return subtractTwo(sumTotal);
+    }
+    debugger;
+    calculate();
+    ```
+
+    - Things are placed into the call stack on top and removed as they are finished. It runs in a first in last out mode. Each call stack can point to a location inside the memory heap. In the above snippet the call stack looks like this:
+
+      ```js
+      anonymous; // file is being ran
+      // CALL STACK
+
+      // hits debugger and stops the file
+      // step through each line
+
+      calculate(
+        // steps through calculate() sumTotal = 9
+        anonymous
+      );
+      // CALL STACK
+
+      // steps into subtractTwo(sumTotal) num = 9
+
+      subtractTwo; // returns 9 - 2
+      calculate(anonymous);
+      // CALL STACK
+
+      // subtractTwo() has finished and has been removed
+
+      calculate(
+        // returns 7
+        anonymous
+      )(
+        // CALL STACK
+
+        // calculate() has finished and has been removed
+
+        anonymous
+      );
+      // CALL STACK
+
+      // and finally the file is finished and is removed
+
+      // CALL STACK
+      ```
 
 > **global execution context** consists of 2 things:
 >
 > - storing variables / function in **memory** (global state)
 > - performing functions execution in the **thread of execution (call stack)** where each function gets its own **mini execution context**
+
+- JavaScript is a **single threaded language**, meaning only one thing can be executed at a time. It only has one call stack and therefore it is a synchronous language.
 
 ---
 
@@ -123,21 +255,101 @@ The JavaScript engine is a program or an interpreter that reads and executes the
 - Javascript has 2 main types of values
   ![types](./img/types-1.png)
 
-- `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack` which has a limited size (`4-8MB`)
-  ![types](./img/types-3.png)
-
-- Types:
+- **Types:**
 
   1. **primitive values** : they are the most basic data types in the language. They are **immutable** (cannot be changed) and **copied by value** (when assigning or passing).
      - There are 7 primitive types
        ![types](./img/types-2.png)
   2. **reference values** : they are more complex data types. They are **mutable** (can be changed), **copied by reference** (when assigning or passing).
+
+     - `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack` which has a limited size (`4-8MB`)
+       ![types](./img/types-3.png)
      - There are 3 types of objects: `object`, `function`, `array`.
 
-- **Memory allocation** for `primitive` vs `reference` types:
-  ![types](./img/types-4.png)
+     ```js
+     typeof []; // object
+     typeof {}; // object
+     typeof function () {}; // function 🤯
+     ```
 
-  - There's a difference in how memory is allocated for `primitive` and `reference` types. In the case of `primitive` types, the value is stored directly in the memory location, while in the case of `reference` types, the memory location stores a reference to the actual value in the `heap`.
+     - If you don't beleive me, try this:
+
+       ```js
+       function fn() {
+         console.log('hello');
+       }
+
+       fn.hi = 'hi';
+       console.log(fn.hi); // hi
+       ```
+
+- `typeof` operator:
+
+  - It's used to get the type of a variable or an expression.
+  - It returns a string indicating the type of the unevaluated operand.
+  - It's useful when you want to check the type of a variable before performing an operation on it.
+
+    ```js
+    typeof 5; // number
+    typeof 'hello'; // string
+    typeof true; // boolean
+    typeof undefined; // undefined
+    typeof null; // object
+    typeof {}; // object
+    typeof []; // object
+    typeof function () {}; // function
+    ```
+
+  - Sometimes it's not enough when figuring out the type of something specially when it's reference type, so you can these:
+
+    ```js
+    // Array.isArray() -> to check if it's an array
+    Array.isArray([]); // true
+
+    // instanceof -> to check if it's an instance of a specific object
+    [] instanceof Array; // true
+
+    // Object.prototype.toString.call() -> to get the type of the object
+    Object.prototype.toString.call([]); // [object Array]
+    ```
+
+---
+
+### Pass by Value vs Pass by Reference (Memory Alocation)
+
+![types](./img/types-5.gif)
+
+- There's a difference in how memory is allocated for `primitive` and `reference` types. In the case of `primitive` types, the value is stored directly in the memory location, while in the case of `reference` types, the memory location stores a reference to the actual value in the `heap`.
+  ![types](./img/types-4.png)
+- "Pass by value"
+
+  ```js
+  const a = 5;
+  let b = a;
+  a = a + 1;
+
+  console.log(a); // 6
+  console.log(b); // 5 -> Didn't change
+  ```
+
+  - means that a copy of the value and store it in a **new memory location**.
+  - So when we change the value of the variable, it doesn't affect the original value.
+
+- "Pass by reference"
+
+  ```js
+  const obj1 = { name: 'Ahmed' };
+  const obj2 = obj1;
+  obj1.name = 'John';
+
+  console.log(obj1.name); // John
+  console.log(obj2.name); // John -> Changed
+  ```
+
+  - means that a **reference to the value** is stored in the memory location and shared between the variables.
+  - So when we change the value of the variable, it affects the original value.
+    - **Why this might be good:** it saves memory space, as it doesn't need to store the same value in multiple locations.
+    - **Why this might be bad:** it can lead to unexpected behavior if you're not careful. like if you want to copy the value of the object to another object, you need to do a `deep copy` not a `shallow copy`.
 
 ---
 
@@ -167,6 +379,8 @@ To remember the difference, use the song "I want it that way"
   ```js
   typeof null; // object (a bug in JS)
   ```
+
+  - Super weird right? It's a long-standing bug in JS, but it's too late to fix it now. It's a quirk in the language that we have to live with.
 
 ---
 
@@ -233,11 +447,11 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
   Boolean({}); // true
   ```
 
-- ***
+---
 
 ### Type Coercion
 
-**Type coercion** is the process of implicitly converting value from one type to another.
+**Type coercion** is the process of implicitly converting value from one type to another by the JavaScript engine.
 
 > **Implicit vs Explicit**
 >
@@ -298,30 +512,47 @@ It's the environment in which javascript code is executed, it stores all the nec
 - Each function has its own Execution context, and it's created when the function is called/invoked. and all execution contexts together make the **call stack**.
   ![execution context](./img/execution-context-4.png)
 
-- **Global Execution Context**:
+- There're 2 types of execution contexts:
+  ![execution context](./img/execution-context-5.jpeg)
 
-  - It's the default execution context, and it's created when the script is loaded.
-  - It has 2 phases:
-    1. **Creation phase**:
-       - Creation of the `global object` ( `window` object in the browser)
-       - Creation of the `this` keyword (points to the `global object`)
-       - Memory allocation for `variables` and `functions` **(hoisting)**
-         - This is super important when understanding hoisting in JavaScript.
-    2. **Execution phase**:
-       - where the code is executed line by line.
-  - It consists of these parts:
-    - Local **Thread of execution** -> code that is being executed
-    - Local **Memory** -> `local variables`, `arguments passed to the function`
-    - **Scope chain** -> where the function was written
-    - **`this`** keyword -> how the function was called (not in `arrow functions`)
+  - **Global Execution Context**:
 
-- It consists of these parts:
-  ![execution context](./img/execution-context-3.png)
+    - It's the default execution context, and it's created when the script is loaded.
+    - It has 2 phases:
 
-  - Local **Thread of execution** -> code that is being executed
-  - Local **Memory** -> `local variables`, `arguments passed to the function`
-  - **Scope chain** -> where the function was written
-  - **`this`** keyword -> how the function was called (not in `arrow functions`)
+      1. **Creation phase**:
+         - Creation of the `global object` ( `window` object in the browser)
+         - Creation of the `this` keyword (points to the `global object`) -> `this` keyword will be automatically defined with value `window` in the global execution context.
+         - Memory allocation for `variables` and `functions` **(hoisting)**
+           - This is super important when understanding hoisting in JavaScript.
+      2. **Execution phase**:
+         - where the code is executed line by line.
+
+    - It consists of these parts:
+      ![execution context](./img/execution-context-3.png)
+
+      - Local **Thread of execution** -> code that is being executed
+      - Local **Memory** -> `local variables`, `arguments passed to the function`
+      - **Scope chain** -> where the function was written -> **Lexical / Variable Environment**
+        - This is slightly different from `closure`, the scope chain is where the function was written, while the closure is what allows a function to access variables from an outer function, even after the outer function has finished executing. it's stored in the `_proto_` property of the function.
+      - **`this`** keyword -> how the function was called (not in `arrow functions`)
+
+  - **Functional Execution Context**:
+
+    - Created when a function is called.
+    - It consists of these parts:
+      ![execution context](./img/execution-context-3.png)
+
+      - Local **Thread of execution** -> code that is being executed
+      - Local **Memory** -> `local variables`, `arguments passed to the function`
+      - **Scope chain** -> where the function was written -> **Lexical / Variable Environment**
+        ![execution context](./img/execution-context-6.png)
+
+        - This is slightly different from `closure`, the scope chain is where the function was written, while the closure is what allows a function to access variables from an outer function, even after the outer function has finished executing. it's stored in the `_proto_` property of the function.
+
+      - **`this`** keyword -> how the function was called (not in `arrow functions`)
+      - **`arguments` object** -> contains all the arguments passed to the function
+        - It's an array-like object that contains all the arguments passed to the function. the default value of `arguments` is an empty array `[]` if no arguments are passed to the function.
 
 - Example
   ![execution context](./img/execution%20context.png)
@@ -389,12 +620,13 @@ Javascript doesn't have **dynamic scope** (where the scope is determined by the 
 
 ---
 
-#### Lexical scope
+#### Lexical Scope (Environment)
 
-It's the scope that is defined at the time of writing the code, and it doesn't change when the code is executed.
+It's a scope that is defined at the time of writing the code, and it doesn't change at runtime.
 
-- It's where the function was **defined** (Functions are linked to the object they were defined within)
-- Lexical Environment has two parts:
+- It refers to the scope where a variable is declared, which remains constant regardless of where the variable is called.
+- Functions are linked to the object they were defined within.
+- Lexical Environment consists of two parts:
   1. **Environment Record**: Stores local variables.
   2. **Outer Reference**: Points to the outer lexical environment.
 
@@ -402,16 +634,21 @@ It's the scope that is defined at the time of writing the code, and it doesn't c
 
 ### Hoisting
 
-It's a JavaScript mechanism where (variables and function) **declarations** are moved to the top of their containing scope before code execution by saving them in memory before the code is executed.
+It's the javascript engine alocating memory for variables and functions before the code is executed **(during the creation phase of the execution context)**.
 
-- It makes some types of variables accessible/usable in the code before they are actually declared.
+It is the process of putting all variable and function declarations into memory during the "compile phase".
+
+- It's a JavaScript mechanism where (variables and function) **declarations** are moved to the top of their containing scope before code execution by saving them in memory before the code is executed.
+- It makes some types of variables accessible/usable in the code before they are actually declared by initializing them with `undefined`.
 
 - It's to make space in memory for a variable to be able to:
 
   - Call functions before they have been declared
   - Assign a value to a variable that has not yet been declared
 
-- Note that the declaration is hoisted, but the initialization/value is not.
+- In JavaScript, `functions` are fully hoisted, `var` variables are hoisted and initialized to `undefined`, and `let` and `const` variables are hoisted but not initialized a value.
+
+  - Note that the declaration is hoisted, but the initialization/value is not.
 
   ```js
   console.log(name); // undefined
@@ -421,12 +658,16 @@ It's a JavaScript mechanism where (variables and function) **declarations** are 
 - **variables and functions** within each execution context are created before they are executed.
   ![hoisting](./img/hoisting-1.png)
 
+  > Variable are **partially hoisted** (only the declaration is hoisted, not the initialization), while functions are **fully hoisted** (both declaration and initialization).
+
   - `var` hoisting: usually bad, as **with `var`, you can access declaration, but not the value**
 
     ```js
     console.log(name); // undefined
     var name = 'John';
     ```
+
+    - `Var` variables are given a memory allocation and initialized a value of `undefined` until they are set to a value in line. So if a var variable is used in the code before it is initialized, then it will return `undefined`.
 
   - `function` hoisting: actually pretty useful --> **must be a function declaration**
 
@@ -442,6 +683,20 @@ It's a JavaScript mechanism where (variables and function) **declarations** are 
     };
     ```
 
+    - if you use `function expression` ( `let display2 = function () {}` ) it will throw an error because it's not a function declaration, **it's a variable declaration that holds a function**.
+    - a function can be called from anywhere in the code base because it is fully hoisted. If `let` and `const` are used before they are declared, then they will throw a `reference error` because they have not yet been initialized
+
+      ```js
+      // function expression gets hoisted as undefined
+      var sing = function () {
+        console.log('uhhhh la la la');
+      };
+      // function declaration gets fully hoisted
+      function sing2() {
+        console.log('ohhhh la la la');
+      }
+      ```
+
   - `let / const` hoisting:
     ![let-hoisting](./img/let-hoisting.png)
 
@@ -452,6 +707,9 @@ It's a JavaScript mechanism where (variables and function) **declarations** are 
 
   - Before the code is executed, code is scanned for variable declarations, and for each variable, a new property is created in the variable environment object and added to the memory
     ![hoisting](./img/hoisting.png)
+
+  - It doen't actually move the code to the top, it alocate memory for them before the code is executed during the "creation phase" of the execution context.
+  - It happens in every execution context, not just the global one.
 
 - Why Hoisting is useful ?
 
@@ -468,9 +726,39 @@ It's a JavaScript mechanism where (variables and function) **declarations** are 
 
     - It helps to catch errors in the code, as it throws an error if you try to access a variable before it's initialized.
 
+- **Notes**
+
+  - What will be the result of this code?
+
+    ```js
+    // variable declaration gets hoisted as undefined
+    var favoriteFood = 'grapes';
+
+    // function expression gets hoisted as undefined
+    var foodThoughts = function () {
+      // new execution context created favoriteFood = undefined
+      console.log(`Original favorite food: ${favoriteFood}`);
+
+      // variable declaration gets hoisted as undefined
+      var favoriteFood = 'sushi';
+
+      console.log(`New favorite food: ${favoriteFood}`);
+    };
+
+    foodThoughts();
+    ```
+
+    - The result will be `undefined` and `sushi`, I bet that you thought it would be `grapes` and `sushi` but here's why:
+      - As told before: **hoisting happens in every execution context**, so when the `foodThoughts` function is called, a new execution context is created, and the `favoriteFood` variable is hoisted to the top of the function and initialized as `undefined`.
+      - So `favoriteFood` inside the function gets overwritten by the `undefined` value, and that's why the result is `undefined` and `sushi`.
+
+  - **Avoid hoisting** when possible. It can cause **memory leaks** and hard to catch bugs in your code. Use `let` and `const` as your go to variables.
+
 ---
 
 ### `this` keyword in functions (execution context)
+
+> **It's the object that the function is a property of.**
 
 It's a special variable that is created for every execution context (every function), which takes the value of (points to) the “owner” of the function in which the `this` keyword is used.
 
@@ -481,17 +769,44 @@ It's a special variable that is created for every execution context (every funct
 >
 > Remember the rule: **`this` is determined by the left of the dot at the call time**, if there's no dot, it points to the global object (`window`) as `someFunction()` is the same as `window.someFunction()`
 
-- **Arrow functions**:
+- `this` is handled differently based on the type of function:
 
-  - Lexical `this`: Defined by where it was written, not called.
-  - No `this`: Taken from the outer scope (global scope, `window` object).
-  - Object methods: Still point to the global object.
-  - **Avoid using arrow functions as methods inside objects**: `this` will refer to the upper scope, usually the global object.
+  - **Arrow functions**:
 
-- **Normal functions**:
+    - Lexical `this`: Defined by where it was written, not called.
+    - No `this`: Taken from the outer scope (global scope, `window` object).
+    - Object methods: Still point to the global object.
+    - **Avoid using arrow functions as methods inside objects**: `this` will refer to the upper scope, usually the global object.
 
-  - `this` refers to the caller (dynamic scope).
-  - `this` is `undefined` if called globally if in strict mode, otherwise it points to the global `window` object.
+  - **Normal functions**:
+
+    - `this` refers to the caller (dynamic scope).
+    - `this` is `undefined` if called globally if in strict mode, otherwise it points to the global `window` object.
+
+- Benefits of `this` in functions:
+
+  - gives methods access to their object
+  - reusability: execute same code for multiple objects (use `this` to refer to the object that the function is a property of) allowing us to save memory.
+
+    ```js
+    function sayName() {
+      console.log(`My name is ${this.name}`);
+    }
+
+    const person1 = {
+      name: 'John',
+      sayName: sayName
+    };
+
+    const person2 = {
+      name: 'Jane',
+      sayName: sayName
+    };
+
+    // call the function with different objects
+    person1.sayName = sayName;
+    person2.sayName = sayName;
+    ```
 
 - **Notes**
 
@@ -524,18 +839,24 @@ It's a special variable that is created for every execution context (every funct
       name: 'John',
       sayHi_1() {
         let func = () => alert(this.name); ✅
+        // this -> user object
         func();
       },
+
       sayHi_2() {
         function func() {
           alert(this.name); // Error ❌: Cannot read property 'name' of undefined
+          // this -> window object
         }
         func();
       },
+
       sayHi_3() {
         const self = this; // use self reference variable
         function normal2() {
           alert(self.name); ✅
+          // this -> window object
+          // self -> user object
         }
         normal2();
       },
@@ -547,6 +868,45 @@ It's a special variable that is created for every execution context (every funct
     ```
 
   - without `strict mode`, `this` will point to the global object => `window`
+  - If we used `use strict`, `this` would be `undefined` in a function that is in the global scope. or that is not in a function (in the global scope directly).
+
+- What will be the result of `this` in the following code?
+
+  ```js
+  const a = {
+    name: 'a',
+    say() {
+      console.log(this);
+    }
+  };
+
+  const b = {
+    name: 'b',
+    say() {
+      return function () {
+        console.log(this);
+      };
+    }
+  };
+
+  const c = {
+    name: 'c',
+    say() {
+      return () => {
+        console.log(this);
+      };
+    }
+  };
+
+  a.say(); // a object
+  b.say()(); // window object
+  c.say()(); // c object
+  ```
+
+  - Always remember to ask the interviewer if the function is an arrow function or a normal function, as it will affect the value of `this`.
+  - In the above code, `b.say()()` will return the `window` object because it's a normal function, while `c.say()()` will return the `c` object because it's an **arrow function and it's lexically scoped**.
+    - **Ask youself: who is calling the function? (the object or the global object)**
+    - The nested function is called by the global object, so `this` will point to the global object.
 
 ---
 
@@ -1033,7 +1393,7 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 - **First-class objects**: Functions are values that can:
 
   - Be assigned to variables
-  - Be passed as arguments
+  - Be passed as arguments to other functions
   - Be returned from functions (enables **closures**)
 
 - **Higher Order Functions**: Functions that accept or return other functions (e.g., `map`, `filter`, `reduce`, `sort`, `forEach`).
@@ -1496,6 +1856,7 @@ They differ from Regular functions which return only single value (or nothing). 
   - `typeof NaN` = `Number` --> as it's **invalid number**
   - example of `NaN` -> **division on strings** -> `"apple" / 3`
   - `Nan === NaN` --> **false**
+    - because `NaN` is a special value that’s not equal to any value, including itself. and due to "Type coercion", `NaN` is not equal to `NaN` because it's not a number.
   - `alert(isNaN("str"))` --> **true**
     - behind the scenes, `isNaN()` converts its argument to a number, so `isNaN("str")` converts `"str"` to a number and then checks the result for being `NaN`, which is `true`.
 
@@ -1610,7 +1971,14 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   - `"use strict"` enables secure coding by enforcing stricter parsing and error handling.
   - Place `"use strict"` at the top of your scripts to enable it.
   - Benefits:
-    1. Forbids certain operations.
+    1. Forbids certain operations, ex:
+       - Using a variable without declaring it first.
+       - Having a default value for `this` in functions and global scope -> `this` is `undefined` in strict mode.
+       - Deleting a variable or function using the `delete` operator.
+       - Duplicating a parameter name in a function.
+       - Duplicating a property name in an object.
+       - Using `eval` or `arguments` as variable names.
+       - Using `with`.
     2. Throws errors for bad syntax instead of failing silently.
     - Example: Mistyping a variable name throws an error instead of creating a global variable.
   - **Usage**:

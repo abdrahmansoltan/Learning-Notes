@@ -22,9 +22,18 @@
     - [How `fetch()` works behind the scenes](#how-fetch-works-behind-the-scenes)
     - [Consumers: `then`, `catch`](#consumers-then-catch)
     - [Cleanup: `finally` method](#cleanup-finally-method)
-  - [consume promises](#consume-promises)
-    - [Promisification (promisify)](#promisification-promisify)
-    - [Consuming Promises with `async / await` (Modern Way 🚀)](#consuming-promises-with-async--await-modern-way-)
+    - [consume promises](#consume-promises)
+      - [Promisification (promisify)](#promisification-promisify)
+      - [Consuming Promises with `async / await` (Modern Way 🚀)](#consuming-promises-with-async--await-modern-way-)
+    - [Promise Chaining: (Sequence vs Parallel vs Race)](#promise-chaining-sequence-vs-parallel-vs-race)
+      - [Sequence promises](#sequence-promises)
+      - [Parallel promises (Promise Combinators)](#parallel-promises-promise-combinators)
+        - [`Promise.all()`](#promiseall)
+        - [`Promise.allSettled()`](#promiseallsettled)
+      - [Race promises](#race-promises)
+        - [`Promise.race()`](#promiserace)
+        - [`Promise.any()`](#promiseany)
+        - [Promise.`resolve`/`reject`](#promiseresolvereject)
   - [Error Handling](#error-handling)
     - [Handling uncaught error](#handling-uncaught-error)
     - [Handling Rejected Promises (2 ways)](#handling-rejected-promises-2-ways)
@@ -34,14 +43,6 @@
     - [Error Handling With try...catch (modern way)](#error-handling-with-trycatch-modern-way)
       - [try…catch…finally](#trycatchfinally)
     - [Global Error Handling (Global catch)](#global-error-handling-global-catch)
-  - [Promise Chaining: (Sequence vs Parallel) Promises](#promise-chaining-sequence-vs-parallel-promises)
-    - [Sequence promises](#sequence-promises)
-    - [Parallel promises (Promise Combinators)](#parallel-promises-promise-combinators)
-      - [`Promise.all()`](#promiseall)
-      - [`Promise.allSettled()`](#promiseallsettled)
-      - [`Promise.race()`](#promiserace)
-      - [`Promise.any()`](#promiseany)
-      - [Promise.`resolve`/`reject`](#promiseresolvereject)
   - [Axios](#axios)
     - [Global Axios Defaults](#global-axios-defaults)
     - [Custom Axios Instance](#custom-axios-instance)
@@ -54,8 +55,7 @@
     - [Long Polling vs WebSockets](#long-polling-vs-websockets)
       - [Long Polling](#long-polling)
       - [WebSocket](#websocket)
-  - [Microtasks](#microtasks)
-    - [Microtasks queue](#microtasks-queue)
+  - [Microtasks queue (Job queue)](#microtasks-queue-job-queue)
   - [Working with data from other servers (Proxy)](#working-with-data-from-other-servers-proxy)
   - [Notes](#notes)
 
@@ -71,7 +71,7 @@
 
 ### Is JavaScript `synchronous` or `asynchronous` ?
 
-JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability
+JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability due to its `Event Loop` which is part of the `browser` not `javascript`.
 
 - Why not `asynchronous` by default?
 
@@ -96,6 +96,9 @@ JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchrono
 
 - **But** when `javascript` runs on certain environments like **browser** or **node.js** --> it allows us to write `asynchronous functionality` like `setTimeOut()` which is not from `javascript` but it's from `window / global` object in the **browser** or in **Node.js**
 - so **Javascript has no timer**, as the timer-function is **Web-browser feature**
+- Javascript is single-threaded because the runtime has only one call stack, and it can only do one thing at a time. but when using it in the browser, it can use the `Web API's` to do things in the background and then put them back in the `callback queue` to be executed by the `event loop`.
+  ![jsRuntime](./img/js-runtime.png)
+  - In Node.js, instead of `web API's`, it uses `C++ API's` to do things in the background.
 
 > So, Javascript can behave in asynchronous way, but it doesn't do this out of the box as we have to manipulate it to be this way
 
@@ -103,10 +106,18 @@ JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchrono
 
 ## How Asynchronous code works in JavaScript
 
+Lets's start from the beginning. When you visit a web page, you run a browser to do so (Chrome, Firefox, Safari, Edge). Each browser has its own version of JavaScript Runtime with a set of Web API's, methods that developers can access from the window object.
+
+In a synchronous language, only one thing can be done at a time. Imagine an alert on the page, blocking the user from accessing any part of the page until the OK button is clicked. If everything in JavaScript that took a significant amount of time, blocked the browser, then we would have a pretty bad user experience.
+
+This is where **concurrency** and the **event loop** come in.
+
 **Concurrency model** and the **event loop** are the most important concepts in `javascript` and they are part of the **browser** not `javascript`
 
 > **Concurrency model** is how javascript engine handles multiple tasks happening at the same time and how it decides which piece of code to run next.
 > ![Concurrency model](./img/concurrency-model.png)
+>
+> Even though JavaScript is a single threaded language, there are worker threads that work in the background that don't block the main thread. Just like **a browser creates a new thread when you open a new tab**. The workers work through messages being sent, but don't have access to the full program.
 
 All this happens in the javascript engine which is part of the browser (javascript runtime)
 ![Event Loop](./img/event-loop-1.png)
@@ -116,6 +127,10 @@ All this happens in the javascript engine which is part of the browser (javascri
 Mainly its job is to always check "is the call stack empty?". If it is, then it checks the **callback queue** and **microtasks queue** and executes the oldest task (the task that is waiting the longest time to be executed) and then goes back to check the call stack again.
 
 ![Event Loop](./img/event-loop-0.png)
+
+Web API's are not something JavaScript recognizes, so the parser knows to pass it off to the browser for it to handle. When the browser has finished running its method, it puts what is needed to be ran by JavaScript into the **callback queue**.
+
+The callback queue cannot be ran until the call stack is completely empty. So, the event loop is constantly checking the call stack to see if it is empty so that it can add anything in the callback queue back into the call stack. And finally, once it is back in the call stack, it is ran and then popped off the stack.
 
 - The general algorithm of the engine:
 
@@ -144,12 +159,13 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
   - **Rendering**: Occurs only after the current task completes, regardless of its duration. Long tasks can cause the browser to become unresponsive, leading to alerts like "Page Unresponsive."
     - so changes to the DOM are painted only after the task is complete.
   - **Timers**: They may not execute exactly on time due to CPU load. After the specified delay, timers enter the callback queue and execute once the call stack is clear.
+  - Here's a [JS Runtime Playground](http://latentflip.com/loupe/?code=ZnVuY3Rpb24gcHJpbnRIZWxsbygpIHsNCiAgICBjb25zb2xlLmxvZygnSGVsbG8gZnJvbSBiYXonKTsNCn0NCg0KZnVuY3Rpb24gYmF6KCkgew0KICAgIHNldFRpbWVvdXQocHJpbnRIZWxsbywgMzAwMCk7DQp9DQoNCmZ1bmN0aW9uIGJhcigpIHsNCiAgICBiYXooKTsNCn0NCg0KZnVuY3Rpb24gZm9vKCkgew0KICAgIGJhcigpOw0KfQ0KDQpmb28oKTs%3D!!!PGJ1dHRvbj5DbGljayBtZSE8L2J1dHRvbj4%3D) to visualize the event loop.
 
 ---
 
 ### Macrotasks and Microtasks queues
 
-- **Microtasks** come solely from our code. They are usually created by promises: an execution of `.then`/`catch`/`finally` handler becomes a microtask (more [here](./05-ASYNC.md#microtasks)). Microtasks are used “under the cover” of `await` as well, as it’s another form of promise handling.
+- **Microtasks** come solely from our code. They are usually created by promises: an execution of `.then`/`catch`/`finally` handler becomes a microtask (more [here](#microtasks-queue-job-queue)). Microtasks are used “under the cover” of `await` as well, as it’s another form of promise handling.
 
 - **Immediately after every macrotask, the engine executes all tasks from microtask queue, prior to running any other macrotasks or rendering or anything else.**
 
@@ -181,10 +197,20 @@ Mainly its job is to always check "is the call stack empty?". If it is, then it 
   ```
 
 - **Web Workers**
+
   - For long heavy calculations that shouldn’t block the event loop, we can use Web Workers.
   - That’s a way to run code in another, parallel thread.
   - Web Workers can exchange messages with the main process, but they have their own variables, and their own event loop.
+
+    ```js
+    var worker = new Worker('worker.js');
+    worker.postMessage('Helloooo');
+
+    addEventListener('message');
+    ```
+
   - Web Workers do not have access to DOM, so they are useful, mainly, for calculations, to use multiple CPU cores simultaneously.
+  - More here: [Using Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
 
 ---
 
@@ -874,9 +900,9 @@ Just like there’s a finally clause in a regular `try {...} catch {...}`, there
 
 ---
 
-## consume promises
+### consume promises
 
-### Promisification (promisify)
+#### Promisification (promisify)
 
 “Promisification” is a long word for a simple transformation. It’s the conversion of a function that accepts a `callback` into a function that returns a `promise`.
 
@@ -989,7 +1015,7 @@ const promisified = function () {
 
 ---
 
-### Consuming Promises with `async / await` (Modern Way 🚀)
+#### Consuming Promises with `async / await` (Modern Way 🚀)
 
 They make us able to write `asynchronous code` that looks like `synchronous code`.
 ![await](./img/async_await.PNG)
@@ -1126,6 +1152,340 @@ asyncCall(); // this returns a promise that we can handle it using .then() or .c
     ```
 
     - Note that this blocks the module execution until the promise is settled, so it’s not recommended to use it in the main thread, because it may freeze the page.
+
+---
+
+### Promise Chaining: (Sequence vs Parallel vs Race)
+
+There are 3 ways you could want promises to resolve:
+
+1. **parallel** (all together)
+2. **sequential** (1 after another)
+3. **race** (doesn't matter who wins).
+
+```js
+const promisify = (item, delay) => new Promise(resolve => setTimeout(() => resolve(item), delay));
+
+const a = () => promisify('a', 100);
+const b = () => promisify('b', 5000);
+const c = () => promisify('c', 3000);
+
+async function parallel() {
+  const promises = [a(), b(), c()];
+  const [output1, output2, output3] = await Promise.all(promises);
+  return `parallel is done: ${output1} ${output2} ${output3}`;
+}
+
+async function sequence() {
+  const output1 = await a();
+  const output2 = await b();
+  const output3 = await c();
+  return `sequence is done: ${output1} ${output2} ${output3}`;
+}
+
+async function race() {
+  const promises = [a(), b(), c()];
+  const output1 = await Promise.race(promises);
+  return `race is done: ${output1}`;
+}
+
+sequence().then(console.log);
+parallel().then(console.log);
+race().then(console.log);
+
+// race is done: a
+// parallel is done: a b c
+// sequence is done: a b c
+```
+
+#### Sequence promises
+
+They depend on each other in their order as if one failed, then all fail as well
+![Sequence promises](./img/Sequence%20promises.PNG)
+
+```javascript
+// using Async/Await
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
+    const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+    const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`);
+    console.log([data1.capital[0], data2.capital[0], data3.capital[0]]);
+  } catch (err) {
+    console.error(err);
+  }
+};
+get3Countries('portugal', 'canada', 'tanzania');
+
+// --------------------------------------------------------------- //
+
+// using Promises
+const get3Countries = function (c1, c2, c3) {
+  getJSON(`https://restcountries.com/v3.1/name/${c1}`)
+    .then(data1 => {
+      console.log(data1[0].capital[0]);
+      return getJSON(`https://restcountries.com/v3.1/name/${c2}`);
+    })
+    .then(data2 => {
+      console.log(data2[0].capital[0]);
+      return getJSON(`https://restcountries.com/v3.1/name/${c3}`);
+    })
+    .then(data3 => {
+      console.log(data3[0].capital[0]);
+    })
+    .catch(err => console.error(err)); // single catch block for all promises in the chain ✅
+};
+
+// --------------------------------------------------------------- //
+
+// Another example
+const wait = seconds => {
+  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
+};
+
+wait(1)
+  .then(() => {
+    console.log('1 second passed');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('2 seconds passed');
+    return wait(1);
+  })
+  .then(() => {
+    console.log('3 seconds passed');
+  });
+```
+
+- **Notes:**
+
+  - We should only use this approach when the promises / requests depend on each other, and the order is important.
+  - This causes a problem, because the requests are made one after the other, so it's not efficient, because we are waiting for the first request to finish before starting the second one, and so on. **This is called `waterfall effect`**.
+    - To solve this problem, we can use [`Promise.all`](#promiseall) to make the requests in parallel.
+
+---
+
+#### Parallel promises (Promise Combinators)
+
+There are 6 static methods in the `Promise` class. They are used to deal with multiple promises at once **(in parallel)**.
+
+- [Promise.all](#promiseall)
+- [Promise.allSettled](#promiseallsettled)
+- [Promise.race](#promiserace)
+- [Promise.any](#promiseany)
+- [Promise.resolve/reject](#promiseresolvereject)
+
+> These are called **"Promise combinators"** because they combine multiple promises into one.
+
+##### `Promise.all()`
+
+- It takes an **iterable** (usually, an array of `promises`) and returns a new `promise` that resolves when all listed promises are resolved, and returns **array of their results becomes its result (in the same order)**. Also it run all the promises **in parallel**.
+
+  ```js
+  Promise.all([
+    new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
+    new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
+    new Promise(resolve => setTimeout(() => resolve(3), 1000)) // 3
+  ]).then(data => console.log(data)); // [1, 2, 3]
+  ```
+
+  - > Note that the order of the resulting array members is the same as in its source promises. Even though the first promise takes the longest time to resolve, it’s still first in the array of results.
+
+- It waits for all promises to resolve and not just the first one to resolve, and then it returns an array of the results of the promises.
+
+- takes an iterable (`array`) of promises as an input, and returns a single Promise that resolves to an `array` of the results of the input promises which you can use array methods like `map()` on it, **but** notice that in `map()` it returns array of `promises and not values`, so we should use `promise.all()` again on this array to get the values
+
+  ```js
+  let urls = [
+    'https://api.github.com/users/iliakan',
+    'https://api.github.com/users/remy',
+    'https://api.github.com/users/jeresig'
+  ];
+
+  // map every url to the promise of the fetch
+  let requests = urls.map(url => fetch(url));
+
+  // Promise.all waits until all jobs are resolved
+  Promise.all(requests).then(responses =>
+    responses.forEach(response => alert(`${response.url}: ${response.status}`))
+  );
+  ```
+
+- If any of the promises is rejected, all will be rejected, and the first rejection will be passed into `catch`.
+
+  ```js
+  Promise.all([
+    new Promise((resolve, reject) => setTimeout(() => resolve(1), 1000)),
+    new Promise((resolve, reject) => setTimeout(() => reject(new Error('Whoops!')), 2000)),
+    new Promise((resolve, reject) => setTimeout(() => resolve(3), 3000))
+  ])
+    .then(data => console.log(data))
+    .catch(err => console.error(err.message)); // Whoops!
+  ```
+
+  > if one promise fails, the others will still continue to execute, but `Promise.all` won’t watch them anymore. They will probably settle, but their results will be ignored.
+  >
+  > `Promise.all` does nothing to cancel them, as there’s no concept of “cancellation” in promises.
+
+- Trick: we can filter out the successful promises using `.filter()` method using the `status` property of the response object.
+
+  ```js
+  Promise.all([
+    fetch(`https://restcountries.eu/rest/v2/name/egypt`),
+    fetch(`https://restcountries.eu/rest/v2/name/usa`),
+    fetch(`dummy-url`),
+    fetch(`https://restcountries.eu/rest/v2/name/germany`)
+  ])
+    .then(resArray => {
+      return resArray.filter(res => res.status === 'fulfilled').map(res => res.value);
+    })
+    .then(data => console.log(data))
+    .catch(err => console.error(err));
+  ```
+
+- `Promise.all(iterable)` allows non-promise “regular” values in iterable
+
+  - Normally, Promise.all(...) accepts an iterable (in most cases an array) of promises. But if any of those objects is not a promise, it’s passed to the resulting array “as is”.
+
+    ```js
+    Promise.all([
+      new Promise((resolve, reject) => {
+        setTimeout(() => resolve(1), 1000);
+      }),
+      2,
+      3
+    ]).then(alert); // 1, 2, 3
+    ```
+
+- `async`/`await` works well with `Promise.all`
+
+  ```js
+  // wait for the array of results
+  let results = await Promise.all([
+    fetch(url1),
+    fetch(url2),
+    ...
+  ]);
+  ```
+
+---
+
+##### `Promise.allSettled()`
+
+- It waits for all promises to settle, regardless of the result. The resulting array has:
+
+  - `{status:"fulfilled", value:result}` for successful responses,
+  - `{status:"rejected", reason:error}` for errors.
+
+- returns a promise that resolves after all of the given promises have either fulfilled or rejected, with an array of objects that each describes the outcome of each promise.
+- It's different from `Promise.all` in that `Promise.allSettled` waits for all promises to settle **(even if some of them reject)**, and returns an array of objects that each describes the outcome of each promise. Unlike `Promise.all` that will reject immediately if any of the promises are rejected.
+- It is typically used when you have multiple asynchronous tasks that are not dependent on one another to complete successfully, or you'd always like to know the result of each promise.
+
+```javascript
+let urls = [
+  'https://api.github.com/users/iliakan',
+  'https://api.github.com/users/remy',
+  'https://no-such-url'
+];
+
+Promise.allSettled(urls.map(url => fetch(url))).then(results => {
+  // (*)
+  alert(results);
+  /*
+    [
+      {status: 'fulfilled', value: ...response...},
+      {status: 'fulfilled', value: ...response...},
+      {status: 'rejected', reason: ...error object...}
+    ]
+    */
+  results.forEach((result, num) => {
+    if (result.status == 'fulfilled') {
+      alert(`${urls[num]}: ${result.value.status}`);
+    }
+    if (result.status == 'rejected') {
+      alert(`${urls[num]}: ${result.reason}`);
+    }
+  });
+});
+```
+
+---
+
+#### Race promises
+
+##### `Promise.race()`
+
+Similar to `Promise.all`, but waits only for the first settled promise and gets its result (or error).
+
+- returns a promise that **fulfills or rejects** as soon as one of the promises in an iterable fulfills or rejects, with the value or reason from that promise.
+- When the first promise settles (either resolves or rejects), the fullfilled value of the promise will be the fullfilled value of the first promise to settle.
+
+```javascript
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 500, 'one');
+});
+
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, 'two');
+});
+
+Promise.race([promise1, promise2]).then(value => {
+  console.log(value);
+  // Both resolve, but promise2 is faster
+});
+// expected output: "two"
+```
+
+- When to use it?
+  - When you want to run multiple promises in parallel and take the result of the first one. e.g. slow network requests, and you want to show the result of the first request that comes back.
+
+---
+
+##### `Promise.any()`
+
+Similar to `Promise.all`, but waits only for the **first fulfilled** promise and gets its result and ignores the rejected promises (even if the rejected promise is the fastest one).
+
+- takes an iterable of Promise objects. It returns a single promise that resolves as soon as **any of the promises in the iterable fulfills** or rejects (if all of the promises are rejected), with the value of the fulfilled promise.
+
+```javascript
+const promise1 = Promise.reject(0); // the fastest but isn't resolved :(
+const promise2 = new Promise(resolve => setTimeout(resolve, 100, 'quick'));
+const promise3 = new Promise(resolve => setTimeout(resolve, 500, 'slow'));
+const promiseArr = [promise1, promise2, promise3];
+
+Promise.any(promiseArr)
+  .then(value => console.log(value))
+  .catch(err => console.error('OH NO, this means all promises were rejected'));
+// expected output: "quick" -> because it's the first resolved promise
+```
+
+---
+
+##### Promise.`resolve`/`reject`
+
+Methods `Promise.resolve` and `Promise.reject` are rarely needed in modern code, because `async/await` syntax
+
+- `Promise.resolve(value)` creates a resolved promise with the result value.
+
+  ```js
+  // same as:
+  let promise = new Promise(resolve => resolve(value));
+  ```
+
+  - The method is used for compatibility, when a function is expected to return a promise.
+
+- `Promise.reject(error)` creates a rejected promise with error.
+
+  ```js
+  // same as:
+  let promise = new Promise((resolve, reject) => reject(error));
+  ```
+
+```javascript
+// immediately resolve /reject a promise using thees methods from (promise) object
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject(new Error('Problem!')).catch(x => console.error(x)
+```
 
 ---
 
@@ -1387,297 +1747,6 @@ window.onerror = function (message, url, line, col, error) {
 > // Error: Promise Failed!
 > window.addEventListener('unhandledrejection', event => alert > event.reason);
 > ```
-
----
-
-## Promise Chaining: (Sequence vs Parallel) Promises
-
-### Sequence promises
-
-They depend on each other in their order as if one failed, then all fail as well
-![Sequence promises](./img/Sequence%20promises.PNG)
-
-```javascript
-// using Async/Await
-const get3Countries = async function (c1, c2, c3) {
-  try {
-    const [data1] = await getJSON(`https://restcountries.com/v3.1/name/${c1}`);
-    const [data2] = await getJSON(`https://restcountries.com/v3.1/name/${c2}`);
-    const [data3] = await getJSON(`https://restcountries.com/v3.1/name/${c3}`);
-    console.log([data1.capital[0], data2.capital[0], data3.capital[0]]);
-  } catch (err) {
-    console.error(err);
-  }
-};
-get3Countries('portugal', 'canada', 'tanzania');
-
-// --------------------------------------------------------------- //
-
-// using Promises
-const get3Countries = function (c1, c2, c3) {
-  getJSON(`https://restcountries.com/v3.1/name/${c1}`)
-    .then(data1 => {
-      console.log(data1[0].capital[0]);
-      return getJSON(`https://restcountries.com/v3.1/name/${c2}`);
-    })
-    .then(data2 => {
-      console.log(data2[0].capital[0]);
-      return getJSON(`https://restcountries.com/v3.1/name/${c3}`);
-    })
-    .then(data3 => {
-      console.log(data3[0].capital[0]);
-    })
-    .catch(err => console.error(err)); // single catch block for all promises in the chain ✅
-};
-
-// --------------------------------------------------------------- //
-
-// Another example
-const wait = seconds => {
-  return new Promise(resolve => setTimeout(resolve, seconds * 1000));
-};
-
-wait(1)
-  .then(() => {
-    console.log('1 second passed');
-    return wait(1);
-  })
-  .then(() => {
-    console.log('2 seconds passed');
-    return wait(1);
-  })
-  .then(() => {
-    console.log('3 seconds passed');
-  });
-```
-
-- **Notes:**
-
-  - We should only use this approach when the promises / requests depend on each other, and the order is important.
-  - This causes a problem, because the requests are made one after the other, so it's not efficient, because we are waiting for the first request to finish before starting the second one, and so on. **This is called `waterfall effect`**.
-    - To solve this problem, we can use [`Promise.all`](#promiseall) to make the requests in parallel.
-
----
-
-### Parallel promises (Promise Combinators)
-
-There are 6 static methods in the `Promise` class. They are used to deal with multiple promises at once **(in parallel)**.
-
-- [Promise.all](#promiseall)
-- [Promise.allSettled](#promiseallsettled)
-- [Promise.race](#promiserace)
-- [Promise.any](#promiseany)
-- [Promise.resolve/reject](#promiseresolvereject)
-
-> These are called **"Promise combinators"** because they combine multiple promises into one.
-
-#### `Promise.all()`
-
-- It takes an **iterable** (usually, an array of `promises`) and returns a new `promise` that resolves when all listed promises are resolved, and returns **array of their results becomes its result (in the same order)**. Also it run all the promises **in parallel**.
-
-  ```js
-  Promise.all([
-    new Promise(resolve => setTimeout(() => resolve(1), 3000)), // 1
-    new Promise(resolve => setTimeout(() => resolve(2), 2000)), // 2
-    new Promise(resolve => setTimeout(() => resolve(3), 1000)) // 3
-  ]).then(data => console.log(data)); // [1, 2, 3]
-  ```
-
-  - > Note that the order of the resulting array members is the same as in its source promises. Even though the first promise takes the longest time to resolve, it’s still first in the array of results.
-
-- It waits for all promises to resolve and not just the first one to resolve, and then it returns an array of the results of the promises.
-
-- takes an iterable (`array`) of promises as an input, and returns a single Promise that resolves to an `array` of the results of the input promises which you can use array methods like `map()` on it, **but** notice that in `map()` it returns array of `promises and not values`, so we should use `promise.all()` again on this array to get the values
-
-  ```js
-  let urls = [
-    'https://api.github.com/users/iliakan',
-    'https://api.github.com/users/remy',
-    'https://api.github.com/users/jeresig'
-  ];
-
-  // map every url to the promise of the fetch
-  let requests = urls.map(url => fetch(url));
-
-  // Promise.all waits until all jobs are resolved
-  Promise.all(requests).then(responses =>
-    responses.forEach(response => alert(`${response.url}: ${response.status}`))
-  );
-  ```
-
-- If any of the promises is rejected, all will be rejected, and the first rejection will be passed into `catch`.
-
-  ```js
-  Promise.all([
-    new Promise((resolve, reject) => setTimeout(() => resolve(1), 1000)),
-    new Promise((resolve, reject) => setTimeout(() => reject(new Error('Whoops!')), 2000)),
-    new Promise((resolve, reject) => setTimeout(() => resolve(3), 3000))
-  ])
-    .then(data => console.log(data))
-    .catch(err => console.error(err.message)); // Whoops!
-  ```
-
-  > if one promise fails, the others will still continue to execute, but `Promise.all` won’t watch them anymore. They will probably settle, but their results will be ignored.
-  >
-  > `Promise.all` does nothing to cancel them, as there’s no concept of “cancellation” in promises.
-
-- Trick: we can filter out the successful promises using `.filter()` method using the `status` property of the response object.
-
-  ```js
-  Promise.all([
-    fetch(`https://restcountries.eu/rest/v2/name/egypt`),
-    fetch(`https://restcountries.eu/rest/v2/name/usa`),
-    fetch(`dummy-url`),
-    fetch(`https://restcountries.eu/rest/v2/name/germany`)
-  ])
-    .then(resArray => {
-      return resArray.filter(res => res.status === 'fulfilled').map(res => res.value);
-    })
-    .then(data => console.log(data))
-    .catch(err => console.error(err));
-  ```
-
-- `Promise.all(iterable)` allows non-promise “regular” values in iterable
-
-  - Normally, Promise.all(...) accepts an iterable (in most cases an array) of promises. But if any of those objects is not a promise, it’s passed to the resulting array “as is”.
-
-    ```js
-    Promise.all([
-      new Promise((resolve, reject) => {
-        setTimeout(() => resolve(1), 1000);
-      }),
-      2,
-      3
-    ]).then(alert); // 1, 2, 3
-    ```
-
-- `async`/`await` works well with `Promise.all`
-
-  ```js
-  // wait for the array of results
-  let results = await Promise.all([
-    fetch(url1),
-    fetch(url2),
-    ...
-  ]);
-  ```
-
----
-
-#### `Promise.allSettled()`
-
-- It waits for all promises to settle, regardless of the result. The resulting array has:
-
-  - `{status:"fulfilled", value:result}` for successful responses,
-  - `{status:"rejected", reason:error}` for errors.
-
-- returns a promise that resolves after all of the given promises have either fulfilled or rejected, with an array of objects that each describes the outcome of each promise.
-- It's different from `Promise.all` in that `Promise.allSettled` waits for all promises to settle **(even if some of them reject)**, and returns an array of objects that each describes the outcome of each promise. Unlike `Promise.all` that will reject immediately if any of the promises are rejected.
-- It is typically used when you have multiple asynchronous tasks that are not dependent on one another to complete successfully, or you'd always like to know the result of each promise.
-
-```javascript
-let urls = [
-  'https://api.github.com/users/iliakan',
-  'https://api.github.com/users/remy',
-  'https://no-such-url'
-];
-
-Promise.allSettled(urls.map(url => fetch(url))).then(results => {
-  // (*)
-  alert(results);
-  /*
-    [
-      {status: 'fulfilled', value: ...response...},
-      {status: 'fulfilled', value: ...response...},
-      {status: 'rejected', reason: ...error object...}
-    ]
-    */
-  results.forEach((result, num) => {
-    if (result.status == 'fulfilled') {
-      alert(`${urls[num]}: ${result.value.status}`);
-    }
-    if (result.status == 'rejected') {
-      alert(`${urls[num]}: ${result.reason}`);
-    }
-  });
-});
-```
-
----
-
-#### `Promise.race()`
-
-Similar to `Promise.all`, but waits only for the first settled promise and gets its result (or error).
-
-- returns a promise that **fulfills or rejects** as soon as one of the promises in an iterable fulfills or rejects, with the value or reason from that promise.
-- When the first promise settles (either resolves or rejects), the fullfilled value of the promise will be the fullfilled value of the first promise to settle.
-
-```javascript
-const promise1 = new Promise((resolve, reject) => {
-  setTimeout(resolve, 500, 'one');
-});
-
-const promise2 = new Promise((resolve, reject) => {
-  setTimeout(resolve, 100, 'two');
-});
-
-Promise.race([promise1, promise2]).then(value => {
-  console.log(value);
-  // Both resolve, but promise2 is faster
-});
-// expected output: "two"
-```
-
-- When to use it?
-  - When you want to run multiple promises in parallel and take the result of the first one. e.g. slow network requests, and you want to show the result of the first request that comes back.
-
----
-
-#### `Promise.any()`
-
-Similar to `Promise.all`, but waits only for the **first fulfilled** promise and gets its result and ignores the rejected promises (even if the rejected promise is the fastest one).
-
-- takes an iterable of Promise objects. It returns a single promise that resolves as soon as **any of the promises in the iterable fulfills** or rejects (if all of the promises are rejected), with the value of the fulfilled promise.
-
-```javascript
-const promise1 = Promise.reject(0); // the fastest but isn't resolved :(
-const promise2 = new Promise(resolve => setTimeout(resolve, 100, 'quick'));
-const promise3 = new Promise(resolve => setTimeout(resolve, 500, 'slow'));
-const promiseArr = [promise1, promise2, promise3];
-
-Promise.any(promiseArr)
-  .then(value => console.log(value))
-  .catch(err => console.error('OH NO, this means all promises were rejected'));
-// expected output: "quick" -> because it's the first resolved promise
-```
-
----
-
-#### Promise.`resolve`/`reject`
-
-Methods `Promise.resolve` and `Promise.reject` are rarely needed in modern code, because `async/await` syntax
-
-- `Promise.resolve(value)` creates a resolved promise with the result value.
-
-  ```js
-  // same as:
-  let promise = new Promise(resolve => resolve(value));
-  ```
-
-  - The method is used for compatibility, when a function is expected to return a promise.
-
-- `Promise.reject(error)` creates a rejected promise with error.
-
-  ```js
-  // same as:
-  let promise = new Promise((resolve, reject) => reject(error));
-  ```
-
-```javascript
-// immediately resolve /reject a promise using thees methods from (promise) object
-Promise.resolve('abc').then(x => console.log(x));
-Promise.reject(new Error('Problem!')).catch(x => console.error(x)
-```
 
 ---
 
@@ -2073,23 +2142,41 @@ The WebSocket protocol, provides a way to exchange data between browser and serv
 
 ---
 
-## Microtasks
+## Microtasks queue (Job queue)
 
 > Don't mix this with the Macrotasks, find more here [Macrotasks and Microtasks](./00-JS_Advanced_concepts.md#macrotasks-and-microtasks)
+
+The **job queue or microtask queue** came about with `Promise` in **ES6**. With `promises` we needed another callback queue that would give higher priority to promise calls. **The JavaScript engine is going to check the job queue before the callback queue**.
 
 - Promise handlers `.then`/`.catch`/`.finally` are always **Asynchronous**.
 
   - Even when a Promise is immediately resolved
 
   ```js
-  let promise = Promise.resolve();
-  promise.then(() => alert('promise done!'));
-  alert('code finished'); // this alert shows first
+  // 1 Callback Queue ~ Task Queue
+  setTimeout(() => {
+    console.log('1', 'is the loneliest number');
+  }, 0);
+  setTimeout(() => {
+    console.log('2', 'can be as bad as one');
+  }, 10);
+
+  // 2 Job Queue ~ Microtask Queue
+  Promise.resolve('hi').then(data => console.log('2', data));
+
+  // 3
+  console.log('3', 'is a crowd');
+
+  // ---------- Output ---------- //
+
+  // 3 is a crowd
+  // 2 hi
+  // undefined Promise resolved
+  // 1 is the loneliest number
+  // 2 can be as bad as one
   ```
 
-### Microtasks queue
-
-Asynchronous tasks need proper management. For that, the **ECMA** standard specifies an internal queue `PromiseJobs`, more often referred to as the “microtask queue” (V8 term).
+- Asynchronous tasks need proper management. For that, the **ECMA** standard specifies an internal queue `PromiseJobs`, more often referred to as the “microtask queue” (V8 term).
 
 - The queue is first-in-first-out **(FIFO)**: tasks enqueued first are run first.
 - Execution of a task is initiated only when nothing else is running.
@@ -2115,6 +2202,9 @@ Asynchronous tasks need proper management. For that, the **ECMA** standard speci
 
 ## Notes
 
+- Javascript is a **single-threaded** language, which means that **it has only one call stack** and can do one thing at a time.
+- timers, promises, and I/O operations are all part of the `web-api` in the browser, and not part of the `javascript` language (not inside the `V8` engine).
+  ![web-api](./img/web-api.png)
 - if you are using hosted version of an Api => don't forget to put `defer` in the `<script>` part of it in the HTML `<head>`
 - in `event loop` :
   - `callback functions` that are coming from **promises** go to **microTasks queue** not the `callback queue`.

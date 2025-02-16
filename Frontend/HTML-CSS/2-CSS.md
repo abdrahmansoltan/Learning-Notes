@@ -21,8 +21,10 @@
   - [Box Model](#box-model)
     - [Box Sizing width \& height calculation (Content)](#box-sizing-width--height-calculation-content)
     - [Padding](#padding)
+      - [Optical Alignment](#optical-alignment)
     - [Border](#border)
       - [Border radius](#border-radius)
+      - [Nested Border Radiuses](#nested-border-radiuses)
     - [Outline](#outline)
     - [Margin](#margin)
       - [Auto margins](#auto-margins)
@@ -30,8 +32,11 @@
     - [Box model notes](#box-model-notes)
   - [Colors](#colors)
     - [HSL Colors](#hsl-colors)
-    - [Linear Gradient](#linear-gradient)
-    - [Animated gradient](#animated-gradient)
+    - [Gradients](#gradients)
+      - [Linear Gradient](#linear-gradient)
+      - [Radial Gradient](#radial-gradient)
+      - [Conic Gradient](#conic-gradient)
+      - [Animated gradient](#animated-gradient)
     - [Color Notes](#color-notes)
   - [Font \& Text](#font--text)
     - [Text Rendering](#text-rendering)
@@ -54,16 +59,27 @@
     - [Keywords](#keywords)
     - [Units Notes](#units-notes)
   - [Shadow](#shadow)
-    - [box-shadow](#box-shadow)
-    - [text-shadow](#text-shadow)
+    - [`box-shadow`](#box-shadow)
+    - [`text-shadow`](#text-shadow)
+    - [`filter: drop-shadow`](#filter-drop-shadow)
+    - [Designing Shadows](#designing-shadows)
   - [images](#images)
     - [Fit and Position of Images](#fit-and-position-of-images)
     - [Transforming Images](#transforming-images)
     - [`background` properties (Background Images)](#background-properties-background-images)
-    - [filter property](#filter-property)
+    - [CSS Filters (`filter` property)](#css-filters-filter-property)
     - [clip-path](#clip-path)
     - [Masking](#masking)
     - [Images Notes](#images-notes)
+  - [Scrolling](#scrolling)
+    - [Scrolling using CSS](#scrolling-using-css)
+    - [Scrolling using JavaScript](#scrolling-using-javascript)
+    - [Scroll Snapping](#scroll-snapping)
+    - [Scrollbar Styling](#scrollbar-styling)
+    - [Scroll Optimization](#scroll-optimization)
+  - [Focusing](#focusing)
+    - [Focus Types \& Improvements](#focus-types--improvements)
+    - [Keeping track of focus](#keeping-track-of-focus)
   - [Calculations Built in Functions](#calculations-built-in-functions)
     - [`calc()`](#calc)
     - [`clamp()`](#clamp)
@@ -77,32 +93,10 @@
   - [Browser Support (CSS Vendor Prefixes)](#browser-support-css-vendor-prefixes)
     - [Vendor Prefixes](#vendor-prefixes)
     - [Graceful Degradation](#graceful-degradation)
-  - [Notes \& Tricks](#notes--tricks)
-    - [Tricks and Techniques](#tricks-and-techniques)
-      - [Display vs Visibility](#display-vs-visibility)
-      - [How to center an element](#how-to-center-an-element)
-        - [Centering a text](#centering-a-text)
-      - [Scrolling](#scrolling)
-        - [Scrolling using CSS](#scrolling-using-css)
-        - [Scrolling using JavaScript](#scrolling-using-javascript)
-      - [Customizable font-size calculation](#customizable-font-size-calculation)
-      - [Custom Audio Player](#custom-audio-player)
-      - [Double Border Corners](#double-border-corners)
-      - [Rotating elements (3D perspective)](#rotating-elements-3d-perspective)
-      - [Hamburger menu that opens navbar from the right as a growing circle](#hamburger-menu-that-opens-navbar-from-the-right-as-a-growing-circle)
-      - [Floating Cursor Animation](#floating-cursor-animation)
-      - [Chat Messages](#chat-messages)
-      - [Facebook-style layout](#facebook-style-layout)
-      - [Spacer Component Trick](#spacer-component-trick)
-      - [Scrollable part of a container](#scrollable-part-of-a-container)
-      - [Tracking the scrollbar width](#tracking-the-scrollbar-width)
-      - [Filler Technique](#filler-technique)
-      - [Book Design](#book-design)
-      - [Grid shapes](#grid-shapes)
-      - [Full Bleed Layout](#full-bleed-layout)
-      - [Specialty story grid (news website)](#specialty-story-grid-news-website)
+  - [Notes](#notes)
     - [General Notes](#general-notes)
     - [Questions](#questions)
+    - [CSS Resources](#css-resources)
 
 ---
 
@@ -188,7 +182,10 @@
 
     - read the README.md file for instructions
 
+  - [Josh Comeau: A Modern CSS Reset](https://www.joshwcomeau.com/css/custom-css-reset/)
+
   - [A (more) Modern CSS Reset](https://piccalil.li/blog/a-more-modern-css-reset/)
+  - [CSS Tools: Reset CSS](https://meyerweb.com/eric/tools/css/reset/)
 
 - Notes:
 
@@ -551,6 +548,21 @@ Pseudo classes are used to apply styles to an element based on its current state
   - `:nth-last-child(n)` -> for every `n`th child of an element, counting from the last child
   - `:first-of-type` -> for the first child of a type
   - `:last-of-type` -> for the last child of a type
+
+    - **Note:** it only selects the first/last child of a **element-type**, not the class or id
+
+      ```css
+      /* selects the last div element */
+      div:last-of-type {
+        color: red;
+      }
+
+      /* doesn't guarantee that the last div will be red */
+      .box:last-of-type {
+        color: red;
+      }
+      ```
+
   - `:nth-of-type(n)` -> for every `n`th child of a type
   - `:only-child` -> for the only child of an element
   - `:only-of-type` -> for the only child of a type
@@ -935,8 +947,53 @@ It's the inner space between the content and the border of an element.
 
   - This pattern is shared amongst other CSS properties that have shorthand values. like `margin`, `border`, `outline`, `background`, `font`, `list-style`, `animation`, `transition`, `grid`, `flex`
 
-- Notes
-  - You will often find usage of **Asymmetric Padding** in elements that contain text, to give more space at the top and bottom of the text. This gives optical illusion that the text is more centered and easier to read. because if we didn't use it, the text will look like it's sticking to the top of the element because of the text's line-height.
+- Note: You will often find usage of **Asymmetric Padding** in elements that contain text, to give more space at the top and bottom of the text. This gives optical illusion that the text is more centered and easier to read. because if we didn't use it, the text will look like it's sticking to the top of the element because of the text's line-height. -> [Optical Alignment](#optical-alignment)
+
+#### Optical Alignment
+
+Let's suppose we have a heading inside a container with `32px` of padding:
+
+```html
+<style>
+  .card {
+    padding: 32px;
+    border-radius: 4px;
+    background: white;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+</style>
+
+<article class="card">
+  <h2>Hello World</h2>
+</article>
+```
+
+![optical alignment](./img/optical-alignment-1.png)
+
+- This box has even padding, `32px` on each side. But if we actually measure it, we'll discover that the padding is not symmetrical. The space above the text is smaller than the space below it.
+
+  - It's because we're not measuring from the container to the characters themselves. We're measuring to the text selection box:
+    ![optical alignment](./img/optical-alignment-2.png)
+
+- Instead of aligning things based on the mathematical values, we should align things based on their perceived symmetry. This is known as **optical alignment**.
+
+- To understand why this is an issue, we need to consider how typography is rendered in design software like **Figma**.
+
+  - In design software, text nodes will have a tiny amount of space around them (the reason there's more space along the bottom is for letters that descend, like `j` or `p`).
+    ![optical alignment](./img/optical-alignment-3.png)
+  - This is why our implementation won't quite look right even if we use the exact same values that we see listed in Figma! The numbers can't be trusted, because typography is handled differently between design software and the web.
+
+- So, to fix this issue, we need to adjust the padding values to make the text look more centered. We can do this by using **asymmetric padding** (more padding at the top and bottom than at the sides).
+
+  ```css
+  .card {
+    padding: 32px 40px;
+  }
+  ```
+
+> Here's a great blog post about optical alignment and pixel-perfect implementations -> [“Chasing the Pixel-Perfect Dream”](https://www.joshwcomeau.com/css/pixel-perfection/)
 
 ---
 
@@ -1003,27 +1060,193 @@ It's used to create rounded corners for an element.
   .box {
     border-radius: 10px;
   }
-
-  .box {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 30px;
-    border-bottom-left-radius: 40px;
-
-    /* Wrong ❌ */
-    border-left-radius: 10px;
-  }
   ```
 
-- If you have an element with square dimensions, you can create a circle by setting the `border-radius` to `50%`.
+  - If you only specify one value, it will be used for all corners.
+  - If you specify two values, the first value will be used for the top-left and bottom-right corners, and the second value will be used for the top-right and bottom-left corners.
 
-  ```css
-  .circle {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-  }
+- **Radius per corner**
+
+  - You can set the radius for each corner separately by using the `border-top-left-radius`, `border-top-right-radius`, `border-bottom-right-radius`, and `border-bottom-left-radius` properties.
+
+    ```css
+    .box {
+      bborder-top-left-radius: 20px;
+      border-top-right-radius: 60px;
+      border-bottom-right-radius: 40px;
+      border-bottom-left-radius: 80px;
+
+      /* or using the shorthand */
+      border-radius: 20px 60px 40px 80px;
+
+      /* Wrong ❌ -> doesn't work */
+      border-left-radius: 10px;
+    }
+    ```
+
+    ![border-radius](./img/border-radius-2.png)
+
+  - Each of these properties accepts two values: the **horizontal radius, and the vertical radius**.
+
+    ```css
+    .box {
+      border-top-left-radius: 40px 20px;
+    }
+    ```
+
+    ![border-radius](./img/border-radius-3.png)
+    ![border-radius](./img/border-radius-4.svg)
+
+  - This is how the shorthand `border-radius` works under-the-hood. When we pass a value like `32px`, that single value is used `8` times:
+    ![border-radius](./img/border-radius-5.svg)
+
+- **Percentages**
+
+  - You can use percentages to set the radius of the corners relative to the size of the element.
+
+    ```css
+    .box {
+      border-radius: 50%;
+    }
+    ```
+
+  - when we use a percentage, **the horizontal radius will be based on the `width`, and the vertical radius will be based on the `height`**.
+    ![border-radius](./img/border-radius-6.svg)
+
+    - Here's how to think about it: the ellipse will be proportional to the element itself. If our element has a width of `300px` and a height of `150px`, it will have an aspect ratio of `2:1`. When we use a single percentage value for border-radius, it produces an ellipse with the same aspect ratio.
+
+  - If you have an element with **square dimensions**, you can create a circle by setting the `border-radius` to `50%`.
+
+    ```css
+    .circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+    }
+    ```
+
+    - How it works: by setting the `border-radius` to `50%`, the radius of the corners will be half of the width and height of the element which will make it a circle.
+      ![border-radius](./img/border-radius-1.jpg)
+    - If the radius is 50%, that means the diameter is 100%. So we wind up with an ellipse that is the same width and height as the element itself. As a result, our shape becomes an ellipse:
+
+- **Shorthand**
+
+  - The `border-radius` property can also be used with the shorthand syntax to set the radius for all corners at once, or you can specify the radius for each corner separately.
+
+  - It can take up to 8 values (first 4 values for the horizontal radius, and the last 4 values for the vertical radius)
+
+    ```css
+    .box {
+      border-radius: 10px 20px 30px 40px / 50px 60px 70px 80px;
+    }
+    ```
+
+    ![border-radius](./img/border-radius-7.webp)
+
+  - If only the first 4 numbers are provided, they're copied over to the last 4:
+
+    ```css
+    .box {
+      /* These two declarations are equivalent: */
+      border-radius: 10% 20% 30% 40%;
+      border-radius: 10% 20% 30% 40% / 10% 20% 30% 40%;
+    }
+    ```
+
+  - And if only a single value is provided, it's copied over to all 8 values:
+
+    ```css
+    .box {
+      /* These two declarations are equivalent: */
+      border-radius: 100px;
+      border-radius: 100px 100px 100px 100px / 100px 100px 100px 100px;
+    }
+    ```
+
+- **Circular Radius**
+
+  - The trick is to pick a very very large value for the radius, so the browser will make the corners as round as possible, and if the value is too large, the browser will make the corners as round as possible, which will make the element a circle.
+
+    ```css
+    .circle {
+      border-radius: 9999px;
+    }
+    ```
+
+    ![border-radius](./img/border-radius-9.png)
+
+- **Blobby shapes**
+
+  - By using all 8 border-radius values, we can create some pretty nifty blobby shapes!
+  - Check out [this neat tool by 9Elements](https://9elements.github.io/fancy-border-radius)
+    ![border-radius](./img/border-radius-8.png)
+
+---
+
+#### Nested Border Radiuses
+
+- There's a common mistake people make when trying to have a rounded element in a rounded container. They try to set the `border-radius` of the inner element to be the same as the outer element, but it doesn't work as expected.
+
+  ```html
+  <style>
+    .card {
+      border-radius: 16px;
+      padding: 8px;
+    }
+    .avatar {
+      border-radius: 16px;
+    }
+  </style>
+
+  <article class="card">
+    <img class="avatar" alt="Dog avatar" src="/course-materials/article-image-spot.jpg" />
+    <h2>Spot</h2>
+    <p>Perennial Good Boy. Parlimentary candidate, district 22. Dog park YIMBY.</p>
+  </article>
   ```
+
+  ![nested-border-radius](./img/nested-border-radius-1.png)
+
+  - The corners don't quite look right, do they? Look at how chunky they are in the middle:
+    ![nested-border-radius](./img/nested-border-radius-2.png)
+  - By using the same border-radius, both corners are being rounded according to their own circles:
+    ![nested-border-radius](./img/nested-border-radius-3.png)
+  - Our corner would look more consistent if the two corners shared the same center point, like tree rings, This way This way, the corners are the same thickness all the way through:
+    ![nested-border-radius](./img/nested-border-radius-4.png)
+    ![nested-border-radius](./img/nested-border-radius-5.png)
+
+- **Solution**
+
+  - How do we calculate this? Well, our goal is to figure out the radius of the larger circle. To do that, we'll need to sum up the inner circle's radius as well as any padding or other spacing:
+    ![nested-border-radius](./img/nested-border-radius-6.png)
+    - In this case, the correct outer radius is `24px` (`16px` inner radius + `8px` padding).
+  - We can use `calc` and `CSS variables` to do this calculation for us:
+
+    ```html
+    <style>
+      .card {
+        --outer-radius: 24px;
+        --padding: 8px;
+        border-radius: var(--outer-radius);
+        padding: var(--padding);
+      }
+      .avatar {
+        border-radius: calc(var(--outer-radius) - var(--padding) /* 24px - 8px = 16px */);
+      }
+    </style>
+
+    <article class="card">
+      <img class="avatar" alt="Dog avatar" src="/course-materials/article-image-spot.jpg" />
+      <h2>Spot</h2>
+      <p>Perennial Good Boy. Parlimentary candidate, district 22. Dog park YIMBY.</p>
+    </article>
+    ```
+
+    ![nested-border-radius](./img/nested-border-radius-7.png)
+
+A lot of developers come up with nested radius values by guessing / trial-and-error. And it's surprisingly hard to come up with the perfect value that way!
+
+Hopefully, this explanation has made the process a bit more intuitive, so you can apply this logic the next time you run into this situation!
 
 ---
 
@@ -1056,6 +1279,15 @@ It's used to create rounded corners for an element.
   ```
 
   ![outline-offset](./img/outline-offset.png)
+
+- we can control the outline color using `outline-color` property
+
+  ```css
+  div {
+    outline: 2px solid;
+    outline-color: #f00;
+  }
+  ```
 
 - `outline` is an **animated property**
 - Notes:
@@ -1254,37 +1486,106 @@ p {
 
 ---
 
-### Linear Gradient
+### Gradients
+
+The CSS language has a surprisingly deep and sophisticated set of gradient functions:
+![gradients](./img/color-gradients.png)
+
+- we have the ability to specify a **gradient** for the background of a box. The gradient is created using the `background-image` property, and it can be `linear` or `radial` or `conic`.
+
+> you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
+
+#### Linear Gradient
 
 It's a way to create a gradient that changes color smoothly from one color to another.
 
 - It's created using the `linear-gradient()` function, which takes two or more color values as arguments.
 
-  ```css
-  div {
-    background-image: linear-gradient(to right, red, yellow);
-    /* or with multiple colors */
-    background-image: linear-gradient(to right, red, yellow, green, blue);
-  }
-  ```
+  - If we provide two colors to linear-gradient, it will interpolate between them, starting from the top and going down.
 
-- You can also specify the direction of the gradient by using the `to` keyword followed by a direction (top, right, bottom, left, or any angle).
+    ```css
+    div {
+      background-image: linear-gradient(red, yellow); /* top to bottom */
+    }
+    ```
 
-  ```css
-  div {
-    background-image: linear-gradient(to bottom right, red, yellow);
-    /* or */
-    background-image: linear-gradient(45deg, red, yellow);
-  }
-  ```
+  - You can also specify the direction of the gradient by using the `to` keyword followed by a direction (top, right, bottom, left, or any angle).
 
-- You can also specify the position of the color stops by adding a percentage value after the color.
+    ```css
+    div {
+      background-image: linear-gradient(to bottom right, red, yellow);
+      /* or */
+      background-image: linear-gradient(45deg, red, yellow);
+    }
+    ```
 
-  ```css
-  div {
-    background-image: linear-gradient(to right, red 20%, yellow 80%);
-  }
-  ```
+    - Note: Somewhat confusingly, the default angle for gradients is `180deg` (top to bottom). If we set it to `0deg`, the gradient would run from the (bottom to the top).
+
+  - We can pass more than two colors, to create richer gradients:
+
+    ```css
+    div {
+      background-image: linear-gradient(90deg, deeppink, red, coral, gold, white);
+    }
+    ```
+
+    ![linear-gradient](./img/linear-gradient-1.png)
+
+  - Gradients have **"color stops"**, points along the spectrum where the color is fully applied. By default, these colors will be equidistant. You can also specify the position of the color stops by adding a percentage value after the color.
+
+    ```css
+    div {
+      background-image: linear-gradient(
+        to right,
+        90deg,
+        deeppink,
+        red 10%,
+        coral 20%,
+        gold 30%,
+        white
+      );
+    }
+    ```
+
+    ![linear-gradient](./img/linear-gradient-2.png)
+
+    - We can use color stops to do something pretty neat and unexpected: we can create sharp lines by positioning the stops very close together:
+
+      ```css
+      div {
+        background-image: linear-gradient(
+          90deg,
+          deeppink 0%,
+          deeppink 9.99%,
+          red 10%,
+          /* very close to the previous color */ red 19.99%,
+          coral 20%,
+          /* very close to the previous color */ coral 29.99%,
+          gold 30%,
+          /* very close to the previous color */ gold 39.99%,
+          white 40% /* very close to the previous color */
+        );
+
+        /* I believe you can use the same color-stop value (eg. gold 40%, white 40%), but I prefer to separate them by a fraction of a percentage, to make it clear what's going on here. The visual result is the same, so this is purely a semantics concern. */
+      }
+      ```
+
+      ![linear-gradient](./img/linear-gradient-3.png)
+
+- **Gradient midpoint**
+
+  - By default, the midpoint of a gradient is at `50%`. You can change this by using the `color hints` to specify the midpoint.
+
+    ```css
+    .box.one {
+      background-image: linear-gradient(deeppink, 20%, gold);
+    }
+    .box.two {
+      background-image: linear-gradient(deeppink, 80%, gold);
+    }
+    ```
+
+    ![linear-gradient](./img/linear-gradient-4.png)
 
 - We can have more than one gradient in the same element (they will be stacked on top of each other)
 
@@ -1294,9 +1595,7 @@ It's a way to create a gradient that changes color smoothly from one color to an
   }
   ```
 
-- we have the ability to specify a **gradient** for the background of a box. The gradient is created using the `background-image` property:
-
-  - to add **overlay gradient** with one color, you make the linear-gradient with the same value for the 2 gradient colors
+- to add **overlay gradient** with one color, you make the linear-gradient with the same value for the 2 gradient colors
 
   ```css
   div {
@@ -1309,14 +1608,203 @@ It's a way to create a gradient that changes color smoothly from one color to an
   - Here, the linear-gradient is on top of the background-image, which gives an overlay look.
 
 - **Notes:**
-  - linear-gradient is a `background-image` property, so it can be applied only with either [background](#background-properties) or `background-image` properties.
+  - linear-gradient is a `background-image` property, so it can be applied only with either [background](#background-properties-background-images) or `background-image` properties.
     - `background-color` won't work ❌
-  - you can generate gradients from here [cssgradient.io](https://cssgradient.io/)
-  - There's also `radial-gradient` which is a gradient from the center to the outside
 
 ---
 
-### Animated gradient
+#### Radial Gradient
+
+It's a way to create a gradient that radiates out from a central point.
+
+- It's created using the `radial-gradient()` function, which takes two or more color values as arguments.
+
+  - If we provide two colors to `radial-gradient`, it will interpolate between them, starting (from the center and going outwards).
+
+    ```css
+    div {
+      background-image: radial-gradient(red, yellow);
+    }
+    ```
+
+  - You can also specify the shape of the gradient by using the `circle` or `ellipse` keyword.
+
+    ```css
+    div {
+      background-image: radial-gradient(circle, red, yellow);
+    }
+    ```
+
+    - The default shape is `ellipse`, so if you don't specify a shape, it will be an ellipse.
+
+  - We can pass more than two colors, to create richer gradients:
+
+    ```css
+    div {
+      background-image: radial-gradient(deeppink, red, coral, gold, white);
+    }
+    ```
+
+    ![radial-gradient](./img/radial-gradient-1.png)
+
+  - Gradients have **"color stops"**, points along the spectrum where the color is fully applied. By default, these colors will be equidistant. You can also specify the position of the color stops by adding a percentage value after the color.
+
+    ```css
+    div {
+      background-image: radial-gradient(circle, deeppink, red 10%, coral 20%, gold 30%, white);
+    }
+    ```
+
+  - We can specify the position of the gradient's center by using the `at` keyword followed by a position.
+
+    ```css
+    div {
+      background-image: radial-gradient(
+        circle at 50% 100%,
+        white 0%,
+        yellow 10%,
+        gold 20%,
+        coral 30%,
+        skyblue
+      );
+    }
+    ```
+
+    ![radial-gradient](./img/radial-gradient-2.png)
+
+    - The `at` keyword is followed by two values, which represent the `x` and `y` coordinates of the center of the gradient. These values can be percentages or lengths.
+    - It's used as a **trick** to create illusions like a **sun** or light source, and can be linked to the mouse position to create a **follow-the-mouse effect**. Here's an [example on codepen](https://codepen.io/msaetre/pen/JjqPby)
+
+---
+
+#### Conic Gradient
+
+It's the newest member of the gradient family, and it's a way to create a gradient that radiates out from a central point in a circular pattern.
+![conic-gradient](./img/conic-gradient-1.png)
+
+- It's what would happen if you took a straight line with a linear gradient, and formed it into a circle:
+  ![conic-gradient](./img/conic-gradient-2.png)
+
+- It's created using the `conic-gradient()` function, which takes two or more color values as arguments.
+
+  - If we provide two colors to `conic-gradient`, it will interpolate between them, starting from the top and **going clockwise**.
+
+    ```css
+    div {
+      background-image: conic-gradient(red, yellow);
+    }
+    ```
+
+  - We can pass more than two colors, to create richer gradients:
+
+    ```css
+    div {
+      background-image: conic-gradient(deeppink, red, coral, gold, white);
+    }
+    ```
+
+  - It supports **"color stops"** as well, and you can specify the position of the color stops by adding a percentage value after the color.
+
+    ```css
+    div {
+      background-image: conic-gradient(white 0%, yellow 10%, gold 20%, coral 30%, skyblue);
+    }
+    ```
+
+  - We can specify the position of the gradient's center by using the `from` keyword followed by a position.
+
+    ```css
+    div {
+      background-image: conic-gradient(
+        from 0deg,
+        white 0%,
+        yellow 10%,
+        gold 20%,
+        coral 30%,
+        skyblue
+      );
+    }
+    ```
+
+    - The `from` keyword is followed by a value, which represents the starting angle of the gradient. This value can be in degrees or radians.
+
+- **Smoothing the gradient out**
+
+  - By default, we wind up with a pretty harsh line running vertically through the top half. This is because our start and end colors are so different! Unlike the other gradient functions, we don't get a seamless blended result automatically with conic gradients.
+  - If our gradient ends with the same color it started with, we can create a smoother effect:
+
+    ```css
+    .box {
+      background-image: conic-gradient(
+        deeppink,
+        coral,
+        gold,
+        coral,
+        deeppink /* <-- same color! */
+      );
+    }
+    ```
+
+    ![conic-gradient](./img/conic-gradient-3.png)
+
+    - Here's a tool to help you ease gradients to make it smooth: [Easing Gradients](https://larsenwork.com/easing-gradients/)
+
+  - Alternatively, we can make all of the lines harsh, by shifting the color stops to be adjacent.
+
+    ```css
+    .box {
+      background-image: conic-gradient(
+        deeppink 0%,
+        deeppink 33.3%,
+        gold 33.4%,
+        gold 66.6%,
+        slateblue 66.7%,
+        slateblue 100%
+      );
+    }
+    ```
+
+    ![conic-gradient](./img/conic-gradient-4.png)
+
+- **Gradient angle and position**
+
+  - Linear gradients are given an angle (eg. `45deg`), and radial gradients are given a position (`circle at 50% 100%`). Conic gradients take both -> `from <angle> at <position>`
+  - Examples:
+
+    ```css
+    /* 
+    First gradient:
+      Angle: 90deg
+      Horizontal offset: 50%
+      Vertical offset: 100%
+    */
+    .box.first {
+      background-image: conic-gradient(from 90deg at 50% 100%, white, yellow, gold, coral, skyblue);
+    }
+
+    /*
+    Second gradient:
+      Angle: 270deg
+      Horizontal offset: 100%
+      Vertical offset: 25%
+    */
+    .box.second {
+      background-image: conic-gradient(
+        from 270deg at 100% 25%,
+        white,
+        yellow,
+        gold,
+        coral,
+        skyblue
+      );
+    }
+    ```
+
+    ![conic-gradient](./img/conic-gradient-5.png)
+
+---
+
+#### Animated gradient
 
 ---
 
@@ -1372,11 +1860,43 @@ It's a way to create a gradient that changes color smoothly from one color to an
 
     > **Trick** to test it when developing, instead of changing the browser or the OS settings, you apply this code for `light` mode then after finishing, you change it to `dark` mode
 
-- To check if the element's color's contrast ratio is good for accessibility, you can use the devtools to check the contrast ratio between the text color and the background color. by selecting the element in the inspector and a **tooltip** will appear with the contrast ratio.
+- **Selection Colors**
 
-  ![contrast-ratio](./img/contrast-ratio.png)
+  - You can style the selected text on the page using the `::selection` pseudo-element.
 
-  - Good contrast is above `4.5:1` for normal text and `3:1` for large text.
+    ```css
+    ::selection {
+      background-color: #ffcc00;
+      color: black;
+    }
+    ```
+
+    ![selection](./img/selection-colors.png)
+
+  - The `::selection` pseudo-element is global; we cannot use it to target selections on a specific element (eg. `.intro::selection`). Originally, this meant that we could only define a single selection style for the entire page.
+
+    - Fortunately, with CSS variables, we can apply different selection styles to different parts of the page:
+
+      ```css
+      :root {
+        --selection-bg: #ffcc00;
+        --selection-color: black;
+      }
+
+      ::selection {
+        background-color: var(--selection-bg);
+        color: var(--selection-color);
+      }
+
+      .intro {
+        --selection-bg: #ff0000;
+        --selection-color: white;
+      }
+      ```
+
+- **Color contrast for accessibility**
+
+  - details here in [Accessibility file](./8-Accessibility.md#colors)
 
 - **Color Recourses**
   - [Happy Hues](https://www.happyhues.co/) -> color palettes for your projects
@@ -2060,37 +2580,53 @@ The `percentage %` unit is sometimes a value from the parent and other times it'
 
 ## Shadow
 
-- To add shadows to elements, you can use the `box-shadow` property.
-- To add shadows to text, you can use the `text-shadow` property.
+Shadows imply elevation, and bigger shadows imply more elevation. If we use shadows strategically, we can create the illusion of depth, as if different elements on the page are floating above the background at different levels.
 
-### box-shadow
+- **Tools of the trade:** There are three main ways to apply shadows in CSS:
+  - [`box-shadow`](#box-shadow)
+  - [`text-shadow`](#text-shadow)
+  - [`filter: drop-shadow`](#filter-drop-shadow)
+
+### `box-shadow`
+
+It' the most common way to apply shadows to elements. It's used to add shadows to the entire box of an element.
 
 ![shadow](./img/shadow.webp)
 
-The first value is the horizontal offset, the second value is the vertical offset, the third value is the blur radius, and the fourth value is the color of the shadow.
+- It's based on the box model. When you apply box-shadow to an element, that element's box will cast a simulated shadow behind it.
 
-```css
-div {
-  /*           x-offset  y-offset  blur-radius  color */
-  box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.1);
-}
-```
-
-- `x-offset`: means in x-direction (horizontal)
-- `y-offset`: means in y-direction (vertical)
-- `blur-radius`: strength of blueness **(Optional)**
-  - If omitted, the shadow is a solid line like a border
-- `spread-radius`: expand or grow the radius of the shadow in all directions **(Optional)**
-- `color`: the color of box-shadow **(Optional)**
-- `inset` to add border from the inside and not outside **(Optional)** => ex:
+- The first value is the horizontal offset, the second value is the vertical offset, the third value is the blur radius, and the fourth value is the color of the shadow.
 
   ```css
-  box-shadow: inset 0 0 0 3px ##7cc0e7;
+  div {
+    /*          x-offset  y-offset  blur-radius  color */
+    box-shadow: 10px 10px 5px rgba(0, 0, 0, 0.1);
+  }
   ```
 
-  ![inset-shadow](./img/inset-shadow.jpeg)
+  - `x-offset`: means in x-direction (horizontal)
+  - `y-offset`: means in y-direction (vertical)
+  - `blur-radius`: strength of blueness **(Optional)**
+    - If omitted, the shadow is a solid line like a border
+  - `spread-radius`: expand or grow the radius of the shadow in all directions **(Optional)**
 
-- sometimes it's used instead of border, as it doesn't affect the size of the element and doesn't cause shifting of other elements
+    ```css
+    box-shadow: 10px 10px 5px 2px rgba(0, 0, 0, 0.1);
+    /*                         ^-- spread-radius */
+    ```
+
+    - If omitted, the shadow is the same size as the element
+    - If it's a positive value, the shadow will grow and expand by that amount on all sides
+    - If it's a negative value, the shadow will shrink and contract
+    - It's useful when you want to create a shadow that's larger than the element itself
+
+  - `color`: the color of box-shadow **(Optional)**
+    > The color can be any valid color value, but It's recommend to use `hsl`/`hsla`.
+    >
+    > Using a solid color like `black` produces a very aggressive shadow. We want to be more subtle than that.
+  - `inset` to add border from the inside and not outside **(Optional)**
+
+- sometimes it's used instead of `border`, as it doesn't affect the size of the element and doesn't cause shifting of other elements **(because it's not part of the box model)**
 
   ```css
   .btn:hover {
@@ -2098,9 +2634,48 @@ div {
   }
   ```
 
+- **Shadow Tricks:**
+
+  - Single-Sided Shadows
+
+    - You can create a shadow on only one side of an element by using a negative value for the `blur-radius` and `spread-radius` properties.
+
+      ```css
+      .box {
+        --blur: 8px;
+        --spread: calc(
+          var(--blur) * -1
+        ); /* negative value to make the shadow appear only on one side */
+        --offset: 12px;
+
+        box-shadow: 0px var(--offset) /* x y */ var(--blur) var(--spread) hsl(0deg 0% 0% / 0.2);
+      }
+      ```
+
+      ![single-shadow](./img/single-shadow.png)
+
+  - Inset Shadows
+
+    - You can create an inset shadow by using the `inset` keyword.
+
+      ```css
+      .box {
+        box-shadow: inset 0 0 0 3px #7cc0e7;
+        /* ___________^__________________ */
+      }
+      ```
+
+      ![inset-shadow](./img/inset-shadow.jpeg)
+
+    - Inset shadows allow us to create the illusion that an element is **lower** than its surrounding environment. This can be a very useful tool!
+    - It's sometimes needed to add a `overflow: hidden` to the parent element to hide the part of the inset-shadow that's outside the parent element due to the shadow-radius
+      ![inset-shadow-overflow](./img/inset-shadow-overflow.png)
+
 ---
 
-### text-shadow
+### `text-shadow`
+
+It's used to add shadows to text only.
 
 ![text-shadow](./img/text-shadow.jpeg)
 
@@ -2113,6 +2688,8 @@ div {
   }
   ```
 
+- One of the most common use cases for text-shadow is to increase the contrast between light-coloured text and a light background.
+
 - you can add multiple text-shadows to the same element by separating them with a comma `","`
 
   ```css
@@ -2122,6 +2699,106 @@ div {
   ```
 
 > To generate text-shadow -> [Here](https://html-css-js.com/css/generator/text-shadow/)
+
+---
+
+### `filter: drop-shadow`
+
+As we've now, the `filter` property allows us to access `SVG` filter mechanics from within the CSS language. `drop-shadow` is one of those filters!
+
+- It's used to apply a shadow to an element, but it's more flexible than `box-shadow` because it can be applied to any element, not just boxes.
+- `filter` produces a softer, more-blended shadow than `box-shadow`
+- In **Photoshop**, when you add a drop shadow to a layer, it applies that shadow to the opaque pixels in the layer. **It doesn't form a rectangle around the layer itself!** This is the same behavior you get with `filter: drop-shadow`
+  - if we use filter: drop-shadow on an image that supports transparency (eg. `png`, `gif`, `svg`), the shadow will apply to the non-transparent parts of the image:
+    ![drop-shadow](./img/filter-drop-shadow.jpg)
+  - This effect isn't limited to images, either—it works for any DOM node! like circle-shaped elements, text, etc.
+
+> With this sort of superpower, you might be wondering: what's the point of `box-shadow`? Shouldn't we just use `filter: drop-shadow` all the time?
+>
+> - The answer is: it depends. `box-shadow` is more performant than `filter: drop-shadow`, and it's more widely supported. If you're adding shadows to a lot of elements, you might want to stick with `box-shadow`. But if you need a more flexible shadow that can be applied to any element, `filter: drop-shadow` is the way to go.
+>
+> - Also, if you want to apply a shadow to an 2 elements that form a shape together, using `box-shadow` will not work as expected, but `filter: drop-shadow` will work perfectly.
+>   ![drop-shadow](./img/filter-drop-shadow-2.png)
+
+- The syntax is similar to `box-shadow`, with the same 4 values: `x-offset`, `y-offset`, `blur-radius`, and `color`. but it's used with the `filter` property
+
+  ```css
+  .myClass {
+    filter: drop-shadow(2px 2px 2px #ff0000);
+  }
+  ```
+
+  - The `drop-shadow` filter is a bit more powerful than `box-shadow` because it can be applied to any element, not just boxes.
+  - It can be used to create shadows for images, text, and even SVG elements.
+
+---
+
+### Designing Shadows
+
+Many developers, including myself, tend to create shadows haphazardly, adjusting values until they "look good". This results in inconsistent shadows across elements that break the illusion of depth. Instead, shadows should be designed systematically to create a cohesive elevation system.
+![shadows](./img/designing-shadows-1.png)
+
+In the natural world, shadows are cast from a light source. The direction of the shadows depends on the position of the light:
+![shadows](./img/designing-shadows-2.png)
+
+In general, we should decide on a single light source for all elements on the page. It's common for that light source to be above and slightly to the left:
+![shadows](./img/designing-shadows-3.png)
+
+**Here we cover three techniques for designing shadows:**
+
+1. **Positioning & Coordinating**
+
+   - If CSS had a real lighting system, we would specify a position for one or more lights. Sadly, CSS has no such thing. Instead, we shift the shadow around by specifying a horizontal offset and a vertical offset.
+   - Ensure all shadows share the same ratio for horizontal and vertical offsets to simulate a consistent light source.
+   - Example: If the horizontal offset is `2px`, the vertical offset should be `4px` (double the horizontal offset).
+
+2. **Elevations**
+
+   - Use elevations to create a consistent visual language. As an element rises:
+     - Increase the blur radius.
+     - Decrease the shadow opacity.
+   - Example: Higher elements have larger offsets, blur radii, and lighter shadows.
+
+     > If you're in a well-lit room, press your hand against your desk (or any nearby surface) and slowly lift up. Notice how the shadow changes: it moves further away from your hand (larger offset), it becomes fuzzier (larger blur radius), and it starts to fade away (lower opacity). If you're not able to move your hands, you can use reference objects in the room instead. Compare the different shadows around you.
+
+3. **Layering**
+
+   - Stack multiple shadows with varying offsets and radii for a realistic effect.
+   - Example:
+
+     ```css
+     .layered-box {
+       box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075), 0 2px 2px rgba(0, 0, 0, 0.075),
+         0 4px 4px rgba(0, 0, 0, 0.075), 0 8px 8px rgba(0, 0, 0, 0.075),
+         0 16px 16px rgba(0, 0, 0, 0.075);
+     }
+     ```
+
+   - This technique is described in detail in Tobias Ahlin's wonderful blog post, [“Smoother and Sharper Shadows with Layered box-shadow”](https://tobiasahlin.com/blog/layered-smooth-box-shadows/).
+
+   - Philipp Brumm created an **awesome tool** to help generate layered shadows: [shadows.brumm.af](https://shadows.brumm.af/)
+     ![layered-shadow](./img/layered-shadow.png)
+
+4. **Color-matched Shadows**
+
+   - Match the shadow color to the element casting it by adjusting `hue`, saturation, and lightness to avoid washed-out grey shadows.
+
+- **Fitting into a design system**
+
+  - When designing shadows, it's important to consider how they fit into a design system. Shadows should be consistent across elements to create a cohesive visual language. This consistency helps users understand the hierarchy of elements on the page.
+
+    ```css
+    :root {
+      --shadow-elevation-small: 0.5px 1px 1px hsl(var(--shadow-color) / 0.7);
+      --shadow-elevation-medium: 1px 2px 2px hsl(var(--shadow-color) / 0.7);
+      --shadow-elevation-large: 2px 4px 4px hsl(var(--shadow-color) / 0.7);
+    }
+
+    .card {
+      --shadow-color: 0deg, 0%, 50%;
+      box-shadow: var(--shadow-elevation-medium);
+    }
+    ```
 
 ---
 
@@ -2413,79 +3090,163 @@ The `background` properties are used to set the background for an element, which
 
 ---
 
-### filter property
+### CSS Filters (`filter` property)
 
-The `filter` property in CSS is used to apply visual effects to an element. It can be used to adjust the color, contrast, brightness, and more.
-![filter](./img/filter-1.jpeg)
+**CSS filters** allow us to leverage the ridiculous power of SVG filters from within CSS, wrapped up in a declarative, straightforward bow.
 
-- We can change color of image using `filter` property
+> If you're not familiar with **SVGs**, it's an image file format that allows us to create vector graphics using an HTML-like syntax
+>
+> One of the things that make SVGs so powerful is that they have a rich filter API.
+>
+> ```html
+> <svg xmlns="http://www.w3.org/2000/svg">
+>   <filter id="drop-shadow">
+>     <feGaussianBlur in="SourceAlpha" stdDeviation="5" />
+>     <feOffset dx="4" dy="8" result="offsetblur" />
+>     <feFlood flood-color="hsl(0deg 0% 0% / 0.2)" />
+>     <feComposite in2="offsetblur" operator="in" />
+>     <feMerge>
+>       <feMergeNode />
+>       <feMergeNode in="SourceGraphic" />
+>     </feMerge>
+>   </filter>
+> </svg>
+> ```
 
-  - make image color **black**
+The filter property will apply an SVG filter to the selected element, but what if we want to blur everything behind the element? That's where the `backdrop-filter` property comes in.
+
+- **`filter` property**
+
+  - The `filter` property in CSS is used to apply visual effects to an element. It can be used to adjust the color, contrast, brightness, and more. (it gives us access to the SVG filters within CSS using much easier syntax)
+    ![filter](./img/filter-1.jpeg)
+
+  - **Color Manipulation**
+
+    - make image color **black**
+
+      ```css
+      img {
+        filter: invert(100%);
+        /* or */
+        filter: brightness(0);
+      }
+      ```
+
+    - make image color **grey** =>
+
+      ```css
+      img {
+        filter: grayscale(100%);
+      }
+      /* or */
+      img {
+        filter: brightness(0.5);
+      }
+      /* or */
+      img {
+        filter: contrast(0.5) brightness(0.5) saturate(0.5);
+      }
+      ```
+
+    - boost/lower the **saturation** of the image
+
+      ```css
+      img {
+        filter: saturate(200%);
+        /* or */
+        filter: saturate(50%);
+      }
+      ```
+
+  - **Blur**
+
+    - To blur the image, you can use the `blur` value, it applies a **Gaussian blur** to the input image
+
+      ```css
+      img {
+        filter: blur(5px);
+      }
+      ```
+
+    - ⚠️ Blur notes:
+      - The `blur` filter will lead to a soft, blurred edge. If you'd prefer a sharper edge, you can add `overflow: hidden` to the parent container
+      - Blurring can be a very expensive operation, even with hardware acceleration. Be sure to test your effect on low-end devices before trying this sort of thing!
+      - Blurring is cosmetic and doesn't affect the actual image data. It's like putting a piece of frosted glass in front of the image. So for **accessibility**, you will need to use the `aria-hidden` attribute to hide the original image from screen readers.
+
+  - **Hue Rotation**
+
+    - To rotate the `hue` of the image, you can use the `hue-rotate` value, which takes an angle in degrees and shifting the colors of the image/element
+
+      ```css
+      img {
+        filter: hue-rotate(60deg);
+      }
+      ```
+
+      ![filter](./img/filter-hue-rotate.png)
+
+  - **Shadow**
+
+    - more here [`filter: drop-shadow`](#filter-drop-shadow)
+
+  - We can apply multiple filters to the same element by space-separating them
 
     ```css
     img {
-      filter: invert(100%);
-      /* or */
-      filter: brightness(0);
+      filter: grayscale(100%) blur(5px) brightness(0.5);
     }
     ```
 
-  - make image color **grey** =>
+  - `filter` property can be used with `hover` to make the image change when hovering over it (it can be transitioned to make it smooth)
 
     ```css
     img {
       filter: grayscale(100%);
+      transition: filter 0.5s;
     }
-    /* or */
-    img {
-      filter: brightness(0.5);
-    }
-    /* or */
-    img {
-      filter: contrast(0.5) brightness(0.5) saturate(0.5);
+
+    img:hover {
+      filter: grayscale(0%);
     }
     ```
 
-- To blur the image, you can use the `blur` value
+    - It can also be more performant, because filter is hardware-accelerated in browsers (it's faster than changing the color of the image using `background-image`)
 
-  ```css
-  img {
-    filter: blur(5px);
-  }
-  ```
+  - The color-manipulation filters are often used on images, but they work with any DOM nodes!
 
-- `filter` property can be used with `hover` to make the image change when hovering over it
+- **`backdrop-filter` property**
 
-  ```css
-  img {
-    filter: grayscale(100%);
-    transition: filter 0.5s;
-  }
+  - It's used to apply a filter to the area behind an element. It's like a filter applied to the background of the element, but it's applied to the area behind the element.
+    ![backdrop-filter](./img/backdrop-filter-1.png)
+  - We can apply multiple filters to the same element by space-separating them
 
-  img:hover {
-    filter: grayscale(0%);
-  }
-  ```
+    ```css
+    div {
+      backdrop-filter: blur(5px) brightness(0.5);
+    }
+    ```
 
 ---
 
 ### clip-path
 
-The `clip-path` property in CSS is used to clip an element to a specific shape or path by specifying a clipping region.
+The `clip-path` property in CSS is used to clip/trim an element to a specific shape or path by specifying a clipping region.
+
+> For a long time, we had to rely on hacky tricks like using **transparent borders** to create shapes in CSS. These days, it's way easier with clip-path.
 
 - It's used to create shapes like **circles**, **ellipses**, **polygons**, and **more**.
 
   - `circle()`
     ![clip-path](./img/clip-path-circle.png)
   - `ellipse()`
-  - `polygon()`
+  - `polygon()` -> most powerful, it takes a list of points to create a custom shape
   - `inset()`
     ![clip-path](./img/clip-path-inset.png)
     ![clip-path](./img/clip-path-inset-1.png)
     ![clip-path](./img/clip-path-inset-3.png)
   - `path()` -> to create custom shapes
 
-- It works by controlling each point of the shape (x, y) and the radius of the shape
+- It works by controlling each point of the shape `(x, y)` and the `radius` of the shape
   ![clip-path](./img/clip-path.webp)
 
 - Example:
@@ -2521,6 +3282,59 @@ The `clip-path` property in CSS is used to clip an element to a specific shape o
     ![skew background](./img/skew-background-3.png)
     - We use pseudo elements to create a **skew** effect on the background, not the element itself **(to prevent skewing the content inside the element)**
       ![skew background](./img/skew-background-2.png)
+
+- **Notes:**
+
+  - `clip-path` can be animated using `transition` or `@keyframes`
+
+    ```css
+    div {
+      clip-path: polygon(10% 10%, 90% 10%, 90% 90%, 10% 80%);
+      transition: clip-path 0.5s;
+    }
+
+    div:hover {
+      clip-path: polygon(10% 10%, 90% 10%, 90% 90%, 10% 80%);
+    }
+    ```
+
+    - ⚠️ In order for `transition` to work, **both `polygon` definitions need to have the same number of points**. It works by interpolating each point; in the example above, the first point goes from `(10%, 10%)` to `(90%, 10%)`, the second point goes from `(90%, 10%)` to `(90%, 90%)`, and so on.
+    - If you do wish to animate between two elements with a different number of points, you'll need to cheat by adding multiple points in the same spot. For example, here's how to transform a 4-pointed “stop” button into a 3-pointed “play” button:
+
+      ```css
+      .triangle {
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        transition: clip-path 250ms;
+        will-change: transform;
+      }
+
+      .triangle-wrapper:hover .triangle,
+      .triangle-wrapper:focus .triangle {
+        clip-path: polygon(0% 0%, 100% 50%, 100% 50%, 0% 100%);
+      }
+      ```
+
+    - You will notice that it's recommended to use `will-change: transform;` to improve the performance of the animation, but why `transform` not `clip-path`?
+
+      - In Chrome (and possibly other browsers), setting will-change: transform will promote the element to its own layer. Curiously, setting will-change: clip-path doesn't have the same effect. As a result, a larger surface area needs to be painted on each frame.
+
+      > Incidentally, Chrome has signaled that they're [working on implementing hardware acceleration for clip-path](https://developer.chrome.com/blog/hardware-accelerated-animations/).
+
+  - clip-path with shadows
+
+    - if you applied shadow to the element, the shadow will be applied to the whole element, and clipped, so it will not be visible, So you can move the shadow to the parent element or use `::before` pseudo-element to apply the shadow to it
+    - We need to use `filter: drop-shadow` because `box-shadow` won't contour the clipped shape, it'll add the shadow to the rectangular box-model container.
+
+    ```css
+    .wrapper {
+      filter: drop-shadow(1px 2px 4px hsl(0deg 0% 0% / 0.5));
+    }
+    .triangle {
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    }
+    ```
+
+    ![clip-path-shadow](./img/clip-path-shadow.png)
 
 ---
 
@@ -2573,12 +3387,13 @@ div {
   }
   ```
 
-- if you have an empty space between the image and the bottom-border, This is because the browser treats **inline-elements** (`display: inline`) as if the're typography, so it adds a space at the bottom as if it's a letter. (This also happens for `SVG` elements because they're inline elements)
+- if you have an empty space between the image and the bottom-border, This is because the browser treats **inline elements** (`display: inline`) as if the're typography, so it adds a space at the bottom as if it's a letter. (This also happens for `SVG` elements because they're inline elements)
   ![img](./img/img-inline.jpeg)
   - To fix this, you can:
     - make the image a **block or inline-block** element
     - set the `line-height` of the wrapper to `0`
     - make sure that you're using `box-sizing: border-box;`
+  - **⚠️ This behavior happens to all inline elements, not just images (e.g. `<a>`)**
 - `img` element can't have `::before` or `::after` pseudo-elements because it's a **replaced element** (it's not a real element in the DOM, it's replaced by the image)
 - In order to change color or `svg` image color, you can use `stroke` or `fill` properties
 
@@ -2628,6 +3443,378 @@ div {
     ```
 
     - You might think that this is not semantic, but it's okay as `div` is meant to "divide" the content, so it's okay to use it for this purpose
+
+---
+
+## Scrolling
+
+To have **smooth scrolling** when clicking on links, you can use: css or javascript
+
+### Scrolling using CSS
+
+- This doesn't work on older versions of **safari Browser**
+- It's a simple way to add smooth scrolling to your page
+- It's done by adding `scroll-behavior: smooth;` to the `html` element
+
+  ```css
+  html {
+    scroll-behavior: smooth;
+  }
+  ```
+
+- Smooth scrolling is disabled by default. The default value for the `scroll-behavior` property `is` auto, which jump-cuts the user to the new location.
+
+- For accessibility, you can add this inside a media query to disable it on devices that don't support it:
+
+  ```css
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth; /* Only enable smooth scrolling if the user hasn't disabled motion */
+    }
+  }
+  ```
+
+  - the fast-scrolling animation is exactly the sort of motion that can be problematic for some people. It can cause dizziness, nausea, or other issues. So, it's a good idea to respect the user's preferences.
+
+> `scroll-behavior` doesn't let us tweak the duration or easing of the scroll animation. It's up to the browser and the operating system.
+
+---
+
+### Scrolling using JavaScript
+
+- This works on all browsers
+- It's done by adding an event listener to the links and then using the `scrollIntoView` method to scroll to the section
+
+  ```js
+  const allLinks = document.querySelectorAll('a:link'); // get all links that have href attribute
+
+  allLinks.forEach(function (link) {
+    link.addEventListener('click', function (e) {
+      // 1. prevent default behavior
+      e.preventDefault();
+
+      // 2. get the href attribute value
+      const href = link.getAttribute('href');
+
+      // 3. Handle the scroll behavior
+      if (href === '#')
+        // Scroll back to top
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth' // 👈 smooth scrolling
+        });
+      if (href !== '#' && href.startsWith('#')) {
+        // Scroll to other links (sections with id attribute equal to the href value)
+        const sectionEl = document.querySelector(href);
+        sectionEl.scrollIntoView({ behavior: 'smooth' }); // 👈
+      }
+    });
+  });
+  ```
+
+  - By default the `scrollTo` method will inherit the scroll behavior specified in CSS (`scroll-behavior: smooth / auto;`), but you can override it by passing the `behavior` option
+
+- Another way to do it is by using a **polyfill** for older browsers
+
+  ```html
+  <script
+    defer
+    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"></script>
+  ```
+
+  - then in JS file, write the same code as above
+
+---
+
+### Scroll Snapping
+
+> This is a **must-read** blog post: [Use CSS Scroll Snap to optimize scrolling and improve user experience!](https://segmentfault.com/a/1190000040824694/en)
+
+Let's suppose that we're implementing a mobile design based around the idea of swiping side-to-side with your thumb:
+![scroll-snapping](./img/scroll-snapping.png)
+
+- **Bad Solution (won't work) ❌**
+  - We start by creating a container element with `overflow: auto`, and stuffing it with full-width elements
+  - This works, but it's loosey-goosey. With the standard momentum-based scrolling, we're flying all over the place
+    ![scroll-snapping](./img/scroll-snapping-2.webp)
+
+We want to implement scroll snapping, so that when the user stops scrolling, the scroll automatically shifts so that the nearest element is fitted to the screen.
+
+- **Good Solution (using `scroll-snap-type` and `scroll-snap-align` properties) ✅**
+
+  ```html
+  <style>
+    .wrapper {
+      scroll-snap-type: x mandatory;
+    }
+    .box {
+      scroll-snap-align: start;
+    }
+  </style>
+  <div class="wrapper">
+    <div class="box one">Item 1</div>
+    <div class="box two">Item 2</div>
+    <div class="box three">Item 3</div>
+    <div class="box four">Item 4</div>
+  </div>
+  ```
+
+  ![scroll-snapping](./img/scroll-snapping-3.webp)
+
+- How it works:
+  ![scroll-snapping](./img/scroll-snapping-1.png)
+
+  - It requires 2 properties:
+    - `scroll-snap-type`
+    - `scroll-snap-align`
+  - We need to use both of them so that we need to tell the browser:
+    - which container we want to manages the scroll snapping (ususally the one with `overflow: auto`) -> **scroll snapping container**
+    - which elements/children will snap to the container & what part of the them will snap -> **scroll snapping children**
+
+- `scroll-snap-type`
+
+  - controls the direction and precision of the scroll snapping
+  - tells the browser to snap to the nearest element in the x-axis when the user stops scrolling
+  - it's applied to the **container element** that we want to scroll through
+  - values:
+    - `mandatory` means that the element will always snap, no matter what. If the element has been scrolled by `49%`, it will snap back to the beginning. If it's `51%`, it'll jump to the next one:
+    - `proximity` is more subtle, and it only triggers a snap when the user is near a snap point:
+
+- `scroll-snap-align`
+  - controls which part of the child we want to snap
+  - tells the browser to snap the start of the element to the start of the container
+  - lets us set the snap point for the children. In this case, we chose `start`, since we want the left edge of the element to snap to the left edge of the container.
+  - It's applied to the **child elements** that we want to snap to
+  - values:
+    ![scroll-snap-align](./img/scroll-snap-align-1.jpg)
+    ![scroll-snap-align](./img/scroll-snap-align-2.png)
+    - `start` means that the start of the element will snap to the start of the container
+    - `center` means that the center of the element will snap to the center of the container
+    - `end` means that the end of the element will snap to the end of the container
+
+---
+
+### Scrollbar Styling
+
+The scrollbar is made up of at least 2 components: the thumb and the track:
+![scrollbar](./img/scrollbar-1.svg)
+
+- Every operating system has its own scrollbar, and this scrollbar will be used for just about all applications. This means that scrollbars aren't usually browser-specific, they're OS-specific.
+  ![scrollbar](./img/scrollbar-2.png)
+
+- Note: Scrolling on mobile devices is a bit different. On mobile, there is no visible scrollbar. When you drag the screen, a thumb appears along the right edge, to provide context for where you are on the page.
+
+- **Styling the scrollbar**
+
+  - The scrollbar is a part of the browser's UI, so it's not easy to style it. But there are some properties that can be used to style it in some browsers
+
+  - **Styling the thumb**
+
+    - `::-webkit-scrollbar-thumb` -> to style the thumb of the scrollbar
+    - `::-webkit-scrollbar-track` -> to style the track of the scrollbar
+    - `::-webkit-scrollbar` -> to style the whole scrollbar
+
+    ```css
+    /* Webkit */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ```
+
+  - **Coloring & Sizing**
+
+    - `scrollbar-width` -> to set the width of the scrollbar
+    - `scrollbar-color` -> to set the color of the `thumb` and the `track` (2 values)
+
+    ```css
+    /* All browsers */
+    html {
+      /* or body */
+      scrollbar-width: thin;
+      scrollbar-color: #888 #f1f1f1;
+    }
+    ```
+
+  - **Notes:**
+
+    - The browser support for these properties is not great, so it's better to `-webkit-` prefix them
+
+      ```css
+      /* Webkit */
+      ::-webkit-scrollbar {
+        width: 12px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ```
+
+    - We can't use `padding` to increase the space around the thumb, but we can fake it with a `border` that matches the track color.
+
+      ```css
+      ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border: 3px solid #f1f1f1;
+      }
+      ```
+
+    - **Mobile scrollbar styles**:
+      - we can't tweak the scrollbar styles on **iOS**. Even though the properties are supported in iOS safari, they appear to have no effect.
+      - In **Android**, the scrollbar styles work as you'd expect.
+
+---
+
+### Scroll Optimization
+
+- **Scroll margin**
+
+  - It's used to add space around the element when scrolling to it
+
+    ```css
+    h2 {
+      scroll-margin-top: 100px;
+    }
+    ```
+
+    ![scroll-margin](./img/scroll-margin-1.webp)
+
+  - It's **useful when you have a fixed header/navbar** and you want to scroll to the element without hiding it behind the navbar
+    ![scroll-margin](./img/scroll-margin-2.png)
+
+- **Avoiding scroll-based layout shifts:** We can optimize **CLS** by using:
+
+  - Using `overflow-y: scroll;` to always show the scrollbar
+
+    ```css
+    body {
+      overflow-y: scroll;
+    }
+    ```
+
+    - This CSS property ensures that the page will always have a visible scrollbar, even if the page isn't tall enough to warrant one.
+    - This will prevent the layout shift when the scrollbar appears
+
+  - Using `scroll-padding` property to reserve space for the scrollbar
+
+    ```css
+    body {
+      scroll-padding: 100px; /* reserve space for the scrollbar */
+    }
+    ```
+
+  - Using `scrollbar-gutter` property to reserve space for the scrollbar
+
+    ```css
+    body {
+      scrollbar-gutter: stable;
+    }
+    ```
+
+    ![scrollbar-gutter](./img/scrollbar-gutter-1.jpg)
+    ![scrollbar-gutter](./img/scrollbar-gutter-2.png)
+
+    - It will allow us to always make space for the scrollbar, without needing to mess with `overflow`.
+    - Learn more in a [detailed blog post by Bramus](https://www.bram.us/2021/07/23/prevent-unwanted-layout-shifts-caused-by-scrollbars-with-the-scrollbar-gutter-css-property/)!
+
+  - Why is this a good thing? When the scrollbar pops into view, it causes a layout shift. Every element on the page shifts a few pixels to the left, to make room for the scrollbar
+
+  > Twitter user Tim Vereecke saw a [massive CLS improvement](https://twitter.com/TimVereecke/status/1239454788116533248) by making this change
+
+---
+
+## Focusing
+
+Some folks navigate exclusively with non-pointer devices, like the keyboard, or a set of paddles, or a sip-and-puff switch.
+
+If you're not pointing and clicking, you need to know which element currently has focus. And that's where **focus indicators** come in!
+
+> **Focus indicators** are visual cues that show which element currently has focus. They're important for keyboard users, but they're also useful for sighted users who are navigating with a mouse.
+
+- At any given moment, exactly one element on the page will be focused.
+- There are (at least) two ways to change which element is focused:
+
+  - Hitting the “Tab” key will cycle to the next interactive element
+  - Clicking an interactive element will focus it
+
+### Focus Types & Improvements
+
+There're multiple types of focus: `focus`, `focus-visible`, `focus-within`, `focus-ring`
+![focus](./img/focus-1.svg)
+
+- `:focus`
+
+  - applies to an element when it is focused
+
+- `:focus-visible`
+
+  - Historically, browsers added visual "focus rings" to interactive elements with focus, using styles like:
+
+    ```css
+    button:focus {
+      outline: 5px auto -webkit-focus-ring-color;
+    }
+    ```
+
+  - These focus indicators, which vary between browsers and operating systems, are crucial for users navigating without a pointer device. However, designers often removed these outlines for aesthetic reasons, creating accessibility issues.
+
+  - The `:focus-visible` pseudo-class addresses this by applying styles only when the element is focused and the user is using a non-pointer input device (e.g., keyboard). This allows developers to remove default focus styles and reapply them using `:focus-visible`, ensuring focus indicators are shown only to users who need them.
+
+  - Recently, browsers updated their default styles to apply focus indicators to `:focus-visible` instead of `:focus`:
+
+    ```css
+    button:focus-visible {
+      outline: 5px auto -webkit-focus-ring-color;
+    }
+    ```
+
+  - **This means default focus rings are hidden for pointer device users, and developers no longer need to manually adjust these styles.**
+
+- `:focus-within`
+  ![focus-within](./img/focus-within.gif)
+
+  - It allows you to style a parent element when any of its children are focused:
+
+    ```css
+    .parent:focus-within {
+      background-color: #f8f8f8;
+    }
+    ```
+
+  - This is a great way to give users a visual cue when they are interacting with a form or a dropdown menu.
+  - **The most common use case for :focus-within is forms**.
+    - For example: When a user starts typing in an input field, the form's background color changes to indicate that it's in focus.
+  - Here's a great article that compares `:focus-within` with `has(:focus)`: [Enhancing focus visibility - focus-within or has(:focus)?](https://mayashavin.com/articles/focus-within-vs-has-focus)
+
+- `:focus-ring`
+
+  - It's a new pseudo-class that allows you to style the focus ring for all focused elements on the page
+
+    ```css
+    :focus-ring {
+      outline: 2px solid blue;
+    }
+    ```
+
+---
+
+### Keeping track of focus
+
+- You can track which element is focused in JavaScript with `document.activeElement`.
+
+  ```js
+  document.activeElement; // returns the currently focused element
+  ```
+
+- This can be useful for testing focus during interactions (eg. opening/closing modals).
 
 ---
 
@@ -3232,1412 +4419,7 @@ It's the practice of building your web functionality so that it provides a certa
 
 ---
 
-## Notes & Tricks
-
-### Tricks and Techniques
-
-#### Display vs Visibility
-
-| Display                                                                         | Visibility                                                                     |
-| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| It specifies the display behavior of an element.                                | It specifies whether an element is visible or hidden.                          |
-| It's a CSS property that defines the type of box used for an HTML element.      | It's a CSS property that determines whether an element is visible or hidden.   |
-| It can have values like `block`, `inline`, `inline-block`, `flex`, `grid`, etc. | It can have values like `visible`, `hidden`, `collapse`, `initial`, `inherit`. |
-
-- (`visibility:hidden` or `opacity: 0`) => hide the element but preserves it's place (leaves a space where the element would have been)
-- `display: none` => remove element from the flow, hide element and collapse its space
-
-  - _note_ => it doesn't work for `animation/transition` (for Javascript usually), instead use (`opacity` or `visibility`):
-
-    ```css
-    /* ALL THESE FOR mimicking [display:none;] */
-
-    /* 1) Hide it visually and preserve the space */
-    opacity: 0;
-
-    /* 2) Make it unaccessible to mouse and keyboard */
-    pointer-events: none;
-
-    /* 3) Hide it from screen readers */
-    visibility: hidden;
-    /* or */
-    opacity: 0;
-    ```
-
-- `display: block` --> can be used to make `<a>` element take full width of its container -> for user clicking accessibility
-- **inline-block**: `display: inline-block` --> causes a block-level element to flow like an inline element, while retaining other features of a block-level element.
-  - doesn't start a new line (like inline element)
-  - respects `margin`, `width`, `height` (like block element)
-
----
-
-#### How to center an element
-
-To center an element vertically and horizontally in a container, we have these options:
-
-1. If the element is `inline`, you can use `text-align: center` on the parent element
-
-   ```css
-   .container {
-     text-align: center;
-   }
-   .element {
-     display: inline;
-   }
-   ```
-
-   - This will center the element horizontally in the container
-   - To center it vertically, you can use `vertical-align: middle` on the element if it's
-
-2. Using `margin: auto`:
-
-   ```css
-   .container {
-     width: 700px;
-     margin: 0 auto;
-   }
-   /* This will center the container horizontally on the page */
-   ```
-
-3. using `position: absolute`:
-
-   ```css
-   .container {
-     position: relative;
-   }
-   .element {
-     width: 100px;
-     height: 100px;
-     position: absolute;
-     top: 50%;
-     left: 50%;
-     transform: translate(-50%, -50%);
-
-     /* or (NOT RECOMMENDED ❌) */
-     top: calc(50% - 50px); /* 50px is half of the element height */
-     left: calc(50% - 50px); /* 50px is half of the element width */
-   }
-   ```
-
-   ![center element](./img/center-element-1.png)
-   ![center element](./img/center-element-2.png)
-
-4. using `flexbox`:
-
-   ```css
-   .container {
-     display: flex;
-     min-height: 100vh; /* to make the container full height */
-     flex-direction: column;
-     justify-content: center;
-     align-items: center;
-   }
-   ```
-
-5. using `grid`:
-
-   - center a container:
-
-     ```css
-     .container {
-       display: grid;
-
-       place-content: center; /* or place-items: center; */
-       /* or */
-       justify-content: center;
-       align-content: center;
-     }
-     ```
-
-   - center a grid-item inside its cell:
-     ![place-self](./img/place-self.png)
-
-     ```css
-     .grid-item {
-       place-self: center;
-     }
-     ```
-
-##### Centering a text
-
-There's a difference between `text-align: center` and centering using flexbox or grid:
-
-```html
-<!-- Using text-align -->
-<div class="with-text-align">
-  <p>
-    It is advisable to drain golfing land much more thoroughly and efficiently than ordinary farm
-    land, but, on the other hand, by exercising a little thought it can be done much more cheaply.
-    For the purpose of golf it is not only unnecessary to drain as deeply as is customary for
-    agricultural purposes, but it is much cheaper and more satisfactory to adopt a system of shallow
-    drains.
-  </p>
-</div>
-
-<hr />
-
-<!-- Using a Flex column -->
-<div class="with-flexbox">
-  <p>
-    It is advisable to drain golfing land much more thoroughly and efficiently than ordinary farm
-    land, but, on the other hand, by exercising a little thought it can be done much more cheaply.
-    For the purpose of golf it is not only unnecessary to drain as deeply as is customary for
-    agricultural purposes, but it is much cheaper and more satisfactory to adopt a system of shallow
-    drains.
-  </p>
-</div>
-
-<style>
-  .with-text-align {
-    text-align: center;
-  }
-
-  .with-flexbox {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  p {
-    max-width: 50ch;
-    padding: 1rem;
-  }
-</style>
-```
-
-![center text](./img/center-text.png)
-
-- What's going on here?
-  - Well, `text-align: center` moves all of the individual characters to the middle of each line, the way you'd expect centering to work in a rich text editor.
-  - `align-items`, though, is more about layout alignment. It positions the paragraph as a block. It doesn't affect the individual characters within that block.
-
----
-
-#### Scrolling
-
-To have **smooth scrolling** when clicking on links, you can use: css or javascript
-
-##### Scrolling using CSS
-
-- This doesn't work on older versions of **safari Browser**
-- It's a simple way to add smooth scrolling to your page
-- It's done by adding `scroll-behavior: smooth;` to the `html` element
-
-  ```css
-  html {
-    scroll-behavior: smooth;
-  }
-  ```
-
----
-
-##### Scrolling using JavaScript
-
-- This works on all browsers including older versions of **safari Browser**
-- It's done by adding an event listener to the links and then using the `scrollIntoView` method to scroll to the section
-
-  ```js
-  const allLinks = document.querySelectorAll('a:link');
-
-  allLinks.forEach(function (link) {
-    link.addEventListener('click', function (e) {
-      // 1. prevent default behavior
-      e.preventDefault();
-
-      // 2. get the href attribute value
-      const href = link.getAttribute('href');
-
-      // 3. Handle the scroll behavior
-      if (href === '#')
-        // Scroll back to top
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth'
-        });
-      if (href !== '#' && href.startsWith('#')) {
-        // Scroll to other links (sections with id attribute equal to the href value)
-        const sectionEl = document.querySelector(href);
-        sectionEl.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-  ```
-
-- Another way to do it is by using a **polyfill** for older browsers
-
-  ```html
-  <script
-    defer
-    src="https://unpkg.com/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js"></script>
-  ```
-
-  - then in JS file, write the same code as above
-
----
-
-#### Customizable font-size calculation
-
-```css
-:red {
-  --base-size: 1rem;
-  --scale: 1.25;
-  --h5: calc(var(--base-size) * var(--scale)); /* 1.25rem */
-  --h4: calc(var(--h5) * var(--scale)); /* 1.5rem */
-  --h3: calc(var(--h4) * var(--scale)); /* 2rem */
-  --h2: calc(var(--h3) * var(--scale)); /* 2.5rem */
-  --h1: calc(var(--h2) * var(--scale)); /* 3rem */
-  --small: calc(var(--base-size) / var(--scale)); /* 0.8rem */
-}
-
-/* Usage */
-h1 {
-  font-size: var(--h1);
-}
-```
-
----
-
-#### Custom Audio Player
-
-- [Let’s Create a Custom Audio Player](https://css-tricks.com/lets-create-a-custom-audio-player/)
-- [Frontend Masters - Custom Audio Player](https://codepen.io/jen4web/pen/OJBjYVy)
-
----
-
-#### Double Border Corners
-
-Double borders on just the corner of some boxes may seem impossible to start with. However, there are [several possible solutions](https://stackoverflow.com/questions/14387690/how-can-i-show-only-corner-borders) to this issue.
-
-- The idea here is to create a double border effect by using a `::before` and `::after` pseudo-elements both for the container and the first element inside it.
-- Then we use `border-width` to control which sides you want to show based on what corner you want to apply the effect to.
-
-- Example:
-  ![double-border](./img/double-border.png)
-
-  ```css
-  .container {
-    position: relative;
-    border: 2px solid #000;
-  }
-
-  .container::before,
-  .container::after,
-  .container > :first-child::before,
-  .container > :first-child::after {
-    content: '';
-    position: absolute;
-    width: 40px;
-    height: 40px;
-    border-color: #000;
-    border-style: solid;
-  }
-
-  /* now for each box, display it in its location and display the border on only 2 sides */
-  .container::before {
-    top: 0;
-    left: 0;
-    border-width: 2px 0 0 2px;
-  }
-  .container::after {
-    top: 0;
-    right: 0;
-    border-width: 2px 2px 0 0;
-  }
-  .container > :first-child::before {
-    bottom: 0;
-    left: 0;
-    border-width: 0 0 2px 2px;
-  }
-  .container > :first-child::after {
-    bottom: 0;
-    right: 0;
-    border-width: 0 2px 2px 0;
-  }
-  ```
-
----
-
-#### Rotating elements (3D perspective)
-
-- when using 3d animation / transform => use `perspective` property on the parent element
-
-  ```css
-  .card {
-    perspective: 1000px; /* 3d effect */
-  }
-
-  .card:hover {
-    transform: rotateY(180deg);
-  }
-  ```
-
-  - it's used to give the 3d effect to the child elements (the lower the value, the more the 3d effect)
-    ![perspective](./img/perspective-1.jpeg)
-  - If the user is right next to the screen, small changes in position will appear huge. Imagine spinning a card that's only a few inches from your face. If the user is further away, though, that same motion will appear smaller and more subtle.
-
-- when rotating cards **180 degrees** and you want not the back of the card to be visible, we use the `backface-visibility` property:
-
-  ```css
-  .card {
-    backface-visibility: hidden;
-  }
-
-  .card:hover {
-    transform: rotateY(180deg);
-  }
-  ```
-
-  ![backface-visibility](./img/backface-visibility.webp)
-  ![backface-visibility](./img/backface-visibility2.png)
-
-- Example
-
-  ```html
-  <style>
-    .card-wrapper {
-      perspective: 500px; /* 3d effect */
-    }
-    .card {
-      position: relative;
-      display: block;
-    }
-    .front,
-    .back {
-      width: 200px;
-      height: 200px;
-      background: white;
-      border-radius: 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 400ms;
-      will-change: transform;
-      backface-visibility: hidden; /* To hide the back of the card */
-      /* Vendor prefix for Safari */
-      -webkit-backface-visibility: hidden;
-    }
-    .back {
-      position: absolute; /* To make it appear behind the front */
-      top: 0;
-      left: 0;
-      transform: rotateY(
-        -180deg
-      ); /* To make it appear behind the front as it will be hidden because of backface-visibility */
-    }
-    .card:hover .front,
-    .card:focus .front {
-      transform: rotateY(180deg);
-    }
-    .card:hover .back,
-    .card:focus .back {
-      transform: rotateY(0deg);
-    }
-  </style>
-
-  <div class="card-wrapper">
-    <a href="/" class="card">
-      <div class="front">
-        <p>Hello World</p>
-      </div>
-      <div class="back">
-        <p>This is the back</p>
-      </div>
-    </a>
-  </div>
-  ```
-
-- Another example: [Folding the DOM](https://www.joshwcomeau.com/react/folding-the-dom/)
-
----
-
-#### Hamburger menu that opens navbar from the right as a growing circle
-
-- The trick here is to use `clip-path` property to create a circle that grows from the center of the button to cover the whole screen
-
-```css
-.nav-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: white;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  z-index: 1;
-  opacity: 1;
-  clip-path: circle(50px at 100% -10%); /* Masking the content of the nav-bar to be a circle */
-  -webkit-clip-path: circle(50px at 100% -10%);
-}
-```
-
----
-
-#### Floating Cursor Animation
-
-- The idea here is to create a floating cursor that follows the mouse movement on the page
-- It's just a simple div with a background color that follows the mouse movement using `mousemove` event
-
-- Floating Cursor when moving the mouse
-
-  ```html
-  <!-- Down in the end of the body -->
-  <div class="cursor"></div>
-  ```
-
-  - Approach 1: using absolute positioning
-
-    ```css
-    .cursor {
-      width: 3rem;
-      height: 3rem;
-      border: 2px solid white;
-      border-radius: 50%;
-      position: absolute;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      transition: all 0.5s ease-in-out;
-      transition-property: background, transform;
-      transform-origin: 75% 75%;
-    }
-    ```
-
-    ```js
-    function cursor(e) {
-      let mouse = document.querySelector('.cursor');
-      mouse.style.top = e.pageY + 'px';
-      mouse.style.left = e.pageX + 'px';
-    }
-
-    window.addEventListener('mousemove', cursor);
-    ```
-
-  - Approach 2: using (fixed positioning & `transform` property)
-
-    ```css
-    .cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 30px;
-      height: 30px;
-      opacity: 1;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid transparent;
-      transition: width 0.3s cubic-bezier(0.3, 0, 0.3, 1), height 0.3s cubic-bezier(0.3, 0, 0.3, 1),
-        background 0.3s cubic-bezier(0.3, 0, 0.3, 1), margin 0.3s cubic-bezier(0.3, 0, 0.3, 1),
-        opacity 0.7s cubic-bezier(0.3, 0, 0.3, 1);
-      -webkit-transition: width 0.3s cubic-bezier(0.3, 0, 0.3, 1), height 0.3s cubic-bezier(0.3, 0, 0.3, 1),
-        background 0.3s cubic-bezier(0.3, 0, 0.3, 1), margin 0.3s cubic-bezier(0.3, 0, 0.3, 1),
-        opacity 0.7s cubic-bezier(0.3, 0, 0.3, 1);
-      z-index: 999;
-      pointer-events: none;
-      border-radius: 100%;
-      -moz-border-radius: 100%;
-      -webkit-border-radius: 100%;
-      -khtml-border-radius: 100%;
-    }
-    ```
-
-    ```js
-    function cursor(e) {
-      let mouse = document.querySelector('.cursor');
-      mouse.style.transform = `translate(${e.pageX}px, ${e.pageY}px)`;
-    }
-
-    window.addEventListener('mousemove', cursor);
-    ```
-
-- Growing Cursor when hovering over an element
-
-  - The idea here is to create a circle that grows from the center of the button to cover the whole button
-
-  ```css
-  .cursor {
-    width: 3rem;
-    height: 3rem;
-    border: 2px solid white;
-    border-radius: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    transition: all 0.5s ease-in-out;
-    transition-property: background, transform;
-    transform-origin: 75% 75%;
-  }
-  .cursor.nav-active {
-    background: rgb(86, 124, 228);
-    transform: scale(3);
-  }
-  .cursor.explore-active {
-    background: white;
-    transform: scale(3);
-  }
-  .cursor-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    font-size: 0.5rem;
-    transform: translate(-50%, -50%);
-  }
-  ```
-
-  ```js
-  let mouse = document.querySelector('.cursor');
-  let mouseTxt = mouse.querySelector('span');
-
-  function activeCursor(e) {
-    const item = e.target;
-
-    // If the item is a link, the cursor will be a pointer
-    if (item.id === 'logo' || item.classList.contains('burger')) {
-      mouse.classList.add('nav-active');
-    } else {
-      mouse.classList.remove('nav-active');
-    }
-
-    // If the item is an explore link, the cursor will be a circle
-    if (item.classList.contains('explore')) {
-      mouse.classList.add('explore-active');
-      mouseTxt.innerText = 'Tap';
-      gsap.to('.title-swipe', 1, { y: '0%' });
-    } else {
-      mouse.classList.remove('explore-active');
-      mouseTxt.innerText = '';
-      gsap.to('.title-swipe', 1, { y: '100%' });
-    }
-  }
-
-  // Event Listeners
-  window.addEventListener('mouseover', activeCursor);
-  ```
-
-- Notes:
-  - It's important to set `pointer-events: none;` to prevent the cursor from blocking the mouse events on the page (like clicking on items)
-
----
-
-#### Chat Messages
-
-![chat-messages](./img/chat-messages.png)
-
-- The idea here is to create a chat interface with messages that have different styles based on the sender or the receiver
-- Also we can move the messages container to the bottom of the page so that it feels like a real chat interface
-
-```html
-<style>
-  ol {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-  }
-  .message.sent {
-    align-self: flex-end;
-  }
-</style>
-
-<body>
-  <ol>
-    <li class="message sent">Can you get me a big salad?</li>
-    <li class="message received">What big salad? I'm going to the coffee shop.</li>
-  </ol>
-</body>
-```
-
----
-
-#### Facebook-style layout
-
-On their desktop application, Facebook has a 3-column layout. There're some added borders so we can see how the columns flex:
-
-![facebook-layout](./img/facebook-layout.png)
-
-- It's a 3 column layout, and below a certain threshold, the left-hand navigation disappears. It's interesting how things scale, though!
-- When shrinking the screen below `1100px`:
-
-  - the left-hand navigation disappears
-  - the right-hand sidebar starts to shrink before reaching a minimum width
-  - the center column appears to not shrink at all, as if it has more priority than the right-hand sidebar (until the right-hand sidebar reaches its minimum width, then they both shrink together)
-
-- Solution:
-
-  ```html
-  <style>
-    .wrapper {
-      display: flex;
-    }
-    nav,
-    aside.contacts {
-      min-width: 150px;
-      max-width: 250px;
-      flex-shrink: 9999999; /* This will make the element shrink more than the other elements */
-      flex-basis: 250px;
-    }
-    main {
-      flex: 1;
-      flex-basis: 500px;
-      /* Here it doesn't have `flex-shrink` property, meaning it has the default value of 1, so it will shrink 1 px for each 9999999 px shrunk by the other elements */
-    }
-  </style>
-
-  <div class="wrapper">
-    <nav></nav>
-    <main></main>
-    <aside class="contacts"></aside>
-  </div>
-  ```
-
----
-
-#### Spacer Component Trick
-
-It's a common pattern to use a spacer component to add space between elements. This is especially useful when you want to add space between elements that are not direct siblings outside of the selector's styles to prevent overriding other styles.
-
-```jsx
-/* Spacer Component */
-const Spacer = ({ size }) => {
-  return <div style={{ height: size }} />;
-};
-
-/* Usage */
-<div>
-  <h1>Heading</h1>
-  <Spacer size='20px' />
-  <p>Paragraph</p>
-</div>;
-```
-
-The above is a vertical-spacer component. You can also create a horizontal-spacer component by changing the `height` to `width`.
-
----
-
-#### Scrollable part of a container
-
-- The idea here is to create a scrollable part of a container that has a fixed height and a scrollbar and when we scroll (as the part B is overflowing), the part A will stay fixed and visible
-
-- Starter code
-
-  ```html
-  <style>
-    section {
-      display: flex;
-      gap: 32px;
-      border: 3px solid hotpink;
-    }
-
-    .col {
-      flex: 1;
-      padding: 16px;
-    }
-  </style>
-
-  <section>
-    <div class="col">
-      <h1>Growing Column</h1>
-      <p>
-        This column will grow very tall indeed, whilst the adjacent one will be clamped to whatever
-        height this one rests at!
-      </p>
-      <p>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-        been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
-        galley of type and scrambled it to make a type specimen book.
-      </p>
-    </div>
-
-    <div class="col">
-      <p>Here is a list of all the letters in the English language:</p>
-      <ol>
-        <li>Item A</li>
-        <li>Item B</li>
-        <li>Item C</li>
-        <li>Item D</li>
-        <li>Item E</li>
-        <li>Item F</li>
-        <li>Item G</li>
-        <li>Item H</li>
-        <li>Item I</li>
-        <li>Item J</li>
-        <li>Item K</li>
-        <li>Item L</li>
-        <li>Item M</li>
-        <li>Item N</li>
-        <li>Item O</li>
-        <li>Item P</li>
-        <li>Item Q</li>
-        <li>Item R</li>
-        <li>Item S</li>
-        <li>Item T</li>
-        <li>Item U</li>
-        <li>Item V</li>
-        <li>Item W</li>
-        <li>Item X</li>
-        <li>Item Y</li>
-        <li>Item Z</li>
-      </ol>
-    </div>
-  </section>
-  ```
-
-- Expected output & constraints:
-  ![scrollable-part](./img/scrollable-part.png)
-
-  - Two equal width columns
-  - The container should be the height of the first column.
-  - The second column should scroll vertically, since it won't fit in the shorter container.
-
-- Solution:
-
-  ```css
-  section {
-    display: flex;
-    gap: 32px;
-    border: 3px solid hotpink;
-    overflow: hidden; /* new ✅ */
-  }
-
-  .col:first-of-type {
-    position: sticky; /* new ✅ */
-    top: 0; /* new ✅ */
-  }
-
-  .col:last-of-type {
-    height: 0; /* new ✅ */
-    /* This will make the second column scrollable */
-  }
-  ```
-
----
-
-#### Tracking the scrollbar width
-
-When you have a scrollbar on the page, it can affect the layout of the page or cover some of the content. You can track the scrollbar width using JavaScript and then adjust the layout accordingly.
-
-```js
-const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
-// window.innerWidth --> width of the window including the scrollbar
-// document.documentElement.clientWidth --> width of the document excluding the scrollbar
-```
-
-- Here's an example: Let's say our window is `500px` wide, and our scrollbar is taking up `20px`. `window.innerWidth` will be `500`, and `clientWidth` will be `480`. By subtracting, we get the difference of `20`. If there is no scrollbar, or the scrollbar is a non-blocking overlay, `scrollbarWidth` will be `0`, since our two width values will be identical.
-
-  - Now that we know how wide the scrollbar is, we can assign it to a CSS variable:
-
-  ```js
-  document.documentElement.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
-  // By attaching this CSS variable to the documentElement, we make it globally available (it's the same thing as targeting html in CSS).
-
-  // Now, in our CSS, we can use this variable to adjust our layout:
-  ```
-
-  ```css
-  .wrapper {
-    width: calc(100% - var(--scrollbar-width));
-  }
-  ```
-
-  ![scrollbar-width](./img/scrollbar-width.png)
-
----
-
-#### Filler Technique
-
-It's a technique that is used for some designs where you need to have an element centered in the middle of the container that has 2 elements and we want the design to be like if the container has 3 elements.
-
-- The idea here is to create a filler element that takes up the remaining space in the container and pushes the centered element to the middle of the container. This way the element that we want to center will be squished to the middle of the container by its left from the filler element and by its right from the other element.
-- The idea here that we need to apply `flex: 1;` to the filler element and the other elements will take the space they need.
-
-- Example:
-
-  ```html
-  <div class="overlay">
-    <div class="container">
-      <div class="filler"></div>
-
-      <div class="nav"></div>
-        <a href="#">Sale</a>
-        <a href="#">New Releases</a>
-        <a href="#">Men</a>
-        <a href="#">Women</a>
-        <a href="#">Kids</a>
-        <a href="#">Collections</a>
-      </div>
-
-      <div class="footer">
-        <a href="/terms">Terms and Conditions</a>
-          <a href="/privacy">Privacy Policy</a>
-          <a href="/contact">Contact Us</a>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    .container {
-      width: 300px;
-      height: 100%;
-      background-color: white;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .nav {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .filler {
-      flex: 1;
-    }
-
-    .footer {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      flex: 1;
-    }
-  ```
-
-  ![filler-technique](./img/filler-technique.png)
-
----
-
-#### Book Design
-
-![book-design](./img/book-design.png)
-
-```html
-<main class="wrapper">
-  <h2>Chapter 1</h2>
-  <p>
-    Outside the space-warp chamber, Rizal's great green sun had already set. Thick olive dusk eddied
-    through the interplanetary transit center. I swore under my breath and slammed shut the
-    warp-hatch switch.
-  </p>
-  <p>
-    Locking bars whispered back. The hatch revolved on its axis, slow as an asteroid eroding. I
-    threw another quick glance at my chrono. It still read the same as before: six Earth hours more…
-    six hours to ferret out the truth or be forever reconditioned.
-  </p>
-  <p>—Six hours, that is, if Controller Alfred Kruze didn't cut it shorter.</p>
-  <p>
-    And if he did, Rizal might very well change status. Today, it was billed as the FedGov's
-    outermost bastion against the Kel. Tomorrow, it could prove man's fatal flaw, the Achilles heel
-    in our whole system of defenses.
-  </p>
-  <p>In which case—</p>
-  <p>Involuntarily, I shivered.</p>
-  <p>“Agent Traynor—?”</p>
-  <p>
-    The voice came from the shadows. A dull, phlegmatic, tranquilized, conditioned voice. I stopped
-    short; turned fast. “Who's asking?”
-  </p>
-  <p>
-    The man shrugged stolidly, not even picking up my tension. “I'm a port rep, Agent Traynor. Port
-    rep second, that is—”
-  </p>
-
-  <p>“So who told you to come out here? Who said you should meet me?”</p>
-  <p>
-    “Oh…” A pause. “Well, you see, there's this sigman, Agent Traynor. Up in the Interworld
-    Communications section. He had a regular 7-D clearance report that a FedGov Security
-    investigation agent was warping in—you have to file a 7-D on all warpings, you know, Agent
-    Traynor, on account of restrictives. So—well, the rep first was out to eat, so I just notified
-    Rizal Security, just a routine report, and the unit controller there, an Agent Gaylord, he said
-    for me to meet you, and—”
-  </p>
-  <p>
-    I bit down hard and shifted my weight, both at once, wondering if a broken jaw would interfere
-    with the work of a port rep second.
-  </p>
-  <p>Only then, all at once, I caught the unmistakable whish of a grav-car sweeping in.</p>
-  <p>
-    The lights hit us almost in the same instant. Two seconds later a man who said he was Agent
-    Gaylord was jumping down and locking wrists with me in Rizal's traditional greeting.
-  </p>
-  <p>
-    Even that wrist-lock set my teeth on edge. It was too solid, too stolid, too thorough a job of
-    conditioning.
-  </p>
-  <p>Or was it maybe, just a trifle over-done?</p>
-</main>
-```
-
-```css
-.wrapper {
-  column-count: 2;
-  column-gap: 150px;
-  max-width: 64rem;
-  margin: 32px auto;
-  border: 2px solid hsl(35deg 10% 40%);
-  padding: 50px;
-  background: linear-gradient(
-    to right,
-    hsl(35deg, 30%, 90%),
-    hsl(35deg, 30%, 90%) 47%,
-    hsl(35deg, 30%, 70%) 49.5%,
-    hsl(35deg, 20%, 50%) 50%,
-    hsl(35deg, 30%, 70%) 50.5%,
-    hsl(35deg, 30%, 90%) 53%,
-    hsl(35deg, 30%, 90%)
-  );
-}
-h2 {
-  font-size: 2rem;
-  margin-bottom: 2em;
-}
-p {
-  text-align: justify;
-}
-p:first-of-type:first-letter {
-  font-size: 3em;
-  float: left;
-  line-height: 1em;
-  margin-right: 0.2em;
-}
-p:not(:first-of-type) {
-  text-indent: 2em;
-}
-* {
-  font-family: 'Merriweather', serif;
-}
-```
-
----
-
-#### Grid shapes
-
-- "stairs" layout using CSS Grid:
-  ![stairs layout](./img/stairs-layout-1.png)
-  ![stairs layout](./img/stairs-layout-2.png)
-
-  ```html
-  <div class="wrapper">
-    <div class="box one"></div>
-    <div class="box two"></div>
-    <div class="box three"></div>
-  </div>
-
-  <style>
-    .wrapper {
-      display: grid;
-      grid-template-rows: repeat(3, 1fr);
-      min-height: 100%;
-      justify-items: center; /* center the items horizontally on the grid row */
-    }
-    .box {
-      width: 50%;
-    }
-    .box.one {
-      background-color: pink;
-      justify-self: end; /* align the item to the end of the grid row */
-    }
-    .box.two {
-      background-color: lavender;
-    }
-    .box.three {
-      background-color: peachpuff;
-      justify-self: start; /* align the item to the start of the grid row */
-    }
-    html,
-    body {
-      height: 100%;
-    }
-  </style>
-  ```
-
-- Broken rectangles
-  ![broken rectangles](./img/broken-rectangles-1.png)
-
-  - The idea is that all rectangles are the same size, but they are broken in the middle to create a unique layout.
-    ![broken rectangles](./img/broken-rectangles-2.png)
-  - You might think that you need to use a lot of grid columns and rows to achieve this layout, but you can do it with just one row and 2 columns (one for the left side and one for the right side).
-  - We also need to store the desired full width of the shape in a CSS variable (`--rect-width`)
-
-  ```html
-  <div class="wrapper">
-    <div class="box one"></div>
-    <div class="box two"></div>
-    <div class="box three"></div>
-    <div class="box four"></div>
-    <div class="box five"></div>
-    <div class="box six"></div>
-  </div>
-  ```
-
-  - phase 1:
-    ![broken rectangles](./img/broken-rectangles-3.png)
-
-    ```css
-    .wrapper {
-      --rect-width: 100px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      min-height: 100%;
-    }
-
-    .box {
-      width: var(--rect-width);
-      height: 80px;
-    }
-
-    .box.one {
-      background-color: pink;
-    }
-    .box.two {
-      background-color: pink;
-    }
-    .box.three {
-      background-color: lavender;
-    }
-    .box.four {
-      background-color: lavender;
-    }
-    .box.five {
-      background-color: honeydew;
-    }
-    .box.six {
-      background-color: honeydew;
-    }
-
-    html,
-    body {
-      height: 100%;
-    }
-    ```
-
-  - phase 2: move the odd boxes to the end of the grid row, then add a gap between the boxes, and finally, adjust the width of the boxes to create the broken rectangles
-
-    ```css
-    .wrapper {
-      --rect-width: 100px;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      align-content: center; /* center the items vertically on the grid row */
-      gap: 4px; /* add a gap between the grid items */
-      min-height: 100%;
-    }
-    .box:nth-of-type(odd) {
-      justify-self: end; /* align the odd items to the end of the grid row */
-    }
-    .box {
-      width: var(--rect-width);
-      height: 80px;
-    }
-    .box.one {
-      background-color: pink;
-      width: calc(var(--rect-width) * 0.25); /* adjust the width of the first box */
-    }
-    .box.two {
-      background-color: pink;
-      width: calc(var(--rect-width) * 0.75); /* adjust the width of the second box */
-    }
-    .box.three {
-      background-color: lavender;
-      width: calc(var(--rect-width) * 0.5); /* adjust the width of the third box */
-    }
-    .box.four {
-      background-color: lavender;
-      width: calc(var(--rect-width) * 0.5); /* adjust the width of the fourth box */
-    }
-    .box.five {
-      background-color: honeydew;
-      width: calc(var(--rect-width) * 0.75); /* adjust the width of the fifth box */
-    }
-    .box.six {
-      background-color: honeydew;
-      width: calc(var(--rect-width) * 0.25); /* adjust the width of the sixth box */
-    }
-    html,
-    body {
-      height: 100%;
-    }
-    ```
-
----
-
-#### Full Bleed Layout
-
-A common blog layout involves a single, centered column of text, with images that either span the full width of the column or are centered within it. This is known as a full-bleed layout.
-
-- **Type 1:** images are centered within the column
-  ![full-bleed-layout](./img/full-bleed-layout-1.png)
-
-  ```html
-  <style>
-    .max-width-wrapper {
-      max-width: 30ch; /* 30 characters wide, or whatever you prefer */
-      padding: 32px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-  </style>
-
-  <div class="max-width-wrapper">
-    <h1>Some Heading</h1>
-    <p>
-      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-      been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
-      galley of type and scrambled it to make a type specimen book. It has survived not only five
-      centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-    </p>
-    <img
-      alt="a satisfied-looking cute meerkat"
-      src="/course-materials/meerkat.jpg"
-      class="meerkat" />
-    <p>
-      It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum
-      passages, and more recently with desktop publishing software like Aldus PageMaker including
-      versions of Lorem Ipsum.
-    </p>
-  </div>
-  ```
-
-  - Using a `max-width` wrapper is a solid approach, but it does lock us in; every in-flow child will be constrained by that container. That's where **type 2** comes in.
-
-- **Type 2:** images span the full width of the column
-  ![full-bleed-layout](./img/full-bleed-layout-2.png)
-
-  > Having an element stretch from edge to edge is known as a **"full-bleed" element**, a term borrowed from the publishing world when magazine ads would be printed right to the edge of the page.
-
-  - Fortunately, **CSS Grid** offers a very clever solution to this problem.
-
-  ```html
-  <style>
-    .wrapper {
-      display: grid;
-      grid-template-columns:
-        1fr
-        min(30ch, 100%)
-        1fr;
-    }
-    .wrapper > * {
-      grid-column: 2;
-    }
-    .full-bleed {
-      grid-column: 1 / -1;
-    }
-
-    .meerkat {
-      display: block;
-      width: 100%;
-      height: 300px;
-      object-fit: cover;
-    }
-  </style>
-
-  <main class="wrapper">
-    <h1>Some Heading</h1>
-    <p>
-      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
-      been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
-      galley of type and scrambled it to make a type specimen book. It has survived not only five
-      centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-    </p>
-    <div class="full-bleed">
-      <img
-        alt="a satisfied-looking cute meerkat"
-        src="/course-materials/meerkat.jpg"
-        class="meerkat" />
-    </div>
-    <p>
-      It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum
-      passages, and more recently with desktop publishing software like Aldus PageMaker including
-      versions of Lorem Ipsum.
-    </p>
-  </main>
-  ```
-
-  - Grid construction:
-    ![full-bleed-layout](./img/full-bleed-layout-3.png)
-
-    - We have 3 explicit columns: the first and last are `1fr` wide, and the middle column is `min(30ch, 100%)` wide.
-    - the `ch` unit is equal to the width of the 0 character, in the current font. Let's assume that in the current situation, our 0 character is `15px` wide. This means that our `30ch` value translates to `450px`.
-    - `450px` is too wide to fit on many mobile displays. That's why we have that min() function. It clamps this value so that it never grows above 100% of the available space. On a `375px`-wide phone, our center column will be `375px` wide, not 450px.
-    - Our two side columns will share whatever space remains. Like auto margins, this is a clever way to make sure the middle column is centered.
-
-  - Column assignment
-    ![full-bleed-layout](./img/full-bleed-layout-4.png)
-
-    - As we start adding children to this grid, they'll be assigned into the first available cell. This doesn't work for us: we want all of our content to be assigned to that middle column by default, That's where this CSS comes in:
-
-      ```css
-      .wrapper > * {
-        grid-column: 2; /* every direct child of .wrapper will be assigned to the second column */
-      }
-      ```
-
-  - Full-bleed children
-    ![full-bleed-layout](./img/full-bleed-layout-5.png)
-
-    - The `full-bleed` class is a simple way to make an element span the full width of the grid. It's a common pattern in CSS Grid to use a class like this to target full-bleed elements.
-
-      ```css
-      .full-bleed {
-        grid-column: 1 / -1; /* span from the first column to the last column */
-      }
-      ```
-
-    - This can lead to some very tall images, on very wide screens, so it's better to combine it with a fixed `height` and `object-fit`:
-
-      ```css
-      .meerkat {
-        display: block;
-        width: 100%;
-        height: 300px;
-        object-fit: cover;
-      }
-      ```
-
-  - Adding gutters (for small screens)
-    ![full-bleed-layout](./img/full-bleed-layout-6.png)
-
-    - We can add `padding` to create some space between the text and the image. This is a great way to add some breathing room to the layout.
-
-      ```css
-      .wrapper {
-        display: grid;
-        grid-template-columns:
-          1fr
-          min(30ch, 100%)
-          1fr;
-        padding: 0 16px; /*  add padding to the grid container */
-      }
-      ```
-
-    - Note: this will create a problem for the "full-bleed" element, as it will not be full-bleed anymore. To fix this, we need to use "negative margin" to make the full-bleed element span the full width of the grid container:
-
-      ```css
-      .full-bleed {
-        grid-column: 1 / -1; /* span from the first column to the last column */
-        margin-left: -16px; /* add negative margin to the left */
-        margin-right: -16px; /* add negative margin to the right */
-      }
-      ```
-
-      - So, Our container has 16px of padding, but our full-bleed children will undo that, using the negative margin trick
-
----
-
-#### Specialty story grid (news website)
-
-![specialty-story-grid](./img/specialty-story-grid.png)
-
-```jsx
-import React from 'react';
-import styled from 'styled-components/macro';
-
-import { MARKET_DATA, SPORTS_STORIES } from '../../data';
-
-import { QUERIES } from '../../constants';
-
-import MarketCard from '../MarketCard';
-import SectionTitle from '../SectionTitle';
-import MiniStory from '../MiniStory';
-
-const SpecialtyStoryGrid = () => {
-  return (
-    <Wrapper>
-      <MarketsSection>
-        <SectionTitle
-          cornerLink={{
-            href: '/markets',
-            content: 'Visit Markets data »'
-          }}>
-          Markets
-        </SectionTitle>
-        <MarketCards>
-          {MARKET_DATA.map(data => (
-            <MarketCard key={data.tickerSymbol} {...data} />
-          ))}
-        </MarketCards>
-      </MarketsSection>
-      <SportsSection>
-        <SectionTitle
-          cornerLink={{
-            href: '/sports',
-            content: 'Visit Sports page »'
-          }}>
-          Sports
-        </SectionTitle>
-        <SportsStories>
-          {SPORTS_STORIES.map(data => (
-            <SportsStoryWrapper key={data.id}>
-              <MiniStory {...data} />
-            </SportsStoryWrapper>
-          ))}
-        </SportsStories>
-      </SportsSection>
-    </Wrapper>
-  );
-};
-
-const Wrapper = styled.div`
-  display: grid;
-  gap: 48px;
-
-  @media ${QUERIES.tabletAndUp} {
-    gap: 64px;
-    grid-template-columns: minmax(0px, auto);
-  }
-  @media ${QUERIES.laptopAndUp} {
-    gap: 0px;
-    grid-template-columns: 1fr minmax(0px, 1fr);
-  }
-`;
-
-const MarketsSection = styled.section`
-  @media ${QUERIES.laptopAndUp} {
-    padding-right: 16px;
-    margin-right: 16px;
-    border-right: 1px solid var(--color-gray-300);
-  }
-`;
-
-const MarketCards = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-  gap: 16px;
-`;
-
-const SportsSection = styled.section``;
-
-const SportsStories = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-  gap: 16px;
-
-  @media ${QUERIES.tabletAndUp} {
-    display: flex;
-    grid-template-columns: revert;
-    overflow: auto;
-  }
-`;
-
-const SportsStoryWrapper = styled.div`
-  min-width: 220px;
-`;
-
-export default SpecialtyStoryGrid;
-```
-
-- Here, the trick is using `auto-fill` in the `grid-template-columns` property to create a flexible grid that will automatically add as many columns as it can fit in the container. This is a great way to create a responsive grid that will adapt to the available space.
-- Also, Handling overflow on the `SportsStories` container is a great way to make sure that the grid will be scrollable on smaller screens. This is a common pattern for responsive grids that need to adapt to different screen sizes.
-
----
+## Notes
 
 ### General Notes
 
@@ -4947,8 +4729,35 @@ export default SpecialtyStoryGrid;
   ```
 
 - **Wildcard (`*`) performance**
+
   - You may have heard that using the wildcard selector (\*) is bad practice. Some will tell you that it is slow, and can affect the overall performance of your page.
   - Happily, this is not true. It's been debunked again and again. Even in 2009, when computers were slower and browsers were less optimized, this wasn't an issue. Performance concerns around the wildcard selector are a particularly-resilient urban legend.
+
+- `user-select` property
+
+  - It allows us to set an element to be unselectable:
+
+    ```css
+    .unselectable {
+      user-select: none;
+    }
+    ```
+
+  - **With great power comes great responsibility.** We should exercise great caution when disabling browser features meant to improve usability! In this case, I feel pretty confident that we are improving the experience, not degrading it, but these properties should be used extremely conservatively.
+
+- `pointer-events` property
+
+  - It allows us to control how an element responds to mouse events:
+
+    ```css
+    .no-pointer {
+      pointer-events: none;
+    }
+    ```
+
+  - This is a great way to make an element unclickable, but still allow clicks to pass through to the elements below it (useful for overlays & toasters).
+    ![pointer-events](./img/pointer-events.png)
+    - Here, the toaster-wrapper will ignore clicks without locking anything for the element's desendants (the button below it).
 
 ---
 
@@ -4971,3 +4780,13 @@ export default SpecialtyStoryGrid;
 
 - As a general rule, elements can't participate in multiple layout modes at once. Either it's using flexbox, or it's using positioned layout. This is ultimately a very good thing, because CSS would be much more complicated if this wasn't true!
   - When there is a conflict between layout modes, **positioned layout always wins**.
+
+---
+
+### CSS Resources
+
+Here are some of the best resources for keeping up with CSS:
+
+- [CSS Tricks](https://css-tricks.com/)
+- [Smashing Magazing](https://www.smashingmagazine.com/)
+- [Google's Web.dev blog](https://web.dev/blog/)

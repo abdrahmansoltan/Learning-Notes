@@ -913,6 +913,11 @@ To get the size of an element and its position relative to the window, the docum
     document.querySelector('.section--1').scrollIntoView({ behavior: 'smooth' });
     ```
 
+| `scrollTo` | `scrollIntoView` |
+| ---------- | ----------------- |
+| takes a pixel value to scroll to | scrolls to the element |
+| good for scrolling users to the very top of the page | good for scrolling users to a specific element |
+
 - **Forbid Scrolling**
 
   - To make the document unscrollable:

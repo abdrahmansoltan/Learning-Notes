@@ -5,6 +5,9 @@
     - [Box Types (Block vs Inline)](#box-types-block-vs-inline)
   - [Positioning Schemes](#positioning-schemes)
     - [Float](#float)
+      - [Collapsed Height (Float drop)](#collapsed-height-float-drop)
+      - [Clearfixing](#clearfixing)
+      - [Floating Shapes](#floating-shapes)
     - [Positioning \& Prospective](#positioning--prospective)
       - [`position` property](#position-property)
       - [`z-index` (Stacking Context)](#z-index-stacking-context)
@@ -131,57 +134,165 @@ It's a CSS property that allows an element to be pushed to the left or right (re
   ```
 
 - When element is floating it acts like it's not in the page like `position:absolute`, this means that if the element next to it has `padding` => the `padding` will override the floating element and not start at its end.
+
   - To fix this, we can also make the next element `float` too or use `clear:both` on the next element
+
+#### Collapsed Height (Float drop)
+
+Floats have one notorious drawback—if you're not careful, they can break your layout. For example: Watch what happens when an image is floated without much content beside it: **(This is called a "float drop" or "Collapsed Height")**
+
+```html
+<style>
+  .floated {
+    --breathing-room: 16px;
+    float: left;
+    shape-outside: url(/course-materials/me-light.png);
+    margin-right: var(--breathing-room);
+    shape-margin: var(--breathing-room);
+    width: 125px;
+  }
+
+  /* Cosmetic styles */
+  .wrapper {
+    max-width: 600px;
+    padding: 32px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+  }
+  body {
+    padding: 16px;
+  }
+</style>
+
+<div class="wrapper">
+  <p>
+    <img class="floated" src=3d-avatar.png" alt="3D avatar" /> Lorem Ipsum is simply dummy text.
+  </p>
+</div>
+```
+
+![collapse](./img/collapseFloat3.png)
+
+- When we float an image, we take it **out of flow**. When the parent `.wrapper` is trying to determine how tall it should be, it ignores floated elements just like it'd ignore an absolutely-positioned one.
+
 - **Collapsed Height**:
+
   - If a parent element only contains floated elements, some browsers may render it as zero pixels tall, effectively making it invisible if it doesn't have a noticeable background.
     ![collapse](./img/collapseFloat.webp)
     ![collapse](./img/collapseFloat2.png)
   - To fix this, we can:
-    - use `clear:both` on the parent element
+    - use `clear:both` on the parent element -> [Clearfixing](#clearfixing)
     - use `overflow: auto` on the parent element
+
+#### Clearfixing
+
+The `clear` property allows us to place additional content below a floated element, in case we don't want it to wrap around it:
+
 - The `clear` property allows you to say that no element (within the same containing element) should touch the left or right-hand or both sides of a box.
 
-  - `clear` has four valid values (**it's like to ignore any floated item from specified direction**):
-    - `Both` is most commonly used, which clears floats coming from either direction.
-    - `left`
-    - `right`
-    - `None` is the default (Elements can touch either side)
-      ![clear](./img/clear.webp)
-  - we use `clear` property when we want the surrounding element to not be floated around element with a `float` property
+- `clear` has four valid values (**it's like to ignore any floated item from specified direction**):
+  - `Both` is most commonly used, which clears floats coming from either direction.
+  - `left`
+  - `right`
+  - `None` is the default (Elements can touch either side)
+    ![clear](./img/clear.webp)
+- we use `clear` property when we want the surrounding element to not be floated around element with a `float` property
 
-    - To clear `float` for the elements next to the (container element that has the floating elements), we can use a class `clearfix` like this --> **clearfix hack**
+  - To clear `float` for the elements next to the (container element that has the floating elements), we can use a class `clearfix` like this --> **clearfix hack**
 
-      - before:
-        ![clearfix](./img/clearfix1.png)
-      - after:
-        ![clearfix](./img/clearfix2.png)
+    - before:
+      ![clearfix](./img/clearfix1.png)
+    - after:
+      ![clearfix](./img/clearfix2.png)
 
-    - Example of `clearfix` class:
+- Example:
 
-      ```scss
-      .clearfix::after,
-      .clearfix::before {
-        content: '';
-        clear: both;
-        display: table;
-      }
+  ```html
+  <style>
+    .clearfix::after {
+      content: '';
+      disaplay: block;
+      clear: both;
+    }
+  </style>
 
-      // or if you're using sass, you can make it a mixin
-      @mixin clearfix {
-        &::after,
-        &::before {
-          content: '';
-          clear: both;
-          display: table;
-        }
-      }
+  <div class="wrapper clearfix">
+    <img class="floated" src="/course-materials/me-light.png" alt="3D avatar" />
+    <p>Lorem Ipsum is simply dummy text.</p>
+  </div>
+  ```
 
-      .container {
-        @include clearfix;
-      }
-      ```
+  ![collapse](./img/collapseFloat3.png)
+  ![clearfix](./img/clearfix3.png)
 
-    - There's a new way to clear float --> `display: flow-root`
+  - Our parent `.wrapper` element now renders a pseudoelement that applies `clear: both` **(which will clear both left and right floated elements)** right after the content. It doesn't actually matter that this element is empty; the fact that it exists causes the parent to grow to include the entire floated element, and the `0px`-tall element below.
+
+- Here's a generic `clearfix` class:
+
+  ```scss
+  .clearfix::after,
+  .clearfix::before {
+    content: '';
+    clear: both;
+    display: table;
+  }
+
+  // or if you're using sass, you can make it a mixin
+  @mixin clearfix {
+    &::after,
+    &::before {
+      content: '';
+      clear: both;
+      display: table;
+    }
+  }
+
+  .container {
+    @include clearfix;
+  }
+  ```
+
+- There's a new way to clear float --> `display: flow-root`
+
+#### Floating Shapes
+
+- Historically, a floated element would "block out" a rectangle. Text would wrap around that rectangle. **Recently**, floats have gained an additional superpower: they can now specify a shape for text to wrap around! This is done with the `shape-outside` property.
+- `shape-outside` lets us specify a shape that text should wrap around. circle is the most straightforward value, but it accepts many different shapes:
+  - shape names like `circle()`, `ellipse()`, `inset()`, `polygon()`
+    ![float](./img/float-shapes-1.jpg)
+  - `clip-path` style polygons
+  - svg paths, to define complex straight and curved shapes
+  - auto-detecting shapes by passing a `url` to an image
+    ![float](./img/float-shapes-2.png)
+- Example
+
+  ```html
+  <style>
+    .floated {
+      float: left;
+      shape-outside: circle();
+      margin-right: 24px;
+
+      /* Cosmetic tweaks: */
+      width: 125px;
+      border-radius: 50%;
+    }
+  </style>
+
+  <div>
+    <p>
+      <img class="floated" src="/course-materials/cat-avatar-250px.jpg" alt="Yawning kitten" />
+      Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+      been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
+      galley of type and scrambled it to make a type specimen book.
+    </p>
+  </div>
+  ```
+
+  ![float](./img/float-shapes.png)
+
+  > `shape-outside` is a hidden gem. Most developers assume that floats aren't relevant anymore, and they miss out on some pretty cool functionality as a result! And because this effect is so rarely used, it really stands out to users.
 
 ---
 
@@ -1086,7 +1197,13 @@ It's used to position the grid items using values to specify which grid lines th
     - Example of percentage `%` vs `fr`:
       ![grid fr](./img/grid-fr-3.png)
       ![grid fr](./img/grid-fr-4.png)
-  - beats `auto`, when they are together (as `auto` will take the required space available for its content)
+  - **Grid row `fr` weirdness**
+
+    - What happens, though, if we use it for rows on a grid container without an explicit height (like `100vh` or `0` height)?
+
+    - Answer: The `fr` unit will take up the remaining space in the grid container, but it will not take up the remaining space in the viewport. It will take up the remaining space in the grid container, which is the space that's left after the explicit rows have been laid out (the space that the grid-items take up).
+
+  - `fr` beats `auto`, when they are together (as `auto` will take the required space available for its content)
     ![grid fr](./img/grid-fr-2.webp)
     - `auto` will take only its width and `fr` will take all remaining space left
 

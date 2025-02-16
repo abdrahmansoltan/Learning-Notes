@@ -29,7 +29,12 @@
     - [Implement a timeout handler for requests (so that the request doesn't hang forever)](#implement-a-timeout-handler-for-requests-so-that-the-request-doesnt-hang-forever)
     - [Implement TODO list using vanilla JavaScript](#implement-todo-list-using-vanilla-javascript)
     - [What is the difference between these 2 promises?](#what-is-the-difference-between-these-2-promises)
+    - [Why do we need to have event-loop that runs JavaScript code asynchronously?](#why-do-we-need-to-have-event-loop-that-runs-javascript-code-asynchronously)
     - [What will happen if you stored an array in the local storage?](#what-will-happen-if-you-stored-an-array-in-the-local-storage)
+    - [What is "Hidden Classes" ?](#what-is-hidden-classes-)
+    - [What is Javascript Runtime? and is it different from the engine?](#what-is-javascript-runtime-and-is-it-different-from-the-engine)
+    - [What is the difference between "context" and "scope" in JavaScript?](#what-is-the-difference-between-context-and-scope-in-javascript)
+    - [Hoising questions](#hoising-questions)
 
 ---
 
@@ -180,14 +185,35 @@
   myfunc(5, undefined, 17);
   ```
 
-- only one `rest parameter` is allowed in one function and it must be the last parameter.
+  - only one `rest parameter` is allowed in one function and it must be the last parameter.
+
+- What is **"inline caching"**?
+
+  - Inline caching is a technique used by JavaScript **engines** to **optimize property-access on objects**. It works by storing the property lookup in a cache, so that subsequent lookups on the same object can be resolved more quickly.
+
+  - EX:
+
+    ```js
+    function findUser(user) {
+      return `Found ${user.name}`;
+    }
+
+    const userData = { name: 'Alice' };
+
+    findUser(userData); // Found Alice
+    ```
+
+    - In this example, the engine will cache the property lookup for `user.name` on the `userData` object, so that subsequent calls to `findUser` with the same object will be resolved more quickly.
+    - if this findUser(user) is called multiple times, then it will be optimized (inline cached) to just be 'Found Alice' without looking up the object again.
+
+  - It's part of the **"Profiling"** and "Optimizing" process in JavaScript engines.
+    > More [here](https://mathiasbynens.be/notes/shapes-ics)
 
 ---
 
 ## Interview Questions
 
-**Reference** -> [Front End Interview Handbook
-](https://www.frontendinterviewhandbook.com/)
+**Reference** -> [Front End Interview Handbook](https://www.frontendinterviewhandbook.com/)
 
 ### What are `call()` and `apply()`?
 
@@ -542,6 +568,8 @@ let arr = [1, 2, 3, 4];
 
 ### How to deep copy an object?
 
+> This is usually used when you want to create a copy of an object (that contains nested objects) without modifying the original object.
+
 1. You can use `JSON.parse()` and `JSON.stringify()` to deep copy an object.
 
    ```js
@@ -864,6 +892,14 @@ async function getUser() {
 
 ---
 
+### Why do we need to have event-loop that runs JavaScript code asynchronously?
+
+- In other synchronous languages (Ex: Ruby), if the code runs synchronously, it will block the execution of the code until it's finished. This can be allowed in server-side languages
+- **but in the browser, it will block the UI and make the page unresponsive**.
+- That's why we need to have an event loop that runs JavaScript code asynchronously, so that the UI can remain responsive while the code is executing.
+
+---
+
 ### What will happen if you stored an array in the local storage?
 
 - The array will be converted to a string using the `toString()` method before being stored in the local storage.
@@ -881,3 +917,88 @@ async function getUser() {
   localStorage.setItem('myArray', JSON.stringify(arr));
   console.log(JSON.parse(localStorage.getItem('myArray'))); // [1, 2, 3]
   ```
+
+---
+
+### What is "Hidden Classes" ?
+
+**Hidden Classes** are a concept used by JavaScript engines to optimize the performance of objects and their properties.
+
+- When an object is created, the JavaScript engine assigns it a hidden class that defines the object's structure and properties. The hidden class is used to optimize property access and method calls on the object.
+- When an object's structure changes (e.g., properties are added or removed), the hidden class is updated to reflect the new structure. If multiple objects have the same structure, they will share the same hidden class, which improves performance by reducing memory usage and speeding up property access.
+- By using hidden classes, JavaScript engines can optimize property access and method calls by storing information about the object's structure and properties in a more efficient way.
+
+- Example
+
+  ```js
+  function Animal(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  const obj1 = new Animal(1, 2);
+  const obj2 = new Animal(3, 4);
+
+  obj1.a = 30;
+  obj1.b = 100;
+  obj2.b = 30;
+  obj2.a = 100;
+
+  delete obj1.x = 30;
+  ```
+
+  - By setting these values in a different order than they were instantiated, we are making the compiler slower because of hidden classes.
+  - Hidden classes are what the compiler uses under the hood to say that these 2 objects have the same properties.
+  - If values are introduced in a different order than it was set up in, the compiler can get confused and think they don't have a shared hidden class, they are 2 different things, and will slow down the computation.
+  - Also, the reason the `delete` keyword shouldn't be used is because it would change the hidden class.
+
+---
+
+### What is Javascript Runtime? and is it different from the engine?
+
+**JavaScript Runtime** is the environment in which JavaScript code is executed. It consists of the JavaScript engine, the Web APIs, the Event Loop, the Callback Queue, and the Microtask Queue.
+
+- Each browser has its own version of JavaScript **Runtime** with a set of **Web API's**, methods that developers can access from the `window` object.
+
+- **JavaScript Engine** is the core component of the JavaScript runtime that executes JavaScript code. It consists of two main components: the Memory Heap and the Call Stack.
+- So in summary, the JavaScript Engine is a part of the JavaScript Runtime. and the JavaScript Runtime is the environment in which JavaScript code is executed.
+  ![jsRuntime](./img/js-runtime.png)
+
+- There're different runtimes for JavaScript like:
+  - **Node.js Runtime**: used for running JavaScript code outside the browser, on the server-side.
+  - **Browser Runtime**: used for running JavaScript code in the browser.
+
+---
+
+### What is the difference between "context" and "scope" in JavaScript?
+
+- **Scope** refers to the visibility and accessibility of variables in a particular part of the code during runtime. It determines the lifetime of variables and the rules for resolving variable names during execution.
+- **Context** refers to the value of `this` within a function. It indicates which object is currently executing the function, allowing access to that object's properties and methods. The context can change depending on how a function is called.
+
+---
+
+### Hoising questions
+
+1. **What will be the result of this code?**
+
+   ```js
+   // variable declaration gets hoisted as undefined
+   var favoriteFood = 'grapes';
+
+   // function expression gets hoisted as undefined
+   var foodThoughts = function () {
+     // new execution context created favoriteFood = undefined
+     console.log(`Original favorite food: ${favoriteFood}`);
+
+     // variable declaration gets hoisted as undefined
+     var favoriteFood = 'sushi';
+
+     console.log(`New favorite food: ${favoriteFood}`);
+   };
+
+   foodThoughts();
+   ```
+
+   - The result will be `undefined` and `sushi`, I bet that you thought it would be `grapes` and `sushi` but here's why:
+     - As told before: **hoisting happens in every execution context**, so when the `foodThoughts` function is called, a new execution context is created, and the `favoriteFood` variable is hoisted to the top of the function and initialized as `undefined`.
+     - So `favoriteFood` inside the function gets overwritten by the `undefined` value, and that's why the result is `undefined` and `sushi`.

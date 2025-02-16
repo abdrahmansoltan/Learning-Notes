@@ -2,15 +2,20 @@
 
 - [INDEX](#index)
   - [Accessibility](#accessibility)
-  - [`tab` keyboard-key](#tab-keyboard-key)
   - [Keyboard Events](#keyboard-events)
+    - [`tab` keyboard-key](#tab-keyboard-key)
+    - [Keyboard Events Types](#keyboard-events-types)
   - [Screen readers](#screen-readers)
   - [Accessible HTML](#accessible-html)
     - [Labels](#labels)
-  - [Visually Hidden Elements](#visually-hidden-elements)
+  - [Accessible CSS](#accessible-css)
+    - [Visually Hidden Elements](#visually-hidden-elements)
   - [ARIA Roles](#aria-roles)
     - [Live region roles](#live-region-roles)
     - [Aria Label](#aria-label)
+  - [Colors](#colors)
+    - [Color Contrast](#color-contrast)
+    - [Browser simulation for color blindness (Emulate vision deficiencies)](#browser-simulation-for-color-blindness-emulate-vision-deficiencies)
   - [Accessibility Tools](#accessibility-tools)
 
 ---
@@ -19,7 +24,9 @@
 
 ---
 
-## `tab` keyboard-key
+## Keyboard Events
+
+### `tab` keyboard-key
 
 A keyboard user typically uses the Tab key to navigate through interactive elements on a web `page—links`, `buttons`, `fields` for inputting text, etc. When an item is tabbed to, it has keyboard `focus` and can be activated or manipulated with the keyboard. A sighted keyboard user must be provided with a visual indicator of the element that currently has keyboard focus. Focus indicators are provided automatically by web browsers. **(That's why `focus` styles are important)**
 
@@ -52,7 +59,7 @@ Elements that are affected by `tab` are the one which the user interacts with li
 
 ---
 
-## Keyboard Events
+### Keyboard Events Types
 
 > find what is the number for each keyboard key from here: [keycode.info](https://www.keycode.info)
 
@@ -145,12 +152,14 @@ Limitations with the `<label>` tag:
 
 ---
 
-## Visually Hidden Elements
+## Accessible CSS
+
+### Visually Hidden Elements
 
 Sometimes you want to hide an element visually but still have it read out loud by screen readers. This is useful for things like skip links, or for providing additional context to screen reader users.
 
 ```css
-.visuallyhidden {
+.visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -217,6 +226,36 @@ It's a way to add annotations for screen readers to read out loud. It's useful f
 ```
 
 - It's an alternative to [Visually Hidden Elements](#visually-hidden-elements)
+
+---
+
+## Colors
+
+### Color Contrast
+
+- Good contrast is above `4.5:1` for normal text and `3:1` for large text.
+  ![contrast-ratio](./img/contrast-ratio-1.png)
+  ![contrast-ratio](./img/contrast-ratio-2.png)
+
+- You can check the color contrast for any two colors using this handy tool: [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/).
+
+- To check if the **element's color's contrast ratio** is good for accessibility, you can use the devtools to check the contrast ratio between the text color and the background color. by selecting the element in the inspector and a **tooltip** will appear with the contrast ratio.
+
+  ![contrast-ratio](./img/contrast-ratio.png)
+
+---
+
+### Browser simulation for color blindness (Emulate vision deficiencies)
+
+- You can simulate how your website looks to people with different types of **color blindness** using the **Chrome DevTools**. To do this, open the DevTools, click on the three dots in the top right corner, go to **More tools**, and then select **Rendering**.
+
+  ![vision-deficiency](./img/vision-deficiency-1.png)
+  ![vision-deficiency](./img/vision-deficiency-2.png)
+
+- You can then select a vision deficiency to simulate.
+  ![vision-deficiency](./img/vision-deficiency-3.png)
+
+> More here: [Emulate vision deficiencies in DevTools](https://addyosmani.com/blog/emulate-vision-deficiencies-devtools/)
 
 ---
 

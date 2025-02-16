@@ -50,6 +50,10 @@ Apart from helping you to scope styles, styled components include the following 
   - Styled components are independent of each other, and you do not have to worry about their names because the library handles that for you.
 - **Elimination of dead styles**
   - Styled components remove unused styles, even if they’re declared in your code.
+- **Usage of JavaScript**
+  - Styled components allow you to use JavaScript in your CSS, which can be useful for dynamic styling.
+- **Single Source of Truth**
+  - Styled components allow you to keep your styles of a component/selector all in one place (including the `@media` queries) which makes it easier to maintain and debug.
 
 ---
 

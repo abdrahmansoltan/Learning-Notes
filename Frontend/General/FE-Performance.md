@@ -134,7 +134,10 @@ There's a cost to every optimization, so you need to measure to know if the opti
   - if you're measuring the performance of the website in **(Development mode)**, you will get different results because the code is not optimized and the files are not minified and the files are not compressed and the files are not cached
   - So, always measure the performance of the website in **(Production mode)** to get the real performance of the website
   - You can use `webpack` to build the website in **(Production mode)** by running `webpack --mode production` or by setting the `mode` property to `production` in the `webpack.config.js` file
-- ***
+- Here's a great site to check the bundle size of libraries: [bundlephobia](https://bundlephobia.com/)
+  - Why use it? because the size of the library matters, the smaller the library, the faster the website
+
+---
 
 ## JavaScript Performance
 
@@ -691,6 +694,27 @@ They are a set of metrics that Google uses to measure the performance of a websi
 - **Largest Contentful Paint (LCP)**: measures loading performance. To provide a good user experience, LCP should occur within 2.5 seconds of when the page first starts loading.
 - **First Input Delay (FID)**: measures interactivity. To provide a good user experience, pages should have a FID of less than 100 milliseconds.
 - **Cumulative Layout Shift (CLS)**: measures visual stability. To provide a good user experience, pages should maintain a CLS of less than 0.1.
+
+  - It is a measure of how much movement there is on the page, typically in the first few seconds as the page is loading.
+  - The CLS metric measures two things: how many items move, and how significant the shift is. A small icon moving by a few pixels won't be judged as harshly as a big element popping into view and pushing all of the content down.
+  - There are two reasons that it's important to optimize for CLS:
+
+    - **Layout shifts** are unpleasant! They're jarring and chaotic, and they can cause you to accidentally click on the wrong thing.
+    - Starting in 2021, Google has incorporated CLS into its search ranking algorithm, meaning that focusing on CLS can help improve SEO.
+
+  - How to improve it:
+    - [Scroll Optimization in CSS file](../HTML-CSS/2-CSS.md#scroll-optimization)
+    - Fixed image sizes
+      - Unless you give images a `width` and `height`, the browser won't know their dimensions until the image finishes loading. As a result, images will default to being `0px` wide and `0px` tall, and a big layout shift will occur when the image loads!
+      - To prevent this, we need to specify two of the following CSS properties: `width`, `height`, `aspect-ratio`
+        - It does mean that you'll need to know the image's intrinsic dimensions before the image loads. This can be tricky if the image is dynamic, but you can solve this by storing the image dimensions in your data model (eg. if blog posts have images, **be sure to store the width and height in the DB, not just the `src`!**).
+      - If all else fails, you can always prescribe a fixed size, and use `object-fit: cover` to ensure it doesn't get squashed!
+    - Grouped loading
+      - If you're loading in a bunch of content at once, try to group it together so that the layout shift is contained to a single area.
+      - For example, if you're loading in a bunch of images, try to load them all in a single container, rather than sprinkling them throughout the page.
+      - This is a tradeoff; we reduce the number of layout shifts, but it also means that the user won't get to see any images until they've all loaded; on a slow connection, this can make a big difference!
+      - In the future, tools like **React Suspense** will help with this problem. For now, you'll need to come up with the right tradeoff for your particular use case.
+
 - **Total Blocking Time (TBT)**: measures responsiveness. To provide a good user experience, pages should have a TBT of less than 300 milliseconds.
 - **Time to First Byte (TTFB)**: measures the time from the start of the initial navigation until the browser receives the first byte of the response.
 

@@ -43,6 +43,7 @@ Injections are the most common security vulnerability in web applications. It ha
 ### SQL Injection
 
 SQL injection is a code injection technique that might destroy your database. It's one of the most common web hacking techniques.
+![SQL Injection](./img/sql-injection-1.jpg)
 
 - It's a type of injection attack that allows an attacker to execute malicious SQL statements that control a web application’s database server.
 - It allows an attacker to view data that they are not normally able to retrieve.

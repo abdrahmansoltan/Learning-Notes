@@ -6,11 +6,14 @@
     - [Adding javascript file in html](#adding-javascript-file-in-html)
   - [Variables](#variables)
     - [`Var` vs `const` \& `let`](#var-vs-const--let)
-    - [Garbage collection](#garbage-collection)
+    - [Memory Management](#memory-management)
+      - [Garbage collection](#garbage-collection)
+      - [Memory Leak](#memory-leak)
   - [Function](#function)
     - [Function declaration vs Function expression](#function-declaration-vs-function-expression)
     - [Arrow function](#arrow-function)
     - [IIFE](#iife)
+    - [Function Constructor](#function-constructor)
     - [Function binding](#function-binding)
       - [Losing "`this`" keyword](#losing-this-keyword)
       - [Solution 1: Wrapper](#solution-1-wrapper)
@@ -272,16 +275,21 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
 
 ---
 
-### Garbage collection
+### Memory Management
+
+#### Garbage collection
 
 Javascript has a built-in garbage collector that automatically removes the old, unused objects from memory to free up space.
 
+JavaScript is a garbage collected language. If you allocate memory inside of a function, JavaScript will automatically remove it from the memory heap when the function is done being called.
+
 - Garbage collection is automatic.
 - Objects stay in memory while **reachable**.
-- Interlinked objects can become unreachable together.
+- Javascript uses algorithm called **Mark-and-sweep**.
+  ![mark-and-sweep](./img/mark-and-sweep.gif)
+  - Unreachable objects become garbage-collected.
+    ![unreachable](./img/unreachable.png)
 - Modern engines use advanced garbage collection algorithms.
-- Unreachable objects become garbage-collected.
-  ![unreachable](./img/unreachable.png)
 
   - to remove something from memory in garbage-collection, we need to make it **unreachable**, ex:
 
@@ -293,6 +301,35 @@ Javascript has a built-in garbage collector that automatically removes the old, 
     john = null;
     // the object will be removed from memory
     ```
+
+- Some developers have the wrong impression that as Javascript has a garbage collector, they don't need to worry about memory management. But it's not true, you still need to manage memory in JavaScript, because the garbage collector can't collect everything, and it can't collect everything immediately. and you might face some performance issues if you don't manage memory properly like **memory leaks**.
+- However, that does not mean you can forget about memory leaks. No system is perfect, so it is important to always remember memory management.
+
+#### Memory Leak
+
+**Memory leak** is a common problem in programming, where the application uses more memory than it should, and it doesn't release the memory that is no longer needed.
+
+- **Causes of memory leaks:**
+
+  - **Global variables**: if you declare a variable in the global scope, it will be available throughout the application, and it will not be garbage collected until the application is closed.
+  - **Event listeners**: if you add an event listener to an element, and you don't remove it, it will keep a reference to the element in memory, even if the element is removed from the DOM.
+  - **Closures**: if you create a closure inside a function, and you don't remove it, it will keep a reference to the outer function, and it will not be garbage collected.
+  - **Timers**: if you create a timer using `setTimeout` or `setInterval`, and you don't clear it, it will keep a reference to the function, and it will not be garbage collected.
+  - **DOM elements**: if you create a DOM element using `document.createElement`, and you don't remove it, it will keep a reference to the element, and it will not be garbage collected.
+
+- Example:
+
+  ```js
+  var person = {
+    first: 'Brittney',
+    last: 'Postma'
+  };
+
+  person = 'Brittney Postma';
+  ```
+
+  - In the example above a memory leak is created. By changing the variable person from an object to a string, it leaves the values of first and last in the memory heap and does not remove it.
+  - This can be avoided by trying to keep variables out of the global namespace, only instantiate variables inside of functions when possible.
 
 ---
 
@@ -325,7 +362,7 @@ It's a block of code that can be reused and called by name. The code inside a fu
 
 - **Function Declarations**:
 
-  - Can be called before they are defined.
+  - Can be called before they are defined (hoisted).
   - Interpreter processes them before executing the script.
   - Instantly fully initialized when the Lexical Environment is created.
     ![function-declaration](./img/function-declaration.png)
@@ -407,9 +444,11 @@ let func = function (arg1, arg2) {
 
 **Immediately Invoked Function Expression** (IIFE) is a function that runs as soon as it is defined - It is an inline function expression. which create its own scope
 
-- In the past, as there was only `var`, and it has no **block-level** visibility, programmers invented a way to emulate it to create a separate scope.
-  - So, **It's a simple approach to avoid global scope pollution**
+- **It's a simple approach to avoid global scope pollution**
 - It's an old approach for creating `modules`
+
+  > In the past, as there was only `var`, and it has no **block-level** visibility, programmers invented a way to emulate it to create a separate scope. where they used IIFE to create a separate scope.
+
 - [ `anonymous function` / `IIFE` ] are **inline function expressions**.
 
 - Ways to create `IIFE`
@@ -419,9 +458,14 @@ let func = function (arg1, arg2) {
     alert('Parentheses around the function');
   })();
 
-  (function () {
-    alert(`Parentheses around the function with argument: ${argument}`);
-  })(argument);
+  // with arguments
+  (function (message) {
+    alert(message);
+  })('Hello');
+
+  (function ($) {
+    $('h1').css('color', 'red');
+  })(jQuery);
   ```
 
 - **Why IIFE ?**:
@@ -445,6 +489,25 @@ let func = function (arg1, arg2) {
 
   alert(message); // Error: message is not defined
   ```
+
+---
+
+### Function Constructor
+
+It's a way to create a function using the `Function` constructor.
+
+> **It's not recommended to use it, because it's not safe and it's not efficient.**
+
+```js
+const sayHi = new Function('return "Hello"');
+alert(sayHi()); // Hello
+
+const sum = new Function('a', 'b', 'return a + b');
+alert(sum(1, 2)); // 3
+```
+
+- The first pamater is the list of arguments, and the last one is the function body.
+  - if there's only one argument, it wll be the function body.
 
 ---
 
@@ -692,16 +755,21 @@ for (let i = 0; i < 3; i++) {
   }
   console.log(i); // ReferenceError: i is not defined
 
+  // ----------------------------------------- //
+
   // Using var ❌
   for (var i = 0; i < 3; i++) {
     console.log(i); // 0, 1, 2
   }
-  console.log(i); // 3 (it's available outside the loop)
+  console.log(i); // 3 (it's available outside the loop because it's function-scoped)
+
+  // ----------------------------------------- //
 
   // Using const ❌
   for (const i = 0; i < 3; i++) {
     console.log(i); // 0, then error: Assignment to constant variable.
   }
+  console.log(i); // ReferenceError: i is not defined
   ```
 
 - Example of `for` loop without any thing in `()` :

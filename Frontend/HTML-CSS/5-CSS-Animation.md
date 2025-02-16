@@ -16,7 +16,7 @@
   - [Animation Performance](#animation-performance)
     - [The pixel pipeline](#the-pixel-pipeline)
     - [What to animate?](#what-to-animate)
-    - [Hardware Acceleration](#hardware-acceleration)
+    - [Hardware Acceleration (`will-change`) 🚀](#hardware-acceleration-will-change-)
   - [Designing Animations](#designing-animations)
     - [Action-Driven Animation](#action-driven-animation)
       - [Modal Animation (Open - Close)](#modal-animation-open---close)
@@ -30,6 +30,8 @@
     - [Loading spinner](#loading-spinner)
     - [Converting hamburger-menu icon to close icon](#converting-hamburger-menu-icon-to-close-icon)
     - [Photo card flip](#photo-card-flip)
+    - [Flibable cards](#flibable-cards)
+    - [Navigation link flip-up](#navigation-link-flip-up)
   - [Animation Libraries](#animation-libraries)
   - [Notes](#notes)
 
@@ -123,6 +125,7 @@ It allows us to change a specified element in some way. It comes with a grab-bag
   - When we apply `transform-style: preserve-3d`, we create a **3D rendering context**. This is similar in philosophy to a stacking context.
     - When we create a 3D rendering context, we allow all descendants to be positioned in 3D space. They'll grow bigger as they approach the user. They'll be allowed to intersect, like the shapes above.
     - Like stacking contexts, the context will apply all the way down the tree, not just to direct children.
+  - With `z-index`, we're assigning each element a layer. With `preserve-3d`, we're positioning elements in 3D space, and letting the 3D engine figure out the layering.
 
 - **Notes**:
 
@@ -141,6 +144,7 @@ It allows us to change a specified element in some way. It comes with a grab-bag
     - We can use multiple transform functions in the same `transform` property, separated by spaces.
 
   - The `transform` property is a shorthand for `transform-function`, `transform-origin`, and `transform-style`.
+  - The percentages in `translate` and `scale` are relative to the element's size, not the parent's size.
   - **Gotcha**: `transform` doesn't work with **inline elements** in Flow layout.
     - You need to change the display property to `inline-block` or `block` to make it work.
 
@@ -815,7 +819,7 @@ Based on their performance impact on the pixel pipeline, here are the CSS proper
 
 ---
 
-### Hardware Acceleration
+### Hardware Acceleration (`will-change`) 🚀
 
 Depending on your browser and OS, you may occasionally notice a curious stutter on certain animations, **This happens because of a hand-off between the computer's CPU and GPU**.
 
@@ -830,12 +834,15 @@ Depending on your browser and OS, you may occasionally notice a curious stutter 
   }
   ```
 
-  - `will-change` is a CSS property that lets the browser know that an element is likely to change in the future. This allows the browser to prepare for the change, and optimize the animation.
+  - `will-change` is a CSS property that lets the browser know that an element is likely to be animated in the future. This allows the browser to prepare for the change, and optimize the animation **(by rendering it on the GPU from the start)**.
+    - By rendering the animation on the GPU from the start, we avoid the CPU/GPU hand-off, and the animation will be smoother because GPU is better at handling animations.
+  - It's a way to hint to the browser that it should prepare for the change. It's like saying, “Hey, I'm going to animate this thing, so you should get ready for it.”
   - In practice, what this means is that the browser will let the GPU handle this element all the time. No more handing-off between CPU and GPU, no more telltale “snapping into place”.
 
 - **Tradeoffs**
   - Nothing in life comes free, and hardware acceleration is no exception. By delegating an element's rendering to the GPU, it'll consume more video memory, a resource that can be limited, especially on lower-end mobile devices.
     - This isn't as big a deal as it used to be — There're some testing on a Xiaomi Redmi 7A, a popular budget smartphone in India, and it seems to hold up just fine. Just don't broadly apply `will-change` to elements that won't move. Be intentional about where you use it.
+    - But be careful, and don't use it on a lot of elements. It's a tool to be used judiciously, and with care.
 - **But when to use `will-change`?**
   - It's best to use `will-change` when you know that an element is going to change in the future. If you're animating an element on hover, for example, you can add `will-change: transform` to the hover state.
   - When you're animating properties that aren't `transform` or `opacity`, you can use `will-change` to hint to the browser that it should prepare for the change.
@@ -1499,6 +1506,180 @@ If you want to use this value in your React applications, you can create a custo
     }
   }
   ```
+
+---
+
+### Flibable cards
+
+![flippable-cards](./img/flippable-cards.png)
+
+```html
+<div class="wrapper">
+  <a href="/" class="card-link">
+    <article class="card">
+      <img src="/images/logos/chrome.svg" />
+    </article>
+  </a>
+  <a href="/" class="card-link">
+    <article class="card">
+      <img src="/images/logos/firefox.svg" />
+    </article>
+  </a>
+  <a href="/" class="card-link">
+    <article class="card">
+      <img src="/images/logos/safari.png" />
+    </article>
+  </a>
+  <a href="/" class="card-link">
+    <article class="card">
+      <img src="/images/logos/edge.svg" />
+    </article>
+  </a>
+  <a href="/" class="card-link">
+    <article class="card">
+      <img src="/images/logos/opera.svg" />
+    </article>
+  </a>
+</div>
+```
+
+```css
+.wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  perspective: 500px;
+  transform-style: preserve-3d; /* 👈 Very important for 3D transforms */
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid hsl(240deg 100% 75%);
+  will-change: transform;
+  transform: rotateX(0deg);
+  transition: transform 750ms;
+  transform-origin: top center;
+}
+.card img {
+  width: 64px;
+  height: 64px;
+}
+.card-link:hover .card,
+.card-link:focus .card {
+  transform: rotateX(-35deg);
+  transition: transform 250ms;
+}
+.card-link:focus {
+  outline: none;
+}
+.card-link:focus .card {
+  outline: 3px solid hsl(240deg 100% 50%);
+  outline-offset: 2px;
+}
+```
+
+---
+
+### Navigation link flip-up
+
+![nav-link-flip](./img/nav-link-flip.gif)
+
+- The trick here is:
+  - to have 2 elements: one for the front and one for the back. The front element is the one that's visible by default, and the back element is hidden behind it (because the're both absolutely positioned).
+  - When the user hovers over the link, we translate the front element up (to leave a room for the back element), and translate the back element up to be visible.
+- Trick: Use CSS variables to control the `from` and `to` values translated positions.
+
+```html
+<nav>
+  <ul>
+    <li>
+      <a href="/">
+        <span class="text main-text">Seraglio</span>
+        <span class="text hover-text">Seraglio</span>
+      </a>
+    </li>
+    <li>
+      <a href="/">
+        <span class="text main-text">Sumptuous</span>
+        <span class="text hover-text">Sumptuous</span>
+      </a>
+    </li>
+    <li>
+      <a href="/">
+        <span class="text main-text">Scintilla</span>
+        <span class="text hover-text">Scintilla</span>
+      </a>
+    </li>
+    <li>
+      <a href="/">
+        <span class="text main-text">Palimpsest</span>
+        <span class="text hover-text">Palimpsest</span>
+      </a>
+    </li>
+    <li>
+      <a href="/">
+        <span class="text main-text">Assemblage</span>
+        <span class="text hover-text">Assemblage</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+```
+
+```scss
+a {
+  position: relative;
+  display: block;
+  font-size: 1.125rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--color-gray-900);
+  font-weight: --WEIGHTS-medium;
+  /*
+    Text slide-up effect
+  */
+  overflow: hidden;
+  &:first-of-type {
+    color: var(--color-secondary);
+  }
+}
+
+.text {
+  display: block;
+  transform: translateY(var(--translate-from));
+  transition: transform 500ms;
+
+  /* Only enable animations when the user has no preference for better UX */
+  @media (prefers-reduced-motion: no-preference) {
+    nav:hover & {
+      transition: transform 250ms;
+      transform: translateY(var(--translate-to));
+    }
+  }
+}
+
+.main-text {
+  --translate-from: 0% /* 👈 */
+  --translate-to: -100%; /* 👈 */
+}
+
+.hover-text {
+  --translate-from: 100%; /* 👈 */
+  --translate-to: 0%; /* 👈 */
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  font-weight: --WEIGHTS-bold;
+}
+```
 
 ---
 

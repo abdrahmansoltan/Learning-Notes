@@ -80,13 +80,22 @@
 ### Statically vs dynamically typed
 
 - `Statically-typed` do type checking **before runtime** (at **compile-time**)
+
   - this detects errors in our code without running it.
+  - Benefits:
+    - self-documenting when reading the code on what values to expect
+    - better error checking
+
+  ```ts
+  let message: string = 'hello';
+  message = 123456; // ❌ Error: Type 'number' is not assignable to type 'string'.
+  ```
+
 - `dynamically-typed` do type-checking at **runtime** as there exist data types, but variables are not bound to any of them.
 
   ```js
-  // no error
   let message = 'hello';
-  message = 123456;
+  message = 123456; // ✅ No error
   ```
 
 ---
