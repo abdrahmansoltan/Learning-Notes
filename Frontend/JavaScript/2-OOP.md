@@ -59,7 +59,7 @@
 To design an `OOP` application using `classes`, follow these 4 principles:
 
 - **Abstraction**
-  - Hide unnecessary details to focus on the big picture.
+  - Hide unnecessary details to focus on the big picture. (hiding the complexity from the user)
     ![Abstraction](./img/oop-1.png)
 - **Encapsulation**
 
@@ -68,7 +68,7 @@ To design an `OOP` application using `classes`, follow these 4 principles:
 
 - **Inheritance**
 
-  - Allow a child class to inherit properties and methods from a parent class, enabling code-reuse and modeling real-world relationships.
+  - Allow a child class to inherit properties and methods from a parent class, enabling code-reuse and modeling real-world relationships. (it allows memory and time optimization)
     ![Inheritance](./img/oop-3.png)
 
 - **Polymorphism**
@@ -83,6 +83,8 @@ To design an `OOP` application using `classes`, follow these 4 principles:
 ---
 
 ## Object
+
+It's a container that organizes things into units that model real-world objects. It's a collection of properties and methods.
 
 ### Object / Accessor properties
 
@@ -205,6 +207,8 @@ Each object has a `prototype`, which contains **methods** and **properties** tha
 
   - The top of the chain is `null`, which means that the chain ends there.
   - The one before the top is `Object.prototype`, which is the default prototype for all objects. because all things in javascript are objects.
+  - `.prototype` is a property of a `constructor function` that is used to set the `prototype` of the objects created by that constructor function. **(It's not the actual prototype of the object, and It's not available for objects or any other non-constructor functions)**
+    - Instead, the actual prototype of an object is stored in a hidden property called `[[Prototype]]` (`__proto__` in modern browsers)
 
 - Ways to implement `prototypal inheritance` in Javascript:
 
@@ -298,6 +302,7 @@ why we do this instead of declaring the function with the class properties each 
 ### Native (Default) Prototypes
 
 - Javascript uses the `__proto__` reference to give `objects`, `functions` and `arrays` a bunch of bonus functionality. as all things in javascript are objects, and all objects by default have `__proto__` property that points to the `prototype` of the `constructor function` that created them.
+  ![native-prototypes](./img/__proto__.png)
   ![native-prototypes](./img/native-prototypes.png)
 
   ```js
@@ -327,6 +332,8 @@ why we do this instead of declaring the function with the class properties each 
   // notes
   alert(Array.prototype.__proto__ === Object.prototype); // true
   alert(Array.prototype.isPrototypeOf(Array)); // false
+  alert(Array.hasOwnProperty('map')); // false
+  alert(Array.prototype.hasOwnProperty('map')); // true
   ```
 
   ![native-prototypes](./img/native-prototypes2.png)
@@ -334,11 +341,49 @@ why we do this instead of declaring the function with the class properties each 
 > - In modern programming, there is only one case where modifying **native prototypes** is approved. That’s **polyfilling**.
 >   - Polyfilling is a term for making a substitute for a method that exists in the JavaScript specification, but is not yet supported by a particular JavaScript engine.
 
+- **How to add a new method to native prototypes?**
+
+  - for example: adding `getLastYear()` method to the `Date` object
+
+    ```js
+    Date.prototype.getLastYear = function () {
+      return this.getFullYear() - 1;
+    };
+    // Note: don't use arrow functions here, because they don't have their own `this` keyword, and we want to use the `this` keyword to refer to the `Date` object.
+
+    new Date('1900-10-10').getLastYear(); // 1899
+    ```
+
+  - example: modify `map` method of the `Array` object **(not recommended)**
+
+    ```js
+    Array.prototype.map = function () {
+      let arr = [];
+      for (let i = 0; i < this.length; i++) {
+        arr.push(this[i] + '🗺');
+      }
+      return arr;
+    };
+
+    console.log([1, 2, 3].map()); // [ "1🗺", "2🗺", "3🗺" ]
+    ```
+
 ---
 
 ## Constructor Function
 
 It's a function that creates an object type, and prepares the object for use. which implements a reusable object creation code.
+
+- It must be called with the `new` keyword. as it's used to create a new instance of an object.
+
+  ```js
+  function User(name) {
+    this.name = name;
+    this.isAdmin = false;
+  }
+
+  let user = new User('Jack');
+  ```
 
 - Their name should start with a capital letter to indicate that they are constructors and not regular functions
 - Usually, constructors do not have a `return` statement. Their task is to write all necessary stuff into `this`, and it automatically becomes the result. But if there is a `return` statement, then:
@@ -362,6 +407,20 @@ It's a function that creates an object type, and prepares the object for use. wh
 
 - This is how build-in objects like `Array`, `Map` or `Set` are actually implemented
 - This only works with functions created with the `function` keyword, not with arrow functions (because arrow functions don't have their own `this` keyword)
+- **Note:** As mention before, only constructor functions have access to the `prototype` property. Allowing us to add methods to the `prototype` of the constructor function.
+
+  ```js
+  function User(name) {
+    this.name = name;
+  }
+
+  User.prototype.sayHi = function () {
+    alert(this.name);
+  };
+
+  let user = new User('John');
+  user.sayHi(); // John
+  ```
 
 ---
 
@@ -373,7 +432,7 @@ It's a keyword that automates the hard work (process of creating an object and l
 
 - When a function is executed with **`new`** keyword, it does the following **steps**:
 
-  - 1️⃣ Creating a new empty object and assigning it to `this` keyword.
+  - 1️⃣ Creating a new empty object and assigning it to `this` keyword which is a reference to the new object (as `this` is returned by default).
   - 2️⃣ creating a new hidden property `__proto__` and setting it to the `prototype` property of the `constructor function`.
   - 3️⃣ The function body executes. Usually it modifies `this`, adds new properties to it.
   - 4️⃣ The value of `this` is returned. (The new object is returned)
@@ -1137,19 +1196,35 @@ It's a way to create a new class that inherits from an existing class.
 
 Here, inherence works by using the parent's factory function inside the child's factory function. and then linking the prototypes manually.
 
-- Complex example with explanation
+- normal example without optimization
+
+  ```js
+  function User(name, score) {
+    return {
+      name: name,
+      score: score,
+      sayName: function () {
+        console.log("I'm " + this.name);
+      },
+      increment: function () {
+        this.score++;
+      }
+    };
+  }
+
+  const user1 = User('Phil', 5);
+  user1.sayName(); // I'm Phil
+  ```
+
+  - The problem here, is when we create a new object from the `User` function, we're creating a new copy of the `sayName` and `increment` methods for each object that we create. which is bad for performance.
+  - Instead, we should have the methods defined once and shared among all objects using the `prototype`.
+
+- Complex example with explanation (with optimization)
 
   - parent factory function
 
     ```js
-    // Parent
-    const UserCreator = function (name, score) {
-      const newUser = Object.create(userFunction);
-      newUser.name = name;
-      newUser.score = score;
-      return newUser;
-    };
-
+    // declaring the functions outside of the factory function so that they are not created every time we create a new object
     const userFunction = {
       sayName: function () {
         console.log("I'm " + this.name);
@@ -1157,6 +1232,14 @@ Here, inherence works by using the parent's factory function inside the child's 
       increment: function () {
         this.score++;
       }
+    };
+
+    // Parent
+    const UserCreator = function (name, score) {
+      const newUser = Object.create(userFunction); // creating a new object that inherits from the userFunction object (prototype) 🚀
+      newUser.name = name;
+      newUser.score = score;
+      return newUser;
     };
 
     const user1 = UserCreator('Phil', 5);
@@ -1586,4 +1669,35 @@ new User('Dude').sayHi(); // Hello Dude!
   }
 
   new Counter();
+  ```
+
+- **Losing `this` in (object / classes) methods**
+
+  ```js
+  function User(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  User.prototype.sayHi = function () {
+    alert(this.name); // works
+  };
+
+  // losing due to Arrow function (lexical this)
+  User.prototype.sayHello = () => {
+    alert(this.name); // undefined
+  };
+
+  // losing due to nested function
+  User.prototype.sayBye = function () {
+    function nested() {
+      alert(this.name); // undefined
+    }
+    nested();
+  };
+
+  const user = new User('John', 30);
+  user.sayHi(); // John ✅
+  user.sayHello(); // undefined ❌
+  user.sayBye(); // undefined ❌
   ```

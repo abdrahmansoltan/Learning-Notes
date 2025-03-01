@@ -25,6 +25,7 @@
     - [For loop](#for-loop)
     - [For..of loop (looping over iterables)](#forof-loop-looping-over-iterables)
     - [For..in loop (looping over object keys) (Old way)](#forin-loop-looping-over-object-keys-old-way)
+    - [For await..of loop](#for-awaitof-loop)
   - [Data Structures](#data-structures)
     - [Strings](#strings)
       - [String Methods](#string-methods)
@@ -761,7 +762,7 @@ for (let i = 0; i < 3; i++) {
   for (var i = 0; i < 3; i++) {
     console.log(i); // 0, 1, 2
   }
-  console.log(i); // 3 (it's available outside the loop because it's function-scoped)
+  console.log(i); // 3 (it's available outside the loop because it's function-scoped, unlike let which is block-scoped so it's not available outside the block)
 
   // ----------------------------------------- //
 
@@ -840,6 +841,33 @@ for (let key in user) {
   ```
 
   - The `for..in` loop is optimized for generic objects, not arrays, and thus is 10-100 times slower. Of course, it’s still very fast. The speedup may only matter in bottlenecks. But still we should be aware of the difference.
+
+---
+
+### For await..of loop
+
+It's a new way to loop over async iterables. It's used to iterate over async iterables like `fetch`, `readableStream`, etc.
+
+```js
+const asyncIterable = {
+  [Symbol.asyncIterator]() {
+    return {
+      i: 0,
+      next() {
+        if (this.i < 3) {
+          return Promise.resolve({ value: this.i++, done: false });
+        }
+
+        return Promise.resolve({ done: true });
+      }
+    };
+  }
+};
+
+for await (let value of asyncIterable) {
+  // code
+}
+```
 
 ---
 

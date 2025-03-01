@@ -4,6 +4,7 @@
   - [`this` keyword](#this-keyword)
   - [Functions](#functions)
   - [Interview Questions](#interview-questions)
+    - [What is a program? and how does javascript work in that context?](#what-is-a-program-and-how-does-javascript-work-in-that-context)
     - [What are `call()` and `apply()`?](#what-are-call-and-apply)
     - [How can you tell if an image element is loaded on a page?](#how-can-you-tell-if-an-image-element-is-loaded-on-a-page)
     - [What is event delegation?](#what-is-event-delegation)
@@ -35,6 +36,9 @@
     - [What is Javascript Runtime? and is it different from the engine?](#what-is-javascript-runtime-and-is-it-different-from-the-engine)
     - [What is the difference between "context" and "scope" in JavaScript?](#what-is-the-difference-between-context-and-scope-in-javascript)
     - [Hoising questions](#hoising-questions)
+    - [(var vs let vs const) in loops](#var-vs-let-vs-const-in-loops)
+    - [What is the difference between Composition and Inheritance?](#what-is-the-difference-between-composition-and-inheritance)
+    - [Explain the difference between functional programming and OOP programming](#explain-the-difference-between-functional-programming-and-oop-programming)
 
 ---
 
@@ -214,6 +218,21 @@
 ## Interview Questions
 
 **Reference** -> [Front End Interview Handbook](https://www.frontendinterviewhandbook.com/)
+
+### What is a program? and how does javascript work in that context?
+
+- **program**
+  - is a set of instructions that tells a computer what to do. It's a sequence of steps that are executed, and it usually do the following:
+    - Allocate memory.
+    - Parse and execute scripts (read and run the code line by line).
+
+- **JavaScript**
+  - is a high-level, interpreted programming language that is used to make web pages interactive. It is executed by the browser's JavaScript engine, which reads and executes the code line by line. JavaScript can be embedded directly into HTML pages or included as separate files.
+  - It uses the `memory heap` to store variables and function calls.
+  - It uses the `call stack` to keep track of function calls and
+  - It uses the `event loop` to handle asynchronous operations.
+
+---
 
 ### What are `call()` and `apply()`?
 
@@ -1002,3 +1021,56 @@ async function getUser() {
    - The result will be `undefined` and `sushi`, I bet that you thought it would be `grapes` and `sushi` but here's why:
      - As told before: **hoisting happens in every execution context**, so when the `foodThoughts` function is called, a new execution context is created, and the `favoriteFood` variable is hoisted to the top of the function and initialized as `undefined`.
      - So `favoriteFood` inside the function gets overwritten by the `undefined` value, and that's why the result is `undefined` and `sushi`.
+
+---
+
+### (var vs let vs const) in loops
+
+1. **What will be the result of this code?**
+
+   ```js
+   for (var i = 0; i < 3; i++) {
+     setTimeout(() => console.log(i), 1);
+   }
+   ```
+
+   - The result will be `3`, `3`, `3`.
+   - This is because the `var` keyword does not have **block scope**, so the `i` variable is hoisted to the top of the function scope and shared across all iterations (blocks) of the loop.
+   - By the time the `setTimeout` function is executed, the loop has already finished, and the value of `i` is `3` globally.
+
+2. **What will be the result of this code?**
+
+   ```js
+   for (let i = 0; i < 3; i++) {
+     setTimeout(() => console.log(i), 1);
+   }
+   ```
+
+   - The result will be `0`, `1`, `2`.
+   - This is because the `let` keyword has **block scope**, so the `i` variable is scoped to each iteration of the loop and maintains its value for each iteration.
+   - When the `setTimeout` function is executed, it captures the value of `i` at the time of the iteration.
+
+3. **Can we fix the `var` weird loop behavior with other ways?**
+
+   - Yes, we can fix the `var` weird loop behavior by using an **IIFE (Immediately Invoked Function Expression)** to create a new scope for each iteration of the loop.
+
+     ```js
+     for (var i = 0; i < 3; i++) {
+       (function (i) {
+         setTimeout(() => console.log(i), 1);
+       })(i);
+     }
+     ```
+
+     - This way, the `i` variable is scoped to each iteration of the loop, and the value of `i` is captured correctly by the `setTimeout` function.
+     - This is because of **closure**, which allows the inner function to access the `i` variable from the outer function's scope, even after the outer function (IIFE) has finished executing.
+
+---
+
+### What is the difference between Composition and Inheritance?
+
+It's more of a functional vs OOP question, but here's an answer:
+
+**Composition** is combining smaller piecies to create something bigger, **Inheritance** is a super-class that is extended to smaller pieces with more functionalities
+
+### Explain the difference between functional programming and OOP programming

@@ -184,6 +184,7 @@ The JavaScript engine is a program or an interpreter that reads and executes the
   - always the first thing in it is the **global execution context** (Top-level Code / variable declared outside a function)
     ![global-execution-context](./img/global-execution-context.PNG)
   - error-> `stack overflow`: usually from **recursion** (function calling itself) and it's not stopping
+    ![stack-overflow](./img/stack-overflow.png)
   - Example:
 
     ```js
@@ -245,6 +246,7 @@ The JavaScript engine is a program or an interpreter that reads and executes the
 > - performing functions execution in the **thread of execution (call stack)** where each function gets its own **mini execution context**
 
 - JavaScript is a **single threaded language**, meaning only one thing can be executed at a time. It only has one call stack and therefore it is a synchronous language.
+  - other languages like `C++` are multi-threaded, meaning they can run multiple things at once. but in javascript, it's was designed to be single-threaded because it was designed to run in the browser, and the browser is single-threaded. and to avoid conflicts between different parts of the code, and **Deadlocks** which is a situation where two or more threads are waiting for each other to release a resource, or waiting for an event to occur.
 
 ---
 
@@ -298,6 +300,13 @@ The JavaScript engine is a program or an interpreter that reads and executes the
     typeof {}; // object
     typeof []; // object
     typeof function () {}; // function
+
+    // Ready for the weird part?
+    typeof Object; // function
+    typeof String; // function
+    typeof Boolean; // function
+    typeof new String(); // object
+    // Why? Because these are constructor functions in JavaScript. They are functions that create (objects, strings, booleans) respectively. But if you use the `new` keyword, it will return an object.
     ```
 
   - Sometimes it's not enough when figuring out the type of something specially when it's reference type, so you can these:
@@ -773,14 +782,14 @@ It's a special variable that is created for every execution context (every funct
 
   - **Arrow functions**:
 
-    - Lexical `this`: Defined by where it was written, not called.
+    - `this`: Defined by where it was written, not called **(lexical scope)**.
     - No `this`: Taken from the outer scope (global scope, `window` object).
     - Object methods: Still point to the global object.
     - **Avoid using arrow functions as methods inside objects**: `this` will refer to the upper scope, usually the global object.
 
   - **Normal functions**:
 
-    - `this` refers to the caller (dynamic scope).
+    - `this` refers to the caller **(dynamic scope)**.
     - `this` is `undefined` if called globally if in strict mode, otherwise it points to the global `window` object.
 
 - Benefits of `this` in functions:
@@ -912,12 +921,13 @@ It's a special variable that is created for every execution context (every funct
 
 ## Functional Programming
 
-It's the process of building software by composing **pure functions**, avoiding **shared state**, **mutable data**, and **side-effects**.
+It's the process of building software with small **pure functions**, avoiding **shared state**, **mutable data**, and **side-effects**.
 
 - It's a **declarative** programming paradigm, which means that the program structure is based on the functions and what they return, not on the order of execution.
 
-  - Imperative vs Declarative programming:
-    ![imperative vs declarative](./img/imperative-vs-declarative.png)
+  > **Imperative vs Declarative programming:**
+  >
+  > ![imperative vs declarative](./img/imperative-vs-declarative.png)
 
 - Functional programming principles
   ![functional programming](./img/functional-programming.png)
@@ -959,7 +969,7 @@ It's the process of building software by composing **pure functions**, avoiding 
 
 ![currying-vs-partialapplication](./img/currying-vs-partialapplication.jpeg)
 
-> These 2 concepts use **Closures**
+> These 2 concepts use **Closures** & **Higher order functions**
 
 #### Currying
 
@@ -1108,12 +1118,20 @@ It's just a name for binding some of the function’s arguments to a specific va
 
 ### Closure
 
-A closure allows a function to remember variables from its creation context, even after the outer function has returned.
+A closure allows a function to remember variables from its creation context, **even after the outer function has returned** (after leaving the scope it was declared in).
 
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
 
+> Javascript engine makes sure that the function has access to all the variables that were in its scope when the function was created, even if the outer function has finished executing.
+
+- Why we have closures in JS?
+
+  - Because in JS, functions are **first-class citizens** (can be passed around and returned like any other value), and has **lexical scope** (where the function was written, not called)
+  - and **closures / backpacks** allow us to keep the variables in the function's scope even after the function has finished executing
+
 - It's a closed-over **(variable environment)** of the execution context in which the function was created, even after that execution context is gone.
+  ![closure](./img/closure-5.png)
 
   - **Function's `[[Environment]]` property**:
 
@@ -1125,6 +1143,7 @@ A closure allows a function to remember variables from its creation context, eve
 
   - When a function is created, it keeps a reference to its outer lexical environment (where it was created), even if the outer function has finished executing.
     - The function keeps a reference to its outer lexical environment in a hidden property `[[Environment]]`.
+      ![closure](./img/closure-6.png)
   - Then, the function is returned and assigned to a variable. The variable becomes a function reference that keeps the reference to the outer lexical environment.
     - It's done by **returning a function from another function**
   - When the function is called, it uses the outer lexical environment to access the variables. (even if the outer function has finished executing)
@@ -1153,6 +1172,56 @@ A closure allows a function to remember variables from its creation context, eve
 
 - **Notes:**
 
+  - Benefits of closures:
+
+    - Memory-efficient: Closures allow us to cache the values inside its block-scoped (where it was called) in case that it was called again.
+
+      ```js
+      function heavyDuty(index) {
+        const bigArray = new Array(7000).fill('😄');
+        console.log('created!');
+        return bigArray[index];
+      }
+
+      heavyDuty(688); // created! (it will create the array every time it's called) BAD ❌
+
+      // ---------------------------------------------------------
+
+      function heavyDutyWithClosure() {
+        const bigArray = new Array(7000).fill('😄');
+        console.log('created once!');
+        return function (index) {
+          return bigArray[index];
+        };
+      }
+
+      const getHeavyDuty = heavyDutyWithClosure(); // created once! (it will create the array only once) GOOD ✅
+      getHeavyDuty(688);
+      ```
+
+    - Encapsulation / Data privacy: Closures allow us to create private variables that can't be accessed directly from outside the function.
+
+      ```js
+      function counterModule() {
+        let count = 0; // private variable that will be unaccessible directly from outside the function
+
+        // returning an object with methods that can access the count variable
+        return {
+          increment() {
+            return count++;
+          },
+          decrement() {
+            return count--;
+          },
+          getCount() {
+            return count;
+          }
+        };
+      }
+      ```
+
+    - Module pattern: Closures allow us to create modules that have private variables and methods that can't be accessed directly from outside the module.
+
   - One of the biggest examples of closures are:
 
     - **timers**
@@ -1168,6 +1237,8 @@ A closure allows a function to remember variables from its creation context, eve
       sayHi(); // Hello after 1 second
       // it remembers the phrase variable even after the function has finished and was popped off the call stack
       ```
+
+      - This is because the `setTimeout` function is higher-order function that takes a function as an argument, and it's important to be able to access the `phrase` variable even after the `sayHi` function has finished executing, and the callback function has been moved to the `microtask queue` in the event loop.
 
     - **event listeners**
 
@@ -1290,6 +1361,22 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
   - **Concurrency**: Easier to run in parallel, as they don't depend on shared state.
   - **Memoization**: the return value can be cached or memoized for performance optimization.
 
+- Examples:
+
+  - Pure functions
+
+    ```js
+
+    ```
+
+  - Non-Pure functions
+
+    ```js
+    // function that consoles something to the world
+
+    // functions that returns different result for the same input (like using Math.random())
+    ```
+
 ---
 
 ### Decorators
@@ -1396,9 +1483,29 @@ recursion sometimes take long time as it calls multiple functions at the same ti
   - Be passed as arguments to other functions
   - Be returned from functions (enables **closures**)
 
-- **Higher Order Functions**: Functions that accept or return other functions (e.g., `map`, `filter`, `reduce`, `sort`, `forEach`).
-  - Benefits: More readable, easier to debug, and makes code DRY.
+- **Higher Order Functions**: Functions that accept or return other functions
+  ![higher order functions](./img/higher-order-functions.png)
+
+  - e.g., `map`, `filter`, `reduce`, `sort`, `forEach`
+  - It gives us ability to not just tell the function what data to use, but also how to use it (by passing the function that will be used on the data)
+  - Benefits: makes functions:
+    - More readable & generic
+    - easier to debug
+    - makes code DRY
   - Allows chaining functions by passing the output of one as the input to another.
+
+    ```js
+    function multiplyBy(num) {
+      return function (x) {
+        return x * num;
+      };
+    }
+
+    // or const multiplyBy = (num) => (x) => x * num;
+
+    multiplyBy(2)(3); // 6
+    ```
+
 - Core of **functional** and **asynchronous programming**: Passing functions as arguments is key, even with `promises` or `async/await`.
 
 ---
@@ -1580,7 +1687,9 @@ It's the combination of multiple functions to create a more complicated one. It'
 
   - **But that’s risky, people can overwrite**, So we can use **composition** to make it more readable and less risky.
 
-- Composition is a fancy term which means "combining pure functions to build more complicated ones" (make complex programs out of simple functions).
+- Composition is a fancy term which means **"combining pure functions to build more complicated ones"** (make complex programs out of simple functions).
+
+  - Useful when you want to have specific order to run the (operations / steps / functions) on the data
 
   ![composition](./img/composition.png)
 
@@ -1593,6 +1702,18 @@ It's the combination of multiple functions to create a more complicated one. It'
 
   // or
   const compose = (fn1, fn2) => fn1(fn2());
+
+  // ---------------------------------------------------------
+
+  // Pipe (opposiste order)
+  let pipe = (fn1, fn2) => {
+    return function (value) {
+      return fn2(fn1(value));
+    };
+  };
+
+  // or
+  const pipe = (fn1, fn2) => fn2(fn1());
   ```
 
 - **Example of generic compose function:**
@@ -1612,6 +1733,8 @@ It's the combination of multiple functions to create a more complicated one. It'
   const transformString = compose(joinWithDashes, splitWords, lowerCaseString);
   console.log(transformString('I Love JavaScript')); // i-love-javascript
   ```
+
+  - Here, we use (spread operator, `reduce()`)
 
 - Why use composition?
 

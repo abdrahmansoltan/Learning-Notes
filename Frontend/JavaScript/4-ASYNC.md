@@ -71,7 +71,7 @@
 
 ### Is JavaScript `synchronous` or `asynchronous` ?
 
-JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability due to its `Event Loop` which is part of the `browser` not `javascript`.
+JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchronous ability due to its `Event Loop` which is part of the `Browser API` not `javascript` (or in `Node.js` it uses `C++ API's`).
 
 - Why not `asynchronous` by default?
 
@@ -106,7 +106,7 @@ JavaScript is always `synchronous` & `single-threaded`, and it has no Asynchrono
 
 ## How Asynchronous code works in JavaScript
 
-Lets's start from the beginning. When you visit a web page, you run a browser to do so (Chrome, Firefox, Safari, Edge). Each browser has its own version of JavaScript Runtime with a set of Web API's, methods that developers can access from the window object.
+Lets's start from the beginning. When you visit a web page, you run a browser to do so (Chrome, Firefox, Safari, Edge). Each browser has its own version of **JavaScript Runtime** with a set of Web API's, methods that developers can access from the window object.
 
 In a synchronous language, only one thing can be done at a time. Imagine an alert on the page, blocking the user from accessing any part of the page until the OK button is clicked. If everything in JavaScript that took a significant amount of time, blocked the browser, then we would have a pretty bad user experience.
 
@@ -591,7 +591,7 @@ It's when you have a lot of nested callbacks to execute asynchronous code in a c
 
 ## Promises
 
-**Promise**: An object representing the future result of an asynchronous operation (failure or success).
+**Promise**: An object representing the future result of an asynchronous operation (failure or success or pending).
 
 - It's a way for handling asynchronous code in a more readable and maintainable way.
 - Avoids callback hell by chaining `then()` and handling errors with `catch()` instead of passing callbacks to asynchronous functions like `xmlHttpRequest`.
@@ -765,14 +765,26 @@ A Promise object serves as a link between the executor (the “producing code”
 
   - If we’re interested only in errors, then we can use `null` as the first argument: `.then(null, errorHandlingFunction)`. Or we can use `.catch(errorHandlingFunction)`, which is exactly the same:
 
-  ```js
-  let promise = new Promise((resolve, reject) => {
-    setTimeout(() => reject(new Error('Whoops!')), 1000);
-  });
+    ```js
+    let promise = new Promise((resolve, reject) => {
+      setTimeout(() => reject(new Error('Whoops!')), 1000);
+    });
 
-  // .catch(f) is the same as promise.then(null, f)
-  promise.catch(alert); // shows "Error: Whoops!" after 1 second
-  ```
+    // .catch(f) is the same as promise.then(null, f)
+    promise.catch(alert); // shows "Error: Whoops!" after 1 second
+    ```
+
+  - It only catches errors that happens before it, and not after it.
+
+    ```js
+    fetch(`https://restcountries.eu/rest/v2/name/Egypt`)
+      .then(response => response.json())
+      .catch(err => console.error(err));
+      .then(data => {
+        console.log(data);
+        throw new Error('💥'); // This won't be handled by the catch below
+      })
+    ```
 
 - **Notes**
 
@@ -1903,7 +1915,7 @@ let promise = fetch(url, [options]);
 - **Notes:**
   - whatever we `return` from a `promise` will be the `fulfilled` value of that promise (which will be used in the `.then()` method), that's why `arrow-functions` are usually used with promises.
   - **json()** is a method available on all response objects that are coming from `fetch()` function (in `__proto__` of the response object), It reads the remote data and parses it as JSON
-    - also `.json()` returns a new promise => so we have to return it
+    - also `.json()` **returns a new promise** => so we have to return it
   - in XHR, we use the `JSON.parse()` method with the response, but in `fetch()`, we use `.json()` method on the returned `data`
 - explanation code :
 
@@ -2147,6 +2159,7 @@ The WebSocket protocol, provides a way to exchange data between browser and serv
 > Don't mix this with the Macrotasks, find more here [Macrotasks and Microtasks](./00-JS_Advanced_concepts.md#macrotasks-and-microtasks)
 
 The **job queue or microtask queue** came about with `Promise` in **ES6**. With `promises` we needed another callback queue that would give higher priority to promise calls. **The JavaScript engine is going to check the job queue before the callback queue**.
+![job-queue](./img/tasks-queue.gif)
 
 - Promise handlers `.then`/`.catch`/`.finally` are always **Asynchronous**.
 
