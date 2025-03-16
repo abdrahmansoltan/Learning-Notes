@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Frameworks](#frameworks)
     - [Problem with vanilla JavaScript](#problem-with-vanilla-javascript)
+    - [Reactivity (Change Detection)](#reactivity-change-detection)
   - [Types of Frameworks](#types-of-frameworks)
     - [Configuration-over-convention](#configuration-over-convention)
     - [convention-over-configuration](#convention-over-configuration)
@@ -38,10 +39,33 @@
 
 - `Vanilla JavaScript` is the term used to describe plain JavaScript without any additional libraries or frameworks.
 - We use frameworks instead of vanilla JavaScript because it's hard to build a complex application with vanilla JavaScript, as it's not scalable and it's hard to maintain and test
+
   - it requires keeping the `UI` in sync with the `data` and `state` of the application, which is hard to do with vanilla JavaScript
   - if we want to build a complex application with vanilla JavaScript, we have 2 problems:
     1. we will require lots of `DOM` manipulation and traversing, which is hard to maintain and test **(spaghetti code)**
     2. state (data) needs to be stored in a central place instead of storing it in the `DOM`, and we need to keep the `UI` in sync with the `state` of the application
+
+---
+
+### Reactivity (Change Detection)
+
+> "Reactivity" is the ability of a web application to update the user interface (html document) in response to changes in the underlying data or state of the application.
+
+- It's one of the superpowers of modern frameworks like `React`, `Angular`, `Vue`, etc. as it replaces the old way of `DOM` manipulation and traversing with a more efficient way of updating the `UI` in response to changes in the `state` of the application
+- When does reactivity happens?
+
+  - when the app is first loaded / initialized
+  - During changes in the state of the application
+  - When the user interacts with the application
+  - Manually triggering a reactivity update
+
+- Some frameworks runs a `Change Detection` mechanism **Twice** to make sure that the `UI` is in sync with the `state` of the application. **But this is only in development mode, in production mode it runs only once**
+
+  - **First run**: to check for changes in the `state` of the application
+  - **Second run**: to update the `UI` with the changes in the `state` of the application
+
+- In a complex application, it's hard to keep the `UI` in sync with the `state` of the application, as we need to manually update the `UI` whenever the `state` changes
+- this is called `Reactivity`, and it's hard to do with vanilla JavaScript
 
 ---
 
@@ -61,7 +85,7 @@
 - structure straight out of the box
 - Provides solutions for common problems
 - larger learning curve
-- EX: `Angular`
+- EX: `Angular`, `Next.js`, `Nuxt.js`
 
 ---
 

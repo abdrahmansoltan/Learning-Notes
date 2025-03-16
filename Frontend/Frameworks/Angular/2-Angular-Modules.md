@@ -19,14 +19,16 @@
 
 Angular uses modules to **bundle** different components into packages
 
+> Angular Team created a module system to group the code into different modules based on their functionality, which helps in organizing the code in a better way and makes it easier to manage and maintain the code
+
 It's a way to organize the code into different modules based on their functionality
 ![module](./img/modules-0.png)
 
 - A single app can have multiple modules, each module can have multiple components, and each component can have multiple services.
   ![structure](./img/modules-1.png)
-
+  - Instead of having to import each component and service individually, we can import the module that contains them, which makes it easier to manage the code, also we can use components and services from the same module without importing them explicitly, which makes the code cleaner and more organized
 - It's where we import components so that Angular knows that they exist
-- There're built-in modules in Angular like:
+- There're **built-in modules** in Angular like:
 
   - `BrowserModule`
     - provides services that are essential to launch the app in the browser

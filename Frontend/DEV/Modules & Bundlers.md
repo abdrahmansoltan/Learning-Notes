@@ -2,10 +2,13 @@
 
 - [INDEX](#index)
   - [Modules](#modules)
-    - [Problems with script loading](#problems-with-script-loading)
+    - [Problems with script loading (Before modules)](#problems-with-script-loading-before-modules)
     - [History of Modules](#history-of-modules)
-      - [CommonJS](#commonjs)
-      - [EcmaScript Modules (ESM)](#ecmascript-modules-esm)
+      - [Old Way](#old-way)
+        - [AMD](#amd)
+        - [CommonJS](#commonjs)
+      - [New Way](#new-way)
+        - [EcmaScript Modules (ES6 Modules)](#ecmascript-modules-es6-modules)
   - [Parcel](#parcel)
   - [Webpack](#webpack)
   - [Vite](#vite)
@@ -28,7 +31,7 @@
 
 As our application grows bigger, we want to split it into multiple files, so called “modules”. A module may contain a class or a library of functions for a specific purpose.
 
-### Problems with script loading
+### Problems with script loading (Before modules)
 
 - We have some problems when trying to run javascript in the browser:
 
@@ -49,11 +52,27 @@ As our application grows bigger, we want to split it into multiple files, so cal
 
 When scripts became more and more complex, so the community invented a variety of ways to organize code into modules, special libraries to load modules on demand:
 
-- **AMD** – one of the most ancient module systems, initially implemented by the library `require.js`.
-- **CommonJS** – the module system created for `Node.js` server.
+#### Old Way
+
+- [AMD](#amd) – one of the most ancient module systems, initially implemented by the library `require.js`.
+- [CommonJS](#commonjs) – the module system created for `Node.js` server.
 - **UMD** – one more module system, suggested as a universal one, compatible with `AMD` and `CommonJS`.
 
-#### CommonJS
+##### AMD
+
+`AMD` (Asynchronous Module Definition) is a module system for the browser
+
+- it's **asynchronous** (it doesn't wait for the module to load before executing the next line of code)
+- it's **non-blocking** (it doesn't block the execution of the code until the module is loaded)
+- You may not have heard of `AMD` before, but you've probably heard of `RequireJS` library which is an implementation of `AMD`
+
+  ```js
+  require(['path'], function (path) {
+    // do something with path
+  });
+  ```
+
+##### CommonJS
 
 - With the creation of `Node.js`, we needed a way to run Javascript outside of the browser, this is where `commonJS` was born
 
@@ -62,6 +81,14 @@ When scripts became more and more complex, so the community invented a variety o
   ```
 
 - `NPM` was created as a package strategy to share **commonJS node modules** across the entire ecosystem
+- It works okay in server-side, but it doesn't work in the browser
+
+  - This is because:
+    - it's **synchronous** (it waits for the module to load before executing the next line of code)
+    - it's **blocking** (it blocks the execution of the code until the module is loaded)
+    - it's **live bindings** (it's a reference to the module, so if the module changes, the value changes)
+  - That's why people then started using tools like `Browserify` to bundle the modules into a single file that can be used in the browser
+
 - Modules also had problems:
   - No live bindings
   - No browser support for commonJS
@@ -69,7 +96,15 @@ When scripts became more and more complex, so the community invented a variety o
 - this is where **bundlers** and **linkers** started to get popular, but they also had problems
 - this led to a solution which is -> **ESM**
 
-#### EcmaScript Modules (ESM)
+---
+
+#### New Way
+
+Native modules became a part of the language in `ES2015` (also known as `ES6`), and now it's supported in all modern browsers
+
+- **ESM** (EcmaScript Modules) is a standard pattern for importing and exporting modules in JavaScript
+
+##### EcmaScript Modules (ES6 Modules)
 
 It's a standard pattern for importing JavaScript modules.
 
@@ -79,6 +114,8 @@ import * as utils from 'utils';
 
 export const uniqConst = uniq([1, 2, 2, 4]);
 ```
+
+- Here, it works by using the `import` and `export` keywords, and only the exported variables are available outside the module
 
 - it's different from **ES2015**
 - it's still not fully compatible with `Node.js`

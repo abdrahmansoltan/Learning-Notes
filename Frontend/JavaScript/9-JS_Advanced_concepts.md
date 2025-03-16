@@ -2103,7 +2103,7 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
        - Using `eval` or `arguments` as variable names.
        - Using `with`.
     2. Throws errors for bad syntax instead of failing silently.
-    - Example: Mistyping a variable name throws an error instead of creating a global variable.
+       - Example: Mistyping a variable name throws an error instead of creating a global variable.
   - **Usage**:
     - Modern JavaScript classes and modules enable strict mode automatically, so explicit `"use strict"` is often unnecessary.
 - `Refactoring the code` : means the process of restructuring code without changing or adding to its external behavior and functionality.

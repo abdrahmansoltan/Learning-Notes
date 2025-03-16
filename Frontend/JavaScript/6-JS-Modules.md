@@ -2,6 +2,8 @@
 
 - [INDEX](#index)
   - [Notes](#notes)
+  - [Modular pattern](#modular-pattern)
+    - [Revealing modular pattern](#revealing-modular-pattern)
   - [Modules](#modules)
     - [Module Features](#module-features)
     - [Module scripts](#module-scripts)
@@ -12,13 +14,13 @@
     - [Importing](#importing)
     - [Re-exporting](#re-exporting)
       - [Re-exporting the default export](#re-exporting-the-default-export)
-  - [modular pattern](#modular-pattern)
 
 ---
 
 ## Notes
 
-- As our program grows bigger, it may contain many lines of code. Instead of putting everything in a single file, you can use `modules` to separate codes in separate files as per their functionality. This makes our code organized and easier to maintain.
+As our program grows bigger, it may contain many lines of code. Instead of putting everything in a single file, you can use `modules` to separate codes in separate files as per their functionality. This makes our code organized and easier to maintain.
+
 - `Module` is a file that contains code to perform a specific task. A module may contain variables, functions, classes etc.
 - As of `ES2022`, `Top-level await` is supported in modules. This means that we can use `await` at the top level of a module without any wrapper function with `async` keyword.
   - Note that this will only work if the module is loaded as an `ES module` (using `import` or `type="module"`).
@@ -27,11 +29,89 @@
 
 ---
 
+## Modular pattern
+
+The module pattern is a special Design pattern in which we use IFFI (Immediately invoked function expression), and we return an object. Inside of that object, we can have functions as well as variables.
+
+> note that the thing that make this possible (reaching what the IIFE-function returns after it was self-invoked) is => `closures`
+
+- Private methods or functions are members of given entity than can be seen only within said entity. Public ones can be accessed from the outside of given entity.
+
+  ```js
+  // IIFE
+  const Formatter = (function () {
+    const log = message => console.log(`[${Date.now()}] Logger: ${message}`);
+  })();
+
+  // using it
+  Formatter.log('Hello');
+  ```
+
+- Why use it?
+
+  - avoid polluting the global namespace.
+  - expose an interface to the outside world.
+  - avoid naming collisions.
+  - encapsulate code.
+
+- Problems:
+
+  - order of dependencies is important and can be hard to manage.
+  - it can be hard to read and understand.
+  - it can be hard to test private methods.
+
+- Solution: `CommonJS` and `ES6 modules` are better solutions for managing dependencies.
+
+  > `CommonJS` is one of the reasons that made `Node.js` popular. It allows us to use `require` and `module.exports` to import and export modules.
+  >
+  > Actually, NPM is just a way to share `CommonJS` modules.
+
+### Revealing modular pattern
+
+It's a variation of the module pattern where we simply define all of our functions and variables in the private scope and return an anonymous object with pointers to the private functionality we wished to reveal as public.
+
+- This pattern allows us to reveal certain variables and methods returned in an object literal.
+
+  ```js
+  const myRevealingModule = (function () {
+    let private;
+    let publicVar = 'I am public';
+
+    let publicFunction = () => {
+      privateVar++;
+      return privateFunction();
+    };
+
+    let privateFunction = () => {
+      console.log('I am private');
+    };
+
+    return {
+      publicVar,
+      publicFunction
+    };
+  })();
+
+  // using it
+  myRevealingModule.publicFunction(); // I am private ✅
+  console.log(myRevealingModule.publicVar); // I am public ✅
+  console.log(myRevealingModule.privateVar); // undefined ❌
+  ```
+
+- This is possible because of the `closures` in JavaScript.
+
+---
+
 ## Modules
 
-> More on modules here -> [Modules & Bundlers](../DEV/Modules%20%26%20Bundlers.md)
+> Read the history first here -> [Modules & Bundlers](../DEV/Modules%20%26%20Bundlers.md#modules)
 
 Modules split a large codebase into smaller files that can be loaded on demand.
+
+- It gives us the ability to:
+
+  - split our code into multiple files, each with a specific purpose, and then import them into the main file.
+  - import/export functionality between files.
 
 - **Module**: A reusable piece of code (file) that encapsulates implementation details.
 - **Directives**:
@@ -49,19 +129,21 @@ Modules split a large codebase into smaller files that can be loaded on demand.
   3. **Polyfilling**: Add code to support older browsers (e.g., `Babel`).
      - ex: `Promise` to `callback functions` **(which is not syntax but a feature)**
 
-- **Usage**: Use `<script type="module">` to tell the browser to treat the script as a module.
+- **Usage**:
 
-  ```html
-  <script type="module" defer src="script.js"></script>
-  ```
+  - Use `<script type="module">` to tell the browser to treat the script as a module.
 
-  - The browser automatically fetches and evaluates the imported module (and its imports if needed), and then runs the script.
+    ```html
+    <script type="module" defer src="script.js"></script>
+    ```
 
-- **Modules require HTTP(s)**, not local files (`file://`), due to `CORS` restrictions.
+    - The browser automatically fetches and evaluates the imported module (and its imports if needed), and then runs the script.
 
-  - Use a local web server (e.g., "live server") to simulate a real server with `http`.
-  - Browsers add an `Origin` header to requests; servers must respond with `Access-Control-Allow-Origin`.
-  - **Summary**: Modules must be served from the same origin (domain, protocol, port).
+  - We must use **HTTP(s)**, not local files (`file://`), due to `CORS` restrictions.
+
+    - Use a local web server (e.g., "live server") to simulate a real server with `http`.
+    - Browsers add an `Origin` header to requests; servers must respond with `Access-Control-Allow-Origin`.
+    - **Summary**: Modules must be served from the same origin (domain, protocol, port).
 
 ---
 
@@ -493,21 +575,3 @@ The default export needs separate handling when re-exporting.
 > Such oddities of re-exporting a default export are one of the reasons why some developers don’t like default exports and prefer named ones.
 
 ---
-
-## modular pattern
-
-The module pattern is a special Design pattern in which we use IFFI (Immediately invoked function expression), and we return an object. Inside of that object, we can have functions as well as variables.
-
-> note that the thing that make this possible (reaching what the IIFE-function returns after it was self-invoked) is => `closures`
-
-- Private methods or functions are members of given entity than can be seen only within said entity. Public ones can be accessed from the outside of given entity.
-
-  ```javascript
-  // IIFE
-  const Formatter = (function () {
-    const log = message => console.log(`[${Date.now()}] Logger: ${message}`);
-  })();
-
-  // using it
-  Formatter.log('Hello');
-  ```

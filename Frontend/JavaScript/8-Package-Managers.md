@@ -149,6 +149,18 @@ It's a simple command-line tool that automates the process of downloading and in
        <script src="dist/main.js"></script>
        ```
 
+- `npx`
+
+  - It's a tool that comes with npm 5.2+ and higher. It allows you to run a command (from the package in `node_modules/.bin`) without having to install it globally.
+  - It's useful for running packages that you don't want to install globally, or for running a package that you only need once.
+  - Ex:
+
+    ```sh
+    npx create-react-app my-app # initialize a react app
+
+    npx tsc example.ts # run typescript compiler
+    ```
+
 ---
 
 ### Yarn

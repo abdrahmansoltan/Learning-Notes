@@ -38,12 +38,11 @@
 
 ![typescript](./img/typescript-1.png)
 
-> It's just: Javascript with types
-
 ![typescript](./img/typescript.PNG)
 
 - It only exists in **development** then it's compiled to javascript
   - Thus, it doesn't provide any performance optimization
+  - it only helps us during the compilation process (adds extra sanity check / step)
 
 ### why use Typescript
 
@@ -79,7 +78,7 @@
 
 ### Statically vs dynamically typed
 
-- `Statically-typed` do type checking **before runtime** (at **compile-time**)
+- `Statically-typed` do type checking **before runtime** (at **compile-time**) (types don't change at runtime)
 
   - this detects errors in our code without running it.
   - Benefits:
@@ -91,7 +90,7 @@
   message = 123456; // ❌ Error: Type 'number' is not assignable to type 'string'.
   ```
 
-- `dynamically-typed` do type-checking at **runtime** as there exist data types, but variables are not bound to any of them.
+- `dynamically-typed` do type-checking at **runtime** as there exist data types, but variables are not bound to any of them. (types change at runtime)
 
   ```js
   let message = 'hello';
@@ -150,7 +149,9 @@ let y = x + 'dot';
   ![type inference](./img/type-annotation-vs-inference.png)
 
   - **Type annotations** -> code we add to tell Typescript what type of value a variable will refer to (what type of value it will hold)
+    - used when the value-initialization and the variable-declaration are on the same line
   - **Type inference** -> Typescript tries to figure out what type of value a variable refers to
+    - used when the value-initialization and the variable-declaration are on different lines
 
 ### When to use type annotations ?
 

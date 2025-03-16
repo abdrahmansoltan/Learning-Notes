@@ -28,6 +28,9 @@
       - [Styled Scrolling (Smooth Scrolling with effects)](#styled-scrolling-smooth-scrolling-with-effects)
     - [Intersection observer](#intersection-observer)
     - [Scrolling Libraries](#scrolling-libraries)
+  - [Shadow DOM](#shadow-dom)
+    - [Shadow tree](#shadow-tree)
+    - [Encaosulation of the Shadow DOM](#encaosulation-of-the-shadow-dom)
   - [Virtual DOM](#virtual-dom)
     - [methods to compare nodes](#methods-to-compare-nodes)
     - [steps](#steps)
@@ -913,9 +916,9 @@ To get the size of an element and its position relative to the window, the docum
     document.querySelector('.section--1').scrollIntoView({ behavior: 'smooth' });
     ```
 
-| `scrollTo` | `scrollIntoView` |
-| ---------- | ----------------- |
-| takes a pixel value to scroll to | scrolls to the element |
+| `scrollTo`                                           | `scrollIntoView`                               |
+| ---------------------------------------------------- | ---------------------------------------------- |
+| takes a pixel value to scroll to                     | scrolls to the element                         |
 | good for scrolling users to the very top of the page | good for scrolling users to a specific element |
 
 - **Forbid Scrolling**
@@ -1018,6 +1021,66 @@ We use them to create advanced scrolling effects like parallax scrolling, sticky
   ```
 
   - See [animated-landing-page project](https://github.com/abdrahmansoltan/aminated-landing-page) for a full working example.
+
+---
+
+## Shadow DOM
+
+Shadow DOM is a way to create a component-local DOM. meaning that the styles and scripts of the component are encapsulated from the rest of the page.
+
+- Shadow DOM serves for **encapsulation**. It allows a component to have its very own “shadow” DOM tree, that can’t be accidentally accessed from the main document, may have local style rules, and more.
+- It's rendered separately from the main document DOM — and controlling associated functionality.
+  - `Light DOM` -> html code that we write
+  - `Shadow DOM` -> html code that the component writes
+- In this way, you can keep an element's features private, so they can be scripted and styled without the fear of collision with other parts of the document. **(Isolate DOM fragments (`HTML` / `CSS`)from the main document DOM tree)**
+- This is done by creating a `shadowRoot` using the `attachShadow()` method and then adding the desired elements to it
+- we can see it in the Devtools using by enabling the `"Show user agent shadow DOM"` option in the `DevTools` settings
+  ![Shadow DOM](./img/shadow-dom-1.png)
+  ![Shadow DOM](./img/shadow-dom-2.png)
+
+### Shadow tree
+
+A DOM can have 2 types of subtrees:
+
+- **Light tree**:
+  - a regular DOM subtree, made of HTML children of the element.
+- **Shadow tree**:
+
+  - a separate DOM subtree, hidden from the main document, created by `attachShadow()` method.
+
+  ```html
+  <script>
+  customElements.define('show-hello', class extends HTMLElement {
+    connectedCallback() {
+      const shadow = this.attachShadow({mode: 'open'});
+      shadow.innerHTML = `<p>
+        Hello, ${this.getAttribute('name')}
+      </p>`;
+    }
+  });
+  </script>
+
+  <show-hello name="John"></show-hello
+  ```
+
+  ![Shadow DOM](./img/shadow-dom-3.png)
+
+  - There are two limitations:
+
+    1. We can create only one shadow root per element.
+    2. The elem must be either a custom element, or one of: “article”, “aside”, “blockquote”, “body”, “div”, “footer”, “h1…h6”, “header”, “main” “nav”, “p”, “section”, or “span”. Other elements, like `<img>`, can’t host shadow tree.
+
+### Encaosulation of the Shadow DOM
+
+- Shadow DOM is strongly delimited from the main document:
+
+  - Shadow DOM elements are not visible to `querySelector` from the light DOM. In particular, Shadow DOM elements may have ids that conflict with those in the light DOM. They must be unique only within the shadow tree.
+  - Shadow DOM has own stylesheets. Style rules from the outer DOM don’t get applied.
+
+- EX:
+  ![Shadow DOM](./img/shadow-dom-4.png)
+  - The style from the document does not affect the shadow tree. But the style from the inside works.
+  - To get elements in shadow tree, we must query from inside the shadow tree.
 
 ---
 

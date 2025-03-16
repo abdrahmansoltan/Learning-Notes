@@ -4,7 +4,9 @@
   - [Angular](#angular)
     - [How Angular works (Compilation)](#how-angular-works-compilation)
     - [Folders and files Structure](#folders-and-files-structure)
-  - [Installation (Angular CLI)](#installation-angular-cli)
+  - [Installation \& Updating (Angular CLI)](#installation--updating-angular-cli)
+    - [Installation](#installation)
+    - [Updating from old version to a new version](#updating-from-old-version-to-a-new-version)
   - [Components](#components)
     - [Creating Components](#creating-components)
     - [Component example](#component-example)
@@ -75,20 +77,36 @@ Angular is a `framework` for building **reactive** web applications.
   - The server sends the `index.html` file to the browser (Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)
   - The `main.ts` file bootstraps the `AppModule` and starts the app
 
-- Transferring code to machine code using different types of compilation
+> **Compilation** is the process of converting the Angular code into `Javascript` code that the browser can understand
 
-  - `Just-in-time compilation`
+- **There are 2 types of compilation strategies in Angular:**
+
+  - Just-in-time compilation
     ![Just-in](./img/justintime.PNG)
 
-  - `Ahead-of-time compilation`
+    - Here, the server compiles typescript code into javascript code
+    - Then, the browser downloads the javascript code (including the Angular framework) and runs & compiles it
+    - This is the default compilation strategy in Angular
+    - It's good for development because it's faster to compile and run the app, but it's slower for the browser to load and run the app
+    - It's good for small to medium-sized apps
+    - It's not used in production because it's slower for the browser to load and run the app
+
+  - Ahead-of-time compilation
     ![head-of](./img/headoftime.PNG)
 
-    - newer and better!
+    - Here, the server compiles typescript code into javascript code (same as JIT)
+    - Then, the server compiles the javascript code into a bundle that the browser can understand
+    - The browser downloads the bundle and runs it immediately (no need to compile it)
+    - It's good for production because it's faster for the browser to load and run the app
+
+    - It's faster and more efficient ✅
       ![jit-aot](./img/jit-vs-aot.PNG)
 
 - selecting platform to run the app (`Compilation Strategy`)
 
   ![jit-aot](./img/jit-vs-aot2.PNG)
+
+- **Note:** Starting from Angular 18, the default compilation strategy is `AOT` (Ahead-of-time compilation), and no need to specify it in the `angular.json` file
 
 - **Incremental DOM**
   - it's a technique used by Angular to update the DOM efficiently
@@ -122,8 +140,11 @@ In Angular, the `src` folder is the main folder that contains all the files of t
   - `index.html` : the main html file for the app
   - `main.ts` : the main typescript file that starts the app
     - it contains the `bootstrapModule` function that bootstraps the `AppModule` -> starts up `app.module.ts`, So we need to register the main module here.
-  - `polyfills.ts` : contains the polyfills for the app
+  - `polyfills.ts` : contains the polyfills for the app (features that are not supported in all browsers)
   - `tsconfig.json` : contains the typescript configuration for the app
+  - `angular.json` : contains the configuration for the app (like build settings, etc.)
+    - The most important part in this file is the `"architect"` object, which contains the build configurations for the app
+      ![file-structure](./img/config-1.png)
 
 - Example
   ![structure](./img/file-structure-1.png)
@@ -144,9 +165,11 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 
 ---
 
-## Installation (Angular CLI)
+## Installation & Updating (Angular CLI)
 
-it's a utility tool for managing projects
+### Installation
+
+it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `Typescript`, etc.) that are needed for Angular development.
 
 ![cli](./img/cli.PNG)
 
@@ -158,7 +181,7 @@ it's a utility tool for managing projects
 
 - ng-commands
 
-  ```bash
+  ```sh
   # Creating new project
   ng new <project_name>
 
@@ -175,6 +198,13 @@ it's a utility tool for managing projects
   ```
 
 - modules generated with `cli` are not registered in the app so you need import the module into the `app.module`
+- now, we can use `Vite` instead of `Angular CLI` for faster development
+
+---
+
+### Updating from old version to a new version
+
+[Update Guide](https://angular.dev/update-guide)
 
 ---
 
@@ -184,7 +214,8 @@ it's a utility tool for managing projects
 
 ![component](./img/component-1.png)
 
-- A component's job is to enable the user experience and nothing more. A component should present properties and methods for data binding, in order to mediate between the **view (rendered by the template)** and the **application logic (services) (which often includes some notion of a model)**.
+A component should present properties and methods for data binding, in order to mediate between the **view (rendered by the template)** and the **application logic (services) (which often includes some notion of a model)**.
+
 - **What does a component consist of?**
 
   - `Component Metadata` : it's the information that Angular needs to create the component and render it to the DOM, like the `selector`, `template`, and `styles`
@@ -199,15 +230,13 @@ it's a utility tool for managing projects
 
 - In order to create a component, you can use the `Angular CLI` to generate a new component
 
-  ```bash
+  ```sh
   ng generate component <component-name> # or ng g c
 
   # Ex: creating a component named "nav" in the app folder
   ng generate component nav
   # Ex: creating a sub-component named "nav-item" in the nav folder
   ng generate component nav/nav-item
-
-
   ```
 
   - this will create a folder with the name of the component in the `app` folder
@@ -231,9 +260,9 @@ it's a utility tool for managing projects
 
   @NgModule({
     declarations: [AppComponent, NavComponent], // add the component to the declarations array ✅
-    imports: [BrowserModule],
-    providers: [],
-    bootstrap: [AppComponent]
+    imports: [BrowserModule], // imported modules go here
+    providers: [], // services go here
+    bootstrap: [AppComponent] // the main component of the app (only in the AppModule)
   })
   export class AppModule {}
   ```
@@ -244,7 +273,7 @@ it's a utility tool for managing projects
 
   // @Component is a decorator that tells Angular that this class is a component
   @Component({
-    selector: 'app-nav',
+    selector: 'app-nav', // the new html tag that will represent this component -> <app-nav></app-nav>
     templateUrl: './nav.component.html',
     styleUrls: ['./nav.component.css']
   })
@@ -294,7 +323,25 @@ it's a utility tool for managing projects
 - **Notes:**
 
   - We can write the `HTML` code directly in the component file using the `template` property instead of using the `templateUrl` property
+
+    ```ts
+    @Component({
+      template: `<h1>{{ title }}</h1> <ul> <li *ngFor="let link of links">{{ link }}</li> </ul>`,
+      // or
+      templateUrl: './nav.component.html'
+    })
+    ```
+
   - We can write the `CSS` code directly in the component file using the `styles` property instead of using the `styleUrls` property
+
+    ```ts
+    @Component({
+      styles: [`h1 { color: red; }`],
+      // or
+      styleUrls: ['./nav.component.css']
+    })
+    ```
+
   - We can use the `selector` property to be any type of selector like `tag`, `class`, or `attribute`
 
     ```ts
@@ -376,7 +423,7 @@ it's a utility tool for managing projects
 - A component instance has a lifecycle that
 
   - **starts** when Angular instantiates the component class and renders the component view along with its child views.
-  - The lifecycle **continues** with change detection, as Angular checks to see when data-bound properties change, and updates both the view and the component instance as needed.
+  - The lifecycle **continues** with "change detection" (reactivity), as Angular checks to see when data-bound properties change, and updates both the view and the component instance as needed.
   - The lifecycle **ends** when Angular destroys the component instance and removes its rendered template from the DOM.
 
 - **Most common lifecycle hooks:**

@@ -6,6 +6,7 @@
   - [How Asynchronous code works in JavaScript](#how-asynchronous-code-works-in-javascript)
     - [Event Loop](#event-loop)
     - [Macrotasks and Microtasks queues](#macrotasks-and-microtasks-queues)
+    - [Microtasks queue (Job queue)](#microtasks-queue-job-queue)
   - [Callbacks: How to do something after something else](#callbacks-how-to-do-something-after-something-else)
   - [Scheduling: setTimeout and setInterval](#scheduling-settimeout-and-setinterval)
     - [`setTimeout()`](#settimeout)
@@ -43,6 +44,8 @@
     - [Error Handling With try...catch (modern way)](#error-handling-with-trycatch-modern-way)
       - [try…catch…finally](#trycatchfinally)
     - [Global Error Handling (Global catch)](#global-error-handling-global-catch)
+  - [Concurrency Model \& Parallelism](#concurrency-model--parallelism)
+    - [Web Workers](#web-workers)
   - [Axios](#axios)
     - [Global Axios Defaults](#global-axios-defaults)
     - [Custom Axios Instance](#custom-axios-instance)
@@ -55,7 +58,6 @@
     - [Long Polling vs WebSockets](#long-polling-vs-websockets)
       - [Long Polling](#long-polling)
       - [WebSocket](#websocket)
-  - [Microtasks queue (Job queue)](#microtasks-queue-job-queue)
   - [Working with data from other servers (Proxy)](#working-with-data-from-other-servers-proxy)
   - [Notes](#notes)
 
@@ -196,21 +198,51 @@ The callback queue cannot be ran until the call stack is completely empty. So, t
   }
   ```
 
-- **Web Workers**
+---
 
-  - For long heavy calculations that shouldn’t block the event loop, we can use Web Workers.
-  - That’s a way to run code in another, parallel thread.
-  - Web Workers can exchange messages with the main process, but they have their own variables, and their own event loop.
+### Microtasks queue (Job queue)
 
-    ```js
-    var worker = new Worker('worker.js');
-    worker.postMessage('Helloooo');
+> Don't mix this with the Macrotasks, find more here [Macrotasks and Microtasks](./00-JS_Advanced_concepts.md#macrotasks-and-microtasks)
 
-    addEventListener('message');
-    ```
+The **job queue or microtask queue** came about with `Promise` in **ES6**. With `promises` we needed another callback queue that would give higher priority to promise calls. **The JavaScript engine is going to check the job queue before the callback queue**.
+![job-queue](./img/tasks-queue.gif)
 
-  - Web Workers do not have access to DOM, so they are useful, mainly, for calculations, to use multiple CPU cores simultaneously.
-  - More here: [Using Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
+- Promise handlers `.then`/`.catch`/`.finally` are always **Asynchronous**.
+
+  - Even when a Promise is immediately resolved
+
+  ```js
+  // 1 Callback Queue ~ Task Queue
+  setTimeout(() => {
+    console.log('1', 'is the loneliest number');
+  }, 0);
+  setTimeout(() => {
+    console.log('2', 'can be as bad as one');
+  }, 10);
+
+  // 2 Job Queue ~ Microtask Queue
+  Promise.resolve('hi').then(data => console.log('2', data));
+
+  // 3
+  console.log('3', 'is a crowd');
+
+  // ---------- Output ---------- //
+
+  // 3 is a crowd
+  // 2 hi
+  // undefined Promise resolved
+  // 1 is the loneliest number
+  // 2 can be as bad as one
+  ```
+
+- Asynchronous tasks need proper management. For that, the **ECMA** standard specifies an internal queue `PromiseJobs`, more often referred to as the “microtask queue” (V8 term).
+
+- The queue is first-in-first-out **(FIFO)**: tasks enqueued first are run first.
+- Execution of a task is initiated only when nothing else is running.
+- Or, to put it more simply, when a promise is ready, its `.then`/`catch`/`finally` handlers are put into the queue; they are not executed yet. When the JavaScript engine becomes free from the current code, it takes a task from the queue and executes it.
+
+> - Remember the **"unhandledrejection"** event from (Error handling with promises)? Now we can see exactly how JavaScript finds out that there was an unhandled rejection:
+> - **An “unhandled rejection” occurs when a promise error is not handled at the end of the microtask queue.**
 
 ---
 
@@ -601,9 +633,22 @@ It's when you have a lot of nested callbacks to execute asynchronous code in a c
 
   - Runs automatically when a new Promise is created (passed to the `Promise` constructor).
   - Contains 2 parameters: `resolve` and `reject` which are callback-functions that control the fate of the promise.
+
     - `resolve(value)` on success.
     - `reject(error)` on failure.
+
       - it's internally the same as `throw new Error()`
+      - we can create custom errors using `new Error('message')`, or using already built-in errors like `new ReferenceError('message')`, `new TypeError('message')`, etc.
+      - we can extend the `Error` class to create custom errors.
+
+        ```js
+        class CustomError extends Error {
+          constructor(message) {
+            super(message);
+            this.name = this.constructor.name;
+          }
+        }
+        ```
 
 - **Promise Object**
 
@@ -785,6 +830,8 @@ A Promise object serves as a link between the executor (the “producing code”
         throw new Error('💥'); // This won't be handled by the catch below
       })
     ```
+
+  - If we don't have a `.catch()` method at the end of the promise chain, then the error will be unhandled -> **"Silent Fail"**.
 
 - **Notes**
 
@@ -1421,6 +1468,36 @@ Promise.allSettled(urls.map(url => fetch(url))).then(results => {
 });
 ```
 
+- Example on how `promise.all` is different:
+
+  ```js
+  let urls = [
+    'https://api.github.com/users/iliakan',
+    'https://api.github.com/users/remy',
+    'https://no-such-url'
+  ];
+
+  Promise.allSettled(urls.map(url => fetch(url))).then(results => {
+    results.forEach((result, num) => {
+      if (result.status == 'fulfilled') {
+        alert(`${urls[num]}: ${result.value.status}`);
+      }
+      if (result.status == 'rejected') {
+        alert(`${urls[num]}: ${result.reason}`);
+      }
+    });
+  });
+  // Here, it will show the status of the first two urls, and the error of the third url, no need to use `.catch` here
+
+  // --------------------------------------------------------------- //
+
+  Promise.all(urls.map(url => fetch(url)))
+    .then(responses => Promise.all(responses.map(r => r.json())))
+    .then(console.log)
+    .catch(console.error);
+  // Here, it won't go to the `.then()` method, because one of the promises is rejected, so it will go to the `.catch()` method
+  ```
+
 ---
 
 #### Race promises
@@ -1759,6 +1836,30 @@ window.onerror = function (message, url, line, col, error) {
 > // Error: Promise Failed!
 > window.addEventListener('unhandledrejection', event => alert > event.reason);
 > ```
+
+---
+
+## Concurrency Model & Parallelism
+
+**Concurrency** is when two or more tasks can start, run, and complete in overlapping time periods. It doesn't necessarily mean they'll ever both be running at the same instant. For example, multitasking on a single-core machine (CPU).
+
+**Parallelism** is when tasks literally run at the same time, e.g., on a multicore processor (CPUs).
+
+### Web Workers
+
+- For long heavy calculations that shouldn’t block the event loop, we can use Web Workers.
+- That’s a way to run code in another, parallel thread.
+- Web Workers can exchange messages with the main process, but they have their own variables, and their own event loop.
+
+  ```js
+  var worker = new Worker('worker.js');
+  worker.postMessage('Helloooo');
+
+  addEventListener('message');
+  ```
+
+- Web Workers do not have access to DOM, so they are useful, mainly, for calculations, to use multiple CPU cores simultaneously.
+- More here: [Using Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
 
 ---
 
@@ -2151,52 +2252,6 @@ The WebSocket protocol, provides a way to exchange data between browser and serv
   - `close` – connection closed
 
 > More detailed info here [javascript.info/websocket](https://javascript.info/websocket)
-
----
-
-## Microtasks queue (Job queue)
-
-> Don't mix this with the Macrotasks, find more here [Macrotasks and Microtasks](./00-JS_Advanced_concepts.md#macrotasks-and-microtasks)
-
-The **job queue or microtask queue** came about with `Promise` in **ES6**. With `promises` we needed another callback queue that would give higher priority to promise calls. **The JavaScript engine is going to check the job queue before the callback queue**.
-![job-queue](./img/tasks-queue.gif)
-
-- Promise handlers `.then`/`.catch`/`.finally` are always **Asynchronous**.
-
-  - Even when a Promise is immediately resolved
-
-  ```js
-  // 1 Callback Queue ~ Task Queue
-  setTimeout(() => {
-    console.log('1', 'is the loneliest number');
-  }, 0);
-  setTimeout(() => {
-    console.log('2', 'can be as bad as one');
-  }, 10);
-
-  // 2 Job Queue ~ Microtask Queue
-  Promise.resolve('hi').then(data => console.log('2', data));
-
-  // 3
-  console.log('3', 'is a crowd');
-
-  // ---------- Output ---------- //
-
-  // 3 is a crowd
-  // 2 hi
-  // undefined Promise resolved
-  // 1 is the loneliest number
-  // 2 can be as bad as one
-  ```
-
-- Asynchronous tasks need proper management. For that, the **ECMA** standard specifies an internal queue `PromiseJobs`, more often referred to as the “microtask queue” (V8 term).
-
-- The queue is first-in-first-out **(FIFO)**: tasks enqueued first are run first.
-- Execution of a task is initiated only when nothing else is running.
-- Or, to put it more simply, when a promise is ready, its `.then`/`catch`/`finally` handlers are put into the queue; they are not executed yet. When the JavaScript engine becomes free from the current code, it takes a task from the queue and executes it.
-
-> - Remember the **"unhandledrejection"** event from (Error handling with promises)? Now we can see exactly how JavaScript finds out that there was an unhandled rejection:
-> - **An “unhandled rejection” occurs when a promise error is not handled at the end of the microtask queue.**
 
 ---
 

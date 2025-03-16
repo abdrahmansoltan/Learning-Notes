@@ -243,19 +243,24 @@ It's a set of web platform APIs that allow you to create new **custom**, **reusa
   ![Web Components](./img/web-components-1.png)
 
 - **Custom Elements**:
+
   - A set of JavaScript APIs that allow you to define custom elements and their behavior, which can then be used as desired in your user interface.
     ![Web Components](./img/web-components-3.png)
   - it must contain a hyphen `-` in its name, otherwise it will not be recognized as a custom element and will be rendered as a normal `HTML` element
   - This is done by creating a `class` that extends the `HTMLElement` class with the desired behavior and then registering the new element using the `customElements.define()` method
   - Each custom element has also `life cycle hooks` that can be used to add some functionality to the element
     - create, insert, remove, attribute change, etc.
+
 - **Shadow DOM**:
-  - A set of JavaScript APIs for attaching an **encapsulated** "shadow" DOM tree to an element — which is rendered separately from the main document DOM — and controlling associated functionality.
+
+  - Shadow DOM serves for **encapsulation**. It allows a component to have its very own “shadow” DOM tree, that can’t be accidentally accessed from the main document, may have local style rules, and more.
+  - It's rendered separately from the main document DOM — and controlling associated functionality.
     ![Web Components](./img/web-components-4.png)
     - `Light DOM` -> html code that we write
     - `Shadow DOM` -> html code that the component writes
   - In this way, you can keep an element's features private, so they can be scripted and styled without the fear of collision with other parts of the document. **(Isolate DOM fragments (`HTML` / `CSS`)from the main document DOM tree)**
   - This is done by creating a `shadowRoot` using the `attachShadow()` method and then adding the desired elements to it
+
 - **HTML Templates**:
   - The `<template>` and `<slot>` elements enable you to write markup templates that are not displayed in the rendered page. These can then be reused multiple times as the basis of a custom element's structure.
     ![Web Components](./img/web-components-2.png)
