@@ -356,6 +356,8 @@ A generic is a way to write a function that is reusable across different types, 
     const input = document.querySelector<HTMLInputElement>('todo-input')!;
     ```
 
+    - `!` is used to tell TS that this element will always exist in the DOM (to avoid null-checking)
+
   - generics can be used with multiple types:
 
     ```ts

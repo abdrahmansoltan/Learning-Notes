@@ -72,31 +72,35 @@ npm i --save-dev @types/node  # type definitions
 
 #### Compiling entire project with all its files
 
-- To use TypeScript, you need to add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
+Usually, we don't compile one file at a time, we compile the entire project, so we need to set up the project to compile all the files at once
 
-  - this command will `transpile` TypeScript to JavaScript
+- **Steps**
 
-  ```json
-  "scripts": {
-      "build": "npx tsc"
-    },
-  ```
+  1. Add a script to your `package.json` file to `compile` TypeScript to JavaScript. This is generally called your "`build`" script
 
-- Add the default TypeScript configuration file with the configurations for the project (how and where to compile the files) -> `tsconfig.json`
+     ```json
+     "scripts": {
+         "build": "npx tsc" // transpile TypeScript to JavaScript
+       },
+     ```
 
-  ```sh
-  npx tsc --init # this will create a `tsconfig.json` file with default configurations
-  ```
+  2. Add the default TypeScript configuration file with the configurations for the project (how and where to compile the files) -> `tsconfig.json`
 
-- Run this command to compile the project
+     ```sh
+     npx tsc --init # this will create a `tsconfig.json` file with default configurations
+     ```
 
-  ```bash
-  tsc  # this will tell TS to convert all (.ts) files to (.js)
-  # or
-  tsc --watch
-  # or using the "build" script above
-  npm run build
-  ```
+     - the created `tsconfig.json` file will have the default configurations for the project -> [more here](#configuring-the-ts-compiler-tsconfigjson)
+
+  3. Run this command to compile the project
+
+     ```sh
+     tsc  # this will tell TS to convert all (.ts) files to (.js)
+     # or
+     tsc --watch
+     # or using the "build" script above
+     npm run build
+     ```
 
 ---
 
@@ -117,27 +121,48 @@ npm i --save-dev @types/node  # type definitions
       "strict": true,
       "noImplicitAny": true //  TypeScript will issue an error whenever it would have inferred (any)
     },
-    "exclude": ["node_modules", "tests"]
+    "exclude": [
+      "node_modules", // Default exclude node_modules folder
+      "**/*.spec.ts" // exclude all test files
+    ]
   }
   ```
 
-  - `target` - sets what version of JS TypeScript will be transpiled to (and include compatible library declarations).
-  - `module` - sets what module system will be used when transpiling
+  - `target`
+    - sets what version of JS TypeScript will be transpiled to (and include compatible library declarations).
+  - `module`
+    - sets what **module-file-system** will be used when transpiling
     - specify what module code is generated when dealing with modules(multiple files with `import`/`export`)
     - best -> `"ES6"`
-  - Node.js uses the common.js module system by default
-  - `lib` - It's a set of bundled library-declaration files that describe the target runtime environment
+    - Node.js uses the `common.js` module system by default
+  - `lib`
+    - It's a set of bundled library-declaration files that describe the target runtime environment
+    - By default it's commented out, and uses the default libraries that come with the TypeScript compiler (like `DOM`, `ES5`, `ES6`, `...`)
     - Used to state what libraries your code is using. In this case, `ES2018` and the `DOM API`
-  - `outDir` - where you want your src code to output to. Often named build, prod, or server (when using it server-side)
-  - `strict` - enable strict type-checking options
-  - `noImplicitAny` - disallow the "any" type (covered in TypeScript Basics)
+      - It's why typescript doesn't complain when using `document` or `window` objects (`document.getElementById()`, `window.addEventListener()`)
+  - `rootDir`
+    - where your code is located that will be compiled (usually named `src`)
+  - `outDir`
+    - where you want your code to output to. Often named `build`, `dist`, `prod`, or `server` (when using it server-side)
+  - `strict`
+    - enable strict type-checking options, for example:
+      - making sure that you're not using a variable before it's defined
+  - `noImplicitAny`
+    - disallow the "any" type (covered in TypeScript Basics)
   - specifying which file to compile:
     - `files`: list all files you want to compile to `js` or use (`include` & `exclude`)
+    - `include`: files or directories to include in compiling **(Note that if you use `include`, you have to include all the files you want to compile)** -> so it's not usually used
     - `exclude`: files or directories to exclude in compiling
-  - for `Debugging` --> use `"sourceMap": true`
+  - `sourceMap`
+    - generate corresponding `.map` files for debugging
+    - it's useful for **debugging**, as it allows you to see the original TypeScript code in the browser's developer tools
+      ![source map](./img/source-map.png)
+    - it's not needed in production, so it's usually turned off
+    - for `Production` --> use `"sourceMap": false`
 
 - **Notes for configuration:**
-  - `strictNullChecks` - When you enable this option, TypeScript will start to complain about variables that might be `null` or `undefined`.
+  - `strictNullChecks`
+    - When you enable this option, TypeScript will start to complain about variables that might be `null` or `undefined`.
     - it's common with `HTML` elements, more [here](./3-TS-DOM.md#dealing-with-null-non-null-assertion-operator)
 
 ---

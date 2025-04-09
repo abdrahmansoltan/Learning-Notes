@@ -8,28 +8,30 @@
   - [Objects](#objects)
     - [Object destructuring](#object-destructuring)
     - [Object Excess Properties Checking](#object-excess-properties-checking)
-  - [unknown -- (type guard)](#unknown----type-guard)
+  - [unknown (type guard)](#unknown-type-guard)
   - [`this` keyword types](#this-keyword-types)
   - [Type Aliases (`type`)](#type-aliases-type)
-    - [`readonly` Modifier](#readonly-modifier)
     - [Literal type](#literal-type)
   - [Interfaces](#interfaces)
     - [When to use Interfaces](#when-to-use-interfaces)
-    - [interface vs type](#interface-vs-type)
-  - [Union \& Intersection Types](#union--intersection-types)
+    - [Interface vs Type alias](#interface-vs-type-alias)
+  - [Combining Interfaces (Union \& Intersection Types)](#combining-interfaces-union--intersection-types)
+    - [Extending Interfaces](#extending-interfaces)
     - [Union types](#union-types)
     - [Intersection types](#intersection-types)
   - [Literal Types](#literal-types)
     - [String Literal Types](#string-literal-types)
   - [Partial Type](#partial-type)
   - [Function](#function)
-    - [function type](#function-type)
-    - [function interface](#function-interface)
+    - [Function type](#function-type)
+    - [Function interface](#function-interface)
     - [`void`](#void)
     - [`never`](#never)
   - [Classes](#classes)
     - [Class Access Modifiers](#class-access-modifiers)
     - [Class Fields](#class-fields)
+      - [Setter \& Getter](#setter--getter)
+    - [`this` keyword in classes](#this-keyword-in-classes)
     - [Using Interfaces with classes](#using-interfaces-with-classes)
     - [Abstract Classes](#abstract-classes)
       - [Interfaces vs Abstract Classes](#interfaces-vs-abstract-classes)
@@ -42,7 +44,7 @@
 
 - It's the most flexible type in Typescript, It allows you to assign any type to that variable
 - It means that TS has no idea what this is, and can't check anything about it
-- It's used when you don't know what the type of the variable will be
+- It's used when you don't know what the type of the variable will be (**as a fallback** when you don't know what the type will be)
 - Avoid using it as much as possible, as it defeats the purpose of using Typescript
 
 ---
@@ -75,7 +77,7 @@ let arr2: (string | number)[]; // array of strings or numbers
 
 It's an array-like structure where each element represent some property of a record.
 
-- It's an array of fixed lengths and ordered with specific types (every element in the array represents some property of a record) and the order of the types in the array is important as it's used to describe the structure of the array.
+- It's an **array of fixed lengths and ordered with specific types** (every element in the array represents some property of a record) and the order of the types in the array is important as it's used to describe the structure of the array.
 
 > It's a special type exclusive to Typescript (doesn't exist in Javascript)
 
@@ -86,6 +88,7 @@ It's an array-like structure where each element represent some property of a rec
 
   myTuple = ['cat', 7, 'dog']; // ✅
   myTuple = ['cat', 'dog', 'dog']; // ❌
+  myTyple = ['cat', 'dog', 7]; // ❌
 
   // it's actually like representing an object as an array
   obj = {
@@ -136,6 +139,7 @@ It allows us to define a **set of named constants**. We can give these constants
     - like action-constants in `Vuex`, `redux`
   - it's like `Object.freeze` and [literal types](#literal-types) for objects
 
+- It usually **starts with uppercase letter** by convention to differentiate it from other variables
 - `enum` is **only** used to provide other engineers with a more understandable way to refer to a set of related values, and there're no other benefits to using it
 
 - Example
@@ -276,26 +280,29 @@ Typescript doesn’t always check for excess properties in an object. Understand
 
 ---
 
-## unknown -- (type guard)
+## unknown (type guard)
 
-- Requires a `type check` (**type guard**)
-  - > **type guard**: technique for guarding against certain operations unless we validate that we have the correct type for it.
-- used when the type of the thing being typed is `unknown`. Used heavily for `type assertion`
+> **type guard**: technique for guarding against certain operations unless we validate that we have the correct type for it.
+
+- Requires a "extra type check" to be performed before using the value of the variable
+- It's used when the type of the thing being typed is actually unknown, and you want to ensure that you're not doing anything unsafe with it
+
+  ```ts
+  let userInput: unknown;
+  let userName: string;
+
+  userInput = 5;
+  userInput = 'Max';
+
+  // type assertion or (Type Guard)
+  if (typeof userInput === 'string') {
+    userName = userInput; // 'Max'
+  }
+  ```
+
 - `unknown` is recommended over `any` because it provides **safer typing** — you have to use type assertion or narrowing to a specific type if you want to perform operations on unknown.
-  - `any` -> can be used for `console.log()` content
-
-```ts
-let userInput: unknown;
-let userName: string;
-
-userInput = 5;
-userInput = 'Max';
-
-// type assertion or (Type Guard)
-if (typeof userInput === 'string') {
-  userName = userInput; // 'Max'
-}
-```
+  - `any` -> can be used for `console.log()` content as it's safe
+  - `unknown` -> can't be used for `console.log()` content as it's not safe
 
 ---
 
@@ -337,9 +344,9 @@ if (typeof userInput === 'string') {
 
 ## Type Aliases (`type`)
 
-Type aliases can be used to "create" your own types. Instead of writing out object-types in an annotation, we can declare them separately in a **type alias** to a (possibly complex) object type.
+Type aliases can be used to "create your own types". Instead of writing out object-types in an annotation, we can declare them separately in a **type alias** to a (possibly complex) object type.
 
-- It allows us to make our code more readable and to reuse the types elsewhere in our code
+- It allows us to make our code more readable and to **reuse** the types elsewhere in our code
 - Type aliases do not create a new type; they rename a type. Therefore, you can use it to type an object and give it a descriptive name.
 - It's usually used for complex types like `union` & `tuple` types, or as a preference for cleaner code
 - it's same as `interface`, but with some [differences](#interface-vs-type)
@@ -362,47 +369,6 @@ function greet(user: User) {
   console.log('Hi, I am ' + user.name);
 }
 ```
-
-### `readonly` Modifier
-
-TypeScript provides the `readonly` modifier that allows you to mark the properties of a (class or object) **immutable**.
-
-- The assignment to a readonly property can only occur in one of two places:
-
-  - In the property declaration.
-  - In the constructor of the same class.
-
-- Class example
-
-  ```ts
-  class Person {
-    readonly birthDate: Date;
-
-    constructor(birthDate: Date) {
-      this.birthDate = birthDate;
-    }
-  }
-
-  const person = new Person(new Date(1990, 12, 25));
-  person.birthDate = new Date(1991, 12, 25); // Compile error
-  ```
-
-- Object example
-
-  ```ts
-  type Person = {
-    name: string
-    readonly birthDate: Date;
-  };
-
-  const John: Person = {
-    name: 'John',
-    birthDate; new Date(1990, 12, 25)
-  };
-  person.birthDate = new Date(1991, 12, 25); // Compile error
-  ```
-
-> the equivalent in variables is to use `const`
 
 ### Literal type
 
@@ -431,17 +397,30 @@ function getUserAttribute(attribute: number | string) {
 
 ## Interfaces
 
-They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a slightly different syntax)
+They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a slightly different syntax and some differences), but they are more powerful and flexible than `type aliases`.
 
-- it's a **blueprint** for `object's items` **(annotating the structure of an object/class)** and can be used to define the shape of an object.
+- Usually used with `objects` and `classes` to define the shape of an object or class, and to define the structure of an object/class
 
-  - you create an abstract class as an `interface` for creating classes. With TypeScript, interfaces are simply used as the blueprint for the shape of something.
+  - it's a **blueprint** for `object's items` **(annotating the structure of an object/class)** and can be used to define the shape of an object.
+
+  - you create an abstract class as an `interface` for creating `classes`. With TypeScript, interfaces are simply used as the blueprint for the shape of something.
+
+- **Notes:**
+
+  - the only way to have a type-contract of a class is to use an `interface` or `abstract class` unlike for objects where you can use `type-alias` or `interface`
+  - You might say, why not use [abstract classes](#abstract-classes) instead of `interfaces`? The answer is that:
+    - interfaces are more flexible and can be used to define the shape of an object or class
+    - while abstract classes are used to define a base class that can be extended by other classes with the implementation of the methods in the base class
+    - for example both chicken and humans can be `living things`, but they are not the same, so we can't use an abstract class for them, but we can use an interface for them that just handles the structure of the object not the implementation of the methods
+  - Interfaces are also used to define the shape of a **function**, which is not possible with `type-aliases` -> [Function interface](#function-interface)
 
 - Use `PascalCase` for naming `interfaces`.
+- Use `?` for **optional** (properties / paramaters) in the interface
 
 - EX:
 
   ```ts
+  // Object example
   interface Student {
     name: string;
     age: number;
@@ -449,6 +428,28 @@ They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a
     enrolled: boolean;
   }
   let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
+
+  // ------------------------------------------------------
+
+  // Class example (use `implements` keyword to implement the interface)
+  interface Greetable {
+    name: string; // property signature
+    greet(phrase: string): void; // method signature
+  }
+
+  class Person implements Greetable {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
+
+    greet(phrase: string) {
+      console.log(phrase + ' ' + this.name);
+    }
+  }
   ```
 
 - The interface doesn't have to have all the types of the object, but it should have at least the required ones **(any additional properties are ignored)**
@@ -514,7 +515,7 @@ They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a
 
 ---
 
-### interface vs type
+### Interface vs Type alias
 
 types & interfaces used to be more different when typescript first came out, but over time their overlap is significantly greater now and they became very similar
 
@@ -546,7 +547,56 @@ types & interfaces used to be more different when typescript first came out, but
 
 ---
 
-## Union & Intersection Types
+## Combining Interfaces (Union & Intersection Types)
+
+### Extending Interfaces
+
+- You can extend interfaces using the `extends` keyword, which allows you to create a new interface that inherits properties from one or more existing interfaces
+
+- Object example
+
+  ```ts
+  interface Person {
+    name: string;
+    age: number;
+  }
+
+  interface Student extends Person {
+    enrolled: boolean;
+  }
+
+  let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
+  ```
+
+- Class example
+
+  ```ts
+  interface Named {
+    name: string;
+  }
+
+  interface Greetable extends Named {
+    greet(phrase: string): void;
+  }
+
+  class Person implements Greetable {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
+
+    greet(phrase: string) {
+      console.log(phrase + ' ' + this.name);
+    }
+  }
+
+  // Now we can use the Greetable interface to create a new object that has the same properties as Person
+  ```
+
+---
 
 ### Union types
 
@@ -630,36 +680,37 @@ let hiWorld = 'Hi World';
   ```
 
 - There are **three** sets of literal types available in TypeScript today: `strings`, `numbers`, and `booleans`, by using literal types you can allow an exact value which a string, number, or boolean must have.
-- ex :
 
-- using it with animations:
+- Ex :
 
-  ```ts
-  type Easing = 'ease-in' | 'ease-out' | 'ease-in-out';
+  - using it with animations:
 
-  class UIElement {
-    animate(dx: number, dy: number, easing: Easing) {
-      if (easing === 'ease-in') {
-        // ...
-      } else if (easing === 'ease-out') {
-      } else if (easing === 'ease-in-out') {
-      } else {
-        // It's possible that someone could reach this
-        // by ignoring your types though.
+    ```ts
+    type Easing = 'ease-in' | 'ease-out' | 'ease-in-out';
+
+    class UIElement {
+      animate(dx: number, dy: number, easing: Easing) {
+        if (easing === 'ease-in') {
+          // ...
+        } else if (easing === 'ease-out') {
+        } else if (easing === 'ease-in-out') {
+        } else {
+          // It's possible that someone could reach this
+          // by ignoring your types though.
+        }
       }
     }
-  }
 
-  let button = new UIElement();
-  button.animate(0, 0, 'ease-in');
-  button.animate(0, 0, 'uneasy');
-  ```
+    let button = new UIElement();
+    button.animate(0, 0, 'ease-in');
+    button.animate(0, 0, 'uneasy');
+    ```
 
-- it can also be for any other type like `number` or `boolean`
+  - it can also be for any other type like `number` or `boolean`
 
-  ```ts
-  animate(dx: 10, dy: number, easing: Easing)
-  ```
+    ```ts
+    animate(dx: 10, dy: number, easing: Easing)
+    ```
 
 ---
 
@@ -708,9 +759,11 @@ We can specify the type of function parameters in a function definition which al
   (person: string = 'John') => {};
   ```
 
-### function type
+### Function type
 
-- it's when you want a variable to be a function with specific conditions
+It's a type that describes a function signature (paramaters and return type) and can be used to define a function type and use it in multiple places
+
+- it's when you want a variable to be a function with specific conditions or restrictions
 
   ```ts
   function add(n1: number, n2: number): number {
@@ -750,7 +803,7 @@ We can specify the type of function parameters in a function definition which al
 
   > It's recommended to always annotate the return type of a function, even if it's not required, to always ensure that the function returns the **correct & intended type**
 
-### function interface
+### Function interface
 
 - it's when you want to create a function type and use it in multiple places
 
@@ -780,11 +833,32 @@ We can specify the type of function parameters in a function definition which al
   }
   ```
 
+- Note: it's not the same as returning `undefined` or `null`, as it's used to indicate that the function doesn't return anything
+
+  ```ts
+  // Undefined (unnecessary return)
+  function printResult(num: number): undefined {
+    console.log('Result: ' + num);
+    return;
+  }
+
+  // Null (unnecessary return)
+  function printResult(num: number): null {
+    console.log('Result: ' + num);
+    return null;
+  }
+
+  // Void (no return)
+  function printResult(num: number): void {
+    console.log('Result: ' + num);
+  }
+  ```
+
 ---
 
 ### `never`
 
-It presents values that never occur. It's used to annotate a function that always throws an exception or a function that never finishes executing.
+It presents values that never occur. It's used to annotate a function that always throws an exception or a function that never finishes executing due to crashing or infinite loop.
 
 - used as a return type when the function will never return anything **as it crashes due to an error**, such as with functions that throw errors or infinite loops
   - as when it's reached, it means that something that wasn't supposed to be reached (returned), was actually reached due to error in code
@@ -807,7 +881,7 @@ function generateError(message: string, code: number): never {
 
 ## Classes
 
-Classes are **templates / blueprint** for creating objects in Javascript. They contain a few different important pieces which allow for creation and extension of customized objects
+Classes are **templates / blueprint** (theoretical definition) for creating objects in Javascript. They contain a few different important pieces which allow for creation and extension of customized objects
 
 - In Typescript, The big difference being that the class-properties are typed, as are the parameters and return types for our constructor and methods.
 
@@ -824,10 +898,11 @@ Classes are **templates / blueprint** for creating objects in Javascript. They c
     }
 
     function printPlayer(player: Player) {
+      // Notice that "Player" acts as both a (type and a Class) ⚠️
       console.log(player.first + ' ' + player.last);
     }
+
     let player = new Player('John', 'Doe');
-    // Notice that "Player" acts as both a (type and a Class) ⚠️
     ```
 
 ### Class Access Modifiers
@@ -846,7 +921,77 @@ They're used to declare how accessible a variable should be from outside the cla
       - if the private property is used with `private` modifier, it will only show warning for typescript but the javascript will run it normally
       - if the private property is used with (javascript native `#` modifier), it will show errors on runtime
   - `protected` : protected properties can be accessed by the class itself **and child classes** but not outside.
-  - `readonly`: [readonly modifier](#readonly-modifier)
+  - `static` : static properties are properties that are shared across all instances of the class, and can be accessed without creating an instance of the class. It's like a global variable for the class.
+
+    - It can be used to create a **singleton class**, which is a class that can only have one instance.
+
+    ```ts
+    class Singleton {
+      private static instance: Singleton;
+
+      private constructor() {}
+
+      public static getInstance() {
+        if (!Singleton.instance) {
+          // if instance is not created yet
+          Singleton.instance = new Singleton();
+        }
+        // if instance is already created, return the existing instance to prevent creating a new one
+        return Singleton.instance;
+      }
+    }
+
+    const singleton1 = Singleton.getInstance();
+    const singleton2 = Singleton.getInstance();
+    console.log(singleton1 === singleton2); // true
+    ```
+
+    > This pattern is called **"singleton pattern" or "private constructor pattern"** and is used to ensure that a class has only one instance and provides a global point of access to it.
+
+  - `readonly` Modifier
+
+    - TypeScript provides the `readonly` modifier that allows you to mark the properties of a (class or object) **immutable**.
+
+    - The assignment to a readonly property can only occur in one of two places:
+
+      - In the property declaration.
+      - In the constructor of the same class.
+
+    - Class example
+
+      ```ts
+      class Person {
+        readonly birthDate: Date;
+
+        constructor(birthDate: Date) {
+          this.birthDate = birthDate;
+        }
+
+        someMethod() {
+          this.birthDate = new Date(1991, 12, 25); // Error ❌ you can't change the value of a readonly property
+        }
+      }
+
+      const person = new Person(new Date(1990, 12, 25));
+      person.birthDate = new Date(1991, 12, 25); // Error ❌ you can't change the value of a readonly property
+      ```
+
+    - Object example
+
+      ```ts
+      type Person = {
+        name: string
+        readonly birthDate: Date;
+      };
+
+      const John: Person = {
+        name: 'John',
+        birthDate; new Date(1990, 12, 25)
+      };
+      person.birthDate = new Date(1991, 12, 25); // Error ❌
+      ```
+
+      > the equivalent in variables is to use `const`
 
 - Example:
 
@@ -883,7 +1028,7 @@ They're used to declare how accessible a variable should be from outside the cla
   console.log(myStudent.id()); // prints 1235
   ```
 
-- you can also use these access modifiers in the constructor function instead of writing them many times
+- **Note 💡:** you can also use these access modifiers in the constructor function instead of writing them many times
 
   ```ts
   class Department {
@@ -900,7 +1045,7 @@ They're used to declare how accessible a variable should be from outside the cla
 
 - **Notes:**
 
-  - You can't modify the access modifiers of the parent class in the child class
+  - ⚠️ You can't modify the access modifiers of the parent class in the child class
 
     ```ts
     class Parent {
@@ -957,6 +1102,92 @@ They're used to define properties in the class without having to define them in 
 
   - Here, by`public`, we're telling typescript to create a property with the same name and type as the parameter and to assign the parameter to the property
 
+#### Setter & Getter
+
+They're used to define a property in the class that can be accessed like a property but is actually a method
+
+- It's used to create a property that can be accessed like a property but is actually a method, and to control the access to the property (like `private` properties)
+- Here we can add extra validation layer when setting the property value, and we can also add a default value for the property
+
+- Example:
+
+  ```ts
+  class Person {
+    private _age: number = 30; // default value
+
+    constructor(public name: string) {}
+
+    get age() {
+      return this._age;
+    }
+
+    set age(value: number) {
+      if (value < 0) {
+        throw new Error('Invalid age - should be positive!');
+      }
+      this._age = value;
+    }
+  }
+
+  const person = new Person('John');
+  person.age = 30; // set the age to 30 ✅
+  person.age = -4; // throws an error ❌
+  ```
+
+---
+
+### `this` keyword in classes
+
+- `this` keyword in classes refers to the instance of the class itself, and it can be used to access the properties and methods of the class
+
+```ts
+class Person {
+  name: string;
+  age: number = 30; // default value
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  greet() {
+    console.log('Hello, my name is ' + this.name);
+  }
+}
+
+const person = new Person('John');
+
+person.greet(); // Hello, my name is John ✅
+```
+
+- But what if we need to set restrictions on the type of `this` that will call the method?
+
+  - We can use the `this` keyword in the method signature to restrict the type of `this` that will call the method
+
+  ```js
+  class Person {
+    name: string;
+    age: number = 30; // default value
+
+    constructor(name: string) {
+      this.name = name;
+    }
+
+    greet(this: Person) {
+      // <----------------------- 👈
+      console.log('Hello, my name is ' + this.name);
+    }
+  }
+
+  const jack = new Person('Jack');
+  const john = {
+    age: 30,
+    greet: jack.greet // this will not work as this is not a Person instance (it doesn't have `name` property) ❌
+  };
+
+  jack.greet(); // Hello, my name is Jack ✅
+  john.greet(); // ERROR ❌
+  ```
+
 ---
 
 ### Using Interfaces with classes
@@ -992,7 +1223,7 @@ class Person implements Greetable {
 
 ### Abstract Classes
 
-Abstract classes are mainly for **inheritance** where other classes may derive from them. **We cannot create an instance of an abstract class**.
+"Abstract classes" are mainly for **inheritance** where other classes may derive from them. **We cannot create an instance of an abstract class**.
 ![abstract class](./img/abstract-class.png)
 
 - You can't create an instance of an abstract class
@@ -1005,10 +1236,11 @@ Abstract classes are mainly for **inheritance** where other classes may derive f
 
     ```ts
     abstract class Sorter {
+      // Properties that will be inherited to the child class
+      abstract length: number;
       // Methods that will be implemented in the child class
       abstract compare(leftIndex: number, rightIndex: number): boolean;
       abstract swap(leftIndex: number, rightIndex: number): void;
-      abstract length: number;
 
       // Method that will be inherited to the child class
       sort(): void {
