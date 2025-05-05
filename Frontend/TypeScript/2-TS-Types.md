@@ -8,6 +8,7 @@
   - [Objects](#objects)
     - [Object destructuring](#object-destructuring)
     - [Object Excess Properties Checking](#object-excess-properties-checking)
+    - [Index Properties](#index-properties)
   - [unknown (type guard)](#unknown-type-guard)
   - [`this` keyword types](#this-keyword-types)
   - [Type Aliases (`type`)](#type-aliases-type)
@@ -15,18 +16,19 @@
   - [Interfaces](#interfaces)
     - [When to use Interfaces](#when-to-use-interfaces)
     - [Interface vs Type alias](#interface-vs-type-alias)
-  - [Combining Interfaces (Union \& Intersection Types)](#combining-interfaces-union--intersection-types)
-    - [Extending Interfaces](#extending-interfaces)
+  - [Combining Types (Union \& Intersection Types)](#combining-types-union--intersection-types)
     - [Union types](#union-types)
     - [Intersection types](#intersection-types)
+    - [Extending Interfaces](#extending-interfaces)
   - [Literal Types](#literal-types)
     - [String Literal Types](#string-literal-types)
-  - [Partial Type](#partial-type)
   - [Function](#function)
     - [Function type](#function-type)
     - [Function interface](#function-interface)
+    - [Funciton Overloading](#funciton-overloading)
     - [`void`](#void)
     - [`never`](#never)
+    - [Functions Notes](#functions-notes)
   - [Classes](#classes)
     - [Class Access Modifiers](#class-access-modifiers)
     - [Class Fields](#class-fields)
@@ -278,6 +280,30 @@ Typescript doesn’t always check for excess properties in an object. Understand
 
 > To recap, excess property checking is only triggered when we define object literals with a type annotation and not in other cases. So, why do we have it? It can be very useful for catching wrong typos and wrong property names. This means it’s very limited in scope and understanding when Typescript will check for excess properties and when it will not is essential for building a better mental model for understanding and using Typescript.
 
+### Index Properties
+
+It's a way to define the shape of an object when you don't know the exact keys of the object, but you know the type of the values.
+
+```ts
+interface StringArray {
+  [index: number]: string; // index signature
+}
+
+const myArray: StringArray = ['Max', 'Anna'];
+
+// ----------------------------------------------------------
+
+interface ErrorContainer {
+  [prop: string]: string; // index signature
+}
+
+const errorsObj: ErrorContainer = {
+  name: 'Not a valid name!',
+  email: 'Not a valid email!'
+  // all are strings
+};
+```
+
 ---
 
 ## unknown (type guard)
@@ -413,9 +439,12 @@ They serve almost the same purpose as [Type Aliases](#type-aliases-type) (with a
     - while abstract classes are used to define a base class that can be extended by other classes with the implementation of the methods in the base class
     - for example both chicken and humans can be `living things`, but they are not the same, so we can't use an abstract class for them, but we can use an interface for them that just handles the structure of the object not the implementation of the methods
   - Interfaces are also used to define the shape of a **function**, which is not possible with `type-aliases` -> [Function interface](#function-interface)
+  - after compiling, interfaces are removed from the code and don't exist in the final JavaScript code.
 
 - Use `PascalCase` for naming `interfaces`.
 - Use `?` for **optional** (properties / paramaters) in the interface
+
+  - Usually when used, we need to add a conditional statement to check if the property exists before using it, or we can use `!` to tell Typescript that the property will always exist
 
 - EX:
 
@@ -545,9 +574,67 @@ types & interfaces used to be more different when typescript first came out, but
 
 - You can add how a **method** in an object will be using `interface` and not using `type`
 
+> **Interview Question:** When to use `interface` and when to use `type`?
+>
+> - Use `interface` when you want to describe the shape of an object or class and when you want to extend it later, and when you want to use it with classes, and when you want to use it with functions
+>
+> - Use `type` when you want to create a type alias for a complex type or when you want to use it with union types, and when you want to use it with literal types, and when you want to use it with tuples
+
 ---
 
-## Combining Interfaces (Union & Intersection Types)
+## Combining Types (Union & Intersection Types)
+
+### Union types
+
+It's a type that can be one of several types, and it allows you to define a variable that can hold values of different types. (think of it as a "logical OR")
+
+- used when more than one type can be used
+- we can create a union-type by using the **pipe character (`|`)** to separate the types we want to include
+- It's commonly used with [Type Guard](./1-TypeScript.md#type-guard-narrowing) to narrow down the type of a variable
+
+- Notes:
+
+  - you shouldn't use it with type `any`, as it's like multiplying by `zero` as it will equal that the type will be `any` (`zero`)
+
+  ```ts
+  let studentPhone: number | string;
+  studentPhone = '(555) 555 - 5555';
+  studentPhone = 5555555555;
+  ```
+
+  - There's a downside that if we will perform an operation for a specific type like `.replace()` for string type, on a union type, we will get an error:
+
+    ```ts
+    function calculateTax(price: number | string, tax: number) {
+      price.replace('$', ''); // ERROR, as it might be number
+      return price * tax;
+    }
+    ```
+
+    - To fix this, we use [Type Guard](./1-TypeScript.md#type-guard-narrowing)
+
+---
+
+### Intersection types
+
+It's a type that combines multiple types into one, and it allows you to create a new type that **has all the properties** of the combined types. (think of it as a "logical AND")
+
+- It's for having multiple types and combining them with (`&`)
+
+```ts
+type Circle = {
+  radius: number;
+};
+type Colorful = {
+  color: string;
+};
+
+type ColorfulCircle = Circle & Colorful;
+```
+
+- This is quite different than what we saw with union types — this is quite literally a `Circle` and `Colorful` combined together, and we have access to everything immediately.
+
+---
 
 ### Extending Interfaces
 
@@ -595,52 +682,6 @@ types & interfaces used to be more different when typescript first came out, but
 
   // Now we can use the Greetable interface to create a new object that has the same properties as Person
   ```
-
----
-
-### Union types
-
-A union type has a very specific technical definition that comes from set theory, but it’s completely fine to think of it as **OR** for types.
-
-- used when more than one type can be used
-- we can create a union-type by using the **pipe character `|`** to separate the types we want to include
-- you shouldn't use it with type `any`, as it's like multiplying by `zero` as it will equal that the type will be `any` (`zero`)
-
-```ts
-let studentPhone: number | string;
-studentPhone = '(555) 555 - 5555';
-studentPhone = 5555555555;
-```
-
-- There's a downside that if we will perform an operation for a specific type like `.replace()` for string type, on a union type, we will get an error:
-
-  ```ts
-  function calculateTax(price: number | string, tax: number) {
-    price.replace('$', ''); // ERROR, as it might be number
-    return price * tax;
-  }
-  ```
-
-  - To fix this, we use [Type Guard (Narrowing)](./1-TypeScript.md#type-guard-narrowing)
-
----
-
-### Intersection types
-
-It's for having multiple types and combining them with `&`
-
-```ts
-type Circle = {
-  radius: number;
-};
-type Colorful = {
-  color: string;
-};
-
-type ColorfulCircle = Circle & Colorful;
-```
-
-- This is quite different than what we saw with union types — this is quite literally a `Circle` and `Colorful` combined together, and we have access to everything immediately.
 
 ---
 
@@ -711,41 +752,6 @@ let hiWorld = 'Hi World';
     ```ts
     animate(dx: 10, dy: number, easing: Easing)
     ```
-
----
-
-## Partial Type
-
-The Partial Type accepts a generic argument (type argument). it creates a new type where all the properties of the original type are **optional**.
-
-The partial type is simple to use as it only requires to pass a type **T** where **T** can be any object type regardless of whether it is a defined type.
-
-> It generates a new type based on the input type/object/interface **with all the property-keys being optional**
-
-```ts
-Partial<MyType>;
-Partial<MyInterface>;
-Partial<{}>;
-```
-
-```ts
-// no need to update all the property keys to be optional
-interface Blog {
-  id: string;
-  title: string;
-  slug: string;
-  categories: string[];
-  tags: string[];
-  featureImageUrl?: string;
-  content: string;
-}
-
-// Partial<Blog> generates a new type based on Blog with all the property
-// keys being optional
-const draft: Partial<Blog> = {
-  title: 'What kind of title should I type?'
-};
-```
 
 ---
 
@@ -821,6 +827,27 @@ It's a type that describes a function signature (paramaters and return type) and
 
 ---
 
+### Funciton Overloading
+
+It's a way to define multiple function signatures for the same function name, allowing the function to accept different types of arguments and return different types of values based on the arguments passed to it
+
+```ts
+function add(a: number, b: number): number; // signature 1
+function add(a: string, b: string): string; // signature 2
+
+function add(a: number | string, b: number | string) {
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString(); // return type is string
+  }
+  return a + b; // return type is number
+}
+```
+
+- When to use it:
+  - When you want to create a function that can accept different types of arguments and return different types of values based on the arguments passed to it
+
+---
+
 ### `void`
 
 - It's a `return` type when the function returns **nothing** (or expected to return nothing)
@@ -876,6 +903,33 @@ function generateError(message: string, code: number): never {
   - `never` -> function doesn't even finish executing, so it never returns
 
 > It's a form of **bottom types**, which are types that describes no possible values allowed by the system
+
+---
+
+### Functions Notes
+
+- When you have function with paramaters but one of them are not used, you can use `_` to indicate that it's not used, but it's not recommended to do so as it can be confusing for other developers
+
+  ```ts
+  // Error: `n3` is not used ❌
+  funciton add(n1: number, n2: number, n3: number) {
+    return n1 + n2;
+  }
+
+  // Works: `_` is used to indicate that it's not used ✅
+  function add(n1: number, n2: number, _: number) {
+    return n1 + n2;
+  }
+  ```
+
+- Another way to indicate that a parameter is not used is to use `?` to indicate that it's optional, but it's not recommended to do so as it can be confusing for other developers
+
+  ```ts
+  // Works: `?` is used to indicate that it's optional ✅
+  function add(n1: number, n2: number, n3?: number) {
+    return n1 + n2;
+  }
+  ```
 
 ---
 

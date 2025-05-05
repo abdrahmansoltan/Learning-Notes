@@ -39,6 +39,7 @@
     - [(var vs let vs const) in loops](#var-vs-let-vs-const-in-loops)
     - [What is the difference between Composition and Inheritance?](#what-is-the-difference-between-composition-and-inheritance)
     - [Explain the difference between functional programming and OOP programming](#explain-the-difference-between-functional-programming-and-oop-programming)
+    - [What is the expected output of this code?](#what-is-the-expected-output-of-this-code)
 
 ---
 
@@ -222,6 +223,7 @@
 ### What is a program? and how does javascript work in that context?
 
 - **program**
+
   - is a set of instructions that tells a computer what to do. It's a sequence of steps that are executed, and it usually do the following:
     - Allocate memory.
     - Parse and execute scripts (read and run the code line by line).
@@ -1073,4 +1075,32 @@ It's more of a functional vs OOP question, but here's an answer:
 
 **Composition** is combining smaller piecies to create something bigger, **Inheritance** is a super-class that is extended to smaller pieces with more functionalities
 
+---
+
 ### Explain the difference between functional programming and OOP programming
+
+- **Functional Programming** is a programming paradigm that treats computation as the evaluation of mathematical functions and avoids changing state and mutable data. It emphasizes the use of pure functions, higher-order functions, and immutability.
+
+  - Functional programming is more declarative, meaning that it focuses on what to do rather than how to do it.
+  - Functional programming is more suitable for parallel processing and concurrency because it avoids side effects and mutable state.
+  - Example: `map`, `filter`, `reduce` methods in JavaScript.
+
+- **Object-Oriented Programming (OOP)** is a programming paradigm that uses objects to represent data and methods to manipulate that data. It emphasizes the use of classes, inheritance, encapsulation, and polymorphism.
+
+  - OOP is more imperative, meaning that it focuses on how to do things step by step.
+  - OOP is more suitable for modeling real-world entities and relationships because it allows for encapsulation and abstraction.
+  - Example: `class`, `constructor`, `this` keyword in JavaScript.
+
+---
+
+### What is the expected output of this code?
+
+```js
+const arr = ['a', 'b', 'c', 'd', 'e'];
+
+arr.splice(arr.indexOf('z'), 1); // remove 'z' from the array
+
+console.log(arr); // ['a', 'b', 'c', 'd']
+```
+
+We will see that the `arr` will be `['a', 'b', 'c', 'd']` and not `['a', 'b', 'c', 'd', 'e']` because the `splice()` method will remove the element at the specified index (which `z` is not in the array, so it will return `-1`), and since the index is `-1`, **it will remove the last element of the array**.

@@ -8,22 +8,23 @@
         - [AMD](#amd)
         - [CommonJS](#commonjs)
       - [New Way](#new-way)
-        - [EcmaScript Modules (ES6 Modules)](#ecmascript-modules-es6-modules)
-  - [Parcel](#parcel)
-  - [Webpack](#webpack)
-  - [Vite](#vite)
-    - [Why Vite](#why-vite)
-      - [The Problems](#the-problems)
-        - [Slow Server Start](#slow-server-start)
-        - [Slow Updates](#slow-updates)
-    - [Bundle-based vs Native-ESM-based Dev server](#bundle-based-vs-native-esm-based-dev-server)
-      - [Bundle-based Dev Server](#bundle-based-dev-server)
-      - [Native-ESM-based Dev Server](#native-esm-based-dev-server)
-    - [Why Bundle for Production](#why-bundle-for-production)
-    - [Why Not Bundle with esbuild?](#why-not-bundle-with-esbuild)
-    - [Browser Support](#browser-support)
-  - [esbuild](#esbuild)
-  - [Difference between Vite and Webpack](#difference-between-vite-and-webpack)
+        - [EcmaScript Modules (ES6)](#ecmascript-modules-es6)
+  - [Bundlers](#bundlers)
+    - [Parcel](#parcel)
+    - [Webpack](#webpack)
+    - [Vite](#vite)
+      - [Why Vite](#why-vite)
+        - [The Problems](#the-problems)
+          - [Slow Server Start](#slow-server-start)
+          - [Slow Updates](#slow-updates)
+      - [Bundle-based vs Native-ESM-based Dev server](#bundle-based-vs-native-esm-based-dev-server)
+        - [Bundle-based Dev Server](#bundle-based-dev-server)
+        - [Native-ESM-based Dev Server](#native-esm-based-dev-server)
+      - [Why Bundle for Production](#why-bundle-for-production)
+      - [Why Not Bundle with esbuild?](#why-not-bundle-with-esbuild)
+      - [Browser Support](#browser-support)
+    - [esbuild](#esbuild)
+    - [Difference between Vite and Webpack](#difference-between-vite-and-webpack)
 
 ---
 
@@ -104,7 +105,9 @@ Native modules became a part of the language in `ES2015` (also known as `ES6`), 
 
 - **ESM** (EcmaScript Modules) is a standard pattern for importing and exporting modules in JavaScript
 
-##### EcmaScript Modules (ES6 Modules)
+##### EcmaScript Modules (ES6)
+
+> [More here -> JS-Modules.md 📄](../JavaScript/6-JS-Modules.md)
 
 It's a standard pattern for importing JavaScript modules.
 
@@ -122,11 +125,26 @@ export const uniqConst = uniq([1, 2, 2, 4]);
 - but you may ask: "How do they work in the browser?"
   - the answer is: "they're incredibly **SLOW**"; it's like unusable after 10 modules
 
+Why it only works in new browsers? Because new browsers support downloading multiple files at the same time, then combine them into one file, and then run them in the browser, **ALSO** this is why we need to use a **Bundler** to combine all the files into **one file**, and then run it in the browser
+
 > **This is where WEBPACK was born**
 
 ---
 
-## Parcel
+## Bundlers
+
+![Bundlers](./img/bundlers.png)
+
+- **Why do we need a bundler?**
+  ![Bundlers](./img/bundlers-2.png)
+  - Because we need to combine all the files into one file, and then run it in the browser
+  - The problem with many files is that the browser can only download a limited number of files at the same time, and this is why we need to use a bundler to combine all the files into one file, and then run it in the browser, also because of **HTTP waterfalling** (the browser can only download a limited number of files at the same time, and this is why we need to use a bundler to combine all the files into one file, and then run it in the browser)
+  - Also, because of the **HTTP/2** protocol, which allows the browser to download multiple files at the same time, but still, we need to use a bundler to combine all the files into one file, and then run it in the browser
+  - Having that many requests to made, will result in latency and slow loading time, so we need to use a bundler to combine all the files into one file, and then run it in the browser
+  - Bundlers also allow us to use **tree-shaking** (removing unused code) and **code-splitting** (splitting the code into multiple files) to improve the performance of our application, and many other great features
+  - Bundlers also allow us to use **transpilers** (like `Babel`) to convert our code into a format that can be run in the browser, and many other great features
+
+### Parcel
 
 `parcel` is a **zero configuration** build tool for the web. It combines a great out-of-the-box development experience with a scalable architecture that can take your project from just getting started to massive production application.
 
@@ -201,13 +219,13 @@ export const uniqConst = uniq([1, 2, 2, 4]);
 
 ---
 
-## Webpack
+### Webpack
 
 [Webpack](./Webpack.md)
 
 ---
 
-## Vite
+### Vite
 
 > Fun fact: It's a french word meaning **"Fast / Quick"**
 
@@ -218,11 +236,11 @@ It's a build tool (module bundler) that aims to provide a faster and leaner deve
 
 in summary, Vite tries to let the browser do more work for us
 
-### Why Vite
+#### Why Vite
 
 ![why vite](./img/why-vite.png)
 
-#### The Problems
+##### The Problems
 
 - Before ES modules were available in browsers, developers had no native mechanism for authoring JavaScript in a **modularized** fashion. This is why we are all familiar with the concept of **"bundling"**: using tools that `crawl`, `process` and `concatenate` our source modules into files that can run in the browser.
 - Over time we have seen tools like `webpack`, `Rollup` and `Parcel`, which greatly improved the development experience for frontend developers.
@@ -232,7 +250,7 @@ Vite aims to address these issues by leveraging new advancements in the ecosyste
 
 ---
 
-##### Slow Server Start
+###### Slow Server Start
 
 - When cold-starting the dev server, a bundler-based build setup has to eagerly crawl and build your entire application before it can be served.
 - Vite improves the dev server start time by first dividing the modules in an application into two categories: **dependencies** and **source code**.
@@ -242,7 +260,7 @@ Vite aims to address these issues by leveraging new advancements in the ecosyste
 
 ---
 
-##### Slow Updates
+###### Slow Updates
 
 - When a file is edited in a bundler-based build setup, it is inefficient to rebuild the whole bundle for obvious reasons: the **update speed will degrade linearly with the size of the app**.
 - In some bundlers, the dev server runs the bundling in memory so that it only needs to invalidate part of its module graph when a file changes (like in `Virtual DOM`), but it still needs to re-construct the entire bundle and reload the web page.
@@ -252,16 +270,16 @@ Vite aims to address these issues by leveraging new advancements in the ecosyste
 
 ---
 
-### Bundle-based vs Native-ESM-based Dev server
+#### Bundle-based vs Native-ESM-based Dev server
 
-#### Bundle-based Dev Server
+##### Bundle-based Dev Server
 
 ![bundle-based-dev-server](./img/bundle-based-dev-serverpng.png)
 
 1. bundles all your code/files (`entry-file`, `routes`, `modules`) into a single bundle
 2. this single bundle will be served into a server, so that the browser can download this specific bundle (every time you make a development change)
 
-#### Native-ESM-based Dev Server
+##### Native-ESM-based Dev Server
 
 ![native-esm-based-dev-server](./img/native-esm-based-dev-server.png)
 
@@ -273,28 +291,28 @@ Vite aims to address these issues by leveraging new advancements in the ecosyste
 
 ---
 
-### Why Bundle for Production
+#### Why Bundle for Production
 
 - Even though `native ESM` is now widely supported, shipping unbundled ESM in production is still inefficient (even with `HTTP/2`) due to the additional network round trips caused by nested imports.
 - To get the optimal loading performance in production, it is still better to bundle your code with `tree-shaking`, `lazy-loading` and `common chunk splitting` (for better caching).
 
 ---
 
-### Why Not Bundle with esbuild?
+#### Why Not Bundle with esbuild?
 
 - While `esbuild` is extremely fast and is already a very capable bundler for libraries, some of the important features needed for bundling applications are still work in progress - in particular `code-splitting` and `CSS handling`.
 - For the time being, **Rollup** is more mature and flexible in these regards.
 
 ---
 
-### Browser Support
+#### Browser Support
 
 - The default build targets browsers that support `native ES Modules`, `native ESM dynamic import`, and `import.meta`.
 - Legacy browsers can be supported via the official [@vitejs/plugin-legacy](https://github.com/vitejs/vite/tree/main/packages/plugin-legacy)
 
 ---
 
-## esbuild
+### esbuild
 
 It's an extremely fast JavaScript bundler
 
@@ -302,7 +320,7 @@ It's written in **Go** Language, this is ok as you may use whatever language oth
 
 ---
 
-## Difference between Vite and Webpack
+### Difference between Vite and Webpack
 
 - while debugging in **devTools**, you will find that:
   - Webpack has one js file with its custom configuration, the problem is it may be difficult to read and understand

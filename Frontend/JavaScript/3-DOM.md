@@ -7,7 +7,7 @@
     - [Steps for creating an element](#steps-for-creating-an-element)
     - [`insertAdjacentHTML()`](#insertadjacenthtml)
     - [DOM collections: (`HTMLCollection` vs `NodeList`)](#dom-collections-htmlcollection-vs-nodelist)
-    - [Node.cloneNode()](#nodeclonenode)
+    - [`Node.cloneNode()` and `document.importNode()`](#nodeclonenode-and-documentimportnode)
     - [DOM Traversing](#dom-traversing)
     - [Searching: `getElement(s)By*`, `querySelector*`](#searching-getelementsby-queryselector)
   - [Node properties: type, tag and contents](#node-properties-type-tag-and-contents)
@@ -304,7 +304,7 @@ message.remove();
 
 ---
 
-### Node.cloneNode()
+### `Node.cloneNode()` and `document.importNode()`
 
 - The `cloneNode()` method creates a copy of a node, and returns the clone.
 - The `cloneNode()` method clones all attributes and their values.
@@ -314,6 +314,17 @@ message.remove();
 let p = document.getElementById('para1');
 let p_prime = p.cloneNode(true);
 ```
+
+- `document.importNode(node, deep)`
+
+  - The `importNode()` method creates a copy of a node from another document and returns it.
+  - The `deep` parameter specifies whether to clone the node's descendants (children) as well.
+
+  ```js
+  let p = document.getElementById('para1');
+
+  let p_prime = document.importNode(p, true); // deep copy
+  ```
 
 ---
 
