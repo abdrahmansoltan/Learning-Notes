@@ -11,6 +11,15 @@ They're files that are used inside the project to store configuration settings, 
 ![Configuration Files](./img/configuration-files.png)
 
 - `.gitignore`: a file that tells `Git` which files or folders to ignore in a project.
+
+  - Note: Instead of manually write it, you can run this script to add the default `.gitignore` file to your project based on the type of project you're working on:
+
+    ```sh
+    npx gitignore <project-type>
+    # example:
+    npx gitignore node
+    ```
+
 - `.editorconfig`: a file that defines coding styles and editor settings for a project.
 - `.eslintrc`: a file that defines rules for `ESLint` (a tool for identifying and reporting on patterns found in `ECMAScript`/`JavaScript` code).
 - `.prettierrc`: a file that defines rules for `Prettier` (a code formatter).

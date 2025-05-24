@@ -204,7 +204,9 @@ The four basic steps include:
 10. **JavaScript:** The `JS` files are parsed and executed to add interactivity to the page
 
     - It can change all the previous steps (the `DOM` tree, `CSSOM` tree, and `Render Tree`), which means that we might have to redo all the previous steps again after the `JS` is executed 🥲
+
       ![Web Pages](./img/web-pages-7.gif)
+
     - This is called **reflow** or **repaint** and it's very expensive
       ![Web Pages](./img/web-pages-8.png)
     - Does all the steps need to happen again every time a `JS` file is executed? **No**, not all the steps, only the steps that are affected by the `JS` file

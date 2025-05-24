@@ -1,7 +1,10 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Typescript with Node.js \& Express](#typescript-with-nodejs--express)
+  - [Typescript with Node.js](#typescript-with-nodejs)
+    - [TS with Express](#ts-with-express)
+      - [Solution 1: Adding type annotation when needed in Express](#solution-1-adding-type-annotation-when-needed-in-express)
+      - [Solution 2: Twist Express library to work with TS classes](#solution-2-twist-express-library-to-work-with-ts-classes)
   - [Using Decorators](#using-decorators)
     - [Wrong way of using decorators](#wrong-way-of-using-decorators)
     - [Using Decorators with Metadata (common approach)](#using-decorators-with-metadata-common-approach)
@@ -12,12 +15,149 @@
 
 ---
 
-## Typescript with Node.js & Express
-
-- Read this first: [TS with Express](../../Frontend/TypeScript/5-TS-Dev.md#ts-with-express)
+## Typescript with Node.js
 
 - In order to have good coupling between Typescript and Node.js, we need to use `Decorators`
   - Decorators are a feature of Typescript that allow us to annotate classes, methods, properties, parameters, etc. with metadata
+- `ts-node` is a package that allows us to run Typescript code directly in Node.js without the need to compile it to JavaScript first
+
+### TS with Express
+
+The issue with using Typescript with Express is that Express is a library that is mostly written in JavaScript, and it doesn't have good support for Typescript out of the box.
+
+- The main issue is that the type definition files for Express are not always accurate, and they don't always match the actual implementation of the library
+- This can lead to issues when using Express with Typescript, as we might get errors that are not actually errors, or we might not get errors when we should
+- So, we need to be careful when using Express with Typescript, and we need to make sure that we're using the correct types for the library
+
+#### Solution 1: Adding type annotation when needed in Express
+
+```sh
+# Install express types declaration file
+npm i -D @types/express
+```
+
+- Simple type annotation with the help of type declaration file
+
+  ```ts
+  import express, { Request, Response } from 'express';
+
+  const app = express();
+
+  app.get('/', (req: Request, res: Response) => {
+    res.send('Hello World!');
+  });
+  ```
+
+- The issue with integrating TS and express usually comes from using `Middlewares`
+
+  - Because usually middlewares are implemented in javascript, and then Typescript won't be able to know the type of properties that might get (added / removed / modified) to/from the express library through the middlewares
+  - Even sometimes the type definition files may have types because they're assuming that we're using specific middlewares, which may cause errors and problems if we didn't follow the assumption and didn't use these middlewares, for example:
+
+    ```ts
+    // The Request interface has a "body" type with type "any" in the declaration file, even though it won't have the "body" property if we didn't use the "bodyparser" middleware
+
+    app.use(bodyParser.urlencoded({ extended: true }));
+    // ...
+    app.post('/', (req: Request, res: Response) => {
+      const { email, password } = req.body; // HERE
+
+      res.send(email + password);
+    });
+    ```
+
+- The issue with that the type definition isn't always accurate also in this example:
+
+  ```ts
+  // The Request interface has a "body" type with type "any" in the declaration file, So, we won't be able to check if the "body" object contains the correct properties or not (email, password)
+
+  app.post('/', (req: Request, res: Response) => {
+    const { email, password } = req.body; // HERE
+    // TS gives no error, even if the "body" object doesn't contain the "email" or "password" properties, or contains them in different keys like ("mail", "pass")
+
+    res.send(email.toLowerCase()); // Assuming that "email" is a string, TS won't give an error if it's not a string
+  });
+  ```
+
+  - A bad solution to this problem is to modify the type declaration file to make the type of the "body" property to be an object with the correct properties, but this is a bad solution because we're modifying the type declaration file which is a 3rd party file, and we shouldn't modify it ❌
+  - A better solution is to create custom types that extend the original types from the type declaration file, and then use these custom types instead of the original types
+
+    ```ts
+    // Create a custom type that extends the original type from the type declaration file
+    interface RequestWithBody extends Request {
+      body: { [key: string]: string | undefined }; // { email: string, password: string }
+    }
+
+    // Use the custom type instead of the original type
+    app.post('/', (req: RequestWithBody, res: Response) => {
+      const { email, password } = req.body; // HERE
+      // TS gives an error if the "body" object doesn't contain the "email" or "password" properties, or contains them in different keys like ("mail", "pass")
+
+      res.send(email.toLowerCase()); // TS gives an error if "email" is not a string
+
+      // OR use a type guard to check if the "body" object contains the correct properties or not
+      if (email) {
+        res.send(email.toLowerCase());
+      } else {
+        res.send('Email is required');
+      }
+    });
+    ```
+
+- Note:
+
+  - Some middlewares type declaration files might be written in a good way that doesn't cause any problems, like the `cookie-session` middleware, as it actually extends the `Request` interface and adds the `session` property and other properties to it, so we don't need to create a custom type for it
+
+    ```ts
+    // cookie-session type declaration file
+    declare namespace Express {
+      interface Request extends CookieSessionInterfaces.CookieSessionRequest {}
+    }
+    // ...
+    declare namespace CookieSessionInterfaces {
+      interface CookieSessionRequest {
+        session?: any;
+        [propertyName: string]: any; // out of the box
+      }
+    }
+    ```
+
+---
+
+#### Solution 2: Twist Express library to work with TS classes
+
+Here, we want to make express (which is mostly written in a functional way) to work with classes (which is the OOP way that TS uses)
+
+- 2 ways:
+  ![twist express](./img/ts-with-express-1.png)
+
+  - The easy way just adds an outer layer of code that uses express in a functional way, and then we use this outer layer in our classes
+
+    ```ts
+    class Server {
+      private app: express.Application;
+
+      constructor() {
+        this.app = express();
+        this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(router);
+      }
+      // ...
+      start(): void {
+        this.app.listen(3000, () => {
+          console.log('Listening on port 3000');
+        });
+      }
+    }
+    ```
+
+    - This is not recommended because we're adding an extra layer of code that we don't need, and will make the developer experience worse
+
+  - The hard way is to modify the express library itself to work with classes, and then we use the modified express library in our classes
+    - This is the best solution, but it's hard and time consuming, and we need to be very familiar with the express library code
+    - If done correctly it will significantly enhance the developer experience and make it easier to work with express
+    - It usually involves using [Decorators](./1-TypeScript.md#decorators) to modify the express library code
+
+---
 
 ---
 

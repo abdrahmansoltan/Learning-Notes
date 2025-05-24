@@ -8,6 +8,7 @@
       - [Type-Assertion or Generics for HTML elements types](#type-assertion-or-generics-for-html-elements-types)
     - [DocumentFragment](#documentfragment)
   - [Events](#events)
+  - [Handling types of variables declared in other scopes](#handling-types-of-variables-declared-in-other-scopes)
 
 ---
 
@@ -170,3 +171,40 @@ handleSubmit = (e: SubmitEvent): void => {
 };
 btn.addEventListener('click', handleSubmit); // ✅
 ```
+
+---
+
+## Handling types of variables declared in other scopes
+
+- When we declare a variable in one scope and use it in another scope, Typescript will not be able to infer the type of the variable, so we need to explicitly type it.
+
+- For example, if you use `<script>` tag to include a script in your HTML file, Typescript will not be able to infer the type of the variable declared in the script tag.
+
+  ```html
+  <!-- ... -->
+  <body>
+    <script src="google.js"></script>
+    <script src="./index.js"></script>
+  </body>
+  ```
+
+  ```ts
+  // index.ts
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 8,
+    center: { lat: -34.397, lng: 150.644 }
+  });
+  // Here `google` is not defined, so Typescript will complain about it ❌
+
+  // --------------------------------------
+
+  // instead we can declare the variable in the global scope
+  declare const google: any; // or declare global { const google: any; } in a separate file (or in same file) ✅
+
+  const map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 8,
+    center: { lat: -34.397, lng: 150.644 }
+  });
+  ```
+
+- Here we use `declare` keyword to tell Typescript that this variable is declared in another file, and we are not going to define it in this file.

@@ -2,6 +2,10 @@
 
 - [INDEX](#index)
   - [Type Assertions / Type Casting](#type-assertions--type-casting)
+  - [Combining Types (Union \& Intersection Types)](#combining-types-union--intersection-types)
+    - [Union types](#union-types)
+    - [Intersection types](#intersection-types)
+    - [Extending Interfaces](#extending-interfaces)
   - [Generics](#generics)
     - [Generics Constraints](#generics-constraints)
       - [Normal Type Constraint](#normal-type-constraint)
@@ -17,6 +21,7 @@
     - [`instanceof` Narrowing](#instanceof-narrowing)
     - [Type Predicates](#type-predicates)
     - [Discriminated Unions (literal types Narrowing)](#discriminated-unions-literal-types-narrowing)
+    - [Declaration Merging](#declaration-merging)
     - [Exhaustiveness Checks with `never`](#exhaustiveness-checks-with-never)
   - [Decorators](#decorators)
     - [How to use Decorators](#how-to-use-decorators)
@@ -64,6 +69,109 @@
   const numChars = (mystery as string).length; // < Note how we use the `as` keyword here in the inline code normally
   //or
   const numChars = (<string>mystery).length;
+  ```
+
+---
+
+## Combining Types (Union & Intersection Types)
+
+### Union types
+
+It's a type that can be one of several types, and it allows you to define a variable that can hold values of different types. (think of it as a "logical OR")
+
+- used when more than one type can be used
+- we can create a union-type by using the **pipe character (`|`)** to separate the types we want to include
+- It's commonly used with [Type Guard](./1-TypeScript.md#type-guard-narrowing) to narrow down the type of a variable
+
+- Notes:
+
+  - you shouldn't use it with type `any`, as it's like multiplying by `zero` as it will equal that the type will be `any` (`zero`)
+
+  ```ts
+  let studentPhone: number | string;
+  studentPhone = '(555) 555 - 5555';
+  studentPhone = 5555555555;
+  ```
+
+  - There's a downside that if we will perform an operation for a specific type like `.replace()` for string type, on a union type, we will get an error:
+
+    ```ts
+    function calculateTax(price: number | string, tax: number) {
+      price.replace('$', ''); // ERROR, as it might be number
+      return price * tax;
+    }
+    ```
+
+    - To fix this, we use [Type Guard](./1-TypeScript.md#type-guard-narrowing)
+
+---
+
+### Intersection types
+
+It's a type that combines multiple types into one, and it allows you to create a new type that **has all the properties** of the combined types. (think of it as a "logical AND")
+
+- It's for having multiple types and combining them with (`&`)
+
+```ts
+type Circle = {
+  radius: number;
+};
+type Colorful = {
+  color: string;
+};
+
+type ColorfulCircle = Circle & Colorful;
+```
+
+- This is quite different than what we saw with union types — this is quite literally a `Circle` and `Colorful` combined together, and we have access to everything immediately.
+
+---
+
+### Extending Interfaces
+
+- You can extend interfaces using the `extends` keyword, which allows you to create a new interface that inherits properties from one or more existing interfaces
+
+- Object example
+
+  ```ts
+  interface Person {
+    name: string;
+    age: number;
+  }
+
+  interface Student extends Person {
+    enrolled: boolean;
+  }
+
+  let newStudent: Student = { name: 'Maria', age: 10, enrolled: true };
+  ```
+
+- Class example
+
+  ```ts
+  interface Named {
+    name: string;
+  }
+
+  interface Greetable extends Named {
+    greet(phrase: string): void;
+  }
+
+  class Person implements Greetable {
+    name: string;
+    age: number;
+
+    constructor(name: string, age: number) {
+      this.name = name;
+      this.age = age;
+    }
+
+    greet(phrase: string) {
+      console.log(phrase + ' ' + this.name);
+    }
+  }
+
+  // Now we can use the Greetable interface to create a new object that has the same properties as Person
   ```
 
 ---
@@ -335,6 +443,36 @@ names[0] = 'Jane'; // ❌ Index signature in type 'readonly string[]' only permi
 console.log(names); // ✅ ['John', 'Doe']
 ```
 
+- Note:
+
+  - this can be done by using `as const` keyword, but this is a better approach
+
+    ```ts
+    const names = ['John', 'Doe'] as const;
+    names.push('Jane'); // ❌ Property 'push' does not exist on type 'readonly ["John", "Doe"]'.
+
+    // ---------------------------------------------
+
+    // or object
+    const person = {
+      name: 'John',
+      age: 20
+    } as const;
+
+    person.name = 'Jane'; // ❌ Cannot assign to 'name' because it is a read-only property.
+    ```
+
+  - Another way to do this is by using `Object.freeze()`, **but this is a runtime check**, and it will not be type-checked
+
+    ```ts
+    const person = Object.freeze({
+      name: 'John',
+      age: 20
+    });
+
+    person.name = 'Jane'; // ❌ Cannot assign to 'name' because it is a read-only property.
+    ```
+
 ---
 
 ## Type Guard (Narrowing)
@@ -544,6 +682,72 @@ const getArea = (shape: Circle | Square): number => {
   }
 };
 ```
+
+---
+
+### Declaration Merging
+
+TypeScript can merge multiple declarations with the same name into one. Useful for enhancing or extending existing types, especially with libraries or global objects.
+
+- Common Mergeable Types:
+
+  - `Interfaces` → Members get combined.
+  - `Namespaces` → Combine and organize code.
+  - `Functions` + `Namespaces` → Allows static properties on functions.
+
+- Use Cases:
+
+  - Extending existing types
+  - Add props to global or third-party interfaces
+  - Extend existing modules (module augmentation)
+  - Combine function logic with extra metadata (via `namespace`)
+
+- Example: (Function + Namespace Merge)
+
+  ```ts
+  // greet is a value (function)
+  function greet(name: string): string {
+    return `Hello, ${name}`;
+  }
+
+  // Merge namespace with function (greet is a namespace)
+  namespace greet {
+    export const version = '1.0.0';
+    export function shout(name: string) {
+      return greet(name).toUpperCase();
+    }
+  }
+
+  console.log(greet('John')); // Hello, John
+  console.log(greet.version); // 1.0.0
+  console.log(greet.shout('John')); // HELLO, JOHN
+  ```
+
+  - This allows the greet function to also carry metadata or helpers via the merged namespace.
+
+- Example: (Class as both a value and a type)
+
+  ```ts
+  class Person {
+    name?: string;
+    age?: number;
+    static createBaby(name: string) {
+      return {
+        name,
+        age: 0
+      };
+    }
+  }
+
+  // 1. Using it as a value
+  const person = Person.createBaby('John');
+
+  // 2. Using it as a type
+  const person2: Person = {
+    name: 'John',
+    age: 10
+  };
+  ```
 
 ---
 
@@ -906,8 +1110,12 @@ Class Decorator is very similar to inheriting from another class.
 
 #### Decorator Libraries
 
-- All of these examples are just to show you how decorators can be used to validate the input of a class or a method, and how they can be used to modify the behavior of a class or a method at runtime. **But in real life, you would use libraries like [`class-validator`](https://github.com/typestack/class-validator) or [`class-transformer`](https://github.com/typestack/class-transformer) to do this kind of validation.**
-- Also there's [NestJS](https://nestjs.com/) which is a framework for building server-side applications with TypeScript, and it uses decorators extensively to define routes, middleware, and other features. It also uses decorators to define validation rules for class properties and methods.
+- All of the above examples are just to show you how decorators can be used to validate the input of a class or a method, and how they can be used to modify the behavior of a class or a method at runtime.
+- **But in real life, you would use libraries to do this kind of validation like:**
+  - [`class-validator`](https://github.com/typestack/class-validator)
+- Also there're libraries that provide decorators & methods for transforming class instances into plain objects and vice versa, and they also provide methods to validate the input of a class or a method like:
+  - [`class-transformer`](https://github.com/typestack/class-transformer)
+- Also there's [`NestJS`](https://nestjs.com/) which is a framework for building server-side applications with TypeScript, and it uses decorators extensively to define routes, middleware, and other features. It also uses decorators to define validation rules for class properties and methods.
 - And also there's [Angular](https://angular.io/) which is a framework for building client-side applications with TypeScript, and it uses decorators extensively to define components, directives, and other features. It also uses decorators to define validation rules for class properties and methods.
 
 ---

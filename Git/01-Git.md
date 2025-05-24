@@ -749,6 +749,14 @@ git log --oneline --decorate
 
 [This github repo for all recommended cases](https://github.com/github/gitignore)
 
+- **Note:** Instead of manually write it, you can run this script to add the default `.gitignore` file to your project based on the type of project you're working on:
+
+    ```sh
+    npx gitignore <project-type>
+    # example:
+    npx gitignore node
+    ```
+
 ### How to Ignore empty directories
 
 - git by default doesn't track empty directories so we have to put a file in the empty directory >> `.gitkeep`

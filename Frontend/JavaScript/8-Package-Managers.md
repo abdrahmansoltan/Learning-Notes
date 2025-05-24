@@ -151,8 +151,11 @@ It's a simple command-line tool that automates the process of downloading and in
 
 - `npx`
 
-  - It's a tool that comes with npm 5.2+ and higher. It allows you to run a command (from the package in `node_modules/.bin`) without having to install it globally.
+  - It's useful when you're running npm package that has some sort of executable script (or command line interface) that you want to run without having to install it globally.
+  - It's a tool that comes with npm `5.2+` and higher. It allows you to run a command (from the package in `node_modules/.bin`) without having to install it globally.
   - It's useful for running packages that you don't want to install globally, or for running a package that you only need once.
+  - If a package doesn't have a `bin` property in its `package.json`, then `npx` will give an error.
+    ![npx error](./img/npx-error.png)
   - Ex:
 
     ```sh
@@ -160,6 +163,13 @@ It's a simple command-line tool that automates the process of downloading and in
 
     npx tsc example.ts # run typescript compiler
     ```
+
+    - Here this is equivalent to running this:
+
+      ```sh
+      npm install -g create-react-app # global install
+      create-react-app my-app # initialize a react app
+      ```
 
 ---
 
@@ -183,6 +193,11 @@ It's a simple command-line tool that automates the process of downloading and in
 - **Symantics Versioning**: is a standard for versioning packages. It has three parts: `major.minor.patch`.
   - For example, `1.2.3` is a `SemVer` version. The `major` version is incremented when there are breaking changes, the `minor` version is incremented when there are new features, and the `patch` version is incremented when there are bug fixes.
   - More here -> [semantic-versioning](../Node.js//1-Node.md#semantic-versioning)
+- **Volta**
+  - It's a hassle-free javascript tool manager. It allows you to install and manage different versions of Node.js, npm, yarn, and other tools.
+  - It allows you to install and manage different versions of Node.js, npm, yarn, and other tools.
+  - This is useful for ensuring that your project works with the same version of Node.js and other tools across different machines and environments.
+  - It also allows you to create a `volta.json` file that specifies the version of Node.js and other tools that your project uses.
 
 ---
 

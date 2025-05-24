@@ -357,6 +357,8 @@ ESLint is a JavaScript linting utility that was first released in June 2013 and 
 
   # or on a folder
   npx eslint <folder containing js files>
+  # ex:
+  npx eslint src --ext .js # to check all `js` files in src folder
   ```
 
 ---
