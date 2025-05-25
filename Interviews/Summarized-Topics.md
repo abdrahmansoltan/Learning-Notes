@@ -72,6 +72,25 @@
       - [AngularJS](#angularjs)
     - [React](#react)
       - [React Summary](#react-summary)
+      - [React Hooks](#react-hooks)
+      - [Class Components](#class-components)
+      - [React Router Summary](#react-router-summary)
+      - [Redux Summary](#redux-summary)
+      - [Redux Toolkit Summary](#redux-toolkit-summary)
+      - [React Query Summary](#react-query-summary)
+      - [React Performance Optimization Summary](#react-performance-optimization-summary)
+      - [React Interview Questions Summary](#react-interview-questions-summary)
+      - [Next.js Summary](#nextjs-summary)
+    - [Vue](#vue)
+      - [Vue Summary](#vue-summary)
+      - [Vue Router Summary](#vue-router-summary)
+      - [Vuex Summary](#vuex-summary)
+      - [Composition API Summary](#composition-api-summary)
+      - [Vue Testing Summary](#vue-testing-summary)
+      - [Nuxt Summary](#nuxt-summary)
+  - [Backend](#backend)
+    - [Backend Summary](#backend-summary)
+    - [Backend Performance Summary](#backend-performance-summary)
 
 ---
 
@@ -5285,3 +5304,2240 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 - **Professional React Development**:
   - Emphasizes project structure, environmental variables, and best practices.
+
+---
+
+#### React Hooks
+
+- **Overview**:
+
+  - React Hooks are special built-in functions that allow functional components to use state and lifecycle features.
+  - Hooks start with the word `use` and enable access to React's internal features like state, side effects, and DOM manipulation.
+  - Hooks can be composed to create custom hooks for reusing stateful logic.
+
+- **Functional Components**:
+
+  - Functional components are pure functions that render the same output for the same input (props).
+  - They avoid side effects like network requests, timers, or DOM manipulation directly in the render logic.
+  - Side effects can be handled using `useEffect` or event handlers.
+
+- **Hooks Rules**:
+
+  - Call Hooks only from React function components or custom hooks.
+  - Do not call Hooks conditionally or inside loops.
+  - Hooks rely on call order to associate state with components.
+
+- **State Management**:
+
+  - `useState` Hook:
+    - Tracks state in functional components.
+    - Returns an array with the current state and a setter function.
+    - State updates are asynchronous; use functional updates for dependent state changes.
+      - Don't mutate state directly; use the setter function to update it. this is because React batches state updates for performance.
+    - Supports lazy initialization for expensive computations.
+  - Changing state of type `object`:
+    - Use the spread operator to update specific properties.
+    - Commonly used for form inputs.
+  - Functional state updates:
+    - Use a callback function to update state based on the previous state.
+
+- **Refs**:
+
+  - `useRef` Hook:
+    - Provides a mutable object (`.current`) that persists across renders.
+    - Used for DOM manipulation, storing previous state, or avoiding re-renders.
+    - Does not trigger re-renders when updated.
+
+- **Effect Hook**:
+
+  - `useEffect` Hook:
+    - Handles side effects like data fetching, subscriptions, or DOM updates.
+    - Replaces lifecycle methods like `componentDidMount`, `componentDidUpdate`, and `componentWillUnmount`.
+    - Dependency array controls when the effect runs (e.g., on mount, state change, or every render).
+    - Cleanup function prevents memory leaks by removing event listeners, canceling subscriptions, etc.
+  - `useLayoutEffect` Hook:
+    - Similar to `useEffect` but fires synchronously after DOM mutations.
+
+- **useReducer**:
+
+  - Manages complex state logic using a reducer function `(state, action) => newState`.
+  - Returns the current state and a `dispatch` function to trigger state updates.
+  - Useful for managing related state updates or when state logic is complex.
+  - Reducer function:
+    - Pure function that takes the previous state and an action to return the next state.
+    - Avoids side effects; use `useEffect` for external interactions.
+  - `useReducer` vs `useState`:
+    - `useReducer` is better for complex state logic or dependent state updates.
+
+- **Context API**:
+
+  - Solves prop drilling by providing a way to share state across components.
+  - `useContext` Hook:
+    - Accesses context values directly in functional components.
+  - Can be combined with `useReducer` for global state management.
+  - Limitations:
+    - Not suitable for high-frequency updates; consider alternatives like Redux.
+
+- **Custom Hooks**:
+  - Encapsulate reusable stateful logic.
+  - Examples:
+    - `useInput`: Manages form input state.
+    - `useKeyPress`: Handles keyboard events.
+    - `useContext`: Simplifies context usage.
+
+---
+
+#### Class Components
+
+- **Overview**:
+
+  - Before React `16.8`, class components were the only way to manage `state` and `lifecycle methods`.
+  - Class components extend `React.Component` and require a `render()` method to return JSX.
+
+- **Class Component Constructor Function**:
+
+  - Called when the component is initialized.
+  - Used to declare:
+    - `state` property.
+    - `props` property.
+    - Bind methods.
+  - Must call `super(props)` to pass props to the parent class.
+
+- **Class Component Fields**:
+
+  - New syntax to declare properties without a constructor function.
+  - Examples:
+
+    - `state` property:
+
+      ```jsx
+      class Car extends React.Component {
+        state = { color: 'red' };
+        render() {
+          return <h2>I am a {this.state.color} Car!</h2>;
+        }
+      }
+      ```
+
+    - `static` properties:
+
+      ```jsx
+      class Car extends React.Component {
+        static defaultProps = { color: 'red' };
+        render() {
+          return <h2>I am a {this.props.color} Car!</h2>;
+        }
+      }
+      ```
+
+- **Props**:
+
+  - Passed to the constructor and React.Component via `super()`.
+  - Example:
+
+    ```jsx
+    class Car extends React.Component {
+      constructor(props) {
+        super(props);
+      }
+      render() {
+        return <h2>I am a {this.props.model}!</h2>;
+      }
+    }
+    ```
+
+- **State**:
+
+  - An instance attribute used to store component-specific data.
+  - Always an object in class components.
+  - Initialized in the constructor function.
+  - Accessed using `this.state`.
+
+- **`setState()`**:
+
+  - Used to update state; never mutate state directly.
+  - Asynchronous; use callback form for dependent updates:
+
+    ```jsx
+    this.setState(prevState => ({ counter: prevState.counter + 1 }));
+    ```
+
+  - Triggers a re-render by invoking the `render()` method.
+
+- **Mutating State Safely**:
+
+  - Avoid direct mutation; create a copy of the state before updating.
+  - Example:
+
+    ```jsx
+    this.setState(state => ({ ...state, isLoading: true }));
+    ```
+
+- **Callbacks in `setState()`**:
+
+  - Useful for performing actions immediately after state updates.
+  - Example:
+
+    ```jsx
+    this.setState({ title: 'New Title' }, () => {
+      console.log(this.state.title);
+    });
+    ```
+
+- **Designing State**:
+
+  - Minimize state: Only include data that changes.
+  - Centralize state in the parent component and pass it to children via props.
+
+- **Context.Consumer**:
+
+  - Subscribes to context changes within a function component.
+  - Example:
+
+    ```jsx
+    <MyContext.Consumer>{value => <div>{value}</div>}</MyContext.Consumer>
+    ```
+
+- **`this` Keyword**:
+
+  - Use arrow functions or bind methods to preserve `this` context in event handlers.
+  - Example:
+
+    ```jsx
+    handleClick = () => {
+      console.log(this);
+    };
+    ```
+
+- **Component LifeCycles**:
+
+  - Three phases:
+    - **Mounting**: `constructor`, `render`, `componentDidMount`.
+    - **Updating**: `componentDidUpdate`.
+    - **Unmounting**: `componentWillUnmount`.
+  - Key methods:
+    - `componentDidMount`: Ideal for AJAX requests or setting up subscriptions.
+    - `componentDidUpdate`: Used for side effects like syncing with localStorage.
+    - `componentWillUnmount`: Cleanup tasks like removing event listeners.
+  - Example:
+
+    ```jsx
+    class Clock extends React.Component {
+      componentDidMount() {
+        this.timerID = setInterval(() => this.tick(), 1000);
+      }
+      componentWillUnmount() {
+        clearInterval(this.timerID);
+      }
+      tick() {
+        this.setState({ date: new Date() });
+      }
+      render() {
+        return <h2>{this.state.date.toLocaleTimeString()}</h2>;
+      }
+    }
+    ```
+
+- **LifeCycle Execution Order**:
+  1. `constructor` -> Initialize state.
+  2. `render()` -> Render JSX.
+  3. `componentDid...` -> Perform side effects.
+  4. Re-render on state/prop changes.
+- **Lifecycle Methods**:
+  - `componentDidMount`: Invoked after the component is mounted.
+  - `componentDidUpdate`: Invoked after the component updates.
+  - `componentWillUnmount`: Invoked before the component is unmounted.
+  - `shouldComponentUpdate`: Determines if the component should re-render based on state or props changes.
+
+---
+
+#### React Router Summary
+
+- **Routing**
+
+  - Determines what pages to render based on the URL.
+  - Enables navigation between screens using the browser URL.
+  - Keeps the UI in sync with the current browser URL.
+  - React Router turns React projects into single-page applications (SPAs).
+
+- **Server-Side Routing (Traditional Routing)**
+
+  - Server decides what HTML to return based on URL request.
+  - Entire page refreshes on navigation.
+  - Clicking a `<a>` link causes the browser to request a new page and replace the entire DOM.
+
+- **Client-Side Routing (CSR)**
+
+  - **Fake CSR**: Uses conditions and prevents default behavior on `<a>` links to render components based on state.
+  - **Real CSR (React Router)**:
+    - All HTML, JavaScript, and CSS are loaded initially.
+    - Browser loads only the data needed for the page.
+    - Uses JavaScript to manipulate the URL bar with the History API.
+    - Handles backward navigation using the `popstate` event.
+  - **SSR vs CSR**: Comparison of server-side and client-side rendering.
+
+- **Set Up**
+
+  - Install React Router: `npm install react-router-dom@6`.
+  - Wrap the app in `<BrowserRouter>` in `index.js`.
+  - Use `<Routes>` and `<Route>` in `App.js` to define routes.
+
+- **Router Components**
+
+  - **`Route` Component**
+    - Matches paths to components.
+    - Props: `component` (instantiates component) vs `render` (evaluates component).
+    - Nested Routes: Use `<Outlet>` to define where nested components render.
+    - `index` route: Default route for a parent route.
+  - **`Switch` Component** (v5 only)
+    - Renders the first matching route.
+    - Use `exact` to ensure only one match.
+    - Include a 404 route with `path="*"`.
+  - **`Link` Component**
+    - Replaces `<a>` to prevent page reloads.
+    - Use `to` prop to specify the target URL.
+  - **`NavLink` Component**
+    - Similar to `Link` but adds an `active` class for the current page.
+    - Use `activeStyle` or `activeClassName` for styling.
+
+- **Dynamic Routes (URL Params)**
+
+  - Store UI state in the URL for bookmarking and sharing.
+  - Use `useParams` hook to access route parameters.
+  - Use `useSearchParams` hook to access query parameters.
+
+- **Programmatic Navigation**
+
+  - Use `useNavigate` hook to navigate programmatically.
+  - Navigate back and forward with `navigate(-1)` and `navigate(1)`.
+  - In v5, use `useHistory` hook.
+  - `history.push` vs `history.replace`: Adds vs replaces history records.
+
+- **Redirection**
+
+  - Use `<Navigate>` component to redirect based on conditions.
+  - Use `replace` prop to maintain the history stack.
+
+- **Accessing the Page's URL**
+
+  - Use `useLocation` hook to access query parameters.
+
+- **Fetcher**
+
+  - Perform HTTP requests without reloading the page using `useFetcher` hook.
+  - Access request state (`pending`, `success`, `error`).
+
+- **Protected Routes (Guarding Routes)**
+
+  - Restrict access based on authentication or permissions.
+  - **Method 1**: Create a custom `ProtectedRoute` component.
+    - Use `AuthContext` to manage authentication state.
+    - Render the component or redirect based on authentication.
+  - **Method 2**: Use a wrapper component with `useEffect` to navigate unauthenticated users.
+
+- **Prompt**
+
+  - Use `<Prompt>` to warn users before navigating away from a page.
+
+- **React Router with Data Loading (v6.4+)**
+  - Fetch data before rendering components using `loaders`.
+  - Define routes with `createBrowserRouter` or `useRoutes`.
+  - Use `useLoaderData` hook to access fetched data.
+  - Handle loading and error states with `useNavigation` and `useRouteError` hooks.
+  - Use `action` property in routes for `POST/PUT/DELETE` requests.
+
+---
+
+#### Redux Summary
+
+- **What is Redux?**
+
+  - A state management system for cross-component or app-wide state.
+  - Core concepts:
+    - Single store containing global state.
+    - Dispatching plain action-objects to the store.
+    - Pure reducer functions immutably updating state.
+  - Can be used with React, Angular, Vue, or vanilla JS.
+  - Two approaches:
+    - Classic Redux.
+    - Redux Toolkit (recommended).
+
+- **When to Use Redux?**
+
+  - Historically used in most React apps for global state.
+  - Alternatives like React Query or SWR are now common for remote state.
+  - Use Redux for apps requiring a lot of global UI state.
+
+- **Core Concepts**
+
+  - Components subscribe to store data (state).
+  - State changes via `dispatch` and reducer functions.
+  - Reducers manage slices of state.
+  - Centralized state change via actions.
+
+- **`useContext` + `useReducer` vs Redux**
+
+  - `useReducer` is similar to Redux but lacks a centralized store.
+  - Redux uses a single store and singular `dispatch`.
+  - Context API is used internally by both.
+
+- **Installation**
+
+  - Install Redux core: `npm install redux`.
+  - Install complementary packages: `react-redux`, `@redux-devtools/core`.
+
+- **Setup & File Architecture**
+
+  - Connect React to Redux using `<Provider>` in `index.js`.
+  - Create state, reducers, and actions in the store.
+  - Use `combineReducers` for multiple reducers.
+  - Access state in components using `useSelector`.
+
+- **Folder Structure**
+
+  - Organize by function or feature.
+  - Avoid circular imports with Redux Toolkit.
+
+- **Store**
+
+  - Define slices for top-level keys of the state.
+  - Use `createSlice` to simplify reducers and action creators.
+  - Mutate state safely using Immer.
+
+- **Action Flow**
+
+  - Centralized action handling via reducers.
+  - Use `extraReducers` or standalone actions for shared logic.
+
+- **Action Creators**
+
+  - Functions that return action objects.
+  - Simplified with `createSlice`.
+
+- **Selector Functions**
+
+  - Extract specific slices of state.
+  - Use libraries like Reselect for memoized selectors.
+
+- **Redux Hooks**
+
+  - `useSelector`: Access state.
+  - `useDispatch`: Dispatch actions.
+
+- **Middleware**
+
+  - Handles async logic outside reducers.
+  - Allows side effects like API calls.
+  - Enhances Redux with additional functionality.
+  - Popular options: `redux-thunk`, `redux-saga`.
+
+- **Redux Thunk**
+
+  - Middleware for async actions.
+  - Dispatch actions within thunks.
+
+- **Redux Saga**
+
+  - Side-effect manager using generator functions.
+  - Actions hit reducers before sagas.
+
+- **Saga vs Thunk**
+
+  - Thunk: Simpler, function-based async handling.
+  - Saga: More powerful, generator-based side effects.
+
+- **Redux in Class Components**
+
+  - Use `connect` HOC with `mapStateToProps` and `mapDispatchToProps`.
+
+- **Redux in TypeScript**
+
+  - Fully supported with TypeScript.
+
+- **Redux Libraries**
+
+  - Reselect: Memoized selectors.
+  - Redux-persist: Persist state across sessions.
+
+- **Redux DevTools**
+
+  - Debugging tool for Redux state and actions.
+
+- **Best Practices**
+  - Use Redux Toolkit for modern development.
+  - Keep reducers pure and simple.
+  - Use middleware for async logic.
+
+---
+
+#### Redux Toolkit Summary
+
+- **What is Redux Toolkit (RTK)?**
+
+  - Official, recommended, and modern approach for writing Redux code.
+  - Opinionated approach enforcing Redux best practices.
+  - Provides utilities to simplify common Redux use cases.
+  - Fully compatible with classic Redux.
+  - Reduces boilerplate code (e.g., middleware setup).
+  - Key features:
+    - Mutates state inside reducers (converted to immutable updates via `immer`).
+    - Automatically generates action creators.
+    - Automatic middleware and Redux DevTools setup.
+
+- **Why RTK is Redux Today?**
+
+  - Eliminates boilerplate and prevents common mistakes.
+  - Simplifies standard Redux tasks with key APIs:
+    - `configureStore`: Combines reducers, adds middleware, and integrates Redux DevTools.
+    - `createSlice`: Simplifies reducers and action creators using `immer`.
+  - Easier to configure than `createStore` with named options parameters.
+  - Works seamlessly with TypeScript.
+
+- **Installation**
+
+  - Install RTK: `npm install @reduxjs/toolkit`.
+  - Complementary packages: `react-redux`, `@redux-devtools/core`.
+
+- **Setup**
+
+  - Use `configureStore()` instead of `createStore()`.
+  - Automatically handles root reducer, `Provider`, devtools, and middleware setup.
+
+- **RTK Methods**
+
+  - `createSlice()`:
+    - Creates a slice of global state with reducers and action creators.
+    - Uses `immer` for immutable updates with mutating syntax.
+    - Simplifies reducer logic (no `switch` statements or `default` cases).
+    - Supports `prepare` callback for custom action creators.
+  - `createActions()`:
+    - Generates action creators for Redux actions.
+  - `createAsyncThunk()`:
+    - Simplifies async actions with promise-based logic.
+    - Automatically generates `pending`, `fulfilled`, and `rejected` states.
+    - Use `extraReducers` to handle thunk states.
+  - `createApi()`:
+    - Creates an API for client-side data fetching.
+
+- **Handling Thunk State**
+
+  - Use `extraReducers` to manage `pending`, `fulfilled`, and `rejected` states.
+  - Example:
+
+    ```js
+    extraReducers: {
+      [fetchAccountById.pending]: (state) => { state.status = 'loading'; },
+      [fetchAccountById.fulfilled]: (state, action) => { state.status = 'succeeded'; state.account = action.payload; },
+      [fetchAccountById.rejected]: (state, action) => { state.status = 'failed'; state.error = action.error.message; }
+    }
+    ```
+
+- **Redux Toolkit Query**
+
+  - Module for creating APIs to fetch data.
+  - Handles loading state, error state, data caching, and refetching.
+  - Key concepts:
+    - `reducerPath`: Key name for API state in the Redux store.
+    - `fetchBaseQuery`: Pre-configured `fetch` function.
+    - `endpoints`: Define queries (read data) and mutations (write data).
+  - Steps to use:
+    1. Identify related requests.
+    2. Create an API file.
+    3. Add `reducerPath` for API state.
+    4. Configure `baseQuery` for requests.
+    5. Define `endpoints` for queries and mutations.
+    6. Export generated hooks.
+    7. Connect API to the store.
+    8. Use hooks in components.
+
+- **Best Practices**
+  - Use RTK for modern Redux development.
+  - Leverage `createSlice` and `createAsyncThunk` for simplicity.
+  - Use Redux Toolkit Query for efficient data fetching.
+
+---
+
+#### React Query Summary
+
+- **What is React Query (Tanstack Query)?**
+
+  - A library for managing remote state in React.
+  - Replaces Redux, MobX, Apollo Client, etc.
+  - Remote state refers to data fetched from a server (e.g., REST or GraphQL APIs).
+  - Key features:
+    - Automatic caching of remote data in memory.
+    - Provides loading and error states.
+    - Re-fetches stale data in the background.
+    - Supports pre-fetching data before it's needed.
+    - Easy remote state mutation.
+    - Offline support with `localStorage` or `IndexedDB` synchronization.
+  - Part of the `Tanstack` ecosystem (works with React, Vue, Angular, etc.).
+
+- **Setup**
+
+  - Wrap the app with `QueryClientProvider`.
+  - Create a `QueryClient` instance:
+
+    ```jsx
+    import { QueryClient, QueryClientProvider } from 'react-query';
+
+    const queryClient = new QueryClient();
+
+    function App() {
+      return (
+        <QueryClientProvider client={queryClient}>
+          <div className='App'>...</div>
+        </QueryClientProvider>
+      );
+    }
+    ```
+
+  - Pass options to `QueryClient` for default settings (e.g., `staleTime`).
+  - Use `useQueryClient` to access the `QueryClient` instance for manual query invalidation.
+
+- **Fetching Data (Queries)**
+
+  - Use the `useQuery` hook to fetch data:
+
+    ```jsx
+    import { useQuery } from 'react-query';
+
+    const fetchTodos = async () => {
+      const res = await fetch('https://jsonplaceholder.typicode.com/todos');
+      return res.json();
+    };
+
+    function Component() {
+      const { data, isLoading, error } = useQuery('todos', fetchTodos);
+
+      if (isLoading) return <div>Loading...</div>;
+      if (error) return <div>Something went wrong...</div>;
+
+      return (
+        <div>
+          {data.map(todo => (
+            <div key={todo.id}>{todo.title}</div>
+          ))}
+        </div>
+      );
+    }
+    ```
+
+  - `queryKey`: Unique identifier for the query (string or array).
+  - `queryFn`: Function returning a promise that resolves to the data.
+  - `useQuery` returns:
+    - `data`, `isLoading`, `error`, `isFetching`, `refetch`, `isSuccess`, `isError`, `status`, etc.
+  - Use `queryKey` array for dependencies.
+
+- **Prefetching Data**
+
+  - Fetch data before it's needed (e.g., navigation, pagination):
+
+    ```jsx
+    import { useQueryClient } from 'react-query';
+
+    function Component() {
+      const queryClient = useQueryClient();
+
+      const handleClick = () => {
+        queryClient.prefetchQuery('todos', fetchTodos);
+      };
+
+      return <button onClick={handleClick}>Prefetch</button>;
+    }
+    ```
+
+- **Mutating Data (Create, Update, Delete)**
+
+  - Use the `useMutation` hook for data mutations:
+
+    ```jsx
+    import { useMutation } from 'react-query';
+
+    const createTodo = async todo => {
+      const res = await fetch('https://jsonplaceholder.typicode.com/todos', {
+        method: 'POST',
+        body: JSON.stringify(todo),
+        headers: { 'Content-type': 'application/json; charset=UTF-8' }
+      });
+      return res.json();
+    };
+
+    function Component() {
+      const [mutate, { isLoading, error }] = useMutation(createTodo);
+
+      const handleSubmit = e => {
+        e.preventDefault();
+        mutate({ title: 'New todo', completed: false });
+      };
+
+      if (isLoading) return <div>Loading...</div>;
+      if (error) return <div>Something went wrong...</div>;
+
+      return (
+        <form onSubmit={handleSubmit}>
+          <input type='text' />
+          <button type='submit'>Add</button>
+        </form>
+      );
+    }
+    ```
+
+  - `useMutation` returns:
+    - `mutate`, `isLoading`, `error`, `isSuccess`, `isError`, `reset`, etc.
+  - Perform actions after mutation success or failure using `onSuccess` and `onError`.
+  - Example: Refetch data after mutation:
+
+    ```jsx
+    const [mutate] = useMutation(createTodo, {
+      onSuccess: () => {
+        queryClient.invalidateQueries('todos');
+      }
+    });
+    ```
+
+- **React Query Custom Hooks**
+
+  - Create custom hooks for fetching data:
+
+    ```jsx
+    // useTodos.js
+    import { useQuery } from 'react-query';
+
+    const fetchTodos = async () => {
+      const res = await fetch('https://jsonplaceholder.typicode.com/todos');
+      return res.json();
+    };
+
+    export default function useTodos() {
+      return useQuery('todos', fetchTodos);
+    }
+    ```
+
+    ```jsx
+    // Component.js
+    import useTodos from './useTodos';
+
+    function Component() {
+      const { data, isLoading, error } = useTodos();
+
+      // ... logic
+    }
+    ```
+
+- **React Query DevTools**
+  - Provides debugging tools for React Query.
+  - Visualize query states, cache, and more.
+  - Install with `npm install react-query-devtools`.
+
+---
+
+#### React Performance Optimization Summary
+
+- **Why Optimize React Performance?**
+
+  - React is fast by default, but optimization can address specific bottlenecks.
+  - Use optimization techniques only when necessary to avoid trade-offs (e.g., memory usage).
+  - Use the DevTools Profiler to identify performance bottlenecks.
+
+- **When to Optimize?**
+
+  - Optimize only when there is a clear performance bottleneck.
+  - Optimization has trade-offs, such as increased memory usage or slower initial loads.
+
+- **Reasons for Re-renders**
+
+  - Component's `state` changes.
+  - Parent component re-renders, causing child components to re-render.
+  - A render does not always mean a DOM update; it could be a "wasted render."
+
+- **Passing Elements as `children` or `props`**
+
+  - Pass slow components as `children` to avoid unnecessary re-renders.
+  - Example:
+    - **Slow:** Passing a slow component directly.
+    - **Fast:** Wrapping the slow component as a `children` prop.
+
+- **Memoization**
+
+  - Prevents wasted renders by caching results of expensive computations.
+  - Techniques:
+    - `memo()`: Memoizes components.
+    - `useMemo()`: Memoizes values or return values of functions.
+    - `useCallback()`: Memoizes functions.
+
+- **`memo()`**
+
+  - Wraps components to skip rendering if props haven't changed.
+  - Use with caution for large components with many child components.
+  - Watch out for reference-type props (e.g., objects, arrays).
+
+- **`useMemo()`**
+
+  - Memoizes values or return values of functions.
+  - Use for expensive computations or dependency arrays in `useEffect()`.
+  - Example:
+
+    ```jsx
+    const calculation = useMemo(() => expensiveCalculation(count), [count]);
+    ```
+
+- **`useCallback()`**
+
+  - Memoizes functions to prevent re-creation on every render.
+  - Useful for passing stable callback functions to child components.
+  - Example:
+
+    ```jsx
+    const handleAddItem = useCallback(() => setItems([...items, item]), [items]);
+    ```
+
+- **Using `useCallback` to Fix `useEffect` Infinite Loops**
+
+  - Prevents infinite re-renders caused by unstable dependencies in `useEffect`.
+
+- **`useTransition`**
+
+  - Allows state updates without blocking the UI.
+  - Useful for heavy computations like filtering or sorting.
+  - Example:
+
+    ```jsx
+    const [isPending, startTransition] = useTransition();
+    startTransition(() => setValue(newValue));
+    ```
+
+- **`PureComponent`**
+
+  - Class-based alternative to `React.memo()` for functional components.
+  - Automatically implements `shouldComponentUpdate` for shallow prop comparisons.
+
+- **Code Splitting & Dynamic Imports**
+
+  - Splits bundles into smaller chunks for faster initial loads.
+  - Use `React.lazy()` and `React.Suspense` for dynamic imports.
+  - Example:
+
+    ```jsx
+    const HomeComponent = lazy(() => import('./Home'));
+    <Suspense fallback={<Loading />}>
+      <HomeComponent />
+    </Suspense>;
+    ```
+
+- **Optimization Advices**
+
+  - **Optimizing Context:**
+    - Memoize consumer components with `memo()`.
+    - Memoize context values with `useMemo()`.
+  - **Optimizing Dependencies:**
+    - Remove unnecessary dependencies in `useEffect` or `useCallback`.
+    - Use primitive values instead of objects or arrays in dependency arrays.
+
+- **React DevTools**
+  - Inspect component rendering and interactions.
+  - Use the Profiler to identify slow components and rendering issues.
+  - Analyze the timeline to understand rendering behavior and performance bottlenecks.
+
+---
+
+#### React Interview Questions Summary
+
+- **General Questions**
+
+  - What happens if you use a state in JSX without defining an initial state and set it in `componentDidMount()`?
+    - Results in an error because `render()` is invoked before `componentDidMount()` and no initial state is defined.
+  - Why use `useEffect()` or `componentDidMount()` to change state after mounting instead of invoking the function directly in the component body?
+    - Direct invocation causes re-renders, leading to a render infinite loop.
+
+- **React Hooks**
+
+  - Why does `useState` use `const` instead of `let`?
+    - State is immutable, so `const` is used to prevent reassignment.
+
+- **State Management**
+
+  - Why doesn't the following code update the name on the page?
+
+    ```jsx
+    <h1
+      onClick={() => {
+        this.state.name = 'Ahmed';
+      }}>
+      Hi {this.state.name}
+    </h1>
+    ```
+
+    - The state changes, but React doesn't recognize it for re-rendering.
+    - Use `setState()` to trigger re-rendering:
+
+      ```jsx
+      this.setState(() => ({ name: 'Ahmed' }));
+      ```
+
+  - Why does fetching data and setting state without `componentDidMount()` or `useEffect()` cause infinite renders?
+    - Fetching and setting state creates a new state object, causing re-renders repeatedly.
+  - Why must the app be opened through a server in development/production modes?
+    - React apps rely on a server to serve files and data, especially for SPAs.
+  - Why avoid mutating objects/arrays directly when updating state?
+    - React uses reference checks to determine re-renders. Mutating directly may skip re-renders.
+    - Always return a new object/array with modifications.
+
+- **Reducers**
+
+  - Why always return the current state and override it in reducers?
+
+    - Ensures additional features in the state are preserved.
+    - Example:
+
+      ```js
+      return {
+        ...state,
+        count: state.count + state.valueToAdd,
+        valueToAdd: 0
+      };
+      ```
+
+- **Context API**
+
+  - What happens if `useContext()` is used in a component not wrapped with the context provider?
+    - Returns the initial/default value of the context.
+
+- **React Internals**
+  - What is the `$$typeof` property in React elements?
+    - Used to check if an object is a React element (`Symbol.for('react.element')`).
+    - Protects against XSS attacks by ensuring only valid React elements are rendered.
+
+---
+
+#### Next.js Summary
+
+- **Overview**
+
+  - Framework built on top of React for scalable apps with server-side rendering.
+  - Provides tooling, configuration, and optimizations for React applications.
+  - Enables full-stack development with features like routing and `<Head>` management.
+
+- **React Drawbacks**
+
+  - Client-side rendering (CSR) impacts SEO due to empty initial HTML.
+
+- **Key Features**
+
+  - **Rendering Techniques**
+    - Server-Side Rendering (SSR): Pre-renders React apps on the server.
+    - Static Site Generation (SSG): Pre-renders at build time for performance and SEO.
+    - Incremental Static Regeneration (ISR): Updates static pages after build.
+    - Client-Side Rendering (CSR): Fetches data on the client side.
+  - **Performance**
+    - Automatic code splitting for faster load times.
+    - Lazy component loading.
+  - **File-Based Routing**
+    - Define routes using files and folders.
+  - **SEO Enhancements**
+    - Optimized metadata and server-side rendering for better search engine indexing.
+  - **Serverless Functions**
+    - Run server-side code only when needed.
+
+- **Installation**
+
+  - Use `npx create-next-app` to set up a new project.
+  - File structure includes `_app.js` for shared components across routes.
+
+- **Configuration**
+
+  - `next.config.js` for server and build phase settings.
+    - Use for environmental variables, allowed domains, etc.
+
+- **Pre-rendering**
+
+  - Converts React components to HTML for faster initial load.
+  - **Hydration**: React takes over after server-side rendering.
+
+- **Data Fetching**
+
+  - **Static Site Generation (SSG)**
+    - Use `getStaticProps` for build-time data fetching.
+    - Benefits: SEO, performance, CDN caching.
+    - Issue: Increased build time for many pages.
+  - **Incremental Static Regeneration (ISR)**
+    - Updates static pages without rebuilding the entire site.
+    - Use `getStaticProps` with `revalidate`.
+    - Pros: Fast performance, less build time.
+    - Cons: Initial stale time.
+  - **Server-Side Rendering (SSR)**
+    - Use `getServerSideProps` for request-time data fetching.
+    - Benefits: Better SEO, dynamic data.
+    - Drawbacks: Lower performance, no CDN caching.
+  - **Client-Side Rendering (CSR)**
+    - Use libraries like SWR for client-side data fetching.
+    - Suitable for non-SEO-critical pages with frequently updated data.
+
+- **File-Based Routing**
+
+  - Dynamic routes: Use `[id].js` for parameterized routes.
+  - Catch-All Routes: Use `[...slug].js` for flexible routing.
+  - Custom 404 Page: Create `404.js` for custom error handling.
+  - Navigation:
+    - Clickable: Use `<Link>` for navigation.
+    - Programmatic: Use `router.push()` for dynamic navigation.
+
+- **Optimization**
+
+  - **Head (Metadata)**
+    - Use `<Head>` for injecting metadata into the HTML.
+    - Supports global headers in `_app.js` or `_document.js`.
+  - **Image Optimization**
+    - Use the `Image` component for modern web optimizations.
+    - Features: Lazy loading, caching, responsive images.
+
+- **API Routes**
+
+  - Write server-side code in the `api` folder.
+  - Code is never exposed to the client side.
+
+- **Deployment**
+  - Multiple deployment options available.
+  - Supports serverless and static deployments.
+
+---
+
+### Vue
+
+#### Vue Summary
+
+- **What is Vue?**
+
+  - A JavaScript framework for building user interfaces.
+  - Builds on standard HTML, CSS, and JavaScript.
+  - Provides a declarative and component-based programming model.
+  - Comparison with other frameworks:
+    - Neutral-opinionated: Tools like routing and testing are recommended but not enforced.
+  - Advantages:
+    - Clean (separation of concerns).
+    - Semantic (write semantic HTML).
+    - Declarative and reactive.
+    - Easy to maintain.
+  - Use `createApp()` to instantiate and mount Vue applications.
+
+- **How Vue Works**
+
+  - **Reactivity and Proxies**:
+    - Vue uses proxies to track changes in data properties and update the DOM reactively.
+    - Proxies use `set` traps to detect changes.
+    - Handles reference types (objects, arrays) with `Vue.set()` or `this.$set()`.
+  - **Template Syntax**:
+    - HTML-based syntax for declarative binding.
+    - Templates are compiled into optimized JavaScript code.
+  - **Virtual DOM**:
+    - Lightweight copy of the actual DOM.
+    - Observes changes and applies minimal updates to the real DOM.
+
+- **Ways of Using Vue**
+
+  - Standalone Script (CDN).
+  - Single-Page Application (SPA).
+  - Fullstack / Server-Side Rendering (SSR).
+
+- **Instance Lifecycle**
+
+  - Lifecycle Hooks:
+    - **Creation Hooks**:
+      - `beforeCreate`: Runs before data and methods are set up.
+      - `created`: Access reactive data and methods; DOM not yet mounted.
+    - **Mounting Hooks**:
+      - `beforeMount`: Runs before initial render; `$el` not available.
+      - `mounted`: Access rendered DOM; common for side effects like data fetching.
+    - **Updating Hooks**:
+      - `beforeUpdate`: Runs before DOM is patched.
+      - `updated`: Runs after DOM re-renders.
+    - **Destroying Hooks**:
+      - `beforeDestroy`: Invoked before teardown.
+      - `destroyed`: Cleanup after component is destroyed.
+
+- **Data**
+
+  - **Interpolation**:
+    - Use `{{ }}` for text interpolation.
+    - Alternative: `v-text` directive.
+  - **Directives**:
+    - Template tokens for DOM manipulation (e.g., `v-bind`, `v-on`).
+    - Shorthand: `:` for `v-bind`, `@` for `v-on`.
+  - **v-model (Two-Way Binding)**:
+    - Creates a two-way binding between form inputs and data properties.
+    - Supports modifiers like `.trim` and `.number`.
+  - **Refs**:
+    - Directly access DOM elements or child components.
+    - Use `ref` attribute and access via `this.$refs`.
+
+- **Methods**
+
+  - Use `v-on` or `@` for event handling.
+  - Avoid arrow functions to preserve `this` context.
+
+- **Computed Properties**
+
+  - Cached based on reactive dependencies.
+  - Use for complex logic to avoid bloated templates.
+  - Difference from methods:
+    - Computed properties are cached; methods are re-executed on every render.
+
+- **Watchers**
+
+  - React to changes in data properties.
+  - Use for side effects or asynchronous operations.
+  - Types:
+    - Deep Watchers.
+    - Immediate Watchers.
+    - `this.$watch()` for programmatic watchers.
+
+- **Styles**
+
+  - Dynamic styling with data binding.
+  - Scoped styles for component-specific CSS.
+
+- **Transitions and Animations**
+
+  - Use `<transition>` and `<transition-group>` for animations.
+  - Supports JavaScript hooks and reusable transitions.
+
+- **Conditional Rendering**
+
+  - Use `v-if`, `v-else`, and `v-show` for conditional rendering.
+  - Dynamic components with `<component>` and `keep-alive`.
+
+- **Rendering Lists**
+
+  - Use `v-for` for looping.
+  - Maintain state with `key` attribute.
+  - Avoid using `v-for` with `v-if` on the same element.
+
+- **Components**
+
+  - Single File Components (SFCs) for modular development.
+  - Register components globally or locally.
+
+- **Communication Between Components**
+
+  - **Props**:
+    - Pass data from parent to child.
+    - Avoid mutating object/array props directly.
+  - **Event Emitters**:
+    - Use `$emit` to send events from child to parent.
+  - **Provide/Inject**:
+    - Dependency injection for sharing data across components.
+    - Use with caution; not reactive by default.
+
+- **Slots**
+
+  - Default and named slots for content distribution.
+  - Scoped slots for passing data to slot content.
+
+- **Teleport Components**
+
+  - Render components outside the DOM hierarchy.
+
+- **Forms**
+
+  - Bind input values with `v-model`.
+  - Validate forms with custom logic or libraries.
+
+- **Modes and Environment Variables**
+
+  - Use modes for different build environments (e.g., development, production).
+  - Access environment variables via `process.env`.
+
+- **Performance**
+
+  - Optimize with lazy loading and code splitting.
+  - Use `v-once` for static content.
+
+- **Progressive Web Apps (PWA)**
+
+  - Build installable and offline-capable apps with Vue.
+
+- **Plugins**
+
+  - Extend Vue functionality with plugins.
+  - Use `app.use()` to install plugins.
+
+- **Notes & Guidelines**
+  - Follow Vue's best practices for maintainable code.
+  - Use Vue DevTools for debugging and performance analysis.
+
+---
+
+#### Vue Router Summary
+
+- **Routing**
+
+  - Router configuration and setup
+
+    - `main.js` setup:
+
+      - Use `createRouter` to create the router.
+      - Use `createWebHistory` for browser history.
+      - Pass routes array with objects for each route and their components.
+      - Register router in the app using `app.use(router)` and `<router-view />`.
+
+    - Example:
+
+      ```js
+      const router = createRouter({
+        history: createWebHistory(),
+        routes: [
+          { path: '/', redirect: '/teams' },
+          {
+            name: 'teams',
+            path: '/teams',
+            meta: { needsAuth: true },
+            components: { default: TeamsList, footer: TeamsFooter },
+            children: [
+              {
+                name: 'team-members',
+                path: ':teamId',
+                component: TeamMembers,
+                props: true
+              }
+            ]
+          },
+          { path: '/:notFound(.*)', component: NotFound }
+        ],
+        linkActiveClass: 'active',
+        scrollBehavior(_, _2, savedPosition) {
+          return savedPosition || { left: 0, top: 0 };
+        }
+      });
+      ```
+
+    - Notes:
+      - Use `alias` for multiple routes pointing to the same component.
+
+  - History
+
+    - Determines how the browser tracks user history.
+    - Modes:
+
+      - **Hash Mode**: Uses `#` in URLs, avoids server requests but impacts SEO.
+      - **HTML5 Mode**: Uses `createWebHistory()`, requires server fallback for 404 errors.
+      - **Memory Mode**: Ideal for Node/SSR, no browser history.
+
+  - Scroll Behavior
+
+    - Customize scroll behavior on route navigation.
+    - Examples:
+
+      - Scroll to top: `{ left: 0, top: 0 }`
+      - Scroll to element: `{ el: '#main', top: -10 }`
+      - Smooth scrolling: `{ el: to.hash, behavior: 'smooth' }`
+      - Delayed scroll:
+
+        ```js
+        scrollBehavior() {
+          return new Promise(resolve => {
+            setTimeout(() => resolve({ left: 0, top: 0 }), 500);
+          });
+        }
+        ```
+
+- **Routes**
+
+  - Named Routes
+
+    - Advantages:
+
+      - No hardcoded URLs.
+      - Automatic encoding/decoding of params.
+      - Prevents typos in URLs.
+
+  - Redirecting and Alias
+
+    - Redirect:
+
+      ```js
+      { path: '/home', redirect: '/' }
+      ```
+
+    - Alias:
+
+      ```js
+      { path: '/', component: Homepage, alias: '/home' }
+      ```
+
+  - `route` vs `router`
+
+    - `route`: Stores current location info (e.g., queryParams, URL).
+    - `router`: Tool for navigation.
+
+  - Navigate from a link: `router-link`
+
+    - Replaces `<a>` tags to prevent page reloads.
+    - Styling:
+
+      - Use `.router-link-active` and `.router-link-exact-active` classes.
+      - Customize active class in router config.
+
+    - Watch route changes for caching components.
+
+  - Nested Routes (Views)
+
+    - Use `children` in routes for nested views.
+
+    - Example:
+
+      ```js
+      const routes = [
+        {
+          path: '/user/:id',
+          component: User,
+          children: [
+            { path: 'profile', component: UserProfile },
+            { path: 'posts', component: UserPosts }
+          ]
+        }
+      ];
+      ```
+
+    - Nested Named Views:
+
+      - Use `name` attribute for complex layouts.
+      - Example:
+
+        ```html
+        <router-view name="helper" />
+        ```
+
+  - Navigate programmatically
+
+    - Methods:
+
+      - `push`: Navigate to a new location.
+      - `replace`: Replace current location without history entry.
+      - `go`: Traverse history stack.
+
+- **Params**
+
+  - Add params to route
+
+    - Use `query` params:
+
+      ```js
+      this.$router.push({ name: 'JobResults', query: { role, location } });
+      ```
+
+  - Dynamic params
+
+    - Define with `:paramName` in routes.
+    - Use `props: true` to pass params as props.
+    - React to param changes:
+
+      - Watch `$route.params`.
+      - Use `beforeRouteUpdate` guard.
+
+  - Routes Matching Syntax
+
+    - Use regex for custom matching.
+    - Optional params: `:paramName?`.
+
+  - Catch all / 404 Not Found Route
+
+    - Example:
+
+      ```js
+      { path: '/:pathMatch(.*)*', component: NotFound }
+      ```
+
+- **Navigation Guards**
+
+  - Types:
+
+    - Global Guards:
+
+      - `beforeEach`: Runs before every navigation.
+      - `afterEach`: Runs after every navigation (e.g., analytics).
+
+    - Per-Route Guard:
+
+      - Define in route config with `beforeEnter`.
+
+    - In-Component Guards:
+
+      - `beforeRouteEnter`, `beforeRouteUpdate`, `beforeRouteLeave`.
+
+  - Use `next()` to confirm/cancel navigation.
+
+- **Route Meta Fields**
+  - Attach arbitrary info to routes (e.g., access control, transition names).
+  - Access via `to.meta` in guards.
+
+---
+
+#### Vuex Summary
+
+- **Overview**
+
+  - Vuex is a **state management pattern + library** for Vue.js applications.
+  - Centralized store for shared data, logic, and methods.
+  - Ensures **unidirectional data flow** to prevent state confusion.
+  - Inspired by **Flux Application Architecture** (e.g., Redux).
+  - Benefits:
+    - Simplifies state management in complex SPAs.
+    - Eliminates prop-drilling by storing data in a centralized `state`.
+    - Real-time state reflection across components.
+  - When to use:
+    - Multiple instances of children/siblings communicating.
+    - Need to organize and visualize the entire state in one place.
+
+- **Application Structure**
+
+  - Typical structure:
+
+    ```sh
+    ├── index.html
+    ├── main.js
+    ├── api
+    │   └── ... # abstractions for making API requests
+    ├── components
+    │   ├── App.vue
+    │   └── ...
+    └── store
+        ├── index.js          # main store file
+        ├── actions.js        # root actions
+        ├── mutations.js      # root mutations
+        └── modules
+            ├── cart.js       # cart module
+            └── products.js   # products module
+    ```
+
+- **Basic Abstract Example**
+
+  - Example store:
+
+    ```js
+    export const store = new Vuex.Store({
+      state: {
+        counter: 0
+      },
+      getters: {
+        tripleCounter: state => state.counter * 3
+      },
+      mutations: {
+        increment: (state, num) => {
+          state.counter += num;
+        }
+      },
+      actions: {
+        asyncIncrement: ({ commit }, asyncNum) => {
+          setTimeout(() => {
+            commit('increment', asyncNum.by);
+          }, asyncNum.duration);
+        }
+      }
+    });
+    ```
+
+  - `namespaced: true` ensures module reusability and prevents conflicts.
+
+- **Usage in Components**
+
+  - Use shortcuts like `mapState`, `mapGetters`, `mapMutations`, and `mapActions`.
+
+- **State**
+
+  - Centralized state similar to `data` in components.
+  - Example:
+
+    ```js
+    const store = createStore({
+      state: {
+        todos: [
+          { id: 1, text: '...', done: true },
+          { id: 2, text: '...', done: false }
+        ]
+      },
+      getters: {
+        doneTodos(state) {
+          return state.todos.filter(todo => todo.done);
+        }
+      }
+    });
+    ```
+
+- **Getting Data from the State**
+
+  - Direct access:
+
+    ```js
+    const Counter = {
+      template: `<div>{{ count }}</div>`,
+      computed: {
+        count() {
+          return this.$store.state.count;
+        }
+      }
+    };
+    ```
+
+  - Use `mapState` for multiple properties:
+
+    ```js
+    import { mapState } from 'vuex';
+
+    export default {
+      computed: {
+        ...mapState(['isLoggedIn'])
+      }
+    };
+    ```
+
+- **Getters**
+
+  - Like computed properties for the state.
+  - Benefits:
+    - Memory-caching.
+    - Updates only when state changes.
+  - Example:
+
+    ```js
+    const store = createStore({
+      getters: {
+        doneTodos(state) {
+          return state.todos.filter(todo => todo.done);
+        }
+      }
+    });
+    ```
+
+  - Use `mapGetters` for components:
+
+    ```js
+    import { mapGetters } from 'vuex';
+
+    export default {
+      computed: {
+        ...mapGetters(['doneTodosCount'])
+      }
+    };
+    ```
+
+- **Mutations**
+
+  - Only way to change state data.
+  - Must be synchronous.
+  - Example:
+
+    ```js
+    const store = createStore({
+      mutations: {
+        increment(state, payload) {
+          state.counter += payload;
+        }
+      }
+    });
+    ```
+
+  - Use `mapMutations` for components:
+
+    ```js
+    import { mapMutations } from 'vuex';
+
+    export default {
+      methods: {
+        ...mapMutations(['increment'])
+      }
+    };
+    ```
+
+- **Actions**
+
+  - For asynchronous operations.
+  - Example:
+
+    ```js
+    const actions = {
+      FETCH_JOBS: async context => {
+        const jobs = await getJobs();
+        context.commit('RECEIVE_JOBS', jobs);
+      }
+    };
+    ```
+
+  - Use `mapActions` for components:
+
+    ```js
+    import { mapActions } from 'vuex';
+
+    export default {
+      methods: {
+        ...mapActions(['FETCH_JOBS'])
+      }
+    };
+    ```
+
+- **Modules**
+
+  - Organize state and logic into modules.
+  - Example:
+
+    ```js
+    const moduleA = {
+      state: () => ({ ... }),
+      mutations: { ... },
+      actions: { ... },
+      getters: { ... }
+    };
+
+    const store = createStore({
+      modules: {
+        a: moduleA
+      }
+    });
+    ```
+
+- **Notes**
+  - Use modularized stores for better organization.
+  - Avoid direct state changes; use mutations.
+  - Use getters for accessing state outside the store.
+  - Register action/mutation names as constants to avoid typos.
+  - Set state as a function for reusable modules.
+
+---
+
+#### Composition API Summary
+
+- **Overview**
+
+  - Encapsulates functionality for reuse across components.
+  - Alternative syntax for writing components.
+  - Bundles component logic in a single `setup` method.
+  - Can be used alongside the Options API.
+
+- **Why Use It?**
+
+  - Problems with Options API:
+    - Logic split across `data`, `methods`, `computed`.
+    - Difficult to reuse logic (mixins considered anti-pattern).
+  - Benefits:
+    - Write reusable functions (composables) using Vue's reactive features.
+    - Better TypeScript support.
+    - Improved organization: related code (data + methods) grouped together.
+
+- **Differences from Options API**
+
+  - No `this` keyword.
+  - Must return an object with data/methods for use in templates.
+  - Use `ref` for reactive state (analogous to `data`).
+  - Use `computed` for reactive logic (analogous to `computed` properties).
+  - Use JavaScript functions to operate on reactive data (analogous to `methods`).
+  - `setup` receives reactive `props` as the first argument.
+  - Use `toRefs` to make individual `props` reactive.
+  - Reactive objects in HTML automatically extract their `value`.
+
+- **Reactivity**
+
+  - Updates templates when data changes.
+  - Equivalent to `computed` and reactive data in Options API.
+
+  - **Reactive Programming**
+    - Programming with asynchronous data streams.
+    - Streams are sequences of events ordered in time.
+    - Vue 3 reactivity:
+      1. Detect changes in values.
+      2. Track functions that depend on them.
+      3. Trigger updates to dependent functions.
+
+- **`ref` Function**
+
+  - Wraps a value in a reactive object.
+  - Access/overwrite value via `.value`.
+  - Example:
+
+    ```js
+    const count = ref(0);
+    count.value++;
+    ```
+
+- **`computed` Function**
+
+  - Reactive-ready function.
+  - Re-invoked when referenced values change.
+  - Returns a reactive object.
+  - Example:
+
+    ```js
+    const sum = computed(() => a.value + b.value);
+    ```
+
+  - Read-only.
+
+  - **Two-Way Computed Property (Form Handling)**
+
+    - Use `getter` and `setter` for two-way binding.
+    - Example:
+
+      ```js
+      const skillsSearchTerm = computed({
+        get: () => store.state.skillsSearchTerm,
+        set: value => store.commit('UPDATE_SKILLS_SEARCH_TERM', value)
+      });
+      ```
+
+- **`reactive` Function**
+
+  - Returns a reactive proxy of an object.
+  - Cleaner than using `ref` for objects.
+  - Avoids `.value` for nested properties.
+  - Example:
+
+    ```js
+    const user = reactive({ name: 'John', age: 20 });
+    ```
+
+- **`toRef` Function**
+
+  - Creates a `ref` for a single property on a reactive object.
+  - Example:
+
+    ```js
+    const fooRef = toRef(state, 'foo');
+    ```
+
+- **`toRefs` Function**
+
+  - Converts all properties of a reactive object into `refs`.
+  - Allows destructuring while retaining reactivity.
+  - Example:
+
+    ```js
+    const { foo, bar } = toRefs(state);
+    ```
+
+- **Composables (Hooks)**
+
+  - Helper functions utilizing Vue's reactive features.
+  - Replace mixins for reusable logic.
+  - Example:
+
+    ```js
+    function useCounter() {
+      const count = ref(0);
+      const increment = () => count.value++;
+      return { count, increment };
+    }
+    ```
+
+- **Lifecycle Hooks**
+
+  - Similar to Options API lifecycle hooks.
+  - Example:
+
+    ```js
+    onMounted(() => console.log('Component mounted'));
+    ```
+
+- **Mixins**
+
+  - Reusable functionalities for components.
+  - Composition API works better with mixins due to priority conflicts.
+  - Example:
+
+    ```js
+    const myMixin = {
+      created() {
+        console.log('Mixin created');
+      }
+    };
+    ```
+
+- **Props**
+
+  - Reactive in `setup` function.
+  - Use `toRefs` or `toRef` for destructuring while retaining reactivity.
+  - Example:
+
+    ```js
+    const { title } = toRefs(props);
+    ```
+
+- **Context**
+
+  - Second argument in `setup` function.
+  - Provides access to `$attrs`, `$slots`, `$emit`, etc.
+  - Example:
+
+    ```js
+    setup(props, { attrs, slots, emit }) {
+      emit('eventName');
+    }
+    ```
+
+- **Router**
+
+  - Use `useRouter` and `useRoute` instead of `this.$router` and `this.$route`.
+  - Example:
+
+    ```js
+    const router = useRouter();
+    const route = useRoute();
+    ```
+
+- **Store**
+
+  - Use `useStore` for Vuex store functionalities.
+
+- **Notes**
+  - Can mix Options API and Composition API in the same component.
+
+---
+
+#### Vue Testing Summary
+
+- **Jest with Vue**
+
+  - Problems:
+    - Runs in Node, not the browser.
+    - Uses JSDOM, limited Vue component support.
+    - Requires transformers for modern syntax and single-file components.
+  - Solution:
+    - Use `babel-jest` for JavaScript.
+    - Use `vue-jest` for Vue components.
+
+- **Installing**
+
+  - Plugin:
+    - Provides Jest integration for Vue.
+  - Vue Test Utils:
+    - Utility library for testing Vue components.
+    - Allows mounting and interacting with components outside the browser.
+
+- **Mount**
+
+  - Simulates components as JavaScript objects for testing.
+  - `mount` vs `shallowMount`:
+    - `mount`: Full rendering, includes child components.
+    - `shallowMount`: Stubs child components for isolated testing.
+  - Second parameter:
+
+    - Configuration object to modify component data.
+    - Example:
+
+      ```js
+      const wrapper = mount(MainNav, {
+        data() {
+          return { company: 'Super Corp' };
+        }
+      });
+      ```
+
+  - `find()` vs `get()`:
+    - `find`: Returns wrapper or `undefined` if not found.
+    - `get`: Throws error if not found.
+  - Factory functions:
+
+    - Reduce duplication in mounting configurations.
+    - Example:
+
+      ```js
+      const createConfig = {
+        global: {
+          stubs: { 'router-link': RouterLinkStub }
+        }
+      };
+      ```
+
+- **Events**
+
+  - `trigger()`:
+    - Simulates user events (e.g., `click`).
+    - Asynchronous, requires `async/await`.
+  - Emitted events:
+
+    - `.emitted()` tracks emitted events and their arguments.
+    - Example:
+
+      ```js
+      const message = wrapper.emitted()['update:modelValue'];
+      expect(message).toEqual([['Engi'], ['eer']]);
+      ```
+
+- **Stubs and Shallow-Mount**
+
+  - Stubs:
+
+    - Replace child/global components with dummy components.
+    - Simplify tests by focusing on the component under test.
+    - Example:
+
+      ```js
+      const wrapper = mount(SubNav, {
+        global: { stubs: { FontAwesomeIcon: true } }
+      });
+      ```
+
+  - Shallow-Mount:
+
+    - Automatically stubs child components.
+    - Focuses on the parent component.
+    - Example:
+
+      ```js
+      const wrapper = mount(ComplexComponent, { shallow: true });
+      ```
+
+- **Router Stubbing**
+
+  - `RouterLinkStub`:
+
+    - Stubs `<router-link>` for testing.
+    - Example:
+
+      ```js
+      const wrapper = shallowMount(MainNav, {
+        global: { stubs: { 'router-link': RouterLinkStub } }
+      });
+      ```
+
+  - Mocking `$route` and `$router`:
+
+    - Replace with custom objects using `mocks`.
+    - Example:
+
+      ```js
+      const wrapper = shallowMount(Component, {
+        mocks: { $route: { path: '/some/path' } }
+      });
+      ```
+
+- **Testing Asynchronous Behavior**
+
+  - Vue updates:
+
+    - Use `nextTick()` to manually trigger DOM updates.
+    - Example:
+
+      ```js
+      button.trigger('click');
+      await Vue.nextTick();
+      ```
+
+  - Promises:
+
+    - Use `flushPromises()` to resolve pending promises.
+    - Example:
+
+      ```js
+      await flushPromises();
+      ```
+
+- **Composable Helper Functions**
+
+  - Encapsulate reusable logic for Vue Router, Vuex, etc.
+  - Example:
+
+    ```js
+    const useConfirmRoute = routeName => {
+      const route = useRoute();
+      return computed(() => route.name === routeName);
+    };
+    ```
+
+- **Testing Vuex**
+
+  - Real Vuex store:
+
+    - Register with the component using `plugins`.
+    - Example:
+
+      ```js
+      const store = createStore({ state: { isLoggedIn: true } });
+      const wrapper = shallowMount(MainNav, { global: { plugins: [store] } });
+      ```
+
+  - Mock store:
+
+    - Use `mocks` to replace Vuex store.
+    - Example:
+
+      ```js
+      const wrapper = shallowMount(MainNav, {
+        global: { mocks: { $store: { state: { isLoggedIn: true } } } }
+      });
+      ```
+
+- **Testing with Composition-API**
+
+  - Mock external objects (e.g., Router, Vuex) instead of `$router`.
+
+- **Test Coverage**
+
+  - Shows untested components.
+  - Use simple tests for small components.
+  - Example:
+
+    ```js
+    const wrapper = mount(ProfileImage);
+    expect(wrapper.exists()).toBe(true);
+    ```
+
+---
+
+#### Nuxt Summary
+
+- **Overview**
+
+  - Nuxt is a framework for building Vue.js applications with features like server-side rendering (SSR), static site generation, and auto-imports.
+
+- **Installation**
+
+  - Use `npx nuxi init app` to initialize a Nuxt project.
+  - Comes with TypeScript support via `tsconfig.json`.
+  - Provides "free typing functionalities" out of the box.
+
+- **Auto Imports**
+
+  - Automatically imports components, layouts, composables, Pinia, and `use`-methods (e.g., `useRouter`).
+  - Default components are tree-shaken to prevent unused imports.
+
+- **Server-Side Rendering (SSR)**
+
+  - Combines the benefits of SSR and CSR (Client-Side Rendering) for "Universal Rendering."
+  - Provides better SEO and faster initial page loads.
+
+- **Components**
+
+  - Global components:
+    - Place components in a `global` folder for automatic global registration.
+
+- **Routes**
+
+  - Views with routes:
+    - Place components in a `pages` folder.
+    - `index.vue` in `pages` maps to the home route `/`.
+    - Use `404.vue` for catch-all routes.
+    - Replace `<router-view/>` with `<NuxtPage/>`.
+    - Use `<NuxtLink/>` instead of `<RouterLink/>` for navigation.
+  - Nested routes:
+    - Use folders with parent route names containing child views.
+  - Dynamic pages:
+
+    - Use brackets `[ ]` for dynamic routes (e.g., `[id].vue`).
+    - Double brackets `[[ ]]` for optional segments.
+    - Catch-all routes:
+
+      ```js
+      File: /pages/person/[...slugs].vue
+
+      Url: /person/spongebob/123/abc
+      $route.params = { slugs: ['spongebob', '123', 'abc'] }
+      ```
+
+- **Layouts**
+
+  - Extract common UI or code patterns (e.g., navbar, footer) into reusable layout components.
+  - Place layouts in the `layouts/` directory.
+  - Use `<NuxtLayout>` in `app.vue` to apply layouts.
+  - Use slots for layout customization.
+  - For single-layout applications, use `app.vue` directly.
+
+- **Composables**
+
+  - `useHead`:
+
+    - Customize `<head>` tag properties for individual pages.
+    - Example:
+
+      ```js
+      useHead({
+        title: 'Page Title',
+        meta: [{ name: 'description', content: 'Page description' }]
+      });
+      ```
+
+  - `useState`:
+    - Manage reactive state across components.
+  - `useLocalStorage`:
+    - Sync state with local storage.
+  - `VueUse`:
+    - Utility library for common Vue composables.
+
+- **Hydration**
+  - Fixes issues with SSR apps where static HTML and data mismatch.
+  - Use `<ClientOnly/>` to render components on the client side only.
+  - Note: Using `<ClientOnly/>` disables SSR benefits for that component.
+
+---
+
+## Backend
+
+### Backend Summary
+
+- **Web Server**
+
+  - A computer connected to the Internet that receives and sends requests.
+  - Examples:
+    - ![Server](./img/server-1.png)
+    - ![Server](./img/server.PNG)
+
+- **Backend**
+
+  - Processes requests and manages app data.
+  - Tasks unsuitable for client-side:
+    - Security
+    - Transactions
+    - Authentication
+  - **Components**:
+    - `Server`: Listens to requests from the frontend.
+    - `Application`: Processes requests and returns responses.
+    - `Database`: Stores and organizes data.
+  - Example:
+    - ![Backend](./img/backend1.PNG)
+
+- **API**
+
+  - Interface or gateway for interacting with external programs or datasets.
+  - Example:
+    - ![api](./img/api.png)
+
+- **How Does a Server Work?**
+
+  - **Common HTTP Requests**:
+    - `GET`: Retrieves data from the server.
+    - `POST`: Sends data to the server.
+    - `DELETE`: Removes data from the server.
+    - `PUT`: Replaces data on the server.
+    - `PATCH`: Updates data on the server.
+  - **Query Parameters**:
+    - Parameters in the URL, identified by `?`.
+    - Chain multiple parameters using `&`.
+    - **Interview Question**:
+      - Difference between query parameters and path parameters?
+        - Query parameters: Filter data, optional.
+        - Path parameters: Identify specific resources, required.
+    - Example:
+      - ![Query](./img/Query%20Parameters.jpg)
+  - **HTTP Request**:
+    - Example:
+      - ![http-request](./img/http-request.PNG)
+  - **HTTP Response**:
+    - Example:
+      - ![http-response](./img/http-response.PNG)
+    - **Status Codes**:
+      - Example:
+        - ![alt](./img/HTTP%20Response%20Status%20Codes.PNG)
+
+- **Same Origin Policy (SOP) & CORS**
+
+  - **SOP**:
+    - Restricts access to resources from different origins unless allowed.
+    - Example:
+      - ![sop](./img/sop.PNG)
+  - **Origin**:
+    - Combination of domain, scheme, or port.
+    - Different ports (e.g., `3000` & `8000`) result in CORS errors.
+    - Example:
+      - ![origin](./img/origin.PNG)
+  - **CORS**:
+    - HTTP-header mechanism allowing cross-origin resource sharing.
+    - Options:
+      - Access for all sites (`*`).
+      - Access for specific sites (whitelisting).
+    - Middleware in `EXPRESS`:
+      - [cors](https://www.npmjs.com/package/cors)
+    - Example:
+      - ![cors](./img/cors.PNG)
+    - **Problem**:
+      - Preflight requests increase response time, affecting user experience.
+
+- **Idempotency**
+
+  - Identical requests produce the same result.
+  - **Methods**:
+    - `POST`: Not idempotent (adds new resources).
+    - `GET`, `DELETE`, `PATCH`, `PUT`: Idempotent (act on the same resource).
+  - **Security**:
+    - `GET`:
+      - Safe, cached, logged, stored in session history.
+    - `POST`:
+      - Not stored in session history, protects user data.
+
+- **REST / RESTful API**
+
+  - **REST**:
+
+    - Pattern for organizing API endpoints.
+    - **Routes**:
+      - `GET ['/cats']`: SHOW (READ ONE).
+      - `GET ['/cats/:id']`: INDEX (READ ALL).
+      - `POST ['/cats']`: CREATE.
+      - `PUT ['/cats/:id']`: UPDATE (EDIT).
+      - `DELETE ['/cats/:id']`: DELETE.
+    - **Examples**:
+
+      - `INDEX`: List all items (`GET ['/cats']`).
+      - `SHOW`: Single item by ID (`GET ['/cats/:id']`).
+
+        - Example:
+
+          ```ts
+          app.get('/articles/:id', (_req: Request, res: Response) => {
+            try {
+              res.send('this is the SHOW route');
+            } catch (err) {
+              res.status(400);
+              res.json(err);
+            }
+          });
+          ```
+
+      - `CREATE`: Add new resource (`POST ['/cats']`).
+      - `EDIT`: Update resource (`PUT ['/cats/:id']`).
+      - `DELETE`: Remove resource (`DELETE ['/cats/:id']`).
+
+---
+
+### Backend Performance Summary
+
+- **Using CDN**
+
+  - A network of servers delivering cached static content based on user location.
+  - Benefits:
+    - Reduces server load.
+    - Improves website performance by reducing latency and server requests.
+  - Mechanism:
+    - Caches files and serves them from the nearest server to the user.
+
+- **Compression (GZIP)**
+
+  - Compresses files (`HTML`, `CSS`, `JS`) on the server before sending them to the browser.
+  - Benefits:
+    - Reduces file size.
+    - Decreases transfer time to the browser.
+  - Verification:
+    - Check response headers to confirm GZIP usage.
+  - Examples:
+    - ![gzip](./img/gzip-1.jpeg)
+    - ![gzip](./img/gzip-2.png)
+
+- **Database Enhancements**
+
+  - Identify and optimize inefficient queries.
+  - Increase memory to speed up database queries.
+  - Use `indexes` to improve query performance.
+  - Techniques:
+    - **Vertical Scaling**: Increase server power.
+    - **Sharding**: Split the database across multiple servers to reduce load.
+  - Choose a database type that fits your needs.
+
+- **Caching**
+
+  - Process of storing data in a cache.
+  - Storage mediums:
+    - `RAM`
+    - `Disk`
+
+- **Using a Load Balancer**
+  - Acts as a reverse proxy to distribute network or application traffic across multiple servers.
+  - Benefits:
+    - Increases application capacity.
+    - Enhances application reliability.
+    - Improves overall performance.
