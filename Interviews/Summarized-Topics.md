@@ -61,6 +61,17 @@
     - [Linters and Code Formatting](#linters-and-code-formatting)
     - [Modules and Bundlers](#modules-and-bundlers)
   - [FE Frameworks](#fe-frameworks)
+    - [Frameworks Overview](#frameworks-overview)
+    - [Angular](#angular)
+      - [Angular Framework Summary](#angular-framework-summary)
+      - [Angular Modules Summary](#angular-modules-summary)
+      - [Angular Router Summary](#angular-router-summary)
+      - [Angular Services Summary](#angular-services-summary)
+      - [Angular RxJS Summary](#angular-rxjs-summary)
+      - [Angular and TypeScript Summary](#angular-and-typescript-summary)
+      - [AngularJS](#angularjs)
+    - [React](#react)
+      - [React Summary](#react-summary)
 
 ---
 
@@ -4460,3 +4471,817 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 ---
 
 ## FE Frameworks
+
+### Frameworks Overview
+
+- **Overview**:
+
+  - JavaScript frameworks are tools for building scalable web applications.
+  - They provide pre-written JavaScript code for standard programming features and tasks.
+  - Before 2010, most web applications used server-side rendering, but modern frameworks like `React`, `Angular`, and `Vue` enable client-side rendering.
+  - Frameworks improve developer experience by adding functionalities like testing and linting.
+
+- **Problem with Vanilla JavaScript**:
+
+  - Vanilla JavaScript refers to plain JavaScript without additional libraries or frameworks.
+  - Challenges with vanilla JavaScript:
+    - Hard to build complex, scalable, and maintainable applications.
+    - Requires extensive DOM manipulation and traversing, leading to "spaghetti code."
+    - State management is difficult, as the UI must be manually kept in sync with the application state.
+
+- **Reactivity (Change Detection)**:
+
+  - Reactivity allows web applications to update the UI in response to changes in data or state.
+  - Modern frameworks replace manual DOM manipulation with efficient state-driven UI updates.
+  - Reactivity occurs during:
+    - App initialization.
+    - State changes.
+    - User interactions.
+    - Manual triggers.
+  - Some frameworks run change detection twice in development mode to ensure UI-state synchronization.
+
+- **Types of Frameworks**:
+
+  - **Configuration-over-convention**:
+    - Easy to use with freedom to structure applications.
+    - Requires additional libraries for missing features.
+    - Examples: `React`, `Vue`.
+  - **Convention-over-configuration**:
+    - Provides structured solutions out of the box.
+    - Larger learning curve.
+    - Examples: `Angular`, `Next.js`, `Nuxt.js`.
+
+- **Libraries vs Frameworks**:
+
+  - Libraries provide reusable code, while frameworks define application design and control flow.
+  - Frameworks control the flow of the app, while libraries are called by the app.
+  - Key differences:
+    - Frameworks offer blueprints for building applications.
+    - Libraries are tools for specific tasks.
+  - Caller-callee relationship:
+    - Frameworks control the flow, while libraries are invoked as needed.
+
+- **React**:
+
+  - React is a library for UI components, often considered a framework.
+  - Provides only the view layer, offering flexibility but requiring additional tools.
+  - Features:
+    - Fast UIs with virtual DOM for efficient updates.
+    - JSX for defining UI components.
+
+- **Angular**:
+
+  - Angular is a component-based framework with integrated libraries and tools.
+  - Features:
+    - Declarative templates.
+    - Dependency injection.
+    - End-to-end tooling.
+    - Built-in solutions for common development challenges.
+
+- **Vue**:
+
+  - Vue is a framework for building user interfaces with a declarative and component-based model.
+  - Combines the best of React and Angular:
+    - Built-in UI, routing, and state management.
+    - Flexibility for additional tools.
+
+- **Frameworks Comparison**:
+
+  - Framework choice depends on team familiarity and project needs.
+  - Larger teams benefit from opinionated frameworks like Angular.
+  - Startups may prefer flexible tools like React.
+
+- **Vue vs React**:
+  1. **Optimization**:
+     - React re-renders entire component sub-trees; Vue tracks dependencies for precise updates.
+  2. **HTML & CSS**:
+     - React uses JSX; Vue offers templates for simpler migration and readability.
+  3. **Native Rendering**:
+     - React Native supports iOS/Android apps; Vue collaborates with Weex.
+  4. **Other Comparisons**:
+     - Vue excels in configuration, animations, DOM manipulation, and dependency injection.
+     - React has stronger market presence and community support.
+
+---
+
+### Angular
+
+#### Angular Framework Summary
+
+- **Overview**
+
+  - Angular is a framework for building reactive web applications.
+  - Written in TypeScript with templates using Angular-specific syntax (superset of HTML).
+  - Provides built-in tools like routing, forms, and HTTP libraries.
+
+- **Compilation**
+
+  - Converts Angular code into JavaScript for browsers.
+  - Two strategies:
+    - Just-in-Time (JIT): Compiles in the browser, faster for development.
+    - Ahead-of-Time (AOT): Compiles on the server, faster for production.
+  - Incremental DOM: Efficient DOM updates by comparing old and new DOM states.
+
+- **File Structure**
+
+  - `src` folder contains all app files.
+  - Key files:
+    - `app/`: Components, services, and modules.
+    - `assets/`: Static files like images and fonts.
+    - `environments/`: Environment-specific configurations.
+    - `styles.css`: Global styles.
+    - `index.html`: Main HTML file.
+    - `main.ts`: Bootstraps the app.
+    - `angular.json`: App configuration.
+
+- **Installation & CLI**
+
+  - Install Angular CLI globally: `npm install -g @angular/cli`.
+  - Common commands:
+    - `ng new <project_name>`: Create a new project.
+    - `ng serve`: Start development server.
+    - `ng generate component <name>`: Generate a new component.
+  - Modules generated with CLI must be imported into `app.module`.
+
+- **Components**
+
+  - Core building blocks of Angular applications.
+  - Consist of metadata, template, and class.
+  - Lifecycle hooks:
+    - `ngOnInit`: Initialization logic.
+    - `ngOnDestroy`: Cleanup logic.
+    - `ngOnChanges`: Respond to input changes.
+  - Types:
+    - Presentational: Display data, use `@Input` and `@Output`.
+    - Smart: Handle data and events, interact with services.
+
+- **Styling**
+
+  - Inline styles: `style="color: red"`.
+  - External styles:
+    - `styles.css`: Global.
+    - Component-specific styles: Scoped to the component.
+  - Dynamic classes:
+    - Use `ngClass` for conditional styling.
+
+- **Data Binding**
+
+  - Communication between component class and template.
+  - Types:
+    - Property Binding: `[property]="value"`.
+    - Event Binding: `(event)="method()"`.
+    - Two-way Binding: `[(ngModel)]="value"`.
+
+- **Directives**
+
+  - Extend HTML with custom behavior.
+  - Types:
+    - Attribute Directives: Modify appearance or behavior.
+    - Structural Directives: Change DOM structure.
+    - Custom Directives: User-defined behavior.
+
+- **Data Flow**
+
+  - Parent to Child: Use `@Input`.
+  - Child to Parent: Use `@Output`.
+  - Local Reference: Template variables.
+  - Content Projection: Slots for dynamic content.
+
+- **Pipes**
+
+  - Transform data in templates.
+  - Types:
+    - Built-in: e.g., `date`, `uppercase`.
+    - Custom: User-defined transformations.
+
+- **Forms**
+
+  - Two approaches:
+    - Reactive Forms: Programmatic control.
+    - Template Forms: Use `ngModel` and `ngForm`.
+  - Input masking for better user experience.
+
+- **Modals**
+
+  - Use Angular CDK for overlays and portals.
+
+- **Notes**
+  - Expressions vs String Interpolation: Differences in syntax and use cases.
+  - HTML Escaping: Use Angular sanitization for security.
+
+---
+
+#### Angular Modules Summary
+
+- **Overview**
+
+  - Angular uses modules to bundle components, directives, and services into packages.
+  - Modules help organize code based on functionality, improving maintainability and reusability.
+  - Built-in modules include:
+    - `BrowserModule`: Essential for launching apps in browsers.
+    - `CommonModule`: Provides common directives like `ngIf` and `ngFor`.
+
+- **Module Types**
+
+  - **Domain Module**: Contains components shown at all times in the app.
+  - **Routing Module**: Manages app routes and navigation.
+  - **Routed Module**: Contains components displayed for specific routes.
+  - **Shared Module**: Includes reusable components, directives, and pipes shared across modules.
+  - **Feature Module**: Contains components, directives, and pipes for specific features or functionalities.
+  - **Core Module**: Singleton services and components used throughout the app, loaded once.
+  - **Lazy Loaded Module**: Loaded on demand to reduce initial load time, improving performance.
+  - **Standalone Module**: A self-contained module that can be used independently without being part of a larger application.
+
+- **Why Use Modules?**
+
+  - **Code Organization**: Separates functionality into distinct modules.
+  - **Reusability**: Allows importing modules instead of individual components.
+  - **Lazy Loading**: Loads modules only when needed, reducing initial load time.
+
+- **Creating and Using Modules**
+
+  - Create a module: `ng generate module <module_name>`.
+  - Add components to a module: `ng generate component <module_name>/<component_name>`.
+  - Export components in the `exports` array to make them available in other modules.
+  - Import modules in `app.module.ts` or other modules to use their components.
+
+- **Router Module**
+
+  - Provides routing functionality for defining app routes.
+  - Create a routing module: `ng generate module <module_name> --routing`.
+  - Includes route definitions and navigation rules.
+
+- **HTTP Module**
+
+  - Use `HttpClientModule` for HTTP requests.
+  - Example:
+
+    ```ts
+    // app.module.ts
+    import { HttpClientModule } from '@angular/common/http';
+
+    @NgModule({
+      declarations: [AppComponent],
+      imports: [BrowserModule, HttpClientModule],
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {}
+    ```
+
+    ```ts
+    // app.component.ts
+    import { HttpClient } from '@angular/common/http';
+
+    export class AppComponent {
+      constructor(private http: HttpClient) {
+        this.http.get('https://jsonplaceholder.typicode.com/posts').subscribe(data => {
+          console.log(data);
+        });
+      }
+    }
+    ```
+
+  - Supports `HttpParams` for query strings and `HttpInterceptors` for modifying requests/responses.
+
+- **HTTP Params**
+
+  - Create URL parameters for HTTP requests.
+  - Immutable and supports chaining key-value pairs.
+  - Example:
+
+    ```ts
+    const params = new HttpParams().set('key', 'value');
+    this.http.get('url', { params }).subscribe();
+    ```
+
+- **HTTP Interceptors**
+
+  - Middleware for modifying HTTP requests and responses.
+  - Common use cases:
+    - Add authentication tokens to headers.
+    - Handle errors globally.
+  - Example:
+
+    ```ts
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      const modifiedReq = req.clone({ headers: req.headers.set('Authorization', 'Bearer token') });
+      return next.handle(modifiedReq);
+    }
+    ```
+
+- **Shared Module**
+  - Contains reusable components, directives, and pipes.
+  - Export shared items in the `exports` array.
+  - Import the shared module in other modules to access its components.
+
+---
+
+#### Angular Router Summary
+
+- **Adding Routing to an Angular App**
+
+  - Generate a new app with routing: `ng new <project_name> --routing`.
+  - Add routing to an existing app: `ng generate module app-routing --flat --module=app`.
+  - Generates `app-routing.module.ts` for route definitions.
+
+- **Router Configuration**
+
+  - Use `RouterModule` and `Routes` to define routes in `app-routing.module.ts`.
+  - Route properties:
+    - `path`: URL path for the route.
+    - `component`: Component to render for the path.
+  - Special routes:
+    - Home route: `path: ''`.
+    - Wildcard route: `path: '**'` for unmatched routes.
+  - Methods:
+    - `RouterModule.forRoot(routes)`: Configures root routes.
+    - `RouterModule.forChild(routes)`: Configures child routes.
+
+- **Nested Routes**
+
+  - Use the `children` property to define child routes.
+  - Example:
+
+    ```ts
+    const routes: Routes = [
+      {
+        path: 'parent',
+        component: ParentComponent,
+        children: [
+          { path: '', component: ChildComponent },
+          { path: 'child', component: AnotherChildComponent }
+        ]
+      }
+    ];
+    ```
+
+  - Use `<router-outlet>` in the parent component to display child components.
+
+- **Using the Router**
+
+  - Use `<router-outlet>` to display routed components.
+  - Router directives:
+    - `routerLink`: Specifies the route (replaces `href`).
+    - `routerLinkActive`: Applies a class when the route is active.
+    - `[routerLinkActiveOptions]`: Prevents partial matching with `{ exact: true }`.
+
+- **Route Properties (Params and Query Params)**
+
+  - Access route parameters using `ActivatedRoute` service:
+    - `params`: Observable for route parameters.
+    - `queryParams`: Observable for query parameters.
+  - Use `ActivatedRouteSnapshot` for static access (no live updates).
+
+- **Router Navigation**
+
+  - Use `routerLink` directive for navigation in templates.
+  - Navigate programmatically using `Router` service:
+
+    ```ts
+    this.router.navigate(['/path'], { queryParams: { key: 'value' } });
+    ```
+
+  - Use relative paths (`./`, `../`) for nested routes.
+
+- **Lazy Loading**
+
+  - Load modules on demand to improve performance.
+  - Example:
+
+    ```ts
+    const routes: Routes = [
+      { path: 'lazy', loadChildren: () => import('./lazy.module').then(m => m.LazyModule) }
+    ];
+    ```
+
+- **Router Guards**
+
+  - Protect routes and control navigation.
+  - Types:
+    - `CanActivate`: Prevent navigation to a route.
+    - `CanActivateChild`: Prevent navigation to child routes.
+    - `CanLoad`: Prevent lazy-loaded module loading.
+    - `CanDeactivate`: Prevent leaving a route.
+  - Example:
+
+    ```ts
+    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+      return isAuthenticated;
+    }
+    ```
+
+- **Route Resolvers**
+
+  - Fetch data before activating a route.
+  - Example:
+
+    ```ts
+    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Data> {
+      return this.dataService.getData();
+    }
+    ```
+
+  - Add resolver to routes using `resolve` property:
+
+    ```ts
+    { path: 'route', component: Component, resolve: { data: DataResolver } }
+    ```
+
+---
+
+#### Angular Services Summary
+
+- **Overview**
+
+  - Services are classes with a narrow, well-defined purpose, used to manage or fetch data.
+  - They can be shared across multiple components and other services.
+
+- **Creating a Service**
+
+  - Use the command: `ng generate service <service_name>`.
+  - The service file includes:
+    - A class with the same name as the service file.
+    - The `@Injectable` decorator for dependency injection.
+    - Methods to fetch data or perform operations.
+  - Example:
+
+    ```ts
+    @Injectable({ providedIn: 'root' })
+    export class FetchDataService {
+      fetchData() {
+        return fetch('https://api.example.com').then(res => res.json());
+      }
+    }
+    ```
+
+  - Inject the service into components using the constructor:
+
+    ```ts
+    constructor(private fetchDataService: FetchDataService) {}
+    ```
+
+- **Dependency Injection**
+
+  - Design pattern to inject dependencies at runtime, making the application loosely coupled.
+  - Angular uses a hierarchical dependency injection system:
+    - Services provided in a parent component are available to all child components.
+    - Use `providedIn: 'root'` to make a service available application-wide.
+  - Benefits:
+    - **Reusability**: Share services across components.
+    - **Maintainability**: Centralize service logic.
+    - **Testability**: Mock services for testing.
+    - **Singleton Pattern**: Ensures a single instance of the service is used.
+
+- **How Angular Handles Dependency Injection**
+
+  - Angular creates an application-wide injector during bootstrap.
+  - The injector:
+    - Creates dependencies and maintains a container of instances.
+    - Uses providers to define how to create dependencies.
+  - Example:
+
+    ```ts
+    @Injectable({ providedIn: 'root' })
+    export class FetchDataService {}
+    ```
+
+- **Singleton Pattern**
+
+  - Ensures only one instance of a service is created and shared across components.
+  - Useful for services managing state or using observables.
+
+- **`@Injectable` Decorator**
+
+  - Marks a class as a service that can be injected.
+  - Enables Angular to create and inject service instances.
+
+- **Services & RxJS**
+
+  - RxJS is used for reactive programming with observables.
+  - Benefits:
+    - Handle asynchronous data streams.
+    - Combine data from multiple sources.
+  - Common RxJS concepts:
+    - Observables, Operators, Subjects, Subscriptions.
+
+- **Auth Service**
+  - Manages authentication logic and state.
+  - Example features:
+    - Handle sign-in state.
+    - Use HTTP interceptors for token management.
+    - Provide observables for signed-in state.
+
+---
+
+#### Angular RxJS Summary
+
+- **Overview**
+
+  - RxJS is a functional reactive library for handling asynchronous and event-based programs.
+  - Provides core types like `Observable`, `Observer`, `Subject`, and operators for data manipulation.
+  - Commonly used in Angular for HTTP requests, event handling, and state management.
+
+- **RxJS Terminology**
+
+  - Observables: Represent data streams that can be subscribed to.
+  - Operators: Functions to transform or manipulate data streams.
+  - Subscription: Mechanism to listen to data emitted by observables.
+  - Subjects: Act as both observable and observer, allowing external data emission.
+
+- **Operators**
+
+  - **Transform Operators**:
+    - `map`: Transforms data emitted by an observable.
+    - `tap`: Performs side effects without altering data.
+    - `pluck`: Extracts a property from emitted data.
+  - **Flattening Operators**:
+    - `mergeMap`: Merges data from inner observables.
+    - `switchMap`: Switches to the latest observable, canceling previous ones.
+  - **Creation Operators**:
+    - `of`: Creates an observable from values.
+    - `Observable`: Creates a custom observable.
+  - **Error Handling Operators**:
+    - `catchError`: Handles errors and returns a fallback observable.
+  - **Other Operators**:
+    - `delay`: Delays data emission.
+    - `scan`: Accumulates emitted data over time.
+
+- **Observables**
+
+  - they are wrappers around a data-source that can be subscribed to.
+  - **Types**
+
+    - **Unicast (Cold)**:
+      - Emit data only when subscribed to.
+      - Each subscriber gets its own data stream.
+    - **Multicast (Hot)**:
+      - Emit data to multiple subscribers simultaneously.
+      - Share the same data stream among subscribers.
+    - **Subject Variations**:
+      - `AsyncSubject`: Emits the last value upon completion.
+      - `BehaviorSubject`: Emits the most recent value to new subscribers.
+      - `ReplaySubject`: Emits a specified number of recent values to new subscribers.
+
+- **Error Handling in Observables**
+
+  - Use `error` method to handle errors during data emission.
+  - Use `catchError` operator to provide fallback logic.
+
+- **Common RxJS Issues**
+
+  - **Nested Subscriptions**:
+    - Avoid subscribing to observables within other subscriptions.
+    - Use operators like `mergeMap` or `switchMap` to flatten data streams.
+  - **Required Return Value**:
+    - Ensure operators return values to mark observables as complete.
+
+- **RxJS in Angular**
+
+  - Angular leverages RxJS for handling asynchronous data streams.
+  - Common use cases:
+    - HTTP requests.
+    - Event handling.
+    - State management.
+  - Example:
+
+    ```ts
+    this.http
+      .get('url')
+      .pipe(map(data => data))
+      .subscribe(console.log);
+    ```
+
+---
+
+#### Angular and TypeScript Summary
+
+- **Overview**
+
+  - Angular uses TypeScript as its primary language.
+  - TypeScript provides static typing, interfaces, and modern JavaScript features.
+  - By default, Angular does not use strict mode.
+    - To enable strict mode, add `"strict": true` in `tsconfig.json`.
+
+- **Decorators**
+
+  - TypeScript feature to enhance or modify classes, properties, and methods.
+  - Used to add metadata to classes, methods, and properties.
+  - Angular-specific decorators:
+
+    - `@Component`: Defines a component and its metadata.
+
+      - Metadata includes `selector`, `templateUrl`, `styleUrls`, etc.
+      - Example:
+
+        ```ts
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {}
+        ```
+
+    - Decorators are substitutes for directly adding metadata to a class.
+
+      - Example:
+
+        ```ts
+        export class AppComponent {
+          selector: 'app-root';
+          templateUrl: './app.component.html';
+          styleUrls: ['./app.component.css'];
+        }
+        ```
+
+---
+
+#### AngularJS
+
+- **Overview**:
+
+  - AngularJS is the older version of Angular, built on the MVC (Model-View-Controller) design pattern.
+  - It is no longer widely used but provides foundational concepts for modern Angular.
+  - Key features include two-way data binding, dependency injection, directives, and routing.
+
+- **Key Concepts**:
+
+  - **Module**: Encapsulates application components.
+  - **Controller**: Defines app behavior through functions and values.
+  - **Directive**: Extends HTML with new attributes for data binding and DOM manipulation.
+  - **Scope**: Stores model data accessible by controllers, directives, and expressions.
+  - **Expression**: Displays values within the page, linked to the scope (e.g., `{{fullName}}`).
+  - **Filter**: Formats expression values for display.
+  - **Service**: Provides reusable business logic independent of views.
+  - **Factory**: A method to create services.
+  - **Provider**: A configurable service.
+  - **Dependency Injection**: Mechanism to access services.
+
+- **Features**:
+
+  - Two-way data binding: Synchronizes model and view instantly.
+  - Templates: HTML with additional markups.
+  - Dependency Injection: Simplifies development, understanding, and testing.
+  - Directives: Extends HTML for data binding and DOM manipulation.
+  - Routing: Enables view switching.
+  - Deep Linking: Encodes application state in the URL for bookmarking.
+  - Controllers: JavaScript functions augmenting the AngularJS scope.
+
+- **AngularJS vs Angular2+**:
+
+  - **Comparison Table**:
+    - Language: JavaScript (AngularJS) vs TypeScript (Angular 2+).
+    - Architecture: MVC (AngularJS) vs Components (Angular 2+).
+    - Data Binding: Two-way (AngularJS) vs One-way with RxJS (Angular 2+).
+    - Expression Syntax: `ng-Directives` (AngularJS) vs `()` for events and `[]` for properties (Angular 2+).
+    - Dependency Injection: Present in both.
+    - Routing: Present in both.
+    - Mobile Support: No (AngularJS) vs Yes (Angular 2+).
+    - Performance: Slower (AngularJS) vs Faster (Angular 2+).
+
+- **Using AngularJS**:
+
+  - **Installation**:
+    - CDN: Add AngularJS script to HTML.
+    - npm: Install AngularJS via npm.
+    - Bower: Install AngularJS via Bower.
+  - **Example**:
+    - Module creation: `var app = angular.module('myApp', []);`
+    - Controller definition: `app.controller('myCtrl', function ($scope) { ... });`
+    - HTML integration with directives like `ng-app`, `ng-controller`, `ng-model`, `ng-click`, etc.
+    - Key directives:
+      - `ng-app`: Declares the AngularJS application.
+      - `ng-controller`: Defines the controller.
+      - `ng-init`: Initializes application data.
+      - `ng-model`: Binds input field values to application variables.
+      - `ng-click`: Defines click event handlers.
+      - `ng-bind`: Binds HTML content to application data.
+      - `ng-repeat`: Repeats HTML elements (e.g., `ng-repeat="x in grades | limitTo:3"`).
+      - `ng-include`: Includes external HTML files.
+
+- **Services**:
+
+  - Reusable business logic independent of views.
+  - Built-in services include `$http`, `$location`, `$timeout`, `$interval`, etc.
+  - Custom services can be created using `service`, `factory`, and `provider` methods.
+
+    - **Service**: Returns the service itself with methods and properties.
+    - **Factory**: Returns an object with exposed methods.
+
+    ```js
+    app.service('myService', function () {
+      this.myFunc = function () {
+        return 'Hello World from Service!';
+      };
+    });
+
+    app.factory('myFactory', function () {
+      return {
+        myFunc: function () {
+          return 'Hello World from Factory!';
+        }
+      };
+    });
+    ```
+
+---
+
+### React
+
+#### React Summary
+
+- **Overview**:
+
+  - React is a library for building user interfaces, often used with tools like `react-router`, `webpack`, and `redux` to form the "React Ecosystem."
+  - React is declarative, component-based, and supports unidirectional data flow.
+  - It focuses on the "View" layer, leaving other functionalities to external libraries.
+
+- **React Concepts**:
+
+  - **Declarative**: React handles the DOM updates based on the app's state.
+  - **Components**: Reusable building blocks grouped to form larger components.
+  - **Unidirectional Data Flow**: State changes trigger UI updates, but data flows only one way.
+  - **Library, Not Framework**: React provides flexibility to mix and match tools.
+
+- **Declarative vs Imperative**:
+
+  - **Declarative**: Describes "what" the program does (e.g., React's state-driven UI updates).
+  - **Imperative**: Describes "how" the program operates step-by-step.
+
+- **Multi-Page vs Single-Page Applications (SPA)**:
+
+  - **Multi-Page Applications**: Reloads the entire app for each user interaction.
+  - **Single-Page Applications**: Loads the app once and updates content dynamically without reloading.
+
+- **Client-Side Rendering (CSR) vs Server-Side Rendering (SSR)**:
+
+  - **CSR**: React apps run in the browser, suitable for SPAs.
+  - **SSR**: React components are rendered on the server before being sent to the client, improving SEO and initial load time.
+
+- **Function Components vs Class Components**:
+
+  - Function components with hooks have replaced class components for state and lifecycle management.
+
+- **Installation**:
+
+  - **Create React App**: Built on Webpack, supports hot module reloading and bundling.
+  - **Vite**: Faster alternative to Create React App, requires manual ESLint configuration.
+
+- **JSX**:
+
+  - Syntax extension for writing HTML-like code in JavaScript.
+  - Transpiled to JavaScript using Babel.
+  - Supports dynamic expressions and conditional rendering.
+
+- **Styling and CSS**:
+
+  - Options include inline styles, CSS modules, styled-components, and CSS-in-JS.
+  - CSS modules provide scoped styles by default.
+
+- **Components**:
+
+  - Building blocks of React, written as functions or classes.
+  - Use the `key` prop for list items to optimize rendering.
+
+- **Props**:
+
+  - Used to pass data between components.
+  - Includes `children` prop, prop validation with PropTypes, and default prop values.
+
+- **State**:
+
+  - Manages component-specific data.
+  - Supports batch updates and derived state.
+  - Enables communication between parent and child components.
+
+- **Events**:
+
+  - React uses synthetic events for cross-browser compatibility.
+  - Event handlers are passed as props to components.
+
+- **Forms**:
+
+  - Supports controlled and uncontrolled components.
+  - Controlled components use state to manage form inputs.
+
+- **Side Effects and Lifecycles**:
+
+  - Lifecycle methods manage component behavior during mounting, updating, and unmounting. Example:
+    - `componentDidMount`: Invoked after the component is mounted.
+    - `componentDidUpdate`: Invoked after the component updates.
+  - Side effects like data fetching are handled using hooks like `useEffect`.
+
+- **How React Works**:
+
+  - React uses a virtual DOM to optimize UI updates.
+  - Rendering phases include triggering, render, commit, and browser paint.
+  - **Reconciliation** compares the virtual DOM with the real DOM to minimize updates.
+
+    > "Reconciliation" is the process of updating the DOM efficiently by comparing the virtual DOM with the real DOM and applying only necessary changes.
+
+  - **Diffing Algorithm**: React's algorithm compares the old and new virtual DOM trees to determine the minimal set of changes needed for the real DOM.
+  - **Fiber Architecture**: React's reconciliation algorithm that allows for incremental rendering and prioritization of updates.
+
+- **Professional React Development**:
+  - Emphasizes project structure, environmental variables, and best practices.
