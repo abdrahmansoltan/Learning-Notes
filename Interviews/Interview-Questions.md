@@ -164,21 +164,26 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 - **CSS `position` types:**
 
-  - `static` (default)
-  - `relative`: relative to itself
-  - `absolute`: relative to nearest positioned ancestor
-  - `fixed`: relative to viewport
-  - `sticky`: switches between relative and fixed on scroll
+  - `static` (default), element is positioned according to the normal document flow.
+  - `relative`, element is positioned relative to its normal position.
+  - `absolute`, element is positioned relative to its nearest positioned ancestor (parent with position with anyother value than `static`).
+  - `fixed`, element is positioned relative to the viewport, meaning it stays in the same place even when the page is scrolled.
+  - `sticky`, element toggles between relative and fixed positioning based on the scroll position.
 
 - **Importance of `z-index`:**
 
-  - Controls stacking of positioned elements.
+  - Controls stacking order of positioned elements in z-axis.
   - Only works on positioned elements (`relative`, `absolute`, `fixed`, `sticky`).
+  - Control overlapping between elements like (dropdown, tooltips, modals, dialogs) where one element needs to be appear on top of another one.
+
+  > Note: Elements inside (flex/grid) containers with `z-index` will not stack above elements outside the container unless the container itself has a `z-index` set.
 
 - **When to use `clear` in CSS?**
 
-  - Used to prevent float overlaps.
+  - when clearing floats to prevent overlap of floated elements.
   - Often used in clearfix patterns:
+
+    - It's when you want to ensure that a container properly contains its floated children, preventing layout issues where the container collapses or does not expand to include the floated elements.
 
     ```css
     .clearfix::after {
@@ -188,37 +193,61 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     }
     ```
 
+  - when working with responsive designs.
+  - when managing layout in complex designs with multiple floated elements.
+
 - **Absolute vs Relative URL:**
 
-  - **Absolute:** Full path (`https://domain.com/image.jpg`)
-  - **Relative:** Based on current location (`../images/image.jpg`)
+  - The difference is in how we specify the location of a resource (like an image, script, or stylesheet) in relation to the current document.
+
+    - **Absolute**
+      - Full path including domain, and protocol (e.g., `https://example.com/images/image.jpg`).
+      - Used when the resource is hosted on a different domain or when you want to ensure the resource is always fetched from the same location.
+    - **Relative**
+      - Based on current location of the web-page (`../images/image.jpg`)
+      - Used when the resource is in the same directory or a subdirectory of the current document, making it easier to move the entire site without breaking links.
 
 - **Types of Media Queries:**
 
-  - `all`, `print`, `screen`, `speech`
-  - Used to query screen/device dimensions and features
+  - `all`, `print`, `screen`, `speech` (screen readers)
+  - Used to query screen/device dimensions and features or orientation.
 
 - **Pseudo-elements vs Pseudo-classes:**
 
-  - **Pseudo-elements:** `::before`, `::after`, `::first-line`
-  - **Pseudo-classes:** `:hover`, `:nth-child`, `:focus`
+  - **Pseudo-elements:**
+    - Used to style specific parts of an element.
+    - `::before`, `::after`, `::first-line`
+  - **Pseudo-classes:**
+    - Used to style elements based on their state or position in the document.
+    - `:hover`, `:nth-child`, `:focus`
 
 - **CSS Selectors:**
 
-  - **Element, Class, ID, Attribute**
-  - **Pseudo-classes/elements**
-  - **Combinators and Grouping**
+  - They're patterns/rules used to select elements in an HTML document for styling.
+  - Types:
+    - **Element, Class, ID, Attribute**
+    - **Pseudo-classes/elements**
+    - **Combinators and Grouping** -> based on relationships between elements (e.g., descendant, child, sibling selectors) in the document tree.
 
 - **CSS Units:**
 
-  - **Absolute:** `px`, `pt`, `cm`, `in`
-  - **Relative:** `%`, `em`, `rem`, `vw`, `vh`, `vmin`, `vmax`
-  - **Grid-specific:** `fr`
+  - They're used to define lengths, sizes, and dimensions in CSS.
+  - Types:
+    - **Absolute:** `px`, `pt`, `cm`, `in`
+    - **Relative:** `%`, `em`, `rem`, `vw`, `vh`, `vmin`, `vmax`
+      - `em`
+        - if used with font-size, it is relative to the font size of the element itself.
+        - if used with other properties, it is relative to the font size of the parent element.
+      - `rem`
+        - is relative to the font size of the root element (`<html>`) for all properties.
+    - **Grid-specific:** `fr`
 
 - **Flex vs Grid:**
 
-  - **Flexbox:** 1D layouts (row or column)
-  - **Grid:** 2D layouts (rows and columns)
+  - **Flexbox:**
+    - single-dimension layouts (row or column), offering flexibility in how items resize and wrap.
+  - **Grid:**
+    - 2-dimensional layouts (rows and columns), allowing for complex arrangements of items in a grid structure.
 
 - **Flexbox Concepts:**
 
@@ -228,7 +257,11 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **Flex-grow and Flex-shrink:**
 
   - **Grow:** expands item to fill space
+    - `flex-grow: 1` means the item can grow to fill available space.
+    - `flex-grow: 0` means the item will not grow beyond its initial size.
   - **Shrink:** contracts item when space is limited
+    - `flex-shrink: 1` means the item can shrink to fit within the container.
+    - `flex-shrink: 0` means the item will not shrink below its initial size.
 
 - **Flex direction:**
 
@@ -246,15 +279,226 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 - **`justify-content` vs `justify-items`:**
 
-  - `justify-content`: applies to flex/grid container
-  - `justify-items`: applies to individual grid items
+  - `justify-content`
+    - applies to flex/grid container, controls alignment of items along the main axis.
+  - `justify-items`
+    - controls how grid items are aligned within their grid area, applies to grid containers only.
 
 - **CSS Grid Attributes:**
+
+  - It's a layout system that allows for the creation of complex, two-dimensional layouts using rows and columns.
+
   - `display: grid`
   - Template: `grid-template-rows`, `grid-template-columns`
   - Placement: `grid-row`, `grid-column`, `grid-area`
   - Alignment: `justify-items`, `align-items`
   - Gaps: `gap`, `row-gap`, `column-gap`
+
+- How can we center an element?
+
+  - **Using Flexbox:**
+
+    ```css
+    .container {
+      display: flex;
+      justify-content: center; /* Horizontal centering */
+      align-items: center; /* Vertical centering */
+    }
+    ```
+
+  - **Using Grid:**
+
+    ```css
+    .container {
+      display: grid;
+      place-items: center; /* Centers both horizontally and vertically */
+    }
+    ```
+
+  - **Using Margin Auto (for block elements):**
+
+    ```css
+    .element {
+      margin: auto; /* Centers horizontally */
+      width: 50%; /* Set a width for centering */
+    }
+    ```
+
+  - **Using Absolute Positioning:**
+
+    ```css
+    .element {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); /* Centers both horizontally and vertically */
+    }
+    ```
+
+- **How we can make photo covered the container?**
+
+  - To make a photo cover the entire container using CSS, you can use the backgroundsize property along with background-image on the container. This approach ensures that the image fills the entire container, scaling appropriately without distortion.
+  - `background-size: cover` -> This property ensures that the background image covers the entire container, **maintaining its aspect ratio** while filling the space.
+
+- **What is mean by mobile first design and desktop first?**
+
+  - **Mobile-first design** is an approach where the design and development of a website or application start with the smallest screen size (mobile devices) and progressively enhance the experience for larger screens (tablets, desktops). This ensures that the core functionality and content are accessible on mobile devices before adding more complex features for larger screens. -> `min-width` media queries
+  - **Desktop-first design** is the opposite approach, where the design starts with larger screens (desktops) and then adapts down to smaller screens. This can lead to a more complex experience on mobile devices, as features designed for larger screens may not translate well to smaller screens. -> `max-width` media queries
+
+- **What is the difference between box model and box sizing ?**
+
+  - **Box Model** refers to the way elements are structured in CSS, including content, padding, border, and margin. It defines how the size of an element is calculated and how it interacts with other elements in the layout.
+  - **Box Sizing** is a CSS property that changes how the width and height of an element are calculated. The `box-sizing` property can be set to `content-box` (default) or `border-box`.
+    - `content-box`: Width and height include only the content, excluding padding and border.
+    - `border-box`: Width and height include padding and border, making it easier to manage layouts without worrying about additional space from padding or borders.
+
+- **What is the difference between `margin` and `padding`?**
+
+  - **Margin** is the space outside an element's border, creating distance between the element and its surrounding elements. It does not affect the element's size.
+  - **Padding** is the space inside an element's border, creating distance between the content and the border. It increases the element's size.
+
+- **How we can use variables in CSS?**
+
+  - CSS variables, also known as custom properties, allow you to define reusable values that can be applied throughout your stylesheets. They are defined using the `--` prefix and can be accessed using the `var()` function.
+
+- **what is specificity in CSS ?**
+
+  - It determines which styles are applied when multiple rules match the same element. Specificity is calculated based on the types of selectors used:
+    - Inline styles (highest specificity)
+    - IDs
+    - Classes, attributes, and pseudo-classes
+    - Elements and pseudo-elements (lowest specificity)
+  - It's a number of 4 values, each representing a different level of specificity:
+    - Inline styles: `1,0,0,0`
+    - IDs: `0,1,0,0`
+    - Classes/attributes/pseudo-classes: `0,0,1,0`
+    - Elements/pseudo-elements: `0,0,0,1`
+
+  > The more specific a selector is, the higher its specificity score, and the more likely it is to override other styles.
+
+- What is the difference between `rem` and `em`?
+
+  - **`rem` (root em)**: Relative to the font size of the root element (`<html>`). It provides a consistent base for sizing elements across the entire document.
+  - **`em`**: Relative to the font size of the element itself or its parent. It can lead to compounding effects if used within nested elements, making it less predictable.
+
+- \*_What is the difference between link tag `<link>` and anchor tag `<a>`?_
+
+  - **`<link>`**: Used to link external resources like stylesheets, icons, or other documents. It does not create a clickable link for navigation.
+    - Example: `<link rel="stylesheet" href="styles.css">`
+  - **`<a>`**: Used to create hyperlinks that allow users to navigate to other pages or resources. It can contain text or other elements and is clickable.
+    - Example: `<a href="https://example.com">Visit Example</a>`
+
+- **What is the difference between `id` and `class` in HTML?**
+
+  - **`id`**: A unique identifier for a single element on a page. It should be used only once per page and is often used for targeting specific elements with JavaScript or CSS.
+  - **`class`**: A reusable class that can be applied to multiple elements. It allows for grouping elements with similar styles or behaviors.
+
+- **What is data attribute?**
+
+  - Data attributes are custom attributes that can be added to HTML elements to store extra information. They are prefixed with `data-` and can be accessed via JavaScript or CSS.
+  - Example: `<div data-user-id="123" data-role="admin"></div>`
+
+- **How to make html more secure?**
+
+  - Use HTTPS to encrypt data in transit (avoid man-in-the-middle attacks).
+  - Validate and sanitize user input to prevent XSS and SQL injection attacks.
+  - Implement Content Security Policy (CSP) to restrict resources loaded by the page.
+  - Avoid `eval()` and similar functions that execute arbitrary code.
+  - Use secure cookies with the `HttpOnly` and `Secure` flags.
+  - Regularly update libraries and frameworks to patch vulnerabilities (Regular Security Audits).
+  - Avoid inline JavaScript and styles to reduce XSS risks.
+  - Educate Developers and Users about security best practices.
+
+- **What is the difference between `GET` and `POST` methods in HTML forms?**
+
+  - **GET**: Sends data in the URL, suitable for retrieving data. Limited in size and not secure for sensitive information.
+    - Example: `<form method="GET" action="/search">`
+  - **POST**: Sends data in the request body, suitable for submitting data. No size limit and more secure for sensitive information.
+    - Example: `<form method="POST" action="/submit">`
+
+- **What is best place to add script in html?**
+
+  - The best place to add scripts in HTML is at the end of the `<body>` tag. This ensures that the HTML content is fully loaded before the script executes, preventing render-blocking and improving page load performance.
+  - Example:
+
+    ```html
+    <body>
+      <!-- Content goes here -->
+      <script src="script.js"></script>
+    </body>
+    ```
+
+  - Alternatively, you can use the `defer` or `async` attributes in the `<script>` tag to control script loading behavior without blocking rendering.
+
+- **What is the difference between `defer` and `async` in script loading?**
+
+  - **`defer`**: Scripts are executed in the order they appear in the document after the HTML is fully parsed. It does not block rendering.
+  - **`async`**: Scripts are executed as soon as they are downloaded, without waiting for the HTML to finish parsing. The order of execution is not guaranteed.
+    - This means that if you have multiple scripts with `async`, they may execute in any order, depending on which one finishes downloading first.
+
+  > Use `defer` for scripts that depend on the DOM being fully loaded, and `async` for independent scripts that can run immediately after downloading.
+
+- **What is BEM in CSS?**
+
+  - BEM (Block Element Modifier) is a naming convention for classes in HTML and CSS that helps create reusable and maintainable components. It consists of three parts:
+    - **Block**: Represents a standalone component (e.g., `header`, `button`).
+    - **Element**: A part of a block that has no standalone meaning (e.g., `header__logo`, `button__icon`).
+    - **Modifier**: A flag that changes the appearance or behavior of a block or element (e.g., `button--primary`, `header--fixed`).
+
+  > BEM promotes clear and consistent naming, making it easier to understand the structure and relationships between components in your code.
+
+- **What is `object-fit` property in CSS?**
+
+  - The `object-fit` property in CSS is used to control how an element's content (such as an image or video) is resized to fit its container. It determines how the content should be scaled and positioned within the element's box.
+  - Common values include:
+    - `fill`: The content stretches to fill the container, potentially distorting its aspect ratio.
+    - `contain`: The content scales to fit within the container while maintaining its aspect ratio, leaving empty space if necessary.
+    - `cover`: The content scales to cover the entire container while maintaining its aspect ratio, cropping if necessary.
+    - `none`: The content retains its original size, which may overflow the container.
+
+- **What is SEO and How to improve it?**
+
+  - **SEO (Search Engine Optimization)** is the practice of optimizing web content to improve its visibility and ranking in search engine results pages (SERPs). The goal is to attract organic traffic from search engines like Google, Bing, and Yahoo.
+  - To improve SEO:
+    - Use relevant keywords in titles, headings, and content.
+    - Optimize `meta` tags (title, description) for click-through rates.
+    - Ensure mobile-friendliness and fast loading times.
+    - Create high-quality, valuable content that addresses user intent.
+    - Use descriptive URLs and proper heading structure (H1, H2, etc.).
+    - Implement internal linking to connect related content.
+    - Build backlinks from reputable sources to increase authority.
+    - Use alt text for images to improve accessibility and indexing.
+    - Regularly update content to keep it fresh and relevant.
+    - Use semantic HTML elements to improve structure and meaning.
+
+- **How to optimize first load of project?**
+
+  - Minimize HTTP requests by combining CSS and JavaScript files.
+  - Use a CDN to serve static assets from locations closer to users.
+  - Enable compression (e.g., Gzip or Brotli) to reduce file sizes.
+  - Optimize images by compressing them and using appropriate formats (e.g., `WebP`, `AVIF`).
+  - Lazy-load non-critical scripts.
+  - Implement lazy loading for images and videos to defer loading until they are in the viewport.
+    - `loading="lazy"` for images and iframes. instead of `loading="eager"` or no attribute.
+  - Minify CSS, JavaScript, and HTML files to reduce file sizes.
+  - Enable browser caching to store static assets locally for faster subsequent loads.
+  - Use `defer` or `async` attributes for script loading to prevent render-blocking.
+  - Use server-side rendering (SSR) or static site generation (SSG) for faster initial page loads.
+  - Use `preload` and `prefetch` for critical resources to prioritize their loading.
+
+    - they're used to optimize resource loading in web applications.
+    - `preload` is used to load resources that are needed immediately, such as fonts or critical CSS, before the browser starts rendering the page.
+    - `prefetch` is used to load resources that may be needed in the future, such as scripts or images for subsequent pages, allowing the browser to cache them for faster access later.
+
+    ```html
+    <link rel="preload" href="styles.css" as="style" />
+    <link rel="prefetch" href="next-page.html" />
+    ```
+
+  - Use Progressive Web App (PWA) Techniques, which include service workers for caching and offline capabilities, to enhance performance and user experience.
+
+- **How to convert from ordered list to un ordered list using CSS?**
+  - To convert an ordered list (`<ol>`) to an unordered list (`<ul>`) using CSS, you can use the `list-style-type` property to change the bullet style.
 
 ---
 
