@@ -14,23 +14,23 @@
     - [Frontend Rendering Methods](#frontend-rendering-methods)
     - [UI Components \& Libraries](#ui-components--libraries)
     - [Progressive Web Apps (PWA)](#progressive-web-apps-pwa)
-  - [HTML \& CSS](#html--css)
-    - [HTML Overview](#html-overview)
-    - [CSS: A Comprehensive Guide](#css-a-comprehensive-guide)
-    - [CSS Layouts](#css-layouts)
-    - [CSS Variables (Custom Properties)](#css-variables-custom-properties)
-    - [CSS Animations Summary](#css-animations-summary)
-    - [Responsive Web Design Summary](#responsive-web-design-summary)
-    - [Web UX Design Summary](#web-ux-design-summary)
-    - [Accessibility Summary](#accessibility-summary)
-  - [CSS Frameworks \& Mehtodologies](#css-frameworks--mehtodologies)
-    - [CSS Methodologies and Frameworks](#css-methodologies-and-frameworks)
-    - [CSS Modules Overview](#css-modules-overview)
-    - [CSS Preprocessors and Build Process](#css-preprocessors-and-build-process)
-    - [PostCSS Overview](#postcss-overview)
-    - [Sass Overview](#sass-overview)
-    - [Styled Components Overview](#styled-components-overview)
-    - [Tailwind CSS](#tailwind-css)
+  - [HTML \& CSS ✅](#html--css-)
+    - [HTML Overview ✅](#html-overview-)
+    - [CSS: A Comprehensive Guide ✅](#css-a-comprehensive-guide-)
+    - [CSS Layouts ✅](#css-layouts-)
+    - [CSS Variables (Custom Properties) ✅](#css-variables-custom-properties-)
+    - [CSS Animations Summary ✅](#css-animations-summary-)
+    - [Responsive Web Design Summary ✅](#responsive-web-design-summary-)
+    - [Web UX Design Summary ✅](#web-ux-design-summary-)
+    - [Accessibility Summary ✅](#accessibility-summary-)
+  - [CSS Frameworks \& Mehtodologies ✅](#css-frameworks--mehtodologies-)
+    - [CSS Methodologies and Frameworks ✅](#css-methodologies-and-frameworks-)
+    - [CSS Modules Overview ✅](#css-modules-overview-)
+    - [CSS Preprocessors and Build Process ✅](#css-preprocessors-and-build-process-)
+    - [PostCSS Overview ✅](#postcss-overview-)
+    - [Sass Overview ✅](#sass-overview-)
+    - [Styled Components Overview ✅](#styled-components-overview-)
+    - [Tailwind CSS ✅](#tailwind-css-)
   - [JavaScript](#javascript)
     - [JavaScript Summary](#javascript-summary)
     - [OOP in JavaScript](#oop-in-javascript)
@@ -718,9 +718,9 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-## HTML & CSS
+## HTML & CSS ✅
 
-### HTML Overview
+### HTML Overview ✅
 
 - **HTML Basics**
 
@@ -851,7 +851,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### CSS: A Comprehensive Guide
+### CSS: A Comprehensive Guide ✅
 
 - **Cascading Style Sheets (CSS)**
 
@@ -934,7 +934,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### CSS Layouts
+### CSS Layouts ✅
 
 - **Definition**: CSS layouts determine how elements are arranged on a web page. They can be general layouts for the entire page or specific layouts for sections/components.
 
@@ -1050,7 +1050,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### CSS Variables (Custom Properties)
+### CSS Variables (Custom Properties) ✅
 
 - **Definition**: CSS variables, also known as custom properties, allow defining reusable variables in CSS. They are inheritable and cascade like CSS properties.
 
@@ -1228,7 +1228,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### CSS Animations Summary
+### CSS Animations Summary ✅
 
 - **Transforms (`transform` property):**
 
@@ -1351,7 +1351,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Responsive Web Design Summary
+### Responsive Web Design Summary ✅
 
 - **Responsive User Interface Design:**
 
@@ -1425,7 +1425,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Web UX Design Summary
+### Web UX Design Summary ✅
 
 - **Web Design:**
 
@@ -1521,7 +1521,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Accessibility Summary
+### Accessibility Summary ✅
 
 - **Accessibility:**
 
@@ -1598,9 +1598,9 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-## CSS Frameworks & Mehtodologies
+## CSS Frameworks & Mehtodologies ✅
 
-### CSS Methodologies and Frameworks
+### CSS Methodologies and Frameworks ✅
 
 - **Modern Component Architecture & Methodologies**
 
@@ -1675,7 +1675,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### CSS Modules Overview
+### CSS Modules Overview ✅
 
 - **What are CSS Modules?**
 
@@ -1723,7 +1723,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### CSS Preprocessors and Build Process
+### CSS Preprocessors and Build Process ✅
 
 - **CSS Preprocessors**
 
@@ -1781,7 +1781,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### PostCSS Overview
+### PostCSS Overview ✅
 
 - **What is PostCSS?**
 
@@ -1878,7 +1878,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Sass Overview
+### Sass Overview ✅
 
 - **What is Sass?**
 
@@ -1937,12 +1937,14 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **Key Questions for Interview Preparation**
   - What are the advantages of using Sass over CSS?
   - How do `@use` and `@import` differ?
+    - `@use` loads a module once, while `@import` can load multiple times. (if used across multiple files)
   - When should you use mixins versus placeholders?
+    - Use mixins for reusable styles with parameters, and placeholders for shared styles without parameters. also, placeholders are more efficient as they don't generate additional CSS unless extended.
   - How does Sass improve maintainability in large projects?
 
 ---
 
-### Styled Components Overview
+### Styled Components Overview ✅
 
 - **What are Styled Components?**
 
@@ -2092,7 +2094,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Tailwind CSS
+### Tailwind CSS ✅
 
 - **Overview**
 
