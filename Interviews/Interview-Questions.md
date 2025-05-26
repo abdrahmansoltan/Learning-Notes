@@ -15,19 +15,26 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ## HTML & CSS
 
-- **Default mode for rendering HTML pages:**
+- **What is the default mode for rendering HTML pages?**
+
+  - The default mode for rendering HTML pages is **Quirks Mode** if no `<!DOCTYPE html>` declaration is present. This mode emulates older browser behavior for compatibility with legacy content. If a proper DOCTYPE is specified, the browser renders in **Standards Mode**.
+
+- **Rendering Modes in Browsers:**
 
   - **Standards Mode (Strict Mode):** Adheres to W3C/WHATWG specifications.
   - **Quirks Mode:** Emulates older browsers for backward compatibility.
-  - **Almost Standards Mode:** Similar to standards but allows some quirks.
+  - **Almost Standards Mode:** Similar to standards but allows some quirks (e.g., box model differences, and table cell spacing).
   - **DOCTYPE declaration** affects rendering mode:
-    - `<!DOCTYPE html>` ensures standards mode.
-    - Older or missing DOCTYPE may trigger quirks mode.
+    - `<!DOCTYPE html>` ensures "standards mode".
+    - Older or missing DOCTYPE may trigger "quirks mode".
+    - The `<!DOCTYPE>` declaration tells the web browser which version of HTML (or sometimes XHTML) the web page is written in. This helps the browser understand how to interpret and render the content of the page.
 
 - **Why "Hyper" and why "Markup"?**
 
   - **Hyper:** Refers to hypertext (linked documents).
   - **Markup:** Tags structure the document (e.g., `<p>`, `<h1>`, `<img>`).
+
+  > So, "HyperText Markup Language" (HTML) essentially describes a language that allows you to create documents with text that contains links (hypertext) and to structure and format this text using tags (markup). This combination of hypertext and markup is what makes HTML such a powerful tool for creating and sharing content on the web
 
 - **Why are semantic elements important?**
 
@@ -39,20 +46,27 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **Types of elements in HTML:**
 
   - **Block-level:** `<div>`, `<p>`, `<ul>`, etc.
+    - They're elements that take up the full width available, starting on a new line.
   - **Inline:** `<span>`, `<a>`, `<img>`, etc.
+    - They're elements that only take up as much width as necessary and do not start on a new line.
   - **Inline-block:** Mix of inline and block.
+    - They're elements that are formatted like inline elements, and have properties of block elements, allowing you to set width and height.
   - **Void:** Self-closing (`<br>`, `<img>`, etc.).
+    - They're elements that do not have a closing tag and do not contain any content.
   - **Semantic:** `<header>`, `<main>`, etc.
+    - They're elements that clearly describe their meaning in a human- and machine-readable way.
   - **Form-related / Table-related**
+    - They're elements used for structuring and displaying tabular or form data, such as `<form>`, `<table>`, `<tr>`, `<td>`, etc.
 
 - **Are HTML elements and tags the same?**
 
-  - **Tags:** Markup syntax like `<p>` and `</p>`.
-  - **Elements:** Tag + content + optional end tag.
+  - **Tags:** Markup syntax used to define the beginning and end of an element. like `<p>` and `</p>`.
+  - **Elements:** are composed of tags and the content they enclose, representing the actual
+    structure and meaning within an HTML document.
 
 - **Root of the document:**
 
-  - `<html>` is the root container of an HTML document.
+  - `<html>` is the root container of an HTML document, enclosing all other elements.
 
 - **Meta tag that enables media query:**
 
@@ -60,9 +74,25 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   ```
 
+  - `meta` is used to define metadata about the HTML document, such as character set, viewport settings, and more.
+  - `name="viewport"` specifically controls the layout on mobile devices by setting the width and initial scale of the viewport.
+  - `content="width=device-width, initial-scale=1.0"` sets the viewport width to the device's width and the initial zoom level to 1.0, ensuring proper scaling on different devices.
+
 - **Types of `<meta>` tags:**
 
-  - `charset`, `viewport`, `description`, `author`, `robots`, `refresh`, etc.
+  - `charset`
+    - Defines the character encoding for the HTML document (e.g., `<meta charset="UTF-8">`).
+  - `viewport`
+    - Controls the layout on mobile devices (e.g., `<meta name="viewport" content="width=device-width, initial-scale=1.0">`).
+    - It is crucial for creating responsive web designs that adapt to different screen sizes and orientations.
+  - `description`
+    - Provides a brief description of the page's content for search engines (e.g., `<meta name="description" content="This is a sample webpage.">`).
+  - `author`
+    - Specifies the author of the document (e.g., `<meta name="author" content="John Doe">`).
+  - `robots`
+    - Controls how search engines index the page (e.g., `<meta name="robots" content="index, follow">`).
+  - `refresh`
+    - Automatically refreshes the page after a specified time (e.g., `<meta http-equiv="refresh" content="30">`).
 
 - **What is meta viewport?**
 
@@ -70,33 +100,67 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 - **Why is meta viewport important?**
 
+  > It's essential for ensuring that your web pages are responsive and mobile-friendly. It allows you to control how the page is displayed on different devices, optimizing the user experience across various screen sizes and orientations.
+
   - Enables **responsive design**.
   - Ensures **mobile optimization** and **better UX**.
+    - Without the `viewport` meta tag, mobile browsers may render the page as if it were a desktop site, leading to content appearing too small or being zoomed out, which can degrade the user experience.
 
 - **Why does HTML5 exist?**
 
+  - HTML5 exists primarily to address the evolving needs of web developers and users, offering new features, improved functionality, and better support for multimedia and interactivity. Several key reasons why HTML5 was developed include
+
   - Adds support for:
-    - Multimedia (`<audio>`, `<video>`)
+    - Multimedia support (`<audio>`, `<video>`) eliminating the need for third-party plugins like `Flash`
     - Semantic tags
-    - Forms enhancements
-    - Canvas and SVG
-    - Offline storage
+    - Forms enhancements (intruduced new input types like `email`, `date`, etc. and new attributes like `placeholder`, `required`, etc.)
+    - Canvas and SVG -> This enables richer visualizations, interactive games, and animations without relying on external plugins.
+      - `canvas` element for dynamic graphics rendering
+      - `svg` for scalable vector graphics (used mainly for icons and illustrations)
+    - Offline storage Capabilities
+      - Local storage and session storage APIs for client-side data persistence
+      - Application cache for offline web applications (`AppCache`)
     - Responsive design and cross-platform compatibility
+      - HTML5 introduced features like the `viewport` meta tag, which allows developers to control how web pages are displayed on different devices, ensuring a consistent and user-friendly experience across desktops, tablets, and smartphones.
+    - APIs for geolocation
+      - Geolocation API for accessing user location data
+    - Backward compatibility with older HTML versions
+      - HTML5 was designed to be backward compatible with previous versions of HTML, allowing developers to gradually adopt new features without breaking existing content.
 
 - **CSS `display` values:**
 
-  - `block`, `inline`, `inline-block`, `none`, `flex`, `grid`, `table`, `list-item`, etc.
+  - It determines how an element is displayed on the page and how it interacts with other elements in the document flow.
+  - Common values include:
+    - `block`: Element starts on a new line, takes full width.
+    - `inline`: Element does not start on a new line, only takes as much width as necessary.
+    - `inline-block`: Element behaves like an inline element but allows setting width and height.
+    - `none`: Element is not displayed and does not take up space.
+    - `flex`: Enables flexible box layout for responsive designs.
+    - `grid`: Enables grid layout for two-dimensional layouts.
+    - `table`, `list-item`, etc.: Other display types for specific use cases.
 
 - **Difference between `display: none`, `visibility: hidden`, and `opacity: 0`:**
 
-  - `none`: Removes element entirely from flow.
-  - `hidden`: Keeps space but hides content.
-  - `opacity: 0`: Transparent but interactive and occupies space.
+  - `display: none`
+    - Removes element entirely from the document flow (not rendered, no space occupied, not accessible via screen readers).
+    - Use case: Hiding elements that should not be displayed at all, such as in responsive designs or when toggling visibility.
+  - `visibility: hidden`
+    - Hides element but keeps its space in the layout (still occupies space, but not visible, accessible via screen readers as it's still in the DOM).
+    - Use case: Temporarily hiding elements while maintaining layout, such as in dropdown menus or tooltips, also animations where you want to hide an element without affecting the layout.
+  - `opacity: 0`
+    - Makes element fully transparent but still visible in the layout (still occupies space, accessible via screen readers).
+    - Use case: Creating fade-out effects or transitions where you want the element to remain in the layout but not visible to the user.
 
 - **Difference between `inline` and `inline-block`:**
 
-  - `inline`: Cannot set width/height.
-  - `inline-block`: Behaves inline but accepts block properties.
+  - `inline`:
+    - Cannot set width/height.
+    - Does not start on a new line.
+    - Margins and paddings only affect horizontal spacing.
+  - `inline-block`:
+    - Behaves inline but accepts block properties.
+    - Can set width/height.
+    - Starts on the same line but allows vertical margins and paddings.
 
 - **CSS `position` types:**
 
