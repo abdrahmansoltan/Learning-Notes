@@ -4,6 +4,7 @@
   - [Intro](#intro)
   - [HTML \& CSS](#html--css)
   - [Tailwind CSS](#tailwind-css)
+  - [Frontend Performance](#frontend-performance)
 
 ---
 
@@ -671,3 +672,104 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **What are plugins in Tailwind CSS?**
 
   - In Tailwind CSS, plugins are modules or extensions that allow you to customize or extend the default functionality of the framework. Plugins enable you to add new utilities, components, variants, or configuration options to Tailwind CSS. They offer a way to tailor Tailwind CSS to suit your specific project requirements.
+
+---
+
+## Frontend Performance
+
+- **What is frontend performance?**
+
+  - Frontend performance refers to the speed and efficiency with which a web application or website loads and responds to user interactions. It encompasses various aspects, including page load times, rendering speed, responsiveness, and overall user experience.
+
+- **Why is frontend performance important?**
+
+  - Frontend performance is crucial for several reasons:
+    - **User Experience:** Faster loading times and smooth interactions lead to a better user experience, reducing bounce rates and increasing user satisfaction.
+    - **SEO:** Search engines consider page speed as a ranking factor, so faster sites are more likely to rank higher in search results.
+    - **Conversion Rates:** Improved performance can lead to higher conversion rates, as users are more likely to complete actions on a fast-loading site.
+    - **Accessibility:** Performance optimizations can enhance accessibility for users with slower connections or devices.
+
+- **What are some common frontend performance metrics?**
+
+  - Some common frontend performance metrics include:
+    - **First Contentful Paint (FCP):** Measures the time it takes for the first piece of content to be rendered on the screen.
+    - **Largest Contentful Paint (LCP):** Measures the time it takes for the largest visible content element to be rendered.
+    - **Time to Interactive (TTI):** Measures the time it takes for a page to become fully interactive.
+    - **Cumulative Layout Shift (CLS):** Measures visual stability by quantifying unexpected layout shifts during page load.
+    - **Total Blocking Time (TBT):** Measures the total time that the main thread is blocked and unable to respond to user input.
+
+- **What are some common frontend performance optimization techniques?**
+
+  - **Minification and Compression:** Minifying CSS, JavaScript, and HTML files to reduce file sizes and using compression algorithms like Gzip or Brotli to further reduce payload sizes.
+  - **Image Optimization:** Compressing images, using appropriate formats (e.g., WebP), and implementing responsive images with `srcset` and `sizes` attributes.
+  - **Lazy Loading:** Deferring the loading of non-critical resources (e.g., images, videos) until they are needed or visible in the viewport.
+  - **Code Splitting:** Breaking up large JavaScript bundles into smaller chunks that can be loaded on demand, reducing initial load times.
+  - **Caching:** Implementing browser caching and server-side caching to store static assets locally for faster subsequent loads.
+  - **Content Delivery Network (CDN):** Using a CDN to serve static assets from locations closer to users, reducing latency.
+  - **Reducing HTTP Requests:** Combining CSS and JavaScript files, using sprites for icons, and minimizing the number of external resources.
+  - **Asynchronous Loading:** Using `async` or `defer` attributes for script tags to prevent render-blocking behavior.
+
+- **What is the critical rendering path, and how can it be optimized?**
+
+  - The critical rendering path is the sequence of steps the browser takes to convert HTML, CSS, and JavaScript into pixels on the screen. It includes parsing HTML, constructing the DOM, parsing CSS, constructing the CSSOM, and rendering the page.
+  - To optimize the critical rendering path:
+    - Minimize the number of critical resources (CSS and JavaScript).
+    - Use inline critical CSS for above-the-fold content.
+    - Defer non-critical JavaScript loading.
+    - Reduce render-blocking resources by using `async` or `defer` attributes for scripts.
+    - Optimize CSS selectors to reduce complexity and improve performance.
+
+- **What is lazy loading, and how does it improve performance?**
+
+  - Lazy loading is a technique that defers the loading of non-critical resources (such as images, videos, or scripts) until they are needed or visible in the viewport. This reduces the initial page load time and improves performance by only loading resources when they are required.
+  - It can be implemented using the `loading="lazy"` attribute for images and iframes, or by using JavaScript libraries that handle lazy loading for other types of content.
+
+- **What is code splitting, and how does it benefit frontend performance?**
+
+  - Code splitting is a technique that breaks up large JavaScript bundles into smaller chunks that can be loaded on demand. This reduces the initial load time of a web application by only loading the code necessary for the current view or interaction.
+  - Benefits include:
+    - Faster initial page load times.
+    - Reduced memory usage, as only the required code is loaded.
+    - Improved user experience by allowing users to interact with the page while additional code is being loaded in the background.
+
+- **What is the difference between synchronous and asynchronous loading of scripts?**
+
+  - **Synchronous Loading:** Scripts are loaded in the order they appear in the HTML document, blocking the rendering of the page until the script is fully loaded and executed. This can lead to longer load times and a poor user experience.
+    - Example: `<script src="script.js"></script>`
+  - **Asynchronous Loading:** Scripts are loaded independently of the page rendering process, allowing the browser to continue rendering the page while the script is being downloaded. This improves performance and reduces render-blocking behavior.
+
+    - Example: `<script src="script.js" async></script>`
+
+  - **Deferred Loading:** Similar to asynchronous loading, but scripts are executed in the order they appear in the document after the HTML is fully parsed. This ensures that scripts do not block rendering while still maintaining the order of execution.
+
+    - Example: `<script src="script.js" defer></script>`
+
+- **How can you measure frontend performance?**
+
+  - Frontend performance can be measured using various tools and metrics, including:
+    - **Google Lighthouse:** An open-source tool that audits web pages for performance, accessibility, SEO, and best practices.
+    - **WebPageTest:** A tool that provides detailed performance analysis, including load times, resource sizes, and rendering metrics.
+    - **Chrome DevTools:** Built-in browser tools that allow developers to analyze network requests, performance timelines, and rendering performance.
+    - **Performance APIs:** The `Performance` API provides methods to measure various aspects of page performance programmatically.
+    - **Real User Monitoring (RUM):** Tools like Google Analytics or New Relic that collect performance data from real users in production environments.
+
+- **Do you know monitoring and observability tools?**
+
+  - Yes, monitoring and observability tools are essential for tracking the performance and health of web applications. They help identify issues, analyze user behavior, and optimize performance.
+  - Examples include:
+    - **Google Analytics:** Provides insights into user behavior, traffic sources, and page performance.
+    - **New Relic:** Offers application performance monitoring (APM) to track server-side and client-side performance.
+    - **Datadog:** Provides real-time monitoring and analytics for applications, infrastructure, and logs.
+    - **Sentry:** Focuses on error tracking and performance monitoring for web applications.
+    - **Prometheus:** An open-source monitoring system that collects metrics from configured targets at specified intervals.
+
+- **What is the difference between monitoring and observability?**
+
+  - **Monitoring** refers to the process of collecting and analyzing data about the performance and health of a system or application. It involves tracking metrics, logs, and events to identify issues and ensure that the system is functioning as expected.
+  - **Observability** goes beyond monitoring by providing deeper insights into the internal workings of a system. It allows developers to understand how different components interact, diagnose complex issues, and gain visibility into the overall behavior of the system. Observability often involves correlating data from multiple sources (logs, metrics, traces) to provide a comprehensive view of the system's state.
+
+- **What do you know about web analytics and tracking events?**
+
+  - Web analytics involves collecting, measuring, and analyzing data about user interactions with a website or web application. It helps understand user behavior, traffic sources, and conversion rates.
+  - Tracking events refers to capturing specific user actions (e.g., clicks, form submissions, page views) to gain insights into user engagement and performance. This data can be used to optimize user experience, improve conversion rates, and inform business decisions.
+  - Common tools for web analytics and event tracking include Google Analytics, Mixpanel, Amplitude, and Segment.

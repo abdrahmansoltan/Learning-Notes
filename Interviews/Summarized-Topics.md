@@ -2739,6 +2739,11 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **WebSockets API**
 
   - Enable real-time communication.
+  - How it works:
+    - Establish a persistent connection between client and server.
+    - Allows bidirectional data transfer without HTTP overhead.
+  - Use Cases:
+    - Chat applications, live updates, real-time notifications.
   - Techniques:
     - Client Pull: Short/Long Polling.
     - Server Push: WebSockets, Server-Sent Events.
