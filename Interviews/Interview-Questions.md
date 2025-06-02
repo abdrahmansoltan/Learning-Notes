@@ -2,8 +2,11 @@
 
 - [INDEX](#index)
   - [Intro](#intro)
-  - [HTML \& CSS](#html--css)
-  - [Tailwind CSS](#tailwind-css)
+  - [HTML \& CSS \& Sass](#html--css--sass)
+    - [HTML \& CSS](#html--css)
+    - [SCSS \& Sass](#scss--sass)
+    - [Tailwind CSS](#tailwind-css)
+    - [Bootstrap](#bootstrap)
   - [Frontend Performance](#frontend-performance)
 
 ---
@@ -14,7 +17,9 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-## HTML & CSS
+## HTML & CSS & Sass
+
+### HTML & CSS
 
 - **What is the default mode for rendering HTML pages?**
 
@@ -29,6 +34,14 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     - `<!DOCTYPE html>` ensures "standards mode".
     - Older or missing DOCTYPE may trigger "quirks mode".
     - The `<!DOCTYPE>` declaration tells the web browser which version of HTML (or sometimes XHTML) the web page is written in. This helps the browser understand how to interpret and render the content of the page.
+
+- **is doctype is case sensitive ?**
+
+  - No, the `<!DOCTYPE html>` declaration is not case-sensitive. It can be written in any combination of uppercase and lowercase letters, such as `<!doctype html>`, `<!Doctype HTML>`, etc. However, it is common practice to use lowercase for consistency and readability.
+
+- **What is HTML?**
+
+  - HTML (HyperText Markup Language) is the standard markup language used to create web pages. It provides the structure and layout of a webpage by using various elements and tags to define content such as headings, paragraphs, images, links, and more.
 
 - **Why "Hyper" and why "Markup"?**
 
@@ -178,6 +191,17 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - Control overlapping between elements like (dropdown, tooltips, modals, dialogs) where one element needs to be appear on top of another one.
 
   > Note: Elements inside (flex/grid) containers with `z-index` will not stack above elements outside the container unless the container itself has a `z-index` set.
+
+- **What is the difference between `float` and `absolute` positioning?**
+
+  - **Float:**
+    - Used for wrapping text around images or creating multi-column layouts.
+    - Elements are taken out of the normal document flow but still affect surrounding elements.
+    - Can lead to layout issues if not cleared properly.
+  - **Absolute Positioning:**
+    - Positions an element relative to its nearest positioned ancestor (not static).
+    - Takes the element out of the normal document flow, and it does not affect surrounding elements.
+    - Useful for creating overlays, tooltips, and modals.
 
 - **When to use `clear` in CSS?**
 
@@ -503,68 +527,145 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-## Tailwind CSS
+### SCSS & Sass
 
-- **What is CSS frameworks?**
+- **What is preprocessor and postprocessor in CSS?**
 
-  - CSS frameworks are pre-prepared software frameworks that are meant to allow for easier, more standards-compliant web design using the Cascading Style Sheets language. Most of these frameworks contain at least a grid. More functional frameworks also come with more features and additional JavaScript-based functions, but are mostly design-oriented and unobtrusive. This differentiates these from functional and full JavaScript frameworks.
+  - **Preprocessor:** A tool that extends CSS with features like variables, nesting, and mixins, allowing for more dynamic and maintainable stylesheets. Examples include Sass, Less, and Stylus.
+  - **Postprocessor:** A tool that processes CSS after it has been written, typically for optimization purposes, such as minification, autoprefixing, and adding vendor prefixes. Examples include PostCSS and Autoprefixer.
+
+- **What is Sass?**
+
+  - Sass (Syntactically Awesome Style Sheets) is a CSS preprocessor that adds features like variables, nesting, mixins, and functions to standard CSS. It allows developers to write more maintainable and modular stylesheets, making it easier to manage complex styles.
+  - advantages of using Sass:
+    - **Variables:** Store reusable values (e.g., colors, fonts).
+    - **Nesting:** Organize styles hierarchically.
+    - **Mixins:** Create reusable style blocks.
+    - **Partials and Imports:** Modularize stylesheets.
+    - **Functions:** Perform calculations and return values.
+
+- **What is the difference between Sass and SCSS?**
+
+  - Sass and SCSS are both Sass syntaxes, but they have different formats. Sass uses indentation and doesn't require semicolons or curly braces, while SCSS uses a syntax similar to CSS with curly braces and semicolons. SCSS is more popular and widely adopted as it closely resembles CSS and is easier for developers transitioning from regular CSS.
+
+- **How can you compile Sass to CSS?**
+
+  - You can compile Sass to CSS using various methods:
+
+    - **Command Line:** Using the `sass` command-line tool.
+
+      ```bash
+      sass input.scss output.css
+      ```
+
+    - **Build Tools:** like Webpack, Gulp, or Grunt with appropriate plugins.
+
+- **How you can inherit selectors in Sass/SCSS?**
+
+  - In Sass/SCSS, you can inherit selectors using the `@extend` directive. This allows one selector to inherit the styles of another, promoting code reuse and reducing duplication.
+
+    ```scss
+    .button {
+      padding: 10px;
+      background-color: blue;
+    }
+
+    .primary-button {
+      @extend .button;
+      background-color: green; // Overrides the background color
+    }
+
+    // ------------------------------------------------------------
+
+    // After compilation, .primary-button will have the styles of .button plus its own styles.
+    .button,
+    .primary-button {
+      padding: 10px;
+      background-color: green; // The final background color for .primary-button
+    }
+
+    .secondary-button {
+      @extend .button;
+      background-color: red; // Overrides the background color
+    }
+    ```
+
+- **What is the difference between `@import` and `@use` in Sass/SCSS?**
+
+  - **`@import`:** Used to include styles from one file into another. It can lead to issues with variable and mixin conflicts, as it imports everything into the global scope.
+  - **`@use`:** Introduced in `Sass 1.23.0`, it allows you to load styles from another file while keeping them in a separate namespace. This prevents naming conflicts and promotes better organization of styles.
+
+    ```scss
+    // Using @import
+    @import 'variables';
+    @import 'mixins';
+
+    // Using @use
+    @use 'variables';
+    @use 'mixins';
+    ```
+
+- **What is the difference between `mixins` and `functions` in Sass/SCSS?**
+
+  - **Mixins:** Reusable blocks of styles that can include CSS properties and other mixins. They can accept arguments and are used to apply styles to multiple selectors.
+
+    ```scss
+    @mixin rounded-corners($radius) {
+      border-radius: $radius;
+    }
+
+    .box {
+      @include rounded-corners(10px);
+    }
+    ```
+
+  - **Functions:** Used to perform calculations or return values. They can accept arguments and are typically used for generating values rather than applying styles directly.
+
+    ```scss
+    @function calculate-rem($pixels) {
+      @return $pixels / 16 * 1rem; // Assuming base font size is 16px
+    }
+
+    .text {
+      font-size: calculate-rem(24px);
+    }
+    ```
+
+- **How do you import other Sass/SCSS files into your main file?**
+
+  - You can import other Sass/SCSS files into your main file using the `@import` or `@use` directives. The `@import` directive is the traditional way, while `@use` is the newer, recommended approach.
+
+---
+
+### Tailwind CSS
 
 - **What is the difference between preprocessors and frameworks?**
 
-  - **Preprocessors:** Tools that allow you to generate CSS from the preprocessor's own unique syntax. They typically provide variables, mixins, functions, and other tools to make it easier to generate CSS.
-  - **Frameworks:** Tools that provide prebuilt CSS for you to use in your projects. They typically provide a grid system, a set of components, and other tools to make it easier to build websites.
-
-- **What is the difference between postprocessors and preprocessors?**
-
-  - **Postprocessors:** CSS optimizers that typically provide features like minification, vendor prefixing, and more. An example tool is the Koala🐨 application.
+  - **Preprocessors:** Tools that extend CSS with features like variables, nesting, and mixins, allowing for more dynamic and maintainable stylesheets. Examples include Sass, Less, and Stylus.
+  - **Frameworks:** Pre-built collections of CSS (and sometimes JavaScript) that provide a structured way to build web applications or websites. They often include a grid system, components, and utilities for rapid development. Examples include Bootstrap, Foundation, and Tailwind CSS.
 
 - **What are the benefits of using CSS frameworks?**
 
-  - **Responsive web design aspects:**
-    - Media queries
-    - Fluid grid
-    - Flexible-sized elements and images
-    - Media object (advanced float)
-    - Off-canvas layout
-    - Lightbox
-    - Responsive typography, navigation, tables, images, embed content, iframes, advertising banners, forms
-  - **Web applications aspects:**
-    - CSS base, components, utilities, layout, print, themes, grid, reset, typography, tables, forms, buttons, navigation, pagination, lists, breadcrumbs, tooltips, alerts, progress bars, media object, columns, tables, icons, sprites, animations
-  - **Web typography aspects:**
-    - Font stacks, sizing, weight, rendering, smoothing, embedding, icons
-  - **CSS preprocessors aspects:**
-    - CSS preprocessors, postprocessors, mixins, variables, functions, mixins libraries, variables libraries
-  - **Modules and tools:**
-    - Reset style sheet
-    - Grid especially designed for web interfaces
-    - Web typography
-    - Set of icons in sprites format
-    - Styling for tooltips, buttons, elements of forms
-    - Parts of graphical interface used in web applications (such as accordion, tabs, pagination, etc.)
-  - **CSS architecture aspects:**
-    - CSS architecture, naming conventions, methodologies, object-oriented, components, utilities
-
-- **What are examples of CSS frameworks?**
-
-  - Bootstrap, Foundation, Semantic UI, Pure, Skeleton, Bulma, Emotion, Styled Components
-  - Materialize, UIkit, Milligram, Susy, Material UI, Gumby, Cardinal
+  - **Rapid development:** CSS frameworks provide pre-designed components and utilities that speed up the development process, allowing developers to focus on functionality rather than styling from scratch.
+  - **Consistency:** Frameworks enforce a consistent design language across the application, ensuring that styles are uniform and adhere to best practices.
+  - **Cross-browser compatibility:** Most CSS frameworks are tested across various browsers, ensuring that styles render consistently, reducing the need for extensive cross-browser testing.
+  - **Responsive design:** Many frameworks come with built-in responsive design features, making it easier to create layouts that adapt to different screen sizes and devices.
+  - **Community support:** Popular CSS frameworks have large communities, providing extensive documentation, tutorials, and third-party plugins that can enhance development.
 
 - **Is Tailwind CSS a framework?**
 
-  - Tailwind CSS is a highly customizable, **low-level CSS framework** with **low-level utility classes** that gives you all of the building blocks you need to build bespoke designs without any annoying opinionated styles you have to fight to override. It lets you build completely custom designs without ever leaving your HTML.
-
-  - 💡 Tailwind is different from frameworks like Bootstrap, Foundation, or Bulma in that it's **not a UI kit.** It doesn't have a **default theme, and there are no built-in UI components.** It comes with a menu of predesigned widgets to build your site with but doesn't impose design decisions that are difficult to undo.
-  - Tailwind is different from **CSS-in-JS systems** like Emotion, Glamor, or Styled Components in that it's plain CSS, but with superpowers. You get all the benefits of authoring plain CSS without the tedium of writing all of the utility classes.
+  - It's a **utility-first CSS framework** that provides a set of pre-defined utility classes for styling HTML elements. Unlike traditional CSS frameworks that offer pre-designed components, Tailwind CSS focuses on providing low-level utility classes that can be combined to create custom designs.
 
 - **What is Tailwind CSS, and how does it differ from traditional CSS frameworks?**
 
   - **Tailwind CSS** is a **utility-first CSS framework** that provides a set of pre-defined utility classes that can be directly applied to HTML elements. It differs from traditional CSS frameworks by focusing on composing UIs using small, single-purpose utility classes rather than relying on pre-designed components. This gives developers more flexibility and control over the styling of their projects.
+  - It differs from traditional CSS frameworks by focusing on composing UIs using small, single-purpose utility classes rather than relying on pre-designed components. This gives developers more flexibility and control over the styling of their projects.
 
-  - 💡 **Tailwind CSS is a CSS framework, while Bootstrap is an HTML, CSS, and JavaScript framework.**
+  > Tailwind CSS is a CSS framework, while Bootstrap is an HTML, CSS, and JavaScript framework.
 
 - **How would you explain the utility-first approach of Tailwind CSS?**
 
-  - The utility-first approach in Tailwind CSS means that it provides a comprehensive set of utility classes that represent individual CSS properties. Developers can combine these utility classes to create custom styles and layouts without writing any CSS from scratch. This approach promotes rapid development and simplifies the process of making changes to the UI.
+  - The utility-first approach of Tailwind CSS emphasizes the use of small, single-purpose utility classes to style elements directly in the HTML. Instead of writing custom CSS for each component, developers can apply multiple utility classes to achieve the desired design.
 
 - **What are some advantages of using Tailwind CSS in a project?**
 
@@ -581,89 +682,9 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - Using Gulp
   - Using Webpack
 
-  **NPM Way:**
-
-  - Install Tailwind via npm:
-
-    ```bash
-    npm install tailwindcss
-    ```
-
-  - Create your configuration file:
-
-    ```bash
-    npx tailwind init
-    ```
-
-  - Create your stylesheet:
-
-    ```bash
-    npx tailwind build styles.css -o output.css
-    ```
-
-  - Include Tailwind in your CSS:
-
-    ```css
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-    ```
-
-  - Compile your CSS:
-
-    ```bash
-    npx tailwindcss build styles.css -o output.css
-    ```
-
-  - Include Tailwind in your HTML:
-
-    ```html
-    <link href="output.css" rel="stylesheet" />
-    ```
-
-  - Start using Tailwind's utility classes to style your content:
-
-    ```html
-    <div class="flex justify-center items-center h-screen">
-      <h1 class="text-blue-500 text-5xl font-bold">Hello, world!</h1>
-    </div>
-    ```
-
-  - Customize your configuration:
-
-    ```javascript
-    module.exports = {
-      theme: {
-        extend: {
-          colors: {
-            // Add custom colors here
-          }
-        }
-      }
-    };
-    ```
-
-  - Rebuild your CSS:
-
-    ```bash
-    npx tailwindcss build styles.css -o output.css
-    ```
-
-  - Use your new custom color in your HTML:
-
-    ```html
-    <div class="flex justify-center items-center h-screen">
-      <h1 class="text-cyan-500 text-5xl font-bold">Hello, world!</h1>
-    </div>
-    ```
-
 - **How do you customize or extend the default styles provided by Tailwind CSS?**
 
   - Tailwind CSS allows customization through its configuration file, usually named `tailwind.config.js`. In this file, you can modify various aspects such as the color palette, spacing scale, breakpoints, and more. By adjusting these settings, you can customize the default styles to match your project's design requirements.
-
-- **What is the purpose of the utility classes "hover" and "focus" in Tailwind CSS?**
-
-  - The `hover` and `focus` utility classes in Tailwind CSS allow developers to apply styles to elements when they are being hovered over or focused. These classes enable interactivity and help in creating engaging user experiences.
 
 - **How would you handle responsive design using Tailwind CSS?**
 
@@ -671,7 +692,51 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 - **What are plugins in Tailwind CSS?**
 
-  - In Tailwind CSS, plugins are modules or extensions that allow you to customize or extend the default functionality of the framework. Plugins enable you to add new utilities, components, variants, or configuration options to Tailwind CSS. They offer a way to tailor Tailwind CSS to suit your specific project requirements.
+  - They're extensions that add additional functionality or utility classes to Tailwind CSS. Plugins can be used to introduce custom styles, components, or utilities that are not included in the core framework. They can be installed via npm or added directly to the configuration file.
+
+---
+
+### Bootstrap
+
+- **What is Bootstrap?**
+
+  - Bootstrap is a popular open-source front-end framework that provides a collection of pre-designed HTML, CSS, and JavaScript components for building responsive and mobile-first web applications.
+  - It includes a grid system, typography, forms, buttons, navigation, and various UI components that help developers create consistent and visually appealing designs quickly.
+
+- **What are the key features/benefits of Bootstrap?**
+
+  - **Responsive Grid System:** Bootstrap's grid system allows developers to create flexible and responsive layouts that adapt to different screen sizes.
+  - **Pre-designed Components:** It provides a wide range of pre-designed UI components such as buttons, forms, modals, alerts, and navigation bars.
+  - **Customizable:** Bootstrap can be easily customized using its Sass variables and mixins, allowing developers to tailor the framework to their project's design requirements.
+  - **JavaScript Plugins:** It includes various JavaScript plugins for adding interactivity, such as modals, tooltips, carousels, and dropdowns.
+  - **Cross-browser Compatibility:** Bootstrap is designed to work consistently across major browsers, ensuring a uniform user experience.
+
+- **Explain the grid system in Bootstrap?**
+
+  - It is based on a 12-column layout, allowing developers to divide the page into up to 12 equal-width columns. which is responsive and mobile-first.
+  - it uses classes like `.container`, `.row`, and `.col-*` to define the structure of the grid.
+
+- **What is a Bootstrap Container, and how does it work?**
+
+  - It's a fixed-width or fluid-width element that serves as a wrapper for the grid system. It provides a responsive layout by adjusting its width based on the screen size.
+  - There are two types of containers:
+    - **`.container`:** A fixed-width container that adapts to different screen sizes.
+    - **`.container-fluid`:** A full-width container that spans the entire width of the viewport.
+
+- **What are Bootstrap Breakpoints?**
+
+  - Bootstrap breakpoints are predefined screen widths at which the layout of the grid system changes to accommodate different devices. They allow developers to create responsive designs that adapt to various screen sizes.
+  - The default breakpoints in Bootstrap are:
+    - **Extra small (xs):** `<576px`
+    - **Small (sm):** `≥576px`
+    - **Medium (md):** `≥768px`
+    - **Large (lg):** `≥992px`
+    - **Extra large (xl):** `≥1200px`
+    - **Extra extra large (xxl):** `≥1400px`
+
+- **What are Bootstrap themes?**
+  - Bootstrap themes are pre-designed styles and components that can be applied to a Bootstrap-based project to change its appearance and layout. They provide a consistent design language and can include custom colors, typography, and UI elements.
+  - Themes can be created by modifying the default Bootstrap styles or by using third-party themes available from various sources.
 
 ---
 
