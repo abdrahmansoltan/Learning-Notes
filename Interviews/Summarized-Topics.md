@@ -32,8 +32,8 @@
     - [Styled Components Overview ✅](#styled-components-overview-)
     - [Tailwind CSS ✅](#tailwind-css-)
   - [JavaScript](#javascript)
-    - [JavaScript Summary](#javascript-summary)
-    - [OOP in JavaScript](#oop-in-javascript)
+    - [JavaScript Summary ✅](#javascript-summary-)
+    - [OOP in JavaScript ✅](#oop-in-javascript-)
     - [Document Object Model (DOM) Summary](#document-object-model-dom-summary)
     - [Asynchronous JavaScript Summary](#asynchronous-javascript-summary)
     - [Web APIs](#web-apis)
@@ -82,12 +82,12 @@
       - [React Interview Questions Summary](#react-interview-questions-summary)
       - [Next.js Summary](#nextjs-summary)
     - [Vue](#vue)
-      - [Vue Summary](#vue-summary)
-      - [Vue Router Summary](#vue-router-summary)
-      - [Vuex Summary](#vuex-summary)
-      - [Composition API Summary](#composition-api-summary)
-      - [Vue Testing Summary](#vue-testing-summary)
-      - [Nuxt Summary](#nuxt-summary)
+      - [Vue Summary ✅](#vue-summary-)
+      - [Vue Router Summary ✅](#vue-router-summary-)
+      - [Vuex Summary ✅](#vuex-summary-)
+      - [Composition API Summary ✅](#composition-api-summary-)
+      - [Vue Testing Summary ✅](#vue-testing-summary-)
+      - [Nuxt Summary ✅](#nuxt-summary-)
   - [Backend](#backend)
     - [Backend Summary](#backend-summary)
     - [Backend Performance Summary](#backend-performance-summary)
@@ -2190,7 +2190,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ## JavaScript
 
-### JavaScript Summary
+### JavaScript Summary ✅
 
 - **Overview**
 
@@ -2290,7 +2290,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### OOP in JavaScript
+### OOP in JavaScript ✅
 
 - **Object-Oriented Paradigm**
 
@@ -6311,7 +6311,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ### Vue
 
-#### Vue Summary
+#### Vue Summary ✅
 
 - **What is Vue?**
 
@@ -6330,15 +6330,25 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **How Vue Works**
 
   - **Reactivity and Proxies**:
+
+    > "Reactivity" it's the ability of a system to react to changes in its environment and to adjust its functioning accordingly
+    >
+    > "Proxy" it's an object that acts as an intermediary for another object, allowing you to intercept and redefine fundamental operations for that object, such as property access, assignment, enumeration, function invocation, etc.
+
     - Vue uses proxies to track changes in data properties and update the DOM reactively.
     - Proxies use `set` traps to detect changes.
     - Handles reference types (objects, arrays) with `Vue.set()` or `this.$set()`.
+    - Note: Reactivity is not deep by default; it has a problem with reference-type properties, as Vue does not automatically track changes to nested properties.
+      - use `Vue.set()` for nested properties to ensure reactivity.
+
   - **Template Syntax**:
     - HTML-based syntax for declarative binding.
     - Templates are compiled into optimized JavaScript code.
   - **Virtual DOM**:
-    - Lightweight copy of the actual DOM.
+    - Lightweight copy of the actual DOM (in memory).
+    - Vue uses a virtual DOM to minimize direct DOM manipulation. as updates are made to the virtual DOM first, then compared with the real DOM.
     - Observes changes and applies minimal updates to the real DOM.
+    - It's different from React's virtual DOM, as Vue's is more optimized for its reactivity system. meaning that Vue's virtual DOM is designed to work seamlessly with its reactivity system, allowing for efficient updates and rendering.
 
 - **Ways of Using Vue**
 
@@ -6474,9 +6484,12 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-#### Vue Router Summary
+#### Vue Router Summary ✅
 
 - **Routing**
+
+  - Vue Router is the official router for Vue.js applications. It enables navigation between different views or components in a Vue application.
+  - It allows you to define routes, map them to components, and manage navigation history.
 
   - Router configuration and setup
 
@@ -6679,7 +6692,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-#### Vuex Summary
+#### Vuex Summary ✅
 
 - **Overview**
 
@@ -6910,7 +6923,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-#### Composition API Summary
+#### Composition API Summary ✅
 
 - **Overview**
 
@@ -7097,7 +7110,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-#### Vue Testing Summary
+#### Vue Testing Summary ✅
 
 - **Jest with Vue**
 
@@ -7288,7 +7301,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-#### Nuxt Summary
+#### Nuxt Summary ✅
 
 - **Overview**
 
@@ -7303,7 +7316,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **Auto Imports**
 
   - Automatically imports components, layouts, composables, Pinia, and `use`-methods (e.g., `useRouter`).
-  - Default components are tree-shaken to prevent unused imports.
+  - Default components are tree-shaking to prevent unused imports.
 
 - **Server-Side Rendering (SSR)**
 
@@ -7368,6 +7381,9 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     - Utility library for common Vue composables.
 
 - **Hydration**
+
+  > It's the process of reusing server-rendered HTML on the client side, allowing for a faster initial load and improved SEO.
+
   - Fixes issues with SSR apps where static HTML and data mismatch.
   - Use `<ClientOnly/>` to render components on the client side only.
   - Note: Using `<ClientOnly/>` disables SSR benefits for that component.

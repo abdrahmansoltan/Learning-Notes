@@ -8,6 +8,8 @@
     - [Tailwind CSS](#tailwind-css)
     - [Bootstrap](#bootstrap)
   - [Frontend Performance](#frontend-performance)
+  - [FE Frameworks](#fe-frameworks)
+    - [Vue](#vue)
 
 ---
 
@@ -838,3 +840,21 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - Web analytics involves collecting, measuring, and analyzing data about user interactions with a website or web application. It helps understand user behavior, traffic sources, and conversion rates.
   - Tracking events refers to capturing specific user actions (e.g., clicks, form submissions, page views) to gain insights into user engagement and performance. This data can be used to optimize user experience, improve conversion rates, and inform business decisions.
   - Common tools for web analytics and event tracking include Google Analytics, Mixpanel, Amplitude, and Segment.
+
+---
+
+## FE Frameworks
+
+### Vue
+
+- **What is Vue.js?**
+
+  - Vue.js is a progressive JavaScript framework for building user interfaces. It is designed to be incrementally adoptable, meaning you can use it to enhance existing projects or build new applications from scratch. Vue.js focuses on the view layer and provides a reactive data binding system, making it easy to create interactive and dynamic web applications.
+
+- **What are the key features of Vue.js?**
+  - **Reactive Data Binding:** Vue.js provides a reactive data binding system that automatically updates the DOM when the underlying data changes, making it easy to create dynamic user interfaces.
+  - **Component-Based Architecture:** Vue.js encourages the use of reusable components, allowing developers to encapsulate functionality and styles in self-contained units.
+  - **Directives:** Vue.js provides built-in directives (e.g., `v-if`, `v-for`, `v-bind`) that allow developers to manipulate the DOM declaratively.
+  - **Single-File Components:** Vue.js supports single-file components (SFCs) that combine HTML, CSS, and JavaScript in a single file, promoting better organization and maintainability.
+  - **Vue Router:** A powerful routing library for managing navigation and URL handling in Vue.js applications.
+  - **Vuex:** A state management library for managing application state in a centralized store, making it easier to share data between components.
