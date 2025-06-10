@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Frameworks](#frameworks)
     - [Problem with vanilla JavaScript](#problem-with-vanilla-javascript)
+    - [Why use a frontend framework?](#why-use-a-frontend-framework)
     - [Reactivity (Change Detection)](#reactivity-change-detection)
   - [Types of Frameworks](#types-of-frameworks)
     - [Configuration-over-convention](#configuration-over-convention)
@@ -44,6 +45,15 @@
   - if we want to build a complex application with vanilla JavaScript, we have 2 problems:
     1. we will require lots of `DOM` manipulation and traversing, which is hard to maintain and test **(spaghetti code)**
     2. state (data) needs to be stored in a central place instead of storing it in the `DOM`, and we need to keep the `UI` in sync with the `state` of the application
+
+---
+
+### Why use a frontend framework?
+
+- It simplifies the development of complex web applications by providing a set of tools, conventions, and best practices that help developers build maintainable, scalable, and efficient user interfaces.
+- It also addresses the challenges faced in traditional web development, such as code duplication, global state management, and complex DOM manipulation.
+- It also has features like: `routing`, `state management`, `component lifecycle`, and `data binding`, which streamline the development process and enhance the user experience.
+- It helps us write **declarative code** that describes what the UI should look like based on the current state of the application, rather than imperative code that describes how to manipulate the DOM directly.
 
 ---
 

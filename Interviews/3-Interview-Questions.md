@@ -7,7 +7,13 @@
     - [SCSS \& Sass](#scss--sass)
     - [Tailwind CSS](#tailwind-css)
     - [Bootstrap](#bootstrap)
-  - [Frontend Performance](#frontend-performance)
+  - [JavaScript](#javascript)
+    - [General JavaScript programming language questions](#general-javascript-programming-language-questions)
+    - [JS Web APIs](#js-web-apis)
+  - [Frontend Dev](#frontend-dev)
+  - [Frontend](#frontend)
+    - [Frontend Rendering](#frontend-rendering)
+    - [Frontend Performance](#frontend-performance)
   - [FE Frameworks](#fe-frameworks)
     - [Vue](#vue)
 
@@ -142,6 +148,24 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
       - Geolocation API for accessing user location data
     - Backward compatibility with older HTML versions
       - HTML5 was designed to be backward compatible with previous versions of HTML, allowing developers to gradually adopt new features without breaking existing content.
+
+- **What is the default behavior of `button` element?**
+
+  - The default behavior of the `<button>` element is to submit a form when clicked, unless its `type` attribute is set to `"button"`. If the `type` attribute is not specified, it defaults to `"submit"`.
+
+- **How can you prevent a button from submitting a form?**
+
+  - To prevent a button from submitting a form, you can set its `type` attribute to `"button"` instead of the default `"submit"`.
+
+    ```html
+    <button type="button">Click Me</button>
+    ```
+
+  - Alternatively, you can use JavaScript to prevent the default action when the button is clicked:
+
+    ```html
+    <button onclick="event.preventDefault();">Click Me</button>
+    ```
 
 - **CSS `display` values:**
 
@@ -498,32 +522,6 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     - Regularly update content to keep it fresh and relevant.
     - Use semantic HTML elements to improve structure and meaning.
 
-- **How to optimize first load of project?**
-
-  - Minimize HTTP requests by combining CSS and JavaScript files.
-  - Use a CDN to serve static assets from locations closer to users.
-  - Enable compression (e.g., Gzip or Brotli) to reduce file sizes.
-  - Optimize images by compressing them and using appropriate formats (e.g., `WebP`, `AVIF`).
-  - Lazy-load non-critical scripts.
-  - Implement lazy loading for images and videos to defer loading until they are in the viewport.
-    - `loading="lazy"` for images and iframes. instead of `loading="eager"` or no attribute.
-  - Minify CSS, JavaScript, and HTML files to reduce file sizes.
-  - Enable browser caching to store static assets locally for faster subsequent loads.
-  - Use `defer` or `async` attributes for script loading to prevent render-blocking.
-  - Use server-side rendering (SSR) or static site generation (SSG) for faster initial page loads.
-  - Use `preload` and `prefetch` for critical resources to prioritize their loading.
-
-    - they're used to optimize resource loading in web applications.
-    - `preload` is used to load resources that are needed immediately, such as fonts or critical CSS, before the browser starts rendering the page.
-    - `prefetch` is used to load resources that may be needed in the future, such as scripts or images for subsequent pages, allowing the browser to cache them for faster access later.
-
-    ```html
-    <link rel="preload" href="styles.css" as="style" />
-    <link rel="prefetch" href="next-page.html" />
-    ```
-
-  - Use Progressive Web App (PWA) Techniques, which include service workers for caching and offline capabilities, to enhance performance and user experience.
-
 - **How to convert from ordered list to un ordered list using CSS?**
   - To convert an ordered list (`<ol>`) to an unordered list (`<ul>`) using CSS, you can use the `list-style-type` property to change the bullet style.
 
@@ -742,7 +740,182 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-## Frontend Performance
+## JavaScript
+
+### General JavaScript programming language questions
+
+- **What is programming language ?**
+
+  - A programming language is a formal set of instructions and rules used to communicate with computers to perform specific tasks.
+
+- **what is the difference between low level and high level programming language ?**
+
+  - **Low-level programming languages** are closer to machine code and hardware, providing more control over system resources. Examples include Assembly and C.
+  - **High-level programming languages** are more abstracted from hardware, focusing on ease of use and readability. Examples include Python, JavaScript, and Ruby.
+
+- **What is the difference between compiled and interpreted languages?**
+
+  - **Compiled languages** are translated into machine code before execution if no errors are found, resulting in faster performance. Examples include C, C++, and Rust.
+  - **Interpreted languages** are executed directly without any previous preparation (line-by-line at runtime), which can lead to slower performance but allows for more flexibility. Examples include JavaScript, Python, and Ruby.
+
+- **What is a programming paradigm?**
+
+  - A programming paradigm is a fundamental style or approach to programming that defines how code is structured and organized. It influences how developers think about and solve problems in software development.
+  - Common programming paradigms include:
+    - **Imperative:** Focuses on describing how a program operates through statements that change a program's state (e.g., C, Java).
+      - Specify how to perform tasks step-by-step, using control structures like loops and conditionals. -> `for`, `while`, `if` statements in JavaScript.
+    - **Declarative:** Focuses on what the program should accomplish without specifying how (e.g., SQL, HTML).
+      - Specify what the desired outcome is, leaving the implementation details to the underlying system. -> `filter`, `map`, `reduce` in JavaScript.
+    - **Functional:** Emphasizes the use of functions and immutability (e.g., Haskell, Lisp).
+    - **Object-Oriented:** Organizes code into objects that encapsulate data and behavior (e.g., Java, Python).
+
+- **What is garbage collection in programming?**
+
+  - Garbage collection is an automatic memory management process that identifies and frees up memory that is no longer in use by the program. It helps prevent memory leaks and optimizes resource usage.
+
+- **What is JavaScript?**
+
+  - JavaScript is a high-level, dynamic, and interpreted programming language primarily used for adding interactivity and dynamic behavior to web pages. It is used to create responsive user interfaces, manipulate the DOM (Document Object Model), handle events, and perform asynchronous operations.
+    - "dynamic" means that JavaScript can change the content and structure of a web page in real-time (without manual compilation), allowing for a more interactive user experience.
+
+- **What is Just-in-Time (JIT) compilation?**
+
+  - Just-in-Time (JIT) compilation is a technique used by some JavaScript engines to improve performance by compiling JavaScript code into machine code at runtime. This allows for faster execution compared to interpreting the code line-by-line, as it optimizes frequently executed code paths.
+  - JIT compilation works by analyzing the code during execution, identifying hot spots (frequently executed code), and compiling them into optimized machine code. This results in improved performance for long-running scripts or applications.
+
+- **What is "ATS" in JavaScript?**
+
+  - "ATS" stands for "Abstract Syntax Tree." In JavaScript, an ATS is a tree representation of the structure of the source code. It is generated by the JavaScript engine during the parsing phase and is used to analyze and transform the code before execution.
+  - It's crucial for representing the code's syntax and semantics, enabling optimizations and transformations by the JavaScript engine.
+  - It's important for performance and optimization, as it allows the engine to analyze the code structure and apply various optimizations before execution.
+  - It's similar to the DOM (Document Object Model) but represents the code structure rather than the document structure.
+
+- **What is the difference between JavaScript and ECMAScript?**
+
+  - **JavaScript** is a programming language that implements the ECMAScript specification. It is widely used for web development and provides features for creating interactive web applications.
+  - **ECMAScript** is a standardized specification that defines the core features and syntax of the JavaScript language. It serves as a blueprint for JavaScript implementations, ensuring consistency across different environments.
+
+- **What is it meant by "JavaScript is a prototype-based language"?**
+
+  - In JavaScript, objects can inherit properties and methods from other objects through a mechanism called prototypal inheritance. This means that every object has a prototype, which is another object from which it can inherit properties and methods.
+  - When you access a property or method on an object, JavaScript first checks if it exists on the object itself. If not, it looks up the prototype chain until it finds the property or reaches the end of the chain (null).
+
+- **What is meant by that "JavaScript is a single-threaded language"?**
+
+  - JavaScript is a single-threaded language, meaning it executes code in a single sequence or thread. **This means that only one thing can happen at a time**, and long-running operations can block the execution of other code.
+  - However, JavaScript uses an event-driven model with an **event loop**, allowing it to handle asynchronous operations (like network requests or timers) without blocking the main thread.
+
+- **What is "Concurrency model" in JavaScript?**
+
+  - It's how JavaScript handles multiple tasks happening at the same time
+  - It's based on an event loop and a single-threaded execution model. It allows JavaScript to handle asynchronous operations without blocking the main thread.
+  - When an asynchronous operation (like a network request or a timer) is initiated, it is offloaded to the browser's APIs or the Node.js runtime. Once the operation completes, a callback function is queued in the event loop, which will be executed when the main thread is free.
+
+- **what is v8 in JS?**
+
+  - V8 is an open-source JavaScript engine developed by Google. It is used in the Chrome browser and Node.js runtime to execute JavaScript code. V8 compiles JavaScript into machine code at runtime, enabling fast execution and performance optimizations.
+  - It is responsible for executing JavaScript code in web browsers and server-side environments, providing features like (garbage collection, JIT compilation), and support for modern JavaScript standards.
+
+---
+
+### JS Web APIs
+
+- localstorage, sessionstorage, cookies, indexedDB
+
+  - **LocalStorage:** A web storage API that allows developers to store key-value pairs in a web browser with no expiration time. Data persists even after the browser is closed and reopened.
+    - Example: `localStorage.setItem('key', 'value');`
+  - **SessionStorage:** Similar to LocalStorage, but data is only available for the duration of the page session. It is cleared when the tab or browser is closed.
+    - Example: `sessionStorage.setItem('key', 'value');`
+  - **Cookies:** Small pieces of data stored by the browser that can be used for various purposes, such as session management or user preferences. Cookies have an expiration date and can be sent to the server with each HTTP request.
+    - Example: `document.cookie = "key=value; expires=Fri, 31 Dec 2023 23:59:59 GMT";`
+  - **IndexedDB:** A low-level API for client-side storage of significant amounts of structured data, including files/blobs. It allows for more complex queries and transactions compared to LocalStorage and SessionStorage.
+    - Example: Using IndexedDB involves creating a database, object stores, and transactions to read/write data.
+
+- **What is the difference between localStorage and sessionStorage?**
+
+  - **LocalStorage** is designed for long-term storage of key-value pairs in a web browser, with no expiration time. Data persists even after the browser is closed and reopened.
+  - **SessionStorage** is designed for temporary storage of key-value pairs that are only available for the duration of the page session. Data is cleared when the tab or browser is closed.
+
+- **What is the difference between History API and Location API?**
+
+  - **History API:** Provides methods to manipulate the browser's session history, allowing developers to change the URL without reloading the page. It includes methods like `pushState()`, `replaceState()`, and `go()`.
+    - Example: `history.pushState({ key: 'value' }, 'Title', '/new-url');`
+  - **Location API:** Represents the current URL of the document and provides properties and methods to access and modify it. It includes properties like `href`, `pathname`, and methods like `assign()` and `reload()`.
+    - Example: `location.href = 'https://example.com';`
+
+- **What is Intersection Observer API?**
+
+  - The Intersection Observer API is a web API that allows developers to asynchronously observe changes in the intersection of a target element with an ancestor element or the viewport. It is commonly used for implementing lazy loading of images, infinite scrolling, and triggering animations when elements come into view.
+  - It provides a way to efficiently monitor visibility changes without relying on scroll events, which can be performance-intensive.
+
+- **What is WebSockets API?**
+
+  - The WebSockets API provides a way to establish a persistent, bidirectional communication channel between a client (usually a web browser) and a server. It allows for real-time data exchange without the overhead of traditional HTTP requests.
+  - It uses technology that depends on:
+    - Handshake: The client initiates a WebSocket connection by sending an HTTP request with an `Upgrade` header to switch from HTTP to WebSocket protocol.
+    - Long/Short Polling: WebSockets can be seen as an alternative to long polling or short polling techniques, where the server can push updates to the client without requiring the client to continuously poll for new data.
+  - WebSockets are particularly useful for applications that require low-latency communication, such as chat applications, online gaming, and live updates.
+
+---
+
+## Frontend Dev
+
+- **How can you debug JavaScript code?**
+
+  - You can debug JavaScript code using various methods:
+    - **Browser Developer Tools:** Most modern browsers have built-in developer tools that allow you to inspect elements, view console logs, set breakpoints, and step through code.
+    - **Console Logging:** Using `console.log()` statements to output variable values and track the flow of execution.
+    - **Debugging Libraries:** Libraries like `debug` or `loglevel` can help manage logging levels and provide more structured debugging output.
+    - **Error Handling:** Implementing try-catch blocks to catch and handle errors gracefully.
+
+- **What is source maps in JavaScript? and how can you use them?**
+
+  - Source maps are files that map the transformed or minified code back to the original source code. They allow developers to debug their code more easily by providing a way to see the original source code in the browser's developer tools, even when the code has been transpiled or minified.
+  - Source maps are particularly useful when using tools like Babel or Webpack, which transform modern JavaScript syntax into a format compatible with older browsers.
+  - They can be used in the `sources` tab of the browser's developer tools, allowing developers to set breakpoints and inspect variables in the original source code rather than the transformed code.
+    ![Source Maps Example](./img/source-maps-example.png)
+
+---
+
+## Frontend
+
+### Frontend Rendering
+
+- **What is the difference between SSR and SSG and CSR and ISR?**
+
+  > They're methods of rendering web applications, each with its own advantages and use cases.
+
+  - **SSR (Server-Side Rendering):**
+
+    - In SSR, the server generates the HTML for a page **(on the fly)** and sends it to the client. This means that the initial page load is faster, as the browser receives fully rendered HTML (without any work). SSR is beneficial for SEO, as search engines can easily index the content.
+
+  - **CSR (Client-Side Rendering):**
+
+    - In CSR, the client (browser) downloads a minimal HTML file and then uses JavaScript to render the content dynamically. This can lead to slower initial page loads, but subsequent interactions are often faster since only data is fetched from the server.
+    - Here, the server doesn't do any rendering work. Instead, it serves a minimal HTML file, and the browser uses JavaScript to fetch data and render the content dynamically.
+
+  - **SSG (Static Site Generation):**
+
+    - In SSG, the HTML for each page is generated **(at build time)** and served as static files. This means that the content does not change unless the site is rebuilt. SSG is ideal for content that does not change frequently, as it allows for faster page loads and better performance.
+    - This means that both the server and the client don't do any rendering work at runtime. Instead, the server generates static HTML files for each page during the build process **(once)**, and these files are served directly to the client.
+
+  - **ISR (Incremental Static Regeneration)?**
+
+    - Incremental Static Regeneration (`ISR`) is a feature that allows developers to update static pages after the site has been built and deployed. It combines the benefits of `SSG` with the ability to update content without requiring a full rebuild of the site.
+    - With `ISR`, developers can specify a revalidation time for static pages, allowing them to be regenerated in the background while serving the cached version to users. This ensures that users always see up-to-date content without sacrificing performance.
+    - It's a hybrid of **(SSG and SSR)**, allowing for some pages to be statically generated at build time while others can be updated on demand or at specified intervals **(to keep content fresh)**.
+    - When to use ISR:
+      - When you have static content that needs to be updated periodically (e.g., blog posts, product listings in E-commerce).
+      - When you want to combine the performance benefits of static pages with the ability to refresh content without a full rebuild.
+
+- **What is Hydration in frontend development?**
+
+  - Hydration is the process of taking a server-rendered HTML page and attaching event listeners and JavaScript functionality to it on the client side. This allows the page to become interactive without requiring a full re-render.
+  - In frameworks like React, Vue, or Angular, hydration involves reusing the existing HTML structure generated by the server and enhancing it with client-side JavaScript to enable dynamic behavior.
+
+---
+
+### Frontend Performance
 
 - **What is frontend performance?**
 
@@ -841,9 +1014,103 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - Tracking events refers to capturing specific user actions (e.g., clicks, form submissions, page views) to gain insights into user engagement and performance. This data can be used to optimize user experience, improve conversion rates, and inform business decisions.
   - Common tools for web analytics and event tracking include Google Analytics, Mixpanel, Amplitude, and Segment.
 
+- **How to optimize first load of project?**
+
+  - Minimize HTTP requests by combining CSS and JavaScript files.
+  - Use a CDN to serve static assets from locations closer to users.
+  - Enable compression (e.g., Gzip or Brotli) to reduce file sizes.
+  - Optimize images by compressing them and using appropriate formats (e.g., `WebP`, `AVIF`).
+  - Lazy-load non-critical scripts.
+  - Implement lazy loading for images and videos to defer loading until they are in the viewport.
+    - `loading="lazy"` for images and iframes. instead of `loading="eager"` or no attribute.
+  - Minify CSS, JavaScript, and HTML files to reduce file sizes.
+  - Enable browser caching to store static assets locally for faster subsequent loads.
+  - Use `defer` or `async` attributes for script loading to prevent render-blocking.
+  - Use server-side rendering (SSR) or static site generation (SSG) for faster initial page loads.
+  - Use `preload` and `prefetch` for critical resources to prioritize their loading.
+
+    - they're used to optimize resource loading in web applications.
+    - `preload` is used to load resources that are needed immediately, such as fonts or critical CSS, before the browser starts rendering the page.
+    - `prefetch` is used to load resources that may be needed in the future, such as scripts or images for subsequent pages, allowing the browser to cache them for faster access later.
+
+    ```html
+    <link rel="preload" href="styles.css" as="style" />
+    <link rel="prefetch" href="next-page.html" />
+    ```
+
+  - Use Progressive Web App (PWA) Techniques, which include service workers for caching and offline capabilities, to enhance performance and user experience.
+
 ---
 
 ## FE Frameworks
+
+- **What is the problem that exist before FE frameworks?**
+
+  - Before frontend frameworks, web development relied heavily on traditional HTML, CSS, and JavaScript. This often led to challenges such as:
+    - **Code Duplication:** Repeated code across multiple pages, making maintenance difficult.
+    - **Global State Management:** Difficulty in managing application state across different components or pages.
+    - **Lack of Reusability:** Limited ability to create reusable components, leading to inconsistent UI and increased development time.
+    - **Complexity in DOM Manipulation:** Direct manipulation of the DOM using JavaScript was cumbersome and error-prone and produced boilerplate code.
+    - **Performance Issues:** Inefficient rendering and updates due to manual DOM manipulation.
+  - Frameworks like Vue.js, React, and Angular addressed these issues by providing:
+    - structured approaches to building web applications
+    - promoting component-based architecture
+    - improving code organization and maintainability.
+
+- **Why use a frontend framework?**
+
+  - It simplifies the development of complex web applications by providing a set of tools, conventions, and best practices that help developers build maintainable, scalable, and efficient user interfaces.
+  - It also addresses the challenges faced in traditional web development, such as code duplication, global state management, and complex DOM manipulation.
+  - It also has features like: `routing`, `state management`, `component lifecycle`, and `data binding`, which streamline the development process and enhance the user experience.
+  - It helps us write **declarative code** that describes what the UI should look like based on the current state of the application, rather than imperative code that describes how to manipulate the DOM directly.
+  - Separation of concerns using **components**, which encapsulate both structure (HTML) and behavior (JavaScript), making it easier to manage and maintain code.
+  - OOP principles like **encapsulation** and **inheritance** are applied to create reusable components that can be easily composed to build complex UIs.
+
+- **What are props and state in frontend frameworks?**
+
+  - **Props (Properties):** Props are read-only data passed from a parent component to a child component in frameworks like React and Vue.js. They allow components to receive data and configuration from their parent, enabling communication between components, and generic and reusable components.
+
+    - Example in React:
+
+      ```jsx
+      function ChildComponent(props) {
+        return <div>{props.message}</div>;
+      }
+
+      function ParentComponent() {
+        return <ChildComponent message='Hello, World!' />;
+      }
+      ```
+
+  - **State:** State is mutable data that belongs to a component and can change over time. It allows components to manage their own data and re-render when the state changes. In React, state is managed using the `useState` hook or class component state.
+
+    - Example in React:
+
+      ```jsx
+      import React, { useState } from 'react';
+
+      function Counter() {
+        const [count, setCount] = useState(0);
+
+        return (
+          <div>
+            <p>Count: {count}</p>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+          </div>
+        );
+      }
+      ```
+
+- **What is "Components", and why use them?**
+
+  - **Components** are reusable, self-contained pieces of UI that encapsulate both structure (HTML) and behavior (JavaScript). They allow developers to break down complex UIs into smaller, manageable parts, promoting code reusability and maintainability.
+  - Using components helps in:
+    - **Separation of Concerns:** Each component handles its own logic and presentation, making it easier to understand and maintain.
+    - **Reusability:** Components can be reused across different parts of the application, reducing code duplication.
+    - **Modularity:** Components can be developed and tested independently, improving collaboration among developers.
+    - **Scalability:** Applications can grow more easily by adding new components without affecting existing ones.
+
+---
 
 ### Vue
 
@@ -852,9 +1119,251 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - Vue.js is a progressive JavaScript framework for building user interfaces. It is designed to be incrementally adoptable, meaning you can use it to enhance existing projects or build new applications from scratch. Vue.js focuses on the view layer and provides a reactive data binding system, making it easy to create interactive and dynamic web applications.
 
 - **What are the key features of Vue.js?**
+
+  - **Declarative Rendering:** Vue.js uses a declarative syntax to render data to the DOM, allowing developers to describe how the UI should look based on the underlying data.
   - **Reactive Data Binding:** Vue.js provides a reactive data binding system that automatically updates the DOM when the underlying data changes, making it easy to create dynamic user interfaces.
   - **Component-Based Architecture:** Vue.js encourages the use of reusable components, allowing developers to encapsulate functionality and styles in self-contained units.
   - **Directives:** Vue.js provides built-in directives (e.g., `v-if`, `v-for`, `v-bind`) that allow developers to manipulate the DOM declaratively.
   - **Single-File Components:** Vue.js supports single-file components (SFCs) that combine HTML, CSS, and JavaScript in a single file, promoting better organization and maintainability.
   - **Vue Router:** A powerful routing library for managing navigation and URL handling in Vue.js applications.
   - **Vuex:** A state management library for managing application state in a centralized store, making it easier to share data between components.
+  - **Progressive Framework:** Vue.js can be used as a library to enhance existing projects or as a full-fledged framework for building complex applications. meaning that you can incrementally adopt Vue.js in your projects without having to rewrite everything from scratch.
+
+- **What is the difference between Vue.js and other frontend frameworks like React or Angular?**
+
+  - Vue.js is more opinionated and provides a complete solution out of the box, while React is more flexible and focuses on the view layer.
+  - Vue.js has a simpler learning curve compared to Angular, which is a full-fledged framework with a steeper learning curve.
+  - Vue.js uses a template-based syntax, while React uses JSX (JavaScript XML) for rendering components.
+  - Vue.js promotes a reactive data binding system, while Angular uses two-way data binding.
+  - Vue.js is lightweight and easy to integrate into existing projects, while Angular is a full-fledged framework with a steeper learning curve.
+  - Vue.js follows a component-based architecture, similar to React, but with a more opinionated structure compared to React's flexibility.
+  - Vue.js is flexible and can be used for both small and large applications, while Angular is more suited for large-scale applications with complex requirements.
+
+- **Is vue.js client ide or server side rendering framework?**
+
+  - Vue.js is primarily a client-side rendering framework, meaning it runs in the browser and updates the DOM dynamically based on user interactions and data changes. However, it can also be used for server-side rendering (SSR) with:
+    - frameworks like Nuxt.js, which allows rendering Vue components on the server before sending the HTML to the client. (this improves SEO and initial load performance)
+    - or with the official SSR package for Vue.js, which enables server-side rendering capabilities.
+
+- **What is Nuxt.js?**
+
+  - Nuxt.js is a framework built on top of Vue.js that simplifies the development of server-side rendered (SSR) applications and static websites. It provides a powerful set of features, including:
+    - automatic routing (file-based routing)
+    - server-side rendering (SSR) -> render pages on the server before sending them to the client, improving performance and SEO
+    - static site generation (SSG) -> generate full static HTML files at build time hosting them on a CDN
+    - Automatic code splitting
+    - Hot Module Replacement (HMR)
+    - server-side rendering, static site generation, and a modular architecture.
+  - Nuxt.js allows developers to create universal applications that can run both on the client and server, improving performance and SEO.
+
+- **What is Vue CLI?**
+
+  - Vue CLI (Command Line Interface) is a tool for scaffolding and managing Vue.js projects. It provides a set of commands and configurations to streamline the development process, including project setup, development server, build tools, and plugin management.
+
+- **What is binding and its types in Vue.js?**
+
+  - Binding in Vue.js refers to the process of linking data and the DOM, allowing changes in data to automatically update the UI and vice versa.
+  - There are several types of binding in Vue.js:
+
+    - **Interpolation**: One-way data binding that allows you to display data in the DOM using double curly braces (`{{ }}`).
+
+      ```html
+      <p>{{ message }}</p>
+      ```
+
+    - **`v-bind`**: One-way data binding that binds an attribute to a Vue instance property. It allows you to dynamically set attributes like `src`, `href`, and `class`.
+
+      ```html
+      <img v-bind:src="imageUrl" alt="Image" />
+      ```
+
+    - **`v-model`**: Two-way data binding that creates a two-way connection between form input elements and Vue instance properties. It automatically updates the data when the user interacts with the input.
+
+      ```html
+      <input v-model="username" type="text" />
+      ```
+
+    - **Event Binding**: Allows you to listen for user events (e.g., clicks, input changes) and execute methods in the Vue instance.
+
+      ```html
+      <button v-on:click="handleClick">Click Me</button>
+      ```
+
+- **What is the difference between interpolation and `v-text` in Vue.js?**
+
+  - **Interpolation** is a way to display data in the DOM using double curly braces (`{{ }}`). It is used for rendering text content and can include HTML entities, but it does not support HTML tags. **`v-text`** directive is used to update the text content of an element. It is similar to interpolation but does not allow HTML tags. It is useful when you want to set the text content of an element without using interpolation syntax.
+  - interpolation can cause flickering or re-rendering issues in some cases, while `v-text` directly updates the text content without causing such issues.
+  - interpolation is more versatile and can be used for both text and HTML content, while `v-text` is specifically for text content only.
+
+- **What are modifiers in Vue.js?**
+
+  - Modifiers in Vue.js are special postfixes denoted by a dot (`.`) that can be added to directives to modify their behavior. They allow you to apply additional functionality or transformations to directives without changing the underlying logic.
+  - Common modifiers include:
+
+    - **`.prevent`:** Prevents the default action of an event (e.g., preventing form submission).
+
+      ```html
+      <form v-on:submit.prevent="handleSubmit">...</form>
+      ```
+
+    - **`.stop`:** Stops the propagation of an event to parent elements.
+
+      ```html
+      <button v-on:click.stop="handleClick">Click Me</button>
+      ```
+
+    - **`.once`:** Ensures that the event handler is only called once.
+
+      ```html
+      <button v-on:click.once="handleClick">Click Me</button>
+      ```
+
+    - **`.self`:** Only triggers the event handler if the event was triggered on the element itself, not on its children.
+
+      ```html
+      <div v-on:click.self="handleClick">...</div>
+      ```
+
+    - **`.lazy`:** Used with `v-model` to update the data only when the input loses focus, rather than on every keystroke.
+
+      ```html
+      <input v-model.lazy="message" type="text" />
+      ```
+
+    - **`.trim`:** Used with `v-model` to automatically trim whitespace from the input value.
+
+      ```html
+      <input v-model.trim="message" type="text" />
+      ```
+
+- **What is the difference between `v-if` and `v-show` in Vue.js?**
+
+  - **`v-if`:** Conditionally renders an element based on the truthiness of the expression. If the expression evaluates to false, the element is not rendered in the DOM at all. This means that `v-if` has a higher performance cost when toggling visibility, as it involves adding or removing elements from the DOM.
+
+    ```html
+    <div v-if="isVisible">This is visible</div>
+    ```
+
+  - **`v-show`:** Toggles the visibility of an element by applying a CSS `display` property. The element remains in the DOM regardless of its visibility, making it more performant for toggling visibility frequently.
+
+    ```html
+    <div v-show="isVisible">This is visible</div>
+    ```
+
+- **What is computed properties in Vue.js?**
+
+  - Computed properties are reactive properties that are derived from other data properties in a Vue instance. They allow you to define complex logic that depends on reactive data, and they automatically update when the underlying data changes. Computed properties are **cached** based on their dependencies, meaning they are only recalculated when their dependencies change, improving performance.
+
+    ```javascript
+    new Vue({
+      data: {
+        firstName: 'John',
+        lastName: 'Doe'
+      },
+      computed: {
+        fullName() {
+          return `${this.firstName} ${this.lastName}`;
+        }
+      }
+    });
+    ```
+
+- **Why it will be best choice to use computed property rather than function in some cases?**
+
+  - **Caching:** Computed properties are cached based on their dependencies, meaning they are only recalculated when their dependencies change. This improves performance, especially for expensive calculations.
+  - **Declarative Syntax:** Computed properties provide a more declarative way to express derived data, making the code easier to read and maintain.
+  - **Reactivity:** Computed properties automatically update when their dependencies change, ensuring that the UI reflects the latest data without requiring manual updates.
+
+- **What are Directives in Vue.js?**
+
+  - Directives are special attributes in Vue.js that provide additional functionality to HTML elements. They are prefixed with `v-` and allow you to bind data, handle events, conditionally render elements, and manipulate the DOM.
+  - Common directives include:
+    - **Attribute directives** Binds an attribute to a Vue instance property.
+      - `v-bind`, `v-class`, `v-style`
+    - **Template directives:** Used to define templates that can be reused throughout other components using slotting.
+      - `v-slot`
+    - **Event directives:** Attaches event listeners to elements.
+      - `v-on`
+    - **Conditional directives:** Conditionally renders elements based on expressions.
+      - `v-if`, `v-else-if`, `v-else`
+    - **Looping directives:** Iterates over an array or object to render a list of items.
+      - `v-for`
+    - **Two way binding directives:** Creates two-way data binding for form inputs.
+      - `v-model`
+
+- **What is `v-clock` in Vue.js?**
+
+  - `v-cloak` is a directive used to hide un-compiled Vue templates until Vue is ready and fully initialized. It prevents the flickering of uncompiled templates when the page loads.
+  - To use `v-cloak`, you can add it to an element that contains Vue templates, and then define a CSS rule to hide elements with the `v-cloak` attribute until Vue is ready.
+
+    ```html
+    <div v-cloak>{{ message }}</div>
+
+    <style>
+      [v-cloak] {
+        display: none;
+      }
+    </style>
+    ```
+
+- **What is `v-slot` in Vue.js?**
+
+  - `v-slot` is a directive used to define named slots in Vue.js components. It allows you to create reusable components with customizable content by passing content from the parent component to the child component.
+  - Named slots enable you to specify different content for different parts of a component, making it more flexible and reusable.
+
+    ```html
+    <!-- Parent Component -->
+    <template>
+      <child-component>
+        <template v-slot:header>
+          <h1>Header Content</h1>
+        </template>
+        <template v-slot:footer>
+          <p>Footer Content</p>
+        </template>
+      </child-component>
+    </template>
+
+    <!------------------------------------------------------------------------------------->
+
+    <!-- Child Component -->
+    <template>
+      <div>
+        <slot name="header"></slot>
+        <p>Main Content</p>
+        <slot name="footer"></slot>
+      </div>
+    </template>
+    ```
+
+- **What is the difference between class-binding and style-binding in Vue.js?**
+
+  - **Class Binding:** Class binding allows you to dynamically add or remove CSS classes from an element based on the state of a Vue instance property. It can be done using the `v-bind:class` directive or the shorthand `:class`.
+
+    ```html
+    <div v-bind:class="{ active: isActive, 'text-danger': hasError }"></div>
+    ```
+
+  - **Style Binding:** Style binding allows you to dynamically apply inline styles to an element based on the state of a Vue instance property. It can be done using the `v-bind:style` directive or the shorthand `:style`.
+
+    ```html
+    <div v-bind:style="{ color: textColor, fontSize: fontSize + 'px' }"></div>
+    ```
+
+- **What is custom events in Vue.js?**
+
+  - Custom events in Vue.js allow child components to communicate with their parent components by **emitting events**. This is useful for passing data or triggering actions in the parent component based on user interactions in the child component.
+  - To create a custom event, you can use the `$emit` method in the child component, and then listen for that event in the parent component using the `v-on` directive or the shorthand `@`.
+
+    ```javascript
+    // Child Component
+    this.$emit('custom-event', payload);
+    ```
+
+    ```html
+    <!-- Parent Component -->
+    <child-component @custom-event="handleCustomEvent"></child-component>
+    ```
+
+- **What is Vuex?**
+  - Vuex is a state management library for Vue.js applications. It provides a centralized store to manage application state, making it easier to share data between components and maintain a predictable state flow. Vuex follows the Flux architecture pattern and includes features like mutations, actions, getters, and modules for organizing state.

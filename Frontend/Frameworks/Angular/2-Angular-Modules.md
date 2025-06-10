@@ -2,6 +2,7 @@
 
 - [INDEX](#index)
   - [Modules](#modules)
+    - [How Modules work (`NgModule`)](#how-modules-work-ngmodule)
     - [Module Types](#module-types)
     - [Why use Modules ?](#why-use-modules-)
   - [Creating and using modules](#creating-and-using-modules)
@@ -12,50 +13,74 @@
     - [HTTP Params](#http-params)
     - [HTTP Interceptors](#http-interceptors)
   - [Shared Module](#shared-module)
+  - [Standalone Components (NEW)](#standalone-components-new)
 
 ---
 
 ## Modules
 
-Angular uses modules to **bundle** different components into packages
-
-> Angular Team created a module system to group the code into different modules based on their functionality, which helps in organizing the code in a better way and makes it easier to manage and maintain the code
-
-It's a way to organize the code into different modules based on their functionality
+It's a way to organize the code into different modules based on their functionality, which helps in separating the code into different modules based on their functionality and makes it easier to manage and maintain the code
 ![module](./img/modules-0.png)
 
-- A single app can have multiple modules, each module can have multiple components, and each component can have multiple services.
+- A **module** is a container for a set of related components, services, directives, and pipes
+- An app can have multiple modules, each containing related components and services.
   ![structure](./img/modules-1.png)
-  - Instead of having to import each component and service individually, we can import the module that contains them, which makes it easier to manage the code, also we can use components and services from the same module without importing them explicitly, which makes the code cleaner and more organized
-- It's where we import components so that Angular knows that they exist
+
+  - Instead of importing each component or service individually, you import the module that contains them, making your code cleaner and easier to manage.
+
 - There're **built-in modules** in Angular like:
 
-  - `BrowserModule`
-    - provides services that are essential to launch the app in the browser
+  - `BrowserModule` **(⚠️ Required for every Angular app that uses modules)**
+    - provides services that are essential to launch the app in the browser _(e.g., Pipes, Directives, etc.)_
     - it's imported in the `app.module.ts` file
   - `CommonModule`
     - provides common directives like `ngIf` and `ngFor`
     - It's re-exported by `BrowserModule`, so when we import `BrowserModule` we actually import `CommonModule` as well
+  - `FormsModule`
+    - provides support for template-driven forms
 
-- The `@NgModule` decorator of the Module is used to define the module and its properties
-  ![module](./img/modules-3.png)
+---
 
-  - It takes a `metadata` object that tells Angular how to compile and launch the application **(like which components to compile, which services to provide, etc.)**
+### How Modules work (`NgModule`)
+
+The `@NgModule` decorator of the Module is used to define the module and its properties
+![module](./img/modules-3.png)
+
+- It takes a `metadata` object that tells Angular how to compile and launch the application **(like which components to compile, which services to provide, etc.)**
+
+  ```ts
+  @NgModule({
+    declarations: [AppComponent], // to declare components that belong to this module and need to be compiled
+    imports: [BrowserModule], // to import other modules that we will depend on (inside the module)
+    exports: [], // to export components to other modules (for shared modules)
+    providers: [], // to provide services
+    bootstrap: [AppComponent] // to bootstrap the app
+  })
+  ```
+
+- `declarations`
+  ![declarations](./img/modules-5.png)
+
+  - `declarations` is used to declare components, directives, and pipes that belong to this module and need to be compiled
+
+- `imports` & `exports`
+  ![imports](./img/modules-6.png)
+
+  - `imports` is used to import other modules/components that we will depend on (inside the module)
+  - `exports` is used to export components/directives/pipes that we want to make available to other modules that will import this module
+
+- **Notes:**
+
+  - You can't add a standalone component to the `declarations` array, as standalone components are not part of a module
+  - You can add a standalone component to the `imports` array, as it can be used in the module without the need for a module
+  - If you're using module for the root and not standalone components, you need to add the `bootstrap` property to the `@NgModule` decorator, which tells Angular which component to bootstrap when the app starts, and bootstrap the app with that module
 
     ```ts
-    @NgModule({
-      declarations: [AppComponent], // to declare components
-      imports: [BrowserModule], // to import other modules that we will depend on (inside the module)
-      exports: [], // to export components to other modules (for shared modules)
-      providers: [], // to provide services
-      bootstrap: [AppComponent] // to bootstrap the app
-    })
+    // main.ts 📄
+    platformBrowserDynamic()
+      .bootstrapModule(AppModule)
+      .catch(err => console.error(err));
     ```
-
-  - `declarations`
-    ![declarations](./img/modules-5.png)
-  - `imports` & `exports`
-    ![imports](./img/modules-6.png)
 
 ---
 
@@ -486,3 +511,76 @@ A shared module is a module that contains the common components, directives, and
     })
     export class AppModule {}
     ```
+
+---
+
+## Standalone Components (NEW)
+
+It's a new feature in Angular that allows you to create components **without the need for a module**. This means that you can create a component and use it directly in your application without having to create a module for it.
+
+> Before **Angular 14**, every component had to be declared in a module, which made the codebase more complex and harder to manage. With standalone components, you can create components that are self-contained and can be used directly in your application without the need for a module.
+>
+> Now, Standalone components are the recommended way to create components in Angular, as they simplify the codebase and make it easier to manage and maintain the code.
+>
+> Note: You can still use modules in Angular, and you can mix standalone components with modules in your application. However, it's recommended to use standalone components for new components that you create in your application.
+
+- **Creating a standalone component**
+
+  - To create a standalone component, use the `--standalone` flag with the `ng generate component` command
+
+    ```bash
+    ng g c my-component --standalone
+    ```
+
+  - This will create a new component in the `my-component` folder and add the `standalone: true` property to the component decorator
+
+    ```ts
+    // my-component.component.ts
+    import { Component } from '@angular/core';
+
+    @Component({
+      selector: 'app-my-component',
+      templateUrl: './my-component.component.html',
+      styleUrls: ['./my-component.component.css'],
+      standalone: true // this makes the component standalone
+    })
+    export class MyComponentComponent {
+      // component logic
+    }
+    ```
+
+- **Using a standalone component**
+
+  - To use a standalone component, you can import it directly into another component or module without the need for a module
+
+    ```ts
+    // app.component.ts
+    import { Component } from '@angular/core';
+    import { MyComponentComponent } from './my-component/my-component.component';
+
+    @Component({
+      selector: 'app-root',
+      template: `
+        <app-my-component></app-my-component>
+      `, // use the standalone component here
+      imports: [MyComponentComponent] // import the standalone component here
+    })
+    export class AppComponent {
+      // component logic
+    }
+    ```
+
+  - In order to use comopnents in the template of a standalone component, you need to import them in the `imports` array of the component decorator. This is similar to how you would import modules in a module file. Also you can import `modules` in the `imports` array of the component decorator, which allows you to use the directives and pipes provided by those modules in the template of the standalone component.
+
+- **Benefits of standalone components**
+  - **Simplified Structure**: Standalone components reduce the need for modules, making the codebase simpler and easier to understand.
+  - **Improved Performance**: They can lead to better performance by reducing the overhead of module loading.
+  - **Easier Testing**: Standalone components can be tested in isolation without the need for a module context.
+  - **Flexibility**: They allow for more flexible component usage across different parts of the application without being tied to a specific module.
+- **Limitations**
+  - Standalone components are still a relatively new feature, and some advanced use cases may require modules (e.g., complex dependency injection scenarios).
+  - Not all Angular features are compatible with standalone components, so it's important to check the documentation for any limitations.
+- **Conclusion**
+  - Standalone components are a powerful feature in Angular that allows you to create components without the need for a module, making the codebase simpler and easier to understand.
+  - They can be used directly in other components or modules, and they can be tested in isolation without the need for a module context.
+  - However, they are still a relatively new feature, and some advanced use cases may require modules.

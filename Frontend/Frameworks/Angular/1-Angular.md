@@ -2,6 +2,7 @@
 
 - [INDEX](#index)
   - [Angular](#angular)
+    - [Angular History](#angular-history)
     - [How Angular works (Compilation)](#how-angular-works-compilation)
     - [Folders and files Structure](#folders-and-files-structure)
   - [Installation \& Updating (Angular CLI)](#installation--updating-angular-cli)
@@ -21,10 +22,20 @@
     - [Inline style](#inline-style)
     - [External styles](#external-styles)
     - [Dynamic classes](#dynamic-classes)
+    - [Encapsulated styles](#encapsulated-styles)
+  - [State](#state)
+    - [State Management](#state-management)
+    - [Zone.js](#zonejs)
+    - [Signals](#signals)
+      - [How to use Signals?](#how-to-use-signals)
+      - [Signals Input and Output](#signals-input-and-output)
+    - [Signals vs Zone.js](#signals-vs-zonejs)
   - [Data-Binding](#data-binding)
+    - [String Interpolation](#string-interpolation)
     - [Property Binding](#property-binding)
     - [Event Binding](#event-binding)
     - [2-way-binding](#2-way-binding)
+    - [Data Binding Notes](#data-binding-notes)
   - [Directives](#directives)
     - [Attribute Directives](#attribute-directives)
     - [Structural Directives](#structural-directives)
@@ -33,8 +44,8 @@
       - [Custom Attribute Directive](#custom-attribute-directive)
       - [Custom Structural Directive](#custom-structural-directive)
   - [Data flow between components](#data-flow-between-components)
-    - [Parent to Child (Passing data)](#parent-to-child-passing-data)
-    - [Child to Parent (Emitting events)](#child-to-parent-emitting-events)
+    - [Parent to Child (Passing data / Input / Props)](#parent-to-child-passing-data--input--props)
+    - [Child to Parent (Emitting events / Output)](#child-to-parent-emitting-events--output)
     - [Local Reference (Template variable)](#local-reference-template-variable)
     - [Content projection (Slots)](#content-projection-slots)
       - [Single-slot content projection](#single-slot-content-projection)
@@ -64,55 +75,100 @@ Angular is a `framework` for building **reactive** web applications.
 > "reactive" means that the app responds to user input and changes in the environment in real-time (by manipulating the **DOM**)
 
 - It's a **framework** because it provides a lot of things out of the box like `routing`, `forms`, `http` libraries, etc.
+- It's also a **collection of tools** that help you build web applications, like `Angular CLI`, `Debugger`, `DevTools`, `IDE Plugins`, etc.
 - Code is written in `Typescript`, and Templates are written in Angular template syntax (which is a superset of `HTML` with Angular-specific syntax).
+
+---
+
+### Angular History
+
+![Angular History](./img/angular-history.png)
+
+1. Angular was created by Google in 2010 as a JavaScript framework called `AngularJS` (or Angular 1)
+2. In 2016, Google released a complete rewrite of AngularJS called `Angular` (or Angular 2+), which is a TypeScript-based framework
+
+   - Angular 2+ is a complete rewrite of AngularJS, and it's not backward compatible with AngularJS
+   - It's based on **Modules** and **Components** architecture, which makes it more modular and easier to maintain
+
+3. Angular has been continuously updated since then, with new versions released every 6 months
+   - But note that any new version of Angular is backward compatible with the previous version, so you can upgrade your app to the latest version without breaking it
+4. The latest version of Angular is `Angular 20` (May 2025), which is the latest stable version at the time of writing this document
+   - Since Angular 16, Angular moved
 
 ---
 
 ### How Angular works (Compilation)
 
-- This is how Angular works under the hood
+This is how Angular works under the hood
 
-  ![compilation](./img/compilation-1.png)
+1. When you run the `ng serve` command, Angular CLI starts a development server that serves the app, and compiles the app code into JavaScript code that the browser can understand
+   ![compilation](./img/compilation-1.png)
 
-  - The server sends the `index.html` file to the browser (Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)
-  - The `main.ts` file bootstraps the `AppModule` and starts the app
+2. The server sends the `index.html` file to the browser **(Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)**
+   ![compilation](./img/compilation-2.png)
+
+   - The `main.ts` file bootstraps the `AppModule` and starts the app
+
+     ```ts
+     // main.ts 📄
+     import { bootstrapApplication } from '@angular/platform-browser';
+     import { AppModule } from './app/app.module'; // or import the main component directly
+
+     // bootstrap the AppModule and start the app
+     bootstrapApplication(AppModule).catch(err => console.error(err));
+     ```
+
+3. The `AppModule` is the main module of the app, and it imports all the other modules and components that are needed for the app to work
+
+   ```ts
+   // app.module.ts 📄
+   // import the necessary modules and components and services
+
+   @NgModule({
+     declarations: [AppComponent], // declare the components that are used in the app
+     imports: [BrowserModule, AppRoutingModule, FormsModule], // import the modules that are needed for the app
+     providers: [AppService], // provide the services that are used in the app
+     bootstrap: [AppComponent] // bootstrap the main component of the app
+   })
+   export class AppModule {}
+   ```
 
 > **Compilation** is the process of converting the Angular code into `Javascript` code that the browser can understand
 
 - **There are 2 types of compilation strategies in Angular:**
 
-  - Just-in-time compilation
-    ![Just-in](./img/justintime.PNG)
+- Just-in-time compilation
+  ![Just-in](./img/justintime.PNG)
 
-    - Here, the server compiles typescript code into javascript code
-    - Then, the browser downloads the javascript code (including the Angular framework) and runs & compiles it
-    - This is the default compilation strategy in Angular
-    - It's good for development because it's faster to compile and run the app, but it's slower for the browser to load and run the app
-    - It's good for small to medium-sized apps
-    - It's not used in production because it's slower for the browser to load and run the app
+  - Here, the server compiles typescript code into javascript code
+  - Then, the browser downloads the javascript code (including the Angular framework) and runs & compiles it
+  - This is the default compilation strategy in Angular
+  - It's good for development because it's faster to compile and run the app, but it's slower for the browser to load and run the app
+  - It's good for small to medium-sized apps
+  - It's not used in production because it's slower for the browser to load and run the app
 
-  - Ahead-of-time compilation
-    ![head-of](./img/headoftime.PNG)
+- Ahead-of-time compilation
+  ![head-of](./img/headoftime.PNG)
 
-    - Here, the server compiles typescript code into javascript code (same as JIT)
-    - Then, the server compiles the javascript code into a bundle that the browser can understand
-    - The browser downloads the bundle and runs it immediately (no need to compile it)
-    - It's good for production because it's faster for the browser to load and run the app
+  - Here, the server compiles typescript code into javascript code (same as JIT)
+  - Then, the server compiles the javascript code into a bundle that the browser can understand
+  - The browser downloads the bundle and runs it immediately (no need to compile it)
+  - It's good for production because it's faster for the browser to load and run the app
 
-    - It's faster and more efficient ✅
-      ![jit-aot](./img/jit-vs-aot.PNG)
+  - It's faster and more efficient ✅
+    ![jit-aot](./img/jit-vs-aot.PNG)
 
 - selecting platform to run the app (`Compilation Strategy`)
 
-  ![jit-aot](./img/jit-vs-aot2.PNG)
+![jit-aot](./img/jit-vs-aot2.PNG)
 
 - **Note:** Starting from Angular 18, the default compilation strategy is `AOT` (Ahead-of-time compilation), and no need to specify it in the `angular.json` file
 
 - **Incremental DOM**
-  - it's a technique used by Angular to update the DOM efficiently
-  - Angular keeps a copy of the DOM in memory, and when the data changes, Angular compares the new DOM with the old DOM and only updates the parts that have changed
-  - It's similar to `Virtual DOM` in `React` but more efficient
-  - Read this [article](https://medium.com/@mubeennaeem247/angular-incremental-dom-bcae3db06108) for more information
+- it's a technique used by Angular to update the DOM efficiently
+- Angular keeps a copy of the DOM in memory, and when the data changes, Angular compares the new DOM with the old DOM and only updates the parts that have changed
+- It's similar to `Virtual DOM` in `React` but more efficient
+- Read this [article](https://medium.com/@mubeennaeem247/angular-incremental-dom-bcae3db06108) for more information
 
 ---
 
@@ -122,50 +178,62 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 
 - **File structure**
 
-  - `app` folder : contains all the components, services, and modules
-    - `app/app.component.html` : the html file for the main component
-    - `app/app.component.ts` :
-      - the main component of the app
-      - it has the content that would be in the `app-root` tags in `index.html`
-        - target can be html-code or `templateUrl` containing path for html file
-    - `app/app-routing.module.ts` : the routing module of the app
-    - `app/app.service.ts` : the main service of the app
-      - it's a class that can be injected into components and contains code that (fetches/stores/update) data
-    - `app/app.module.ts` : the main module of the app
-      - It's a gate to import the main app components and services
-        ![app-module](./img/file-structure-2.png)
-  - `assets` : contains all the static files like images, fonts, etc.
-  - `environments` : contains the environment files for the app
-  - `styles.css` : contains the global styles for the app
-  - `index.html` : the main html file for the app
-  - `main.ts` : the main typescript file that starts the app
-    - it contains the `bootstrapModule` function that bootstraps the `AppModule` -> starts up `app.module.ts`, So we need to register the main module here.
-  - `polyfills.ts` : contains the polyfills for the app (features that are not supported in all browsers)
-  - `tsconfig.json` : contains the typescript configuration for the app
-  - `angular.json` : contains the configuration for the app (like build settings, etc.)
-    - The most important part in this file is the `"architect"` object, which contains the build configurations for the app
-      ![file-structure](./img/config-1.png)
+- `app` folder : contains all the components, services, and modules
+  - `app/app.component.html` : the html file for the main component
+  - `app/app.component.ts` :
+    - the main component of the app
+    - it has the content that would be in the `app-root` tags in `index.html`
+      - target can be html-code or `templateUrl` containing path for html file
+  - `app/app-routing.module.ts` : the routing module of the app
+  - `app/app.service.ts` : the main service of the app
+    - it's a class that can be injected into components and contains code that (fetches/stores/update) data
+  - `app/app.module.ts` : the main module of the app
+    - It's a gate to import the main app components and services
+      ![app-module](./img/file-structure-2.png)
+- `assets` : contains all the static files like images, fonts, etc.
+- `environments` : contains the environment files for the app
+- `styles.css` : contains the global styles for the app
+- `index.html` : the main html file for the app
+- `main.ts` : the main typescript file that starts the app
+  - it contains the `bootstrapModule` function that bootstraps the `AppModule` -> starts up `app.module.ts`, So we need to register the main module here.
+- `polyfills.ts` : contains the polyfills for the app (features that are not supported in all browsers)
+- `tsconfig.json` : contains the typescript configuration for the app
+- `angular.json` : contains the configuration for the app (like build settings, etc.)
+
+  - The most important part in this file is the `"architect"` object, which contains the build configurations for the app
+    ![file-structure](./img/config-1.png)
 
 - Example
   ![structure](./img/file-structure-1.png)
 
 - **Images**
 
-  - external images (hosted on different server) -> just need `url` in the `src` attribute
+- external images (hosted on different server) -> just need `url` in the `src` attribute
 
-    ```html
-    <img src="https://example.com/image.jpg" />
-    ```
+  ```html
+  <img src="https://example.com/image.jpg" />
+  ```
 
-  - local images **(assets folder)** -> need to use `src` attribute with the path of the image in the `assets` folder
+- local images **(assets folder)** -> need to use `src` attribute with the path of the image in the `assets` folder
 
-    ```html
-    <img src="assets/image.jpg" />
+  ```html
+  <img src="assets/image.jpg" />
+  ```
+
+  - **⚠️ Note:** If you don't see the image, make sure that the path is added in `angular.json` file in the `assets` array
+
+    ```json
+    "assets": [
+      "src/favicon.ico",
+      "src/assets"
+    ]
     ```
 
 ---
 
 ## Installation & Updating (Angular CLI)
+
+**Angular CLI** is a command-line interface tool that helps you to create, develop, and maintain Angular applications.
 
 ### Installation
 
@@ -175,9 +243,9 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
 
 - Installing `Angular CLI` globally to use it in the terminal
 
-  ```bash
-  npm install -g @angular/cli
-  ```
+```bash
+npm install -g @angular/cli
+```
 
 - ng-commands
 
@@ -195,6 +263,9 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
   ng generate component <name of component>
   # Generating new module
   ng generate module <name of module>
+
+  # To skip creating test files for the component/module
+  ng generate component <name of component> --skip-tests
   ```
 
 - modules generated with `cli` are not registered in the app so you need import the module into the `app.module`
@@ -275,7 +346,8 @@ A component should present properties and methods for data binding, in order to 
   @Component({
     selector: 'app-nav', // the new html tag that will represent this component -> <app-nav></app-nav>
     templateUrl: './nav.component.html',
-    styleUrls: ['./nav.component.css']
+    styleUrls: ['./nav.component.css'],
+    standalone: false // if true, the component can be used without being declared in a module (default is true starting from Angular 19)
   })
   export class NavComponent {}
   ```
@@ -319,6 +391,31 @@ A component should present properties and methods for data binding, in order to 
   ```
 
   - When using the component, you must match the `selector` with the name of the component -> `app-nav`
+  - It's a good practice to use the `app-` prefix for the component selector to avoid conflicts with native HTML elements, ex: `app-header` instead of `header` which will conflict with the native HTML `<header>` element
+  - we can also overwrite the `selector` to be any type of selector like `class` or `attribute` selector (also you can use combinators like `tag.class` or `tag[attribute]`)
+
+    ```ts
+    @Component({
+      selector: '.app-nav', // class selector
+      // or
+      selector: '[app-nav]' // attribute selector
+    })
+    ```
+
+    ```html
+    <!-- class selector -->
+    <div class="app-nav"></div>
+    <!-- attribute selector -->
+    <div app-nav></div>
+    ```
+
+  - Also you can have multiple selectors for the same component by using an array of selectors
+
+    ```ts
+    @Component({
+      selector: ['app-nav', '.app-nav', '[app-nav]'] // multiple selectors
+    })
+    ```
 
 - **Notes:**
 
@@ -399,6 +496,9 @@ A component should present properties and methods for data binding, in order to 
       this.title = 'My App';
     }
     ```
+
+- It's the **state** of the component, and it can be changed by the user or by the component itself
+  - It's different from state in React, where we use `useState` hook to manage the state of the component, but in Angular, we just declare the properties in the component class and use them in the template
 
 ---
 
@@ -541,6 +641,13 @@ The `style` attribute can be used to add inline styles to an element
   <button [ngStyle]="{color: isRed ? 'red' : 'blue'}">Click me</button>
   ```
 
+- or you can use the `style` binding to add styles dynamically
+
+  ```html
+  <button [style.color]="currentColor">Click me</button>
+  <!-- Here, `currentColor` is a property in the component class, and we want to add its value as a style to the button element -->
+  ```
+
 ---
 
 ### External styles
@@ -575,24 +682,24 @@ The `style` attribute can be used to add inline styles to an element
   }
   ```
 
-- In order to select the component in the `app.component.css` file, you can use the `:host` pseudo-class
+- **Host Element**
+  ![Host Element](./img/host-element.png)
+
+  - Every component has a **host element** that is the root element of the component in the DOM
+  - The host element is the element that is used to render the component in the DOM, and it can be selected using the `:host` pseudo-class in the CSS file of the component
+
+  ```html
+  <!-- in app.component.html -->
+  <h1>My App</h1>
+  <button>Click me</button>
+  ```
 
   ```css
   /* in app.component.css */
-
-  /* This will work only for the app.component ✅ */
   :host {
-    display: block;
-    border: 1px solid black;
+    display: block; /* This will apply to the host element */
+    border: 1px solid black; /* This will apply to the host element */
   }
-
-  /* This won't work ❌ because it's a child of the app.component */
-  app-root {
-    display: block;
-    border: 1px solid black;
-  }
-
-  /* Note: in `styles.css` you can use the `app-root` selector normally ✅ */
   ```
 
 ---
@@ -609,13 +716,15 @@ The `style` attribute can be used to add inline styles to an element
 
   ```html
   <button [class]="classNames">Click me</button>
-  <!-- Here, classNames is a property in the component class, and we want to add its string value as a class to the button element -->
+  <!-- Here, `classNames` is a property in the component class, and we want to add its string value as a class to the button element -->
   ```
 
-- To add classes dynamically, you can use the `ngClass` directive
+- To add classes dynamically, you can use the `ngClass` or `class` binding
 
   ```html
-  <button [ngClass]="{error: isError}">Error Button</button>
+  <button [ngClass]="{btn-error: isError}">Error Button</button>
+  <!-- or -->
+  <button [class]="{'btn-error': isError}">Error Button</button>
   ```
 
   - It's a common pattern to use a method in the component class to return the classes
@@ -641,6 +750,197 @@ The `style` attribute can be used to add inline styles to an element
     }
     ```
 
+- ✅ Or to dynamically add classes based on a condition, you can use the `class.<class-name>` syntax
+
+  ```html
+  <button [class.btn-error]="isError">Error Button</button>
+  <!-- conditionaly adding the class btn-error if isError is true -->
+  ```
+
+---
+
+### Encapsulated styles
+
+Sometimes you want to apply styles to a component, but you don't want those styles to affect other components. In Angular, you can use **encapsulated styles** to achieve this.
+
+- **Encapsulated styles** are styles that are applied only to the component and its children, and they don't affect other components
+- This is done by using the `ViewEncapsulation` property in the `@Component` decorator
+
+  ```ts
+  import { Component, ViewEncapsulation } from '@angular/core';
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    encapsulation: ViewEncapsulation.Emulated // default value 👈
+  })
+  export class AppComponent {}
+  ```
+
+- It has 3 possible values:
+  - `ViewEncapsulation.Emulated` (default): styles are encapsulated and don't affect other components
+  - `ViewEncapsulation.None`: styles are applied **globally** and affect all components
+  - `ViewEncapsulation.ShadowDom`: styles are encapsulated using Shadow DOM, which is a web standard that allows you to create a separate DOM tree for the component
+
+---
+
+## State
+
+**State** in Angular refers to the data that is used by the component to render the view. It's similar to `state` in React, where we use `useState` hook to manage the state of the component, but in Angular, we just declare the properties in the component class and use them in the template.
+
+### State Management
+
+- There're multiple approaches to manage state in Angular:
+  ![State](./img/state-1.png)
+  - Relying on `Zone.js`
+  - Using a state management library like `NgRx` or `Akita`
+  - Uing **Signals**
+
+---
+
+### Zone.js
+
+It's a library that Angular uses to detect changes in the component state and update the view accordingly. It patches the `JavaScript` event loop and detects when an event occurs, and then it triggers change detection in Angular.
+
+It's invisible grouping mechanism that allows Angular to know when to update the view. It works by monkey-patching the `JavaScript` event loop and detecting when an event occurs, and then it triggers change detection in Angular.
+
+- **How does Angular's Change Detection Works with state/properties?**
+
+  - Angular uses a change detection mechanism to detect changes in the component state and update the view accordingly
+    ![change-detection](./img/change-detection-1.png)
+  - When a property in the component class changes, Angular automatically updates the view to reflect the new value of the property
+  - This is done using [`Zone.js`](https://www.npmjs.com/package/zone.js), which is a library that Angular uses to detect changes in the component state
+    ![zone](./img/zone-1.webp)
+    - This means that when an event occurs, Angular will check if any of the component properties have changed, and if so, it will update the view accordingly
+      ![zone](./img/zone-2.webp)
+    - This is done automatically, so you don't need to worry about it, but it's good to know how it works under the hood
+
+---
+
+### Signals
+
+**Signals** are a new way to manage state in Angular, introduced in Angular 16, which allows you to create **reactive state** that can be used in the component template and automatically updates the view when the state changes.
+
+- Signals are similar to
+  - `useState` in React, but they are more powerful and flexible
+  - `ref` in Vue, but they are more efficient and easier to use
+- They're like a **container** that contains a value, and when the value changes, Angular is notified and updates the view accordingly wherever the signal is used
+  ![Signals](./img/signals-1.png)
+
+- **Signals are automatically tracked by Angular**, so when the signal value changes, Angular will update the view accordingly
+- It's better than using `Zone.js` because it doesn't require any monkey-patching of the `JavaScript` event loop, and it's more efficient because it only updates the view when the signal value changes
+  > "monkey-patching" means modifying the behavior of a function or object at runtime, which can lead to performance issues and bugs
+
+#### How to use Signals?
+
+- `signal()`
+
+  - You can create a signal using the `signal` function from the `@angular/core` package
+
+    ```ts
+    import { signal } from '@angular/core';
+
+    // Create a signal with an initial value
+    const count = signal(0);
+    ```
+
+  - You can use the signal in the component template using the `{{}}` syntax, **and you have to call the signal as a function to get its value**
+
+    ```html
+    <p>Count: {{ count() }}</p>
+    ```
+
+  - You can update the signal value using the `set` method
+
+    ```ts
+    count.set(count() + 1);
+    ```
+
+- `computed()`
+
+  - You can create a computed signal that depends on other signals using the `computed` function
+
+    ```ts
+    import { computed } from '@angular/core';
+
+    const doubleCount = computed(() => count() * 2);
+    ```
+
+  - You can use the computed signal in the component template using the `{{}}` syntax, **and you have to call the computed signal as a function to get its value**
+
+    ```html
+    <p>Double Count: {{ doubleCount() }}</p>
+    ```
+
+  - It will only be re-evaluated when the signals it depends on change, so it's more efficient than using a method that returns a value
+
+---
+
+#### Signals Input and Output
+
+- **`input`**
+
+  - You can use signals as input properties in a component by using the `input` decorator (it's lowercase unlike `@Input()` decorator)
+
+    ```ts
+    import { Component, input } from '@angular/core';
+
+    @Component({
+      selector: 'app-child',
+      template: `
+        <h2>{{ title }}</h2>
+        <p>Child Count: {{ count() }}</p>
+      `
+    })
+    export class ChildComponent {
+      title = input.required<string>(); // create a required input signal
+      count = input<number>(); // create an input signal
+    }
+    ```
+
+- **`output`**
+
+  - You can use signals as output properties in a component by using the `output` decorator (it's lowercase unlike `@Output()` decorator)
+
+    ```ts
+    import { Component, output } from '@angular/core';
+
+    @Component({
+      selector: 'app-child',
+      template: `
+        <button (click)="increment()">Increment</button>
+      `
+    })
+    export class ChildComponent {
+      count = output<number>(); // create an output signal
+
+      increment() {
+        this.count.emit(this.count() + 1); // emit the new value of the count signal
+      }
+    }
+    ```
+
+  - **⚠️ Note:** It doesn't create a signal, it just creates an output property that can be used to emit values from the component
+
+- **2 way binding**
+
+  - You can use signals for 2-way binding with `ngModel` normally as Angular will detect that we're using signals and will update the view accordingly, and no need to use `()` syntax
+
+    ```html
+    <input [(ngModel)]="count" />
+    <p>Count: {{ count() }}</p>
+    ```
+
+---
+
+### Signals vs Zone.js
+
+- `Signals` are more efficient than `Zone.js` because they only update the view when the `signal` value changes, while `Zone.js` updates the view whenever an event occurs
+- `Signals` are more powerful than `Zone.js` because they allow you to create reactive state that can be used in the component template and automatically updates the view when the state changes
+- `Signals` are easier to use than `Zone.js` because they don't require any monkey-patching of the `JavaScript` event loop, and they are more intuitive to use
+
+**Note:** Signals are still an experimental feature in Angular, and they are not yet widely used in production apps. But they are expected to become the standard way to manage state in Angular in the future.
+
 ---
 
 ## Data-Binding
@@ -650,13 +950,27 @@ The `style` attribute can be used to add inline styles to an element
 ![data binding](./img/databinding2.PNG)
 ![data binding](./img/databinding.PNG)
 
-> **String-interpolation**: it's a way to display data in the template using `{{}}` syntax
+### String Interpolation
+
+It's a way to display data in the template using `{{}}` syntax
+
+- It's a one-way data binding from the component to the template
+
+```html
+<p>{{ property_x }}</p>
+```
+
+- Here, we are binding the `property_x` from the component class to the template, so that when the value of `property_x` changes, the template will be updated automatically
+
+---
 
 ### Property Binding
 
-It sets a property on an HTML element. It's a one-way data binding from the component to the template using `properties / methods` from the component class
+It's a way to bind the properties of an HTML element to the properties of the component class
 
-- t's like `Attribute Directives` as if the value is true you will add the attribute/class to the html element
+- It's a one-way data binding from the component to the template using **square brackets `[]`** around the property name
+
+- It's like `Attribute Directives` as if the value is true you will add the attribute/class to the html element
   ![property](./img/property-binding-1.png)
 
 - Here, we **bind** the property of an element to a property in the component class
@@ -690,7 +1004,7 @@ It sets a property on an HTML element. It's a one-way data binding from the comp
 
 ### Event Binding
 
-It sets up an event handler on an HTML element. It's a one-way data binding from the template to the component using `methods` from the component class
+It's a way to bind an event of an HTML element to a method in the component class by setting up an event handler on the element using **parentheses `()`** around the event name
 
 - Here we write events-attribute in the html element and call a method from the class
   ![event](./img/event-binding-1.png)
@@ -726,6 +1040,8 @@ It sets up an event handler on an HTML element. It's a one-way data binding from
 ### 2-way-binding
 
 - it's the ability to being able to listen to events and update a property simultaneously
+- It's usually used with form elements like `input`, `select`, and `textarea`
+- It's a combination of property binding and event binding, and it's done using the `ngModel` directive
 
   ```html
   <input [(ngModel)]="name" />
@@ -736,9 +1052,55 @@ It sets up an event handler on an HTML element. It's a one-way data binding from
   <p>{{ name }}</p>
   ```
 
-- here the `ngModel` directive is doing 2 tasks:
-  - set value of the attribute with property-binding
-  - **Emit an event** when the property changes in the template
+  - here the `ngModel` directive is doing 2 tasks:
+    - set value of the attribute with property-binding
+    - **Emit an event** when the property changes in the template
+
+- **⚠️ Note:** In order to use `ngModel`, you need to import the `FormsModule` in the `app.module.ts` file
+
+  ```ts
+  import { FormsModule } from '@angular/forms';
+
+  @NgModule({
+    declarations: [AppComponent],
+    imports: [BrowserModule, FormsModule], // import the FormsModule here 👈
+    providers: [],
+    bootstrap: [AppComponent]
+  })
+  export class AppModule {}
+  ```
+
+---
+
+### Data Binding Notes
+
+- It's a good practice to make binded values in the template as simple as possible, so that the template is easy to read and understand, So if you have a complex expression, it's better to move it to a method in the component class and call that method in the template
+
+  ```html
+  <!---------------------------- ❌ ---------------------------->
+  <!-- in template -->
+  <p>{{ firstName + ' ' + lastName }}</p>
+
+  <!---------------------------- ✅ ---------------------------->
+  <!-- in template -->
+  <p>{{ getFullName() }}</p>
+
+  <!-- in component class -->
+  getFullName() { return `${this.firstName} ${this.lastName}`; }
+  ```
+
+  - Also you can make the method a `getter` so that it can be used as a property in the template
+
+    ```ts
+    get fullName() {
+      return `${this.firstName} ${this.lastName}`;
+    }
+    ```
+
+    ```html
+    <!-- in template -->
+    <p>{{ fullName }}</p>
+    ```
 
 ---
 
@@ -818,36 +1180,87 @@ It sets up an event handler on an HTML element. It's a one-way data binding from
 - it starts with `*` and it's a `directive` that changes the structure of the DOM
 - Angular makes the content inside of `<ng-template>` become hidden but Angular will be aware of it so that it can be used based on condition
 
-- `*ngIf`
+- **Angular <= 16**
 
-  ```html
-  <!-- this element "<p>" will only show if the property "blueClass=True" -->
-  <p *ngIf="blueClass">the button is blue</p>
-  ```
+  - `*ngIf`
 
-- `*ngFor`
+    ```html
+    <!-- this element "<p>" will only show if the property "blueClass=True" -->
+    <p *ngIf="blueClass">the button is blue</p>
+    ```
 
-  ```html
-  <ul>
-    <li *ngFor="let item of items">{{ item }}</li>
-    <!-- Or, to access the index -->
-    <li *ngFor="let item of items; let i = index">{{ i }} - {{ item }}</li>
-  </ul>
+  - `*ngFor`
 
-  <!-- OR, passing props -->
+    ```html
+    <ul>
+      <li *ngFor="let item of items">{{ item }}</li>
+      <!-- Or, to access the index -->
+      <li *ngFor="let item of items; let i = index">{{ i }} - {{ item }}</li>
+    </ul>
 
-  <app-card *ngFor="let card of cards" [title]="card.title" [content]="card.content"></app-card>
-  ```
+    <!-- OR, passing props -->
 
-- `*ngSwitch`
+    <app-card *ngFor="let card of cards" [title]="card.title" [content]="card.content"></app-card>
+    ```
 
-  ```html
-  <div [ngSwitch]="color">
-    <p *ngSwitchCase="'red'">Red color</p>
-    <p *ngSwitchCase="'blue'">Blue color</p>
-    <p *ngSwitchDefault>Invalid color</p>
-  </div>
-  ```
+  - `*ngSwitch`
+
+    ```html
+    <div [ngSwitch]="color">
+      <p *ngSwitchCase="'red'">Red color</p>
+      <p *ngSwitchCase="'blue'">Blue color</p>
+      <p *ngSwitchDefault>Invalid color</p>
+    </div>
+    ```
+
+- **Angular >= 17**
+
+  - with the new syntax, we can use structural directives without the `*ng` prefix, and we can use them with the `@` prefix
+  - It's better because it makes the code cleaner and easier to read, and it allows us to use structural directives in a more consistent way, also it has better TypeScript support.
+
+  - `@if`
+
+    ```html
+    @if (condition) {
+    <p>The condition is true</p>
+    }
+
+    <!-- Or, with an else block -->
+    @if (condition) {
+    <p>The condition is true</p>
+    } @else {
+    <p>The condition is false</p>
+    }
+    ```
+
+  - `@for`
+
+    ```html
+    <ul>
+      @for (item of items) {
+      <li>{{ item }}</li>
+      }
+    </ul>
+
+    <!-- Or, to access the index with tracking -->
+    <ul>
+      @for (item of items; track i) {
+      <li>{{ i }} - {{ item }}</li>
+      }
+    </ul>
+    ```
+
+  - `@switch`
+
+    ```html
+    <div @switch (color) { @case 'red':
+    <p>Red color</p>
+    @case 'blue':
+    <p>Blue color</p>
+    @default:
+    <p>Invalid color</p>
+    }
+    ```
 
 - [Shorthand examples](https://angular.io/guide/structural-directives#shorthand-examples)
 
@@ -1001,7 +1414,9 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
 
 ---
 
-### Parent to Child (Passing data)
+### Parent to Child (Passing data / Input / Props)
+
+The parent component can pass data to the child component using `@Input()` decorator, and the child component can receive the data using property binding.
 
 ![parent-child](./img/data-flow-1.png)
 
@@ -1055,9 +1470,18 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
 
   - here we use an alias(`"master"`) so that in the parent component we use the alias not the other name (`"masterName"`), but in the child component we use the other name (`"masterName"`)
 
+- To make a prop required, you should:
+
+  - 1️⃣ use the `!` operator after the property name (To tell TypeScript that this property will be initialized later, and it will not be `undefined`)
+  - 2️⃣ use the `@Input({ required: true })` decorator
+
+    ```ts
+    @Input({ required: true }) hero!: Hero;
+    ```
+
 ---
 
-### Child to Parent (Emitting events)
+### Child to Parent (Emitting events / Output)
 
 - To emit an event from a child component to a parent component, you can use the `@Output()` decorator
 
@@ -1105,6 +1529,12 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
     <button (click)="sayHi(); $event.stopPropagation()">Click me</button>
     ```
 
+  - When you know the type of value that will be emitted, you can specify the type of the `EventEmitter` in the `@Output()` decorator using TypeScript generics `<T>`:
+
+    ```ts
+    @Output() myEvent = new EventEmitter<string>(); // here we specify that the event will emit a string value
+    ```
+
 ---
 
 ### Local Reference (Template variable)
@@ -1139,7 +1569,7 @@ its a word that you use to mark an element and get access to it in the template 
 
 ### Content projection (Slots)
 
-**Content projection** is a pattern in which you `insert, or project`, the content you want to use inside another component. For example, you could have a Card component that accepts content provided by another component.
+**Content projection** is a pattern in which you `insert, or project`, the content you want to use inside another component.
 
 > This pattern is used as a replacement for using `properties/props` to pass data from a parent component to a child component and add special handling for the content based on the `properties/props`.
 >
@@ -1147,6 +1577,7 @@ its a word that you use to mark an element and get access to it in the template 
 
 - This is done using the `<ng-content>` element in the child component
   ![content-projection](./img/content-projection-1.png)
+  - **`<ng-content>` is a placeholder for the content that will be projected into the component**
 
 #### Single-slot content projection
 
@@ -1196,6 +1627,8 @@ its a word that you use to mark an element and get access to it in the template 
 
 ## Pipes
 
+It's a transformer that takes input data and transforms it into a desired output format, which is then displayed in the template.
+
 ![pipe](./img/pipes.png)
 ![pipe](./img/pipes-1.png)
 ![pipe](./img/pipes-2.png)
@@ -1204,8 +1637,40 @@ its a word that you use to mark an element and get access to it in the template 
 
 ### Built-in pipes
 
-- [pipe reference](https://angular.io/api?type=pipe)
-  - Here, you can find all the built-in pipes in Angular
+> [pipe reference](https://angular.io/api?type=pipe) -> Here, you can find all the built-in pipes in Angular
+
+- In order to use a pipe:
+
+  - **Using modules:** you need to import the `CommonModule` in the `app.module.ts` file, and other pipes like `currency`, `date`, `decimal`, etc. are already included in the `CommonModule`, so you don't need to import them separately.
+
+    ```ts
+    import { CommonModule } from '@angular/common';
+
+    @NgModule({
+      declarations: [AppComponent],
+      imports: [BrowserModule, CommonModule], // import the CommonModule here 👈
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {}
+    ```
+
+  - **Using standalone components:** you can import the `CommonModule` in the `@Component` decorator of the component that uses the pipe
+
+    ```ts
+    import { Component } from '@angular/core';
+    import { CommonModule } from '@angular/common';
+
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.css'],
+      standalone: true,
+      imports: [CommonModule] // import the CommonModule here 👈
+    })
+    export class AppComponent {}
+    ```
+
 - [date-pipe format options](https://angular.io/api/common/DatePipe#pre-defined-format-options)
 - **Format:** `{{ data | pipeName:arg1:arg2:... }}`
 
@@ -1389,6 +1854,35 @@ Angular has **two different approaches** to handling user input through forms: `
 | Form validation     | Functions                                     | Directives                                                        |
 | Scalability         | Scalable                                      | better for small forms                                            |
 | Selector            | `[FormGroup]` directive                       | `[ngForm]` directive                                              |
+
+- Angular provides `ngSubmit` directive to handle form submission, which is used in both approaches
+
+  ```html
+  <form (ngSubmit)="onSubmit()">
+    <input type="text" name="name" [(ngModel)]="name" />
+    <button type="submit">Submit</button>
+  </form>
+  ```
+
+  - **⚠️ Note:** In order to use `ngSubmit`, you need to import the `FormsModule` in the `app.module.ts` file or the standalone-component that uses it
+
+    ```ts
+    import { FormsModule } from '@angular/forms';
+
+    @NgModule({
+      imports: [FormsModule]
+    })
+    export class AppModule {}
+    ```
+
+  - or we can use the `submit` event, but the difference is that `ngSubmit` will not reload the page, while the `submit` event will reload the page
+
+    ```html
+    <form (submit)="onSubmit()">
+      <input type="text" name="name" [(ngModel)]="name" />
+      <button type="submit">Submit</button>
+    </form>
+    ```
 
 ---
 

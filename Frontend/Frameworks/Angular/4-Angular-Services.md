@@ -2,7 +2,9 @@
 
 - [INDEX](#index)
   - [Services](#services)
-  - [Creating a Service](#creating-a-service)
+    - [Creating a Service](#creating-a-service)
+    - [How Services work](#how-services-work)
+    - [Access modifiers in Services](#access-modifiers-in-services)
   - [Dependency injection](#dependency-injection)
     - [Why use Dependency Injection?](#why-use-dependency-injection)
     - [How Angular does Dependency Injection?](#how-angular-does-dependency-injection)
@@ -15,16 +17,16 @@
 
 ## Services
 
-Service is a broad category encompassing any value, function, or feature that an application needs. A service is typically a class with a narrow, well-defined purpose. It should do something specific and do it well.
+It's a class that is used to **share data and logic between components** in Angular applications
+
+- It has often a single responsibility, meaning that it does one thing and does it well, so it can be reused in multiple components, (_e.g. fetching data from an API, handling authentication, etc_).
 
 ![service](./img/services-1.png)
 
 - It's something that **manages or fetches data**
   ![service](./img/services-2.png)
 
-- It's a class that can be used in multiple components and other services
-
-## Creating a Service
+### Creating a Service
 
 - Create a service using the following command:
 
@@ -32,85 +34,111 @@ Service is a broad category encompassing any value, function, or feature that an
   ng generate service services/modal
   ```
 
-- This will create a service file in the `services` folder
+  - This will create a service file in the `services` folder
+
 - The service file will have a class with the same name as the service file
-- The service class will have a decorator `@Injectable` which is used to inject the service into other components
+- The service class will:
 
-  - The service class will have a constructor that will have the dependencies that the service needs
+  - have a decorator `@Injectable` which is used to inject the service into other components
+  - have a constructor that will have the dependencies that the service needs
+  - have a method that will be used to fetch data or perform some operation
+  - be imported in the component where it is needed
+  - be injected in the constructor of the component
 
-- The service class will have a method that will be used to fetch data or perform some operation
-- The service class will be imported in the component where it is needed
-- The service class will be injected in the constructor of the component
 - The method of the service class will be called in the component
 
 - **Example:**
 
-  - First, create a service using the following command:
+  ```ts
+  // services/fetch-data.service.ts 📄
+  import { Injectable } from '@angular/core';
 
-    ```sh
-    ng generate service services/fetch-data
-    ```
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class FetchDataService {
+    constructor() {}
 
-  - Second, create a method in the service class that will fetch data from an API
-
-    ```ts
-    // services/fetch-data.service.ts
-    import { Injectable } from '@angular/core';
-
-    @Injectable({
-      providedIn: 'root'
-    })
-    export class FetchDataService {
-      constructor() {}
-
-      fetchData() {
-        return fetch('https://jsonplaceholder.typicode.com/posts')
-          .then(response => response.json())
-          .then(data => data);
-      }
+    fetchData() {
+      return fetch('https://jsonplaceholder.typicode.com/posts')
+        .then(response => response.json())
+        .then(data => data);
     }
-    ```
+  }
+  ```
 
-  - Third, import the service class in the component where it is needed **and inject it in the constructor** to use the method of the service class
+  ```ts
+  // import the service class in the component where it is needed and inject it in the constructor
 
-    ```ts
-    // app.component.ts
-    import { Component, OnInit } from '@angular/core';
-    import { FetchDataService } from './services/fetch-data.service';
+  // app.component.ts 📄
+  import { Component, OnInit } from '@angular/core';
+  import { FetchDataService } from './services/fetch-data.service';
 
-    @Component({
-      selector: 'app-root',
-      templateUrl: './app.component.html',
-      styleUrls: ['./app.component.css']
-    })
-    export class AppComponent implements OnInit {
-      fetchData: any;
-      constructor(private fetchDataService: FetchDataService) {}
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
+  })
+  export class AppComponent implements OnInit {
+    fetchData: any;
+    constructor(private fetchDataService: FetchDataService) {}
 
-      ngOnInit() {
-        this.fetchDataService.fetchData().then(data => {
-          this.fetchData = data;
-        });
-      }
+    ngOnInit() {
+      this.fetchDataService.fetchData().then(data => {
+        this.fetchData = data;
+      });
     }
-    ```
+  }
+  ```
 
-  - Fourth, display the data in the component template
+---
 
-    ```html
-    <!-- app.component.html -->
-    <div *ngFor="let data of fetchData">
-      <p>{{ data.title }}</p>
-    </div>
-    ```
+### How Services work
 
-- We use `@Injectable` decorator to inject the service into other components
+Services depend on the **[Dependency Injection](#dependency-injection)** system in Angular to work, where only one instance of the service class is created and shared across the application, this is done by using the `@Injectable` decorator and the `providedIn` property, and injecting the service in the component where it is needed.
 
-  - This enables Angular to inject the service as an instance of the class in the component where it is needed **(dependency injection)**
+- **Why don't we instantiate the service class in the component?**
+
+  - Because we want to use the same instance of the service class in multiple components, and we want to use the Dependency Injection system to manage the service class instance
+  - If we instantiate the service class in the component, we will create a new instance of the service class for each component, which will lead to multiple instances of the same service class and will not maintain the state of the data and the previous emissions
+  - This is especially important when we have services that use `Observables` to handle asynchronous data, because we don't want to create multiple instances of the service class that uses Observables which will create multiple subscriptions and not maintain the state of the data and the previous emissions
+
+- **How services use Dependency Injection?**
+
+  - Fortunately, we don't need to manually create instances of the service class in the component, Angular does it for us using the Dependency Injection system
+  - When we inject the service in the component, Angular looks for the service in the `[providers] array in the component` and creates an instance of the service class **(if it doesn't exist)**, or uses the existing instance if it does exist
+  - This way, we can use the service in the component without creating an instance of the service class in the component class
+  - This requires 3 things:
+
+    1. **Injectable decorator**: We use the `@Injectable` decorator to mark the class as a service, which tells Angular that this class can be injected into other components
+    2. **ProvidedIn property**: We use the `providedIn` property to provide the service in the root module, so that it can be used in the whole application
+    3. **Dependency Injection**: We use the Dependency Injection system to inject the service in the component where it is needed, so that we can use the service without creating an instance of the service class in the component class:
+
+       ```ts
+       constructor(private fetchDataService: FetchDataService) {}
+       ```
+
+- We use `@Injectable` decorator to mark the class as a service
+
+  - This tells Angular that this class can be injected into other components
+    - This enables Angular to inject the service as an instance of the class in the component where it is needed **(dependency injection)**
+  - The `@Injectable` decorator is used to define the metadata for the service class
 
   > Another alternative is to add the service in the `[providers] array in the module` to provide the service in the module's components **(not recommended anymore ❌, because it's not tree-shakable and creates multiple instances of the service class)**
 
 - We use `provided: 'root'` to provide the service in the root module **so that it can be used in the whole application**
+
+---
+
+### Access modifiers in Services
+
+- We can use access modifiers in the service class to control the visibility of the properties and methods of the service class
+
+  - `public`: The property or method is accessible from anywhere
+  - `private`: The property or method is only accessible within the service class
+  - `protected`: The property or method is accessible within the service class and its subclasses
+
+- Usually, we use `private` access modifier for the properties and methods in the service, so that they are not accessible from outside the service class, and we use `public` access modifier for the methods that we want to expose to the components that use the service
 
 ---
 
@@ -217,7 +245,7 @@ Service is a broad category encompassing any value, function, or feature that an
 
 ### Singleton
 
-> `Singleton` is a **creation design pattern** that lets you ensure that a class has only one instance, while providing a global access point to this instance. more [here](https://refactoring.guru/design-patterns/singleton)
+> `Singleton` is a **creation design pattern** that lets you ensure that a class has only one instance, while providing a global access point to this instance. more here: [Singleton Pattern](https://refactoring.guru/design-patterns/singleton)
 
 - Angular uses `Singleton` pattern to create a single instance of the service class and use it in multiple components
   ![Singleton](./img/singleton.png)

@@ -34,12 +34,12 @@
   - [JavaScript](#javascript)
     - [JavaScript Summary ✅](#javascript-summary-)
     - [OOP in JavaScript ✅](#oop-in-javascript-)
-    - [Document Object Model (DOM) Summary](#document-object-model-dom-summary)
-    - [Asynchronous JavaScript Summary](#asynchronous-javascript-summary)
-    - [Web APIs](#web-apis)
-    - [JavaScript Modules](#javascript-modules)
-    - [JavaScript Bundlers](#javascript-bundlers)
-    - [JavaScript Package Managers](#javascript-package-managers)
+    - [Document Object Model (DOM) Summary ✅](#document-object-model-dom-summary-)
+    - [Asynchronous JavaScript Summary ✅](#asynchronous-javascript-summary-)
+    - [Web APIs ✅](#web-apis-)
+    - [JavaScript Modules ✅](#javascript-modules-)
+    - [JavaScript Bundlers ✅](#javascript-bundlers-)
+    - [JavaScript Package Managers ✅](#javascript-package-managers-)
     - [JavaScript Advanced Concepts](#javascript-advanced-concepts)
     - [JavaScript Interview Questions and Tricks](#javascript-interview-questions-and-tricks)
   - [Typescript](#typescript)
@@ -2402,7 +2402,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Document Object Model (DOM) Summary
+### Document Object Model (DOM) Summary ✅
 
 - **Overview**
 
@@ -2526,7 +2526,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Asynchronous JavaScript Summary
+### Asynchronous JavaScript Summary ✅
 
 - **Overview**
 
@@ -2663,7 +2663,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### Web APIs
+### Web APIs ✅
 
 - **API**
 
@@ -2761,7 +2761,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### JavaScript Modules
+### JavaScript Modules ✅
 
 - **Notes**
 
@@ -2844,7 +2844,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### JavaScript Bundlers
+### JavaScript Bundlers ✅
 
 - **Module Bundler**
 
@@ -2928,7 +2928,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
-### JavaScript Package Managers
+### JavaScript Package Managers ✅
 
 - **Old vs Modern JavaScript**
 

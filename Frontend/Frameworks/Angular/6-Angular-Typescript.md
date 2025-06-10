@@ -2,6 +2,7 @@
 
 - [INDEX](#index)
   - [Typescript with Angular](#typescript-with-angular)
+  - [Models](#models)
   - [Decorators](#decorators)
   - [Components](#components)
   - [Props](#props)
@@ -17,6 +18,18 @@ Guide: [Angular Typescript](https://angular.io/guide/typescript-configuration)
 - Angular uses Typescript as its primary language.
 - Angular by default doesn't use strict mode.
   > To enable strict mode, add `"strict": true` in `tsconfig.json`.
+
+---
+
+## Models
+
+Models are used to define the structure of data in Angular applications. They are typically defined as classes or interfaces.
+
+- They're files that contain any `type` or `interface` definitions that are used in the application.
+  - This is better for organization and maintainability, instead of defining types and interfaces in the same file as the component or service.
+- Models has a single responsibility, which is to define the structure of data, and export it for use in other parts of the application.
+- They have this format:
+  - `user.model.ts`, `product.model.ts`, etc.
 
 ---
 
