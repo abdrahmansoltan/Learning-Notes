@@ -14,8 +14,11 @@
   - [Frontend](#frontend)
     - [Frontend Rendering](#frontend-rendering)
     - [Frontend Performance](#frontend-performance)
+    - [Micro Frontends](#micro-frontends)
+    - [Internationalization (i18n) and Localization (l10n)](#internationalization-i18n-and-localization-l10n)
   - [FE Frameworks](#fe-frameworks)
     - [Vue](#vue)
+    - [Next.js](#nextjs)
 
 ---
 
@@ -758,6 +761,11 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - **Compiled languages** are translated into machine code before execution if no errors are found, resulting in faster performance. Examples include C, C++, and Rust.
   - **Interpreted languages** are executed directly without any previous preparation (line-by-line at runtime), which can lead to slower performance but allows for more flexibility. Examples include JavaScript, Python, and Ruby.
 
+- **what is the difference between compiler and interpreter?**
+
+  - **Compiler:** Translates the entire source code of a program into machine code before execution, creating an executable file. It performs optimizations and error checking during the compilation process.
+  - **Interpreter:** Executes the source code line-by-line at runtime without producing an intermediate executable file. It translates each line into machine code as it runs, which can lead to slower performance.
+
 - **What is a programming paradigm?**
 
   - A programming paradigm is a fundamental style or approach to programming that defines how code is structured and organized. It influences how developers think about and solve problems in software development.
@@ -795,6 +803,10 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - **JavaScript** is a programming language that implements the ECMAScript specification. It is widely used for web development and provides features for creating interactive web applications.
   - **ECMAScript** is a standardized specification that defines the core features and syntax of the JavaScript language. It serves as a blueprint for JavaScript implementations, ensuring consistency across different environments.
 
+- **What is js backwordCOMPATIBILITY?**
+
+  - JavaScript backward compatibility refers to the ability of newer versions of JavaScript to run code written in older versions without breaking functionality. This ensures that existing code continues to work as expected when new features or changes are introduced in the language.
+
 - **What is it meant by "JavaScript is a prototype-based language"?**
 
   - In JavaScript, objects can inherit properties and methods from other objects through a mechanism called prototypal inheritance. This means that every object has a prototype, which is another object from which it can inherit properties and methods.
@@ -816,6 +828,204 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - V8 is an open-source JavaScript engine developed by Google. It is used in the Chrome browser and Node.js runtime to execute JavaScript code. V8 compiles JavaScript into machine code at runtime, enabling fast execution and performance optimizations.
   - It is responsible for executing JavaScript code in web browsers and server-side environments, providing features like (garbage collection, JIT compilation), and support for modern JavaScript standards.
 
+- **What are types of data in JavaScript?**
+
+  - JavaScript has several built-in data types, which can be categorized into two main groups: **primitive types** and **reference types**.
+
+  - **Primitive Types:**
+
+    - **String**
+    - **Number**
+    - **Boolean**
+    - **Null**
+    - **Undefined**
+    - **Symbol**
+    - **BigInt**
+
+  - **Reference Types:**
+    - **Object**
+    - **Array**
+    - **Function**
+
+- **What is the difference between call stack and heap in JavaScript?**
+
+  - **Call Stack:** The call stack is a data structure that keeps track of function calls in JavaScript. It follows the Last In, First Out (LIFO) principle, meaning the last function called is the first one to be executed. When a function is called, it is pushed onto the stack, and when it returns, it is popped off the stack.
+
+    - Example: If you call `functionA()` which calls `functionB()`, `functionB()` will be on top of the stack until it completes execution.
+
+  - **Heap:** The heap is a memory area used for dynamic memory allocation in JavaScript. It stores objects and variables that are created at runtime. Unlike the call stack, the heap does not follow a strict order for allocation and deallocation.
+    - Example: When you create an object or an array, it is stored in the heap memory.
+
+- **What is the difference between `null` and `undefined` in JavaScript?**
+
+  - **`null`:** Represents the intentional absence of any object value. It is an assignment value that can be explicitly set to indicate that a variable has no value.
+    - Example: `let myVar = null;`
+  - **`undefined`:** Represents a variable that has been declared but not assigned a value. It is the default value for uninitialized variables.
+    - Example: `let myVar; // myVar is undefined`
+
+- **What is the difference between `==` and `===` in JavaScript?**
+
+  - **`==` (Equality Operator):** Compares two values for equality after performing type coercion if necessary. It checks if the values are equal, regardless of their types.
+    - Example: `5 == '5' // true`
+  - **`===` (Strict Equality Operator):** Compares two values for equality without performing type coercion. It checks both the value and the type.
+    - Example: `5 === '5' // false`
+
+- **What is the difference between `let`, `const`, and `var` in JavaScript?**
+
+  - **`let`:** A block-scoped variable declaration that allows you to declare variables that can be reassigned. It is not hoisted to the top of its block.
+  - **`const`:** A block-scoped variable declaration that creates a constant reference to a value. It cannot be reassigned, but if it holds an object or array, the properties or elements can still be modified.
+  - **`var`:** A function-scoped variable declaration that allows you to declare variables that can be reassigned. It is hoisted to the top of its function or global scope.
+
+- **What is Hoisting in JavaScript?**
+
+  - It's a mechanism where variable and function declarations are moved to the top of their containing scope during the compilation phase. This means that you can access/use variables and functions before they are declared in the code.
+  - However, only the declarations are hoisted, not the initializations. For example:
+
+    ```javascript
+    console.log(myVar); // undefined
+    var myVar = 5;
+
+    // ------------------------------------------
+
+    // It's interpreted as:
+    var myVar; // Declaration is hoisted
+    console.log(myVar); // undefined (initialization is not hoisted)
+    myVar = 5; // Initialization happens here
+    ```
+
+    - In this case, `myVar` is hoisted, but its value is not assigned until the line where it is initialized.
+
+- **What is TDZ (Temporal Dead Zone) in JavaScript?**
+
+  - The Temporal Dead Zone (TDZ) refers to the period between the start of a block scope and the point where a variable is declared. During this time, accessing the variable will result in a `ReferenceError`.
+  - This applies to variables declared with `let` and `const`, as they are not hoisted like `var`. For example:
+
+    ```javascript
+    console.log(myLet); // ReferenceError: Cannot access 'myLet' before initialization
+    console.log(myVar); // undefined (hoisted)
+
+    let myLet = 10;
+    var myVar = 5;
+    ```
+
+- **What is the difference between type-coercion and type-conversion in JavaScript?**
+
+  - **Type Coercion:** The automatic conversion of one data type to another by the JavaScript engine when performing operations. It can lead to unexpected results if not understood properly.
+    - Example: `5 + '5'` results in `'55'` (number is coerced to a string).
+  - **Type Conversion:** The explicit conversion of one data type to another using functions or methods, such as `Number()`, `String()`, or `Boolean()`.
+    - Example: `Number('5')` converts the string `'5'` to the number `5`.
+
+- **What is the difference between `function` and `arrow function` in JavaScript?**
+
+  - **Function Declaration:** A traditional way to define a function using the `function` keyword. It is hoisted, meaning it can be called before its declaration in the code.
+
+    - Example:
+
+      ```javascript
+      function add(a, b) {
+        return a + b;
+      }
+      ```
+
+  - **Arrow Function:** A more concise syntax introduced in ES6 for defining functions. It does not have its own `this`, making it useful for preserving the context of `this` in callbacks.
+
+    - Example:
+
+      ```javascript
+      const add = (a, b) => a + b;
+      ```
+
+- **What is execution context in JavaScript?**
+
+  - It's the environment in which JavaScript code is executed, including the scope, variables, and the value of `this`. It is created whenever a function is called.
+  - The "global execution context" is created when the JavaScript engine starts executing the script, and each function call creates a new execution context. and it contains all the variables, functions, and objects that are accessible within that context.
+
+- **What is mean by scoping and lexical scope ?**
+
+  - **Scoping:** Refers to the visibility and accessibility of variables and functions in different parts of the code (where do variables live).
+
+    - In JavaScript, there are 3 types of scope: (global scope, function scope, and block scope).
+
+  - **Lexical Scope:** It's the scope **where variables are defined** based on their physical location in the source code.
+
+- **what is the difference between mutable and immutable Object?**
+
+  - **Mutable Object:** An object whose properties can be changed or modified after it is created. In JavaScript, most objects and arrays are mutable.
+
+    - Example:
+
+      ```javascript
+      const obj = { name: 'Alice' };
+      obj.name = 'Bob'; // obj is now mutable
+      ```
+
+  - **Immutable Object:** An object whose properties cannot be changed after it is created. In JavaScript, you can create immutable objects using libraries like `Immutable.js` or by using techniques like `Object.freeze()`.
+
+    - Example:
+
+      ```javascript
+      const obj = Object.freeze({ name: 'Alice' });
+      obj.name = 'Bob'; // This will not change the object
+      ```
+
+- **What is the difference between `isNaN` and `Number.isNaN` in JavaScript?**
+
+  - They both check if a value is NaN (Not-a-Number), but they behave differently in terms of type coercion: as `isNaN` performs type coercion, while `Number.isNaN` does not.
+
+  ```js
+  isNaN('hello'); // true (coerces 'hello' to NaN)
+  Number.isNaN('hello'); // false (does not coerce, checks if the value is actually NaN)
+  ```
+
+- **What is the difference between transpiling and polyfilling in JS?**
+
+  - **Transpiling:** The process of converting code written in one new version of JavaScript into another version, typically to ensure compatibility with older browsers or environments.
+    - Tools like **Babel** are commonly used for transpiling modern JavaScript (ES6+) to ES5.
+    - Example: Converting arrow functions to traditional function expressions.
+  - **Polyfilling:** The process of adding missing features or functionality to older environments that do not support certain JavaScript features.
+    - Example: Adding support for `Array.prototype.includes()` in browsers that do not natively support it.
+
+- **What is strict mode in js?**
+
+  - Strict mode is a way to introduce better error-checking into your code to make code more secure and without it mode javascript fail silently.
+  - Benefits of strict mode include:
+    - Preventing the use of undeclared variables.
+    - Disallowing duplicate parameter names in functions.
+    - Throwing errors for assignments to read-only properties.
+    - Preventing the use of `this` in global scope.
+    - Functions become block-scoped, meaning that `this` behaves differently in functions.
+
+- **What is the difference between function deceleration and function expression and arrow function?**
+
+  - **Function Declaration:** A named function defined using the `function` keyword. It is hoisted, meaning it can be called before its declaration in the code.
+
+    ```javascript
+    function greet() {
+      console.log('Hello!');
+    }
+    ```
+
+  - **Function Expression:** A function defined as part of an expression, which can be anonymous or named. It is not hoisted, meaning it cannot be called before its declaration.
+
+    ```javascript
+    const greet = function () {
+      console.log('Hello!');
+    };
+    ```
+
+  - **Arrow Function:** A concise syntax introduced in ES6 for defining functions. It does not have its own `this`, making it useful for preserving the context of `this` in callbacks. also used to define object methods.
+
+    ```javascript
+    const greet = () => {
+      console.log('Hello!');
+    };
+    ```
+
+- **What is js Runtime in the browser?**
+
+  - It's the environment in which JavaScript code is executed. It includes the JavaScript engine (like V8 in Chrome), the event loop, and the Web APIs provided by the browser.
+  - The runtime allows JavaScript to interact with the Document Object Model (DOM), handle events, and perform asynchronous operations like network requests.
+
 ---
 
 ### JS Web APIs
@@ -826,7 +1036,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     - Example: `localStorage.setItem('key', 'value');`
   - **SessionStorage:** Similar to LocalStorage, but data is only available for the duration of the page session. It is cleared when the tab or browser is closed.
     - Example: `sessionStorage.setItem('key', 'value');`
-  - **Cookies:** Small pieces of data stored by the browser that can be used for various purposes, such as session management or user preferences. Cookies have an expiration date and can be sent to the server with each HTTP request.
+  - **Cookies:** Small pieces of data stored by the browser that can be used for various purposes, such as session management or user preferences. Cookies have an expiration date and can be **sent to the server with each HTTP request**.
     - Example: `document.cookie = "key=value; expires=Fri, 31 Dec 2023 23:59:59 GMT";`
   - **IndexedDB:** A low-level API for client-side storage of significant amounts of structured data, including files/blobs. It allows for more complex queries and transactions compared to LocalStorage and SessionStorage.
     - Example: Using IndexedDB involves creating a database, object stores, and transactions to read/write data.
@@ -835,6 +1045,50 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
   - **LocalStorage** is designed for long-term storage of key-value pairs in a web browser, with no expiration time. Data persists even after the browser is closed and reopened.
   - **SessionStorage** is designed for temporary storage of key-value pairs that are only available for the duration of the page session. Data is cleared when the tab or browser is closed.
+  - main differences:
+
+    - Their main difference is that local storage data does not expire, whereas session storage data gets cleared when the user closes its browser window.
+
+    - Page sessions are valid for only one tab at a time. So, if a user has three tabs open, each one will have its own page session.
+
+- **How to make cookies secure?**
+
+  - To make cookies secure, you can use the following attributes:
+
+    - `secure` which Ensures that the cookie is only sent over HTTPS connections.
+
+      ```js
+      document.cookie = 'key=value; Secure;';
+      ```
+
+    - `HttpOnly` which Prevents JavaScript from accessing the cookie, reducing the risk of cross-site scripting (XSS) attacks.
+
+      ```js
+      document.cookie = 'key=value; HttpOnly;';
+      ```
+
+    - `SameSite` which Controls whether the cookie is sent with cross-site requests, helping to prevent cross-site request forgery (CSRF) attacks. It can be set to `Strict`, `Lax`, or `None`.
+
+      ```js
+      document.cookie = 'key=value; SameSite=Strict;';
+      ```
+
+  - Also by:
+
+    - Setting an appropriate expiration time for cookies to limit their lifespan and reduce the risk of unauthorized access.
+
+      ```js
+      document.cookie = 'key=value; expires=Fri, 31 Dec 2023 23:59:59 GMT;';
+      ```
+
+    - Avoiding Storing Sensitive Information as they can be accessed by client-side scripts and may be exposed to security vulnerabilities.
+
+      ```js
+      // Example: Storing a session ID in a cookie instead of sensitive data
+      const sessionId = 'abcd1234'; // Generate a unique session ID
+
+      document.cookie = `sessionId=${sessionId}; Secure; HttpOnly; SameSite=Strict;`;
+      ```
 
 - **What is the difference between History API and Location API?**
 
@@ -855,6 +1109,55 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     - Handshake: The client initiates a WebSocket connection by sending an HTTP request with an `Upgrade` header to switch from HTTP to WebSocket protocol.
     - Long/Short Polling: WebSockets can be seen as an alternative to long polling or short polling techniques, where the server can push updates to the client without requiring the client to continuously poll for new data.
   - WebSockets are particularly useful for applications that require low-latency communication, such as chat applications, online gaming, and live updates.
+
+- **What is the difference between Short and Long Polling?**
+
+  - **Short Polling:**
+
+    - The client sends a request to the server at regular intervals (e.g., every few seconds) to check for new data.
+    - If there is no new data, the server responds immediately with an empty response.
+    - This can lead to increased latency and unnecessary network traffic, as requests are made even when there is no new data.
+    - It's suitable for applications where real-time updates are not critical, but periodic checks are acceptable.
+
+  - **Long Polling:**
+    - The client sends a request to the server, and the server holds the request open until new data is available or a timeout occurs.
+    - When new data is available, the server responds with the data, and the client can immediately send a new request to wait for more updates.
+    - This reduces latency and network traffic compared to short polling, as requests are only made when there is new data. but it can still lead to resource exhaustion on the server if not managed properly.
+    - It's suitable for applications that require near real-time updates, such as chat applications or live notifications.
+
+- **What is the difference between WebSockets and HTTP?**
+
+  - **WebSockets:**
+
+    - Provides a persistent, bidirectional communication channel.
+    - Allows real-time data exchange without the overhead of HTTP headers.
+    - Suitable for applications that require low-latency communication (e.g., chat applications, online gaming).
+    - Uses a single connection for multiple messages, reducing the need for repeated handshakes.
+
+  - **HTTP:**
+    - A stateless protocol used for request-response communication.
+    - Each request/response cycle involves sending headers and body, which can introduce latency.
+    - Suitable for traditional web applications where real-time updates are not required.
+    - Each request opens a new connection, leading to higher overhead compared to WebSockets.
+
+- **What is the difference between GET and POST methods in HTTP?**
+
+  - **GET Method:**
+
+    - Used to retrieve data from a server.
+    - Parameters are sent in the URL query string, making it visible in the browser's address bar.
+    - Limited in the amount of data that can be sent (URL length restrictions).
+    - Generally considered safe and idempotent (does not change server state).
+    - Supports caching by default, allowing responses to be stored and reused.
+    - Not safe for sensitive data, as parameters are visible in the URL.
+
+  - **POST Method:**
+    - Used to send data to a server, often resulting in a change in server state or side effects.
+    - Parameters are sent in the request body, making them not visible in the URL.
+    - No strict limitations on the amount of data that can be sent.
+    - Not idempotent, as multiple identical requests can result in different outcomes.
+    - Doesn't support caching by default, as POST requests are typically used for actions that modify data.
+    - Generally considered safer for sending sensitive data, as parameters are not exposed in the URL.
 
 ---
 
@@ -1039,6 +1342,74 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
     ```
 
   - Use Progressive Web App (PWA) Techniques, which include service workers for caching and offline capabilities, to enhance performance and user experience.
+
+---
+
+### Micro Frontends
+
+- **What are micro frontends?**
+
+  - Micro frontends is an architectural style that extends the principles of microservices to the frontend. It involves breaking down a web application into smaller, independent, and self-contained frontend components or applications that can be developed, deployed, and maintained independently.
+  - Each micro frontend can be built using different technologies or frameworks, allowing teams to choose the best tools for their specific needs while still integrating seamlessly into a cohesive user experience.
+
+- **What is a Monorepo?**
+
+  - A Monorepo (short for "monolithic repository") is a version control strategy where multiple projects or components are stored in a single repository. In the context of micro frontends, a monorepo can be used to manage all micro frontend applications and shared libraries in one place.
+  - Benefits of using a monorepo for micro frontends include:
+    - Simplified dependency management and versioning.
+    - Easier code sharing and collaboration between teams.
+    - Consistent tooling and build processes across all micro frontends.
+    - Simplified deployment and CI/CD pipelines.
+
+- **What are the benefits of using micro frontends?**
+
+  - **Scalability:** Micro frontends allow teams to work on different parts of the application independently, enabling parallel development and faster feature delivery.
+  - **Technology Diversity:** Teams can choose different technologies or frameworks for different micro frontends, allowing for flexibility and innovation.
+  - **Independent Deployment:** Each micro frontend can be deployed independently, reducing the risk of breaking the entire application during updates.
+  - **Improved Maintainability:** Smaller codebases are easier to maintain, test, and refactor, leading to better code quality and reduced technical debt.
+  - **Team Autonomy:** Teams can take ownership of specific micro frontends, leading to increased accountability and faster decision-making.
+
+---
+
+### Internationalization (i18n) and Localization (l10n)
+
+- **What is i18n and l10n?**
+
+  - **i18n (Internationalization):** The process of designing and developing a software application in a way that allows it to be easily adapted to different languages, regions, and cultures without requiring significant changes to the codebase. It involves preparing the application for localization by externalizing text, formatting dates, numbers, and currencies, and supporting various character sets.
+  - **l10n (Localization):** The process of adapting an internationalized application for a specific language or region. This includes translating text, adjusting layouts, formatting dates and numbers according to local conventions, and ensuring cultural appropriateness.
+
+  | Internationalization (i18n)                                                                                           | Localization (l10n)                                                                                                              |
+  | --------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+  | Preparing the application for multiple languages and regions, and easily adapt to local market norms and preferences. | Adapting the application for a specific language or region (targeted market) from UI to images, colors, and cultural references. |
+  | Internationalization comes first—aiming to make localization easier.                                                  | Localization follows internationalization—translating and adapting content                                                       |
+
+- **What are some common challenges in i18n and l10n?**
+
+  - Some common challenges in i18n and l10n include:
+    - **Text Expansion:** Translated text may be longer or shorter than the original, affecting layout and design.
+    - **Cultural Differences:** Different cultures may have different preferences for colors, symbols, and imagery, requiring careful consideration during localization.
+    - **Date and Number Formats:** Different regions use different formats for dates, times, and numbers, which can lead to confusion if not handled correctly.
+    - **Pluralization Rules:** Different languages have different rules for pluralization, which can complicate translation.
+    - **Right-to-Left (RTL) Languages:** Supporting RTL languages like Arabic or Hebrew requires additional considerations for layout and text direction.
+    - **Character Encoding:** Ensuring that the application supports various character sets and encodings to handle different languages.
+
+- **How can you implement i18n and l10n in a web application?**
+
+  - Implementing i18n and l10n in a web application can be done using various techniques and tools:
+    - **Externalizing Strings:** Store all user-facing text in separate resource files (e.g., JSON, YAML) that can be easily translated.
+    - **Using Libraries:** Utilize libraries or frameworks that provide built-in support for i18n and l10n, such as `react-intl`, `vue-i18n`, or `i18next`.
+    - **Locale Detection:** Automatically detect the user's locale based on browser settings or user preferences and load the appropriate language resources.
+    - **Dynamic Content Loading:** Load translations dynamically based on user interactions or preferences to reduce initial load times.
+    - **Date and Number Formatting:** Use libraries like `Intl.DateTimeFormat` and `Intl.NumberFormat` to format dates, numbers, and currencies according to the user's locale.
+    - **Testing:** Test the application with different languages and locales to ensure proper rendering, layout, and functionality.
+
+- **What do you know about phrase.com?**
+  - Phrase.com is a localization management platform that helps teams manage the translation and localization of their software applications. It provides tools for:
+    - **Translation Management:** Streamlining the translation process by allowing teams to collaborate on translations, manage glossaries, and track translation progress.
+    - **Contextualization:** Providing context for translators by allowing them to see how strings are used in the application, which helps improve translation quality.
+    - **Integration:** Integrating with various development tools and platforms (e.g., GitHub, Bitbucket) to automate the localization workflow and keep translations up-to-date.
+    - **Collaboration:** Enabling collaboration between developers, translators, and product managers to ensure that translations are accurate and culturally appropriate.
+  - Phrase.com supports various file formats (e.g., JSON, YAML, PO) and provides APIs for seamless integration with web applications.
 
 ---
 
@@ -1367,3 +1738,29 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 - **What is Vuex?**
   - Vuex is a state management library for Vue.js applications. It provides a centralized store to manage application state, making it easier to share data between components and maintain a predictable state flow. Vuex follows the Flux architecture pattern and includes features like mutations, actions, getters, and modules for organizing state.
+
+---
+
+### Next.js
+
+- **What is Next.js?**
+
+  - Next.js is a React framework that enables server-side rendering (SSR) and static site generation (SSG) for React applications. It provides a set of features and conventions that simplify the development of React applications, including automatic code splitting, routing, and API routes.
+
+- **What are the key features of Next.js?**
+
+  - **Server-Side Rendering (SSR):** Next.js allows pages to be rendered on the server before being sent to the client, improving performance and SEO.
+  - **Static Site Generation (SSG):** Next.js can generate static HTML files at build time, allowing for fast page loads and better caching.
+  - **Automatic Code Splitting:** Next.js automatically splits code into smaller chunks, loading only the necessary code for each page, which improves performance.
+  - **File-Based Routing:** Next.js uses a file-based routing system, where each file in the `pages` directory corresponds to a route in the application.
+  - **API Routes:** Next.js allows you to create API endpoints within the same application, enabling server-side logic without needing a separate backend.
+  - **Built-in CSS and Sass Support:** Next.js supports CSS and Sass out of the box, allowing developers to style their applications easily.
+  - **Image Optimization:** Next.js provides built-in image optimization features, automatically resizing and serving images in modern formats.
+
+- **How Next.js is used for SEO?**
+
+  - Next.js improves SEO by enabling server-side rendering (SSR) and static site generation (SSG), which allows search engines to crawl and index pages more effectively. Key features that enhance SEO include:
+    - **Pre-rendering:** Pages can be pre-rendered on the server, providing fully rendered HTML to search engines.
+    - **Dynamic Metadata:** Next.js allows you to set dynamic metadata (e.g., title, description) for each page using the `next/head` component.
+    - **Clean URLs:** File-based routing creates clean and readable URLs, which are beneficial for SEO.
+    - **Automatic Sitemap Generation:** Next.js can generate sitemaps automatically, helping search engines discover all pages in the application.

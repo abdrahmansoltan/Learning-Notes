@@ -339,15 +339,15 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
 
 ### HTTP Interceptors
 
-**HTTP Interceptor** is a middleware that intercepts HTTP requests and responses from the client to the server and vice versa
+**HTTP Interceptor** is a middleware (function) that intercepts HTTP requests and responses from the client to the server and vice versa **(executes before the request is sent to the server and after the response is received from the server)**
+![http interceptor](./img/http-interceptor-1.png)
 
 ![auth service](./img/auth-service-12.png)
-![http interceptor](./img/http-interceptor-1.png)
 
 - It is used to modify the request or response, add headers, handle errors, etc.
 - Usually, we use HTTP Interceptor to add the token to the request headers before sending the request to the server, ex:
 
-  - add the JWT token to the request headers before sending the request to the server
+  - add the `JWT` token to the request headers before sending the request to the server
   - set cookies in the request headers before sending the request to the server
   - handle errors in the response before sending the response to the client
 
@@ -392,33 +392,94 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       - `next`: the next interceptor in the chain
     - It returns an observable of the `HttpEvent` type
 
-  - 3️⃣ Add the interceptor to the providers array in the `app.module.ts` file (to make it available to the entire app)
+  - 3️⃣ register the interceptor in the `app.module.ts` file / or the `app.config.ts` file (to make it available to the entire app)
+    - The old way is to create a class for the interceptor and register it in the `app.module.ts` file, but now we can also use standalone components to register the interceptor using the `withInterceptors` method
+    - **Module based:** Add the interceptor to the providers array in the `app.module.ts` file (to make it available to the entire app)
 
-    ```ts
-    // app.module.ts
-    import { HTTP_INTERCEPTORS } from '@angular/common/http';
-    import { AuthInterceptor } from './interceptors/auth-interceptor';
+      ```ts
+      // app.module.ts
+      import { HTTP_INTERCEPTORS } from '@angular/common/http';
+      import { AuthInterceptor } from './interceptors/auth-interceptor';
 
-    @NgModule({
-      declarations: [AppComponent],
-      imports: [BrowserModule, HttpClientModule],
-      providers: [
-        // Here, we're telling Angular to provide the AuthInterceptor and use it as an HTTP_INTERCEPTOR if any HTTP request is made in the app (because by default, Angular doesn't know about the AuthInterceptor, so we need to provide it here as it only uses the HTTP_INTERCEPTORS token)
-        {
-          provide: HTTP_INTERCEPTORS,
-          useClass: AuthInterceptor,
-          multi: true
-        }
-      ],
-      bootstrap: [AppComponent]
-    })
-    export class AppModule {}
-    ```
+      @NgModule({
+        declarations: [AppComponent],
+        imports: [BrowserModule, HttpClientModule],
+        providers: [
+          // Here, we're telling Angular to provide the AuthInterceptor and use it as an HTTP_INTERCEPTOR if any HTTP request is made in the app (because by default, Angular doesn't know about the AuthInterceptor, so we need to provide it here as it only uses the HTTP_INTERCEPTORS token)
+          {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true
+          }
+        ],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule {}
+      ```
 
-    - The `HTTP_INTERCEPTORS` is a token that is used to provide the interceptors in Angular
-    - Here, we're telling Angular to provide the `AuthInterceptor` and use it as an `HTTP_INTERCEPTOR` if any HTTP request is made in the app (because by default, Angular doesn't know about the `AuthInterceptor`, so we need to provide it here as it only uses the `HTTP_INTERCEPTORS` token)
+      - The `HTTP_INTERCEPTORS` is a token that is used to provide the interceptors in Angular
+      - Here, we're telling Angular to provide the `AuthInterceptor` and use it as an `HTTP_INTERCEPTOR` if any HTTP request is made in the app (because by default, Angular doesn't know about the `AuthInterceptor`, so we need to provide it here as it only uses the `HTTP_INTERCEPTORS` token)
+    - **Standalone based:** If you're using standalone components, you can use the `withInterceptors` method to register the interceptor in the component
+
+      ```ts
+      // app.component.ts
+      import { withInterceptors } from '@angular/core';
+      import { AuthInterceptor } from './interceptors/auth-interceptor';
+
+      @Component({
+        selector: 'app-root',
+        templateUrl: './app.component.html',
+        styleUrls: ['./app.component.css'],
+        imports: [HttpClientModule],
+        providers: [withInterceptors([AuthInterceptor])] // register the interceptor here
+      })
+      export class AppComponent {
+        // component logic
+      }
+      ```
 
   - 4️⃣ Now, the `AuthInterceptor` will intercept every HTTP request and add the token to the request headers before sending the request to the server
+    ```ts
+    // interceptors/auth-interceptor.ts 📄
+
+    // Option 1: class based interceptor (OLD WAY)
+    import { Injectable } from '@angular/core';
+    import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+    import { Observable } from 'rxjs';
+    @Injectable()
+    export class AuthInterceptor implements HttpInterceptor {
+      intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const modifiedRequest = req.clone({
+            headers: req.headers.set('Authorization', 'Bearer ' + token)
+          });
+          return next.handle(modifiedRequest);
+        } else {
+          return next.handle(req);
+        }
+      }
+    }
+
+    // -------------------------or-------------------------
+    
+    // Option 2: standalone based interceptor (NEW WAY)
+    import { withInterceptors } from '@angular/core';
+    import { HttpClientModule } from '@angular/common/http';
+    import { AuthInterceptor } from './interceptors/auth-interceptor'; 
+
+    export funtion AuthInterceptor(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const modifiedRequest = req.clone({
+          headers: req.headers.set('Authorization', 'Bearer ' + token)
+        });
+        return next.handle(modifiedRequest);
+      } else {
+        return next.handle(req);
+      }
+    }
+    ```
 
 - Notes:
 

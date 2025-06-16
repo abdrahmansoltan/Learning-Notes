@@ -7,10 +7,14 @@
     - [Access modifiers in Services](#access-modifiers-in-services)
   - [Dependency injection](#dependency-injection)
     - [Why use Dependency Injection?](#why-use-dependency-injection)
-    - [How Angular does Dependency Injection?](#how-angular-does-dependency-injection)
+    - [How to use Dependency Injection in Angular components](#how-to-use-dependency-injection-in-angular-components)
+      - [Old/Common Way (in the constructor)](#oldcommon-way-in-the-constructor)
+      - [New way (using `inject()`)](#new-way-using-inject)
+    - [How Angular does Dependency Injection behind the scenes](#how-angular-does-dependency-injection-behind-the-scenes)
     - [Singleton](#singleton)
     - [`@injectable`](#injectable)
   - [Services \& RxJS](#services--rxjs)
+    - [HttpClient Service](#httpclient-service)
     - [Auth Service](#auth-service)
 
 ---
@@ -140,6 +144,35 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 
 - Usually, we use `private` access modifier for the properties and methods in the service, so that they are not accessible from outside the service class, and we use `public` access modifier for the methods that we want to expose to the components that use the service
 
+  ```ts
+  // services/fetch-data.service.ts 📄
+  import { Injectable } from '@angular/core';
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class FetchDataService {
+    // private property, not accessible from outside the service class
+    private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+
+    constructor() {}
+
+    // public method, accessible from outside the service class
+    public fetchData() {
+      return fetch(this.apiUrl)
+        .then(response => response.json())
+        .then(data => data);
+    }
+
+    // private method, not accessible from outside the service class
+    private handleError(error: any) {
+      console.error('An error occurred', error);
+      return throwError(error);
+    }
+  }
+  ```
+
+- It's also a good practice to use `computed()` when accessing properties in the service class, so that we can control the visibility of the properties and methods of the service class
+
 ---
 
 ## Dependency injection
@@ -197,8 +230,116 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 
 ---
 
-### How Angular does Dependency Injection?
+### How to use Dependency Injection in Angular components
 
+Either way, we need to import the service class in the component where it is needed and inject it in the constructor of the component
+
+Also if we're using modules instead of standalone components, we need to import the service in the module where the component is declared and add it to the `[providers] array in the module` to provide the service in the module's components
+
+```ts
+// app.module.ts 📄
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { FetchDataService } from './services/fetch-data.service';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule],
+  providers: [FetchDataService], // providing the service in the module
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+```
+
+#### Old/Common Way (in the constructor)
+
+Here we use access-modifiers in the constructor to inject the service in the component class, which is the most common way to inject dependencies in Angular components
+
+```ts
+// app.component.ts 📄
+import { Component, OnInit } from '@angular/core';
+import { FetchDataService } from './services/fetch-data.service';
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  fetchData: any;
+
+  // Injecting the service in the constructor ✅
+  constructor(private fetchDataService: FetchDataService) {}
+
+  ngOnInit() {
+    // Using the service in the component
+    this.fetchDataService.fetchData().then(data => {
+      this.fetchData = data;
+    });
+  }
+}
+```
+
+- When Angular sees a service in the constructor of a component, it looks in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
+  ![inject](./img/enj.PNG)
+
+- **Question ?**: What is the difference between adding a class-access-modifier in the constructor and not adding it?
+
+  ```ts
+  constructor(private fetchDataService: FetchDataService) {}
+  // vs
+  constructor(fetchDataService: FetchDataService) {}
+  ```
+
+  - When we add a class-access-modifier (`private` or `public`), it creates a property of the service in the component class
+  - When we don't add a class-access-modifier, it creates a parameter of the service in the `constructor` (only accessible in the `constructor`)
+
+#### New way (using `inject()`)
+
+- Angular 14 introduced a new way to inject dependencies using the `inject()` function, which allows us to inject dependencies without using the constructor
+- This is useful when we want to inject dependencies in a method or a property, instead of the constructor
+
+  ```ts
+  import { inject } from '@angular/core';
+  import { FetchDataService } from './services/fetch-data.service';
+
+  export class AppComponent {
+    private fetchDataService = inject(FetchDataService); // injecting the service using the inject() function
+
+    ngOnInit() {
+      this.fetchDataService.fetchData().then(data => {
+        console.log(data);
+      });
+    }
+  }
+  ```
+
+---
+
+### How Angular does Dependency Injection behind the scenes
+
+Angular uses a **hierarchical dependency injection system**, which means that it creates an injector for each component and its children, and it looks for the service in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
+
+![Dependency Injection](./img/dependency-injection-4.png)
+
+- Angular has multiple **injectors**:
+
+  - `Element Injector`: Each component has its own injector, which is created when the component is created
+  - `Module Injector`: Each module has its own injector, which is created when the module is created
+  - `Environment Injector`: The root injector, which is created when the application is bootstrapped
+  - `Platform Injector`: The platform injector, which is created when the application is bootstrapped
+    - **Note:** Avoid using the `Platform Injector` directly, as it will **not be tree-shakable** if the service is not used. and will be always included in the final bundle, which will increase the bundle size
+
+  > You can see all injectors and the Injector tree in the Angular DevTools in the browser
+  >
+  > ![Angular DevTools](./img/angular-devtools-injectors.png)
+
+- Angular checks each injector in the hierarchy to find the service that is being requested
+  - If the service is found in the injector, Angular creates an instance of the service class and injects it into the component
+  - If the service is not found in the injector, Angular looks for the service in the parent injector, and so on, until it finds the service or reaches the root injector
+- Angular uses the `@Injectable` decorator to mark the class as a service, which tells Angular that this class can be injected into other components
+- Angular uses the `providedIn` property to provide the service in the root module, so that it can be used in the whole application
+- When we inject the service in the component, Angular looks for the service in the `[providers] array in the component` and creates an instance of the service class **(if it doesn't exist)**, or uses the existing instance if it does exist
 - Angular uses `Hierarchical Dependency Injection` system
 
   > if service is initiates in a parent component -> it will be available for all of its children
@@ -226,20 +367,6 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
     }
     // Here, FetchDataService is a provider that is used to provide the service in the root module
     ```
-
-- When Angular sees a service in the constructor of a component, it looks in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
-  ![inject](./img/enj.PNG)
-
-- **Question ?**: What is the difference between adding a class-access-modifier in the constructor and not adding it?
-
-  ```ts
-  constructor(private fetchDataService: FetchDataService) {}
-  // vs
-  constructor(fetchDataService: FetchDataService) {}
-  ```
-
-  - When we add a class-access-modifier (`private` or `public`), it creates a property of the service in the component class
-  - When we don't add a class-access-modifier, it creates a parameter of the service in the `constructor` (only accessible in the `constructor`)
 
 ---
 
@@ -275,6 +402,139 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 - We use `Observables` to:
   - handle data that changes over time
   - handle data that comes from multiple sources (like multiple API calls)
+
+---
+
+### HttpClient Service
+
+The `HttpClient` service is a built-in Angular service that provides a simplified API for making HTTP requests and handling responses using observables.
+
+- **How to use it in Angular?**
+
+  - In order to use the `HttpClient` service in Angular, we need to
+
+    - If using modules
+
+      - import the `HttpClientModule` from the `@angular/common/http` package and add it to the `imports` array of the `AppModule`.
+
+        ```ts
+        import { HttpClientModule } from '@angular/common/http';
+
+        @NgModule({
+          declarations: [AppComponent],
+          imports: [BrowserModule, HttpClientModule], // add HttpClientModule here
+          providers: [],
+          bootstrap: [AppComponent]
+        })
+        export class AppModule {}
+        ```
+
+    - If using standalone components
+
+      - import the `provideHttpClient` function from the `@angular/common/http` package and add it to the `providers` array of the component.
+
+        ```ts
+        import { provideHttpClient } from '@angular/common/http';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: ['./app.component.css'],
+          providers: [provideHttpClient()] // add provideHttpClient here
+        })
+        export class AppComponent implements OnInit {
+          // ...
+        }
+        ```
+
+      - or in the `app.config.ts` file, we can add the `provideHttpClient` function to the `providers` array.
+
+        ```ts
+        import { provideHttpClient } from '@angular/common/http';
+
+        export const appConfig: ApplicationConfig = {
+          providers: [provideHttpClient()]
+        };
+        ```
+
+    - This will allow us to use the `HttpClient` service in our Angular application to make HTTP requests and handle the responses using observables.
+
+  - The `HttpClient` service provides methods for making HTTP requests, such as `get()`, `post()`, `put()`, `delete()`, etc.
+
+    - These methods return an `Observable` that emits the response from the server, which we can subscribe to in order to handle the response data.
+
+    ```ts
+    // services/fetch-data.service.ts 📄
+    import { Injectable } from '@angular/core';
+    import { HttpClient } from '@angular/common/http';
+    import { Observable } from 'rxjs';
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class FetchDataService {
+      private apiUrl = 'https://jsonplaceholder.typicode.com/posts';
+
+      constructor(private http: HttpClient) {} // inject HttpClient service
+
+      // use HttpClient to make a GET request
+      fetchData(): Observable<any> {
+        return this.http.get<any>(this.apiUrl); // return an Observable
+      }
+    }
+    ```
+
+  - Now to use it in a component, after injecting the service in the component, we can subscribe to the `Observable` returned by the `fetchData()` method to get the data from the server.
+
+    ```ts
+    // app.component.ts 📄
+    import { Component, OnInit, OnDestroy } from '@angular/core';
+    import { FetchDataService } from './services/fetch-data.service';
+
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.css']
+    })
+    export class AppComponent implements OnInit, OnDestroy {
+      fetchData: any;
+
+      constructor(private fetchDataService: FetchDataService) {}
+
+      ngOnInit() {
+        // ⚠️ Note: This won't do anything, because fetchData() returns an Observable, and must be subscribed to in order to get the data
+        // this.fetchDataService.fetchData();
+
+        // subscribe to the Observable returned by fetchData()
+        this.fetchDataService.fetchData().subscribe(data => {
+          this.fetchData = data; // handle the response data
+        });
+
+        // or using next() and error() methods
+        this.fetchDataService.fetchData().subscribe({
+          next: data => {
+            this.fetchData = data; // handle the response data
+          },
+          error: error => {
+            console.error('Error fetching data:', error); // handle the error
+          }
+        });
+      }
+
+      // Also, don't forget to clean up the subscription when the component is destroyed to avoid memory leaks
+      ngOnDestroy() {
+        if (this.fetchDataSubscription) {
+          this.fetchDataSubscription.unsubscribe(); // unsubscribe from the Observable
+        }
+      }
+    }
+    ```
+
+- Why use it instead of `fetch()` or `axios`?
+
+  - Because it provides a simplified API for making HTTP requests and handling responses using observables, which makes it easier to work with asynchronous data in Angular applications
+  - It provides built-in support for **interceptors**, which allows us to modify the request and response data before they are sent or received, and to handle errors in a more elegant way
+
+    > **Interceptors**: We can use `HttpClient` interceptors to intercept HTTP requests and responses, and modify them before they are sent or received, or to handle errors in a more elegant way. More about interceptors [in the Angular-Modules file](./2-Angular-Modules.md#http-interceptors)
 
 ---
 

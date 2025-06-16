@@ -12,9 +12,9 @@
     - [Creating Components](#creating-components)
     - [Component example](#component-example)
     - [Component properties](#component-properties)
-    - [Component methods](#component-methods)
-    - [Component Lifecycle Hooks](#component-lifecycle-hooks)
+    - [Component Lifecycles](#component-lifecycles)
       - [ngOnInit()](#ngoninit)
+      - [ngAfterViewInit()](#ngafterviewinit)
       - [ngOnDestroy()](#ngondestroy)
       - [ngOnChanges()](#ngonchanges)
     - [Presentational vs Smart components](#presentational-vs-smart-components)
@@ -23,18 +23,12 @@
     - [External styles](#external-styles)
     - [Dynamic classes](#dynamic-classes)
     - [Encapsulated styles](#encapsulated-styles)
-  - [State](#state)
-    - [State Management](#state-management)
-    - [Zone.js](#zonejs)
-    - [Signals](#signals)
-      - [How to use Signals?](#how-to-use-signals)
-      - [Signals Input and Output](#signals-input-and-output)
-    - [Signals vs Zone.js](#signals-vs-zonejs)
   - [Data-Binding](#data-binding)
     - [String Interpolation](#string-interpolation)
     - [Property Binding](#property-binding)
     - [Event Binding](#event-binding)
     - [2-way-binding](#2-way-binding)
+      - [Custom 2-way binding](#custom-2-way-binding)
     - [Data Binding Notes](#data-binding-notes)
   - [Directives](#directives)
     - [Attribute Directives](#attribute-directives)
@@ -46,20 +40,15 @@
   - [Data flow between components](#data-flow-between-components)
     - [Parent to Child (Passing data / Input / Props)](#parent-to-child-passing-data--input--props)
     - [Child to Parent (Emitting events / Output)](#child-to-parent-emitting-events--output)
-    - [Local Reference (Template variable)](#local-reference-template-variable)
+    - [Template variable (Refs)](#template-variable-refs)
     - [Content projection (Slots)](#content-projection-slots)
       - [Single-slot content projection](#single-slot-content-projection)
       - [Multi-slot content projection](#multi-slot-content-projection)
   - [Pipes](#pipes)
+    - [How to use Pipes](#how-to-use-pipes)
     - [Built-in pipes](#built-in-pipes)
     - [Custom Pipes](#custom-pipes)
     - [Chaining pipes](#chaining-pipes)
-  - [Forms and Input Handling](#forms-and-input-handling)
-    - [Input Handling (Two-way data binding)](#input-handling-two-way-data-binding)
-      - [Input masking in Angular](#input-masking-in-angular)
-    - [Forms](#forms)
-      - [Reactive Forms](#reactive-forms)
-      - [Template Forms (`ngModel` \& `ngForm`)](#template-forms-ngmodel--ngform)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
   - [Notes](#notes)
@@ -502,22 +491,11 @@ A component should present properties and methods for data binding, in order to 
 
 ---
 
-### Component methods
+### Component Lifecycles
 
-- `constructor` : it's a method that runs when the component is created
-- `ngOnInit` : it's a lifecycle hook that runs after the constructor and after the first `ngOnChanges` (it's a good place to put initialization logic)
-- `ngOnChanges` : it's a lifecycle hook that runs when the input properties of the component change
-- `ngOnDestroy` : it's a lifecycle hook that runs when the component is destroyed (it's a good place to put cleanup logic)
-- `ngAfterViewInit` : it's a lifecycle hook that runs after the view has been initialized (it's a good place to put logic that needs to run after the view has been initialized)
-- `ngAfterViewChecked` : it's a lifecycle hook that runs after the view has been checked (it's a good place to put logic that needs to run after the view has been checked)
-- **Notes:**
-  - Don't use the constructor to fetch data from a server or to initialize the component. Use `ngOnInit` instead.
-  - Don't use arrow functions when defining methods in a component. Use regular functions instead. (to avoid `this` keyword problems)
+Angular components have a lifecycle that consists of a series of events that occur from the moment the component is created until it is destroyed. These events are called **lifecycle hooks**, and they allow you to run code at specific points in the component's lifecycle.
 
----
-
-### Component Lifecycle Hooks
-
+![lifeCycle](./img/life-cycle-hooks.png)
 ![lifeCycle](./img/life-cycle-hooks-1.png)
 
 - A component instance has a lifecycle that
@@ -528,6 +506,18 @@ A component should present properties and methods for data binding, in order to 
 
 - **Most common lifecycle hooks:**
   ![lifeCycle](./img/life-cycle-hooks-2.png)
+
+- **Lifecycles:**
+
+  - `constructor` : it's a method that runs when the component is created
+  - `ngOnInit` : it's a lifecycle hook that runs after the constructor and after the first `ngOnChanges` (it's a good place to put initialization logic)
+  - `ngOnChanges` : it's a lifecycle hook that runs when the input properties of the component change
+  - `ngOnDestroy` : it's a lifecycle hook that runs when the component is destroyed (it's a good place to put cleanup logic)
+  - `ngAfterViewInit` : it's a lifecycle hook that runs after the view has been initialized (it's a good place to put logic that needs to run after the view has been initialized)
+  - `ngAfterViewChecked` : it's a lifecycle hook that runs after the view has been checked (it's a good place to put logic that needs to run after the view has been checked)
+  - **Notes:**
+    - Don't use the constructor to fetch data from a server or to initialize the component. Use `ngOnInit` instead.
+    - Don't use arrow functions when defining methods in a component. Use regular functions instead. (to avoid `this` keyword problems)
 
 - To be able to use the lifecycle hooks, you need to implement the interface for the hook you want to use in the component class **(it's optional)**
 
@@ -557,6 +547,23 @@ A component should present properties and methods for data binding, in order to 
   }
   ```
 
+- **⚠️ Note:** It's better to import the`OnInit` interface from `@angular/core` package, so that you can use them in the component class to implement the lifecycle hooks, but it's not mandatory. You can just define the methods in the component class without implementing the interface. But it's a good practice to implement the interface to make it clear that the component has lifecycle hooks and to avoid typos in the method names.
+
+  ```ts
+  import { Component, OnInit } from '@angular/core';
+
+  export class MyComponent implements OnInit {
+    ngOnInit() {
+      // ...
+    }
+  }
+  ```
+
+- Why use `ngOnInit` instead of `constructor`?
+
+  - The `ngOnInit` hook is called after the component is initialized, and **all the component's input properties are set**. This is unlike `constructor`, which is called before the component is initialized and before the input properties are set.
+  - So, if you need to access the input properties of the component, you should use `ngOnInit` instead of `constructor`.
+
 - **Useful Links:**
 
   - [lifecycle hooks guide](https://angular.io/guide/lifecycle-hooks)
@@ -585,6 +592,37 @@ class MyComponent implements OnInit {
   - `ngOnInit` is a life cycle hook called by Angular to indicate that Angular is done creating the component (data is passed between components).
   - Mostly we use `ngOnInit` for all the initialization/declaration and avoid stuff to work in the constructor. The `constructor` should only be used to initialize class members but shouldn't do actual "work".
 
+#### ngAfterViewInit()
+
+- It's a callback method that is invoked after the component's view and its child views have been initialized. It is invoked only once when the directive is instantiated.
+- It's used to perform any additional initialization tasks that require access to the component's view or its child views, such as **querying for elements in the view or setting up Intersection Observers**.
+
+  ```ts
+  import { Component, AfterViewInit } from '@angular/core';
+
+  class MyComponent implements AfterViewInit {
+    @ViewChild('childElement') childElementRef: ElementRef;
+
+    ngAfterViewInit() {
+      // This method is called after the view is initialized
+      console.log('View has been initialized');
+
+      // Example: Accessing a child element using ViewChild
+      const childElement = this.childElementRef.nativeElement;
+
+      // Example: Setting intersection observer on the child element
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            console.log('Child element is in view');
+          }
+        });
+      });
+      observer.observe(childElement);
+    }
+  }
+  ```
+
 #### ngOnDestroy()
 
 - It's a callback method that performs `cleanup` right before Angular destroys the directive/component. Use `ngOnDestroy` for `cleanup` logic, `subscriptions`, `listeners`, etc.
@@ -595,15 +633,81 @@ class MyComponent implements OnInit {
   }
   ```
 
-#### ngOnChanges()
-
-- It's a callback method that is invoked immediately after the default change detector has checked the directive's data-bound properties for the first time and before any of the view or content children have been checked. It is invoked every time the input properties of a component change.
+- It's common to use it to unsubscribe from `Observables` or `EventEmitters` **to prevent memory leaks, or to remove event listeners** that were added in the component.
 
   ```ts
-  ngOnChanges() {
-    // ...
+  import { Component, OnDestroy } from '@angular/core';
+  import { Subscription } from 'rxjs';
+
+  class MyComponent implements OnDestroy {
+    private subscription: Subscription;
+
+    constructor() {
+      // Subscribe to an observable
+      this.subscription = someObservable.subscribe(data => {
+        // Handle data
+      });
+    }
+
+    ngOnDestroy() {
+      // Unsubscribe to prevent memory leaks
+      this.subscription.unsubscribe();
+    }
   }
   ```
+
+- `destroyRef`
+
+  - It's a reference to the component instance that is being destroyed, and it can be used to perform cleanup logic before the component is destroyed.
+
+  ```ts
+  import { Component, inject } from '@angular/core';
+  import { DestroyRef } from '@angular/core';
+  import { Subscription } from 'rxjs';
+
+  class MyComponent {
+    private destroyRef = inject(DestroyRef);
+    private subscription: Subscription;
+
+    constructor() {
+      // Subscribe to an observable
+      this.subscription = someObservable.subscribe(data => {
+        // Handle data
+      });
+
+      this.destroyRef.onDestroy(() => {
+        // Cleanup logic before the component is destroyed
+        console.log('Component is being destroyed');
+      });
+    }
+  }
+  ```
+
+#### ngOnChanges()
+
+It's a callback method that is invoked whenever one or more data-bound input properties change. It receives a `SimpleChanges` object that contains the current and previous values of the changed properties.
+
+```ts
+import { Component, OnChanges, SimpleChanges } from '@angular/core';
+
+class MyComponent implements OnChanges {
+  // Input properties
+  @Input() someProperty: string;
+
+  ngOnChanges(changes: SimpleChanges) {
+    // Handle changes to input properties
+    console.log('Changes:', changes);
+  }
+}
+```
+
+- The value of the `changes` object is a map of the changed properties, where the key is the name of the property and the value is an object that contains the current and previous values of the property.
+  ![ngOnChanges](./img/ngonchanges.png)
+
+- **⚠️ Notes:**
+  - `ngOnChanges` is called before `ngOnInit`, so if you need to access the input properties of the component, you should use `ngOnChanges` instead of `ngOnInit`.
+  - `ngOnChanges` is called whenever the input properties of the component change, so you can use it to react to changes in the input properties and update the component accordingly.
+  - **it's called a lot of times, so you should avoid doing heavy computations in it**.
 
 ---
 
@@ -784,165 +888,6 @@ Sometimes you want to apply styles to a component, but you don't want those styl
 
 ---
 
-## State
-
-**State** in Angular refers to the data that is used by the component to render the view. It's similar to `state` in React, where we use `useState` hook to manage the state of the component, but in Angular, we just declare the properties in the component class and use them in the template.
-
-### State Management
-
-- There're multiple approaches to manage state in Angular:
-  ![State](./img/state-1.png)
-  - Relying on `Zone.js`
-  - Using a state management library like `NgRx` or `Akita`
-  - Uing **Signals**
-
----
-
-### Zone.js
-
-It's a library that Angular uses to detect changes in the component state and update the view accordingly. It patches the `JavaScript` event loop and detects when an event occurs, and then it triggers change detection in Angular.
-
-It's invisible grouping mechanism that allows Angular to know when to update the view. It works by monkey-patching the `JavaScript` event loop and detecting when an event occurs, and then it triggers change detection in Angular.
-
-- **How does Angular's Change Detection Works with state/properties?**
-
-  - Angular uses a change detection mechanism to detect changes in the component state and update the view accordingly
-    ![change-detection](./img/change-detection-1.png)
-  - When a property in the component class changes, Angular automatically updates the view to reflect the new value of the property
-  - This is done using [`Zone.js`](https://www.npmjs.com/package/zone.js), which is a library that Angular uses to detect changes in the component state
-    ![zone](./img/zone-1.webp)
-    - This means that when an event occurs, Angular will check if any of the component properties have changed, and if so, it will update the view accordingly
-      ![zone](./img/zone-2.webp)
-    - This is done automatically, so you don't need to worry about it, but it's good to know how it works under the hood
-
----
-
-### Signals
-
-**Signals** are a new way to manage state in Angular, introduced in Angular 16, which allows you to create **reactive state** that can be used in the component template and automatically updates the view when the state changes.
-
-- Signals are similar to
-  - `useState` in React, but they are more powerful and flexible
-  - `ref` in Vue, but they are more efficient and easier to use
-- They're like a **container** that contains a value, and when the value changes, Angular is notified and updates the view accordingly wherever the signal is used
-  ![Signals](./img/signals-1.png)
-
-- **Signals are automatically tracked by Angular**, so when the signal value changes, Angular will update the view accordingly
-- It's better than using `Zone.js` because it doesn't require any monkey-patching of the `JavaScript` event loop, and it's more efficient because it only updates the view when the signal value changes
-  > "monkey-patching" means modifying the behavior of a function or object at runtime, which can lead to performance issues and bugs
-
-#### How to use Signals?
-
-- `signal()`
-
-  - You can create a signal using the `signal` function from the `@angular/core` package
-
-    ```ts
-    import { signal } from '@angular/core';
-
-    // Create a signal with an initial value
-    const count = signal(0);
-    ```
-
-  - You can use the signal in the component template using the `{{}}` syntax, **and you have to call the signal as a function to get its value**
-
-    ```html
-    <p>Count: {{ count() }}</p>
-    ```
-
-  - You can update the signal value using the `set` method
-
-    ```ts
-    count.set(count() + 1);
-    ```
-
-- `computed()`
-
-  - You can create a computed signal that depends on other signals using the `computed` function
-
-    ```ts
-    import { computed } from '@angular/core';
-
-    const doubleCount = computed(() => count() * 2);
-    ```
-
-  - You can use the computed signal in the component template using the `{{}}` syntax, **and you have to call the computed signal as a function to get its value**
-
-    ```html
-    <p>Double Count: {{ doubleCount() }}</p>
-    ```
-
-  - It will only be re-evaluated when the signals it depends on change, so it's more efficient than using a method that returns a value
-
----
-
-#### Signals Input and Output
-
-- **`input`**
-
-  - You can use signals as input properties in a component by using the `input` decorator (it's lowercase unlike `@Input()` decorator)
-
-    ```ts
-    import { Component, input } from '@angular/core';
-
-    @Component({
-      selector: 'app-child',
-      template: `
-        <h2>{{ title }}</h2>
-        <p>Child Count: {{ count() }}</p>
-      `
-    })
-    export class ChildComponent {
-      title = input.required<string>(); // create a required input signal
-      count = input<number>(); // create an input signal
-    }
-    ```
-
-- **`output`**
-
-  - You can use signals as output properties in a component by using the `output` decorator (it's lowercase unlike `@Output()` decorator)
-
-    ```ts
-    import { Component, output } from '@angular/core';
-
-    @Component({
-      selector: 'app-child',
-      template: `
-        <button (click)="increment()">Increment</button>
-      `
-    })
-    export class ChildComponent {
-      count = output<number>(); // create an output signal
-
-      increment() {
-        this.count.emit(this.count() + 1); // emit the new value of the count signal
-      }
-    }
-    ```
-
-  - **⚠️ Note:** It doesn't create a signal, it just creates an output property that can be used to emit values from the component
-
-- **2 way binding**
-
-  - You can use signals for 2-way binding with `ngModel` normally as Angular will detect that we're using signals and will update the view accordingly, and no need to use `()` syntax
-
-    ```html
-    <input [(ngModel)]="count" />
-    <p>Count: {{ count() }}</p>
-    ```
-
----
-
-### Signals vs Zone.js
-
-- `Signals` are more efficient than `Zone.js` because they only update the view when the `signal` value changes, while `Zone.js` updates the view whenever an event occurs
-- `Signals` are more powerful than `Zone.js` because they allow you to create reactive state that can be used in the component template and automatically updates the view when the state changes
-- `Signals` are easier to use than `Zone.js` because they don't require any monkey-patching of the `JavaScript` event loop, and they are more intuitive to use
-
-**Note:** Signals are still an experimental feature in Angular, and they are not yet widely used in production apps. But they are expected to become the standard way to manage state in Angular in the future.
-
----
-
 ## Data-Binding
 
 **Data-binding** is a way to pass data from the component class to the component template and vice versa (Communication between the component class and the template)
@@ -1070,6 +1015,65 @@ It's a way to bind an event of an HTML element to a method in the component clas
   export class AppModule {}
   ```
 
+#### Custom 2-way binding
+
+- You can create a custom 2-way binding using the `@Input()` and `@Output()` decorators in the component class
+
+  - The trick here is the naming of the `@Output()` property, which should be named with the `Change` suffix to indicate that it is a 2-way binding -> **(e.g. `value` and `valueChange`)**
+
+    ```ts
+    import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+    @Component({
+      selector: 'app-custom-input',
+      template: `
+        <input [value]="value" (input)="onInput($event)" />
+      `
+    })
+    export class CustomInputComponent {
+      @Input() value: string = '';
+      @Output() valueChange = new EventEmitter<string>();
+
+      onInput(event: Event) {
+        const inputValue = (event.target as HTMLInputElement).value;
+        this.valueChange.emit(inputValue);
+      }
+    }
+    ```
+
+  - And then you can use it in the parent component like this:
+
+    ```html
+    <app-custom-input [(value)]="name"></app-custom-input>
+    ```
+
+- **Newer and easier way** to do custom 2-way binding is to use **Signals** (`model` directive) in the component class, which is a shorthand for `[(ngModel)]`
+
+  ```ts
+  import { Component, model } from '@angular/core';
+
+  @Component({
+    selector: 'app-custom-input',
+    template: `
+      <input [value]="value()" (input)="onInput($event)" />
+    `
+  })
+  export class CustomInputComponent {
+   value = model<string>(''); // create a model signal with initial value
+   // ⚠️ No need for @Input() and @Output() decorators
+
+    onInput(event: Event) {
+      const inputValue = (event.target as HTMLInputElement).value;
+      this.value.set(inputValue); // update the model signal value
+    }
+  ```
+
+  - And then you can use it in the parent component like this:
+
+    ```html
+    <app-custom-input [(value)]="name"></app-custom-input>
+    ```
+
 ---
 
 ### Data Binding Notes
@@ -1106,8 +1110,10 @@ It's a way to bind an event of an HTML element to a method in the component clas
 
 ## Directives
 
-**Angular directives** are extended `HTML attributes` with the prefix `"ng-"`.
-![directives](./img/directives-0.png)
+It's a way to extend the HTML with custom behavior and functionality **(Enhancements to HTML)**, allowing you to create reusable components and manipulate the DOM in a declarative way.
+
+- **Angular directives** are extended `HTML attributes` with the prefix `"ng-"`.
+  ![directives](./img/directives-0.png)
 
 > [Directives Resource](https://angular.io/api?type=directive)
 
@@ -1115,18 +1121,17 @@ It's a way to bind an event of an HTML element to a method in the component clas
 - **Directives Types**
   ![Directives](./img/Directives.png)
   ![Directives](./img/Directives-1.png)
-  ![Directives](./img/Directives-2.png)
 
 - Angular has built-in directives:
-  - **Structural directives**: Change the DOM structure.
+  - [Structural directives](#structural-directives): Change the DOM structure by adding/removing elements.
     - `*ngIf`: Conditionally remove/recreate DOM.
     - `*ngFor`: Repeat DOM for each list item.
     - `*ngSwitch`: Swap DOM based on expression.
-  - **Attribute directives**: Change element appearance/behavior.
+  - [Attribute directives](#attribute-directives): Change the appearance or behavior of an element.
     - `ngStyle`: Set inline styles.
     - `ngClass`: Add/remove CSS classes.
     - `ngModel`: Two-way data binding.
-  - **Multiple directives**: Combine for complex behavior.
+  - [Multiple directives](#multiple-directives): Combine multiple directives for complex behavior.
     - `<ng-container>`: Grouping element, no style/layout impact.
     - `<ng-template>`: Grouping element, no style/layout impact.
 
@@ -1268,40 +1273,65 @@ It's a way to bind an event of an HTML element to a method in the component clas
 
 ### Multiple Directives
 
-We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-container>` to group them together, and use them on the `<ng-container>` element
+- `ng-container`
 
-```html
-<!-- ✅ -->
-<ng-container *ngIf="condition">
-  <p *ngFor="let item of items">{{ item }}</p>
-</ng-container>
+  - it's a grouping element that doesn't add any extra element to the DOM, and it can be used to group multiple elements together and apply a structural directive to them
 
-<!-- ❌ -->
-<p *ngIf="condition" *ngFor="let item of items">{{ item }}</p>
-```
+    ```html
+    <ng-container *ngIf="condition">
+      <p>Item 1</p>
+      <p>Item 2</p>
+      <p>Item 3</p>
+    </ng-container>
+    ```
 
-- It's usually used when we want to limit the number of elements that can be used with a structural directive
+  - We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-container>` to group them together, and use them on the `<ng-container>` element
 
-  ```html
-  <ng-container *ngFor="let item of items; let i = index">
-    <p *ngIf="i < 3">{{ item }}</p>
-  </ng-container>
-  ```
+    ```html
+    <!-- ❌ -->
+    <p *ngIf="condition" *ngFor="let item of items">{{ item }}</p>
 
-- It's also used when we want to group elements together **(without adding an extra wrapping element to the DOM)**
+    <!-- ✅ -->
+    <ng-container *ngIf="condition">
+      <p *ngFor="let item of items">{{ item }}</p>
+    </ng-container>
+    ```
 
-  ```html
-  <ng-container *ngIf="condition">
-    <p>Item 1</p>
-    <p>Item 2</p>
-    <p>Item 3</p>
-  </ng-container>
-  ```
+  - It's similar to:
+    - `<template>` in **Vue.js**
+    - `<Fragment>` in **React**
 
-> It's similar to:
->
-> - `<template>` in **Vue.js**
-> - `<Fragment>` in **React**
+- `ng-template`
+
+  - it's a grouping element that doesn't add any extra element to the DOM, and it can be used to group multiple elements together and apply a structural directive to them
+  - It allows us to **define a template that can be used later** in the component, and it can be used with structural directives like `*ngIf` and `*ngFor`
+  - It can be used to be a placeholder for content that will be rendered later **(lazy loaded)**
+
+    ```html
+    <button (click)="openModal()">Open Modal</button>
+
+    <ng-template #modalContainer></ng-template>
+    ```
+
+    ```ts
+    //in component.ts
+    import { Component, ViewChild, TemplateRef } from '@angular/core';
+
+    export class ModalComponent {
+      @ViewChild('modalContainer', { static: true }) modalContainer!: TemplateRef<any>;
+
+      openModal() {
+        // Here we can use the modalContainer template to render the modal content
+
+        // 1. Open modal
+        this.isModalOpen = true;
+        // 2. Load FavoritesModalComponent dynamically
+        const { ModalComponent } = await import('./modal.component');
+        // 3. Create component and insert it in the modal container ref
+        this.modalRef = this.modalContainer.createComponent(ModalComponent);
+      }
+    }
+    ```
 
 ---
 
@@ -1316,6 +1346,18 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
   - this will create a file in the `app` folder with the name `<directive-name>.directive.ts` and add the directive to the `declarations` array in the `app.module.ts` file
   - the file will contain a class with the name `<DirectiveName>Directive`
   - the class will have a `constructor` method that takes an `ElementRef` and a `Renderer2` as arguments
+
+- We can also use `standalone: true` to make the directive standalone, so that it can be used without importing it in the `app.module.ts` file
+
+  ```ts
+  @Directive({
+    selector: '[appHighlight]',
+    standalone: true // makes the directive standalone
+  })
+  export class HighlightDirective {
+    constructor(private el: ElementRef, private renderer: Renderer2) {}
+  }
+  ```
 
 #### Custom Attribute Directive
 
@@ -1348,7 +1390,7 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
   - `el` -> is a reference to the element that the directive is applied to
   - `renderer` -> is a service that can be used to modify the element in a way that is safe from XSS attacks
 
-- Example: setting background color dynamically
+- **Example: setting background color dynamically**
 
   ```ts
   // in app/highlight.directive.ts
@@ -1370,6 +1412,26 @@ We can't use both `*ngIf` and `*ngFor` on the same element, so we use `<ng-conta
 
   ```html
   <p [appHighlight]="'red'">Highlight me!</p>
+  ```
+
+- **Example: Adding query params to a link `href`**
+
+  ```ts
+  // query-params.directive.ts 📄
+  import { Directive, ElementRef, Input, Renderer2 } from '@angular/core';
+
+  @Directive({
+    selector: '[appQueryParams]'
+  })
+  export class QueryParams Directive {
+   // Access the `href` in the <a> element and add `+ '?from=myapp'` to it
+    @Input() set appQueryParams(params: string) {
+      const href = (this.el.nativeElement as HTMLAnchorElement).href; // get the href attribute of the <a> element
+      this.renderer.setAttribute(this.el.nativeElement, 'href', `${href}?${params}`);
+    }
+
+    constructor(private el: ElementRef, private renderer: Renderer2) {}
+  }
   ```
 
 #### Custom Structural Directive
@@ -1537,33 +1599,70 @@ The parent component can pass data to the child component using `@Input()` decor
 
 ---
 
-### Local Reference (Template variable)
+### Template variable (Refs)
 
-its a word that you use to mark an element and get access to it in the template to use it in another place in the **same template**
+It's a way to reference an element in the template so that you can access it in the template or in the component class.
 
 - it starts with `#`
 
-- to access it in the template:
+- to access it:
+
+  - in the template:
+
+    ```html
+    <input #nameInput />
+
+    <button (click)="fun(nameInput.value)"></button>
+    ```
+
+  - in the component class, you can use the `@ViewChild` decorator to get a reference to the element
+
+    ```ts
+    @ViewChild('nameInput') nameInput:ElementRef;
+    ```
+
+    > If you want to use signals, you can use `signal()` function to create a signal that holds the value of the input element
+
+- To select multiple elements, you can use the `@ViewChildren` decorator
+
+  ```ts
+  @ViewChildren('nameInput') nameInputs: QueryList<ElementRef>;
+  ```
+
+- To access content-projected (slots) elements, you can use the `@ContentChild` decorator
 
   ```html
-  <input #serveNameInput />
-
-  <button (click)="fun(serverNameInput.value)"></button>
+  <!-- parent -->
+  <child-component>
+    <input #nameInput />
+  </child-component>
   ```
 
-- to access it in the .ts file:
+  ```html
+  <!-- child -->
+  <ng-content></ng-content>
+  ```
 
   ```ts
-  // in the class
-  @viewChile('serveNameInput') serveNameInput:ElementRef;
+  @ContentChild('nameInput') nameInput: ElementRef;
   ```
 
-- to access it in its child-.ts file:
+- **Use cases:**
 
-  ```ts
-  // in the class
-  @contentChild('serveNameInput') serveNameInput:ElementRef;
-  ```
+  - To access the value of an input elements in a form instead of using `ngModel`
+
+    ```html
+    <form (submit)="submit(nameInput.value)">
+      <input #nameInput />
+      <button type="submit">Submit</button>
+    </form>
+    ```
+
+    ```ts
+    submit(name: string) {
+      console.log(name);
+    }
+    ```
 
 ---
 
@@ -1627,56 +1726,86 @@ its a word that you use to mark an element and get access to it in the template 
 
 ## Pipes
 
-It's a transformer that takes input data and transforms it into a desired output format, which is then displayed in the template.
+It's a way to transform data **in the template** before displaying it, and it's used to format data in a specific way.
 
 ![pipe](./img/pipes.png)
 ![pipe](./img/pipes-1.png)
 ![pipe](./img/pipes-2.png)
 
-- Pipes are used to transform data **in the template** before displaying it.
+### How to use Pipes
 
-### Built-in pipes
+In order to use a pipe, you need 2 steps:
 
-> [pipe reference](https://angular.io/api?type=pipe) -> Here, you can find all the built-in pipes in Angular
+1. **Import the Pipe in the component/module** where you want to use it
 
-- In order to use a pipe:
+   - If you're using a built-in pipe, you need to import the `CommonModule` in the `app.module.ts` file or in the component that uses the pipe
 
-  - **Using modules:** you need to import the `CommonModule` in the `app.module.ts` file, and other pipes like `currency`, `date`, `decimal`, etc. are already included in the `CommonModule`, so you don't need to import them separately.
+     - **Using modules:** you need to import the `CommonModule` in the `app.module.ts` file, and other pipes like `currency`, `date`, `decimal`, etc. are already included in the `CommonModule`, so you don't need to import them separately.
 
-    ```ts
-    import { CommonModule } from '@angular/common';
+       ```ts
+       import { CommonModule } from '@angular/common';
 
-    @NgModule({
-      declarations: [AppComponent],
-      imports: [BrowserModule, CommonModule], // import the CommonModule here 👈
-      providers: [],
-      bootstrap: [AppComponent]
-    })
-    export class AppModule {}
-    ```
+       @NgModule({
+         declarations: [AppComponent],
+         imports: [BrowserModule, CommonModule], // import the CommonModule here 👈
+         providers: [],
+         bootstrap: [AppComponent]
+       })
+       export class AppModule {}
+       ```
 
-  - **Using standalone components:** you can import the `CommonModule` in the `@Component` decorator of the component that uses the pipe
+     - **Using standalone components:** you can import the `CommonModule` or the specific pipe directly in the component that uses the pipe, and you don't need to import it in the `app.module.ts` file
 
-    ```ts
-    import { Component } from '@angular/core';
-    import { CommonModule } from '@angular/common';
+       ```ts
+       import { Component } from '@angular/core';
+       import { CommonModule } from '@angular/common';
+       // or
+       import { DatePipe } from '@angular/common';
 
-    @Component({
-      selector: 'app-root',
-      templateUrl: './app.component.html',
-      styleUrls: ['./app.component.css'],
-      standalone: true,
-      imports: [CommonModule] // import the CommonModule here 👈
-    })
-    export class AppComponent {}
-    ```
+       @Component({
+         selector: 'app-root',
+         templateUrl: './app.component.html',
+         styleUrls: ['./app.component.css'],
+         standalone: true,
+         imports: [CommonModule], // import the CommonModule here 👈
+         // or
+         imports: [DatePipe] // import the specific pipe here 👈
+       })
+       export class AppComponent {}
+       ```
+
+   - If you're creating a custom pipe, you need to import it in the `app.module.ts` file or in the component that uses the pipe
+
+2. **Use the Pipe in the template**
+
+   - You can use the pipe in the template by using the `|` (pipe) operator followed by the pipe name and optional arguments
+
+   ```html
+   <p>{{ data | pipeName:arg1:arg2:... }}</p>
+   ```
 
 - [date-pipe format options](https://angular.io/api/common/DatePipe#pre-defined-format-options)
 - **Format:** `{{ data | pipeName:arg1:arg2:... }}`
 
-  - `data` : the data you want to transform
-  - `pipeName` : the name of the pipe you want to use
-  - `arg1`, `arg2`, ... : the arguments you want to pass to the pipe (optional)
+- `data` : the data you want to transform
+- `pipeName` : the name of the pipe you want to use
+- `arg1`, `arg2`, ... : the arguments you want to pass to the pipe (optional)
+
+---
+
+### Built-in pipes
+
+> [Built-in pipes reference](https://angular.dev/guide/templates/pipes#built-in-pipes) -> Here, you can find all the built-in pipes in Angular
+
+- Example with `number` pipe: it formats a number to a specific format
+
+  ```html
+  <p>{{ 123456.789 | number }}</p>
+  <!-- this converts the number to a string with commas, ex: 123,456.789 -->
+
+  <p>{{ 123456.789 | number: '1.2-2' }}</p>
+  <!-- this converts the number to a string with 2 decimal places, ex: 123,456.79 -->
+  ```
 
 - Example with `UpperCasePipe`: it transform text to all uppercase
 
@@ -1738,16 +1867,18 @@ It's a transformer that takes input data and transforms it into a desired output
 
   ```bash
   ng generate pipe <pipe-name>
+  # OR
+  ng g p <pipe-name>
   ```
 
   - this will create a file in the `app` folder with the name `<pipe-name>.pipe.ts` and add the pipe to the `declarations` array in the `app.module.ts` file
   - the file will contain a class with the name `<PipeName>Pipe`
   - the class will have a `transform()` method that takes a value and **returns a value after transforming it**
 
-- Example: creating a custom pipe to shorten a text
+- Example: creating a custom pipe to shorten a text **(Truncate text)**
 
   ```ts
-  // in app/shorten.pipe.ts
+  // in app/shorten.pipe.ts 📄
   import { Pipe, PipeTransform } from '@angular/core';
 
   @Pipe({
@@ -1760,10 +1891,33 @@ It's a transformer that takes input data and transforms it into a desired output
   }
   ```
 
-  ```html
-  <!-- in app.component.html -->
-  <p>{{ longText | shorten: 10 }}</p>
+  ```ts
+  // in app.component.ts 📄
+  import { Component } from '@angular/core';
+  import { ShortenPipe } from './shorten.pipe';
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: true,
+    imports: [ShortenPipe] // import the custom pipe here 👈
+  })
+  export class AppComponent {
+    longText = 'This is a very long text that needs to be shortened for display purposes.';
+  }
   ```
+
+  ```html
+  <!-- in app.component.html 📄 -->
+  <p>{{ longText | shorten: 10 }}</p>
+  <!-- result: This is a... -->
+  ```
+
+- Notes:
+
+  - There's the `pure` option that can be used to make the pipe pure or impure
+    - **Pure pipes**: are only called when the input value changes, and they are **more performant (Cached)**
+    - **Impure pipes**: are called on every change detection cycle, and they are less performant (Not Cached)
 
 ---
 
@@ -1776,461 +1930,6 @@ It's a transformer that takes input data and transforms it into a desired output
   ```
 
   - Here, we first transform the text to uppercase, then we shorten it
-
----
-
-## Forms and Input Handling
-
-### Input Handling (Two-way data binding)
-
-- To handle user input in Angular, you can use `two-way data binding` with the `ngModel` directive
-
-  ```html
-  <input [(ngModel)]="name" />
-  ```
-
-  - Here, we are creating a **two-way data binding** on the `input` element, so that the `name` property in the component class is updated when the input value changes, and the input value is updated when the `name` property changes
-
-- It's a replacement for `event binding` and `property binding` to handle user input
-
-  ```html
-  <input [value]="name" (input)="name = $event.target.value" />
-  ```
-
-#### Input masking in Angular
-
-- To create an input mask in Angular, you can use the [ngx-mask library](https://www.npmjs.com/package/ngx-mask)
-
-  ```bash
-  npm install ngx-mask --save
-  ```
-
-  - This library provides a directive that can be used to create an input mask
-
-  ```html
-  <!-- Create an input mask for a date field -->
-  <input type="text" mask="00/00/0000" />
-  ```
-
-  - We can also use `pipe` to for masking text
-
-    ```html
-    <p>{{ '1234567890' | mask: '(000) 000-0000' }}</p>
-    ```
-
-- You can also create a custom input mask using the `input` event and the `value` property of the input element
-
-  ```html
-  <input (input)="onInput($event)" />
-  ```
-
-  ```ts
-  onInput(event: Event) {
-    const input = event.target as HTMLInputElement;
-    // or const input = <HTMLInputElement>event.target;
-    let value = input.value.replace(/\D/g, '');
-    if (value.length > 8) {
-      value = value.substr(0, 8);
-    }
-    input.value = value;
-  }
-  ```
-
-  - Here, we are creating a custom input mask for a date field
-
----
-
-### Forms
-
-Angular has **two different approaches** to handling user input through forms: `Reactive Forms` and `Template Forms`. Both capture user input events from the view, validate the user input, create a form model and data model to update, and provide a way to track changes.
-
-![forms](./img/forms-1.png)
-
-|                     | `REACTIVE`                                    | `TEMPLATE-DRIVEN`                                                 |
-| ------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
-| Setup of form model | Explicit, created in component class manually | Implicit, created by directives (the class is created by Angular) |
-| Data model          | Structured and immutable                      | Unstructured and mutable                                          |
-| Data flow           | Synchronous                                   | Asynchronous                                                      |
-| Form validation     | Functions                                     | Directives                                                        |
-| Scalability         | Scalable                                      | better for small forms                                            |
-| Selector            | `[FormGroup]` directive                       | `[ngForm]` directive                                              |
-
-- Angular provides `ngSubmit` directive to handle form submission, which is used in both approaches
-
-  ```html
-  <form (ngSubmit)="onSubmit()">
-    <input type="text" name="name" [(ngModel)]="name" />
-    <button type="submit">Submit</button>
-  </form>
-  ```
-
-  - **⚠️ Note:** In order to use `ngSubmit`, you need to import the `FormsModule` in the `app.module.ts` file or the standalone-component that uses it
-
-    ```ts
-    import { FormsModule } from '@angular/forms';
-
-    @NgModule({
-      imports: [FormsModule]
-    })
-    export class AppModule {}
-    ```
-
-  - or we can use the `submit` event, but the difference is that `ngSubmit` will not reload the page, while the `submit` event will reload the page
-
-    ```html
-    <form (submit)="onSubmit()">
-      <input type="text" name="name" [(ngModel)]="name" />
-      <button type="submit">Submit</button>
-    </form>
-    ```
-
----
-
-#### Reactive Forms
-
-- Reactive forms are more **explicit** and **synchronous** than template-driven forms. They are created programmatically in the component class and are **immutable**.
-- To create a reactive form:
-
-  - 1️⃣ You need to import the `ReactiveFormsModule` in the `app.module.ts` file
-
-    ```ts
-    // in app.module.ts
-    import { ReactiveFormsModule } from '@angular/forms';
-
-    @NgModule({
-      imports: [ReactiveFormsModule]
-    })
-    export class AppModule {}
-    ```
-
-    - The `ReactiveFormsModule` module provides the `FormControl`, `FormGroup`, and `FormArray` classes to create reactive forms
-
-  - 2️⃣ Then, you can create a reactive form in the component class
-
-    ```ts
-    // in app.component.ts
-    import { Component } from '@angular/core';
-    import { FormGroup, FormControl, Validators } from '@angular/forms';
-
-    @Component({
-      selector: 'app-root',
-      template: 'app.component.html'
-    })
-    export class AppComponent {
-      // Telling Angular that we have a form group with the name "form"
-      myForm = new FormGroup({
-        name: new FormControl(''), // Telling Angular that we have a form-field named "name" with an initial value of ""
-        email: new FormControl('', [
-          Validators.required, // Telling Angular that the email field is required
-          Validators.email // Telling Angular that the email field should be a valid email
-        ]),
-        password: new FormControl('', [
-          Validators.required,
-          Validators.minLength(6),
-          Validators.pattern('^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$')
-        ])
-      });
-
-      onSubmit() {
-        console.log(this.myForm.value); // { name: 'John', email: 'test@test.com', password: '123456' }
-        console.log(this.myForm.get('name').value); // John
-        console.log(this.myForm.valid); // true or false
-      }
-    }
-    ```
-
-  - 3️⃣ Then, you can bind the form to the template using the `formGroup` directive
-
-    ```html
-    <!-- in app.component.html -->
-    <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
-      <input formControlName="name" />
-      <input formControlName="email" />
-      <input formControlName="password" />
-      <button type="submit" [disabled]="!myForm.valid">Submit</button>
-    </form>
-    ```
-
-    - The `formGroup` directive is used to bind the form to the template
-    - The `formControlName` directive is used to bind the input element to a form field
-
-  - 4️⃣ (OPTIONAL): You can handle form validation in the component class
-
-    ```ts
-    // in app.component.ts
-    get email() {
-      return this.myForm.get('email');
-    }
-
-    get password() {
-      return this.myForm.get('password');
-    }
-
-    onSubmit() {
-      if (this.myForm.valid) {
-        console.log(this.myForm.value);
-      } else {
-        if (this.email.hasError('required')) {
-          console.log('Email is required');
-        }
-        if (this.email.hasError('email')) {
-          console.log('Email is invalid');
-        }
-        if (this.password.hasError('required')) {
-          console.log('Password is required');
-        }
-      }
-    }
-    ```
-
-    ```html
-    <!-- in app.component.html -->
-    <p *ngIf="email.hasError('required')">Email is required</p>
-    <p *ngIf="email.hasError('email')">Email is invalid</p>
-    <p *ngIf="password.hasError('required')">Password is required</p>
-    ```
-
-  - 5️⃣ (OPTIONAL): You can listen to form changes in the component class, by subscribing to the `valueChanges` or `statusChanges` observables from the form
-
-    ```ts
-    // in app.component.ts
-    ngOnInit() {
-      this.myForm.valueChanges.subscribe(value => {
-        console.log(value); // Whenever the form value changes, this will log the form value
-      });
-
-      this.myForm.statusChanges.subscribe(status => {
-        console.log(status); // Whenever the form status changes, this will log the form status
-      });
-    }
-    ```
-
-- Here, we are:
-  - creating a reactive form with a single `FormControl` named `name` in the component class
-  - We are binding the form to the `form` property in the component class using the `formGroup` directive
-  - We are binding the input element to the `name` property in the form using the `formControlName` directive
-  - We are handling the form submission using the `ngSubmit` event, and not using the `submit` event (because it will reload the page and we're using a reactive form)
-- **Form Validation**
-
-  - `Validators` is a class that **provides built-in validators** like `required`, `email`, `minLength`, `maxLength`, etc.
-    - To have multiple validators for a form field, you can pass an array of validators to the `FormControl` constructor
-  - To access information about the form-field, you can use the `get()` method of the `FormGroup` object to get different properties of the form-field
-    ![form-validation](./img/form-validation-1.png)
-
-  - To handle validation errors, you can use the `errors` property of the `FormControl` object
-
-    - You can use the `hasError()` method to check if a specific error exists
-    - You can use the `getError()` method to get the error message
-
-    ```ts
-    // in the component class
-    get email() {
-      return this.myForm.get('email');
-      // or return this.myForm.controls.email;
-    }
-
-    get password() {
-      return this.myForm.get('password');
-    }
-
-    onSubmit() {
-      if (this.myForm.valid) {
-        console.log(this.myForm.value);
-      } else {
-        if (this.email.hasError('required') && this.password.touched) {
-          console.log('Email is required'); // or you can set an error message in the template via a variable
-        }
-        if (this.email.hasError('email')) {
-          console.log('Email is invalid');
-        }
-        if (this.password.hasError('required')) {
-          console.log('Password is required');
-        }
-      }
-    }
-    ```
-
-  - **Custom validation** can be done by passing a function to the `FormControl` constructor
-
-    - The function should return `null` if the field is valid, and an object with the error message if the field is invalid
-    - You can pass the function to the `FormControl` constructor as the second argument
-    - The function have access to the:
-
-      - (`FormControl` or `FormGroup` or `FormArray` or `AbstractControl`) objects
-
-    - Example of custom validation for the password field
-
-      ```ts
-      // in the component class
-      myForm = new FormGroup({
-        // ...
-        password: new FormControl('', [Validators.required, Validators.minLength(6), this.customValidator])
-      });
-
-      customValidator(control: FormControl) {
-        if (!control.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)) {
-          return { invalidPassword: true };
-        }
-        return null;
-      }
-      ```
-
-      ```html
-      <!-- in the template -->
-      <p *ngIf="password.hasError('invalidPassword')">
-        Password should contain at least one letter and one number
-      </p>
-      ```
-
-  > **Note:** `Validators` class provides **static methods** to create validators, So, it's a good practice to create a custom validator as a **static method** in a separate class for custom validation
-
-  - **Synchronous vs Asynchronous validation**
-
-    - **Synchronous validation**:
-      ![custom-validation](./img/form-validation-2.png)
-
-      - is done using the `Validators` class and the `errors` property of the `FormControl` object
-      - it's done **immediately** when the form is submitted
-      - Example of **Class-Based Custom Validator**:
-
-        ```ts
-        // in the component class
-        myForm = new FormGroup({
-          // ...
-          password: new FormControl('', [
-            Validators.required,
-            Validators.minLength(6),
-            CustomValidators.passwordValidator
-          ])
-        });
-
-        // in a separate file
-        export class CustomValidators implements Validator {
-          validate(control: AbstractControl): ValidationErrors | null {
-            if (!control.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)) {
-              return { invalidPassword: true };
-            }
-            return null;
-          }
-        }
-        ```
-
-        - We use `Validator` interface to create a custom validator class, and to help Angular understand that this class is a validator and tell the developer how to use it correctly
-
-    - **Asynchronous validation**:
-      ![async-validation](./img/form-validation-3.png)
-
-      - is done using the `asyncValidator` property of the `FormControl` object
-      - it's done **after a delay** when the form is submitted (like checking if the email is already taken from the server)
-      - It's called after the synchronous validation is done **(to avoid unnecessary server requests)**
-      - Example of **Async Custom Validator**:
-
-        ```ts
-        @Injectable({
-          providedIn: 'root'
-        })
-        export class UniqueUsername implements AsyncValidator {
-          constructor(private http: HttpClient) {} // 👈 inject the HttpClient
-
-          // Arrow function to bind the context of 'this'
-          validate = (control: FormControl) => {
-            const { value } = control;
-
-            return this.http.get<any>('https://api.angular-email.com/auth/signedin');
-          };
-        }
-
-        // -------------------------OR------------------------- //
-        export class UniqueUsername {
-          static validate(control: AbstractControl): Promise<ValidationErrors | null> {
-            return new Promise((resolve, reject) => {
-              setTimeout(() => {
-                if (control.value === 'test') {
-                  resolve({ isUsernameUnique: true });
-                } else {
-                  resolve(null);
-                }
-              }, 2000);
-            });
-          }
-        }
-        ```
-
-        - We use a **static method** to create an async custom validator, and to help Angular understand that this method is a validator and tell the developer how to use it correctly
-        - We use `Promise` to create an async custom validator
-
----
-
-#### Template Forms (`ngModel` & `ngForm`)
-
-- Here, we use `ngModel` directive **with 2-way-binding** added to the `input element`
-
-  - a local-reference equal to `ngModel` is added to the `input element`
-
-- To create a template form:
-
-  - 1️⃣ You need to import the `FormsModule` in the `app.module.ts` file
-
-    ```ts
-    // in app.module.ts
-    import { FormsModule } from '@angular/forms';
-
-    @NgModule({
-      imports: [FormsModule]
-    })
-    export class AppModule {}
-    ```
-
-    - The `FormsModule` module provides the `ngModel` directive to create template forms
-
-    > **Note**: without importing the `FormsModule` module, you will get an error like `Can't bind to 'ngModel' since it isn't a known property of 'input'`
-
-  - 2️⃣ Then, you can create a template form in the component class with (`ngForm` & `ngModel` directives)
-
-    ```html
-    <!-- in app.component.html -->
-    <form #credentials="ngForm" (ngSubmit)="onSubmit()">
-      <input [(ngModel)]="credentials.name" name="name" />
-      <input [(ngModel)]="credentials.email" name="email" />
-      <input [(ngModel)]="credentials.password" name="password" />
-      <button type="submit">Submit</button>
-    </form>
-    ```
-
-    - `ngForm` directive is used to create a template form which is a group of form fields that can be accessed using the `ngModel` directive
-    - `ngModel` directive is used to create a two-way data binding on form fields
-
-  - 3️⃣ Then, you can handle the form submission in the component class
-
-    ```ts
-    // in app.component.ts
-    import { Component } from '@angular/core';
-
-    @Component({
-      selector: 'app-root',
-      template: 'app.component.html'
-    })
-    export class AppComponent {
-      myForm = new FormGroup({
-        name: new FormControl(''),
-        email: new FormControl('', [Validators.required, Validators.email]),
-        password: new FormControl('', [Validators.required, Validators.minLength(6)])
-      });
-    }
-    ```
-
-- Here, we are:
-  - creating a template form with a single `FormControl` named `name` in the component class
-  - We are binding the form to the `form` property in the component class using the `ngForm` directive
-  - We are binding the input element to the `name` property in the form using the `ngModel` directive
-  - We are handling the form submission using the `ngSubmit` event, and not using the `submit` event (because it will reload the page and we're using a template form)
-- **Validation** is done using the `Validators` class and the `errors` property of the `FormControl` object
-
-  ```html
-  <input [(ngModel)]="credentials.email" name="email" required email />
-  ```
-
-  - You can find more [Constraint validation attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Constraint_validation) here
 
 ---
 
