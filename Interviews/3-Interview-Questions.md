@@ -17,6 +17,7 @@
     - [Micro Frontends](#micro-frontends)
     - [Internationalization (i18n) and Localization (l10n)](#internationalization-i18n-and-localization-l10n)
   - [FE Frameworks](#fe-frameworks)
+    - [Angular](#angular)
     - [Vue](#vue)
     - [Next.js](#nextjs)
 
@@ -435,7 +436,7 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - **`rem` (root em)**: Relative to the font size of the root element (`<html>`). It provides a consistent base for sizing elements across the entire document.
   - **`em`**: Relative to the font size of the element itself or its parent. It can lead to compounding effects if used within nested elements, making it less predictable.
 
-- \*_What is the difference between link tag `<link>` and anchor tag `<a>`?_
+- **What is the difference between link tag `<link>` and anchor tag `<a>`?**
 
   - **`<link>`**: Used to link external resources like stylesheets, icons, or other documents. It does not create a clickable link for navigation.
     - Example: `<link rel="stylesheet" href="styles.css">`
@@ -637,6 +638,30 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 - **How do you import other Sass/SCSS files into your main file?**
 
   - You can import other Sass/SCSS files into your main file using the `@import` or `@use` directives. The `@import` directive is the traditional way, while `@use` is the newer, recommended approach.
+
+- **What is the difference between SCSS variables and CSS variables?**
+
+  - **SCSS Variables:** Defined using the `$` symbol, they are preprocessed and replaced with their values during compilation. They are not dynamic and cannot be changed at runtime.
+
+    ```scss
+    $primary-color: blue;
+
+    .button {
+      background-color: $primary-color;
+    }
+    ```
+
+  - **CSS Variables:** Defined using the `--` prefix, they can be changed dynamically at runtime using JavaScript or CSS. They are scoped to the element they are defined on and can be accessed using the `var()` function.
+
+    ```css
+    :root {
+      --primary-color: blue;
+    }
+
+    .button {
+      background-color: var(--primary-color);
+    }
+    ```
 
 ---
 
@@ -1311,6 +1336,11 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - **Monitoring** refers to the process of collecting and analyzing data about the performance and health of a system or application. It involves tracking metrics, logs, and events to identify issues and ensure that the system is functioning as expected.
   - **Observability** goes beyond monitoring by providing deeper insights into the internal workings of a system. It allows developers to understand how different components interact, diagnose complex issues, and gain visibility into the overall behavior of the system. Observability often involves correlating data from multiple sources (logs, metrics, traces) to provide a comprehensive view of the system's state.
 
+- **What is RUM and New Relic?**
+
+  - **RUM (Real User Monitoring):** A technique for monitoring the performance of web applications by collecting data from real users in production environments. RUM tools track user interactions, page load times, and other performance metrics to provide insights into how users experience the application.
+  - **New Relic:** A comprehensive application performance monitoring (APM) tool that provides real-time insights into the performance of web applications, including server-side and client-side metrics. It helps developers identify bottlenecks, track errors, and optimize application performance.
+
 - **What do you know about web analytics and tracking events?**
 
   - Web analytics involves collecting, measuring, and analyzing data about user interactions with a website or web application. It helps understand user behavior, traffic sources, and conversion rates.
@@ -1483,6 +1513,26 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
 
 ---
 
+### Angular
+
+- **What is the difference between Observables and Promises in Angular?**
+
+  - **Observables:**
+
+    - Observables are a part of the RxJS library and provide a way to handle asynchronous data streams.
+    - They can emit multiple values over time, allowing for continuous data updates.
+    - Observables are lazy, meaning they do not execute until subscribed to.
+    - They support operators for transforming, filtering, and combining streams of data.
+    - Observables can be canceled by unsubscribing, preventing memory leaks.
+
+  - **Promises:**
+    - Promises are a built-in JavaScript feature for handling asynchronous operations.
+    - They can only resolve or reject once, providing a single value or error.
+    - Promises are eager, meaning they start executing immediately upon creation.
+    - They do not support operators like Observables and cannot be canceled once initiated.
+
+---
+
 ### Vue
 
 - **What is Vue.js?**
@@ -1509,6 +1559,36 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - Vue.js is lightweight and easy to integrate into existing projects, while Angular is a full-fledged framework with a steeper learning curve.
   - Vue.js follows a component-based architecture, similar to React, but with a more opinionated structure compared to React's flexibility.
   - Vue.js is flexible and can be used for both small and large applications, while Angular is more suited for large-scale applications with complex requirements.
+
+- **What are the lifecycle hooks in Vue.js?**
+
+  - Lifecycle hooks are special methods in Vue.js that allow developers to execute code at specific stages of a component's lifecycle. They provide a way to perform actions when a component is created, mounted, updated, or destroyed.
+  - Common lifecycle hooks include:
+    - **`created`:** Called after the component instance is created but before it is mounted to the DOM. Useful for initializing data or making API calls.
+    - **`mounted`:** Called after the component is mounted to the DOM. Useful for accessing DOM elements or performing actions that require the component to be rendered.
+    - **`updated`:** Called after the component's reactive data changes and the DOM is re-rendered. Useful for responding to data changes.
+    - **`beforeDestroy`:** Called before the component is destroyed. Useful for cleaning up resources or event listeners.
+    - **`destroyed`:** Called after the component is destroyed. Useful for final cleanup tasks.
+
+- **What are watchers in Vue.js?**
+
+  - Watchers in Vue.js are special properties that allow developers to observe changes to reactive data properties and execute custom logic when those properties change. They are useful for performing side effects or asynchronous operations based on data changes.
+  - Watchers can be defined using the `watch` option in a Vue component, where you specify the property to watch and the callback function to execute when the property changes.
+
+    ```javascript
+    export default {
+      data() {
+        return {
+          count: 0
+        };
+      },
+      watch: {
+        count(newValue, oldValue) {
+          console.log(`Count changed from ${oldValue} to ${newValue}`);
+        }
+      }
+    };
+    ```
 
 - **Is vue.js client ide or server side rendering framework?**
 
