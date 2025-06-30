@@ -464,6 +464,36 @@ Reactive forms are a more **structured** and **scalable** way to handle forms in
       const emailControl = new FormControl('', [Validators.required, Validators.email]); // A form control with an initial value of "" and validators
       ```
 
+    - To provide the **type** of the form control, you can use the `FormControl` generic type (useful for dropdonwns, selectors inputs)
+
+      ```ts
+      const roleControl = new FormControl<string>(''); // A form control with an initial value of "" and type string
+
+      // or
+
+      const roleControl = new FormControl<'admin' | 'user' | 'guest'>('user'); // A form control with an initial value of "user" and type 'admin' | 'user' | 'guest'
+      ```
+
+  - `FormArray`
+
+    - is used to create a dynamic list of form fields, It's commonly used for forms that require a list of items, like a list of emails or a list of phone numbers
+    - it takes an array of `FormControl` or `FormGroup` objects as an argument, and can also take an array of validators as the second argument
+
+      ```ts
+      const myArray = new FormArray([
+        new FormControl(''),
+        new FormControl(''),
+        new FormControl('')
+      ]);
+      ```
+
+    - You can add or remove form controls from the array using the `push` and `removeAt` methods
+
+      ```ts
+      myArray.push(new FormControl('')); // Add a new form control to the array
+      myArray.removeAt(0); // Remove the first form control from the array
+      ```
+
   - `FormGroup`
 
     - is used to create a group of form fields
@@ -475,6 +505,29 @@ Reactive forms are a more **structured** and **scalable** way to handle forms in
         email: new FormControl(''),
         password: new FormControl('')
       });
+      ```
+
+    - You can have **Nested FormGroups** to create a more complex form structure (but it's not recommended to have more than 2 levels of nesting), and bind them to the template using the `formGroupName` directive
+
+      ```ts
+      const myForm = new FormGroup({
+        user: new FormGroup({
+          name: new FormControl(''),
+          email: new FormControl('')
+        }),
+        password: new FormControl('')
+      });
+      ```
+
+      ```html
+      <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+        <div formGroupName="user">
+          <input formControlName="name" />
+          <input formControlName="email" />
+        </div>
+        <input formControlName="password" />
+        <button type="submit">Submit</button>
+      </form>
       ```
 
 ### How to create a reactive form
@@ -855,8 +908,8 @@ Here, we can create custom validators to validate the form fields, and we can us
         name: 'John Doe'
       });
     }
-
-
+  ```
 
 ---
+
 [Back to top](#index)

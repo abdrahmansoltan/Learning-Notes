@@ -1,18 +1,20 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Adding Routing to an Angular App](#adding-routing-to-an-angular-app)
+  - [Angular Router](#angular-router)
+    - [Adding Routing to an Angular App](#adding-routing-to-an-angular-app)
   - [Router configuration](#router-configuration)
     - [Routes](#routes)
       - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
+    - [Dynamic Routes](#dynamic-routes)
     - [Nested Routes](#nested-routes)
   - [Using the Router](#using-the-router)
-    - [Router directives](#router-directives)
     - [Route Properties (Params and Query Params)](#route-properties-params-and-query-params)
       - [`ActivatedRoute` service](#activatedroute-service)
       - [`ActivatedRouteSnapshot` and `RouterStateSnapshot`](#activatedroutesnapshot-and-routerstatesnapshot)
-  - [Router Navigation](#router-navigation)
-    - [Navigating using the `routerLink` directive](#navigating-using-the-routerlink-directive)
+  - [Navigation (Router Links)](#navigation-router-links)
+    - [`routerLink`](#routerlink)
+    - [Styling the Router Links](#styling-the-router-links)
     - [Navigating to route programmatically](#navigating-to-route-programmatically)
     - [Relative Router Link References (Nested Routes)](#relative-router-link-references-nested-routes)
   - [Lazy Loading](#lazy-loading)
@@ -25,7 +27,18 @@
 
 ---
 
-## Adding Routing to an Angular App
+## Angular Router
+
+**Angular Router** is a powerful module that allows you to create single-page applications (SPAs) with Angular. It enables navigation between different views or components in your application without reloading the entire page.
+
+> **Single Page Application (SPA)**: A web application that loads a **single HTML page** and dynamically updates the content as the user interacts with the app, without requiring a full page reload.
+
+- It provides a way to define routes, navigate between them, and manage the state of the application
+- Angular **watches & manipulates the browser's URL** to determine which component to render based on the current route
+
+---
+
+### Adding Routing to an Angular App
 
 - **Generate a new app with routing**
 
@@ -39,11 +52,45 @@
 
 - **Add routing to an existing app**
 
-  ```bash
-  ng generate module app-routing --flat --module=app
-  ```
+  - **Option 1: module-based routing**
 
-  - this will generate a new module called `app-routing` and import it into the `app.module.ts` file
+    - Create a new module for routing
+
+      ```bash
+      ng generate module app-routing --flat
+      ```
+
+    - This will create a new module called `app-routing.module.ts` in the `src/app` directory
+    - Then, import the `AppRoutingModule` in the `app.module.ts` file
+
+      ```ts
+      // in app.module.ts
+      import { AppRoutingModule } from './app-routing.module';
+
+      @NgModule({
+        declarations: [AppComponent],
+        imports: [BrowserModule, AppRoutingModule], // import the AppRoutingModule
+        providers: [],
+        bootstrap: [AppComponent]
+      })
+      export class AppModule {}
+      ```
+
+  - **Option 2: standalone-component-based routing**
+
+    - import the `provideRouter` function from `@angular/router` in the `main.ts` file
+
+      ```ts
+      // in main.ts
+      import { provideRouter } from '@angular/router';
+      import { AppComponent } from './app/app.component';
+
+      platformBrowserDynamic()
+        .bootstrapModule(AppModule, {
+          providers: [provideRouter(routes)] // provide the routes to the app
+        })
+        .catch(err => console.error(err));
+      ```
 
 - **Generating Router Module** -> [Router module](./2-Angular-Modules.md#router-module)
 
@@ -160,6 +207,92 @@
 
 ---
 
+### Dynamic Routes
+
+**Dynamic routes** are routes that contain parameters in the URL, which can be used to pass data to the component
+
+- To define a dynamic route, use the `:` character before the parameter name in the `path` property of the route object
+
+  ```ts
+  const routes: Routes = [
+    { path: 'users/:id', component: UserComponent },
+    { path: 'products/:id', component: ProductComponent }
+  ];
+  ```
+
+  - The `:id` in the path is a dynamic parameter that can be used to pass data to the component
+  - The `id` parameter can be accessed in the component using the `ActivatedRoute` service
+
+- **Accessing Dynamic Route Parameters**
+
+  - To access the dynamic route parameters in the component, We have 2 options:
+
+    1. **Using the `ActivatedRoute` service** (recommended ✅)
+    2. accessing the paramater as an input property of the component
+       - This is not recommended because it doesn't provide live updates when the route parameter changes
+
+  - **Option 1:** use the `ActivatedRoute` service (Observables)
+
+    ```ts
+    // in user.component.ts
+    import { Component, OnInit } from '@angular/core';
+    import { ActivatedRoute } from '@angular/router';
+
+    @Component({
+      selector: 'app-user',
+      templateUrl: './user.component.html',
+      styleUrls: ['./user.component.css']
+    })
+    export class UserComponent implements OnInit {
+      constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service
+
+      ngOnInit() {
+        this.route.params.subscribe(params => {
+          console.log(params.id); // log the dynamic route parameter id
+        });
+      }
+    }
+    ```
+
+    - The `ActivatedRoute` service is used to access data about the current route like (route parameters, query parameters, and more)
+    - The `params` property of the `ActivatedRoute` service is an `Observable` that contains the dynamic route parameters
+    - The `subscribe` method of the `Observable` is used to subscribe to the `Observable` and get the value of the dynamic route parameter
+
+  - **Option 2:** access the parameter as an input property of the component
+
+    - First, we need to add the `withComponentInputBinding` option to the route object in the `app.config.ts` file
+
+      ```ts
+      // in app.config.ts
+      import { ApplicationConfig } from '@angular/core';
+      import { provideRouter, withComponentInputBinding } from '@angular/router';
+      import { routes } from './app.routes';
+
+      export const appConfig: ApplicationConfig = {
+        providers: [
+          provideRouter(routes, withComponentInputBinding()) // add the withComponentInputBinding option
+        ]
+      };
+      ```
+
+    - Then, we can access the dynamic route parameter as an input property of the component
+
+      ```ts
+      // in user.component.ts
+      import { Component, Input } from '@angular/core';
+
+      @Component({
+        selector: 'app-user',
+        templateUrl: './user.component.html',
+        styleUrls: ['./user.component.css']
+      })
+      export class UserComponent {
+        @Input() id!: string; // access the dynamic route parameter as an input property (MUST BE THE SAME NAME AS THE PARAMETER IN THE ROUTE)
+      }
+      ```
+
+---
+
 ### Nested Routes
 
 **Nested routes** are routes that are defined inside another route and are used to create a hierarchy of routes
@@ -195,7 +328,9 @@
 
 ## Using the Router
 
-- To show the component based on the route, use the `router-outlet` directive in the `app.component.html` file
+Angular doesn't replace the entire page when navigating between routes, it only updates the view based on the current route. This is done using the `<router-outlet>` directive which acts as a placeholder for the component that will be displayed based on the current route.
+
+- To show the component based on the route, use the `<router-outlet>` directive in the `app.component.html` file
 
   ```html
   <h1>Angular Router App</h1>
@@ -213,20 +348,6 @@
 
 - It shows the component based on the route
   ![router-outlet](./img/router-1.png)
-- Example
-  ![router-outlet](./img/router-2.png)
-  - Here, we have 2 `Routing modules` and 2 `Domain modules` that are imported in the `AppModule`
-  - The `Domain modules` contain the `Routing modules` and the `Routing modules` contain the `Routes` and the `RouterModule`
-  - The main `App module` imports the `Domain modules` and the `RouterModule` is imported in the `AppRoutingModule`, so that now the `App module` contains all the routes
-
----
-
-### Router directives
-
-- `routerLink` : to specify the link ( **instead of `href`** )
-- `routerLinkActive` : it's an attribute directive that applies a class if the router link is matched
-- `[routerLinkActiveOptions]="{exact:true}"` to prevent `Partial Matching Routes` to make it exact route **usually with route("/")**
-- `router-outlet` : place holder for the component that will show based on the router link
 
 ---
 
@@ -334,9 +455,9 @@ They are used to access the route parameters and query parameters of the route *
 
 ---
 
-## Router Navigation
+## Navigation (Router Links)
 
-### Navigating using the `routerLink` directive
+### `routerLink`
 
 - To navigate to a route, use the `routerLink` directive in the `app.component.html` file
 
@@ -351,12 +472,15 @@ They are used to access the route parameters and query parameters of the route *
   ```
 
 - The `routerLink` (directive / attribute) is used to navigate to a route when the link is clicked
-  - The `routerLink` (directive / attribute) takes the path of the route as an argument
-- The `routerLinkActive` (directive / attribute) is used to apply a class to the link when the route is active
-  - Make sure to use the **`exact`** option to prevent partial matching routes (specially with nested routes)
-- We don't use `href` to navigate to a route, we use `routerLink` instead
+  - It takes the path of the route as an argument, and set-up the path for this link with extra handling from Angular so that it doesn't reload the page
 
-  - This is because if we use `href` attribute, the page will reload and the app will lose its state, but if we use `routerLink`, the app will not lose its state and the page will not reload
+> We don't use `href` to navigate to a route, we use `routerLink` instead
+>
+> This is because if we use `href` attribute, the page will reload and the app will lose its state, but if we use `routerLink`, the app will not lose its state and the page will not reload
+
+- The `routerLinkActive` (directive / attribute) is used to apply a class to the link when the route is active
+
+  - Make sure to use the **`exact`** option to prevent partial matching routes (specially with nested routes)
 
 - **Notes:**
 
@@ -372,6 +496,38 @@ They are used to access the route parameters and query parameters of the route *
     <!-- This will route to "/first-component/1/edit" -->
     <a [routerLink]="['/first-component', 1, 'edit']">First Component</a>
     ```
+
+---
+
+### Styling the Router Links
+
+- `routerLinkActive` : it's an attribute directive that applies a class if the router link is matched
+- `[routerLinkActiveOptions]="{exact:true}"` to prevent `Partial Matching Routes` to make it exact route **usually with route("/")**
+
+- Example:
+
+  ```html
+  <nav>
+    <ul>
+      <li>
+        <a
+          routerLink="/first-component"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{exact:true}">
+          First Component
+        </a>
+      </li>
+    </ul>
+  </nav>
+  ```
+
+  ```css
+  /* in styles.css */
+  .active-link {
+    color: blue;
+    font-weight: bold;
+  }
+  ```
 
 ---
 

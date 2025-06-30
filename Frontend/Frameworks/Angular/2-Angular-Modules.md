@@ -232,6 +232,12 @@ It's a module that provides the `routing` functionality to the Angular app and i
 
 - **Router Configuration ->** [Router configuration](./4-Angular-Router.md#router-configuration)
 
+- Example
+  ![router-module-example](./img/router-2.png)
+  - Here, we have 2 `Routing modules` and 2 `Domain modules` that are imported in the `AppModule`
+  - The `Domain modules` contain the `Routing modules` and the `Routing modules` contain the `Routes` and the `RouterModule`
+  - The main `App module` imports the `Domain modules` and the `RouterModule` is imported in the `AppRoutingModule`, so that now the `App module` contains all the routes
+
 ---
 
 ## HTTP Module
@@ -393,6 +399,7 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
     - It returns an observable of the `HttpEvent` type
 
   - 3️⃣ register the interceptor in the `app.module.ts` file / or the `app.config.ts` file (to make it available to the entire app)
+
     - The old way is to create a class for the interceptor and register it in the `app.module.ts` file, but now we can also use standalone components to register the interceptor using the `withInterceptors` method
     - **Module based:** Add the interceptor to the providers array in the `app.module.ts` file (to make it available to the entire app)
 
@@ -419,6 +426,7 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
 
       - The `HTTP_INTERCEPTORS` is a token that is used to provide the interceptors in Angular
       - Here, we're telling Angular to provide the `AuthInterceptor` and use it as an `HTTP_INTERCEPTOR` if any HTTP request is made in the app (because by default, Angular doesn't know about the `AuthInterceptor`, so we need to provide it here as it only uses the `HTTP_INTERCEPTORS` token)
+
     - **Standalone based:** If you're using standalone components, you can use the `withInterceptors` method to register the interceptor in the component
 
       ```ts
@@ -439,6 +447,7 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       ```
 
   - 4️⃣ Now, the `AuthInterceptor` will intercept every HTTP request and add the token to the request headers before sending the request to the server
+
     ```ts
     // interceptors/auth-interceptor.ts 📄
 
@@ -462,11 +471,11 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
     }
 
     // -------------------------or-------------------------
-    
+
     // Option 2: standalone based interceptor (NEW WAY)
     import { withInterceptors } from '@angular/core';
     import { HttpClientModule } from '@angular/common/http';
-    import { AuthInterceptor } from './interceptors/auth-interceptor'; 
+    import { AuthInterceptor } from './interceptors/auth-interceptor';
 
     export funtion AuthInterceptor(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
       const token = localStorage.getItem('token');
