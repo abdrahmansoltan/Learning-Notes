@@ -7,7 +7,13 @@
     - [Routes](#routes)
       - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
     - [Dynamic Routes](#dynamic-routes)
+      - [Accessing Dynamic Route Parameters and query parameters](#accessing-dynamic-route-parameters-and-query-parameters)
     - [Nested Routes](#nested-routes)
+    - [Redirecting Routes](#redirecting-routes)
+    - [Adding data to routes](#adding-data-to-routes)
+      - [Adding static data to routes](#adding-static-data-to-routes)
+      - [Adding dynamic data to routes (Resolvers)](#adding-dynamic-data-to-routes-resolvers)
+      - [Adding title to routes window tab](#adding-title-to-routes-window-tab)
   - [Using the Router](#using-the-router)
     - [Route Properties (Params and Query Params)](#route-properties-params-and-query-params)
       - [`ActivatedRoute` service](#activatedroute-service)
@@ -21,6 +27,8 @@
     - [Implementing Lazy Loading](#implementing-lazy-loading)
   - [Router Guards](#router-guards)
     - [Implementing Router Guards](#implementing-router-guards)
+      - [NEW: Guards Using Functions](#new-guards-using-functions)
+      - [OLD: Guards Using Classes](#old-guards-using-classes)
     - [Route Guards Common Issues](#route-guards-common-issues)
   - [Route Resolvers](#route-resolvers)
     - [Why we use Route Resolvers](#why-we-use-route-resolvers)
@@ -78,6 +86,8 @@
 
   - **Option 2: standalone-component-based routing**
 
+    - Here, the `<router-outlet>` directive is not defined in the standalone components unless you explicitly add it to the component's provider array.
+
     - import the `provideRouter` function from `@angular/router` in the `main.ts` file
 
       ```ts
@@ -90,6 +100,22 @@
           providers: [provideRouter(routes)] // provide the routes to the app
         })
         .catch(err => console.error(err));
+      ```
+
+    - Or you can import the `provideRouter` in the standalone component directly in the `providers` array
+
+      ```ts
+      // in app.component.ts
+      import { provideRouter } from '@angular/router';
+      import { AppComponent } from './app.component';
+
+      @Component({
+        selector: 'app-root',
+        templateUrl: './app.component.html',
+        styleUrls: ['./app.component.css'],
+        providers: [provideRouter(routes)] // provide the routes to the app
+      })
+      export class AppComponent {}
       ```
 
 - **Generating Router Module** -> [Router module](./2-Angular-Modules.md#router-module)
@@ -157,7 +183,7 @@
     { path: '', component: HomeComponent },
     { path: 'first-component', component: FirstComponent },
     { path: 'second-component', component: SecondComponent },
-    { path: '**', component: PageNotFoundComponent } // wildcard route
+    { path: '**', component: PageNotFoundComponent } // catch-all route -> It's used to handle any route that does not match the other routes
   ];
   ```
 
@@ -223,73 +249,73 @@
   - The `:id` in the path is a dynamic parameter that can be used to pass data to the component
   - The `id` parameter can be accessed in the component using the `ActivatedRoute` service
 
-- **Accessing Dynamic Route Parameters**
+#### Accessing Dynamic Route Parameters and query parameters
 
-  - To access the dynamic route parameters in the component, We have 2 options:
+- To access the dynamic route parameters (or query parameters) in the component, We have 2 options:
 
-    1. **Using the `ActivatedRoute` service** (recommended ✅)
-    2. accessing the paramater as an input property of the component
-       - This is not recommended because it doesn't provide live updates when the route parameter changes
+  1. **Using the `ActivatedRoute` service** (recommended ✅)
+  2. accessing the paramater as an `input` property of the component
+     - This is not recommended because it doesn't provide live updates when the route parameter changes (but it can be useful in some cases)
 
-  - **Option 1:** use the `ActivatedRoute` service (Observables)
+- **Option 1:** use the `ActivatedRoute` service (Observables)
+
+  ```ts
+  // in user.component.ts
+  import { Component, OnInit } from '@angular/core';
+  import { ActivatedRoute } from '@angular/router';
+
+  @Component({
+    selector: 'app-user',
+    templateUrl: './user.component.html',
+    styleUrls: ['./user.component.css']
+  })
+  export class UserComponent implements OnInit {
+    constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service
+
+    ngOnInit() {
+      this.route.params.subscribe(params => {
+        console.log(params.id); // log the dynamic route parameter id
+      });
+    }
+  }
+  ```
+
+  - The `ActivatedRoute` service is used to access data about the current route like (route parameters, query parameters, and more)
+  - The `params` property of the `ActivatedRoute` service is an `Observable` that contains the dynamic route parameters
+  - The `subscribe` method of the `Observable` is used to subscribe to the `Observable` and get the value of the dynamic route parameter
+
+- **Option 2:** access the parameter as an `input` property of the component
+
+  - First, we need to add the `withComponentInputBinding` option to the route object in the `app.config.ts` file
+
+    ```ts
+    // in app.config.ts
+    import { ApplicationConfig } from '@angular/core';
+    import { provideRouter, withComponentInputBinding } from '@angular/router';
+    import { routes } from './app.routes';
+
+    export const appConfig: ApplicationConfig = {
+      providers: [
+        provideRouter(routes, withComponentInputBinding()) // add the withComponentInputBinding option
+      ]
+    };
+    ```
+
+  - Then, we can access the dynamic route parameter as an input property of the component
 
     ```ts
     // in user.component.ts
-    import { Component, OnInit } from '@angular/core';
-    import { ActivatedRoute } from '@angular/router';
+    import { Component, Input } from '@angular/core';
 
     @Component({
       selector: 'app-user',
       templateUrl: './user.component.html',
       styleUrls: ['./user.component.css']
     })
-    export class UserComponent implements OnInit {
-      constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service
-
-      ngOnInit() {
-        this.route.params.subscribe(params => {
-          console.log(params.id); // log the dynamic route parameter id
-        });
-      }
+    export class UserComponent {
+      @Input() id!: string; // access the dynamic route parameter as an input property (MUST BE THE SAME NAME AS THE PARAMETER IN THE ROUTE)
     }
     ```
-
-    - The `ActivatedRoute` service is used to access data about the current route like (route parameters, query parameters, and more)
-    - The `params` property of the `ActivatedRoute` service is an `Observable` that contains the dynamic route parameters
-    - The `subscribe` method of the `Observable` is used to subscribe to the `Observable` and get the value of the dynamic route parameter
-
-  - **Option 2:** access the parameter as an input property of the component
-
-    - First, we need to add the `withComponentInputBinding` option to the route object in the `app.config.ts` file
-
-      ```ts
-      // in app.config.ts
-      import { ApplicationConfig } from '@angular/core';
-      import { provideRouter, withComponentInputBinding } from '@angular/router';
-      import { routes } from './app.routes';
-
-      export const appConfig: ApplicationConfig = {
-        providers: [
-          provideRouter(routes, withComponentInputBinding()) // add the withComponentInputBinding option
-        ]
-      };
-      ```
-
-    - Then, we can access the dynamic route parameter as an input property of the component
-
-      ```ts
-      // in user.component.ts
-      import { Component, Input } from '@angular/core';
-
-      @Component({
-        selector: 'app-user',
-        templateUrl: './user.component.html',
-        styleUrls: ['./user.component.css']
-      })
-      export class UserComponent {
-        @Input() id!: string; // access the dynamic route parameter as an input property (MUST BE THE SAME NAME AS THE PARAMETER IN THE ROUTE)
-      }
-      ```
 
 ---
 
@@ -322,6 +348,165 @@
   ```html
   <h1>First Component</h1>
   <router-outlet></router-outlet>
+  ```
+
+---
+
+### Redirecting Routes
+
+**Redirecting routes** are used to redirect the user from one route to another route when the user navigates to a specific route
+
+- To define a redirect route, use the `redirectTo` property of the route object
+
+  ```ts
+  const routes: Routes = [
+    { path: '', redirectTo: '/home', pathMatch: 'full' }, // redirect to home route
+    { path: 'home', component: HomeComponent },
+    { path: 'store', component: StoreComponent }
+  ];
+  ```
+
+  - The `redirectTo` property is used to redirect the user to the specified route when the user navigates to the route
+  - The `pathMatch` property is used to determine how the router should match the URL segment to the route's path
+    - `full` : the router will only redirect if the entire URL matches the path
+    - `prefix` : the router will redirect if the URL starts with the path
+  - **Note:** `pathMatch` is required when using `redirectTo` to avoid routing issues
+    - This is because for example if we don't use `pathMatch: 'full'` and we have a route with the path `''`, the router will match this route and redirect to `/home` for every route that starts with `/`, which are all routes in the app **(infinite redirect loop)**
+
+---
+
+### Adding data to routes
+
+#### Adding static data to routes
+
+You can add static data to routes using the `data` property of the route object
+
+```ts
+const routes: Routes = [
+  { path: 'home', component: HomeComponent, data: { title: 'Home' } },
+  { path: 'about', component: AboutComponent, data: { title: 'About' } }
+];
+```
+
+- The `data` property is an object that contains the static data to be passed to the component when the route is navigated to.
+- It's commonly used to pass metadata to the component, such as the title of the page or other information that is not dynamic
+- It can be accessed in the component using the `ActivatedRoute` service or as an `input` property of the component -> [more here on how to access router properties](#route-properties-params-and-query-params)
+
+---
+
+#### Adding dynamic data to routes (Resolvers)
+
+You can add dynamic data to routes using the `resolve` property of the route object
+
+```ts
+const routes: Routes = [
+  { path: 'home', component: HomeComponent, resolve: { data: HomeResolver } },
+  { path: 'about', component: AboutComponent, resolve: { data: AboutResolver } }
+];
+```
+
+- The `resolve` property is used to define a resolver for the route
+
+> **A resolver is a service that is responsible for fetching data before the route is activated**
+>
+> It's used to fetch data from an API or a service before the route is activated, and then pass the data to the component so that when the component is initialized, it already has the data it needs to render
+
+- How the resolver works:
+
+  - The `resolver` is a service that implements the `Resolve` interface
+  - The `resolve` method of the resolver is called before the route is activated
+  - The `resolve` method returns an `Observable`, `Promise`, or a value that contains the data to be passed to the component
+    - This method will be located inside the component that is being resolved and then imported into the `routes` file
+  - The data returned from the resolver is available in the component via the `ActivatedRoute` service
+
+- **Example:**
+
+  - Here, we first will have a resolver function inside the component
+
+    ```ts
+    // in home.component.ts
+    import { resolveFn } from '@angular/core';
+    import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+
+    //...
+    export const HomeResolver: resolveFn = (
+      route: ActivatedRouteSnapshot,
+      state: RouterStateSnapshot
+    ) => {
+      return this.dataService.getData(); // return the data to be passed to the component
+    };
+    ```
+
+  - Then, we will import the resolver into the `routes` file and use it in the route
+
+  ```ts
+  import { Routes } from '@angular/router';
+  import { HomeComponent } from './home/home.component';
+  import { HomeResolver } from './home.resolver';
+
+  export const routes: Routes = [
+    {
+      path: 'home',
+      component: HomeComponent,
+      resolve: {
+        data: HomeResolver // we can use any alias not just 'data' and that alias will be used to access the resloved data inside the component
+      }
+    }
+  ];
+  ```
+
+- **Resolver Notes:**
+
+  - The resolver function runs every time the route is activated or re-activated, but by default it doesn't run when the query parameters change
+
+    - To make the resolver run when the query parameters change, we can use the `runGuardsAndResolvers` property in the route configuration
+
+    ```ts
+    const routes: Routes = [
+      {
+        path: 'home',
+        component: HomeComponent,
+        resolve: {
+          data: HomeResolver
+        },
+        runGuardsAndResolvers: 'paramsChange' // 👈 this will make the resolver run when the query parameters change
+      }
+    ];
+    ```
+
+---
+
+#### Adding title to routes window tab
+
+You can add a title to the window tab of the browser when navigating to a route by using:
+
+- Option 1: the `title` option in the route object
+
+  ```ts
+  const routes: Routes = [
+    {
+      path: 'home',
+      component: HomeComponent,
+      title: 'Home Page' // this will set the title of the window tab to 'Home Page'
+    },
+    {
+      path: 'about',
+      component: AboutComponent,
+      title: 'About Page' // this will set the title of the window tab to 'About Page'
+    }
+  ];
+  ```
+
+- Option 2: the `Title` service in Angular
+
+  ```ts
+  import { Title } from '@angular/platform-browser';
+
+  constructor(private titleService: Title) {}
+
+  ngOnInit() {
+    this.titleService.setTitle('Home Page');
+  }
   ```
 
 ---
@@ -396,7 +581,7 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
     styleUrls: ['./first.component.css']
   })
   export class FirstComponent implements OnInit {
-    constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service (dependency injection)
+    constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service (dependency injection) and use it in the component using `this.route`
 
     ngOnInit() {
       this.route.params.subscribe(params => {
@@ -415,6 +600,8 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
   - The `params` property of the `ActivatedRoute` service is an `Observable` that contains the route parameters
   - The `queryParams` property of the `ActivatedRoute` service is an `Observable` that contains the query parameters
   - The `subscribe` method of the `Observable` is used to subscribe to the `Observable` and get the value of the `Observable`
+
+---
 
 #### `ActivatedRouteSnapshot` and `RouterStateSnapshot`
 
@@ -451,7 +638,7 @@ They are used to access the route parameters and query parameters of the route *
 
 - **Notes:**
 
-  - By using the `snapshot` property of the `ActivatedRoute` service, We won't be able to get the updated values of the route parameters and query parameters when they change **(no live updates, only initial values when the component is initialized)**
+  - By using the `snapshot` property of the `ActivatedRoute` service, **We won't be able to get the updated values** of the route parameters and query parameters when they change **(no live updates, only initial values when the component is initialized)**
 
 ---
 
@@ -466,6 +653,9 @@ They are used to access the route parameters and query parameters of the route *
     <ul>
       <li>
         <a routerLink="/first-component" routerLinkActive="blue-text">First Component</a>
+
+        <!-- routerlink with query params -->
+        <a [routerLink]="['/first-component']" [queryParams]="{ id: 1 }">First Component</a>
       </li>
     </ul>
   </nav>
@@ -481,6 +671,16 @@ They are used to access the route parameters and query parameters of the route *
 - The `routerLinkActive` (directive / attribute) is used to apply a class to the link when the route is active
 
   - Make sure to use the **`exact`** option to prevent partial matching routes (specially with nested routes)
+
+- The `queryParams` property is used to pass query parameters to the route
+
+  ```html
+  <a [routerLink]="'./'" [queryParams]="{ order: 'asc'}">sort by asc</a>
+  <a [routerLink]="'./'" [queryParams]="{ order: 'desc'}">sort by desc</a>
+  ```
+
+  - The `queryParams` property takes an object with the query parameters to pass to the route
+  - The `queryParams` will be added to the URL as query parameters when the link is clicked
 
 - **Notes:**
 
@@ -559,6 +759,17 @@ They are used to access the route parameters and query parameters of the route *
       path: '/first-component',
       queryParams: { id: 1 }
     }
+    ```
+
+- It is also possible to navigate to a route with query parameters using the `navigate` method
+
+  - The `queryParams` property is used to pass query parameters to the route
+
+    ```ts
+    this.router.navigate(['/first-component'], {
+      queryParams: { id: 1 },
+      replaceUrl: true // optional, to replace the current URL in the browser history (prevent going back to the previous URL)
+    });
     ```
 
 - Example:
@@ -656,15 +867,67 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
   - They are used to prevent users from navigating to certain routes based on certain conditions
     ![router-guards](./img/router-guards-1.png)
 - They're **Classes** that implement a specific interface and contain a method that returns a `boolean` or an `observable` that resolves to a `boolean`
+
+  > In newer versions of Angular, the guards are **functions instead of classes**, but they still implement the same logic
+
   - This `boolean` value determines whether the user can navigate to the route
+
 - There are 4 types of router guards in Angular:
   ![router-guards](./img/router-guards-2.png)
-  - `CanActivate` : to prevent the user from navigating to a route
-  - `CanActivateChild` : to prevent the user from navigating to the child routes of a route
-  - `CanLoad` : to prevent the user from loading the module of a route (lazy loading modules)
-  - `CanDeactivate` : to prevent the user from leaving a route
+  - `canActivate` : to prevent the user from navigating to a route
+  - `canMatch` **(NEW)**: to prevent the user from navigating to a route based on certain conditions (used for advanced routing scenarios)
+  - `canActivateChild` : to prevent the user from navigating to the child routes of a route
+  - `canLoad` : to prevent the user from loading the module of a route (lazy loading modules)
+  - `canDeactivate` : to prevent the user from leaving a route
+    - It's confusing for beginners, but it's used to prevent the user from leaving a route **when there are unsaved changes in the form or other conditions**
+      ![router-guards-deactivate](./img/router-guards-deactivate.png)
+    - Usually it will be inside the component that is being navigated away from and we will export the guard function from the component and use it in the routes file, so that it will have access to the component instance and its properties
+
+---
 
 ### Implementing Router Guards
+
+#### NEW: Guards Using Functions
+
+- **Steps to implement Router Guards:**
+
+  1. **Create a function** that implements the guard logic (it should return a `boolean` or an `Observable` that resolves to a `boolean`)
+  2. **Add the function to the routes** using the `canActivate` property
+  3. the guard property **takes an array of functions**, so you can add multiple guards to the route
+
+  ```ts
+  // routes.ts
+  import { Routes } from '@angular/router';
+  import { canActivate } from '@angular/router';
+  import { FirstComponent } from './first/first.component';
+  import { SecondComponent } from './second/second.component';
+
+  const authGuard: CanMatchFn = (
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): boolean | Observable<boolean> => {
+    // Implement your guard logic here
+    // For example, check if the user is authenticated
+    const isAuthenticated = true; // Replace with actual authentication check
+    return isAuthenticated; // Return true to allow navigation, false to prevent it
+  };
+
+  export const routes: Routes = [
+    { path: '', component: HomeComponent },
+    { path: 'first-component', component: FirstComponent, canMatch: [authGuard] }, // 👈
+    { path: 'second-component', component: SecondComponent }
+  ];
+  ```
+
+- Notes:
+
+  - It's sometimes recommended to use the `canMatch` guard instead of `canActivate` for advanced routing scenarios, especially when dealing with lazy-loaded modules or complex route configurations
+  - It's recommended to not return `false` directly in the guard function, but rather return an `Observable` that resolves to `false` to allow for asynchronous checks (like API calls or other asynchronous operations)
+  - Also it's not recommended to return falsy values directly, as this can lead to crashing the app or unexpected behavior. Instead, we should redirect the user to a specific route using `new RedirectCommand()` or return an `Observable` that resolves to `false` or a `UrlTree` to redirect the user to a specific route
+
+---
+
+#### OLD: Guards Using Classes
 
 - **Steps to implement Router Guards:**
 
@@ -743,6 +1006,8 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 ---
 
 ## Route Resolvers
+
+> See this part: [Adding dynamic data to routes (Resolvers)](#adding-dynamic-data-to-routes-resolvers)
 
 **Route resolvers** are used to fetch the data needed for a route before the route is activated, and then pass the data to the component
 
