@@ -2646,6 +2646,24 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
     }
     ```
 
+  - Questions for further understanding:
+
+    - Why is this better than using `typeof`?
+
+      - `typeof` checks the type of the variable, but it doesn't validate the content. For example, `typeof input.value === "number"` would be false for a numeric string like `"123"`, while `parseInt` can extract the number from it.
+
+    - Why is using `parseInt` is better than using `Number()`?
+
+      - `parseInt` can handle strings with non-numeric characters more gracefully, returning the integer value it can parse, while `Number()` will return `NaN` if the entire string is not a valid number.
+
+        ```js
+        parseInt('123abc'); // 123
+        parseInt('abc123'); // NaN
+
+        Number('123abc'); // NaN
+        Number('abc123'); // NaN
+        ```
+
 ---
 
 ### event handler in forms

@@ -82,7 +82,12 @@ PWAs are better than the mobile web and offer a much faster, reliable and engagi
 ## Service Workers
 
 - It's a **Javascript script file that runs in the background** Asynchronously (separate from our code and can run in a separate thread in the background)
-- It acts as a **proxy server** that sits between web applications, the browser, and the network (when available)
+  ![service worker](./img/service-worker-1.png)
+  - The browser allows us to use another thread different than the main javascript thread.
+  - **this thread is decoupled from the main thread and can run independently**.
+  - it can manage different pages and listen to ongoing events and network requests. and do something with them like caching the response for offline use.
+- It acts as a **proxy server** that sits between web applications, the browser, and the network requests (when available)
+  ![service worker](./img/service-worker-2.png)
   ![service worker](./img/serviceworker.png)
 - It's used for features that don't need a web page or user interaction like:
   - **Offline work mode**

@@ -25,6 +25,8 @@
     - [Relative Router Link References (Nested Routes)](#relative-router-link-references-nested-routes)
   - [Lazy Loading](#lazy-loading)
     - [Implementing Lazy Loading](#implementing-lazy-loading)
+      - [Old way of lazy loading (modules)](#old-way-of-lazy-loading-modules)
+      - [New way of lazy loading (standalone components)](#new-way-of-lazy-loading-standalone-components)
   - [Router Guards](#router-guards)
     - [Implementing Router Guards](#implementing-router-guards)
       - [NEW: Guards Using Functions](#new-guards-using-functions)
@@ -824,6 +826,8 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
 ### Implementing Lazy Loading
 
+#### Old way of lazy loading (modules)
+
 ![lazy-loading](./img/lazy-loading-2.png)
 
 - **Steps to implement Lazy Loading:**
@@ -856,6 +860,33 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
   - The lazy loaded module should be set up in its own `Domain module` and `Routing module` **with empty string path** to avoid routing issues
     ![lazy-loading](./img/lazy-loading-3.png)
     ![lazy-loading](./img/lazy-loading-4.png)
+
+---
+
+#### New way of lazy loading (standalone components)
+
+- **Steps to implement Lazy Loading:**
+
+  1. **Create a new standalone component** that you want to lazy load
+  2. **Remove the component from the imports array** of the `AppModule`
+  3. **Add the component to the routes array** of the `AppRoutingModule` with the `loadComponent` property and rules on how to load the component
+  4. **Remove the component from the imports array** of the `DomainModule` (if it is imported)
+  5. **Remove the component from the imports array** of the `RoutingModule` (if it is imported)
+
+- **Example:**
+
+  ```ts
+  // in app-routing.module.ts
+  const routes: Routes = [
+    { path: '', component: HomeComponent },
+    { path: 'first-component', component: FirstComponent },
+    { path: 'second-component', component: SecondComponent },
+    {
+      path: 'lazy',
+      loadComponent: () => import('./lazy/lazy.component').then(m => m.LazyComponent)
+    }
+  ];
+  ```
 
 ---
 

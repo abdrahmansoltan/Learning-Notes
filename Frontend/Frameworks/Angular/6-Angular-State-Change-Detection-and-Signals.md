@@ -5,21 +5,29 @@
     - [State Management](#state-management)
   - [Angular Detection Mechanism](#angular-detection-mechanism)
     - [Zone.js](#zonejs)
-  - [Performance Optimization in Detection Mechanism](#performance-optimization-in-detection-mechanism)
-    - [Avoiding heavy operations in the component's Getters and Setters](#avoiding-heavy-operations-in-the-components-getters-and-setters)
-    - [`OnPush` Strategy](#onpush-strategy)
-    - [`ngZone.runOutsideAngular()`](#ngzonerunoutsideangular)
-  - [Triggering Change Detection Manually](#triggering-change-detection-manually)
+    - [Performance Optimization in Detection Mechanism](#performance-optimization-in-detection-mechanism)
+      - [Avoiding heavy operations in the component's Getters and Setters](#avoiding-heavy-operations-in-the-components-getters-and-setters)
+      - [`OnPush` Strategy](#onpush-strategy)
+      - [`ngZone.runOutsideAngular()`](#ngzonerunoutsideangular)
+    - [Triggering Change Detection Manually](#triggering-change-detection-manually)
   - [Signals](#signals)
     - [How to use Signals?](#how-to-use-signals)
+      - [`signal()`](#signal)
+      - [`computed()`](#computed)
+      - [`effect()` - Effects (Watchers)](#effect---effects-watchers)
     - [Signals Input and Output](#signals-input-and-output)
-    - [Effects (Watchers)](#effects-watchers)
     - [Signals vs Zone.js](#signals-vs-zonejs)
     - [Signals vs Observables](#signals-vs-observables)
+  - [NgRx](#ngrx)
+    - [Key Concepts](#key-concepts)
+      - [NgRx Store Structure](#ngrx-store-structure)
+    - [How to Use NgRx](#how-to-use-ngrx)
 
 ---
 
 ## State
+
+> **State** is data that changes over time and affects the behavior of the application.
 
 **State** in Angular refers to the data that is used by the component to render the view. It's similar to `state` in React, where we use `useState` hook to manage the state of the component, but in Angular, we just declare the properties in the component class and use them in the template.
 
@@ -27,9 +35,9 @@
 
 - There're multiple approaches to manage state in Angular:
   ![State](./img/state-1.png)
-  - Relying on `Zone.js`
-  - Using a state management library like `NgRx` or `Akita`
-  - Uing **Signals**
+  - [Relying on `Zone.js`](#angular-detection-mechanism)
+  - [Using `Signals`](#signals)
+  - [Using a state management library like `NgRx` or `Akita`](#ngrx)
 
 ---
 
@@ -58,7 +66,7 @@ Angular uses a change detection mechanism to detect changes in the component sta
 
 ---
 
-## Performance Optimization in Detection Mechanism
+### Performance Optimization in Detection Mechanism
 
 - As the application grows, the number of components in the component tree increases, and this can lead to performance issues because Angular has to check all components in the tree to see if any of their properties have changed
 - So, it's important to optimize the change detection mechanism to improve performance, and there are several ways to do this:
@@ -69,7 +77,7 @@ Angular uses a change detection mechanism to detect changes in the component sta
   - Use `async` pipe to handle observables
   - Use `ngZone.runOutsideAngular()` to run code outside of Angular's zone
 
-### Avoiding heavy operations in the component's Getters and Setters
+#### Avoiding heavy operations in the component's Getters and Setters
 
 - Avoid performing heavy operations in the component's Getters and Setters, as they are called during change detection, which can lead to performance issues
 
@@ -116,7 +124,7 @@ Angular uses a change detection mechanism to detect changes in the component sta
 
 ---
 
-### `OnPush` Strategy
+#### `OnPush` Strategy
 
 The `OnPush` change detection strategy is a way to optimize change detection in Angular by **telling Angular to check the component only when certain conditions are met, instead of checking it on every change detection cycle**.
 
@@ -159,7 +167,7 @@ The `OnPush` change detection strategy is a way to optimize change detection in 
 
 ---
 
-### `ngZone.runOutsideAngular()`
+#### `ngZone.runOutsideAngular()`
 
 This is called **"Avoiding Zone Pollution"** and it helps to improve performance by avoiding unnecessary change detection cycles
 
@@ -223,7 +231,7 @@ This is called **"Avoiding Zone Pollution"** and it helps to improve performance
 
 ---
 
-## Triggering Change Detection Manually
+### Triggering Change Detection Manually
 
 This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 
@@ -296,7 +304,7 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 
 ### How to use Signals?
 
-- `signal()`
+#### `signal()`
 
 - You can create a signal using the `signal` function from the `@angular/core` package
 
@@ -313,47 +321,54 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
   <p>Count: {{ count() }}</p>
   ```
 
-- You can update the signal value using the `.set()` method
+- You can update the signal value using:
 
-  ```ts
-  count.set(count() + 1);
-  ```
+  - `.set()` method to set a new value
 
-- You can also use the `.update()` method to update the signal value based on its current value
+    ```ts
+    count.set(count() + 1);
+    ```
 
-  ```ts
-  count.update(value => value + 1);
+  - `.update()` method to update the signal value based on its current value
 
-  // or it's useful for toggling a boolean signal
-  isVisible.update(value => !value);
-  ```
+    ```ts
+    count.update(value => value + 1);
+    isVisible.update(value => !value); // Toggling a boolean value
 
-- **Note:** when working with Arrays or Objects, you should replace the entire array or object to trigger change detection, as signals do not track changes to the properties of an object or the elements of an array
+    // Note: you can also do this using the .set() method
+    count.set(count() + 1); // Notice here that we're calling the signal as a function to get its value
+    ```
 
-  ```ts
-  // For arrays
-  const items = signal(['item1', 'item2']);
-  items.set([...items(), 'item3']); // replace the entire array
-  // or
-  items.update(currentItems => [...currentItems, 'item3']); // add an item to the array
+- **Note for reference-type signals**
 
-  // -----------------------------------------------------------------
+  - when working with `Arrays` or `Objects`, you should replace the entire array or object to trigger change detection, as signals do not track changes to the properties of an object or the elements of an array
 
-  // For objects
-  const user = signal({ name: 'John', age: 30 });
-  user.set({ ...user(), age: 31 }); // replace the entire object
-  // or
-  user.update(currentUser => ({ ...currentUser, age: 31 })); // update a property of the object
-  ```
+    ```ts
+    // For arrays
+    const items = signal(['item1', 'item2']);
+    items.set([...items(), 'item3']); // replace the entire array
+    // or
+    items.update(currentItems => [...currentItems, 'item3']); // add an item to the array
 
-- `computed()`
+    // -----------------------------------------------------------------
+
+    // For objects
+    const user = signal({ name: 'John', age: 30 });
+    user.set({ ...user(), age: 31 }); // replace the entire object
+    // or
+    user.update(currentUser => ({ ...currentUser, age: 31 })); // update a property of the object
+    ```
+
+---
+
+#### `computed()`
 
 - You can create a computed signal that depends on other signals using the `computed` function
 
   ```ts
   import { computed } from '@angular/core';
 
-  const doubleCount = computed(() => count() * 2);
+  doubleCount = computed(() => this.count() * 2);
   ```
 
 - You can use the computed signal in the component template using the `{{}}` syntax, **and you have to call the computed signal as a function to get its value**
@@ -363,6 +378,39 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
   ```
 
 - It will only be re-evaluated when the signals it depends on change, so it's more efficient than using a method that returns a value
+
+---
+
+#### `effect()` - Effects (Watchers)
+
+- You can create an effect (or watcher) that runs when a signal changes using the `effect` function
+
+  ```ts
+  import { Component, effect } from '@angular/core';
+  import { signal } from '@angular/core';
+  @Component({
+    selector: 'app-root',
+    template: `
+      <h1>Signals Example</h1>
+      <p>Count: {{ count() }}</p>
+      <button (click)="increment()">Increment</button>
+    `
+  })
+  export class AppComponent {
+    count = signal(0); // create a signal with an initial value
+
+    constructor() {
+      // ✅ Create an effect that runs when the count signal changes
+      effect(() => {
+        console.log('Count changed:', this.count());
+      });
+    }
+
+    increment() {
+      this.count.set(this.count() + 1); // update the count signal
+    }
+  }
+  ```
 
 ---
 
@@ -423,44 +471,15 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 
 ---
 
-### Effects (Watchers)
-
-- You can create an effect (or watcher) that runs when a signal changes using the `effect` function
-
-  ```ts
-  import { Component, effect } from '@angular/core';
-  import { signal } from '@angular/core';
-  @Component({
-    selector: 'app-root',
-    template: `
-      <h1>Signals Example</h1>
-      <p>Count: {{ count() }}</p>
-      <button (click)="increment()">Increment</button>
-    `
-  })
-  export class AppComponent {
-    count = signal(0); // create a signal with an initial value
-
-    constructor() {
-      // ✅ Create an effect that runs when the count signal changes
-      effect(() => {
-        console.log('Count changed:', this.count());
-      });
-    }
-
-    increment() {
-      this.count.set(this.count() + 1); // update the count signal
-    }
-  }
-  ```
-
----
-
 ### Signals vs Zone.js
+
+![signals-vs-zonejs](./img/signals-vs-zonejs-1.png)
 
 - `Signals` are more efficient than `Zone.js` because they only update the view when the `signal` value changes, while `Zone.js` updates the view whenever an event occurs
 - `Signals` are more powerful than `Zone.js` because they allow you to create reactive state that can be used in the component template and automatically updates the view when the state changes
 - `Signals` are easier to use than `Zone.js` because they don't require any monkey-patching of the `JavaScript` event loop, and they are more intuitive to use
+
+- Signals give us full control over the reactivity of our components, allowing us to create more predictable and maintainable code, and reduce overhead on the browser's rendering engine when always updating the view for changes.
 
 **Note:** Signals are still an experimental feature in Angular, and they are not yet widely used in production apps. But they are expected to become the standard way to manage state in Angular in the future.
 
@@ -553,6 +572,361 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 - Use **Signals** for local, synchronous state that needs to update the view.
 - Use **Observables** for async data, streams, or when you need advanced operators.
 - You can combine both: use Observables for async data, then update Signals with the results for simple state management.
+
+---
+
+## NgRx
+
+**NgRx** is a state management library for Angular applications inspired by **Redux**. It provides a way to manage state in a reactive way using Observables and the Redux pattern.
+
+- It helps with the management of more complex (application-wide) state.
+- **Benefits of Using NgRx**
+
+  - Centralized state management
+  - Predictable state changes
+  - Time-travel debugging
+  - Improved performance with memoized selectors
+
+### Key Concepts
+
+![NgRx](./img/ngrx-1.png)
+
+- **Store**: The single source of truth for the application state.
+- **Selectors**: Functions that select a slice of state from the store.
+- **Actions**: Events that describe a change in the state.
+- **Reducers**: Functions that take the current state and an action, and return a new state.
+- **Effects**: Functions that listen for actions and perform side effects (e.g., API calls).
+
+#### NgRx Store Structure
+
+A typical NgRx store follows a well-organized folder structure that separates concerns and makes the codebase maintainable:
+
+```sh
+src/
+└── app/
+  └── store/
+    ├── actions/           # Action definitions
+    │   ├── user.actions.ts
+    │   ├── product.actions.ts
+    │   └── ...
+    ├── reducers/          # State reducers
+    │   ├── user.reducer.ts
+    │   ├── product.reducer.ts
+    │   └── index.ts       # Root reducer combining all feature reducers
+    ├── effects/           # Side effects handlers
+    │   ├── user.effects.ts
+    │   ├── product.effects.ts
+    │   └── ...
+    ├── selectors/         # State selectors
+    │   ├── user.selectors.ts
+    │   ├── product.selectors.ts
+    │   └── ...
+    ├── models/            # TypeScript interfaces/types
+    │   ├── user.model.ts
+    │   ├── product.model.ts
+    │   ├── app-state.model.ts
+    │   └── ...
+    └── index.ts           # Barrel exports
+```
+
+**Alternative Feature-Based Structure** (recommended for larger apps):
+
+```sh
+src/
+└── app/
+  └── store/
+    ├── user/              # User feature module
+    │   ├── user.actions.ts
+    │   ├── user.reducer.ts
+    │   ├── user.effects.ts
+    │   ├── user.selectors.ts
+    │   ├── user.models.ts
+    │   └── index.ts
+    ├── product/           # Product feature module
+    │   ├── product.actions.ts
+    │   ├── product.reducer.ts
+    │   ├── product.effects.ts
+    │   ├── product.selectors.ts
+    │   ├── product.models.ts
+    │   └── index.ts
+    ├── app.state.ts       # Root application state interface
+    └── index.ts           # Root store configuration
+```
+
+**Key Files Explanation:**
+
+- **`actions/`**: Define all possible events that can occur in your app
+- **`reducers/`**: Pure functions that specify how state changes in response to actions
+- **`effects/`**: Handle side effects like API calls, triggered by actions
+- **`selectors/`**: Efficiently extract and compute derived state from the store
+- **`models/`**: TypeScript interfaces defining the shape of your state
+- **`index.ts`**: Barrel file for clean imports and store configuration
+
+This structure promotes:
+
+- **Separation of concerns**
+- **Code reusability**
+- **Easy testing**
+- **Scalable architecture**
+
+---
+
+---
+
+### How to Use NgRx
+
+1. **Install NgRx**: Add NgRx to your Angular project using Angular CLI:
+
+   ```bash
+   ng add @ngrx/store @ngrx/effects @ngrx/store-devtools
+   ```
+
+   - If you're using **Modules**, you will find that this will modify your `app.module.ts` file to include the NgRx store module.
+
+     ```ts
+     import { StoreModule } from '@ngrx/store';
+     import { effects } from './store/effects';
+     import { reducers } from './store/reducers';
+
+     @NgModule({
+       imports: [
+         StoreModule.forRoot(reducers), // 👈 Register the root reducer
+         EffectsModule.forRoot(effects) // 👈 Register the root effects
+       ]
+     })
+     export class AppModule {}
+     ```
+
+   - If you're using **standalone components**, it will modify the `main.ts` file to provide the NgRx store module in the `providers` array.
+
+     ```ts
+     // ...
+     import { provideStore } from '@ngrx/store';
+
+     bootstrapApplication(AppComponent, {
+       providers: [provideStore(reducers)]
+     });
+     ```
+
+   - `reducers` here is a combination of all feature reducers, which manage the state for their respective features.
+
+     ```ts
+     // reducers.ts 📄
+
+     export const reducers = {
+       user: userReducer,
+       product: productReducer
+     };
+     ```
+
+2. **Define State**: Create interfaces to define the shape of your application state.
+
+   ```ts
+   // user.state.ts 📄
+   export interface UserState {
+     user: User | null;
+     loading: boolean;
+     error: string | null;
+   }
+
+   export const initialState: UserState = {
+     user: null,
+     loading: false,
+     error: null
+   };
+   ```
+
+3. **Create Actions**: Define actions that describe state changes.
+
+   ```ts
+   // user.actions.ts 📄
+   import { createAction, props } from '@ngrx/store';
+
+   export const loadUser = createAction('[User] Load User');
+   export const loadUserSuccess = createAction('[User] Load User Success', props<{ user: User }>());
+   export const loadUserFailure = createAction(
+     '[User] Load User Failure',
+     props<{ error: string }>()
+   );
+   ```
+
+   - Here, we define three actions related to user loading: initiating the load, handling success, and handling failure.
+     - Each action is created using the `createAction` function from NgRx. it takes **(a string identifier and optional payload properties)**.
+       - The string identifier is used to uniquely identify the action. it consists of **a feature name (e.g., `[User]`) and a descriptive action name (e.g., `Load User`)**.
+       - The `props` function is used to define the shape of the payload for actions that require it.
+     - Actions can be dispatched from components or services to trigger state changes.
+   - There's another way to define actions instead of using `createAction`. which is to create a **class-based action**.
+
+     ```ts
+     import { Action } from '@ngrx/store';
+
+     export class LoadUser implements Action {
+       readonly type = '[User] Load User';
+     }
+
+     export class LoadUserSuccess implements Action {
+       readonly type = '[User] Load User Success';
+       constructor(public payload: { user: User }) {}
+     }
+
+     export class LoadUserFailure implements Action {
+       readonly type = '[User] Load User Failure';
+       constructor(public payload: { error: string }) {}
+     }
+     ```
+
+4. **Implement Reducers**: Write reducer functions to handle state transitions based on actions.
+
+   ```ts
+   // user.reducer.ts 📄
+   import { createReducer, on } from '@ngrx/store';
+   import { loadUser, loadUserSuccess, loadUserFailure } from './user.actions';
+   import { initialState } from './user.state';
+
+   export const userReducer = createReducer(
+     initialState,
+     on(loadUser, state => ({ ...state, loading: true })),
+     on(loadUserSuccess, (state, { user }) => ({ ...state, user, loading: false })),
+     on(loadUserFailure, (state, { error }) => ({ ...state, error, loading: false }))
+   );
+   ```
+
+5. **Register and use the store**: Import the store module in your app module (or standalone component) and register your reducers.
+
+   ```ts
+   // component.component.ts 📄
+   import { Component } from '@angular/core';
+   import { Store } from '@ngrx/store';
+   import { loadUser } from './store/user.actions';
+   import { UserState } from './store/user.state';
+
+   @Component({
+     selector: 'app-user',
+     templateUrl: './user.component.html',
+     styleUrls: ['./user.component.css']
+   })
+   export class UserComponent {
+     // Inject the store 👈
+     constructor(private store: Store<{ user: UserState }>) {}
+
+     ngOnInit() {
+       this.store.dispatch(loadUser()); // the action must be called inside the `dispatch` function
+
+       // ⚠️ Subscribe to the user state (as it's an observable)
+       this.store.select('user').subscribe(user => {
+         console.log('user state:', user);
+       });
+     }
+   }
+   ```
+
+   - When accessing the store's state, you can use the `select` method to retrieve specific slices of state. **(They are called "selectors")**
+   - Note that they return an **observable**, so you need to subscribe to it to get the actual state.
+   - Usually this is not how selectors are used in practice. Instead, you would define selector functions to encapsulate the selection logic which will be inside a `.selectors.ts` file.
+
+6. **Define Selectors**: Create selector functions to encapsulate the selection logic.
+
+   ```ts
+   // user.selectors.ts 📄
+   import { createFeatureSelector, createSelector } from '@ngrx/store';
+   import { UserState } from './user.state';
+
+   export const selectUserState = createFeatureSelector<UserState>('user');
+
+   export const selectUser = createSelector(selectUserState, (state: UserState) => state.user);
+
+   export const selectUserLoading = createSelector(
+     selectUserState,
+     (state: UserState) => state.loading
+   );
+
+   export const selectUserError = createSelector(
+     selectUserState,
+     (state: UserState) => state.error
+   );
+   ```
+
+   - To use these selectors in your components, you can inject the store and use the `select` method.
+
+     ```ts
+     // user.component.ts 📄
+     import { Component } from '@angular/core';
+     import { Store } from '@ngrx/store';
+     import { selectUser, selectUserLoading, selectUserError } from './store/user.selectors';
+
+     @Component({
+       selector: 'app-user',
+       templateUrl: './user.component.html',
+       styleUrls: ['./user.component.css']
+     })
+     export class UserComponent {
+       user$ = this.store.select(selectUser);
+       loading$ = this.store.select(selectUserLoading);
+       error$ = this.store.select(selectUserError);
+
+       constructor(private store: Store) {}
+     }
+     ```
+
+     - Notice that we use `$` at the end of the observable variable names (e.g., `user$`). This is a common convention in Angular to indicate that the variable is an observable.
+
+7. **Use Async Pipe**: In your component template, use the `async` pipe to subscribe to the observables and get the latest values.
+
+   ```html
+   <!-- user.component.html 📄 -->
+   <div *ngIf="loading$ | async; else userContent">Loading...</div>
+   <ng-template #userContent>
+     <div *ngIf="error$ | async as error">Error: {{ error }}</div>
+     <div *ngIf="user$ | async as user">User: {{ user.name }}</div>
+   </ng-template>
+   ```
+
+   - **Note**: The `async` pipe automatically subscribes to the observable and unsubscribes when the component is destroyed, preventing memory leaks.
+
+8. **Creating Effects**: Effects are used to handle side effects in your application, such as API calls. Create an effect to load the user data.
+   ![NGRX Effects](./img/ngrx-effects-1.png)
+
+   ```ts
+   // user.effects.ts 📄
+   import { Injectable } from '@angular/core';
+   import { Actions, createEffect, ofType } from '@ngrx/effects';
+   import { UserService } from './user.service';
+   import { loadUser, loadUserSuccess, loadUserFailure } from './user.actions';
+   import { catchError, map, mergeMap } from 'rxjs/operators';
+
+   @Injectable()
+   export class UserEffects {
+     constructor(private actions$: Actions, private userService: UserService) {}
+
+     loadUser$ = createEffect(() =>
+       this.actions$.pipe(
+         ofType(loadUser),
+         mergeMap(() =>
+           this.userService.getUser().pipe(
+             map(user => loadUserSuccess({ user })),
+             catchError(error => of(loadUserFailure({ error })))
+           )
+         )
+       )
+     );
+   }
+   ```
+
+   - **Note**: Effects are typically used for handling side effects, such as API calls, and are defined in a separate file (e.g., `user.effects.ts`).
+
+   - **Register Effects**: Finally, register the effects in your module.
+
+     ```ts
+     // user.module.ts 📄
+     import { NgModule } from '@angular/core';
+     import { EffectsModule } from '@ngrx/effects';
+     import { UserEffects } from './user.effects';
+
+     @NgModule({
+       imports: [EffectsModule.forFeature([UserEffects])]
+     })
+     export class UserModule {}
+     ```
 
 ---
 

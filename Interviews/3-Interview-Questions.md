@@ -1051,6 +1051,39 @@ This file summarizes key topics in this repository (Learning Notes) to be used a
   - It's the environment in which JavaScript code is executed. It includes the JavaScript engine (like V8 in Chrome), the event loop, and the Web APIs provided by the browser.
   - The runtime allows JavaScript to interact with the Document Object Model (DOM), handle events, and perform asynchronous operations like network requests.
 
+- **How can you remove duplicate elements from an array?**
+
+  You can remove duplicate elements from an array using various methods. Here are a few examples:
+
+  - **Using Set:**
+
+    ```javascript
+    const array = [1, 2, 2, 3, 4, 4, 5];
+    const uniqueArray = [...new Set(array)];
+    console.log(uniqueArray); // [1, 2, 3, 4, 5]
+    ```
+
+  - **Using filter:**
+
+    ```javascript
+    const array = [1, 2, 2, 3, 4, 4, 5];
+    const uniqueArray = array.filter((value, index, self) => self.indexOf(value) === index);
+    console.log(uniqueArray); // [1, 2, 3, 4, 5]
+    ```
+
+  - **Using reduce:**
+
+    ```javascript
+    const array = [1, 2, 2, 3, 4, 4, 5];
+    const uniqueArray = array.reduce((acc, value) => {
+      if (!acc.includes(value)) {
+        acc.push(value);
+      }
+      return acc;
+    }, []);
+    console.log(uniqueArray); // [1, 2, 3, 4, 5]
+    ```
+
 ---
 
 ### JS Web APIs

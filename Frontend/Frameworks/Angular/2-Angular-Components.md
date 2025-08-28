@@ -20,7 +20,7 @@
 
 ## Components
 
-**Components** are just exported `classes`
+**Components** are just exported `classes` that are decorated with the `@Component` decorator.
 
 ![component](./img/component-1.png)
 

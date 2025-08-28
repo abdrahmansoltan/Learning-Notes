@@ -42,6 +42,7 @@
     - [Chaining pipes](#chaining-pipes)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
+  - [Angular Service Worker](#angular-service-worker)
   - [Notes](#notes)
     - [Expressions vs String Interpolation](#expressions-vs-string-interpolation)
     - [Angular HTML Escaper (Sanitization)](#angular-html-escaper-sanitization)
@@ -79,39 +80,47 @@ Angular is a `framework` for building **reactive** web applications.
 
 ### How Angular works (Compilation)
 
-This is how Angular works under the hood
+- **This is how Angular works under the hood (App bootstrap process)**
 
-1. When you run the `ng serve` command, Angular CLI starts a development server that serves the app, and compiles the app code into JavaScript code that the browser can understand
-   ![compilation](./img/compilation-1.png)
+  1. When you run the `ng serve` command, Angular CLI starts a development server that serves the app, and compiles the app code into JavaScript code that the browser can understand
+     ![compilation](./img/compilation-1.png)
 
-2. The server sends the `index.html` file to the browser **(Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)**
-   ![compilation](./img/compilation-2.png)
+  2. The server sends the `index.html` file to the browser **(Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)**
+     ![compilation](./img/compilation-2.png)
 
-   - The `main.ts` file bootstraps the `AppModule` and starts the app
+     - The `main.ts` file bootstraps the `AppModule` and starts the app (or if using standalone components, it bootstraps the main component directly)
+
+       ```ts
+       // main.ts 📄
+       import { bootstrapApplication } from '@angular/platform-browser';
+       import { AppModule } from './app/app.module'; // or import the main component directly
+
+       // bootstrap the AppModule and start the app
+       bootstrapApplication(AppModule).catch(err => console.error(err));
+       ```
+
+  3. The `AppModule` is the main module of the app, and it imports all the other modules and components that are needed for the app to work
 
      ```ts
-     // main.ts 📄
-     import { bootstrapApplication } from '@angular/platform-browser';
-     import { AppModule } from './app/app.module'; // or import the main component directly
+     // app.module.ts 📄
+     // import the necessary modules and components and services
 
-     // bootstrap the AppModule and start the app
-     bootstrapApplication(AppModule).catch(err => console.error(err));
+     @NgModule({
+       declarations: [AppComponent], // declare the components that are used in the app
+       imports: [BrowserModule, AppRoutingModule, FormsModule], // import the modules that are needed for the app
+       providers: [AppService], // provide the services that are used in the app
+       bootstrap: [AppComponent] // bootstrap the main component of the app
+     })
+     export class AppModule {}
      ```
 
-3. The `AppModule` is the main module of the app, and it imports all the other modules and components that are needed for the app to work
+  4. The `<app-root>` component is the main component of the app, and it is defined in the `app.component.ts` file. It serves as the entry point for the application and contains the HTML template for the app.
 
-   ```ts
-   // app.module.ts 📄
-   // import the necessary modules and components and services
+     - Angular creates an **instance** of the `AppComponent` class and inserts it into the DOM at the location of the `<app-root>` tag.
+     - Then it turns the instance's template into HTML and inserts it into the DOM (into the `host` element)
 
-   @NgModule({
-     declarations: [AppComponent], // declare the components that are used in the app
-     imports: [BrowserModule, AppRoutingModule, FormsModule], // import the modules that are needed for the app
-     providers: [AppService], // provide the services that are used in the app
-     bootstrap: [AppComponent] // bootstrap the main component of the app
-   })
-   export class AppModule {}
-   ```
+  5. Angular inspects the main `app-component` for any sub-components that need to be rendered and creates instances of those components as well.
+     - It continues this process recursively until all components in the app have been instantiated and rendered.
 
 > **Compilation** is the process of converting the Angular code into `Javascript` code that the browser can understand
 
@@ -302,7 +311,7 @@ The `style` attribute can be used to add inline styles to an element
 
 ### External styles
 
-- You can add styles to the `styles.css` file to apply them globally to the app
+- You can add styles to the `styles.css` file to apply them **globally to the app**
 
   ```css
   /* in styles.css */
@@ -311,7 +320,7 @@ The `style` attribute can be used to add inline styles to an element
   }
   ```
 
-- You can also add styles to the `app.component.css` file to apply them only to the `app.component` (scoped styles)
+- You can also add styles to the `app.component.css` file to apply them only to the `app.component` **(scoped styles)**
 
   ```ts
   // in app.component.ts
@@ -332,6 +341,9 @@ The `style` attribute can be used to add inline styles to an element
   }
   ```
 
+  - How does Angular scope styles for each component?
+    - Angular uses a technique called **View Encapsulation** to scope styles for each component. This means that styles defined in a component's CSS file will only apply to that component and its children, not to other components in the application.
+
 - **Host Element**
   ![Host Element](./img/host-element.png)
 
@@ -351,6 +363,11 @@ The `style` attribute can be used to add inline styles to an element
     border: 1px solid black; /* This will apply to the host element */
   }
   ```
+
+- **Styling `<app-root>` component/element**
+  - The only way to use the `app-root` element-selector inside a css file is by using it inside the `styles.css` main file.
+  - If you tried to use it inside the `app.component.css` file, it wouldn't work because of Angular's view encapsulation.
+  - Another way to style the `app-root` element is by using the `:host` pseudo-class in the `app.component.css` file.
 
 ---
 
@@ -658,7 +675,7 @@ It's a way to bind an event of an HTML element to a method in the component clas
 
 It's a way to extend the HTML with custom behavior and functionality **(Enhancements to HTML)**, allowing you to create reusable components and manipulate the DOM in a declarative way.
 
-- **Angular directives** are extended `HTML attributes` with the prefix `"ng-"`.
+- **Angular directives** are extended `HTML attributes` with the prefix `"ng-"` (or `[]`, `*` syntax).
   ![directives](./img/directives-0.png)
 
 > [Directives Resource](https://angular.io/api?type=directive)
@@ -714,6 +731,11 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   ```
 
   - Here, we are adding the `error` class to the button element if the `isError` property is `true`
+  - `[class]` is also a way to add/remove classes dynamically but it requires more boilerplate code
+
+    ```html
+    <button [class]="isError ? 'error' : ''">Error Button</button>
+    ```
 
 - `ngModel` : it creates a two-way data binding on form elements
 
@@ -730,6 +752,9 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 - it can add or remove elements from the DOM
 - it starts with `*` and it's a `directive` that changes the structure of the DOM
 - Angular makes the content inside of `<ng-template>` become hidden but Angular will be aware of it so that it can be used based on condition
+- **⚠️ You can only apply one structural directive per element**
+
+  - To do so, you can wrap the element with a `<ng-container>` or `<ng-template>` -> [see more here](#multiple-directives)
 
 - **Angular <= 16**
 
@@ -758,11 +783,14 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 
     ```html
     <div [ngSwitch]="color">
+      <!-- It checks the value of the "color" variable and displays the corresponding paragraph -->
       <p *ngSwitchCase="'red'">Red color</p>
       <p *ngSwitchCase="'blue'">Blue color</p>
       <p *ngSwitchDefault>Invalid color</p>
     </div>
     ```
+
+  > **Note:** You need to import `CommonModule` in your component to use structural directives.
 
 - **Angular >= 17**
 
@@ -788,7 +816,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 
     ```html
     <ul>
-      @for (item of items) {
+      @for (item of items; track $index) {
       <li>{{ item }}</li>
       }
     </ul>
@@ -822,6 +850,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 - `ng-container`
 
   - it's a grouping element that doesn't add any extra element to the DOM, and it can be used to group multiple elements together and apply a structural directive to them
+  - It's like an **invisible element**
 
     ```html
     <ng-container *ngIf="condition">
@@ -1078,7 +1107,7 @@ The parent component can pass data to the child component using `@Input()` decor
 
   - here we use an alias(`"master"`) so that in the parent component we use the alias not the other name (`"masterName"`), but in the child component we use the other name (`"masterName"`)
 
-- To make a prop required, you should:
+- **To make a prop required**, you should:
 
   - 1️⃣ use the `!` operator after the property name (To tell TypeScript that this property will be initialized later, and it will not be `undefined`)
   - 2️⃣ use the `@Input({ required: true })` decorator
@@ -1343,7 +1372,7 @@ In order to use a pipe, you need 2 steps:
 
 > [Built-in pipes reference](https://angular.dev/guide/templates/pipes#built-in-pipes) -> Here, you can find all the built-in pipes in Angular
 
-- Example with `number` pipe: it formats a number to a specific format
+- Example with `number / Decimal` pipe: it formats a number to a specific format
 
   ```html
   <p>{{ 123456.789 | number }}</p>
@@ -1353,14 +1382,23 @@ In order to use a pipe, you need 2 steps:
   <!-- this converts the number to a string with 2 decimal places, ex: 123,456.79 -->
   ```
 
-- Example with `UpperCasePipe`: it transform text to all uppercase
+  - `'1.2-2'` means that the number will have **at least 1 digit before the decimal point**, **at least 2 digits after the decimal point**, and a **maximum of 2 digits after the decimal point**.
+
+- Example with `UpperCase` Pipe: it transform text to all uppercase
 
   ```html
   <p>{{ 'hello' | uppercase }}</p>
   <!-- this converts the text to uppercase, ex: HELLO -->
   ```
 
-- Example with `DatePipe`: it transform date to a specific format
+- Example with `titleCase` Pipe: it transform text to title case
+
+  ```html
+  <p>{{ 'hello world' | titlecase }}</p>
+  <!-- this converts the text to title case, ex: Hello World -->
+  ```
+
+- Example with `Date` Pipe: it transform date to a specific format
 
   ```html
   <p>{{ today | date: 'short' }}</p>
@@ -1373,7 +1411,7 @@ In order to use a pipe, you need 2 steps:
   <!-- this converts the date to this custom format, ex: June 15, 2015 -->
   ```
 
-- Example with `CurrencyPipe`: it transform number to currency
+- Example with `Currency` Pipe: it transform number to currency
 
   ```html
   <p>{{ price | currency }}</p>
@@ -1383,20 +1421,13 @@ In order to use a pipe, you need 2 steps:
   <!-- this converts the number to currency, ex: €123.45 -->
   ```
 
-- Example with `DecimalPipe`: it transform number to decimal
-
-  ```html
-  <p>{{ pi | number: '1.2-2' }}</p>
-  <!-- this converts the number to decimal, ex: transform 3.1412 to 3.14 -->
-  ```
-
 - `JSONPipe` : it converts a JavaScript object into a JSON string **(it's only for debugging purposes)**
 
   ```html
   <p>{{ userObject | json }}</p>
   ```
 
-- `async` : it's a pipe that subscribes to an `Observable` or a `Promise` and returns the latest value it has emitted
+- `async` **(IMPORTANT ⚠️)** : it's a pipe that subscribes to an `Observable` or a `Promise` and returns the latest value it has emitted
 
   ```html
   <p>{{ user$ | async }}</p>
@@ -1421,43 +1452,73 @@ In order to use a pipe, you need 2 steps:
   - the file will contain a class with the name `<PipeName>Pipe`
   - the class will have a `transform()` method that takes a value and **returns a value after transforming it**
 
-- Example: creating a custom pipe to shorten a text **(Truncate text)**
+- **Examples:**
 
-  ```ts
-  // in app/shorten.pipe.ts 📄
-  import { Pipe, PipeTransform } from '@angular/core';
+  - creating a custom pipe to shorten a text **(Truncate text)**
 
-  @Pipe({
-    name: 'shorten'
-  })
-  export class ShortenPipe implements PipeTransform {
-    transform(value: string, limit: number) {
-      return value.length > limit ? value.substr(0, limit) + '...' : value;
+    ```ts
+    // in app/shorten.pipe.ts 📄
+    import { Pipe, PipeTransform } from '@angular/core';
+
+    @Pipe({
+      name: 'shorten'
+    })
+    export class ShortenPipe implements PipeTransform {
+      transform(value: string, limit: number) {
+        return value.length > limit ? value.substr(0, limit) + '...' : value;
+      }
     }
-  }
-  ```
+    ```
 
-  ```ts
-  // in app.component.ts 📄
-  import { Component } from '@angular/core';
-  import { ShortenPipe } from './shorten.pipe';
-  @Component({
-    selector: 'app-root',
-    templateUrl: './app.component.html',
-    styleUrls: ['./app.component.css'],
-    standalone: true,
-    imports: [ShortenPipe] // import the custom pipe here 👈
-  })
-  export class AppComponent {
-    longText = 'This is a very long text that needs to be shortened for display purposes.';
-  }
-  ```
+    ```ts
+    // in app.component.ts 📄
+    import { Component } from '@angular/core';
+    import { ShortenPipe } from './shorten.pipe';
+    @Component({
+      selector: 'app-root',
+      templateUrl: './app.component.html',
+      styleUrls: ['./app.component.css'],
+      standalone: true,
+      imports: [ShortenPipe] // import the custom pipe here 👈
+    })
+    export class AppComponent {
+      longText = 'This is a very long text that needs to be shortened for display purposes.';
+    }
+    ```
 
-  ```html
-  <!-- in app.component.html 📄 -->
-  <p>{{ longText | shorten: 10 }}</p>
-  <!-- result: This is a... -->
-  ```
+    ```html
+    <!-- in app.component.html 📄 -->
+    <p>{{ longText | shorten: 10 }}</p>
+    <!-- result: This is a... -->
+    ```
+
+  - creating a custom pipe to convert length from miles to specified units
+
+    ```ts
+    // in app/length.pipe.ts 📄
+    import { Pipe, PipeTransform } from '@angular/core';
+
+    @Pipe({
+      name: 'length'
+    })
+    export class LengthPipe implements PipeTransform {
+      transform(value: number, unit: string): number {
+        switch (unit) {
+          case 'km':
+            return value * 1.60934;
+          case 'm':
+            return value * 1609.34;
+          default:
+            return value;
+        }
+      }
+    }
+    ```
+
+    ```html
+    <p>{{ miles | length: 'km' }}</p>
+    <p>{{ miles | length: 'm' }}</p>
+    ```
 
 - Notes:
 
@@ -1476,6 +1537,8 @@ In order to use a pipe, you need 2 steps:
   ```
 
   - Here, we first transform the text to uppercase, then we shorten it
+
+- Also you can use pipes inside of `*ngFor` and `*ngIf`
 
 ---
 
@@ -1577,6 +1640,26 @@ A common problem in web development is how to create a modal dialog that is posi
   ```
 
   - Here, we are creating a modal component that will be rendered in the center of the page using the `Angular CDK` overlay service
+
+---
+
+## Angular Service Worker
+
+It's a script that runs in the web browser and manages caching and retrieval of resources, enabling offline capabilities and faster load times for web applications.
+
+> Check more details on the [service worker in the FE-PWA file](../../General/FE-PWA.md#service-workers)
+
+- Angular provides a built-in service worker implementation that can be easily added to your application.
+
+  ```sh
+  ng add @angular/pwa
+  ```
+
+  - This command will add the necessary files and configurations to enable the service worker in your Angular application.
+
+- Now you need to configure the service worker by editing the `ngsw-config.json` file.
+
+More details in the [official Angular documentation](https://angular.dev/ecosystem/service-workers)
 
 ---
 

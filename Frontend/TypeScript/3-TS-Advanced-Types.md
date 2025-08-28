@@ -23,6 +23,9 @@
     - [Discriminated Unions (literal types Narrowing)](#discriminated-unions-literal-types-narrowing)
     - [Declaration Merging](#declaration-merging)
     - [Exhaustiveness Checks with `never`](#exhaustiveness-checks-with-never)
+  - [Key Operators \& Utility Types](#key-operators--utility-types)
+    - [Built-in Operators](#built-in-operators)
+    - [Built-in Utility Types](#built-in-utility-types)
   - [Decorators](#decorators)
     - [How to use Decorators](#how-to-use-decorators)
     - [Decorator Factories (factory decorator)](#decorator-factories-factory-decorator)
@@ -377,14 +380,14 @@ We can use `keyof` operator to constrain a generic to only accept keys of a cert
   getProperty(user, 'role'); // ❌ Argument of type "role" is not assignable to parameter of type '"id" | "name" | "age"'.
   ```
 
-- This is done instead of explicitly defining the type of the key
+  - This is done instead of explicitly defining the type of the key
 
-  ```ts
-  // BAD ❌
-  function getProperty(obj: any, key: string): string | number {
-    return obj[key];
-  }
-  ```
+    ```ts
+    // BAD ❌
+    function getProperty(obj: any, key: string): string | number {
+      return obj[key];
+    }
+    ```
 
 ---
 
@@ -754,6 +757,299 @@ TypeScript can merge multiple declarations with the same name into one. Useful f
 ### Exhaustiveness Checks with `never`
 
 It's the default thing to do when all the type-narrowing checks are all passed and this is the last check, and it's like: "we should never make it here, if we handled all cases correctly"
+
+---
+
+## Key Operators & Utility Types
+
+### Built-in Operators
+
+- `as` (type assertion)
+
+  - it tells the compiler to treat a value as a specific type, overriding its inferred type.
+
+    ```ts
+    let value: unknown = 'Hello';
+    const str = value as string;
+    ```
+
+  - When to use it:
+    - when you're certain about the type of the value but TypeScript can't infer it. **(be careful as incorrect usage can lead to runtime errors)**
+    - when you want to narrow down the type of a value to a more specific type.
+    - when dealing with dynamic data sources (e.g. data from **APIs**)
+
+- `satisfies` (type satisfier)
+
+  - it was introduced in TypeScript `4.9` and allows you to assert that a value satisfies a specific type but retains any extra fields or information.
+
+    ```ts
+    type User = {
+      id: number;
+      username: string;
+      role: 'admin' | 'user' | 'guest';
+    };
+
+    const adminUser = {
+      id: 1,
+      username: 'admin',
+      role: 'admin',
+      extraField: 'extraValue' // 👈
+    } satisfies User; // 👈 Here we assert that adminUser satisfies the User type
+    ```
+
+  - When to use it:
+    - useful when you want type safety with some flexibility, allowing extra fields that aren’t part of the defined type.
+    - better than `as` for preserving extra fields.
+
+- `keyof` (key operator)
+
+  - It returns a union type of the keys of an object type.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age: number;
+    };
+
+    type UserKeys = keyof User; // "id" | "name" | "age"
+    ```
+
+  - We can use `keyof` operator to constrain a generic to only accept keys of a certain type
+    ![keyof](./img/generic-constraints-1.jpeg)
+
+    ```ts
+    function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+      return obj[key];
+    }
+
+    let user = {
+      id: 1,
+      name: 'test',
+      age: 20
+    };
+
+    getProperty(user, 'id'); // ✅
+    getProperty(user, 'name'); // ✅
+    getProperty(user, 'age'); // ✅
+    getProperty(user, 'role'); // ❌ Argument of type "role" is not assignable to parameter of type '"id" | "name" | "age"'.
+    ```
+
+    - This is done instead of explicitly defining the type of the key
+
+      ```ts
+      // BAD ❌
+      function getProperty(obj: any, key: string): string | number {
+        return obj[key];
+      }
+      ```
+
+  > It depends on [Literal type](./2-TS-Types.md#literal-type)
+
+  - When to use it:
+    - When you need to dynamically access or iterate over the keys of an object type while maintaining type safety.
+    - when creating (utility-types or generics) that operate on the keys of an object type.
+
+- `typeof` (Type Query)
+
+  - It allows you to get the type of a variable or property at compile time.
+
+    ```ts
+    const user = {
+      id: 1,
+      name: 'John Doe'
+    };
+
+    type User = typeof user; // { id: number; name: string; }
+    ```
+
+  - When to use it:
+    - When you need to get the type of a variable or property at compile time.
+    - When you want to reuse the shape of an object across multiple places in your code.
+
+- `in` (Mapped type operator)
+
+  - It's' used inside mapped types to iterate over a union of keys, making it easier to create variations of existing types.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age: number;
+    };
+
+    type UserReadOnly = {
+      readonly [K in keyof User]: User[K];
+      // Now all properties are readonly
+    };
+
+    type UserOptional = {
+      [K in keyof User]?: User[K];
+      // Now all properties are optional
+    };
+    ```
+
+- `extends` (Type constraint)
+
+  - It's used to constrain a generic type to a specific shape or set of properties.
+
+    ```ts
+    function printName<T extends { name: string }>(arg: T): void {
+      console.log(arg.name);
+    }
+
+    printName({ name: 'John', age: 30 }); // ✅
+    printName({ age: 30 }); // ❌ Argument of type '{ age: number; }' is not assignable to parameter of type '{ name: string; }'.
+    ```
+
+- `infer` (Type Inference in conditional types)
+
+  - It's used to infer a type within a conditional type.
+
+    ```ts
+    type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+    type MyFunction = (a: number, b: string) => boolean;
+
+    type MyReturnType = ReturnType<MyFunction>; // boolean
+    ```
+
+- `is` (Type Guard/Predicate)
+
+  - It's used to create a user-defined type guard.
+
+    ```ts
+    function isString(value: any): value is string {
+      return typeof value === 'string';
+    }
+
+    const input: unknown = 'Hello';
+
+    if (isString(input)) {
+      console.log(input.toUpperCase()); // ✅
+    }
+    ```
+
+  - It's used to create custom type-guards that help narrow down types within conditional blocks.
+
+- `?` (Optional property modifier)
+
+  - It allows you to mark a property as optional in an object type.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age?: number;
+    };
+    ```
+
+  - When to use it:
+    - when defining object types where certain properties are not required, giving flexibility in how objects can be structured.
+
+- `!` (Non-null assertion operator)
+
+  - It allows you to assert that a value is not null or undefined **bypassing typescript strict `null` checks**
+
+    ```ts
+    function processValue(value: string | null | undefined) {
+      const processed = value!.trim();
+      // Now TypeScript knows 'processed' is a string
+    }
+    ```
+
+- `readonly` (Modifier)
+
+  - It allows you to mark a property as read-only in an object type, ensuring that the property cannot be reassigned or modified.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age: number;
+      readonly email: string;
+    };
+    ```
+
+  - When to use it:
+    - When you want to prevent a property from being modified after it's been set.
+    - When you want to create immutable objects.
+
+---
+
+### Built-in Utility Types
+
+- `Pick<T, K>`
+
+  - Constructs a type by picking the set of properties `K` from `T`.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age: number;
+    };
+
+    type UserName = Pick<User, 'name'>; // { name: string }
+    ```
+
+  - Use it when you want to create a type by selecting only certain properties from an existing type.
+
+- `Omit<T, K>`
+
+  - Constructs a type by omitting the set of properties `K` from `T`.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age: number;
+    };
+
+    type UserWithoutAge = Omit<User, 'age'>; // { id: number; name: string; }
+    ```
+
+  - It's the opposite of `Pick<T, K>`.
+
+- `Partial<T>`
+
+  - Makes all properties in a type **optional**.
+
+    ```ts
+    type User = {
+      id: number;
+      name: string;
+      age: number;
+    };
+
+    type PartialUser = Partial<User>; // { id?: number; name?: string; age?: number; }
+    ```
+
+  - It's used to make types more flexible and easier to work with, especially in scenarios where you want to allow partial updates to an object.
+
+- `ReturnType<T>`
+
+  - Extracts the return type of a function type.
+
+    ```ts
+    function createUser(name: string, age: number) {
+      return {
+        id: Date.now(),
+        name,
+        age
+      };
+    }
+
+    type User = ReturnType<typeof createUser>;
+
+    const user: User = {
+      id: 1,
+      name: 'John Doe',
+      age: 30
+    };
+    ```
+
+  - It's used when you need to reuse the return type of a function elsewhere in your code.
 
 ---
 
