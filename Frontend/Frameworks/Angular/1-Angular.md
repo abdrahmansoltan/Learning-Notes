@@ -936,7 +936,9 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 
 #### Custom Attribute Directive
 
-- Example: creating a custom directive to highlight an element
+Here, we use `ElementRef` and `Renderer2` to create an attribute directive and **manipulate the DOM**.
+
+- **Example: creating a custom directive to highlight an element**
 
   ```sh
   ng generate directive highlight
@@ -1009,7 +1011,37 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   }
   ```
 
+  ```html
+  <a appQueryParams="'from=myapp'" href="https://example.com">Link</a>
+  ```
+
+- **Example: recreating the `ngClass` directive**
+
+  ```html
+  <div [appNgClass]="{ 'class1': condition1, 'class2': condition2 }">Hello World</div>
+  ```
+
+  ```ts
+  import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+
+  @Directive({
+    selector: '[appNgClass]'
+  })
+  export class NgClassDirective {
+    @Input() set appNgClass(classes: { [key: string]: boolean }) {
+      const classList = Object.keys(classes).filter(key => classes[key]);
+      this.renderer.setAttribute(this.el.nativeElement, 'class', classList.join(' '));
+    }
+
+    constructor(private el: ElementRef, private renderer: Renderer2) {}
+  }
+  ```
+
+---
+
 #### Custom Structural Directive
+
+Here, we use `TemplateRef` and `ViewContainerRef` to create a structural directive and **manipulate the DOM**.
 
 - Example: creating a custom directive to repeat an element multiple times
 
@@ -1027,6 +1059,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   export class RepeatDirective {
     @Input() set appRepeat(times: number) {
       for (let i = 0; i < times; i++) {
+        // Create an embedded view for each repetition and insert it into the view container
         this.viewContainer.createEmbeddedView(this.templateRef);
       }
     }
@@ -1036,7 +1069,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   ```
 
   ```html
-  <ng-template appRepeat="3">
+  <ng-template *appRepeat="3">
     <p>Repeat me!</p>
   </ng-template>
   ```

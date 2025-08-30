@@ -18,7 +18,7 @@
 
 ## Modules
 
-It's a way to organize the code into different modules based on their functionality, which helps in separating the code into different modules based on their functionality and makes it easier to manage and maintain the code
+**It's a way to organize the code into different modules based on their functionality**, which helps in separating the code into different modules based on their functionality and makes it easier to manage and maintain the code
 ![module](./img/modules-0.png)
 
 - A **module** is a container for a set of related components, services, directives, and pipes
