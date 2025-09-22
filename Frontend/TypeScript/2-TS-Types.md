@@ -872,28 +872,43 @@ They're used to declare how accessible a variable should be from outside the cla
 
     - It can be used to create a **singleton class**, which is a class that can only have one instance.
 
-    ```ts
-    class Singleton {
-      private static instance: Singleton;
+      ```ts
+      class Singleton {
+        private static instance: Singleton;
 
-      private constructor() {}
+        private constructor() {}
 
-      public static getInstance() {
-        if (!Singleton.instance) {
-          // if instance is not created yet
-          Singleton.instance = new Singleton();
+        public static getInstance() {
+          if (!Singleton.instance) {
+            // if instance is not created yet
+            Singleton.instance = new Singleton();
+          }
+          // if instance is already created, return the existing instance to prevent creating a new one
+          return Singleton.instance;
         }
-        // if instance is already created, return the existing instance to prevent creating a new one
-        return Singleton.instance;
       }
-    }
 
-    const singleton1 = Singleton.getInstance();
-    const singleton2 = Singleton.getInstance();
-    console.log(singleton1 === singleton2); // true
-    ```
+      const singleton1 = Singleton.getInstance();
+      const singleton2 = Singleton.getInstance();
+      console.log(singleton1 === singleton2); // true
+      ```
 
-    > This pattern is called **"singleton pattern" or "private constructor pattern"** and is used to ensure that a class has only one instance and provides a global point of access to it.
+      > This pattern is called **"singleton pattern" or "private constructor pattern"** and is used to ensure that a class has only one instance and provides a global point of access to it.
+
+    - It can also be used to create utility classes, which are classes that contain only static methods and properties. that can be used without creating an instance of the class. like a static method that can be used to calculate math operations, **and the class is just a container for these methods**
+
+      ```ts
+      class MathUtils {
+        static PI: number = 3.14;
+
+        static calculateCircumference(diameter: number): number {
+          return diameter * MathUtils.PI;
+        }
+      }
+
+      console.log(MathUtils.PI); // 3.14
+      console.log(MathUtils.calculateCircumference(10)); // 31.4
+      ```
 
   - `readonly` Modifier
 
@@ -1048,6 +1063,7 @@ They're used to define properties in the class without having to define them in 
   ```
 
   - Here, by`public`, we're telling typescript to create a property with the same name and type as the parameter and to assign the parameter to the property
+  - Here, it seems like we're passing the parameters to the constructor and not using them, but typescript is doing more behind the scenes like creating the properties and assigning the parameters to them
 
 #### Setter & Getter
 

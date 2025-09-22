@@ -976,6 +976,7 @@ It's a methodology used for **hiding information**. It is based on the concept t
   - `Public`: accessible from anywhere. They comprise the external interface. Until now we were only using public properties and methods.
   - `Private`: accessible only from inside the class (and subclasses). They are for internal operations.
   - `static`: accessible from the class itself, not from instances or subclasses.
+    - Example: a static method to create an instance of the class (factory method). or a **static method that can be used to calculate math operations, and the class is just a container for these methods**.
 
 - we use it to prevent the user from seeing specific properties or changing them
 - so we make these properties accessible from methods and not directly

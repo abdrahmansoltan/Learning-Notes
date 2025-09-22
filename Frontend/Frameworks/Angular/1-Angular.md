@@ -35,6 +35,7 @@
     - [Content projection (Slots)](#content-projection-slots)
       - [Single-slot content projection](#single-slot-content-projection)
       - [Multi-slot content projection](#multi-slot-content-projection)
+      - [Handling projected content](#handling-projected-content)
   - [Pipes](#pipes)
     - [How to use Pipes](#how-to-use-pipes)
     - [Built-in pipes](#built-in-pipes)
@@ -45,7 +46,7 @@
   - [Angular Service Worker](#angular-service-worker)
   - [Notes](#notes)
     - [Expressions vs String Interpolation](#expressions-vs-string-interpolation)
-    - [Angular HTML Escaper (Sanitization)](#angular-html-escaper-sanitization)
+    - [Angular HTML Escaper (Sanitization / Security)](#angular-html-escaper-sanitization--security)
 
 ---
 
@@ -197,26 +198,44 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 
 - **Images**
 
-- external images (hosted on different server) -> just need `url` in the `src` attribute
+  - external images (hosted on different server) -> just need `url` in the `src` attribute
 
-  ```html
-  <img src="https://example.com/image.jpg" />
-  ```
-
-- local images **(assets folder)** -> need to use `src` attribute with the path of the image in the `assets` folder
-
-  ```html
-  <img src="assets/image.jpg" />
-  ```
-
-  - **⚠️ Note:** If you don't see the image, make sure that the path is added in `angular.json` file in the `assets` array
-
-    ```json
-    "assets": [
-      "src/favicon.ico",
-      "src/assets"
-    ]
+    ```html
+    <img src="https://example.com/image.jpg" />
     ```
+
+  - local images
+
+    - **(assets folder)** -> need to use `src` attribute with the path of the image in the `assets` folder
+
+      ```html
+      <img src="assets/image.jpg" />
+      ```
+
+      - **⚠️ Note:** If you don't see the image, make sure that the path is added in `angular.json` file in the `assets` array
+
+        ```json
+        "assets": [
+          "src/favicon.ico",
+          "src/assets"
+        ]
+        ```
+
+    - **(public folder)** -> need to use `src` attribute with the path of the image in the `public` folder without any prefix (because the `public` folder is the root folder for static files)
+
+      ```html
+      <img src="image.jpg" />
+      ```
+
+      - **⚠️ Note:** If you don't see the image, make sure that the path is added in `angular.json` file in the `assets` array
+
+        ```json
+        "assets": [
+          "src/favicon.ico",
+          "src/assets",
+          "src/public" // add this line ✅
+        ]
+        ```
 
 ---
 
@@ -1293,42 +1312,76 @@ It's a way to reference an element in the template so that you can access it in 
 <h2>Single-slot content projection</h2>
 <ng-content></ng-content>
 
+<!-------------------------------------------->
+
 <!-- parent -->
 <child-component>
   <p>the projected content</p>
 </child-component>
 ```
 
+---
+
 #### Multi-slot content projection
 
 - A component can have multiple slots. Each slot can specify a CSS selector that determines which content goes into that slot. This pattern is referred to as multi-slot content projection. With this pattern, you must specify where you want the projected content to appear. You accomplish this task by using the `select` attribute of `<ng-content>`.
 
-  ```ts
-  // in the child component
-  @Component({
-    selector: 'app-child',
-    template: `
-      <h2>Multi-slot content projection</h2>
-      <ng-content select=".header"></ng-content>
-      <ng-content select=".footer"></ng-content>
-      <ng-content></ng-content>
-    `
-  })
-  export class ChildComponent {}
+  ```html
+  <!-- child -->
+  <h2>Multi-slot content projection</h2>
+  <ng-content select=".header"></ng-content>
+  <ng-content select="[mainContent]"></ng-content>
+  <ng-content select="#footer"></ng-content>
+  <ng-content></ng-content>
   ```
 
   ```html
-  <!-- in the parent component -->
-  <app-child>
+  <!-- parent -->
+  <child-component>
     <p class="header">Header content</p>
-    <p class="footer">Footer content</p>
-  </app-child>
+    <p mainContent>Main content</p>
+    <p id="footer">Footer content</p>
+  </child-component>
   ```
 
 - Here, the `header` content will be projected into the first slot, and the `footer` content will be projected into the second slot.
 - The `select` attribute of `<ng-content>` is used to specify the CSS selector that determines which content goes into that slot.
-  - It's can select by `class`, `id`, `tag`, etc.
+  - It can select by any selector type: `class`, `id`, `element name`, `attribute`, etc.
 - The `<ng-content>` element without the `select` attribute is the **default slot**, and it will project any content that doesn't match the other slots.
+
+---
+
+#### Handling projected content
+
+- Sometimes, you may want to show/hide a wrapper element that contains `<ng-content>`, based on if there's any projected content or not.
+
+  - To do so we may:
+
+    - 1️⃣ use `@ContentChild` decorator to check if there's any projected content or not, and `*ngIf` to show/hide the wrapper element
+
+      ```ts
+      @ContentChild('projectedContent') projectedContent!: ElementRef;
+      ```
+
+      ```html
+      <div *ngIf="projectedContent">
+        <ng-content></ng-content>
+      </div>
+      ```
+
+    - 2️⃣ use `:empty` CSS pseudo-class to style the wrapper element based on if there's any projected content or not
+
+      ```html
+      <div class="wrapper">
+        <ng-content></ng-content>
+      </div>
+      ```
+
+      ```css
+      .wrapper:empty {
+        display: none;
+      }
+      ```
 
 ---
 
@@ -1579,6 +1632,8 @@ In order to use a pipe, you need 2 steps:
 
 A common problem in web development is how to create a modal dialog that is positioned **absolutely** and in the center of the page, regardless of the size of the content, and be positioned **relatively** to the `<body>` element so that it's not affected by the parent's styles.
 
+> This is not a problem with Angular itself, but it's a problem with the way the DOM works, and it's a common problem in web development in general.
+
 - So, instead of making the modal rendered inside the parent component in the DOM tree, we can render it outside the parent component and inside the `<body>` element, and use the `Angular CDK` to create a portal that will render the modal in the desired position.
   ![modal](./img/modal-1.png)
 
@@ -1601,6 +1656,7 @@ A common problem in web development is how to create a modal dialog that is posi
   })
   export class ModalComponent implements OnInit, OnDestroy {
     constructor(private elementRef: ElementRef) {}
+    // Here: elementRef is a reference to the component's host element (the modal element)
 
     ngOnInit() {
       // Manually adding the modal to the body element
@@ -1608,7 +1664,7 @@ A common problem in web development is how to create a modal dialog that is posi
     }
 
     ngOnDestroy() {
-      // Manually removing the modal from the body element when the component is destroyed
+      // ⚠️ Manually removing the modal from the body element when the component is destroyed, otherwise it will stay in the DOM and be duplicated if the modal is opened again, and cause memory leaks
       document.body.removeChild(this.elementRef.nativeElement);
       // or
       this.elementRef.nativeElement.remove();
@@ -1618,6 +1674,8 @@ A common problem in web development is how to create a modal dialog that is posi
 
   ```html
   <!-- in app.component.html -->
+  <button (click)="showModal = true">Open Modal</button>
+
   <app-modal *ngIf="showModal">
     <p>Modal content</p>
   </app-modal>
@@ -1721,7 +1779,7 @@ export class AppModule {
 
 ---
 
-### Angular HTML Escaper (Sanitization)
+### Angular HTML Escaper (Sanitization / Security)
 
 - Angular escapes the HTML content by default automatically to prevent **XSS attacks**
   ![escaper](./img/escaper-2.png)
@@ -1731,7 +1789,6 @@ export class AppModule {
   ```ts
   import { DomSanitizer } from '@angular/platform-browser';
 
-  @...
   export class MyComponent {
     content = '<p>Some HTML content</p>';
 

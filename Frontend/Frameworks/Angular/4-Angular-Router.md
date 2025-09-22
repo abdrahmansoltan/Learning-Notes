@@ -348,7 +348,7 @@
 - The place where the child component will be displayed is defined in the parent component using the `router-outlet` directive
 
   ```html
-  <h1>First Component</h1>
+  <!-- in parent.component.html -->
   <router-outlet></router-outlet>
   ```
 
@@ -648,7 +648,11 @@ They are used to access the route parameters and query parameters of the route *
 
 ### `routerLink`
 
-- To navigate to a route, use the `routerLink` directive in the `app.component.html` file
+- To navigate to a route, use the `routerLink` attribute/directive instead of `href` in the `<a>` tag
+
+  > We don't use `href` to navigate to a route, we use `routerLink` instead
+  >
+  > This is because if we use `href` attribute, the page will reload and the app will lose its state, but if we use `routerLink`, the app will not lose its state and the page will not reload
 
   ```html
   <nav>
@@ -664,11 +668,19 @@ They are used to access the route parameters and query parameters of the route *
   ```
 
 - The `routerLink` (directive / attribute) is used to navigate to a route when the link is clicked
+
   - It takes the path of the route as an argument, and set-up the path for this link with extra handling from Angular so that it doesn't reload the page
 
-> We don't use `href` to navigate to a route, we use `routerLink` instead
->
-> This is because if we use `href` attribute, the page will reload and the app will lose its state, but if we use `routerLink`, the app will not lose its state and the page will not reload
+- Check this: [Relative RouterLink References](#relative-router-link-references-nested-routes)
+
+  - You can use relative paths to navigate to a route
+
+    ```html
+    <a [routerLink]="'./'">First Component</a>
+    <!-- relative path to the current route -->
+    <a [routerLink]="'../'">Parent Component</a>
+    <!-- relative path to the parent route -->
+    ```
 
 - The `routerLinkActive` (directive / attribute) is used to apply a class to the link when the route is active
 
@@ -686,7 +698,7 @@ They are used to access the route parameters and query parameters of the route *
 
 - **Notes:**
 
-  - There's another syntax for `routerLink` that uses an array of strings to navigate to a route
+  - There's another alternative syntax for `routerLink` that uses an array of strings to navigate to a route
 
     ```html
     <!-- This will route to "/first-component" -->
@@ -704,23 +716,10 @@ They are used to access the route parameters and query parameters of the route *
 ### Styling the Router Links
 
 - `routerLinkActive` : it's an attribute directive that applies a class if the router link is matched
-- `[routerLinkActiveOptions]="{exact:true}"` to prevent `Partial Matching Routes` to make it exact route **usually with route("/")**
-
-- Example:
 
   ```html
-  <nav>
-    <ul>
-      <li>
-        <a
-          routerLink="/first-component"
-          routerLinkActive="active-link"
-          [routerLinkActiveOptions]="{exact:true}">
-          First Component
-        </a>
-      </li>
-    </ul>
-  </nav>
+  <a routerLink="/first-component" routerLinkActive="active-link">First Component</a>
+  <a routerLink="/second-component" routerLinkActive="active-link">Second Component</a>
   ```
 
   ```css
@@ -729,6 +728,16 @@ They are used to access the route parameters and query parameters of the route *
     color: blue;
     font-weight: bold;
   }
+  ```
+
+- `[routerLinkActiveOptions]="{exact:true}"` to prevent `Partial Matching Routes` to make it exact route **usually with main route `"/"` or with nested routes**
+
+  - This is useful when you have nested routes and you want to apply the class only to the exact route, and not partial matching routes
+
+  ```html
+  <a routerLink="./" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+    First Component
+  </a>
   ```
 
 ---
@@ -819,10 +828,14 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
 **Lazy loading** is a technique in Angular that allows you to load the modules of the app only when they are needed (on-demand)
 
+> The default way of loading route's modules/components is called **Eager Loading**. In this case, all modules are loaded at the start of the application, which can lead to longer initial load times and larger bundle sizes.
+
 - It is used to improve the performance of the app by reducing the initial load time
 - It is used to reduce the size of the app by loading only the modules that are needed
-  ![lazy-loading](./img/lazy-loading-1.png)
 - Usually it's used for large modules that are not needed when the app is loaded **(for the main routes in the main app module)**
+- Example: **Eager vs Lazy Loading**
+  ![lazy-loading](./img/lazy-loading-0.png)
+  ![lazy-loading](./img/lazy-loading-1.png)
 
 ### Implementing Lazy Loading
 
@@ -850,10 +863,17 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
   ];
   ```
 
+  ```ts
+  // in lazy-routing.module.ts
+  // We must create a routing module for the lazy-loaded module
+  const routes: Routes = [{ path: '', component: LazyComponent }];
+  ```
+
   - The `loadChildren` property is used to lazy load the module `LazyModule` when the route `/lazy` is navigated to
   - The `loadChildren` property takes a function that returns a `Promise` that resolves to the module to load
   - The `import` function is used to import the module `LazyModule` and the `then` method is used to return the module
   - `m.LazyModule` is the module that is returned by the `then` method, **which is the module to load when the route `/lazy` is navigated to**
+  - When the route is activated, the `LazyModule` will be loaded on demand, and it also contains a `routes` array with the routes for the lazy-loaded module
 
 - **Notes:**
 

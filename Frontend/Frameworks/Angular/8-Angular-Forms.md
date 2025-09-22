@@ -12,10 +12,18 @@
     - [Watching Changes in the Form](#watching-changes-in-the-form)
     - [Updating Templates-Form Values Programmatically](#updating-templates-form-values-programmatically)
   - [Reactive Forms](#reactive-forms)
+    - [Form Controls \& Groups](#form-controls--groups)
     - [How to create a reactive form](#how-to-create-a-reactive-form)
     - [Validation in reactive forms](#validation-in-reactive-forms)
+      - [Normal validation in reactive forms](#normal-validation-in-reactive-forms)
+        - [FormControl validation](#formcontrol-validation)
+        - [FormGroup Validation](#formgroup-validation)
       - [Custom validation in reactive forms](#custom-validation-in-reactive-forms)
       - [Synchronous vs Asynchronous validation](#synchronous-vs-asynchronous-validation)
+        - [Synchronous validation](#synchronous-validation)
+        - [Asynchronous validation](#asynchronous-validation)
+    - [Watching/Reacting to form changes (RxJS in Reactive Forms)](#watchingreacting-to-form-changes-rxjs-in-reactive-forms)
+    - [Error handling in Reactive Forms](#error-handling-in-reactive-forms)
     - [Updating Reactive Form Values Programmatically](#updating-reactive-form-values-programmatically)
 
 ---
@@ -32,13 +40,15 @@
 
   - Here, we are creating a **two-way data binding** on the `input` element, so that the `name` property in the component class is updated when the input value changes, and the input value is updated when the `name` property changes
 
-- It's a replacement for `event binding` and `property binding` to handle user input
+- It's a **replacement** for `event binding` and `property binding` to handle user input
 
   ```html
   <input [value]="name" (input)="name = $event.target.value" />
   ```
 
 #### Input masking in Angular
+
+> **Input masking** is a way to format user input as they type, to ensure that the input is in a specific format (e.g., phone number, date, credit card number, etc.)
 
 - To create an input mask in Angular, you can use the [ngx-mask library](https://www.npmjs.com/package/ngx-mask)
 
@@ -79,6 +89,8 @@
 
   - Here, we are creating a custom input mask for a date field
 
+- Also, we can do masking by creating custom `FormControl` class (explained in the [Reactive Forms section](#form-controls--groups))
+
 ---
 
 ### Forms Handling
@@ -87,6 +99,9 @@ Angular has **two different approaches** to handling user input through forms: (
 
 ![forms](./img/forms.png)
 ![forms](./img/forms-1.png)
+
+- The 2 forms is similar from Angular's perspective, but they differ in how they are created and managed
+  ![forms](./img/forms-2.png)
 
 |                     | REACTIVE                                      | TEMPLATE-DRIVEN                                                   |
 | ------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
@@ -169,8 +184,13 @@ Template-driven forms are more **declarative** and **asynchronous** than reactiv
       <!-- in app.component.html -->
       <form #form="ngForm" (ngSubmit)="onSubmit(form)">
         <input type="text" name="name" ngModel />
+        <!-- or -->
+        <input type="text" name="name" [(ngModel)]="name" />
+
         <input type="email" name="email" ngModel />
+
         <input type="password" name="password" ngModel minlength="6" />
+
         <button type="submit">Submit</button>
       </form>
       ```
@@ -221,11 +241,22 @@ Template-driven forms are more **declarative** and **asynchronous** than reactiv
   <p>Name valid: {{ nameField.valid }}</p>
   ```
 
+  - We can also do this for the `<form>` element using `#<formName>="ngForm"` to create a local reference to the form, and then you can access the value and validity of the form in the template
+
+    ```html
+    <form #myForm="ngForm" (ngSubmit)="onSubmit(myForm)">
+      <input type="text" name="name" ngModel />
+      <p>Form value: {{ myForm.value | json }}</p>
+      <p>Form valid: {{ myForm.valid }}</p>
+      <button type="submit">Submit</button>
+    </form>
+    ```
+
 ---
 
 ### Validation in template-driven forms
 
-Here, we can use the `required`, `minlength`, `maxlength`, and `pattern` attributes to validate the form fields, and we can use the `ngModel` directive to bind the form fields to the component class and handle the validation in the component class.
+Here, we can use the `required`, `minlength`, `maxlength`, and `pattern` **attributes** to validate the form fields, and we can use the `ngModel` directive to bind the form fields to the component class and handle the validation in the component class.
 
 - To validate the form fields, you can use the `required`, `minlength`, `maxlength`, and `pattern` attributes in the template
 
@@ -236,6 +267,23 @@ Here, we can use the `required`, `minlength`, `maxlength`, and `pattern` attribu
     <input type="password" name="password" ngModel required minlength="6" />
     <button type="submit">Submit</button>
   </form>
+  ```
+
+- To show the validation-error messages, you can use the `errors` property of the `NgModel` object, which contains the validation errors for the form field
+
+  ```html
+  <input type="text" name="name" ngModel #nameField="ngModel" required />
+  <p *ngIf="nameField.errors?.required && nameField.touched">Name is required</p>
+
+  <input type="email" name="email" ngModel #emailField="ngModel" required email />
+  <p *ngIf="emailField.errors?.required && emailField.touched">Email is required</p>
+  <p *ngIf="emailField.errors?.email && emailField.touched">Email is invalid</p>
+
+  <input type="password" name="password" ngModel #passwordField="ngModel" required minlength="6" />
+  <p *ngIf="passwordField.errors?.required && passwordField.touched">Password is required</p>
+  <p *ngIf="passwordField.errors?.minlength && passwordField.touched">
+    Password must be at least 6 characters long
+  </p>
   ```
 
 - You can also use the `ngModel` directive to bind the form fields to the component class and handle the validation in the component class, by accessing the `form.controls` object that contains the form fields and their validation status
@@ -453,82 +501,96 @@ Reactive forms are a more **structured** and **scalable** way to handle forms in
 
 - Here, we don't do much in the template (we just connect the form to the template), and we do most of the setup in the component class, that's why it's called **reactive forms**.
 
-  - `FormControl`
+### Form Controls & Groups
 
-    - is used to create a single form field
-    - it takes the initial value of the form field as an argument, and can also take an array of validators as the second argument
+- `FormControl`
 
-      ```ts
-      const nameControl = new FormControl(''); // A form control with an initial value of ""
+  - is used to create a single form field
+  - it takes the initial value of the form field as an argument, and can also take an array of validators as the second argument
 
-      const emailControl = new FormControl('', [Validators.required, Validators.email]); // A form control with an initial value of "" and validators
-      ```
+    ```ts
+    const nameControl = new FormControl(''); // A form control with an initial value of ""
 
-    - To provide the **type** of the form control, you can use the `FormControl` generic type (useful for dropdonwns, selectors inputs)
+    const emailControl = new FormControl('', [Validators.required, Validators.email]); // A form control with an initial value of "" and validators
+    ```
 
-      ```ts
-      const roleControl = new FormControl<string>(''); // A form control with an initial value of "" and type string
+  - To provide the **type** of the form control, you can use the `FormControl` generic type (useful for dropdonwns, selectors inputs)
 
-      // or
+    ```ts
+    const roleControl = new FormControl<string>(''); // A form control with an initial value of "" and type string
+    // or
+    const roleControl = new FormControl<'admin' | 'user' | 'guest'>('user'); // A form control with an initial value of "user" and type 'admin' | 'user' | 'guest'
+    ```
 
-      const roleControl = new FormControl<'admin' | 'user' | 'guest'>('user'); // A form control with an initial value of "user" and type 'admin' | 'user' | 'guest'
-      ```
+  - We can create **custom form-controls** by extending the `FormControl` class
 
-  - `FormArray`
+    ```ts
+    import { FormControl } from '@angular/forms';
 
-    - is used to create a dynamic list of form fields, It's commonly used for forms that require a list of items, like a list of emails or a list of phone numbers
-    - it takes an array of `FormControl` or `FormGroup` objects as an argument, and can also take an array of validators as the second argument
+    export class MyCustomFormControl extends FormControl {
+      // example of hijacking the setValue method to add custom behavior
+      setValue(value: any, options?: any): void {
+        // Custom behavior here to add 'USD' suffix to the value
+        super.setValue(value + ' USD', { ...options, emitModelToViewChange: true });
+      }
+    }
+    ```
 
-      ```ts
-      const myArray = new FormArray([
-        new FormControl(''),
-        new FormControl(''),
-        new FormControl('')
-      ]);
-      ```
+    - `emitModelToViewChange: true` is used to update the view when the model changes, so that the input value is updated when we call the `setValue` method
 
-    - You can add or remove form controls from the array using the `push` and `removeAt` methods
+- `FormArray`
 
-      ```ts
-      myArray.push(new FormControl('')); // Add a new form control to the array
-      myArray.removeAt(0); // Remove the first form control from the array
-      ```
+  - is used to create a dynamic list of form fields, It's commonly used for forms that require a list of items, like a list of emails or a list of phone numbers
+  - it takes an array of `FormControl` or `FormGroup` objects as an argument, and can also take an array of validators as the second argument
 
-  - `FormGroup`
+    ```ts
+    const myArray = new FormArray([new FormControl(''), new FormControl(''), new FormControl('')]);
+    ```
 
-    - is used to create a group of form fields
-    - it takes an object with the form fields as keys and their initial values as values
+  - You can add or remove form controls from the array using the `push` and `removeAt` methods
 
-      ```ts
-      const myForm = new FormGroup({
+    ```ts
+    myArray.push(new FormControl('')); // Add a new form control to the array
+    myArray.removeAt(0); // Remove the first form control from the array
+    ```
+
+- `FormGroup`
+
+  - is used to create a group of form fields
+  - it takes an object with the form fields as keys and their initial values as values
+
+    ```ts
+    const myForm = new FormGroup({
+      name: new FormControl(''),
+      email: new FormControl(''),
+      password: new FormControl('')
+    });
+    ```
+
+  - You can have **Nested FormGroups** to create a more complex form structure (but it's not recommended to have more than 2 levels of nesting), and bind them to the template using the `formGroupName` directive
+
+    ```ts
+    const myForm = new FormGroup({
+      user: new FormGroup({
         name: new FormControl(''),
-        email: new FormControl(''),
-        password: new FormControl('')
-      });
-      ```
+        email: new FormControl('')
+      }),
+      password: new FormControl('')
+    });
+    ```
 
-    - You can have **Nested FormGroups** to create a more complex form structure (but it's not recommended to have more than 2 levels of nesting), and bind them to the template using the `formGroupName` directive
+    ```html
+    <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+      <div formGroupName="user">
+        <input formControlName="name" />
+        <input formControlName="email" />
+      </div>
+      <input formControlName="password" />
+      <button type="submit">Submit</button>
+    </form>
+    ```
 
-      ```ts
-      const myForm = new FormGroup({
-        user: new FormGroup({
-          name: new FormControl(''),
-          email: new FormControl('')
-        }),
-        password: new FormControl('')
-      });
-      ```
-
-      ```html
-      <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
-        <div formGroupName="user">
-          <input formControlName="name" />
-          <input formControlName="email" />
-        </div>
-        <input formControlName="password" />
-        <button type="submit">Submit</button>
-      </form>
-      ```
+---
 
 ### How to create a reactive form
 
@@ -590,10 +652,14 @@ Reactive forms are a more **structured** and **scalable** way to handle forms in
     <!-- in app.component.html -->
     <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
       <input formControlName="name" />
-      <!-- or -->
-      <!-- <input type="email" [formControl]="myForm.get('email')" /> -->
+
       <input formControlName="email" />
+      <!-- or -->
+      <input type="email" [formControl]="myForm.get('email')" />
+
       <input formControlName="password" />
+      <button type="submit" [disabled]="myForm.invalid">Submit</button>
+      <!-- or -->
       <button type="submit" [disabled]="!myForm.valid">Submit</button>
     </form>
     ```
@@ -662,11 +728,17 @@ Reactive forms are a more **structured** and **scalable** way to handle forms in
 
 ### Validation in reactive forms
 
+#### Normal validation in reactive forms
+
+##### FormControl validation
+
 Here, we can use the `Validators` class to validate the form fields, and we can use the `errors` property of the `FormControl` object to check for validation errors.
 
-- `Validators` is a class that **provides built-in validators** like `required`, `email`, `minLength`, `maxLength`, etc.
+- `Validators` is a class that **provides built-in validators** like `required`, `email`, `min`, `minLength`, `maxLength`, etc.
 
   - To have multiple validators for a form field, you can pass an array of validators to the `FormControl` constructor
+
+  > The difference between `min` and `minLength` is that `min` is used for numeric values, while `minLength` is used for string values
 
 - Example of creating a reactive form with validation:
 
@@ -726,6 +798,40 @@ Here, we can use the `Validators` class to validate the form fields, and we can 
 - Here're some of the values of the controls object that you can use to check the validation status of the form fields:
   ![form-validation](./img/form-validation-1.png)
 
+---
+
+##### FormGroup Validation
+
+Here, we can use the `Validators` class to validate the form group, and we can use the `errors` property of the `FormGroup` object to check for validation errors.
+
+- It's the same as the `FormControl` validation, but we use it as a second argument to the `FormGroup` constructor
+
+  ```ts
+  // in the component class
+  myForm = new FormGroup(
+    {
+      password: new FormControl('', [Validators.required, Validators.minLength(6)]),
+      confirmPassword: new FormControl('', [Validators.required, Validators.minLength(6)])
+    },
+    {
+      validators: this.passwordsMatch // 👈 note passing the function as the second argument
+    }
+  );
+
+  passwordsMatch(group: FormGroup) {
+    const password = group.get('password').value;
+    const confirmPassword = group.get('confirmPassword').value;
+    return password === confirmPassword ? null : { passwordsMismatch: true }; // meaning the form-group is invalid ❌ and return an error object
+  }
+  ```
+
+  ```html
+  <!-- in the template -->
+  <p *ngIf="myForm.hasError('passwordsMismatch')">Passwords do not match</p>
+  ```
+
+---
+
 #### Custom validation in reactive forms
 
 Here, we can create custom validators to validate the form fields, and we can use the `errors` property of the `FormControl` object to check for validation errors.
@@ -749,9 +855,9 @@ Here, we can create custom validators to validate the form fields, and we can us
 
     mustContainQuestionMark(control: FormControl) {
       if (!control.value.includes('?')) {
-        return { mustContainQuestionMark: true };
+        return { mustContainQuestionMark: true }; // meaning the field is invalid ❌ and return an error object
       }
-      return null;
+      return null; // meaning the field is valid ✅
     }
     ```
 
@@ -762,7 +868,37 @@ Here, we can create custom validators to validate the form fields, and we can us
     </p>
     ```
 
-> **Note:** `Validators` class provides **static methods** to create validators, So, it's a good practice to create a custom validator as a **static method** in a separate class for custom validation
+- **Note:** `Validators` class provides **static methods** to create validators, So, it's a good practice to create a custom validator as a **static method** in a separate class for custom validation
+
+  ```ts
+  // 📄 custom-validators.ts
+  import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+
+  export class CustomValidators {
+    static mustContainQuestionMark(): ValidatorFn {
+      return (control: AbstractControl): ValidationErrors | null => {
+        if (!control.value.includes('?')) {
+          return { mustContainQuestionMark: true };
+        }
+        return null;
+      };
+    }
+  }
+  ```
+
+  ```ts
+  // in the component class
+  import { CustomValidators } from './custom-validators';
+
+  myForm = new FormGroup({
+    // ...
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6),
+      CustomValidators.mustContainQuestionMark() // 👈 note using the class without instantiation
+    ])
+  });
+  ```
 
 - To handle validation errors, you can use the `errors` property of the `FormControl` object
 
@@ -797,82 +933,266 @@ Here, we can create custom validators to validate the form fields, and we can us
   }
   ```
 
+- Notes
+  - Somethimes, you may find people use **Dependency Injection** to create a custom validator class that implements the `Validator` or `AsyncValidator` interface, but it's not necessary to use dependency injection for custom validators, unless you need to inject a service into the validator (like making an HTTP request to validate the form field)
+    - it's not wrong to do this for synchronous validators, but it's not a common practice
+    - it's a common practice to do this for asynchronous validators
+
+---
+
 #### Synchronous vs Asynchronous validation
 
-- **Synchronous validation**:
-  ![custom-validation](./img/form-validation-2.png)
+> **Synchronous validation** is done immediately when the form is submitted (like most built-in validators), while **asynchronous validation** is done after a delay (like checking if the email is already taken from the server using an HTTP request).
 
-  - is done using the `Validators` class and the `errors` property of the `FormControl` object
-  - it's done **immediately** when the form is submitted
-  - Example of **Class-Based Custom Validator**:
+##### Synchronous validation
+
+![custom-validation](./img/form-validation-2.png)
+
+- is done using the `Validators` class and the `errors` property of the `FormControl` object
+- it's done **immediately** when the form is submitted
+- Example of **Class-Based Custom Validator**:
+
+  ```ts
+  // in the component class
+  myForm = new FormGroup({
+    // ...
+    password: new FormControl('', [
+      Validators.required,
+      Validators.minLength(6),
+      CustomValidators.passwordValidator
+    ])
+  });
+
+  // in a separate file
+  export class CustomValidators implements Validator {
+    validate(control: AbstractControl): ValidationErrors | null {
+      if (!control.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)) {
+        return { invalidPassword: true };
+      }
+      return null;
+    }
+  }
+  ```
+
+  - We use `Validator` interface to create a custom validator class, and to help Angular understand that this class is a validator and tell the developer how to use it correctly
+
+##### Asynchronous validation
+
+![async-validation](./img/form-validation-3.png)
+
+- It's a validation that is done asynchronously, meaning it takes some time to complete, and it can be used to validate form fields that require a server request or some other asynchronous operation
+
+- is done using the `asyncValidator` property of the `FormControl` object
+- it's done **after a delay**
+  - like when the form is submitted (like checking if the email is already taken from the server)
+  - or when the form field value changes (like checking if the username is already taken from the server)
+- It must return an `Observable` or a `Promise` that resolves to `null` if the field is valid, and an object with the error message if the field is invalid
+- ⚠️ It's called after the synchronous validation is done **(to avoid unnecessary server requests)**
+  - This is because Angular knows that most likely the Async validator is expensive to run (like making an HTTP request), so it will only run the async validator if the synchronous validators pass
+- Example of **Async Custom Validator**:
+
+  ```ts
+  // 📄 in the validation class file
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class UniqueUsername implements AsyncValidator {
+    constructor(private http: HttpClient) {} // 👈 inject the HttpClient
+
+    // 1. Observable-based async validator
+    // Arrow function to bind the context of 'this'
+    validate = (control: FormControl) => {
+      const { value } = control;
+
+      return this.http.get<any>('https://api.angular-email.com/auth/signedin');
+    };
+  }
+
+  // -------------------------OR------------------------- //
+  export class UniqueUsername {
+    // 2. Promise-based async validator
+    static validate(control: AbstractControl): Promise<ValidationErrors | null> {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (control.value === 'test') {
+            resolve({ isUsernameUnique: true });
+          } else {
+            resolve(null);
+          }
+        }, 2000);
+      });
+    }
+  }
+  ```
+
+  - We use a **static method** to create an async custom validator, and to help Angular understand that this method is a validator and tell the developer how to use it correctly
+  - We use `Promise` to create an async custom validator
 
     ```ts
-    // in the component class
+    // 📄 in the component file
+    import { Component } from '@angular/core';
+    import { FormGroup, FormControl } from '@angular/forms';
+
+    @Component({
+      selector: 'app-root',
+      template: 'app.component.html'
+    })
+    export class AppComponent {
+      myForm = new FormGroup({
+        name: new FormControl(''),
+        email: new FormControl(''),
+        password: new FormControl('')
+      });
+
+      // Inject the UniqueUsername service in the constructor
+      constructor(private uniqueUsername: UniqueUsername) {}
+
+      ngOnInit() {
+        // Add the async validator to the form control
+        this.myForm.get('name').setAsyncValidators(this.uniqueUsername.validate);
+        // or if using the static method
+        // this.myForm.get('name').setAsyncValidators(UniqueUsername.validate);
+      }
+    }
+    ```
+
+---
+
+### Watching/Reacting to form changes (RxJS in Reactive Forms)
+
+- You can watch for changes in the form using the `valueChanges` or `statusChanges` **observables** from the form or form controls
+
+  - `valueChanges` emits the form value whenever it changes
+  - `statusChanges` emits the form status whenever it changes
+
+- Usually, we subscribe to these observables in the `ngOnInit` lifecycle hook, and unsubscribe from them in the `ngOnDestroy` lifecycle hook to avoid memory leaks
+
+- Example of watching for changes in the form:
+
+  ```ts
+  // in app.component.ts
+  import { Component, OnDestroy } from '@angular/core';
+  import { FormGroup, FormControl } from '@angular/forms';
+  import { Subscription } from 'rxjs';
+
+  @Component({
+    selector: 'app-root',
+    template: 'app.component.html'
+  })
+  export class AppComponent implements OnDestroy {
     myForm = new FormGroup({
-      // ...
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(6),
-        CustomValidators.passwordValidator
-      ])
+      name: new FormControl(''),
+      email: new FormControl(''),
+      password: new FormControl('')
     });
 
-    // in a separate file
-    export class CustomValidators implements Validator {
-      validate(control: AbstractControl): ValidationErrors | null {
-        if (!control.value.match(/^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)$/)) {
-          return { invalidPassword: true };
-        }
-        return null;
-      }
+    private formSubscription: Subscription;
+
+    ngOnInit() {
+      this.formSubscription = this.myForm.valueChanges.subscribe(value => {
+        console.log('Form value changed:', value); // Whenever the form value changes, this will log the form value, like { name: 'John', email: 'john@example.com', password: 'password123' }
+      });
+
+      this.formSubscription = this.myForm.statusChanges.subscribe(status => {
+        console.log('Form status changed:', status); // Whenever the form status changes, this will log the form status, like 'VALID' or 'INVALID'
+      });
     }
-    ```
 
-    - We use `Validator` interface to create a custom validator class, and to help Angular understand that this class is a validator and tell the developer how to use it correctly
+    ngOnDestroy() {
+      this.formSubscription.unsubscribe(); // Unsubscribe to avoid memory leaks
+    }
+  }
+  ```
 
-- **Asynchronous validation**:
-  ![async-validation](./img/form-validation-3.png)
+- Note:
 
-  - It's a validation that is done asynchronously, meaning it takes some time to complete, and it can be used to validate form fields that require a server request or some other asynchronous operation
-
-  - is done using the `asyncValidator` property of the `FormControl` object
-  - it's done **after a delay** when the form is submitted (like checking if the email is already taken from the server)
-  - It's called after the synchronous validation is done **(to avoid unnecessary server requests)**
-  - Example of **Async Custom Validator**:
+  - Because that `valueChanges` returns an observable, you can use any RxJS operator to transform the data before subscribing to it
+  - You can use **Debouncing** to limit the number of times the `valueChanges` observable emits values, especially for large forms or complex forms, to avoid performance issues, using the `debounceTime` operator from `rxjs/operators`
 
     ```ts
-    @Injectable({
-      providedIn: 'root'
-    })
-    export class UniqueUsername implements AsyncValidator {
-      constructor(private http: HttpClient) {} // 👈 inject the HttpClient
+    // in app.component.ts
+    import { debounceTime } from 'rxjs/operators';
 
-      // Arrow function to bind the context of 'this'
-      validate = (control: FormControl) => {
-        const { value } = control;
-
-        return this.http.get<any>('https://api.angular-email.com/auth/signedin');
-      };
-    }
-
-    // -------------------------OR------------------------- //
-    export class UniqueUsername {
-      static validate(control: AbstractControl): Promise<ValidationErrors | null> {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            if (control.value === 'test') {
-              resolve({ isUsernameUnique: true });
-            } else {
-              resolve(null);
-            }
-          }, 2000);
+    ngOnInit() {
+      this.formSubscription = this.myForm.valueChanges
+        .pipe(debounceTime(300)) // Wait for 300ms before emitting the value
+        // or
+        .pipe(delay(300)) // Delay the emission of the value by 300ms
+        .subscribe(value => {
+          console.log('Form value changed:', value);
         });
-      }
     }
     ```
 
-    - We use a **static method** to create an async custom validator, and to help Angular understand that this method is a validator and tell the developer how to use it correctly
-    - We use `Promise` to create an async custom validator
+---
+
+### Error handling in Reactive Forms
+
+Error handling in reactive forms is complex and can be done in multiple ways, depending on the use case.
+
+- You can handle errors in the component class using the `errors` property of the `FormControl` object, as shown above.
+- Also to show the error messages in the template, you can use the `*ngIf` directive to conditionally show the error messages based on the validation status of the form fields
+
+  ```html
+  <!-- in app.component.html -->
+  <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+    <input formControlName="email" />
+    <p *ngIf="myForm.get('email').hasError('required')">Email is required</p>
+    <p *ngIf="myForm.get('email').touched && myForm.get('email').hasError('email')">
+      Email is invalid
+    </p>
+
+    <input formControlName="password" />
+    <p *ngIf="myForm.get('password').hasError('required')">Password is required</p>
+    <p *ngIf="myForm.get('password').touched && myForm.get('password').hasError('minlength')">
+      Password must be at least 6 characters long
+    </p>
+
+    <button type="submit" [disabled]="!myForm.valid">Submit</button>
+  </form>
+  ```
+
+  - As you can see, here it's nasty to repeat the same code for each form field, **so it's a common practice to create a reusable component for form fields that handles the error messages and validation status**, and use it in the main form component
+
+- Example of a reusable form field component:
+
+  ```ts
+  // in form-field.component.ts
+  import { Component, Input } from '@angular/core';
+  import { FormControl } from '@angular/forms';
+
+  @Component({
+    selector: 'app-form-field',
+    template: `
+      <div>
+        <label>{{ label }}</label>
+        <input [formControl]="control" />
+        <div *ngIf="control.touched && control.invalid">
+          <p *ngIf="control.hasError('required')">{{ label }} is required</p>
+          <p *ngIf="control.hasError('email')">Invalid email format</p>
+          <p *ngIf="control.hasError('minlength')">
+            {{ label }} must be at least {{ control.errors?.minlength.requiredLength }} characters
+            long
+          </p>
+        </div>
+      </div>
+    `
+  })
+  export class FormFieldComponent {
+    @Input() control: FormControl;
+    @Input() label: string;
+  }
+  ```
+
+  ```html
+  <!-- in app.component.html -->
+  <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+    <app-form-field [control]="myForm.get('email')" label="Email"></app-form-field>
+    <app-form-field [control]="myForm.get('password')" label="Password"></app-form-field>
+    <button type="submit" [disabled]="!myForm.valid">Submit</button>
+  </form>
+  ```
 
 ---
 
@@ -901,6 +1221,10 @@ Here, we can create custom validators to validate the form fields, and we can us
         name: 'John Doe',
         email: 'john@test.com',
       });
+
+      // or update each field individually
+      this.myForm.get('name').setValue('John Doe');
+      this.myForm.controls.email.setValue('john@test.com'); // Different way to access the form control
     }
 
       // or you can use patchValue to update only some fields
@@ -909,6 +1233,35 @@ Here, we can create custom validators to validate the form fields, and we can us
       });
     }
   ```
+
+- `setErrors`
+
+  - You can use the `setErrors` method of the `FormControl` or `FormGroup` object to set custom errors on the form fields or form group
+
+    ```ts
+    onSubmit() {
+      if (this.myForm.valid) {
+        console.log(this.myForm.value);
+      } else {
+        if (this.email.hasError('required')) {
+          this.email.setErrors({ customError: 'Email is required' }); // Set a custom error on the email field
+        }
+        if (this.email.hasError('email')) {
+          this.email.setErrors({ customError: 'Email is invalid' }); // Set a custom error on the email field
+        }
+      }
+
+      this.authService.login(this.myForm.value).subscribe({
+        next: response => {
+          console.log('Login successful', response);
+        },
+        error: err => {
+          // Set a custom error on the form group
+          this.myForm.setErrors({ serverError: err.message });
+        }
+      })
+    }
+    ```
 
 ---
 

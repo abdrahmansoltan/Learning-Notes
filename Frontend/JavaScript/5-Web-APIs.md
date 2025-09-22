@@ -117,13 +117,16 @@ a set of APls define that describe how to interact with features of web browsers
 
 ### Cookies
 
-Cookies are strings of data that are stored in the browser. They are a part of the HTTP protocol,
+Cookies are strings of data that are stored in the browser. They are a part of the HTTP protocol, They are sent to the server with every request, and they are used to store information about the user.
+![cookies](./img/cookies-1.png)
 
 - Cookies are usually set by a web-server using the response `Set-Cookie` HTTP-header. Then, the browser automatically **adds them to (almost) every request to the same domain** using the Cookie HTTP-header.
+  ![cookies](./img/cookies-2.png)
 - One of the most widespread use cases is **authentication**:
 
-  1. Upon sign in, the server uses the Set-Cookie HTTP-header in the response to set a cookie with a unique “session identifier”.
+  1. Upon **sign in**, the server uses the `Set-Cookie` HTTP-header in the response to set a cookie with a unique “session identifier”.
   2. Next time when the request is sent to the same domain, the browser sends the cookie over the net using the Cookie HTTP-header. **So the server knows who made the request**.
+  3. When the user **signs out**, the cookie is deleted by the server as it sends the `Set-Cookie` HTTP-header with an expiration date in the past or it can be deleted by the client using JavaScript.
 
 - We can also access cookies from the browser, using `document.cookie` property.
 

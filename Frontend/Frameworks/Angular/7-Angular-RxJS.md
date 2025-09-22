@@ -6,8 +6,9 @@
     - [Reference \& Docs](#reference--docs)
   - [Observables](#observables)
     - [Creating an Observable](#creating-an-observable)
-    - [Unicast (Cold) Observables](#unicast-cold-observables)
-    - [Multicast (Hot) Observables](#multicast-hot-observables)
+    - [Types of Observables](#types-of-observables)
+      - [Unicast (Cold) Observables](#unicast-cold-observables)
+      - [Multicast (Hot) Observables](#multicast-hot-observables)
       - [Subject Variations](#subject-variations)
     - [Observables with Typescript](#observables-with-typescript)
     - [Error Handling in Observables](#error-handling-in-observables)
@@ -24,14 +25,15 @@
     - [How to use RxJS in Angular](#how-to-use-rxjs-in-angular)
     - [Example on how to use RxJS in Angular](#example-on-how-to-use-rxjs-in-angular)
       - [1️⃣ Fetching data from an API using an Angular service and an observable](#1️⃣-fetching-data-from-an-api-using-an-angular-service-and-an-observable)
-      - [2️⃣ Using the `navigator` api to get the user's location](#2️⃣-using-the-navigator-api-to-get-the-users-location)
-      - [3️⃣ Using the `navigator` api to get the user's location (With Pipe)](#3️⃣-using-the-navigator-api-to-get-the-users-location-with-pipe)
+      - [2️⃣ Authentication using an Angular service and an observable](#2️⃣-authentication-using-an-angular-service-and-an-observable)
+      - [3️⃣ Using the `navigator` api to get the user's location](#3️⃣-using-the-navigator-api-to-get-the-users-location)
+      - [4️⃣ Using the `navigator` api to get the user's location (With Pipe)](#4️⃣-using-the-navigator-api-to-get-the-users-location-with-pipe)
 
 ---
 
 ## RxJS
 
-It's a **functional reactive library** for filtering,sorting and coordinating data.
+It's a **functional reactive library** for filtering, sorting and coordinating data **(Managing data)**.
 
 ![RxJS](./img/rxjs-1.png)
 
@@ -39,7 +41,7 @@ It's a **functional reactive library** for filtering,sorting and coordinating da
 
   - It provides one core type, the Observable, satellite types `(Observer, Schedulers, Subjects)` and operators inspired by Array#extras `(map, filter, reduce, every, etc)` to allow handling asynchronous events as collections.
 
-- It's a third-party library that is independent of Angular, but it's used in Angular applications to handle asynchronous data streams.
+- **It's a third-party library that is independent of Angular**, but it's used in Angular applications to handle asynchronous data streams.
 - It can be used with Angular, React, Vue, Node.js, and other frameworks. But it's mostly used with Angular for:
   - handling HTTP requests
   - event handling
@@ -68,6 +70,9 @@ It's a **functional reactive library** for filtering,sorting and coordinating da
 - How is this different in **RxJS**?
 
   - In RxJS, we have an **Observable** that wraps the input element and listens to the input event. **(instead of using `addEventListener` (imperative approach))**
+
+    > **Observable:** Is something that emits data/events over time.
+
   - In RxJS, the "pipeline processing steps" are called **Operators**. which are used to transform the data sequently by using the `pipe` method.
   - In RxJS, the `subscribe` method is used to listen to the data emitted by the observable.
   - In RxJS, the `Observer` is used to handle the data emitted by the observable.
@@ -92,13 +97,13 @@ It's a **functional reactive library** for filtering,sorting and coordinating da
   observable.subscribe({
     next: value => console.log(value),
     error: err => console.error(err), // optional (to handle errors)
-    complete: () => console.log('done') // optional (like finally in promises)
+    complete: () => console.log('done') // optional (similar to finally in promises)
   });
   ```
 
-  - **Note:** for the `error` and `complete` methods, we should use **Arrow functions** to maintain the context of `this`. (because they are called by the observable, not by us)
-
   ![RxJS](./img/rxjs-3.png)
+
+  - **Note:** for the `error` and `complete` methods, we should use **Arrow functions** to maintain the context of `this`. (because they are called by the observable, not by us)
 
 ---
 
@@ -205,13 +210,22 @@ It's wrapped around a data source that can emit data over time, and it allows us
 
 ---
 
-### Unicast (Cold) Observables
+### Types of Observables
 
-**Unicast Observables:** They are cold observables that emit data to a single subscriber.
+There are two main types of observables: **(cold vs hot) and (unicast vs multicast)**.
+
+> Think of "cold Observables" as they're created for each subscriber, and "hot Observables" as they share the same data stream among all subscribers.
+
+#### Unicast (Cold) Observables
+
+**Unicast Observables:** They are cold observables that emit data to a single subscriber at a time **(each subscriber has its own data stream)**.
 ![unicast](./img/observables-1.png)
 
 > **"COLD"** means that the data is emitted only when there is a subscriber.
+>
+> **"UNICAST"** means that each subscriber has its own data stream.
 
+- When a new subscriber subscribes to a cold observable, a new data stream is created for that subscriber (even if it was created before when another subscriber subscribed to it). **(meaning that we have separate data streams for each subscriber -> "Unicast")**
 - Example:
 
   ```ts
@@ -232,15 +246,17 @@ It's wrapped around a data source that can emit data over time, and it allows us
   observable.subscribe(console.log); // 1, 2, 3
   ```
 
+  ![cold observable](./img/cold-observable.png)
+
 - Each subscriber gets its own data stream. which means that all operators are executed for each subscriber.
 - This can lead to performance issues if the data stream is expensive to create. **(Bad practice ❌)**
   ![unicast](./img/observables-2.png)
 
 ---
 
-### Multicast (Hot) Observables
+#### Multicast (Hot) Observables
 
-**Multicast Observables:** They are hot observables that emit data to multiple subscribers at the same time **(share the same data stream)**.
+**Multicast Observables:** They are hot observables that emit data to multiple subscribers at the same time **(all subscribers share the same data stream)**. Also called **Subjects** and we can call `.next()` on them to emit data outside the observable unlike the `Observable` class.
 ![multicast](./img/observables-3.png)
 
 > **"HOT"** means that the data is emitted regardless of whether there are any subscribers.
@@ -254,16 +270,24 @@ It's wrapped around a data source that can emit data over time, and it allows us
   subject.next(1);
   subject.next(2);
   subject.next(3);
+  setTimeout(() => subject.next(4), 1000); // emit data after 1 second
 
-  subject.subscribe(console.log); // 1, 2, 3
-  subject.subscribe(console.log); // 1, 2, 3
+  // first subscriber
+  subject.subscribe(console.log); // 1, 2, 3, ( 4 after 1 second )
+
+  // second subscriber
+  subject.subscribe(console.log); // ⚠️ in the beginning, it won't receive 1, 2, 3 because they were emitted before it subscribed, but it will receive 4 after 1 second
   ```
+
+  ![hot observable](./img/observables-4.png)
 
 - All subscribers share the same data stream. which means that all operators are executed only once for all subscribers.
   - This can lead to performance improvements if the data stream is expensive to create. **(Good practice ✅)**
     ![multicast](./img/observables-4.png)
   - **But be careful! ⚠️** because all subscribers share the same data stream, if one observer subscribes after the data stream has completed, it will not receive any data, or after some operators are executed, it will not receive the data that was emitted before it subscribed.
     ![multicast](./img/observables-6.png)
+- **Note:** If the observer gets `complete` or `error`, it will be reseted for new subscribers.
+  - This is because it will be unsubscribed from the first subscription, and when a new subscription is made, it will be subscribed again.
 - To convert a `cold` observable to a `hot` observable, we can use the `share` operator.
 
   ```ts
@@ -308,8 +332,6 @@ It's wrapped around a data source that can emit data over time, and it allows us
   - We can emit data from outside the observable using the `next` method of the `subject`.
   - This is useful when we want to emit data from an event handler or a callback function.
 
----
-
 #### Subject Variations
 
 ![subject](./img/observables-13.png)
@@ -346,7 +368,7 @@ It's wrapped around a data source that can emit data over time, and it allows us
   ```
 
   - Here, the `subject` will emit the most recent value (`3`) when a new subscriber subscribes to it.
-  - It's commonly used ✅, when we want to emit the most recent value of the observable to new subscribers.
+  - It's commonly used ✅, when we want to emit the most recent value of the observable to new subscribers. **(Ex: state management and user authentication status, more here [in the authentication section below](#2️⃣-authentication-using-an-angular-service-and-an-observable))**
 
 - **ReplaySubject:** It emits a specified number of the most recent values emitted by the observable when a new subscriber subscribes to it.
 
@@ -372,6 +394,7 @@ It's wrapped around a data source that can emit data over time, and it allows us
 - We can use **Typescript** to define the type of the data emitted by the observable.
 
 - This is done by using **generics** with the `Observable` class.
+  - This is becase `Observable` is a generic class.
 - Example:
 
   ```ts
@@ -494,6 +517,7 @@ It's a function that takes an observable as input and returns a new observable a
 
 - **Operator Groups**
   ![operators](./img/operators-2.png)
+
   - **Generic operators:** These are the operators that can be used with any type of observable.
   - **Specific operators:** These are the operators that are used with specific types of observables.
     - **Creation operators:** These are the operators that are used to create observables.
@@ -502,6 +526,21 @@ It's a function that takes an observable as input and returns a new observable a
     - **Combination operators:** These are the operators that are used to combine the data emitted by the observables.
     - **Multicasting operators:** These are the operators that are used to multicast the data emitted by the observables.
     - **Error handling operators:** These are the operators that are used to handle the errors emitted by the observables.
+
+- You will find that almost everythings has an operator for it in RxJS. So **it's a common practice to use operator for each task instead of grouping multiple tasks in a single operator**.
+
+  ```js
+  // ❌ Bad practice
+  observable.pipe(
+    map(parseInt(event.target.value)) // parse the value
+  );
+
+  // ✅ Good practice
+  observable.pipe(
+    map(event => event.target.value), // extract the value
+    map(value => parseInt(value)) // parse the value
+  );
+  ```
 
 ---
 
@@ -517,7 +556,7 @@ It's a function that takes an observable as input and returns a new observable a
   observable.pipe(map(value => value * 2)).subscribe(console.log); // 2, 4, 6, 8, 10
   ```
 
-- `tap`: It is used to perform side-effects on the data emitted by the observable.
+- `tap`: It is used to perform side effects for the data emitted by the observable **(like logging, debugging, etc.)** without modifying the data. **(It's used for `console.log` the data)**
 
   ```ts
   import { of } from 'rxjs';
@@ -536,6 +575,8 @@ It's a function that takes an observable as input and returns a new observable a
   const observable = of({ name: 'Alice', age: 30 }, { name: 'Bob', age: 25 });
   observable.pipe(pluck('name')).subscribe(console.log); // Alice, Bob
   ```
+
+  - It's similar to `map` operator, but it's more concise and easier to read when we want to extract a property from an object.
 
 ---
 
@@ -939,6 +980,40 @@ It's a function that takes an observable as input and returns a new observable a
       });
       ```
 
+- Note:
+
+  - if you want to catch errors emitted by the observable, you can use the `catchError` operator in the service or the `error` method in the subscription. **Note that when using the `next` and `error` methods in the subscription, you should be careful about `this` keyword binding. so use arrow functions to avoid this issue.**
+
+    ```ts
+    // 1. Using catchError operator in the service
+    return this.fetchDataService
+      .fetchData()
+      .pipe(
+        catchError(err => {
+          console.error(err);
+          return of([]); // return an empty array or any default value
+        })
+      )
+      .subscribe(data => {
+        this.fetchedData = data;
+      });
+
+    // --------------------------------------------------------------------
+
+    // 2. Using error method in the subscription
+    this.fetchDataService.fetchData().subscribe({
+      next: data => {
+        this.fetchedData = data;
+      },
+      error: err => {
+        console.error(err);
+      },
+      complete: () => {
+        console.log('Data fetching completed');
+      }
+    });
+    ```
+
 ---
 
 ### Example on how to use RxJS in Angular
@@ -1048,7 +1123,131 @@ export class AppComponent implements OnInit {
 
 ---
 
-#### 2️⃣ Using the `navigator` api to get the user's location
+#### 2️⃣ Authentication using an Angular service and an observable
+
+1. First, we create a service that handles the authentication logic and returns an observable that emits the authentication status.
+
+   ```ts
+   export class AuthService {
+     // private isAuthenticated = false; // ❌ This is not a good practice, Instead it should be an observable or behavior-subject to allow other components to listen to the authentication status
+
+     private isAuthenticated$ = new BehaviorSubject<boolean>(false); // ✅ This is a good practice, as it allows other components to listen to the authentication status
+
+     login(username: string, password: string): Observable<boolean> {
+       return this.http
+         .post('https://jsonplaceholder.typicode.com/posts', { username, password })
+         .pipe(
+           map(response => {
+             this.isAuthenticated$.next(true);
+             return this.isAuthenticated$.asObservable();
+           })
+         );
+     }
+
+     logout(): Observable<boolean> {
+       return this.http.post('https://jsonplaceholder.typicode.com/posts', {}).pipe(
+         map(response => {
+           this.isAuthenticated$.next(false);
+           return this.isAuthenticated$.asObservable();
+         })
+       );
+     }
+
+     isLoggedIn(): Observable<boolean> {
+       return this.isAuthenticated$.asObservable();
+     }
+   }
+   ```
+
+   - Here, we use the `BehaviorSubject` to allow other components to listen to the authentication status.
+     ![BehaviorSubject](./img/behavior-subject-1.png)
+
+     > Why not use a simple boolean variable or a `Subject`?
+     >
+     > - A simple boolean variable won't allow other components to listen to the authentication status.
+     > - A `Subject` won't emit the last value to new subscribers so some subscribers/components might miss the current authentication status.
+     > - A `BehaviorSubject` **will emit the last value** to new subscribers, so all subscribers/components will always have the current authentication status.
+
+     - This way, we can easily manage the authentication status and update the UI accordingly.
+
+2. Then, we create a component that uses the service to handle the authentication logic and listen to the authentication status.
+
+   ```ts
+   import { Component, OnInit } from '@angular/core';
+   import { AuthService } from './auth.service';
+
+   @Component({
+     selector: 'app-login',
+     templateUrl: './login.component.html',
+     styleUrls: ['./login.component.css']
+   })
+   export class LoginComponent implements OnInit {
+     isLoggedIn = false;
+
+     constructor(private authService: AuthService) {}
+
+     ngOnInit() {
+       // subscribe to the authentication status to listen to it and update the UI accordingly
+       this.authService.isAuthenticated$.subscribe(status => {
+         this.isLoggedIn = status;
+       });
+     }
+
+     login(username: string, password: string) {
+       this.authService.login(username, password).subscribe();
+     }
+
+     logout() {
+       this.authService.logout().subscribe();
+     }
+   }
+   ```
+
+- Instead of having a boolean variable to track the authentication status in the component, we can just create another observable that listens to the authentication status from the service.
+
+  ```ts
+  import { Component, OnInit } from '@angular/core';
+  import { AuthService } from './auth.service';
+
+  @Component({
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css']
+  })
+  export class LoginComponent implements OnInit {
+    isLoggedIn$: Observable<boolean>;
+
+    constructor(private authService: AuthService) {}
+
+    ngOnInit() {
+      this.isLoggedIn$ = this.authService.isAuthenticated$;
+    }
+
+    // ...
+  }
+  ```
+
+  - In this case, we can also use the `async` pipe in the template to automatically subscribe to the observable and display the authentication status.
+
+    ```html
+    <div *ngIf="isLoggedIn$ | async; else loginForm">
+      <h1>Welcome, User!</h1>
+      <button (click)="logout()">Logout</button>
+    </div>
+
+    <ng-template #loginForm>
+      <h1>Please log in</h1>
+      <form (ngSubmit)="login(username.value, password.value)">
+        <input type="text" #username placeholder="Username" required />
+        <input type="password" #password placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+    </ng-template>
+    ```
+
+---
+
+#### 3️⃣ Using the `navigator` api to get the user's location
 
 ```ts
 export class LocationService {
@@ -1091,7 +1290,7 @@ export class AppComponent implements OnInit {
 
 ---
 
-#### 3️⃣ Using the `navigator` api to get the user's location (With Pipe)
+#### 4️⃣ Using the `navigator` api to get the user's location (With Pipe)
 
 - service for getting the forecast
 

@@ -269,7 +269,9 @@ Angular components have a lifecycle that consists of a series of events that occ
     - Don't use the constructor to fetch data from a server or to initialize the component. Use `ngOnInit` instead.
     - Don't use arrow functions when defining methods in a component. Use regular functions instead. (to avoid `this` keyword problems)
 
-- To be able to use the lifecycle hooks, you need to implement the interface for the hook you want to use in the component class **(it's optional)**
+- **Note ⚠️:** To be able to use the lifecycle hooks, you need to implement the interface for the hook you want to use in the component class
+
+  > it's optional technically for typescript, but it's a good practice, as it's simply a check for typescript that this component's class has the method for the lifecycle hook
 
   ```ts
   import { Component, OnInit, OnDestroy } from '@angular/core';

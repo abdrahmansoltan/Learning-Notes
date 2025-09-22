@@ -46,7 +46,7 @@ It basically allow to load sources from the specified origins -> hardcode from w
       " />
       ```
 
-    - Or, EX: Entering this script on an input, so that it would be sent to server and then sent to other users to show inputs from other users
+    - Or, **EX:** Entering this script on an input, so that it would be sent to server and then sent to other users to show inputs from other users
 
       ```html
       <input type="text" value=" <img src="" onerror="alert('XSS')"" />

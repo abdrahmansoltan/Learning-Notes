@@ -1865,7 +1865,7 @@ window.onerror = function (message, url, line, col, error) {
 
 ## Axios
 
-- Axios is a promise-based HTTP client for the browser and node.js. It is a very popular library for making HTTP requests in JavaScript.
+- Axios is a **promise-based HTTP client** for the browser and node.js. It is a very popular library for making HTTP requests in JavaScript.
   - On the server-side, it uses the native node.js `http` module.
   - On the client-side (browser), it uses the `XMLHttpRequest` object.
 - **Features:**

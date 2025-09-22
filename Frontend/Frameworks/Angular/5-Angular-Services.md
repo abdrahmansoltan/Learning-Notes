@@ -7,6 +7,7 @@
     - [Access modifiers in Services](#access-modifiers-in-services)
   - [Dependency injection](#dependency-injection)
     - [Why use Dependency Injection?](#why-use-dependency-injection)
+    - [Why Dependency Injection is useful?](#why-dependency-injection-is-useful)
     - [How to use Dependency Injection in Angular components](#how-to-use-dependency-injection-in-angular-components)
       - [Old/Common Way (in the constructor)](#oldcommon-way-in-the-constructor)
       - [New way (using `inject()`)](#new-way-using-inject)
@@ -177,6 +178,13 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 
 ## Dependency injection
 
+![dependency injection](./img/dependency-injection-1.png)
+
+- it's a system that does 2 things:
+
+  - looks in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
+  - pass them on to our classes
+
 > **Dependency Injection** is a design pattern that allows us to remove the hard-coded dependencies and make our application more loosely coupled and easy to manage by injecting the dependencies at runtime
 >
 > Meaning that when we have a piece of code inside a piece of code, we can inject the dependency from the outside instead of creating it inside the code
@@ -185,13 +193,6 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 > ![dependency injection](./img/dependency-injection-3.png)
 >
 > - When we pass something into the code, we call it **"injection"**
-
-![dependency injection](./img/dependency-injection-1.png)
-
-- it's a system that does 2 things:
-
-  - looks in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
-  - pass them on to our classes
 
 - When we use `services`, We use the `constructor` to inject the service in the component where it is needed
   ![service](./img/services-3.png)
@@ -227,6 +228,92 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
   - instead of creating one instance of the same class for each component
   - This is super important when we have services that uses `Observables` to handle asynchronous data
     - because we don't want to create multiple instances of the service class that uses Observables which will create multiple subscriptions and not maintain the state of the data and the previous emissions
+
+---
+
+### Why Dependency Injection is useful?
+
+- **Testing**
+
+  - When we use Dependency Injection, we can easily create a mock service and inject it in the component class when testing the component class
+  - This is not possible when we create an instance of the service class in the component class
+  - This way, we can test the component class without worrying about the service class
+
+  - Examples:
+
+    - example without Dependency Injection ❌
+
+      ```ts
+      const axios = require('axios');
+
+      class WikipediaSearch {
+        constructor() {
+          this.axios = axios.create({});
+        }
+
+        async search(term) {
+          const response = await this.axios.get(`https://en.wikipedia.org/w/api.php`, {
+            params: {
+              action: 'query',
+              format: 'json',
+              list: 'search',
+              srsearch: term
+            }
+          });
+          return response.data;
+        }
+      }
+      ```
+
+      - Here, whenever the class is instantiated, a new instance of `axios` is created, which makes it hard to test the class without making actual HTTP requests
+      - ex:
+
+        ```ts
+        const wikipediaSearch = new WikipediaSearch();
+        const data = await wikipediaSearch.search('test');
+        // This will make an actual HTTP request, which is not ideal for testing and will take time ❌
+        ```
+
+    - example with Dependency Injection ✅
+
+      ```ts
+      class WikipediaSearch {
+        constructor(axiosInstance) {
+          this.axios = axiosInstance;
+        }
+
+        async search(term) {
+          const response = await this.axios.get(`https://en.wikipedia.org/w/api.php`, {
+            params: {
+              action: 'query',
+              format: 'json',
+              list: 'search',
+              srsearch: term
+            }
+          });
+          return response.data;
+        }
+      }
+      ```
+
+      - Here, we can pass a mock instance of `axios` when testing the class, which makes it easy to test the class without making actual HTTP requests
+      - ex:
+
+        ```ts
+        // fake mock object for axios
+        const mockAxios = {
+          get: jest.fn().mockResolvedValue({ data: 'mock data' })
+        };
+
+        const wikipediaSearch = new WikipediaSearch(mockAxios);
+        const data = await wikipediaSearch.search('test');
+        // This will use the mock instance of axios, which is ideal for testing ✅
+        expect(data).toBe('mock data');
+        ```
+
+- Separate low-level services from the components that use them
+  - For example, if we have a service that fetches data from an API, we can separate the service from the component that uses the service, and this service will contain all the logic for fetching data from the API using low-level services like `HttpClient` or `axios`
+  - This also makes it easier to reuse the service in other components
 
 ---
 
@@ -411,7 +498,7 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
 
 - **How to use it in Angular?**
 
-  - In order to use the `HttpClient` service in Angular, we need to
+  - In order to use the `HttpClient` service in Angular, we need to:
 
     - If using modules
 
@@ -458,10 +545,12 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
         ```
 
     - This will allow us to use the `HttpClient` service in our Angular application to make HTTP requests and handle the responses using observables.
+    - Then, we can inject the `HttpClient` service in our service class and use it to make HTTP requests.
+      > It's similar to the example here [Why Dependency Injection is useful?](#why-dependency-injection-is-useful) where we used `axios` to make HTTP requests
 
   - The `HttpClient` service provides methods for making HTTP requests, such as `get()`, `post()`, `put()`, `delete()`, etc.
 
-    - These methods return an `Observable` that emits the response from the server, which we can subscribe to in order to handle the response data.
+    - T**hese methods return an `Observable` that emits the response** from the server, which we can subscribe to in order to handle the response data.
 
     ```ts
     // services/fetch-data.service.ts 📄
@@ -478,10 +567,15 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
 
       // use HttpClient to make a GET request
       fetchData(): Observable<any> {
-        return this.http.get<any>(this.apiUrl); // return an Observable
+        return this.http.get<any>(this.apiUrl).subscribe(response => {
+          console.log(response); // handle the response data
+        });
+        // return an Observable
       }
     }
     ```
+
+    - You will notice the usage of **Generics** in the `get<any>()` method, which allows us to specify the type of the response data, so that we can get type-checking and autocompletion when working with the response data. So instead of using `any`, we can create an interface that defines the structure of the response data and use it in the `get<ResponseInterface>()` method.
 
   - Now to use it in a component, after injecting the service in the component, we can subscribe to the `Observable` returned by the `fetchData()` method to get the data from the server.
 
@@ -529,12 +623,24 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
     }
     ```
 
-- Why use it instead of `fetch()` or `axios`?
+- **Notes**
 
-  - Because it provides a simplified API for making HTTP requests and handling responses using observables, which makes it easier to work with asynchronous data in Angular applications
-  - It provides built-in support for **interceptors**, which allows us to modify the request and response data before they are sent or received, and to handle errors in a more elegant way
+  - Why use it instead of `fetch()` or `axios`?
 
-    > **Interceptors**: We can use `HttpClient` interceptors to intercept HTTP requests and responses, and modify them before they are sent or received, or to handle errors in a more elegant way. More about interceptors [in the Angular-Modules file](./2-Angular-Modules.md#http-interceptors)
+    - Because it provides a simplified API for making HTTP requests and handling responses using observables, which makes it easier to work with asynchronous data in Angular applications
+    - It provides built-in support for **interceptors**, which allows us to modify the request and response data before they are sent or received, and to handle errors in a more elegant way
+
+      > **Interceptors**: We can use `HttpClient` interceptors to intercept HTTP requests and responses, and modify them before they are sent or received, or to handle errors in a more elegant way. More about interceptors [in the Angular-Modules file](./2-Angular-Modules.md#http-interceptors)
+
+    - It provides built-in support for **cancellation** of HTTP requests, which allows us to cancel an ongoing request if it is no longer needed, and to avoid unnecessary network traffic
+
+      > **Cancellation**: We can use the `takeUntil` operator from RxJS to cancel an ongoing HTTP request if it is no longer needed, and to avoid unnecessary network traffic.
+
+    - It has a lot of built-in performance optimizations, such as request caching, request deduplication, and request batching, which can improve the performance of our Angular applications
+
+  - It's a good practice to use the `pluck` operator piped to the data emitted from the `http` methods inside the service method and not in the component using the service, this is because of 2 reasons:
+    1. separation of concerns (the component only cares about the data from the service-method)
+    2. making use of `generics` in the service-method to select the right data from the response
 
 ---
 
@@ -556,7 +662,7 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
 - Signed-in Observable
   ![auth service](./img/auth-service-11.png)
   ![auth service](./img/auth-service-12.png)
-- HTTP Requests interceptor -> [Here](./2-Angular-Modules.md#http-interceptors)
+- HTTP Requests interceptor -> [Here in modules file](./3-Angular-Modules.md#http-interceptors)
 
 ---
 

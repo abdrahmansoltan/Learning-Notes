@@ -486,6 +486,8 @@ Why do we need to tell the browser what our HTML elements represent?
 **Input masking** is a way to format the input of a form field to make it easier for the user to understand. For example, you can format a phone number field to automatically add the country code and hyphens between the numbers.
 ![inputMasking](./img/input-masking.png)
 
+> **Input masking** is a way to format user input as they type, to ensure that the input is in a specific format (e.g., phone number, date, credit card number, etc.)
+
 - More here [input masking](https://css-tricks.com/input-masking)
 - You can use libraries like:
   - [inputmask](https://www.npmjs.com/package/inputmask)

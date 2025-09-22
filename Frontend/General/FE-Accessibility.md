@@ -5,14 +5,31 @@
     - [Why Accessibility is Non-Negotiable](#why-accessibility-is-non-negotiable)
     - [Core Principles of Accessibility](#core-principles-of-accessibility)
     - [WCAG Compliance Levels: A, AA, AAA](#wcag-compliance-levels-a-aa-aaa)
-  - [Key Accessibility Challenges and Solutions](#key-accessibility-challenges-and-solutions)
-  - [ Advanced Accessibility Practices](#advanced-accessibility-practices)
-  - [Keyboard Events](#keyboard-events)
-    - [`tab` keyboard-key](#tab-keyboard-key)
-    - [Keyboard Events Types](#keyboard-events-types)
-  - [Screen readers](#screen-readers)
-  - [Accessible HTML](#accessible-html)
-    - [Labels](#labels)
+      - [Industry-Specific Compliance: Where AAA Compliance is Mandatory](#industry-specific-compliance-where-aaa-compliance-is-mandatory)
+    - [Key Accessibility Challenges and Solutions](#key-accessibility-challenges-and-solutions)
+  - [Accessibility main concepts](#accessibility-main-concepts)
+    - [Keyboard Events](#keyboard-events)
+      - [`tab` keyboard-key](#tab-keyboard-key)
+      - [Keyboard Events Types](#keyboard-events-types)
+    - [Screen readers](#screen-readers)
+    - [Accessible HTML](#accessible-html)
+      - [Labels](#labels)
+    - [Accessible CSS](#accessible-css)
+      - [Visually Hidden Elements](#visually-hidden-elements)
+    - [ARIA Roles](#aria-roles)
+      - [Live region roles](#live-region-roles)
+      - [Aria Label](#aria-label)
+    - [Colors](#colors)
+      - [Color Contrast](#color-contrast)
+      - [Browser simulation for color blindness (Emulate vision deficiencies)](#browser-simulation-for-color-blindness-emulate-vision-deficiencies)
+    - [Accessibility Tools](#accessibility-tools)
+  - [Working with Accessibility](#working-with-accessibility)
+    - [Advanced Accessibility Practices](#advanced-accessibility-practices)
+    - [Accessibility Testing Framework](#accessibility-testing-framework)
+    - [Modern Frontend Frameworks: Accessibility Best Practices for React, Vue, and Angular](#modern-frontend-frameworks-accessibility-best-practices-for-react-vue-and-angular)
+      - [Accessibility in React](#accessibility-in-react)
+      - [Accessibility in Vue](#accessibility-in-vue)
+      - [Accessibility in Angular](#accessibility-in-angular)
 
 ---
 
@@ -52,9 +69,17 @@ The Web Content Accessibility Guidelines (WCAG) define three levels of complianc
 
 > For most projects, **Level AA** compliance is considered a reasonable standard. **Level AAA**, while ideal, may not always be feasible due to its stringent requirements.
 
+#### Industry-Specific Compliance: Where AAA Compliance is Mandatory
+
+Certain industries, such as **healthcare, finance, and government**, may require AAA compliance to meet legal and regulatory standards. For example:
+
+- **Healthcare:** Patients with disabilities need access to medical records, appointment scheduling, and telehealth services.
+- **Finance:** Users with disabilities need to manage accounts, conduct transactions, and access financial services without barriers.
+- **Government:** Government websites must be accessible to all citizens, including those with disabilities.
+
 ---
 
-## Key Accessibility Challenges and Solutions
+### Key Accessibility Challenges and Solutions
 
 1. Insufficient Text Alternatives
 
@@ -128,13 +153,11 @@ The Web Content Accessibility Guidelines (WCAG) define three levels of complianc
 
 ---
 
-##  Advanced Accessibility Practices
+## Accessibility main concepts
 
----
+### Keyboard Events
 
-## Keyboard Events
-
-### `tab` keyboard-key
+#### `tab` keyboard-key
 
 A keyboard user typically uses the Tab key to navigate through interactive elements on a web `page—links`, `buttons`, `fields` for inputting text, etc. When an item is tabbed to, it has keyboard `focus` and can be activated or manipulated with the keyboard. A sighted keyboard user must be provided with a visual indicator of the element that currently has keyboard focus. Focus indicators are provided automatically by web browsers. **(That's why `focus` styles are important)**
 
@@ -167,7 +190,7 @@ Elements that are affected by `tab` are the one which the user interacts with li
 
 ---
 
-### Keyboard Events Types
+#### Keyboard Events Types
 
 > find what is the number for each keyboard key from here: [keycode.info](https://www.keycode.info)
 
@@ -181,7 +204,7 @@ You can use keyboard events to do stuff
 
 ---
 
-## Screen readers
+### Screen readers
 
 - **Alternative Text**
   ![altText](./img/altText.png)
@@ -199,7 +222,7 @@ You can use keyboard events to do stuff
 
 ---
 
-## Accessible HTML
+### Accessible HTML
 
 - Some elements have semantic meaning but no special functionality. Examples are:
 
@@ -213,7 +236,7 @@ You can use keyboard events to do stuff
   - `<input>`
   - `<textarea>`
 
-### Labels
+#### Labels
 
 Form fields can be confusing for screen reader users. There are many ways to **label form fields** so the label is read out loud whenever the field has focus.
 
@@ -225,8 +248,6 @@ Form fields can be confusing for screen reader users. There are many ways to **l
     <input id="first" type="text" />
   </form>
   ```
-
-````
 
 - Implicit HTML labels
 
@@ -262,9 +283,9 @@ Limitations with the `<label>` tag:
 
 ---
 
-## Accessible CSS
+### Accessible CSS
 
-### Visually Hidden Elements
+#### Visually Hidden Elements
 
 Sometimes you want to hide an element visually but still have it read out loud by screen readers. This is useful for things like skip links, or for providing additional context to screen reader users.
 
@@ -307,13 +328,13 @@ Sometimes you want to hide an element visually but still have it read out loud b
 
 ---
 
-## ARIA Roles
+### ARIA Roles
 
 ARIA roles provide **semantic meaning to content**, allowing screen readers and other tools to present and support interaction with object in a way that is consistent with user expectations of that type of object. ARIA roles can be used to describe elements that don't natively exist in HTML or exist but don't yet have full browser support.
 
 You can find more here along with roles to use -> [here in mozilla docs](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Roles)
 
-### Live region roles
+#### Live region roles
 
 Live Region roles are used to define elements with **content that will be dynamically changed** ex:(`chat`). Sighted users can see dynamic changes when they are visually noticeable. These roles help low vision and blind users know if content has been updated. Assistive technologies, like screen readers, can be made to announce dynamic content changes:
 
@@ -325,7 +346,7 @@ Live Region roles are used to define elements with **content that will be dynami
   <div aria-live="assertive">Waiting for a ride</div>
   ```
 
-### Aria Label
+#### Aria Label
 
 It's a way to add annotations for screen readers to read out loud. It's useful for elements that don't have a label, like `<div>` or `<span>`. It's also useful for elements that have a label but need additional context.
 
@@ -339,9 +360,9 @@ It's a way to add annotations for screen readers to read out loud. It's useful f
 
 ---
 
-## Colors
+### Colors
 
-### Color Contrast
+#### Color Contrast
 
 - Good contrast is above `4.5:1` for normal text and `3:1` for large text.
   ![contrast-ratio](./img/contrast-ratio-1.png)
@@ -355,7 +376,7 @@ It's a way to add annotations for screen readers to read out loud. It's useful f
 
 ---
 
-### Browser simulation for color blindness (Emulate vision deficiencies)
+#### Browser simulation for color blindness (Emulate vision deficiencies)
 
 - You can simulate how your website looks to people with different types of **color blindness** using the **Chrome DevTools**. To do this, open the DevTools, click on the three dots in the top right corner, go to **More tools**, and then select **Rendering**.
 
@@ -369,8 +390,150 @@ It's a way to add annotations for screen readers to read out loud. It's useful f
 
 ---
 
-## Accessibility Tools
+### Accessibility Tools
 
 - [WAVE](https://wave.webaim.org/)
   - Web Accessibility Evaluation Tool that helps developers make their web content more accessible.
-````
+
+---
+
+## Working with Accessibility
+
+### Advanced Accessibility Practices
+
+1. **Semantic HTML:** Use meaningful elements such as `<header>, <main>, and <button>` to provide structural clarity.
+2. **ARIA Landmarks:** Utilize ARIA roles and landmarks (e.g., `role="navigation"`) to enhance screen reader navigation.
+3. **Error Handling:** Design accessible error messages with clear descriptions and suggestions.
+
+   ```html
+   <label for="email">Email</label>
+   <input id="email" type="email" />
+   <span id="error" aria-live="assertive">Invalid email format</span>
+   ```
+
+4. **Accessible Animations:** Minimize motion effects that may trigger vestibular disorders and provide a “reduce motion” option.
+
+   ```css
+   @media (prefers-reduced-motion: reduce) {
+     * {
+       animation: none;
+       transition: none;
+     }
+   }
+   ```
+
+   - More here: [Animation Accessibility section](../HTML-CSS/5-CSS-Animation.md#animation-accessibility)
+
+5. **Multimedia Accessibility:** Provide captions, transcripts, and audio descriptions for all multimedia content.
+
+---
+
+### Accessibility Testing Framework
+
+Testing for accessibility should combine automated, manual, and user-driven methods to ensure thorough validation:
+
+- **Automated Tools:** Tools like `Lighthouse`, `Axe`, and `WAVE` can quickly identify common issues.
+- **Manual Testing:** Navigate with just a keyboard and use screen readers to experience your application as visually impaired users would.
+- **User Testing:** Involve users with disabilities in usability testing to uncover real-world challenges.
+
+---
+
+### Modern Frontend Frameworks: Accessibility Best Practices for React, Vue, and Angular
+
+Each modern frontend framework offers unique challenges and solutions for implementing accessibility. Below are best practices tailored to React, Vue, and Angular.
+
+#### Accessibility in React
+
+- React’s component-based architecture makes it powerful, but it requires deliberate accessibility considerations.
+
+  - **Semantic HTML:** Ensure that components use semantic HTML elements to convey meaning and structure.
+  - **Leverage React’s Accessibility Features:** Use built-in features like:
+
+    - `aria-*` attributes for dynamic content
+    - `React.Fragment` to group elements without adding extra nodes instead of `<div>`
+    - `useRef` to manage focus on custom components
+
+  - **Keyboard Navigation & Focus Management:** Implement proper focus management in modals, dialogs, and dynamic content updates.
+
+    - Use `tabIndex` to control the tab order of elements.
+    - Manage focus with `useEffect` and `useRef`.
+    - Implement skip links for keyboard navigation.
+
+- Example: Managing focus in a react modal
+
+  ```jsx
+  import { useEffect, useRef } from 'react';
+
+  const Modal = ({ isOpen, onClose }) => {
+    const modalRef = useRef(null);
+
+    useEffect(() => {
+      if (isOpen) {
+        modalRef.current?.focus();
+      }
+    }, [isOpen]);
+
+    return isOpen ? (
+      <div role='dialog' aria-labelledby='modal-title' tabIndex={-1} ref={modalRef}>
+        <h2 id='modal-title'>Accessible Modal</h2>
+        <button onClick={onClose}>Close</button>
+      </div>
+    ) : null;
+  };
+
+  export default Modal;
+  ```
+
+- Tools:
+  - `eslint-plugin-jsx-a11y`: Lints JSX elements for accessibility issues.
+  - `react-axe`: Integrates accessibility checks into React applications.
+
+---
+
+#### Accessibility in Vue
+
+- Vue provides reactivity and templates, but it’s easy to overlook accessibility when working with dynamic components.
+
+  - **Use Vue’s Built-in Directives:** Leverage directives like:
+    - `v-bind` for dynamic attributes
+    - `v-focus` for managing focus
+  - **Ensure keyboard operability:** Make sure all interactive elements are keyboard accessible.
+  - **Handle dynamic content accessibility:** Use `aria-live` regions to announce updates to dynamic content.
+
+- Example: Keyboard Navigation in a Custom Vue Component
+
+  ```html
+  <template>
+    <div>
+      <button @click="focusNext" @keydown.enter="focusNext" @keydown.space.prevent="focusNext">
+        Next
+      </button>
+      <input type="text" v-focus="isFocused" />
+    </div>
+  </template>
+
+  <script>
+    export default {
+      data() {
+        return {
+          isFocused: false
+        };
+      },
+      methods: {
+        focusNext() {
+          this.isFocused = true;
+        }
+      }
+    };
+  </script>
+  ```
+
+- Tools:
+  - `Nuxt.js a11y module`: A module for Nuxt.js that helps with accessibility.
+  - `vue-axe`: Integrates accessibility checks into Vue applications.
+
+---
+
+#### Accessibility in Angular
+
+---

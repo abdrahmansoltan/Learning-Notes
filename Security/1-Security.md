@@ -112,6 +112,14 @@ Cross-site scripting (`XSS`) is a type of security vulnerability typically found
   - Typing `<script>window.location.href = 'https://google.com'</script>` in the `input` element or search bar, and when the admin search for something, the page will redirect to google.
   - Typing `<script>document.body.innerHTML = '<img src="/" onerror="alert('XSS')">'</script>` in the `input` element or search bar, and when the admin search for something, the alert will pop up.
 
+- Example:
+
+  ```html
+  <input type="text" value=" <img src="" onerror="alert('XSS')"" />
+  ```
+
+  - Here, the `onerror` event will be triggered when the image fails to load (because the `src` is empty), and the alert will pop up.
+
 - **How to prevent it?**
 
   - Sanitize (clean) the user input. by using `white-list` and `black-list` to prevent the browser from interpreting the input as HTML.
@@ -132,7 +140,17 @@ Cross-site scripting (`XSS`) is a type of security vulnerability typically found
       ```
 
   - Escape the user input. by using escape characters to prevent the browser from interpreting the input as HTML.
+
     - ex: `&lt;` instead of `<`.
+
+      ```js
+      const html = '<h1>Hello World</h1>';
+      const escapedHtml = html.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+      console.log(escapedHtml); // &lt;h1&gt;Hello World&lt;/h1&gt;
+      ```
+
+    - This is automatically done by libraries like `React`, `Angular`, and `Vue.js`.
 
 #### Stored XSS
 

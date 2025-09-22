@@ -51,22 +51,32 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
   @NgModule({
     declarations: [AppComponent], // to declare components that belong to this module and need to be compiled
     imports: [BrowserModule], // to import other modules that we will depend on (inside the module)
-    exports: [], // to export components to other modules (for shared modules)
+    exports: [], // to export components to other modules (for shared modules or any other modules)
     providers: [], // to provide services
     bootstrap: [AppComponent] // to bootstrap the app
   })
   ```
 
-- `declarations`
-  ![declarations](./img/modules-5.png)
+  - `declarations`
+    ![declarations](./img/modules-5.png)
 
-  - `declarations` is used to declare components, directives, and pipes that belong to this module and need to be compiled
+    - It's used to declare components, directives, and pipes that belong to this module and need to be compiled
+    - when using `ng generate component` command, the new component will be automatically added to the `declarations` array of the module
 
-- `imports` & `exports`
-  ![imports](./img/modules-6.png)
+  - `imports` & `exports`
+    ![imports](./img/modules-6.png)
 
-  - `imports` is used to import other modules/components that we will depend on (inside the module)
-  - `exports` is used to export components/directives/pipes that we want to make available to other modules that will import this module
+    - `imports` is used to import other modules/components that we will depend on (inside the module)
+    - `exports` is used to export components/directives/pipes that we want to make available to other modules that will import this module
+
+  - `providers`
+
+    - It's an **old way** of providing services
+
+  - `bootstrap`
+
+    - It's used to bootstrap the application with the root module
+    - It's only used in the **root module** (usually `app.module.ts`)
 
 - **Notes:**
 
@@ -148,7 +158,7 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
   ng g c modules/modal/modal
   ```
 
-  - This will create a new component in the `modules/modal` folder and add it to the `declarations` array of the module
+  - This will create a new component in the `modules/modal` module-folder and add it to the `declarations` array of the module
 
     ```ts
     // modules/modal/modal.module.ts
@@ -213,29 +223,76 @@ It's a module that provides the `routing` functionality to the Angular app and i
 - To include the router inside of your new app
 
   ```sh
-  ng g module <Module_name> --routing
+  ng g module <module_name> --routing
   ```
 
-- For example to create a new module called `app-routing` with routing
+  - `--routing` flag will create a separate routing module for the feature module, that will handle the routing for that module
+
+- For example to create a new module called `cart` with routing
 
   ```bash
-  ng g module app-routing --routing
+  ng g module cart --routing
   ```
 
-- This will generate 2 files `app-routing.module.ts` and `app-routing-routing.module.ts`
+- This will generate 2 files `cart-routing.module.ts` and `cart.module.ts`
 
-  - `app-routing.module.ts`
+  - `cart-routing.module.ts`
     - It will contain the routes of the app
-  - `app-routing-routing.module.ts`
-    - It will contain the routing module configuration
+  - `cart.module.ts`
+    - It will contain the module configuration
 
 - **Router Configuration ->** [Router configuration](./4-Angular-Router.md#router-configuration)
 
 - Example
   ![router-module-example](./img/router-2.png)
+
   - Here, we have 2 `Routing modules` and 2 `Domain modules` that are imported in the `AppModule`
-  - The `Domain modules` contain the `Routing modules` and the `Routing modules` contain the `Routes` and the `RouterModule`
+  - The `Domain modules` contain the `Routing modules`, and then the `Routing modules` contain the `Routes` and the `RouterModule`
   - The main `App module` imports the `Domain modules` and the `RouterModule` is imported in the `AppRoutingModule`, so that now the `App module` contains all the routes
+
+  - **Notes:**
+    - the `<router-outlet>` directive will be in the `AppComponent` template, and not in the `Domain modules`
+
+- **Common Router Modules Issue**
+
+  - When we have multiple `Routing modules`, we need to ensure that order of imports is correct to avoid any issues with route resolution.
+    ![router-module-issue](./img/router-3.png)
+  - Angular uses a hierarchical dependency injection system, and the order of module imports in the @NgModule decorator matters. If the routing modules are not imported in the correct order, it can lead to route resolution conflicts or unexpected behavior.
+  - Example: Consider the following scenario:
+
+    ```ts
+    // AppRoutingModule
+    // contains this:
+    const routes: Routes = [
+      { path: '', component: HomeComponent },
+      { path: '**', component: PageNotFoundComponent }
+    ];
+    ```
+
+    ```ts
+    // FeatureRoutingModule
+    // contains this:
+    const routes: Routes = [
+      { path: 'elements', component: ElementsHomeComponent },
+      { path: 'collections', component: CollectionsHomeComponent }
+    ];
+    ```
+
+    ```ts
+    // main module: `app.module.ts`
+    import { AppRoutingModule } from './app-routing.module';
+    import { FeatureModule } from './feature/feature.module';
+    import { AppComponent } from './app.component';
+
+    @NgModule({
+      declarations: [AppComponent],
+      imports: [BrowserModule, AppRoutingModule, FeatureModule], // 👈 Here's the root cause of the issue
+      // solution: re-order the imports, so that FeatureModule is imported before AppRoutingModule
+      providers: [],
+      bootstrap: [AppComponent]
+    })
+    export class AppModule {}
+    ```
 
 ---
 
