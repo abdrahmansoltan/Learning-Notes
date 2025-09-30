@@ -8,7 +8,7 @@
       - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
     - [Dynamic Routes](#dynamic-routes)
       - [Accessing Dynamic Route Parameters and query parameters](#accessing-dynamic-route-parameters-and-query-parameters)
-    - [Nested Routes](#nested-routes)
+    - [Nested Routes (Children)](#nested-routes-children)
     - [Redirecting Routes](#redirecting-routes)
     - [Adding data to routes](#adding-data-to-routes)
       - [Adding static data to routes](#adding-static-data-to-routes)
@@ -16,7 +16,7 @@
       - [Adding title to routes window tab](#adding-title-to-routes-window-tab)
   - [Using the Router](#using-the-router)
     - [Route Properties (Params and Query Params)](#route-properties-params-and-query-params)
-      - [`ActivatedRoute` service](#activatedroute-service)
+      - [`ActivatedRoute`](#activatedroute)
       - [`ActivatedRouteSnapshot` and `RouterStateSnapshot`](#activatedroutesnapshot-and-routerstatesnapshot)
   - [Navigation (Router Links)](#navigation-router-links)
     - [`routerLink`](#routerlink)
@@ -32,6 +32,7 @@
       - [NEW: Guards Using Functions](#new-guards-using-functions)
       - [OLD: Guards Using Classes](#old-guards-using-classes)
     - [Route Guards Common Issues](#route-guards-common-issues)
+      - [Auth Guard always returns false or never allows navigation](#auth-guard-always-returns-false-or-never-allows-navigation)
   - [Route Resolvers](#route-resolvers)
     - [Why we use Route Resolvers](#why-we-use-route-resolvers)
 
@@ -321,9 +322,10 @@
 
 ---
 
-### Nested Routes
+### Nested Routes (Children)
 
 **Nested routes** are routes that are defined inside another route and are used to create a hierarchy of routes
+![nested-routes](./img/nested-routes-1.png)
 
 - To define nested routes, use the `children` property of the route object
 
@@ -345,7 +347,7 @@
   - The `component` property of the child route is the component that will be displayed when the child route is navigated to
 
 - Now, the `ChildComponent` will be displayed when the route `/parent-component/child-component` is navigated to
-- The place where the child component will be displayed is defined in the parent component using the `router-outlet` directive
+- The place where the child component will be displayed is defined in the parent component using the `<router-outlet>` directive
 
   ```html
   <!-- in parent.component.html -->
@@ -544,9 +546,9 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
 
 ![route-params](./img/route-params-1.png)
 
-#### `ActivatedRoute` service
+#### `ActivatedRoute`
 
-- The `ActivatedRoute` service is used to access the route parameters and query parameters of the route
+- The `ActivatedRoute` is a service used to access the route parameters and query parameters of the route
 
   - To be able to use the `ActivatedRoute` service, we need to inject it into the component using **dependency injection**
 
@@ -554,20 +556,43 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
     constructor(private route: ActivatedRoute) {} // inject the ActivatedRoute service
     ```
 
-  - The `ActivatedRoute` service has a property called `params` that is an `Observable` that contains the route parameters
+- The `ActivatedRoute` has multiple properties that can be used to access the route parameters and query parameters.
+- It provides access to information from the current route in 2 ways: (Observables and Snapshots)
+  ![activated-route](./img/activated-route-0.png)
+
+  - **Using Observables** (recommended ✅)
+
+    - This is done by subscribing to the `params` and `queryParams` properties of the `ActivatedRoute` service
+    - they are all (`BehaviorSubject`) that can be subscribed to **in order to get the updated values when they change**
+      ![activated-route](./img/activated-route-1.png)
+    - The `ActivatedRoute` service has a property called `params` that is an `Observable` that contains the route parameters
+
+      ```ts
+      this.route.params.subscribe(params => {
+        console.log(params.id); // log the route parameter id
+      });
+      ```
+
+    - The `ActivatedRoute` service has a property called `queryParams` that is an `Observable` that contains the query parameters
+
+      ```ts
+      this.route.queryParams.subscribe(params => {
+        console.log(params.id); // log the query parameter id
+      });
+      ```
+
+  - **Using Snapshots** (not recommended ❌)
+
+    - This is done by using the `snapshot` property of the `ActivatedRoute` service
+    - The `snapshot` property contains the current value of the route parameters and query parameters
+      ![activated-route](./img/activated-route-2.png)
+    - It doesn't provide live updates when the route parameters or query parameters change
 
     ```ts
-    this.route.params.subscribe(params => {
-      console.log(params.id); // log the route parameter id
-    });
-    ```
-
-  - The `ActivatedRoute` service has a property called `queryParams` that is an `Observable` that contains the query parameters
-
-    ```ts
-    this.route.queryParams.subscribe(params => {
-      console.log(params.id); // log the query parameter id
-    });
+    ngOnInit() {
+      console.log(this.route.snapshot.params.id); // log the route parameter id
+      console.log(this.route.snapshot.queryParams.id); // log the query parameter id
+    }
     ```
 
 - **Example:**
@@ -912,7 +937,7 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
 ## Router Guards
 
-**Router guards** are used to protect the routes of the app and control the navigation to the routes
+**Router guards** are used to protect the routes of the app and control the navigation to the routes by **restricting access to certain routes based on certain conditions**
 
 - They are used to prevent **unauthorized** users from accessing certain routes
   - They are used to prevent users from navigating to certain routes based on certain conditions
@@ -928,7 +953,7 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
   - `canActivate` : to prevent the user from navigating to a route
   - `canMatch` **(NEW)**: to prevent the user from navigating to a route based on certain conditions (used for advanced routing scenarios)
   - `canActivateChild` : to prevent the user from navigating to the child routes of a route
-  - `canLoad` : to prevent the user from loading the module of a route (lazy loading modules)
+  - `canLoad` : to prevent the user from loading the module of a route **(lazy loaded modules)**
   - `canDeactivate` : to prevent the user from leaving a route
     - It's confusing for beginners, but it's used to prevent the user from leaving a route **when there are unsaved changes in the form or other conditions**
       ![router-guards-deactivate](./img/router-guards-deactivate.png)
@@ -972,9 +997,11 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
 - Notes:
 
+  - We can use multiple guards in the `canActivate` property by passing an **array of functions**
   - It's sometimes recommended to use the `canMatch` guard instead of `canActivate` for advanced routing scenarios, especially when dealing with lazy-loaded modules or complex route configurations
   - It's recommended to not return `false` directly in the guard function, but rather return an `Observable` that resolves to `false` to allow for asynchronous checks (like API calls or other asynchronous operations)
   - Also it's not recommended to return falsy values directly, as this can lead to crashing the app or unexpected behavior. Instead, we should redirect the user to a specific route using `new RedirectCommand()` or return an `Observable` that resolves to `false` or a `UrlTree` to redirect the user to a specific route
+  - If you want to return observables instead of boolean values, you must know that **the guard will wait for the observable to (complete) before allowing or preventing navigation**, so make sure the observable completes (for example, using `take(1)` operator from `rxjs` which takes the first value **and completes the observable**)
 
 ---
 
@@ -1033,12 +1060,13 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
     // in app-routing.module.ts
     const routes: Routes = [
       { path: '', component: HomeComponent },
-      { path: 'first-component', component: FirstComponent, canActivate: [AuthGuard] },
+      { path: 'first-component', component: FirstComponent, canActivate: [AuthGuard] }, // 👈
       { path: 'second-component', component: SecondComponent }
     ];
     ```
 
     - The `canActivate` property is used to add the `AuthGuard` to the route `/first-component` to prevent the user from navigating to the route
+    - we can pass multiple guards to the `canActivate` property by passing an **array of guards**
 
 - **Notes:**
 
@@ -1052,7 +1080,69 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
 ### Route Guards Common Issues
 
-![router-guards](./img/router-guards-3.png)
+#### Auth Guard always returns false or never allows navigation
+
+- Problem:
+  ![router-guards](./img/router-guards-3.png)
+
+  > Here, we assume that the `checkAuth` function is defined and returns a boolean indicating whether the user is authenticated or not by sending an API request to the server or checking a token in local storage
+
+- Solution:
+  ![router-guards](./img/router-guards-4.png)
+
+  - Instead of having the `signedin$` with only 2 boolean values (`true` or `false`), we can have 3 states: `loading / null`, `true`, `false`
+    - This way, we can handle the loading state and prevent the guard from returning `false` before the authentication check is complete
+  - We will use the (`skipWhile` and `take`) operators from `rxjs` to skip the loading state and take only the first non-loading state value
+
+    ```ts
+    // in auth.service.ts
+
+    // ...
+    private signedin$ = new BehaviorSubject<boolean | null>(null); // 👈 initial state is null (loading state)
+    ```
+
+    ```ts
+    // in auth.guard.ts
+    import { Injectable } from '@angular/core';
+    import {
+      CanActivate,
+      ActivatedRouteSnapshot,
+      RouterStateSnapshot,
+      UrlTree
+    } from '@angular/router';
+    import { Observable } from 'rxjs';
+    import { map, skipWhile, take } from 'rxjs/operators';
+    import { AuthService } from './auth.service';
+
+    @Injectable({
+      providedIn: 'root'
+    })
+    export class AuthGuard implements CanActivate {
+      constructor(private authService: AuthService) {}
+
+      canActivate(
+        route: ActivatedRouteSnapshot,
+        state: RouterStateSnapshot
+      ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+        return this.authService.signedin$.pipe(
+          skipWhile(value => value === null), // Skip the loading state (null)
+          take(1), // Take only the first non-loading state value, and mark the observable as complete
+          map(isSignedIn => {
+            if (isSignedIn) {
+              return true; // User is authenticated, allow navigation
+            } else {
+              // navigate to another route (e.g., login page) if not authenticated
+              // this.router.navigate(['/login']);
+              return false; // User is not authenticated, prevent navigation
+            }
+          })
+        );
+      }
+    }
+    ```
+
+    - We use the `skipWhile` operator to skip the loading state (`null` value)
+    - We use the `take(1)` operator to take only the first non-loading state value and mark the observable as complete **(Actually it doesn't complete the observable, it just unsubscribes from it after taking the first value, but for our case it's enough because we only need the first value to determine whether to allow navigation or not. So it tricks the subscriber into thinking that the observable is complete)**
 
 ---
 
@@ -1136,7 +1226,13 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
       resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): MaybeAsync<Email> {
         const { id } = route.params;
-        return this.emailService.getEmail(id);
+        // call HTTP request to fetch the email data and then return it so that it can be passed to the component
+        return this.emailService.getEmail(id).pipe(
+          catchError(() => {
+            // Handle error and return a default value or navigate to an error page
+            return of({ id: '', subject: 'Error', body: 'Could not load email.' });
+          })
+        );
       }
     }
     ```
@@ -1161,6 +1257,7 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
     ```
 
     - The `resolve` property is used to add the `EmailResolverService` to the route `/email/:id` to fetch the email data needed for the route
+    - Now in the `EmailComponent`, we can access the email data using the `email` property of the `ActivatedRoute` service
 
   - 3️⃣ **Use the data in the component**
 
@@ -1182,6 +1279,10 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
       ngOnInit() {
         this.email = this.route.snapshot.data.email;
+        // or using observable
+        // this.route.data.subscribe(data => {
+        //   this.email = data.email;
+        // });
       }
     }
     ```
@@ -1211,3 +1312,5 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
 - Prevent the user from navigating to the route until the data is fetched
 - Pause rendering of the component until the data is fetched (to avoid `undefined` errors in the template)
+  - I know that we can just use `*ngIf` to check if the data is available before rendering the component, or the safe navigation operator (`?.`) in the template to avoid `undefined` errors, but using resolvers is a cleaner way to handle this
+- Ensure that the data is available when the component is initialized

@@ -136,6 +136,7 @@ There's a cost to every optimization, so you need to measure to know if the opti
   - You can use `webpack` to build the website in **(Production mode)** by running `webpack --mode production` or by setting the `mode` property to `production` in the `webpack.config.js` file
 - Here's a great site to check the bundle size of libraries: [bundlephobia](https://bundlephobia.com/)
   - Why use it? because the size of the library matters, the smaller the library, the faster the website
+  - **It's a good practice to check the bundle size of the libraries before using them in your project**
 
 ---
 

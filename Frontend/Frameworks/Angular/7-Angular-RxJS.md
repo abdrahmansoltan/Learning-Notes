@@ -353,7 +353,7 @@ There are two main types of observables: **(cold vs hot) and (unicast vs multica
   - Here, the `subject` won't emit any data until the `complete` method is called, and when it's called, it will emit only the last value (`3`).
   - It's rarely used ❌, because it's not common to emit only the last value of the observable.
 
-- **BehaviorSubject:** It emits the most recent value emitted by the observable when a new subscriber subscribes to it.
+- **BehaviorSubject:** It emits the most recent value emitted by the observable when a new subscriber subscribes to it. and also **requires an initial value**.
 
   ```ts
   import { BehaviorSubject } from 'rxjs';
@@ -627,28 +627,57 @@ It's a function that takes an observable as input and returns a new observable a
   observable.pipe(switchMap(value => of(value * 2))).subscribe(console.log); // 10
   ```
 
-  - The `switchMap` operator is used to subscribe to the **inner observable** and emit its data in the **outer observable** (but it only emits the data from the last inner observable).
-    ![nested](./img/nested-subscriptions-2.png)
+  - It takes a value and returns a new observable.
+  - It's used when we have **nested subscriptions** and we want to avoid them **(observable inside an observable)**.
+    - It is used to subscribe to the **inner observable** and emit its data in the **outer observable** (but it only emits the data from the last inner observable).
+    - Meaning that is cancel the previous inner observable when a new inner observable is created.
+      ![nested](./img/nested-subscriptions-2.png)
   - This way, we avoid nested subscriptions and the problems that come with them when a conflict occurs between the data emitted by the inner observables.
   - It's commonly used with `http` requests to cancel the previous request when a new request is made.
 
-    ```ts
-    import { fromEvent } from 'rxjs';
-    import { switchMap } from 'rxjs/operators';
+    - Example: (calling a http request when the route `id` parameter changes)
 
-    const input = document.querySelector('input');
-    fromEvent(input, 'input')
-      .pipe(
-        // ... other operators, then switch to the fetch request and cancel any conflicting requests (like typing fast)
-        switchMap(params =>
-          this.http.get('https://api.openweathermap.org/data/2.5/weather', { params })
+      ```ts
+      ngOnInit() {
+        // Bad practice ❌ (nested subscription)
+        this.route.params.subscribe(params => {
+          this.emailService
+            .getEmail(params['id'])
+            .subscribe(email => (this.email = email));
+        });
+
+        // Good practice ✅ (using switchMap to avoid nested subscription and cancel the previous request when a new request is made)
+        this.route.params
+          .pipe(
+            switchMap(params => this.emailService.getEmail(params['id']))
+          )
+          .subscribe(email => (this.email = email));
+
+      }
+      ```
+
+      - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and **cancel the previous request** when a new request is made that **conflicts** with it.
+        ![nested](./img/nested-subscriptions-1.png)
+
+    - Example: (when the user is typing fast in an input field and we want to make a request to the server for each input change, but we want to cancel the previous request when a new request is made)
+
+      ```ts
+      import { fromEvent } from 'rxjs';
+      import { switchMap } from 'rxjs/operators';
+
+      const input = document.querySelector('input');
+      fromEvent(input, 'input')
+        .pipe(
+          // ... other operators, then switch to the fetch request and cancel any conflicting requests (like typing fast)
+          switchMap(params =>
+            this.http.get('https://api.openweathermap.org/data/2.5/weather', { params })
+          )
         )
-      )
-      .subscribe(console.log);
-    ```
+        .subscribe(console.log);
+      ```
 
-    - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and cancel the previous request when a new request is made that **conflicts** with it.
-      ![nested](./img/nested-subscriptions-4.png)
+      - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and cancel the previous request when a new request is made that **conflicts** with it.
+        ![nested](./img/nested-subscriptions-4.png)
 
 ---
 
@@ -1162,11 +1191,16 @@ export class AppComponent implements OnInit {
    - Here, we use the `BehaviorSubject` to allow other components to listen to the authentication status.
      ![BehaviorSubject](./img/behavior-subject-1.png)
 
-     > Why not use a simple boolean variable or a `Subject`?
+     > **Why not use a simple boolean variable or a `Subject`?**
      >
      > - A simple boolean variable won't allow other components to listen to the authentication status.
      > - A `Subject` won't emit the last value to new subscribers so some subscribers/components might miss the current authentication status.
      > - A `BehaviorSubject` **will emit the last value** to new subscribers, so all subscribers/components will always have the current authentication status.
+     >
+     > **Why not use an `Observable`?**
+     >
+     > - An `Observable` is not a good choice here because it doesn't have a way to emit new values. we need a way to update the authentication status when the user logs in or out (inside each auth method).
+     > - A `BehaviorSubject` is a good choice because it allows us to emit new values and also allows other components to listen to the authentication status.
 
      - This way, we can easily manage the authentication status and update the UI accordingly.
 

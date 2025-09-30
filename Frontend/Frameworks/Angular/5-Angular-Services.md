@@ -496,6 +496,8 @@ Angular uses a **hierarchical dependency injection system**, which means that it
 
 The `HttpClient` service is a built-in Angular service that provides a simplified API for making HTTP requests and handling responses using observables.
 
+> Check also the [HTTP Module section](./3-Angular-Modules.md#http-module) in the Angular-Modules file
+
 - **How to use it in Angular?**
 
   - In order to use the `HttpClient` service in Angular, we need to:
@@ -641,6 +643,11 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
   - It's a good practice to use the `pluck` operator piped to the data emitted from the `http` methods inside the service method and not in the component using the service, this is because of 2 reasons:
     1. separation of concerns (the component only cares about the data from the service-method)
     2. making use of `generics` in the service-method to select the right data from the response
+  - By default, the `HttpClient` service **doesn't send or receive cookies** from the server, to enable this, we need to set the `withCredentials` option to `true` in the request options
+
+    ```ts
+    this.http.get<any>(this.apiUrl, { withCredentials: true });
+    ```
 
 ---
 
@@ -663,6 +670,44 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
   ![auth service](./img/auth-service-11.png)
   ![auth service](./img/auth-service-12.png)
 - HTTP Requests interceptor -> [Here in modules file](./3-Angular-Modules.md#http-interceptors)
+
+```ts
+// auth.service.ts 📄
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = 'https://example.com/api/auth';
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false); // BehaviorSubject to hold the authentication status
+  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable(); // Observable to expose the authentication status
+  private token: string | null = null; // to hold the JWT token
+
+  constructor(private http: HttpClient) {}
+  // Login method
+  login(username: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { username, password }).pipe(
+      tap(response => {
+        this.token = response.token; // store the JWT token
+        this.isAuthenticatedSubject.next(true); // update the authentication status
+      })
+    );
+  }
+  // Logout method
+  logout(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/logout`, {}).pipe(
+      tap(() => {
+        this.token = null; // clear the JWT token
+        this.isAuthenticatedSubject.next(false); // update the authentication status
+      })
+    );
+  }
+}
+```
 
 ---
 

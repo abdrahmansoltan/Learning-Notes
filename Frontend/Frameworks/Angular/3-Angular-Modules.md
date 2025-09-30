@@ -438,7 +438,8 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
         const token = localStorage.getItem('token');
         if (token) {
           const modifiedRequest = req.clone({
-            headers: req.headers.set('Authorization', 'Bearer ' + token)
+            headers: req.headers.set('Authorization', 'Bearer ' + token),
+            withCredentials: true // to send cookies with the request
           });
           return next.handle(modifiedRequest);
         } else {
@@ -453,6 +454,8 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       - `req`: the request object
       - `next`: the next interceptor in the chain
     - It returns an observable of the `HttpEvent` type
+    - **Why we use `req.clone()` method?**
+      - Because the `HttpRequest` object is immutable (if you try to override it, Typescript will raise errors), which means that we cannot modify it directly, so we need to create a copy of the request object and modify the copy using the `clone()` method
 
   - 3️⃣ register the interceptor in the `app.module.ts` file / or the `app.config.ts` file (to make it available to the entire app)
 
@@ -481,7 +484,8 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       ```
 
       - The `HTTP_INTERCEPTORS` is a token that is used to provide the interceptors in Angular
-      - Here, we're telling Angular to provide the `AuthInterceptor` and use it as an `HTTP_INTERCEPTOR` if any HTTP request is made in the app (because by default, Angular doesn't know about the `AuthInterceptor`, so we need to provide it here as it only uses the `HTTP_INTERCEPTORS` token)
+      - Here, we're telling Angular to provide the `AuthInterceptor` class and use it as an `HTTP_INTERCEPTOR` if any HTTP request is made in the app (because by default, Angular doesn't know about the `AuthInterceptor`, so we need to provide it here as it only uses the `HTTP_INTERCEPTORS` token)
+      - It's an old way of dependency injection, and now we can also use standalone components to register the interceptor using the `withInterceptors` method
 
     - **Standalone based:** If you're using standalone components, you can use the `withInterceptors` method to register the interceptor in the component
 
@@ -567,7 +571,7 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       }
       ```
 
-    - or we can handle both request and response in the same interceptor
+    - or **we can handle both request and response** in the same interceptor
 
       ```ts
       export class AuthInterceptor implements HttpInterceptor {
@@ -576,9 +580,13 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
           return next.handle(req).pipe(
             tap(event => {
               if (event instanceof HttpResponse) {
+                // or
+                // if (event.type === HttpEventType.Response) {
                 // handle response
               }
               if (event instanceof HttpRequest) {
+                // or
+                // if (event.type === HttpEventType.Sent) {
                 // handle request
               }
 

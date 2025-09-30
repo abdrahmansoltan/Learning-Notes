@@ -299,6 +299,7 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 
 - **Signals are automatically tracked by Angular**, so when the signal value changes, Angular will update the view accordingly
 - It's better than using `Zone.js` because it doesn't require any monkey-patching of the `JavaScript` event loop, and it's more efficient because it only updates the view when the signal value changes
+- It's now used as a replacement for wrapping shared values/state in (`BehaviorSubject` or `ReplaySubject`) when you want to share state between components
 
 > "monkey-patching" means modifying the behavior of a function or object at runtime, which can lead to performance issues and bugs
 

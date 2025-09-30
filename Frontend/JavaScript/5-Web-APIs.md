@@ -140,18 +140,18 @@ Cookies are strings of data that are stored in the browser. They are a part of t
     document.cookie = 'user=John'; // update only cookie named 'user'
     ```
 
-- Technically, name and value can have any characters. To keep the valid formatting, **They must be encoded** -> they should be escaped using a built-in **encodeURIComponent** function:
+  - Technically, name and value can have any characters. To keep the valid formatting, **They must be encoded** -> they should be escaped using a built-in **encodeURIComponent** function:
 
-  ```js
-  // special characters (spaces), need encoding
-  let name = 'my name';
-  let value = 'John Smith';
+    ```js
+    // special characters (spaces), need encoding
+    let name = 'my name';
+    let value = 'John Smith';
 
-  // encodes the cookie as my%20name=John%20Smith
-  document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+    // encodes the cookie as my%20name=John%20Smith
+    document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value);
 
-  alert(document.cookie); // ...; my%20name=John%20Smith
-  ```
+    alert(document.cookie); // ...; my%20name=John%20Smith
+    ```
 
 - One cookie may not exceed `4KB` in size. The number of cookies allowed on a domain is around `20+` (varies by browser).
 
