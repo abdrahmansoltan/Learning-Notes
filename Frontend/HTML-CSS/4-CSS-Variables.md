@@ -184,7 +184,7 @@ It's a way to provide a default value for the variable **if it's not defined**, 
 
 ## Variables inheritance
 
-By default, all CSS variables are inheritable. This is why CSS variables hung on :root are available globally.
+By default, all CSS variables are **inheritable and cascade**. This is why CSS variables hung on :root are available globally.
 
 - css variables are **inherited** from the parent element if it's declared in the parent element to the (`classes` / `pseudo-elements` / `pseudo-classes` / `IDs`) in the same element
 

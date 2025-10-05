@@ -475,7 +475,30 @@ Why do we need to tell the browser what our HTML elements represent?
     }
     ```
 
-  - > **Note:** In practice :invalid is tricky to work with. Invalid form fields are already marked as :`invalid` before user interaction, which may confuse users. The `:user-invalid` pseudo-class solves this issue, as the styles are only applied after user interaction. Learn more about `:user-invalid`.
+    - Usually, it's used with validation and sometimes **shaking animation** to indicate that the input is invalid.
+      ![invalid](./img/invalid-animation.gif)
+
+      ```css
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-5px);
+        }
+        75% {
+          transform: translateX(5px);
+        }
+      }
+
+      input:invalid:not(:focus) {
+        border: 2px solid red;
+        animation: shake 0.3s;
+      }
+      ```
+
+  > **Note:** In practice :invalid is tricky to work with. Invalid form fields are already marked as :`invalid` before user interaction, which may confuse users. The `:user-invalid` pseudo-class solves this issue, as the styles are only applied after user interaction. Learn more about `:user-invalid`.
 
 - **Note:** You can find more [Constraint validation attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Constraint_validation) here
 

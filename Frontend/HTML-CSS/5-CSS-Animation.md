@@ -1,9 +1,12 @@
 # INDEX
 
 - [INDEX](#index)
+  - [CSS Animation](#css-animation)
+    - [Why animate?](#why-animate)
+    - [Animation Fundamentals](#animation-fundamentals)
   - [Transforms (`transform` property)](#transforms-transform-property)
     - [Transform Functions](#transform-functions)
-  - [Transition](#transition)
+  - [Transitions](#transitions)
     - [Animating(transitioning) background issue](#animatingtransitioning-background-issue)
   - [CSS Animation (Keyframe Animation)](#css-animation-keyframe-animation)
     - [Animation properties](#animation-properties)
@@ -18,14 +21,16 @@
     - [What to animate?](#what-to-animate)
     - [Hardware Acceleration (`will-change`) 🚀](#hardware-acceleration-will-change-)
   - [Designing Animations](#designing-animations)
+    - [Flip Technique (layout animation)](#flip-technique-layout-animation)
     - [Action-Driven Animation](#action-driven-animation)
       - [Modal Animation (Open - Close)](#modal-animation-open---close)
       - [Button Animation (Hover - Depress - Release)](#button-animation-hover---depress---release)
+    - [Reactive Animation](#reactive-animation)
     - [Orchestration](#orchestration)
   - [Animation Accessibility](#animation-accessibility)
-    - [Accessing in CSS](#accessing-in-css)
-    - [Accessing in JavaScript](#accessing-in-javascript)
-    - [Accessing in React](#accessing-in-react)
+    - [Accessing User Preference in CSS](#accessing-user-preference-in-css)
+    - [Accessing User Preference in JS](#accessing-user-preference-in-js)
+    - [Accessing User Preference in React](#accessing-user-preference-in-react)
   - [Animation Examples](#animation-examples)
     - [Loading spinner](#loading-spinner)
     - [Converting hamburger-menu icon to close icon](#converting-hamburger-menu-icon-to-close-icon)
@@ -34,6 +39,59 @@
     - [Navigation link flip-up](#navigation-link-flip-up)
   - [Animation Libraries](#animation-libraries)
   - [Notes](#notes)
+
+---
+
+## CSS Animation
+
+### Why animate?
+
+- **Guidance and clarification**
+  - Draw attention to specific elements
+  - Provide visual feedback for user interactions (especially in mobile devices when tapping)
+- **Style and branding**
+  - Convey personality and tone
+  - Create a memorable user experience
+  - Enhance storytelling and engagement
+
+---
+
+### Animation Fundamentals
+
+- **Duration**
+  - How long an **iteration** of an animation takes to complete
+  - It applies to each iteration, not the entire animation
+- **Delay**
+  - How long to wait before starting the animation
+  - It only happens once, at the start of the animation (the first iteration)
+- **Timing Function**
+  - It's the "easing" of an animation (how the animation progresses over time)
+    ![animation-easing](./img/animation-timing-function.png)
+  - The speed curve of the animation (e.g., ease-in, ease-out)
+- **Iteration Count**
+  - How many times the animation should repeat
+- **Direction**
+  - The direction the animation should play (e.g., normal, reverse, alternate)
+- **Fill Mode**
+  - What styles are applied before and after the animation (e.g., forwards, backwards)
+- **CSS Variables**
+
+  - They can be used to create dynamic animations by changing their values in different states or with JavaScript
+
+  ```css
+  :root {
+    --duration: 2s;
+  }
+
+  .box {
+    animation-duration: var(--duration, 1s); /* fallback to 1s if --duration is not defined */
+  }
+  ```
+
+  ```js
+  const box = document.querySelector('.box');
+  box.style.setProperty('--duration', '5s'); // change duration to 5s
+  ```
 
 ---
 
@@ -152,11 +210,11 @@ It allows us to change a specified element in some way. It comes with a grab-bag
 
 ---
 
-## Transition
+## Transitions
 
-`transition` property is used to animate the changes in css properties **over time**
+`transition` property is used to animate the changes in css properties **when their state changes** (e.g. hover, focus, active, etc.)
 
-- It works by applying the changes in the css properties over a period of time
+- It works by applying the changes in the css properties over a period of time instead of instantly when the state changes.
 
 - The `transition` shorthand property consists of multiple properties:
   ![transition](./img/transition-1.png)
@@ -213,9 +271,14 @@ It allows us to change a specified element in some way. It comes with a grab-bag
       transition-property: background-color, border-radius;
       transition-duration: 4s, 2s;
     }
+
+    button:hover {
+      background-color: red;
+      border-radius: 50%;
+    }
     ```
 
-- If you plan on animating multiple properties, you can pass it a comma-separated list:
+- If you plan on animating multiple properties with the shorthand property, you can pass it a comma-separated list:
 
   ```css
   button {
@@ -225,9 +288,10 @@ It allows us to change a specified element in some way. It comes with a grab-bag
 
 - **Notes:**
 
-  - `transition-property` takes a special value: `all`. When `all` is specified, any CSS property that changes will be transitioned. It can be tempting to use this value, as it saves us a good chunk of typing if we're animating multiple properties, but **It's not recommended**.
+  - `transition-property` takes a special value: `all`. When `all` is specified, any CSS property that changes will be transitioned. It can be tempting to use this value, as it saves us a good chunk of typing if we're animating multiple properties, but **It's not recommended ⚠️**.
     - This is because it can lead to unexpected behavior. If you add a new property to the element, it will be transitioned as well, which might not be what you want.
-    - At some point in the future, you (or someone on your team) will change this CSS. You might add a new declaration that you don't want to transition. It's better to be specific, and avoid any unintended animations. (Animation is like salt: too much of it spoils the dish.)
+      - At some point in the future, you (or someone on your team) will change this CSS. You might add a new declaration that you don't want to transition. It's better to be specific, and avoid any unintended animations. (Animation is like salt: too much of it spoils the dish.)
+    - Also it can lead to performance issues, as there might be "layout properties" that are expensive to animate.
   - Custom timing function curve
 
     - You can create your own timing function curve using `cubic-bezier` function
@@ -237,6 +301,9 @@ It allows us to change a specified element in some way. It comes with a grab-bag
         transition: background-color 1s cubic-bezier(0.17, 0.67, 0.83, 0.67);
       }
       ```
+
+      - It's recommended to keep the `y` value of the first point to `0`, and the `y` value of the second point to `1`, to ensure that the animation starts and ends at the correct points **mimicking real-world physics**.
+        ![animation-timing-function](./img/animation-timing-function.png)
 
     - You can use online tools to generate the cubic-bezier curve, like [cubic-bezier.com](https://cubic-bezier.com/)
       ![cubic-bezier](./img/transition-3.png)
@@ -358,6 +425,8 @@ It allows us to change a specified element in some way. It comes with a grab-bag
 
 **CSS keyframe animations** are declared using the `@keyframes` at-rule. We can specify a transition from one set of CSS declarations to another
 
+Think of it as a **Timeline** for an animation, where we can define multiple points in time (keyframes) and the styles that should be applied at those points.
+
 - Applying animation to an element is done by 2 steps:
 
   1. Define the animation with a name -> `@keyframes`
@@ -450,10 +519,24 @@ It allows us to change a specified element in some way. It comes with a grab-bag
       - Useful when we want to apply the styles before the animation starts and after it finishes (e.g. delay and persist the final state)
 
 - `animation-play-state`
+
   - it's to pause and resume the animation
     ![CSS-Animation-Play-State](./img/CSS-Animation-Play-State.webp)
     - `paused` -> pause the animation
     - `running` -> resume the animation
+  - Example: pause the animation on hover
+
+    ```css
+    div {
+      animation: move 2s infinite;
+      animation-play-state: running;
+    }
+
+    div:hover {
+      animation-play-state: paused;
+      // this is better than using `animation: none;` because it doesn't cause interruption
+    }
+    ```
 
 ---
 
@@ -563,21 +646,57 @@ They're used to define the animation states and the time between them (the anima
 
 ### Animation choreograph
 
+When animating multiple elements, we often want to stagger their animations, so that they don't all start at the same time. This can create a more interesting and dynamic effect.
+![animation choreograph](./img/animation-choreography-1.png)
+![animation choreograph](./img/animation-choreography-2.webp)
+
 it's to use the `nth-child` selector and **CSS variables** to choreograph animations between multiple elements.
 
-```scss
-.balls-container {
-  --duration: 1s;
-  animation: move-right var(--duration) both;
+- Normal Example
 
-  &:nth-child(2) {
-    animation-delay: calc(var(--duration) - 0.1s);
+  ```scss
+  .balls-container {
+    --duration: 1s;
+    animation: move-right var(--duration) both;
+
+    &:nth-child(2) {
+      animation-delay: calc(var(--duration) - 0.1s);
+    }
+    &:nth-child(3) {
+      animation-delay: calc(var(--duration) * 2 - 0.1s * 2);
+    }
   }
-  &:nth-child(3) {
-    animation-delay: calc(var(--duration) * 2 - 0.1s * 2);
+  ```
+
+- Example using React or a framework:
+
+  ```jsx
+  // Here, we can pass the index of the element as a css variable
+  // and use it to calculate the animation delay
+  const balls = [1, 2, 3, 4, 5];
+  return (
+    <div className='balls-container'>
+      {balls.map((ball, index) => (
+        <div
+          key={ball}
+          className='ball'
+          style={{ '--i': index }} // passing the index as a CSS variable
+        ></div>
+      ))}
+    </div>
+  );
+  ```
+
+  ```scss
+  .balls-container {
+    --duration: 1s;
+
+    .ball {
+      animation: move-right var(--duration) both;
+      animation-delay: calc(var(--i) * var(--duration) - 0.1s * var(--i));
+    }
   }
-}
-```
+  ```
 
 ---
 
@@ -635,11 +754,59 @@ You can use `data-state` attribute to define state and make css values establish
 
 - you change data.state in Javascript which then reflects in the `data-state` HTML attribute, then define which css property will be shown
 
-```css
-.container[data-state='success'] {
-  animation: slide-up 1s both;
-}
-```
+  ```html
+  <div class="container" data-state="success"></div>
+  <div class="container" data-state="loading"></div>
+  <div class="container" data-state="error"></div>
+  ```
+
+  ```css
+  .container[data-state='success'] {
+    animation: slide-up 1s both;
+  }
+
+  .container[data-state='loading'] {
+    animation: pulse 1s infinite;
+  }
+
+  .container[data-state='error'] {
+    animation: shake 0.5s both;
+  }
+  ```
+
+- We can use Javascript to change the `data-state` attribute, which will trigger the corresponding animation:
+
+  ```js
+  const container = document.querySelector('.container');
+
+  // Change state to loading
+  container.setAttribute('data-state', 'loading');
+
+  // After some time, change state to success or a HTTP response
+  setTimeout(() => {
+    container.setAttribute('data-state', 'success');
+  }, 3000);
+  ```
+
+- Note: we can also use `class` instead of `data-state`, but using `data-state` is more semantic and easier to understand the purpose of the attribute.
+
+  ```css
+  // still works
+  .container.success {
+    animation: slide-up 1s both;
+  }
+
+  .container.loading {
+    animation: pulse 1s infinite;
+  }
+
+  .container.error {
+    animation: shake 0.5s both;
+  }
+  ```
+
+- Examples:
+  - [Password Modal](https://codepen.io/davidkpiano/pen/WKvPBP)
 
 ---
 
@@ -711,11 +878,11 @@ You can use `data-state` attribute to define state and make css values establish
 
 The main differences between `transition` and `animation`:
 
-| Transition                                              | Animation                                |
-| ------------------------------------------------------- | ---------------------------------------- |
-| Simple animations between 2 states (like hover effects) | Complex animations with multiple states  |
-| Changes happen between start and end state              | Can define multiple steps with keyframes |
-| Can't be reused easily                                  | Can be reused across different elements  |
+| Transition                                              | Animation                                                                               |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Simple animations between 2 states (like hover effects) | Complex animations with multiple states (not just start and end states, but in-between) |
+| Changes happen between start and end state              | Can define multiple steps with keyframes                                                |
+| Can't be reused easily                                  | Can be reused across different elements                                                 |
 
 Key points:
 
@@ -851,6 +1018,25 @@ Depending on your browser and OS, you may occasionally notice a curious stutter 
 ---
 
 ## Designing Animations
+
+### Flip Technique (layout animation)
+
+It's a technique for animating between two different layouts. It works by capturing the initial and final states of the elements, and then animating between them.
+
+![flip-technique](./img/flip-technique.jpg)
+
+> It's a technique because it's always hard to animate layout changes, because they often involve changing the size and position of elements on the page. The Flip technique is a way to make these animations smoother and more natural.
+
+- The Flip technique involves 4 steps:
+
+  1. **First**: Capture the initial state of the elements (before the layout change)
+  2. **Last**: Capture the final state of the elements (after the layout change)
+  3. **Invert**: Apply a transform to each element that will move it from its initial position to its final position
+  4. **Play**: Animate the transform back to `none`, which will move the element to its final position
+
+- More here: [Animating Layouts with the FLIP Technique](https://css-tricks.com/animating-layouts-with-the-flip-technique/)
+
+---
 
 ### Action-Driven Animation
 
@@ -1005,6 +1191,83 @@ But how can we have multiple settings for the same animation?
 
 ---
 
+### Reactive Animation
+
+> **Reactive Animation** is the art of making animations that respond to user input in real-time (e.g., mouse movement, scrolling, etc).
+
+- Example: Parallax Effect
+
+  - A parallax effect is when the background moves at a different speed than the foreground, creating a sense of depth.
+    ![parallax-effect](./img/parallax-effect.webp)
+  - We can create a parallax effect by using the `mousemove` event to track the user's mouse position, and then using that position to update the `transform` property of the background element.
+
+    ```html
+    <style>
+      .container {
+        perspective: 1000px;
+      }
+      .background {
+        width: 100%;
+        height: 100%;
+        background: url('background.jpg');
+        background-size: cover;
+        transform: translateZ(-1px) scale(2);
+        transition: transform 100ms;
+      }
+    </style>
+
+    <div class="container">
+      <div class="background" id="background"></div>
+    </div>
+    <script>
+      const background = document.getElementById('background');
+      document.addEventListener('mousemove', event => {
+        const x = event.clientX / window.innerWidth - 0.5;
+        const y = event.clientY / window.innerHeight - 0.5;
+        background.style.transform = `translateZ(-1px) scale(2) translate(${x * 20}px, ${
+          y * 20
+        }px)`;
+      });
+    </script>
+    ```
+
+  - More here: [CSS Parallax Effect](https://medium.com/@samdbeckham/css-parallax-effect-b6ce9d71c0bb)
+
+- Example: Mouse cursor effect (Animated Cursor)
+
+  - We can create a cursor effect by using the `mousemove` event to track the user's mouse position, and then using that position to update the `transform` property of the cursor element.
+    ![cursor-effect](./img/cursor-effect.webp)
+
+    ```html
+    <style>
+      .cursor {
+        width: 20px;
+        height: 20px;
+        border: 2px solid black;
+        border-radius: 50%;
+        position: absolute;
+        pointer-events: none;
+        transition: transform 100ms;
+      }
+    </style>
+
+    <!-- The cursor circle element that will follow the mouse -->
+    <div class="cursor" id="cursor"></div>
+
+    <script>
+      const cursor = document.getElementById('cursor');
+      document.addEventListener('mousemove', event => {
+        const x = event.clientX;
+        const y = event.clientY;
+        cursor.style.transform = `translate(${x}px, ${y}px)`;
+      });
+    </script>
+    ```
+
+  - More here: [Animated Cursor](https://dev.to/raghavbhardwaj/animated-cursor-5hcj)
+
+---
+
 ### Orchestration
 
 > **Orchestration** is the art of coordinating multiple animations to create a cohesive, delightful experience.
@@ -1106,9 +1369,16 @@ In [Action-Driven Animation section](#action-driven-animation), we saw how we ca
   - Happily, this setting now exists in all mainstream operating systems, including desktop (MacOS 10.12+, Windows 7+, Linux) and mobile (iOS, Android 9+). You can google _"reduce animations [operating system]"_ to find the specific instructions for your device.
   - Apple added a media query that Safari could use to hook into this setting: `prefers-reduced-motion`. In the years since, other browsers and operating systems have followed suit. Today, [browser support is very good](https://caniuse.com/?search=prefers-reduced-motion).
 
+- In development, we can use the devtools to simulate this setting:
+  ![devtools-prefers-reduced-motion](./img/devtools-prefers-reduced-motion.png)
+  1. Open devtools
+  2. Open the Command Menu (Cmd + Shift + P)
+  3. Type "reduced motion"
+  4. Select "Emulate prefers-reduced-motion: reduce"
+
 ---
 
-### Accessing in CSS
+### Accessing User Preference in CSS
 
 ```css
 .fancy-box {
@@ -1143,7 +1413,9 @@ In [Action-Driven Animation section](#action-driven-animation), we saw how we ca
 
   - This way, we're only applying the transition when the user has no preference. If they've opted out of animations, the transition will be disabled.
 
-### Accessing in JavaScript
+---
+
+### Accessing User Preference in JS
 
 - The media query shown above works great for animations that take place entirely from within CSS (eg. transitions, keyframe animations). However, there are many types of animations that cannot be done entirely through CSS like:
 
@@ -1184,7 +1456,9 @@ In [Action-Driven Animation section](#action-driven-animation), we saw how we ca
 
   - This listener will fire when the user toggles the "Reduce motion" checkbox in their operating system.
 
-### Accessing in React
+---
+
+### Accessing User Preference in React
 
 If you want to use this value in your React applications, you can create a custom hook based on this JS logic.
 
@@ -1714,8 +1988,6 @@ Instead of re-inventing the wheel, you can use libraries to animate elements:
   }
   ```
 
-````
-
 - it will make the transition happen when the mouse enters the element and **not** when it leaves it
 
 - instead of writing different final state in `100%`, you can call it any name and use `to <name>`
@@ -1747,5 +2019,7 @@ Instead of re-inventing the wheel, you can use libraries to animate elements:
   }
   ```
 
----
-````
+- We can inspect the animation in Chrome DevTools -> `command + shift + p` -> `show animations`
+  ![devtools-animation](./img/devtools-animation-1.png)
+  ![devtools-animation](./img/devtools-animation.png)
+  - More here in the [chrome docs](https://developer.chrome.com/docs/devtools/css/animations)
