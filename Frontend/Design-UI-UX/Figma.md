@@ -9,7 +9,11 @@
     - [Layout Grids](#layout-grids)
     - [Auto Layout](#auto-layout)
       - [Responsive Auto Layout](#responsive-auto-layout)
+    - [Components](#components)
   - [Styles and Typography](#styles-and-typography)
+  - [Variables](#variables)
+    - [Modes for variables](#modes-for-variables)
+  - [Prototyping](#prototyping)
   - [Useful Shortcuts and tips](#useful-shortcuts-and-tips)
 
 ---
@@ -78,6 +82,26 @@ Figma is a web-based design tool used for interface design, prototyping, and col
 
 ---
 
+### Components
+
+Components are reusable design elements in Figma that can be used across multiple frames and projects. They allow designers to create a single source of truth for design elements, making it easier to maintain consistency and update designs.
+
+- To create a component, select the elements you want to include and then use the `Create Component` option from the right-click menu or press `Ctrl + Alt + K` (or `Cmd + Option + K` on Mac).
+- To use a component, simply drag and drop it from the `Assets` panel onto your design canvas.
+  ![components](./img/components-1.png)
+- It's like "Prototype Inheritance in JS", where you can create a base component and then create variations of that component by overriding specific properties.
+- When you update the master component, all instances of that component will automatically update to reflect the changes.
+- **Component Properties (props)**
+
+  - They allow you to create variations of a component by exposing certain properties that can be modified in each instance. This is similar to how props work in React components.
+    ![component properties](./img/component-properties-1.png)
+    ![component properties](./img/component-properties-2.gif)
+
+- **Component Variants**
+  - Variants allow you to create multiple versions of a component within a single component set. This is useful for creating design systems where you have different states or styles for a component, such as buttons with different colors or sizes.
+
+---
+
 ## Styles and Typography
 
 - Styles in Figma are reusable design elements that can be applied to multiple layers or components. They can include colors, typography, effects, and grids. By using styles, designers can maintain consistency across their designs and make it easier to update and manage design elements.
@@ -88,6 +112,7 @@ Figma is a web-based design tool used for interface design, prototyping, and col
 - You can create shared styles for any of the following:
 
   - Colors
+    ![color styles](./img/color-styles.png)
   - Text
     ![text styles](./img/text-styles.png)
     ![text styles](./img/text-styles-1.png)
@@ -105,6 +130,55 @@ Figma is a web-based design tool used for interface design, prototyping, and col
 
   - [Themer](https://www.figma.com/community/plugin/731176732337510831/themer)
     - To manage and apply themes to your designs.
+  - [Typescales](https://www.figma.com/community/plugin/739825414752646970/typescales)
+    - To create and manage typographic scales in your designs.
+  - [Tailwind CSS Color Generator](https://www.figma.com/community/plugin/1242548152689430610/tailwind-css-color-generator)
+    - To generate Tailwind CSS color palettes and styles.
+  - [Variables to CSS](https://www.figma.com/community/plugin/1256552240995753259/variables-to-css)
+    - To export Figma variables as CSS custom properties.
+
+---
+
+## Variables
+
+Variables in Figma are a way to store and reuse values across your designs. They can be used for colors, text styles, effects, and other design properties. By using variables, designers can maintain consistency and make it easier to update and manage design elements.
+
+![variables](./img/variables-1.png)
+
+- We can access/create variables from the "Local variables" tab in the right sidebar when no elements are selected.
+  ![variables](./img/variables-2.png)
+
+- To use a variable, select an element and then in the properties panel, click on the property you want to set (e.g., fill color, text color, etc.) and then click on the variable icon to choose a variable.
+  ![using variables](./img/variables-3.png)
+  - or right-click on the element and choose "Apply variable" from the context menu.
+
+### Modes for variables
+
+- Variables can have different modes, such as **light and dark mode**. This allows designers to create designs that adapt to different themes and contexts.
+  ![modes](./img/modes-2.avif)
+  ![modes](./img/modes-1.gif)
+
+- Common use cases for modes include:
+
+  - Light and dark themes for user interfaces.
+  - Different color schemes for different brands or products.
+  - Viewport-specific styles for responsive designs (e.g., mobile vs. tablet vs. desktop).
+    ![viewport-specific styles](./img/viewport-specific-styles.png)
+  - State-specific styles for interactive elements (e.g., hover, active, disabled).
+
+---
+
+## Prototyping
+
+Prototyping in Figma allows designers to create interactive and animated designs that simulate the user experience of a website or application. With Figma's prototyping features, designers can create clickable prototypes that can be shared with stakeholders and tested with users.
+
+- To create a prototype, select an element and then click on the `Prototype` tab in the right sidebar. From there, you can create interactions by dragging the blue circle from the selected element to another frame or element.
+  ![prototyping](./img/prototyping-1.jpeg)
+  ![prototyping](./img/prototyping-2.png)
+
+- You can set different types of interactions, such as `On Click`, `While Hovering`, `After Delay`, etc., and choose different transition effects, such as `Instant`, `Dissolve`, `Move In`, `Push`, etc.
+  ![prototyping](./img/prototyping-3.jpeg)
+- You can also create overlays, which are elements that appear on top of the current frame, such as modals or dropdowns.
 
 ---
 

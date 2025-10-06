@@ -2,6 +2,9 @@
 
 - [INDEX](#index)
   - [Intro](#intro)
+  - [Internet \& Networking](#internet--networking)
+    - [Basics of Networking](#basics-of-networking)
+    - [HTTP](#http)
   - [HTML \& CSS \& Sass](#html--css--sass)
     - [HTML \& CSS](#html--css)
     - [SCSS \& Sass](#scss--sass)
@@ -26,6 +29,135 @@
 ## Intro
 
 This file summarizes key topics in this repository (Learning Notes) to be used as a quick reference guide for interviews or study purposes.
+
+---
+
+## Internet & Networking
+
+### Basics of Networking
+
+- **What is the internet?**
+
+  - The Internet is a global network of interconnected computers and servers that communicate using standardized protocols (like TCP/IP) to share information and resources.
+
+- **What is a protocol?**
+
+  - A protocol is a set of rules and conventions that govern how data is transmitted and received over a network. It ensures that devices can communicate effectively and understand each other.
+
+- **What is OSI model in short?**
+
+  - it's a framework that standardizes the steps of how data is transmitted over a network.
+
+    1. **Physical Layer:**
+       - Deals with the physical connection between devices.
+       - Sends packet to server using cables, wifi, etc.
+    2. **Data Link Layer:**
+       - Responsible for node-to-node data transfer and error detection/correction.
+       - Adds `MAC` address to the packet.
+    3. **Network Layer:**
+       - Manages packet forwarding, and routes.
+       - Adds `IP` address to the packet.
+    4. **Transport Layer:**
+       - Ensures reliable data transfer between devices.
+       - Breaks data into segments and adds `TCP`/`UDP` headers.
+    5. **Session Layer:**
+       - Establishes, maintains, and terminates connections between applications.
+    6. **Presentation Layer:**
+       - Formats data for the application (e.g., encryption (HTTPS, SSL/TLS), compression).
+    7. **Application Layer:**
+       - Process data and adds `HTTP` headers, and resolve domain to IP using `DNS`.
+
+- **What is a packet?**
+
+  - A packet is a small unit of data that is transmitted over a network. It contains both the **payload** (actual data) and **metadata** (like source and destination addresses) to ensure proper delivery.
+
+- **How can we ensure that packets are sent and received correctly over the internet?**
+
+  - Using protocols like `TCP` (Transmission Control Protocol) that establish a connection, ensure data integrity, and manage retransmission of lost packets.
+  - TCP checks that all packets are received and in the correct order.
+
+- **What is SSL/TLS?**
+
+  - SSL (Secure Sockets Layer) and TLS (Transport Layer Security) are protocols that provide secure communication over a computer network. They encrypt data to protect it during transmission.
+  - It has **Certificate** issued by a trusted authority to verify the identity of a website and establish a secure connection.
+  - it has a **"Handshake"** process to establish a secure connection between a client and server.
+
+- **What is "Handshake" in SSL/TLS?**
+
+  - The "Handshake" is a process that occurs when a client (like a web browser) connects to a server (like a website) using SSL/TLS. During the handshake, the client and server exchange information to establish a secure connection, including agreeing on encryption methods and verifying the server's identity using its SSL certificate.
+
+- **What is SSH?**
+
+  - SSH (Secure Shell) is a protocol used to securely connect to remote computers and servers over an unsecured network. It provides encrypted communication, allowing users to execute commands, transfer files, and manage systems remotely while ensuring data confidentiality and integrity.
+
+- **What is Nginx?**
+
+  - Nginx is a high-performance web server and **reverse proxy server** that is used to serve static content, handle HTTP requests, and manage load balancing for web applications. It is known for its speed, scalability, and ability to handle a large number of concurrent connections efficiently.
+
+---
+
+### HTTP
+
+- **What is HTTP?**
+
+  - HTTP (HyperText Transfer Protocol) is the protocol used for transmitting data over the web. It defines how messages are formatted and transmitted, and how web servers and browsers should respond to various commands.
+  - It's a **stateless** protocol, meaning each request is independent and does not retain any information about previous requests.
+
+- **What are HTTP methods?**
+
+  - HTTP methods are standardized ways to interact with resources on a web server. Common methods include:
+    - `GET`: Retrieve data from the server.
+    - `POST`: Submit data to the server (e.g., form submission).
+    - `PUT`: Update existing data on the server --> **Replace** the entire resource.
+    - `DELETE`: Remove data from the server.
+    - `PATCH`: Partially update existing data on the server --> **Modify** part of the resource.
+    - `HEAD`: Similar to GET but retrieves only headers, not the body.
+    - `OPTIONS`: Describe communication options for the target resource.
+
+- **What are difference between PUT vs PATCH?**
+
+  - `PUT` is used to update or replace an entire resource, while `PATCH` is used to make partial updates to a resource. `PUT` requires the full representation of the resource, whereas `PATCH` only requires the changes to be sent.
+
+- **What are differences between GET vs POST?**
+
+  - `GET`
+    - used to retrieve data from a server.
+    - sends data via URL parameters (query string).
+    - can be cached.
+    - less secure as data is visible in the URL.
+    - have limitations on the amount of data that can be sent.
+  - `POST`
+    - used to submit data to a server (e.g., form submission).
+    - sends data in the request `body`.
+    - not cached by default (as requests usually don't result in the same response).
+    - more secure as data is not visible in the URL.
+    - can handle larger amounts of data (big payloads).
+
+- **What are HTTP status codes?**
+
+  - HTTP status codes are standardized codes that indicate the result of an HTTP request. They are grouped into five categories:
+    - `1xx` (Informational): Request received, continuing process.
+    - `2xx` (Success): Request was successful (e.g., `200 OK`, `201 Created`).
+    - `3xx` (Redirection): Further action needed to complete the request (e.g., `301 Moved Permanently`, `302 Found`).
+    - `4xx` (Client Error): Client-side error (e.g., `400 Bad Request`, `401 Unauthorized`, `404 Not Found`).
+    - `5xx` (Server Error): Server-side error (e.g., `500 Internal Server Error`, `502 Bad Gateway`).
+
+- **What is the difference between HTTP and HTTPS?**
+
+  - **HTTP (HyperText Transfer Protocol)** is the standard protocol for transmitting data over the web. It is not secure, meaning that data sent between the client and server can be intercepted and read by third parties.
+  - **HTTPS (HyperText Transfer Protocol Secure)** is a secure version of HTTP that uses encryption (SSL/TLS) to protect data during transmission. This ensures that data cannot be easily intercepted or tampered with, providing a higher level of security for sensitive information.
+
+- **What are the 3 main properties of HTTPS?**
+
+  - **Privacy:** Data is encrypted.
+  - **Integrity:** Data cannot be manipulated (man-in-the-middle attacks).
+  - **Identity:** Confirms that users are communicating with the intended server **(Authentication)**.
+
+- **What are sessions and cookies?**
+
+  - **Cookies** are small pieces of data stored on the client-side (browser) that help maintain stateful information between requests. They can store user preferences, session identifiers, and other data.
+    - It's because HTTP is stateless, so cookies help remember user sessions.
+  - **Sessions** are server-side storage mechanisms that maintain user state across multiple requests. A session is typically identified by a unique session ID, which is often stored in a cookie on the client-side.
 
 ---
 
