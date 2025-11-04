@@ -1,13 +1,21 @@
 # INDEX
 
 - [INDEX](#index)
+  - [Why Use Angular for Web Applications](#why-use-angular-for-web-applications)
   - [Angular](#angular)
     - [Angular History](#angular-history)
-    - [How Angular works (Compilation)](#how-angular-works-compilation)
+    - [Angular Overview](#angular-overview)
+    - [How Angular works](#how-angular-works)
+      - [App bootstrap process](#app-bootstrap-process)
+    - [Compilation Strategy](#compilation-strategy)
+      - [Just-in-time (JIT) Compilation](#just-in-time-jit-compilation)
+      - [Ahead-of-time (AOT) Compilation](#ahead-of-time-aot-compilation)
+      - [Comparison: JIT vs AOT](#comparison-jit-vs-aot)
     - [Folders and files Structure](#folders-and-files-structure)
   - [Installation \& Updating (Angular CLI)](#installation--updating-angular-cli)
     - [Installation](#installation)
     - [Updating from old version to a new version](#updating-from-old-version-to-a-new-version)
+    - [Configuring Angular (`angular.json`)](#configuring-angular-angularjson)
   - [Components](#components)
   - [Styling and CSS](#styling-and-css)
     - [Inline style](#inline-style)
@@ -38,7 +46,6 @@
       - [Handling projected content](#handling-projected-content)
   - [Pipes](#pipes)
     - [How to use Pipes](#how-to-use-pipes)
-    - [Built-in pipes](#built-in-pipes)
     - [Custom Pipes](#custom-pipes)
     - [Chaining pipes](#chaining-pipes)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
@@ -47,6 +54,30 @@
   - [Notes](#notes)
     - [Expressions vs String Interpolation](#expressions-vs-string-interpolation)
     - [Angular HTML Escaper (Sanitization / Security)](#angular-html-escaper-sanitization--security)
+
+---
+
+## Why Use Angular for Web Applications
+
+Angular and TypeScript are excellent tools for developing web applications due to the following reasons:
+
+- **Separation of Concerns**: Angular ensures a clean separation between UI rendering and application logic. It even supports native UI rendering for platforms like iOS and Android.
+- **Modularization**: Applications can be modularized with support for lazy loading, making them scalable and efficient.
+- **Advanced Navigation**: The router handles complex navigation scenarios in single-page applications seamlessly.
+- **Loose Coupling**: Dependency injection and event binding allow for reusable, loosely coupled components and services.
+- **Component Lifecycle**: Well-defined lifecycle hooks enable developers to manage component behavior effectively.
+- **Efficient Change Detection**: Automatic and fast change detection minimizes manual UI updates while allowing fine-tuning.
+- **Simplified Asynchronous Handling**: RxJS eliminates callback hell with subscription-based asynchronous data processing.
+- **Forms and Validation**: Angular supports both template-driven and programmatic forms with robust validation mechanisms.
+- **Comprehensive Testing**: Built-in support for unit and end-to-end testing integrates seamlessly into automated build processes.
+- **Developer Tooling**: Angular CLI and IDE support streamline development with features like code generation, error detection, and optimized builds.
+- **Concise and Readable Code**: TypeScript classes and interfaces make code easier to write and maintain.
+- **Flexible Compilation**: TypeScript compiles to various JavaScript versions, and ahead-of-time compilation improves app performance.
+- **Server-Side Rendering**: [Angular Universal](https://angular.io/guide/universal) enhances SEO and search engine indexing through server-side rendering.
+- **Modern UI Components**: [Angular Material](https://material.angular.dev/) provides a rich set of over 35 well-designed UI components.
+- **Completeness compared to other frameworks**: Angular is a full-fledged framework that provides everything you need to build a web application out of the box, unlike libraries like React or Vue which require additional libraries for routing, state management, forms, etc.
+  - If you pick React or Vue.js for your project, you’ll also need to select other products that support routing, dependency injection, forms, bundling and deploying the app, and more. In the end, your app will consist of multiple libraries and tools picked by a senior developer or an architect. If this developer decides to leave the project, finding a replacement won’t be easy because the new hire may not be familiar with all the libraries and tools used in the project.
+  - The Angular framework is a platform that includes all you need for developing and deploying a web app, batteries included. Replacing one Angular developer with another is easy, as long as the new person knows Angular.
 
 ---
 
@@ -75,16 +106,73 @@ Angular is a `framework` for building **reactive** web applications.
 3. Angular has been continuously updated since then, with new versions released every 6 months
    - But note that any new version of Angular is backward compatible with the previous version, so you can upgrade your app to the latest version without breaking it
 4. The latest version of Angular is `Angular 20` (May 2025), which is the latest stable version at the time of writing this document
-   - Since Angular 16, Angular moved
+   - Since Angular 16, Angular moved to a more streamlined release process with a focus on performance improvements and smaller bundle sizes.
+5. Angular can be written in JavaScript (using the syntax of ECMAScript 5 or later versions) or TypeScript.
 
 ---
 
-### How Angular works (Compilation)
+### Angular Overview
+
+Angular is a component-based framework where an application is structured as a tree of components. Each Angular app starts with a root component, which can have child components, and those children can have their own descendants, forming a hierarchy.
+
+- Component Communication
+
+  - **Parent to Child**: Data flows from parent to child components via property binding. The child component remains unaware of the data's origin.
+  - **Child to Parent**: Child components can emit events to pass data back to the parent, without knowing the parent's implementation.
+
+- Business logic is typically implemented in **services**, which are plain classes without a UI. Angular uses dependency injection (DI) to provide instances of these services to components or other services. This promotes modularity and testability.
+
+- Components, services, and other artifacts are grouped into Angular **modules**. A module is a class annotated with `@NgModule()`, which organizes the app's building blocks
+
+  - Modules help manage the app's structure and dependencies, making it easier to scale and maintain.
+
+- **Components** are the core building blocks of Angular applications. Each component consists of:
+
+  - **HTML Template**: Defines the UI, either inline (`template`) or in a separate file (`templateUrl`).
+  - **CSS Styles**: Defines the styling, either inline (`styles`) or in a separate file (`styleUrls`).
+  - **Logic**: Encapsulated in a TypeScript class.
+
+  ```ts
+  @Component({
+    selector: 'app-search', // the custom HTML tag for this component (other components can use the <app-search> tag to include this component)
+    templateUrl: './search.component.html', // path to the HTML template file
+    styleUrls: ['./search.component.css'] // path to the CSS styles file (there could be multiple files)
+  })
+  export class SearchComponent {
+    // Component logic here
+  }
+  ```
+
+- A component is a class with a UI, and a service is a class where you implement the business logic of your app
+
+- **Single-Page Applications (SPAs) and Angular Router**
+
+  - Angular is ideal for building SPAs, where only parts of the page update dynamically without a full page reload. This is achieved using the Angular Router, which manages client-side navigation.
+
+  - Use `<router-outlet>` to define where child components will render within a parent component.
+
+---
+
+### How Angular works
+
+#### App bootstrap process
 
 - **This is how Angular works under the hood (App bootstrap process)**
 
   1. When you run the `ng serve` command, Angular CLI starts a development server that serves the app, and compiles the app code into JavaScript code that the browser can understand
      ![compilation](./img/compilation-1.png)
+
+     - The `ng serve` command builds the bundles **in memory** without generating files.
+
+     - When you modify and save a file, Angular CLI rebuilds the bundles in memory, allowing you to see changes instantly. The following JavaScript bundles are generated:
+
+       - `inline.bundle.js`: Used by Webpack loader to load other files.
+       - `main.bundle.js`: Contains your application code (components, services, etc.).
+       - `polyfills.bundle.js`: Includes polyfills for older browsers.
+       - `styles.bundle.js`: Contains CSS styles for your app.
+       - `vendor.bundle.js`: Includes Angular framework code and dependencies.
+
+     - Each bundle includes a source map for debugging TypeScript code. While `vendor.bundle.js` **may seem large during development, its size is significantly reduced in production builds, so don't worry about it**.
 
   2. The server sends the `index.html` file to the browser **(Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)**
      ![compilation](./img/compilation-2.png)
@@ -123,36 +211,65 @@ Angular is a `framework` for building **reactive** web applications.
   5. Angular inspects the main `app-component` for any sub-components that need to be rendered and creates instances of those components as well.
      - It continues this process recursively until all components in the app have been instantiated and rendered.
 
-> **Compilation** is the process of converting the Angular code into `Javascript` code that the browser can understand
+---
 
-- **There are 2 types of compilation strategies in Angular:**
+### Compilation Strategy
 
-- Just-in-time compilation
-  ![Just-in](./img/justintime.PNG)
+**Compilation** is the process of converting the Angular code into `Javascript` code that the browser can understand
 
-  - Here, the server compiles typescript code into javascript code
-  - Then, the browser downloads the javascript code (including the Angular framework) and runs & compiles it
-  - This is the default compilation strategy in Angular
-  - It's good for development because it's faster to compile and run the app, but it's slower for the browser to load and run the app
-  - It's good for small to medium-sized apps
-  - It's not used in production because it's slower for the browser to load and run the app
+> It's the process of transforming the Angular templates and TypeScript code into efficient JavaScript code that can be executed by the browser. ex: structural directives like `*ngIf`, `*ngFor` are converted into JavaScript code that manipulates the DOM directly.
 
-- Ahead-of-time compilation
-  ![head-of](./img/headoftime.PNG)
+- **There are 2 types of compilation strategies in Angular:** JIT and AOT
 
-  - Here, the server compiles typescript code into javascript code (same as JIT)
-  - Then, the server compiles the javascript code into a bundle that the browser can understand
-  - The browser downloads the bundle and runs it immediately (no need to compile it)
-  - It's good for production because it's faster for the browser to load and run the app
+#### Just-in-time (JIT) Compilation
 
-  - It's faster and more efficient ✅
-    ![jit-aot](./img/jit-vs-aot.PNG)
+![Just-in](./img/justintime.PNG)
+
+- **Definition**: Compilation happens in the browser when the app bundles are loaded.
+- **Process**:
+  - Angular compiler (`ngc`) compiles templates into JavaScript at runtime **in the browser**.
+  - Bundles like `vendor.bundle.js` and `main.bundle.js` are loaded, and templates are compiled just-in-time.
+- **Advantages**:
+  - Faster development builds.
+  - Ideal for small to medium-sized apps.
+- **Drawbacks**:
+  - Slower app load time in the browser.
+  - Larger bundle size due to the inclusion of the Angular compiler.
+- **Usage**: Recommended for development, not production.
+
+#### Ahead-of-time (AOT) Compilation
+
+![head-of](./img/headoftime.PNG)
+
+- **Definition**: Templates are precompiled into JavaScript during the build process.
+- **Process**:
+  - Angular compiler runs during the build phase, generating optimized JavaScript bundles.
+  - Browser loads precompiled bundles directly.
+- **Advantages**:
+  - Faster app load time.
+  - Smaller bundle size. because the Angular compiler is not included in the bundles.
+  - Improved performance and security.
+- **Usage**: Recommended for production builds.
+
+#### Comparison: JIT vs AOT
+
+![jit-aot](./img/jit-vs-aot.PNG)
+
+> Think of JIT as client-side rendering (CSR) and AOT as server-side rendering (SSR) in terms of when the compilation happens.
+
+| Feature              | JIT Compilation | AOT Compilation |
+| -------------------- | --------------- | --------------- |
+| **Compilation Time** | In the browser  | During build    |
+| **App Load Time**    | Slower          | Faster          |
+| **Bundle Size**      | Larger          | Smaller         |
+| **Use Case**         | Development     | Production      |
+
+- **Default**: Starting from Angular 18, AOT is the default compilation strategy. and no need to specify it in the `angular.json` file
+- **Incremental DOM**: Angular efficiently updates the DOM by comparing changes, similar to React's Virtual DOM.
 
 - selecting platform to run the app (`Compilation Strategy`)
 
-![jit-aot](./img/jit-vs-aot2.PNG)
-
-- **Note:** Starting from Angular 18, the default compilation strategy is `AOT` (Ahead-of-time compilation), and no need to specify it in the `angular.json` file
+  ![jit-aot](./img/jit-vs-aot2.PNG)
 
 - **Incremental DOM**
 - it's a technique used by Angular to update the DOM efficiently
@@ -243,23 +360,24 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 
 **Angular CLI** is a command-line interface tool that helps you to create, develop, and maintain Angular applications.
 
-### Installation
-
 it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `Typescript`, etc.) that are needed for Angular development.
 
 ![cli](./img/cli.PNG)
 
+### Installation
+
 - Installing `Angular CLI` globally to use it in the terminal
 
-```bash
-npm install -g @angular/cli
-```
+  ```bash
+  npm install -g @angular/cli
+  ```
 
 - ng-commands
 
   ```sh
   # Creating new project
   ng new <project_name>
+  # This command creates a new directory and generates an Angular project with one module, one component, and all necessary configuration files, including `package.json`. It also installs all dependencies automatically using npm.
 
   # Create new project with flags (routing, style, strict)
   ng new <project_name> --routing --style=scss --no-strict
@@ -269,6 +387,9 @@ npm install -g @angular/cli
 
   # Generating new component
   ng generate component <name of component>
+  # You can provide some options like the path where to create the component, or whether to create a (test file, inline template, inline styles, etc.)
+  # ng generate component <name of component> --path=<path> --inline-template --inline-style --skip-tests
+
   # Generating new module
   ng generate module <name of module>
 
@@ -284,6 +405,49 @@ npm install -g @angular/cli
 ### Updating from old version to a new version
 
 [Update Guide](https://angular.dev/update-guide)
+
+---
+
+### Configuring Angular (`angular.json`)
+
+`angular.json` file is the main configuration file for Angular projects
+
+- It contains information about the project structure, build options, and other settings
+- You can configure various aspects of your Angular project using this file, such as:
+
+  - **Build options**: You can specify the build options for your project, such as the output directory, optimization settings, and more.
+  - **Serve options**: You can configure the development server settings, such as the port number, proxy settings, and more.
+  - **Test options**: You can specify the test options for your project, such as the test framework, code coverage settings, and more.
+  - **Lint options**: You can configure the linting settings for your project, such as the linting rules, file patterns to include/exclude, and more.
+
+- **Styles configuration**
+
+  > Usually in order to add global styles or external library styles to your Angular project, you need to add them to the `.html` file using the `<link>` tag. But in Angular, you can also add them to the `angular.json` file in the `styles` array.
+
+  - You can add global styles to your project by specifying the stylesheets in the `styles` array
+
+    ```json
+    "styles": [
+      "src/styles.css", // can contain multiple stylesheets by importing them inside this file
+      "src/custom-styles.scss",
+      "node_modules/bootstrap/dist/css/bootstrap.min.css" // external library styles
+    ]
+    ```
+
+- **Scripts configuration**
+
+  > Usually in order to add global scripts or external library scripts to your Angular project, you need to add them to the `.html` file using the `<script>` tag. But in Angular, you can also add them to the `angular.json` file in the `scripts` array.
+
+  - You can add global scripts to your project by specifying the script files in the `scripts` array
+
+    ```json
+    "scripts": [
+      "src/scripts.js",
+      "node_modules/jquery/dist/jquery.min.js", // external library scripts
+      "node_modules/bootstrap/dist/js/bootstrap.min.js"
+    ]
+    ```
+  - When you’re running the `ng serve` or `ng build` commands, the preceding scripts will be placed in the `scripts.bundle.js` file.
 
 ---
 
@@ -474,6 +638,10 @@ Sometimes you want to apply styles to a component, but you don't want those styl
 
 **Data-binding** is a way to pass data from the component class to the component template and vice versa (Communication between the component class and the template)
 
+> Angular has a mechanism called **data binding** that allows you to keep a component’s properties in sync with the view.
+>
+> Angular supports 2 types of data binding: **one-way (Unidirectional) data binding** and **two-way data binding**.
+
 ![data binding](./img/databinding2.PNG)
 ![data binding](./img/databinding.PNG)
 
@@ -566,24 +734,27 @@ It's a way to bind an event of an HTML element to a method in the component clas
 
 ### 2-way-binding
 
-- it's the ability to being able to listen to events and update a property simultaneously
+It's the ability to being able to listen to events and update a property simultaneously
+
 - It's usually used with form elements like `input`, `select`, and `textarea`
 - It's a combination of property binding and event binding, and it's done using the `ngModel` directive
 
-  ```html
-  <input [(ngModel)]="name" />
-  <p>{{ name }}</p>
+  - Remember, **square brackets represent property binding**, and **parentheses represent event binding**. To denote two-way binding, surround a template element’s ngModel with both square brackets and parentheses.
 
-  <!-- Instead of -->
-  <input [value]="name" (input)="name = $event.target.value" />
-  <p>{{ name }}</p>
-  ```
+    ```html
+    <input [(ngModel)]="name" />
+    <p>{{ name }}</p>
+
+    <!-- Instead of -->
+    <input [value]="name" (input)="name = $event.target.value" />
+    <p>{{ name }}</p>
+    ```
 
   - here the `ngModel` directive is doing 2 tasks:
     - set value of the attribute with property-binding
     - **Emit an event** when the property changes in the template
 
-- **⚠️ Note:** In order to use `ngModel`, you need to import the `FormsModule` in the `app.module.ts` file
+- **⚠️ Note:** In order to use `ngModel`, you need to import the `FormsModule` in the `app.module.ts` file (or the feature module where you want to use it)
 
   ```ts
   import { FormsModule } from '@angular/forms';
@@ -596,6 +767,8 @@ It's a way to bind an event of an HTML element to a method in the component clas
   })
   export class AppModule {}
   ```
+
+---
 
 #### Custom 2-way binding
 
@@ -694,6 +867,10 @@ It's a way to bind an event of an HTML element to a method in the component clas
 
 It's a way to extend the HTML with custom behavior and functionality **(Enhancements to HTML)**, allowing you to create reusable components and manipulate the DOM in a declarative way.
 
+> Think of an Angular directive as an HTML enhancer. Directives allow you to teach an old HTML element new tricks. A directive is a class annotated with the `@Directive()` decorator.
+>
+> A directive can’t have its own UI, but can be attached to a component or a regular HTML element to change their visual representation.
+
 - **Angular directives** are extended `HTML attributes` with the prefix `"ng-"` (or `[]`, `*` syntax).
   ![directives](./img/directives-0.png)
 
@@ -704,8 +881,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   ![Directives](./img/Directives.png)
   ![Directives](./img/Directives-1.png)
 
-- Angular has built-in directives:
-  - [Structural directives](#structural-directives): Change the DOM structure by adding/removing elements.
+  - [Structural directives](#structural-directives): Change the DOM (component's template) structure by adding/removing elements.
     - `*ngIf`: Conditionally remove/recreate DOM.
     - `*ngFor`: Repeat DOM for each list item.
     - `*ngSwitch`: Swap DOM based on expression.
@@ -1389,6 +1565,8 @@ It's a way to reference an element in the template so that you can access it in 
 
 It's a way to transform data **in the template** before displaying it, and it's used to format data in a specific way.
 
+> A pipe is a template element that allows you to transform a value into a desired output. A pipe is specified by adding the vertical bar `(|)` and the pipe name right after the value to be transformed
+
 ![pipe](./img/pipes.png)
 ![pipe](./img/pipes-1.png)
 ![pipe](./img/pipes-2.png)
@@ -1442,7 +1620,9 @@ In order to use a pipe, you need 2 steps:
    - You can use the pipe in the template by using the `|` (pipe) operator followed by the pipe name and optional arguments
 
    ```html
-   <p>{{ data | pipeName:arg1:arg2:... }}</p>
+   <!-- <p>{{ data | pipeName:arg1:arg2:... }}</p> -->
+   <p>{{ data | date:'short' }}</p>
+   <!-- this converts the date to a short format, ex: 6/15/15
    ```
 
 - [date-pipe format options](https://angular.io/api/common/DatePipe#pre-defined-format-options)

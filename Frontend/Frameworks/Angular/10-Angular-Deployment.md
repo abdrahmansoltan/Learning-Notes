@@ -35,6 +35,12 @@ When deploying an Angular application, it's crucial to understand the difference
 
 ## Production Build Steps
 
+> When using the `ng serve` command, **bundles are built in memory**. To generate production files, use the `ng build` command, which outputs files **(build the bundles in disk)** to the `dist/` directory. However, these files are not optimized.
+>
+> To optimize the build, use: `ng build --prod`
+>
+> This command generates optimized files, but they are not compressed. You can apply `gzip` compression afterward for further optimization. Once the files are built, deploy the contents of the `dist/` folder to your web server. Ensure the server is configured to serve the `index.html` file for all routes.
+
 - To create a production build of your Angular application, follow these steps:
 
   1. **Update Environment Configuration**:
@@ -47,10 +53,20 @@ When deploying an Angular application, it's crucial to understand the difference
      ```
 
      - This command will optimize the build for production, including minification and tree-shaking.
+     - Applying the `--prod` option during the build process significantly reduces the bundle size by optimizing the code. This includes (renaming variables to shorter names, removing comments and empty lines, and eliminating most unused code).
      - The output will be placed in the `dist/` folder 📁 of your Angular project.
 
   3. **Deploy the Application**:
      After the build is complete, deploy the contents of the `dist/` folder to your web server or hosting platform.
+
+- You can also check the build version in development using this command:
+
+  ```sh
+  ng serve --prod
+  ```
+
+  - This will serve the application in production mode locally for testing purposes.
+  - You will notice in the network tab of the browser dev tools that the bundle sizes are significantly smaller compared to the development build.
 
 - Angular supports different types of deployment, including:
   - static file hosting

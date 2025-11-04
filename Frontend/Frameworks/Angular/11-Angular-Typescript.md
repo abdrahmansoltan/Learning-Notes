@@ -35,7 +35,11 @@ Models are used to define the structure of data in Angular applications. They ar
 
 ## Decorators
 
-They're a typescript feature that allows you to **enhance or modify** classes and their properties and methods. They're used to add metadata to classes, methods, and properties.
+They're a typescript feature that allows you to **enhance or modify** classes and their properties and methods. They're used to add **metadata** to classes, methods, and properties.
+
+> In the case of classes, **metadata** refers to additional information about the class. For example, the `@Component()` decorator tells Angular (the metadata processor) that this is not a regular class, but a component. Angular generates additional JavaScript code based on the information provided in the properties of the `@Component()`
+>
+> `nsdecorator` to turn a class into a UI component. The `@Component()` decorator doesn’t change the internals of the decorated class but adds some data describing the class so the Angular compiler can properly generate the final code of the component.
 
 - Decorators are a design pattern that is used to separate modification or decoration of a class without modifying the original class.
 - Decorators are used to add metadata to a class, method, or property.

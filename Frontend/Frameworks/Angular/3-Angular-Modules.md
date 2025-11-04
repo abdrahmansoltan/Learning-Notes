@@ -3,6 +3,7 @@
 - [INDEX](#index)
   - [Modules](#modules)
     - [How Modules work (`NgModule`)](#how-modules-work-ngmodule)
+    - [Explaining an example module](#explaining-an-example-module)
     - [Module Types](#module-types)
     - [Why use Modules ?](#why-use-modules-)
   - [Creating and using modules](#creating-and-using-modules)
@@ -20,6 +21,10 @@
 
 **It's a way to organize the code into different modules based on their functionality**, which helps in separating the code into different modules based on their functionality and makes it easier to manage and maintain the code
 ![module](./img/modules-0.png)
+
+> An Angular module is a container for a group of related components, services, directives, and pipes. You can think of a module as a package that implements certain functionality from the business domain of your application, such as a (shipping or billing module). All elements of a small application can be located in one module (the root module), whereas larger apps may have more than one module (feature modules).
+>
+> All apps must have at least a root module that’s bootstrapped during app launch.
 
 - A **module** is a container for a set of related components, services, directives, and pipes
 - An app can have multiple modules, each containing related components and services.
@@ -53,7 +58,7 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
     imports: [BrowserModule], // to import other modules that we will depend on (inside the module)
     exports: [], // to export components to other modules (for shared modules or any other modules)
     providers: [], // to provide services
-    bootstrap: [AppComponent] // to bootstrap the app
+    bootstrap: [AppComponent] // to bootstrap the app (only in the root module)
   })
   ```
 
@@ -61,13 +66,16 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
     ![declarations](./img/modules-5.png)
 
     - It's used to declare components, directives, and pipes that belong to this module and need to be compiled
+    - A **feature module** may **declare** its own components and services, but to make all or some of them visible to other modules, you need to **export** them.
     - when using `ng generate component` command, the new component will be automatically added to the `declarations` array of the module
 
   - `imports` & `exports`
     ![imports](./img/modules-6.png)
 
     - `imports` is used to import other modules/components that we will depend on (inside the module)
+      - Usually, we import `CommonModule` in feature modules to have access to common directives like `ngIf` and `ngFor`, and we import `BrowserModule` in the root module to have access to all the features of Angular for web applications
     - `exports` is used to export components/directives/pipes that we want to make available to other modules that will import this module
+      - External modules will see only those members of the shipping module that were explicitly mentioned in exports.
 
   - `providers`
 
@@ -77,6 +85,7 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
 
     - It's used to bootstrap the application with the root module
     - It's only used in the **root module** (usually `app.module.ts`)
+    - **Feature modules** doesn’t include the `bootstrap` property, because bootstrapping the entire app is the responsibility of the **root module**.
 
 - **Notes:**
 
@@ -90,6 +99,23 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
       .bootstrapModule(AppModule)
       .catch(err => console.error(err));
     ```
+
+---
+
+### Explaining an example module
+
+A typical Angular module is a small class that has an empty body, unless you want to write code that manually bootstraps the application—for example, if an app includes a legacy AngularJS app. The `@NgModule()` decorator lists all components, directives, and pipes that belong to the module.
+
+```ts
+@NgModule({
+  declarations: [AppComponent], // -> Declares that the AppComponent belongs to this module
+  imports: [BrowserModule], // -> Imports BrowserModule to have access to common directives like ngIf and ngFor (Needed for any web-based Angular app)
+  bootstrap: [AppComponent] // -> Specifies the root component that Angular should bootstrap when it starts the application (the root component of the app)
+})
+export class ExampleModule {}
+```
+
+- A typical module lists several components, and the root component is specified in the bootstrap property of the module. also lists `BrowserModule`, which is a must for apps that run in a browser.
 
 ---
 

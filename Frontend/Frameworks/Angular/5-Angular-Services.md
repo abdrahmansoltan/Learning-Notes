@@ -24,6 +24,8 @@
 
 It's a class that is used to **share data and logic between components** in Angular applications
 
+> For cleaner code separation, we usually don’t use a component for code that fetches or manipulates data. An injectable service is the right place for handling data. A component may depend on one or more services.
+
 - It has often a single responsibility, meaning that it does one thing and does it well, so it can be reused in multiple components, (_e.g. fetching data from an API, handling authentication, etc_).
 
 ![service](./img/services-1.png)

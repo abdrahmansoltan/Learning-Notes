@@ -4,6 +4,7 @@
   - [Components](#components)
     - [Creating Components](#creating-components)
     - [Component example](#component-example)
+    - [Component Selector](#component-selector)
     - [Component properties](#component-properties)
     - [Component Lifecycles](#component-lifecycles)
       - [ngOnInit()](#ngoninit)
@@ -120,42 +121,6 @@ A component should present properties and methods for data binding, in order to 
   }
   ```
 
-- now in `"nav.component.html"` you can use this component like an html element or as a `directive`
-
-  ```html
-  <app-nav></app-nav>
-
-  <!-- or as a directive -->
-  <div app-nav></div>
-  ```
-
-  - When using the component, you must match the `selector` with the name of the component -> `app-nav`
-  - It's a good practice to use the `app-` prefix for the component selector to avoid conflicts with native HTML elements, ex: `app-header` instead of `header` which will conflict with the native HTML `<header>` element
-  - we can also overwrite the `selector` to be any type of selector like `class` or `attribute` selector (also you can use combinators like `tag.class` or `tag[attribute]`)
-
-    ```ts
-    @Component({
-      selector: '.app-nav', // class selector
-      // or
-      selector: '[app-nav]' // attribute selector
-    })
-    ```
-
-    ```html
-    <!-- class selector -->
-    <div class="app-nav"></div>
-    <!-- attribute selector -->
-    <div app-nav></div>
-    ```
-
-  - Also you can have multiple selectors for the same component by using an array of selectors
-
-    ```ts
-    @Component({
-      selector: ['app-nav', '.app-nav', '[app-nav]'] // multiple selectors
-    })
-    ```
-
 - **Notes:**
 
   - We can write the `HTML` code directly in the component file using the `template` property instead of using the `templateUrl` property
@@ -178,21 +143,80 @@ A component should present properties and methods for data binding, in order to 
     })
     ```
 
-  - We can use the `selector` property to be any type of selector like `tag`, `class`, or `attribute`
+---
+
+### Component Selector
+
+- The `selector` property in the `@Component` decorator defines the custom HTML tag that represents the component.
+- This selector can be used in the component's template to include the component itself.
+
+  ```html
+  <!-- in app.component.html -->
+  <app-nav></app-nav>
+  <!-- using the NavComponent here -->
+  ```
+
+  - When using the component, you must match the `selector` with the name of the component -> `app-nav`
+
+- **Selector Prefix:**
+
+  - The `selector` property in the `@Component` decorator defines the custom HTML tag for the component. By default, Angular uses the `app-` prefix for selectors in applications and `lib-` for libraries.
+
+  - **Custom Prefix**: You can specify a custom prefix for your components to better identify them. For example, if your project is named `Hello CLI`, you might use the `hello-` prefix.
+
+    ```sh
+    ng generate component product --prefix hello
+    ```
+
+    - This command generates a component with the selector `hello-product`.
+
+  - **Global Prefix**: To ensure all components use a specific prefix, set it in the `angular.json` file under the `prefix` property.
+
+    ```json
+    {
+      "projects": {
+        "your-project-name": {
+          "prefix": "hello"
+        }
+      }
+    }
+    ```
+
+  - **Best Practice**: Use prefixes like `app-` or `hello-` to avoid conflicts with native HTML elements. like `app-header` instead of `header`.
+
+- **Selector Types**: You can use different types of selectors:
+
+  - **Tag Selector**: `<app-nav></app-nav>`
+  - **Class Selector**: `<div class="app-nav"></div>`
+  - **Attribute Selector**: `<div app-nav></div>`
 
     ```ts
-    selector: 'app-nav'; // element tag selector
-    selector: '.app-nav'; // class selector
-    selector: '[app-nav]'; // attribute selector
+    @Component({
+      selector: 'app-nav', // tag selector
+      // or
+      selector: '.app-nav', // class selector
+      // or
+      selector: '[app-nav]' // attribute selector
+    })
     ```
 
     ```html
-    <!-- element tag selector -->
+    <!-- tag selector -->
     <app-nav></app-nav>
+
     <!-- class selector -->
     <div class="app-nav"></div>
+
     <!-- attribute selector -->
     <div app-nav></div>
+    ```
+
+  - Also you can have multiple selectors for the same component by using an array of selectors
+
+    ```ts
+    @Component({
+      selector: ['app-nav', '.app-nav', '[app-nav]'] // multiple selectors
+    })
     ```
 
 ---
