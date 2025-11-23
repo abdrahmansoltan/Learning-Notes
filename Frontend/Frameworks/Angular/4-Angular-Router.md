@@ -4,25 +4,30 @@
   - [Angular Router](#angular-router)
     - [Adding Routing to an Angular App](#adding-routing-to-an-angular-app)
   - [Router configuration](#router-configuration)
+    - [Router Outlet](#router-outlet)
     - [Routes](#routes)
       - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
-    - [Dynamic Routes](#dynamic-routes)
+    - [Dynamic Routes (Routes with parameters)](#dynamic-routes-routes-with-parameters)
       - [Accessing Dynamic Route Parameters and query parameters](#accessing-dynamic-route-parameters-and-query-parameters)
-    - [Nested Routes (Children)](#nested-routes-children)
+    - [Nested Routes (child routes)](#nested-routes-child-routes)
     - [Redirecting Routes](#redirecting-routes)
     - [Adding data to routes](#adding-data-to-routes)
       - [Adding static data to routes](#adding-static-data-to-routes)
       - [Adding dynamic data to routes (Resolvers)](#adding-dynamic-data-to-routes-resolvers)
       - [Adding title to routes window tab](#adding-title-to-routes-window-tab)
-  - [Using the Router](#using-the-router)
+  - [Router Data (route)](#router-data-route)
     - [Route Properties (Params and Query Params)](#route-properties-params-and-query-params)
       - [`ActivatedRoute`](#activatedroute)
       - [`ActivatedRouteSnapshot` and `RouterStateSnapshot`](#activatedroutesnapshot-and-routerstatesnapshot)
-  - [Navigation (Router Links)](#navigation-router-links)
+  - [Router Navigation (router)](#router-navigation-router)
+    - [Location strategies](#location-strategies)
+      - [Hash-based Navigation](#hash-based-navigation)
+      - [History API-based navigation (Default)](#history-api-based-navigation-default)
     - [`routerLink`](#routerlink)
     - [Styling the Router Links](#styling-the-router-links)
     - [Navigating to route programmatically](#navigating-to-route-programmatically)
     - [Relative Router Link References (Nested Routes)](#relative-router-link-references-nested-routes)
+  - [Router Events](#router-events)
   - [Lazy Loading](#lazy-loading)
     - [Implementing Lazy Loading](#implementing-lazy-loading)
       - [Old way of lazy loading (modules)](#old-way-of-lazy-loading-modules)
@@ -42,7 +47,9 @@
 
 **Angular Router** is a powerful module that allows you to create single-page applications (SPAs) with Angular. It enables navigation between different views or components in your application without reloading the entire page.
 
-> **Single Page Application (SPA)**: A web application that loads a **single HTML page** and dynamically updates the content as the user interacts with the app, without requiring a full page reload.
+> - **Single Page Application (SPA)**: A web application that loads a **single HTML page** and dynamically updates the content as the user interacts with the app, without requiring a full page reload.
+>
+> - You can think of a router as an object responsible for the view state of the application. Every application has one router object, and you need to configure the routes of your app.
 
 - It provides a way to define routes, navigate between them, and manage the state of the application
 - Angular **watches & manipulates the browser's URL** to determine which component to render based on the current route
@@ -64,6 +71,8 @@
 - **Add routing to an existing app**
 
   - **Option 1: module-based routing**
+
+    > **Generating Router Module in more details** -> [Router module](./3-Angular-Modules.md#router-module)
 
     - Create a new module for routing
 
@@ -121,8 +130,6 @@
       export class AppComponent {}
       ```
 
-- **Generating Router Module** -> [Router module](./2-Angular-Modules.md#router-module)
-
 ---
 
 ## Router configuration
@@ -138,17 +145,47 @@
   const routes: Routes = [{ path: 'first-component', component: FirstComponent }]; // sets up routes constant where you define your routes
 
   @NgModule({
-    imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule]
+    imports: [RouterModule.forRoot(routes)], // <- Creates a router module and a service for the app root module
+    exports: [RouterModule] // <- Makes module and router directives accessible from other modules
   })
   export class AppRoutingModule {}
   ```
 
-- The `RouterModule.forRoot(routes)` method is used to configure the routes of the app and the `routes` constant is used to define the routes
+- The `RouterModule.forRoot(routes)`
+  - Because route configuration is done on the module level, you need to let the app module know about the routes in the `@NgModule()` decorator. If you declare routes for the root module, use the `forRoot()` method.
+  - It's a method is used to configure the routes of the app and the `routes` constant is used to define the routes
 - Each route in this array is a `JavaScript object` that contains two properties.
   - `path` -> defines the URL path for the route.
   - `component` -> defines the component Angular should use for the corresponding path.
 - We can also use `RouterModule.forChild(routes)` to configure child routes
+  - If you’re configuring routes for a feature module (not for the root one), use the `forChild()` method, which also creates a router module but doesn’t create the router service (`forRoot()` should have created the service by now), as you can see in the following listing.
+
+---
+
+### Router Outlet
+
+It's the placeholder that Angular uses to display the component based on the current route.
+
+![router-outlet](./img/router-outlet-1.png)
+
+- We have main `<router-outlet>` in the `app.component.html` file to display the component based on the current route
+
+  ```html
+  <!-- in app.component.html -->
+  <h1>Angular Router App</h1>
+  <nav>
+    <ul>
+      <li>
+        <a routerLink="/first-component" routerLinkActive="blue-text">First Component</a>
+      </li>
+    </ul>
+  </nav>
+  <!-- The routed views render in the <router-outlet>-->
+  <router-outlet></router-outlet>
+  ```
+
+- We also can have multiple `<router-outlet>` in the app to display nested routes (child routes)
+  ![router-outlet](./img/router-outlet-2.png)
 
 ---
 
@@ -179,7 +216,10 @@
 
   - The `HomeComponent` is the component that will be displayed when the app is loaded
 
-- **Wildcard route** : The wildcard route is defined by the path `**` and is usually the last route in the `Routes` array
+- **Wildcard route**
+
+  - The wildcard route is defined by the path `**` and is usually the last route in the `Routes` array
+  - It's used to handle any route that does not match the other routes, instead of showing a blank page or an error
 
   ```ts
   const routes: Routes = [
@@ -191,6 +231,7 @@
   ```
 
   - The `PageNotFoundComponent` is the component that will be displayed when the route does not match any of the other routes
+  - It must be the last route in the `Routes` array because the router uses the first match it finds, or it will always match the wildcard route and never reach the other routes (as other routes will be ignored)
 
 - **Notes:**
 
@@ -236,7 +277,7 @@
 
 ---
 
-### Dynamic Routes
+### Dynamic Routes (Routes with parameters)
 
 **Dynamic routes** are routes that contain parameters in the URL, which can be used to pass data to the component
 
@@ -245,19 +286,27 @@
   ```ts
   const routes: Routes = [
     { path: 'users/:id', component: UserComponent },
-    { path: 'products/:id', component: ProductComponent }
+    { path: 'products/:id', component: ProductComponent } // if the url contains the fragment 'product' followed by a value, the ProductComponent will be displayed and passed the id parameter
   ];
   ```
 
   - The `:id` in the path is a dynamic parameter that can be used to pass data to the component
   - The `id` parameter can be accessed in the component using the `ActivatedRoute` service
 
+- **Important Notes:**
+
+  - Dynamic route parameters are different from query parameters.
+    - Dynamic route parameters are part of the URL path and are defined in the route configuration, and they're **required** by default when navigating to the route.
+    - Query parameters are **optional** and are added to the URL after a `?` character, and they can be accessed in any route without being defined in the route configuration.
+
 #### Accessing Dynamic Route Parameters and query parameters
+
+> **Note:** Because query parameters are optional and not scoped to a specific route, they don't require to be defined in the route path. You can add query parameters to any route without modifying the route configuration.
 
 - To access the dynamic route parameters (or query parameters) in the component, We have 2 options:
 
   1. **Using the `ActivatedRoute` service** (recommended ✅)
-  2. accessing the paramater as an `input` property of the component
+  2. Accessing the paramater as an `input` property of the component
      - This is not recommended because it doesn't provide live updates when the route parameter changes (but it can be useful in some cases)
 
 - **Option 1:** use the `ActivatedRoute` service (Observables)
@@ -322,7 +371,7 @@
 
 ---
 
-### Nested Routes (Children)
+### Nested Routes (child routes)
 
 **Nested routes** are routes that are defined inside another route and are used to create a hierarchy of routes
 ![nested-routes](./img/nested-routes-1.png)
@@ -515,7 +564,7 @@ You can add a title to the window tab of the browser when navigating to a route 
 
 ---
 
-## Using the Router
+## Router Data (route)
 
 Angular doesn't replace the entire page when navigating between routes, it only updates the view based on the current route. This is done using the `<router-outlet>` directive which acts as a placeholder for the component that will be displayed based on the current route.
 
@@ -557,7 +606,7 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
     ```
 
 - The `ActivatedRoute` has multiple properties that can be used to access the route parameters and query parameters.
-- It provides access to information from the current route in 2 ways: (Observables and Snapshots)
+- It provides access to information from the current route in **2 ways: (Observables and Snapshots)**
   ![activated-route](./img/activated-route-0.png)
 
   - **Using Observables** (recommended ✅)
@@ -589,7 +638,7 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
     - It doesn't provide live updates when the route parameters or query parameters change
 
     ```ts
-    ngOnInit() {
+    ngOnInit() { // or in the constructor
       console.log(this.route.snapshot.params.id); // log the route parameter id
       console.log(this.route.snapshot.queryParams.id); // log the query parameter id
     }
@@ -621,6 +670,10 @@ In order to access the route parameters, we can use the `ActivatedRoute` service
     }
   }
   ```
+
+> **When to use Observables vs Snapshots?**
+>
+> The snapshot property of ActivatedRoute gives you the route parameters just once—when the component loads. Use it if the parameters never change. If the parameters can change while the component is active (like clicking different products), use ActivatedRoute.paramMap and subscribe to it, so your component updates automatically.
 
 - **Notes:**
 
@@ -669,7 +722,77 @@ They are used to access the route parameters and query parameters of the route *
 
 ---
 
-## Navigation (Router Links)
+## Router Navigation (router)
+
+### Location strategies
+
+**URL Structure:**
+A typical URL consists of several parts:
+
+```diagram
+http://mysite.com:8080/users/123?sort=name#section
+│      │         │    │        │         │
+│      │         │    │        │         └─ Fragment (hash)
+│      │         │    │        └─ Query parameters
+│      │         │    └─ Path segments
+│      │         └─ Port number
+│      └─ Domain name
+└─ Protocol
+```
+
+In a non-SPA, changing any character in the preceding URL results in a new request to the server. In SPAs, you need the ability to modify the URL without forcing the browser to make a server-side request so the application can locate the proper view on the client. Angular offers two location strategies for implementing client-side navigation: **(HashLocationStrategy & PathLocationStrategy)**
+
+#### Hash-based Navigation
+
+Hash-based navigation uses a `#` in the URL to separate the base URL from the client-side route. This strategy works in all browsers, including older ones, and doesn't require server configuration.
+
+- Example: `http://localhost:4200/#/users/123`
+  - The part after `#` is handled by the client and not sent to the server.
+  - Gmail uses this strategy for its web app.
+- It works with all browsers, including older ones.
+- To enable this strategy in Angular, configure the `HashLocationStrategy`:
+
+```ts
+// 📄 app.module.ts
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
+
+@NgModule({
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }] // <- provide HashLocationStrategy
+})
+export class AppModule {}
+```
+
+#### History API-based navigation (Default)
+
+The browser's History API allows you to move back and forth through the user's navigation history as well as programmatically manipulate the history stack. In particular, the `pushState()` method is used to attach a segment to the base URL as the user navigates your SPA.
+
+- It uses the HTML5 History API (`pushState`, `replaceState`, `popstate`) to manage navigation without reloading the page.
+
+Consider the following URL: `http://mysite.com:8080/products/page/3` **(note the absence of the hash sign)**. The URL segment `products/page/3` can be pushed (attached) to the base URL programmatically without using the hash tag. If the user navigates from page 3 to 4, the application's code will push the URL segment `products/page/4`, saving the previously visited `products/page/3` in the browser history.
+
+- Angular spares you from invoking `pushState()` explicitly—you just need to configure the URL segments and map them to the corresponding components. With the History API–based location strategy, you need to tell Angular what to use as a base URL in your application so it can properly append the client-side URL segments. If you want to serve an Angular app on a non-root path, you have to do the following:
+
+  - Add the `<base>` tag to the header of index.html, such as `<base href="/mypath">`, or use the `--base-href` option while running `ng build`. Angular CLI-generated projects include `<base href="/">` in index.html.
+
+  - Assign a value for the `APP_BASE_HREF` constant in the root module and use it as the providers value. The following listing uses `/` as a base URL, but it can be any URL segment that denotes the end of the base URL.
+
+    ```ts
+    import { APP_BASE_HREF } from '@angular/common';
+    // ...
+    @NgModule({
+      // ...
+      providers: [{ provide: APP_BASE_HREF, useValue: '/mypath' }] // <- set base href for the app
+    })
+    class AppModule {}
+    ```
+
+    > `APP_BASE_HREF` affects how the router resolves `routerLink` properties and the `router.navigate()` calls within the app, whereas the `<base href="...">` tag affects how the browser resolves URLs when loading static resources like `<link>`, `<script>`, and `<img>` tags.
+
+- **Example:**
+  - The image below shows a snapshot of the home page of the application with the Chrome Developer Tools panel open. Because the path property of the configured home route had an empty string, Angular didn’t add anything to the base URL of the page. But the anchor under the Product Details link has already been converted into a regular HTML tag. When the user clicks the Product Details link, the router will attach a hash sign and add `/product/1234` to the base URL so that the absolute URL of the product-detail view will become `http:// localhost:4200/#/product/1234`.
+    ![angular-router-devtools](./img/angular-router-devtools-1.png)
+
+---
 
 ### `routerLink`
 
@@ -684,6 +807,9 @@ They are used to access the route parameters and query parameters of the route *
     <ul>
       <li>
         <a routerLink="/first-component" routerLinkActive="blue-text">First Component</a>
+
+        <!-- Dynamic route with parameters -->
+        <a [routerLink]="['/first-component', 1]">First Component with ID 1</a>
 
         <!-- routerlink with query params -->
         <a [routerLink]="['/first-component']" [queryParams]="{ id: 1 }">First Component</a>
@@ -736,6 +862,16 @@ They are used to access the route parameters and query parameters of the route *
     <a [routerLink]="['/first-component', 1, 'edit']">First Component</a>
     ```
 
+  - If you don't want to change the url in the address-bar in the browser when navigating to a route, you can use the `skipLocationChange` option
+
+    ```html
+    <a [routerLink]="['/first-component']" [queryParams]="{ id: 1 }" [skipLocationChange]="true">
+      First Component
+    </a>
+    ```
+
+    - This will navigate to the route without changing the url in the address-bar in the browser
+
 ---
 
 ### Styling the Router Links
@@ -769,7 +905,7 @@ They are used to access the route parameters and query parameters of the route *
 
 ### Navigating to route programmatically
 
-- To navigate to a route programmatically, use the `Router` service in the component
+- To navigate to a route programmatically, use the`navigate()` method of the `Router` service in the component
 
 - The `Router` service is used to navigate to a route programmatically
 
@@ -779,23 +915,20 @@ They are used to access the route parameters and query parameters of the route *
     constructor(private router: Router) {} // inject the Router service
     ```
 
-- The `navigate` method of the `Router` service is used to navigate to a route
+  - The `navigate` method of the `Router` service is used to navigate to a route
 
-  - The `navigate` method takes an array of the path of the route as an argument
+    - The `navigate` method takes an array of the path of the route as an argument, or an object with additional options
 
-    ```ts
-    ['/first-component'];
-    ```
+      ```ts
+      this.router.navigate(['/first-component']); // navigate to the /first-component route
 
-  - The path of the route is the same as the path of the route in the `Routes` array
-  - The `navigate` method can also take an object as an argument to navigate to a route with query parameters
+      // or
 
-    ```ts
-    {
-      path: '/first-component',
-      queryParams: { id: 1 }
-    }
-    ```
+      this.router.navigate({
+        path: '/first-component',
+        queryParams: { id: 1 }
+      });
+      ```
 
 - It is also possible to navigate to a route with query parameters using the `navigate` method
 
@@ -846,6 +979,20 @@ When we use nested (child) routes, we need to use relative paths to navigate to 
 
   - The `./` is used to navigate to the child route from the parent route
   - The `../` is used to navigate to the parent route from the child route
+
+---
+
+## Router Events
+
+The Angular Router emits various events during the navigation process. You can listen to these events to perform actions based on the navigation state.
+
+- To listen to router events, you can subscribe to the `events` observable of the `Router` service
+
+  ```ts
+  this.router.events.subscribe(event => {
+    // handle the event
+  });
+  ```
 
 ---
 
