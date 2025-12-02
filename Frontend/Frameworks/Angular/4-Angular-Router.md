@@ -4,7 +4,6 @@
   - [Angular Router](#angular-router)
     - [Adding Routing to an Angular App](#adding-routing-to-an-angular-app)
   - [Router configuration](#router-configuration)
-    - [Router Outlet](#router-outlet)
     - [Routes](#routes)
       - [RouterModule.`forRoot`(ROUTES) vs RouterModule.`forChild`(ROUTES)](#routermoduleforrootroutes-vs-routermoduleforchildroutes)
     - [Dynamic Routes (Routes with parameters)](#dynamic-routes-routes-with-parameters)
@@ -15,6 +14,8 @@
       - [Adding static data to routes](#adding-static-data-to-routes)
       - [Adding dynamic data to routes (Resolvers)](#adding-dynamic-data-to-routes-resolvers)
       - [Adding title to routes window tab](#adding-title-to-routes-window-tab)
+  - [Router Outlet](#router-outlet)
+    - [Multiple Router Outlets](#multiple-router-outlets)
   - [Router Data (route)](#router-data-route)
     - [Route Properties (Params and Query Params)](#route-properties-params-and-query-params)
       - [`ActivatedRoute`](#activatedroute)
@@ -32,14 +33,20 @@
     - [Implementing Lazy Loading](#implementing-lazy-loading)
       - [Old way of lazy loading (modules)](#old-way-of-lazy-loading-modules)
       - [New way of lazy loading (standalone components)](#new-way-of-lazy-loading-standalone-components)
-  - [Router Guards](#router-guards)
+    - [Preloading](#preloading)
+      - [Preloading Strategies](#preloading-strategies)
+  - [Route Guards](#route-guards)
     - [Implementing Router Guards](#implementing-router-guards)
       - [NEW: Guards Using Functions](#new-guards-using-functions)
       - [OLD: Guards Using Classes](#old-guards-using-classes)
+      - [Complex guards](#complex-guards)
+    - [Route Guards Examples](#route-guards-examples)
     - [Route Guards Common Issues](#route-guards-common-issues)
       - [Auth Guard always returns false or never allows navigation](#auth-guard-always-returns-false-or-never-allows-navigation)
   - [Route Resolvers](#route-resolvers)
     - [Why we use Route Resolvers](#why-we-use-route-resolvers)
+    - [How to implement Route Resolvers](#how-to-implement-route-resolvers)
+    - [Tracking resolved data progress](#tracking-resolved-data-progress)
 
 ---
 
@@ -158,34 +165,16 @@
   - `path` -> defines the URL path for the route.
   - `component` -> defines the component Angular should use for the corresponding path.
 - We can also use `RouterModule.forChild(routes)` to configure child routes
+
   - If you’re configuring routes for a feature module (not for the root one), use the `forChild()` method, which also creates a router module but doesn’t create the router service (`forRoot()` should have created the service by now), as you can see in the following listing.
 
----
-
-### Router Outlet
-
-It's the placeholder that Angular uses to display the component based on the current route.
-
-![router-outlet](./img/router-outlet-1.png)
-
-- We have main `<router-outlet>` in the `app.component.html` file to display the component based on the current route
-
-  ```html
-  <!-- in app.component.html -->
-  <h1>Angular Router App</h1>
-  <nav>
-    <ul>
-      <li>
-        <a routerLink="/first-component" routerLinkActive="blue-text">First Component</a>
-      </li>
-    </ul>
-  </nav>
-  <!-- The routed views render in the <router-outlet>-->
-  <router-outlet></router-outlet>
-  ```
-
-- We also can have multiple `<router-outlet>` in the app to display nested routes (child routes)
-  ![router-outlet](./img/router-outlet-2.png)
+> **Notes:** The following features are possible in angular router:
+>
+> - You can configure routes in parent and child modules/components.
+> - You can create nested routes (child routes).
+> - You can pass data to routes (static and dynamic data).
+> - During navigation, the router renders components in the area defined by the `<router-outlet>` directive/tag.
+> - During navigation, you can listen to route events.
 
 ---
 
@@ -449,83 +438,7 @@ const routes: Routes = [
 
 #### Adding dynamic data to routes (Resolvers)
 
-You can add dynamic data to routes using the `resolve` property of the route object
-
-```ts
-const routes: Routes = [
-  { path: 'home', component: HomeComponent, resolve: { data: HomeResolver } },
-  { path: 'about', component: AboutComponent, resolve: { data: AboutResolver } }
-];
-```
-
-- The `resolve` property is used to define a resolver for the route
-
-> **A resolver is a service that is responsible for fetching data before the route is activated**
->
-> It's used to fetch data from an API or a service before the route is activated, and then pass the data to the component so that when the component is initialized, it already has the data it needs to render
-
-- How the resolver works:
-
-  - The `resolver` is a service that implements the `Resolve` interface
-  - The `resolve` method of the resolver is called before the route is activated
-  - The `resolve` method returns an `Observable`, `Promise`, or a value that contains the data to be passed to the component
-    - This method will be located inside the component that is being resolved and then imported into the `routes` file
-  - The data returned from the resolver is available in the component via the `ActivatedRoute` service
-
-- **Example:**
-
-  - Here, we first will have a resolver function inside the component
-
-    ```ts
-    // in home.component.ts
-    import { resolveFn } from '@angular/core';
-    import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-
-    //...
-    export const HomeResolver: resolveFn = (
-      route: ActivatedRouteSnapshot,
-      state: RouterStateSnapshot
-    ) => {
-      return this.dataService.getData(); // return the data to be passed to the component
-    };
-    ```
-
-  - Then, we will import the resolver into the `routes` file and use it in the route
-
-  ```ts
-  import { Routes } from '@angular/router';
-  import { HomeComponent } from './home/home.component';
-  import { HomeResolver } from './home.resolver';
-
-  export const routes: Routes = [
-    {
-      path: 'home',
-      component: HomeComponent,
-      resolve: {
-        data: HomeResolver // we can use any alias not just 'data' and that alias will be used to access the resloved data inside the component
-      }
-    }
-  ];
-  ```
-
-- **Resolver Notes:**
-
-  - The resolver function runs every time the route is activated or re-activated, but by default it doesn't run when the query parameters change
-
-    - To make the resolver run when the query parameters change, we can use the `runGuardsAndResolvers` property in the route configuration
-
-    ```ts
-    const routes: Routes = [
-      {
-        path: 'home',
-        component: HomeComponent,
-        resolve: {
-          data: HomeResolver
-        },
-        runGuardsAndResolvers: 'paramsChange' // 👈 this will make the resolver run when the query parameters change
-      }
-    ];
-    ```
+See this part: [How to implement Route Resolvers](#how-to-implement-route-resolvers)
 
 ---
 
@@ -561,6 +474,78 @@ You can add a title to the window tab of the browser when navigating to a route 
     this.titleService.setTitle('Home Page');
   }
   ```
+
+---
+
+## Router Outlet
+
+It's the placeholder that Angular uses to display the component based on the current route.
+
+![router-outlet](./img/router-outlet-1.png)
+
+- We have main `<router-outlet>` in the `app.component.html` file to display the component based on the current route
+
+  ```html
+  <!-- in app.component.html -->
+  <h1>Angular Router App</h1>
+  <nav>
+    <ul>
+      <li>
+        <a routerLink="/first-component" routerLinkActive="blue-text">First Component</a>
+      </li>
+    </ul>
+  </nav>
+  <!-- The routed views render in the <router-outlet>-->
+  <router-outlet></router-outlet>
+  ```
+
+- We also can have multiple `<router-outlet>` in the app to display nested routes (child routes)
+  ![router-outlet](./img/router-outlet-2.png)
+
+---
+
+### Multiple Router Outlets
+
+You can have multiple `<router-outlet>` in the app to display nested routes (child routes).
+
+- This is useful when you want to display multiple components based on the current route, like a dashboard with multiple sections, each with its own `<router-outlet>`
+
+- This can be done by:
+
+  - Having one primary (default) `<router-outlet>` and one or more named `<router-outlet>`s
+
+  - First, giving each `<router-outlet>` a unique name using the `name` attribute
+
+    ```html
+    <nav>
+      <ul>
+        <li>
+          <a routerLink="/home" routerLinkActive="blue-text">Home</a>
+        </li>
+        <li>
+          <a [routerLink]="[{ outlets: { aux: ['chat'] } }]" routerLinkActive="blue-text">Chat</a>
+        </li>
+      </ul>
+    </nav>
+
+    <router-outlet></router-outlet>
+    <router-outlet name="chat"></router-outlet>
+    ```
+
+  - Then, defining the routes for each outlet using the `outlet` property of the route object
+
+    ```ts
+    export const routes: Routes = [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: HomeComponent },
+      { path: 'chat', component: ChatComponent, outlet: 'aux' }
+    ];
+    ```
+
+    ![multiple-router-outlets](./img/multiple-router-outlets-0.png)
+
+  - The result will be:
+    ![multiple-router-outlets](./img/multiple-router-outlets-1.png)
 
 ---
 
@@ -1009,6 +994,25 @@ The Angular Router emits various events during the navigation process. You can l
   ![lazy-loading](./img/lazy-loading-0.png)
   ![lazy-loading](./img/lazy-loading-1.png)
 
+- **Note:** If you want to see the effect on the bundles, you can:
+
+  - check the terminal output after building the app using `ng build --prod` command. You will see that the lazy-loaded modules are in separate chunks, which are loaded on demand when the user navigates to the corresponding routes. it will be something like this:
+
+    ```sh
+    chunk {main} main.js (main) 200 kB [initial] [rendered]
+    chunk {polyfills} polyfills.js (polyfills) 50 kB [initial] [rendered]
+    chunk {runtime} runtime.js (runtime) 6 kB [entry] [rendered]
+    chunk {lazy-lazy-module} lazy-lazy-module.js (lazy-lazy-module) 123 kB [rendered] # 👈
+    chunk {styles} styles.js (styles) 20 kB [initial] [rendered]
+    ```
+
+  - Alternatively, you can use browser developer tools (like Chrome DevTools) to monitor network requests. When you navigate to a lazy-loaded route, you should see a new network request for the corresponding chunk file, indicating that the module is being loaded on demand.
+    ![lazy-loading](./img/lazy-loading-bundle.png)
+
+> **TIP:** Make the root module of your app as small as possible. Split the rest of your app into lazy-loaded modules, and users will praise the performance of your app.
+
+---
+
 ### Implementing Lazy Loading
 
 #### Old way of lazy loading (modules)
@@ -1082,25 +1086,131 @@ The Angular Router emits various events during the navigation process. You can l
 
 ---
 
-## Router Guards
+### Preloading
 
-**Router guards** are used to protect the routes of the app and control the navigation to the routes by **restricting access to certain routes based on certain conditions**
+Let's say we have a large application with multiple lazy-loaded modules. When a user navigates to a route that requires a lazy-loaded module, there might be a noticeable delay as the module is fetched from the server. To improve the user experience, we can use preloading to load these modules in the background after the initial application load.
+
+- With Angular preloaders, you can do the following:
+
+  - Load lazy-loaded modules in the background after the initial application load
+  - Improve the user experience by reducing the delay when navigating to lazy-loaded routes
+  - Control which modules to preload based on certain conditions (like user roles or network speed)
+  - Specify the preloading strategy to use for the lazy-loaded modules
+
+- **How to enable Preloading:**
+
+  - To enable preloading, you need to configure the `RouterModule` in the `AppRoutingModule` with a preloading strategy
+
+    ```ts
+    import { NgModule } from '@angular/core';
+    import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
+
+    const routes: Routes = [
+      // your routes here
+    ];
+
+    @NgModule({
+      imports: [
+        RouterModule.forRoot(routes, {
+          preloadingStrategy: PreloadAllModules // 👈 enable preloading with PreloadAllModules strategy
+        })
+      ],
+      exports: [RouterModule]
+    })
+    export class AppRoutingModule {}
+    ```
+
+#### Preloading Strategies
+
+- Angular provides two built-in preloading strategies:
+
+  1. `PreloadAllModules`: This strategy preloads all lazy-loaded modules in the background after the initial application load. This is useful when you want to ensure that all modules are available for navigation without any delay.
+
+  2. `NoPreloading`: This strategy does not preload any lazy-loaded modules. **This is the default behavior** if no preloading strategy is specified.
+
+- You can also create custom preloading strategies by implementing the `PreloadingStrategy` interface. This allows you to define your own logic for determining which modules to preload based on specific conditions.
+
+  - Say you have two lazy modules, `LuxuryModule` and `SuperLuxuryModule`, and you want to preload only the first. You can add some Boolean variable (for example, `preloadme: true`) to the configuration of the luxury path:
+
+    ```ts
+    const routes: Routes = [
+      {
+        path: 'luxury',
+        loadChildren: () => import('./luxury/luxury.module').then(m => m.LuxuryModule),
+        data: { preloadme: true } // 👈
+      },
+      {
+        path: 'super-luxury',
+        loadChildren: () =>
+          import('./super-luxury/super-luxury.module').then(m => m.SuperLuxuryModule),
+        data: { preloadme: false } // 👈
+      }
+    ];
+    ```
+
+  - Then, you can create a custom preloading strategy that checks this variable and preloads only the modules with `preloadme: true`:
+
+    ```ts
+    import { PreloadingStrategy, Route } from '@angular/router';
+    import { Observable, of } from 'rxjs';
+
+    export class CustomPreloadingStrategy implements PreloadingStrategy {
+      // it must implement the `preload` method
+      preload(route: Route, load: () => Observable<any>): Observable<any> {
+        return route.data && route.data['preloadme'] ? load() : of(null); // or return EMPTY;
+      }
+    }
+    ```
+
+  - Finally, you need to provide this custom preloading strategy in the `AppRoutingModule`:
+
+    ```ts
+    import { NgModule } from '@angular/core';
+    import { RouterModule, Routes } from '@angular/router';
+    import { CustomPreloadingStrategy } from './custom-preloading.strategy';
+    import routes from './app.routes';
+
+    @NgModule({
+      imports: [
+        RouterModule.forRoot(routes, {
+          preloadingStrategy: CustomPreloadingStrategy // 👈 use custom preloading strategy
+        })
+      ],
+      exports: [RouterModule],
+      providers: [CustomPreloadingStrategy] // 👈 provide the custom preloading strategy
+    })
+    ```
+
+---
+
+## Route Guards
+
+**Route guards** are used to protect the routes of the app and control the navigation (to & from) the routes by **restricting access to certain routes based on certain conditions**
 
 - They are used to prevent **unauthorized** users from accessing certain routes
   - They are used to prevent users from navigating to certain routes based on certain conditions
-    ![router-guards](./img/router-guards-1.png)
+    - For example, preventing users from accessing a route if they are not logged in
+      ![router-guards](./img/router-guards-0.png)
 - They're **Classes** that implement a specific interface and contain a method that returns a `boolean` or an `observable` that resolves to a `boolean`
+  ![router-guards](./img/router-guards-1.png)
 
   > In newer versions of Angular, the guards are **functions instead of classes**, but they still implement the same logic
 
   - This `boolean` value determines whether the user can navigate to the route
 
-- There are 4 types of router guards in Angular:
+- **Use cases for Router Guards:**
+
+  - Preventing unauthorized access to certain routes (e.g., admin routes)
+  - Preventing users from navigating away from a route when there are unsaved changes in a form
+  - Preventing navigation to the route before certain data is loaded
+
+- **Guard Interfaces:**
   ![router-guards](./img/router-guards-2.png)
   - `canActivate` : to prevent the user from navigating to a route
   - `canMatch` **(NEW)**: to prevent the user from navigating to a route based on certain conditions (used for advanced routing scenarios)
   - `canActivateChild` : to prevent the user from navigating to the child routes of a route
   - `canLoad` : to prevent the user from loading the module of a route **(lazy loaded modules)**
+  - `resolve` : to ensure that the required data is retrieved before navigating to a route
   - `canDeactivate` : to prevent the user from leaving a route
     - It's confusing for beginners, but it's used to prevent the user from leaving a route **when there are unsaved changes in the form or other conditions**
       ![router-guards-deactivate](./img/router-guards-deactivate.png)
@@ -1144,7 +1254,7 @@ The Angular Router emits various events during the navigation process. You can l
 
 - Notes:
 
-  - We can use multiple guards in the `canActivate` property by passing an **array of functions**
+  - We can use multiple guards in the `canActivate` property by passing an **array of functions**.
   - It's sometimes recommended to use the `canMatch` guard instead of `canActivate` for advanced routing scenarios, especially when dealing with lazy-loaded modules or complex route configurations
   - It's recommended to not return `false` directly in the guard function, but rather return an `Observable` that resolves to `false` to allow for asynchronous checks (like API calls or other asynchronous operations)
   - Also it's not recommended to return falsy values directly, as this can lead to crashing the app or unexpected behavior. Instead, we should redirect the user to a specific route using `new RedirectCommand()` or return an `Observable` that resolves to `false` or a `UrlTree` to redirect the user to a specific route
@@ -1225,6 +1335,123 @@ The Angular Router emits various events during the navigation process. You can l
 
 ---
 
+#### Complex guards
+
+- Guards are methods/functions that take 2 parameters: `ActivatedRouteSnapshot` and `RouterStateSnapshot`, and return a `boolean` or an `Observable` that resolves to a `boolean`
+  - `ActivatedRouteSnapshot`: contains information about the route that is being navigated to
+  - `RouterStateSnapshot`: contains information about the state of the router at the time of navigation
+- There parameters usually is not used in simple guards, but they are useful in advanced guards where we need to access the route parameters or query parameters to determine whether the user can navigate to the route or not, like having a white-list or black-list of routes in the guard or based on user roles/permissions
+- We can access the route or the component or any other service inside the guard to determine whether the user can navigate to the route or not
+
+  - This is super useful, for example we can access the route's component instance to check if there are unsaved changes in a form before navigating away from the route using the `canDeactivate` guard
+
+    ```ts
+    canDeactivate(
+      component: YourComponent, // access the component instance
+      currentRoute: ActivatedRouteSnapshot,
+      currentState: RouterStateSnapshot,
+      nextState?: RouterStateSnapshot
+    ): boolean | Observable<boolean> {
+      if (component.hasUnsavedChanges()) {
+        // or we can check if form is dirty using component.form.dirty
+        return confirm('You have unsaved changes! Do you really want to leave?');
+      }
+      return true; // allow navigation if there are no unsaved changes
+    }
+    ```
+
+---
+
+### Route Guards Examples
+
+- **Auth Guard Example:**
+
+  - We will create an `AuthService` that will handle the authentication logic
+  - We will create an `AuthGuard` that will use the `AuthService` to check if the user is authenticated
+    - If the user is authenticated, the guard will return `true` to allow the user to navigate to the route
+    - If the user is not authenticated, the guard will redirect the user to the login page and return `false` to prevent the user from navigating to the route
+  - We will add the `AuthGuard` to the routes to protect the routes
+
+  ```ts
+  // in auth.service.ts
+  import { Injectable } from '@angular/core';
+  import { BehaviorSubject } from 'rxjs';
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class AuthService {
+    private signedin$ = new BehaviorSubject<boolean>(false); // initial state is false (not signed in)
+
+    // method to sign in the user
+    signIn() {
+      this.signedin$.next(true); // set the signedin$ to true (signed in)
+    }
+
+    // method to sign out the user
+    signOut() {
+      this.signedin$.next(false); // set the signedin$ to false (not signed in)
+    }
+
+    // method to get the signedin$ observable
+    get isSignedIn$() {
+      return this.signedin$.asObservable(); // return the signedin$ as an observable
+    }
+  }
+  ```
+
+  ```ts
+  // in auth.guard.ts
+  import { Injectable } from '@angular/core';
+  import {
+    CanActivate,
+    ActivatedRouteSnapshot,
+    RouterStateSnapshot,
+    UrlTree
+  } from '@angular/router';
+  import { Observable } from 'rxjs';
+  import { map } from 'rxjs/operators';
+  import { AuthService } from './auth.service';
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class AuthGuard implements CanActivate {
+    constructor(private authService: AuthService, private router: Router) {}
+
+    canActivate(
+      route: ActivatedRouteSnapshot,
+      state: RouterStateSnapshot
+    ): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+      return this.authService.isSignedIn$.pipe(
+        map(isSignedIn => {
+          if (isSignedIn) {
+            return true;
+          } else {
+            // navigate to another route (e.g., login page) if not authenticated
+            this.router.navigate(['/login']);
+            return false;
+          }
+        })
+      );
+    }
+  }
+  ```
+
+  ```ts
+  // in app-routing.module.ts
+  const routes: Routes = [
+    { path: '', component: HomeComponent },
+    { path: 'first-component', component: FirstComponent, canActivate: [AuthGuard] }, // 👈
+    { path: 'second-component', component: SecondComponent }
+  ];
+  ```
+
+- **Resolver Guard Example:**
+
+  - See this part: [Adding dynamic data to routes (Resolvers)](#adding-dynamic-data-to-routes-resolvers)
+
+---
+
 ### Route Guards Common Issues
 
 #### Auth Guard always returns false or never allows navigation
@@ -1295,7 +1522,9 @@ The Angular Router emits various events during the navigation process. You can l
 
 ## Route Resolvers
 
-> See this part: [Adding dynamic data to routes (Resolvers)](#adding-dynamic-data-to-routes-resolvers)
+> Let’s say you navigate to a product-detail component that makes an HTTP request to retrieve data. The connection is slow, and it takes two seconds to retrieve the data. This means that the user will look at the empty component for two seconds (or at least see loading state), and then the data will be displayed. That’s not a good user experience. What if the server request returns an error? The user will look at the empty component to see the error message after that. That’s why it may be a good idea to not even render the component until the required data arrives.
+>
+> If you want to make sure that by the time the user navigates to a route some data structures are populated, create a Resolve guard that allows getting the data before the route is activated. A `resolver` is a class that implements the Resolve interface. The code in its `resolve()` method loads the required data, and only after the data arrives does the router navigate to the route.
 
 **Route resolvers** are used to fetch the data needed for a route before the route is activated, and then pass the data to the component
 
@@ -1342,7 +1571,7 @@ The Angular Router emits various events during the navigation process. You can l
     // in app-routing.module.ts
     const routes: Routes = [
       { path: '', component: HomeComponent },
-      { path: 'first-component', component: FirstComponent, resolve: { data: DataResolver } }, // add the resolver to the route
+      { path: 'first-component', component: FirstComponent, resolve: { data: DataResolver } }, // 👈 add the resolver to the route
       { path: 'second-component', component: SecondComponent }
     ];
     ```
@@ -1384,9 +1613,10 @@ The Angular Router emits various events during the navigation process. You can l
     }
     ```
 
-    - The `resolve` method of the `EmailResolverService` class is used to fetch the email data needed for the route
-    - The `resolve` method takes the `ActivatedRouteSnapshot` and `RouterStateSnapshot` as arguments (to access the route parameters)
-    - The `resolve` method returns an `Observable`, a `Promise`, or the email data needed for the route
+    - The `resolve()` method of the `EmailResolverService` class is used to fetch the email data needed for the route
+    - The `resolve()` method takes the `ActivatedRouteSnapshot` and `RouterStateSnapshot` as arguments (to access the route parameters)
+    - The `resolve()` method **returns an `Observable`, a `Promise`**, or the email data needed for the route
+      > Angular generates the code for resolvers that auto-subscribes to the observable and stores the emitted data in the `ActivatedRoute` object.
     - **Now, the data returned will now be passed to the component through the `ActivatedRoute` service**
 
   - 2️⃣ **Add the resolver to the routes** of the `AppRoutingModule` using the `resolve` property
@@ -1461,3 +1691,111 @@ The Angular Router emits various events during the navigation process. You can l
 - Pause rendering of the component until the data is fetched (to avoid `undefined` errors in the template)
   - I know that we can just use `*ngIf` to check if the data is available before rendering the component, or the safe navigation operator (`?.`) in the template to avoid `undefined` errors, but using resolvers is a cleaner way to handle this
 - Ensure that the data is available when the component is initialized
+
+### How to implement Route Resolvers
+
+You can add dynamic data to routes using the `resolve` property of the route object
+
+```ts
+const routes: Routes = [
+  { path: 'home', component: HomeComponent, resolve: { data: HomeResolver } },
+  { path: 'about', component: AboutComponent, resolve: { data: AboutResolver } }
+];
+```
+
+- The `resolve` property is used to define a resolver for the route
+
+> **A resolver is a service that is responsible for fetching data before the route is activated**
+>
+> It's used to fetch data from an API or a service before the route is activated, and then pass the data to the component so that when the component is initialized, it already has the data it needs to render
+
+- How the resolver works:
+
+  - The `resolver` is a service that implements the `Resolve` interface
+  - The `resolve` method of the resolver is called before the route is activated
+  - The `resolve` method returns an `Observable`, `Promise`, or a value that contains the data to be passed to the component
+    - This method will be located inside the component that is being resolved and then imported into the `routes` file
+  - The data returned from the resolver is available in the component via the `ActivatedRoute` service
+
+- **Example:**
+
+  - Here, we first will have a resolver function inside the component
+
+    ```ts
+    // in home.component.ts
+    import { resolveFn } from '@angular/core';
+    import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+
+    //...
+    export const HomeResolver: resolveFn = (
+      route: ActivatedRouteSnapshot,
+      state: RouterStateSnapshot
+    ) => {
+      return this.dataService.getData(); // return the data to be passed to the component
+    };
+    ```
+
+  - Then, we will import the resolver into the `routes` file and use it in the route
+
+  ```ts
+  import { Routes } from '@angular/router';
+  import { HomeComponent } from './home/home.component';
+  import { HomeResolver } from './home.resolver';
+
+  export const routes: Routes = [
+    {
+      path: 'home',
+      component: HomeComponent,
+      resolve: {
+        data: HomeResolver // we can use any alias not just 'data' and that alias will be used to access the resloved data inside the component
+      }
+    }
+  ];
+  ```
+
+- **Resolver Notes:**
+
+  - The resolver function runs every time the route is activated or re-activated, but by default it doesn't run when the query parameters change
+
+    - To make the resolver run when the query parameters change, we can use the `runGuardsAndResolvers` property in the route configuration
+
+    ```ts
+    const routes: Routes = [
+      {
+        path: 'home',
+        component: HomeComponent,
+        resolve: {
+          data: HomeResolver
+        },
+        runGuardsAndResolvers: 'paramsChange' // 👈 this will make the resolver run when the query parameters change
+      }
+    ];
+    ```
+
+---
+
+### Tracking resolved data progress
+
+- We can track the progress of the resolved data using the **`Router` events**
+  - The `ResolveStart` event is emitted when the resolver starts fetching the data
+  - The `ResolveEnd` event is emitted when the resolver finishes fetching the data
+
+> **Note:** The `Router` events can be used to track the progress of the resolved data and show a loading indicator while the data is being fetched
+>
+> This is also commonly used with [lazy loading](#lazy-loading) to show a loading indicator while the module is being loaded
+
+- Example:
+
+  ```ts
+  import { Router, ResolveStart, ResolveEnd } from '@angular/router';
+
+  constructor(private router: Router) {
+    this.router.events.subscribe(event => {
+      if (event instanceof ResolveStart) {
+        // Show loading indicator
+      } else if (event instanceof ResolveEnd) {
+        // Hide loading indicator
+      }
+    });
+  }
+  ```

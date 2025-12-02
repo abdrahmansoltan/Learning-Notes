@@ -6,12 +6,19 @@
     - [How Services work](#how-services-work)
     - [Access modifiers in Services](#access-modifiers-in-services)
   - [Dependency injection](#dependency-injection)
+    - [Introduction to Dependency Injection](#introduction-to-dependency-injection)
+    - [Dependency Injection in Angular](#dependency-injection-in-angular)
     - [Why use Dependency Injection?](#why-use-dependency-injection)
-    - [Why Dependency Injection is useful?](#why-dependency-injection-is-useful)
+    - [Why Dependency Injection is useful? (Benefits in Angular apps)](#why-dependency-injection-is-useful-benefits-in-angular-apps)
     - [How to use Dependency Injection in Angular components](#how-to-use-dependency-injection-in-angular-components)
       - [Old/Common Way (in the constructor)](#oldcommon-way-in-the-constructor)
       - [New way (using `inject()`)](#new-way-using-inject)
+    - [Nested dependency injection (dependency that has it's own dependencies)](#nested-dependency-injection-dependency-that-has-its-own-dependencies)
     - [How Angular does Dependency Injection behind the scenes](#how-angular-does-dependency-injection-behind-the-scenes)
+    - [Injectors and Providers](#injectors-and-providers)
+      - [Provider Configuration Methods](#provider-configuration-methods)
+      - [Provider Location \& Scope](#provider-location--scope)
+      - [Switching injectables easily in Angular](#switching-injectables-easily-in-angular)
     - [Singleton](#singleton)
     - [`@injectable`](#injectable)
   - [Services \& RxJS](#services--rxjs)
@@ -180,6 +187,53 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 
 ## Dependency injection
 
+### Introduction to Dependency Injection
+
+Dependency Injection (DI) is a design pattern that helps you separate how objects are created from how they are used.
+
+If you’ve ever written a function that accepts an object as a parameter, you’ve already used a simple form of DI.
+
+- Imagine you have a function:
+
+  ```ts
+  var product = new Product();
+  createShipment(product);
+  ```
+
+  - The `createShipment()` function depends on a `Product` object.
+  - But the function itself has no idea how to create a Product—it just receives it. This is the basic idea of injecting a dependency.
+  - However, this example still creates the object in the same place where it’s used. If we wanted to switch `Product` with a `MockProduct`, we’d still need to manually change the code.
+  - Now imagine `createShipment()` needed three dependencies (product, shipping company, fulfillment center), and each of those had their own dependencies. Manually creating all of these becomes messy and error-prone.
+
+- What Dependency Injection Actually Does
+
+  - DI means:
+
+    - A function or class **declares what it needs**, not how to create it.
+    - Something else (often a DI container or framework) **creates and provides these objects**.
+    - The code becomes easier to change, test, and maintain.
+
+  - So instead of object `A` manually creating object `B`:
+
+    ```css
+    Object A → “I need something that matches token B—give it to me.”
+    ```
+
+  `A` does **not** care about the exact class type or how it's instantiated. The framework takes care of figuring out what `B` is and how to create it.
+
+- Why it matters
+
+  - No more tight coupling between creation and use
+  - Easier unit testing
+  - More flexible: swap dependencies without rewriting logic
+  - Cleaner and more maintainable architecture
+
+> **In short, DI helps you write code in a loosely coupled way and makes your code more testable and reusable.**
+
+---
+
+### Dependency Injection in Angular
+
 ![dependency injection](./img/dependency-injection-1.png)
 
 - it's a system that does 2 things:
@@ -233,13 +287,64 @@ Services depend on the **[Dependency Injection](#dependency-injection)** system 
 
 ---
 
-### Why Dependency Injection is useful?
+### Why Dependency Injection is useful? (Benefits in Angular apps)
+
+- **Loose coupling and reusability**
+
+  - Imagine you have a `ProductComponent` that needs product details from a `ProductService`.
+  - Without DI, `ProductComponent` must create `ProductService` itself (using `new` or a factory). This makes the component tightly connected to that service, and changing to another service requires editing the component.
+
+  - With Dependency Injection, Angular creates the service for you. The component only declares what it needs, and Angular provides it. This keeps components flexible and reusable.
+
+  - Angular uses **tokens** to identify what to inject, and providers define how to create those objects. This is part of the broader concept of **Inversion of Control**, where the framework manages object creation instead of your code.
+
+    ```ts
+    @component({
+      // ...
+      providers: [ProductService] // provider for the service
+    })
+    export class ProductComponent {
+      constructor(private productService: ProductService) {}
+
+      this.productService.getProductDetails();
+    }
+    ```
+
+    - Here, `providers: [ProductService]` tells Angular how to create `ProductService` instances.
+    - It's like this: `providers: [{ provide: ProductService, useClass: ProductService }]` which means "when someone asks for `ProductService`, give them an instance of `ProductService`".
+
+  - In Angular, you typically inject services (business logic classes) or constants. These can be injected into components or other services.
+
+  - **How providers work in Angular:**
+
+    - When you add the `providers` property to the `@Component()` decorator, you specify the provider for the service. This tells Angular to create an instance of `ProductService` when `ProductComponent` is created.
+    - ⚠️ If you specify `ProductService` in the `providers` property **inside the `@Component()` decorator**, then the service instance would be created on the component level, so all components using this service would share the same instance (as a singleton).
+    - ⚠️ If you specify `ProductService` in the `providers` property **inside the `@NgModule()` decorator**, then the service instance would be created on the app level as a singleton, so all components could use it.
+    - `ProductComponent` doesn't need to know which concrete implementation of the `ProductService` type to use—it'll use whatever object is specified as a provider.
+    - The reference to the `ProductService` object will be injected via the constructor argument, and there's no need to explicitly instantiate `ProductService` in `ProductComponent`.
+
+  - **Example: Changing Injectable Services**
+
+    - If you need to reuse the same `ProductComponent` with a different implementation of the `ProductService` type, change the providers line:
+
+      ```ts
+      providers: [{ provide: ProductService, useClass: AnotherProductService }];
+      ```
+
+    - You'll see an example of changing an injectable service in section 5.5.
+    - Now Angular will instantiate `AnotherProductService`, but the code of `ProductComponent` that uses `ProductService` doesn't require modification.
+    - **In this example, using DI increases the reusability of `ProductComponent` and eliminates its tight coupling with `ProductService`.**
 
 - **Testing**
 
-  - When we use Dependency Injection, we can easily create a mock service and inject it in the component class when testing the component class
-  - This is not possible when we create an instance of the service class in the component class
-  - This way, we can test the component class without worrying about the service class
+  - DI makes testing much easier by allowing you to inject mock dependencies instead of real ones
+  - **Real-world example**:
+
+    - Say you have a `LoginComponent` that uses a `LoginService` to connect to an authorization server. During testing, you don't want your tests to fail because the server is down or to make actual network requests.
+    - With DI, you can inject a `MockLoginService` that has hardcoded responses, so your tests run fast and reliably without depending on external services.
+    - You simply write one line to inject the mock service, and your tests get an instance of `MockLoginService` instead of the real one.
+
+    ![DI in testing](./img/di-testing.png)
 
   - Examples:
 
@@ -405,6 +510,30 @@ export class AppComponent implements OnInit {
 
 ---
 
+### Nested dependency injection (dependency that has it's own dependencies)
+
+Sometimes, a service may have its own dependencies that need to be injected, for example, a `ProductService` may depend on an `HttpClient` service to fetch product data from an API
+
+![nested dependency injection](./img/nested-dependency-injection.png)
+
+```ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  constructor(private http: HttpClient) {} // injecting HttpClient service in the ProductService
+
+  getProducts() {
+    return this.http.get('https://api.example.com/products');
+  }
+}
+```
+
+---
+
 ### How Angular does Dependency Injection behind the scenes
 
 Angular uses a **hierarchical dependency injection system**, which means that it creates an injector for each component and its children, and it looks for the service in the `[providers] array in the component` and creates instances (objects) from the service-class so that it can be used in other components
@@ -428,6 +557,8 @@ Angular uses a **hierarchical dependency injection system**, which means that it
   - If the service is not found in the injector, Angular looks for the service in the parent injector, and so on, until it finds the service or reaches the root injector
 - Angular uses the `@Injectable` decorator to mark the class as a service, which tells Angular that this class can be injected into other components
 - Angular uses the `providedIn` property to provide the service in the root module, so that it can be used in the whole application
+  - we can also provide the service in the module or component level, but it's not recommended anymore because it's not tree-shakable and creates multiple instances of the service class
+  - **✅ the recommended way is to use `providedIn: 'root'` to provide the service in the root module, or not to specify the `providedIn` property and add the service in the `[providers] array in the module` to provide the service in the module's components**
 - When we inject the service in the component, Angular looks for the service in the `[providers] array in the component` and creates an instance of the service class **(if it doesn't exist)**, or uses the existing instance if it does exist
 - Angular uses `Hierarchical Dependency Injection` system
 
@@ -456,6 +587,123 @@ Angular uses a **hierarchical dependency injection system**, which means that it
     }
     // Here, FetchDataService is a provider that is used to provide the service in the root module
     ```
+
+---
+
+### Injectors and Providers
+
+- **Injector**: The mechanism that creates and injects dependencies into components/services
+  - Each component can have an `injector` instance capable of injecting objects or primitive values into it
+  - Angular application has a root injector available to all its modules
+  - To tell the injector what to inject, you specify the `provider` for the dependency
+- **Provider**: Maps a token (type) to a concrete implementation that the injector will use
+  - An injector will inject the object or value specified in the provider into the constructor of a component
+  - Providers allow you to map a custom type (or a token) to a concrete implementation of this type (or value)
+
+#### Provider Configuration Methods
+
+You can specify providers in different ways:
+
+1. **`useClass`**: Map a token to a class (most common)
+
+   ```ts
+   providers: [{ provide: ProductService, useClass: ProductService }];
+   // Shorthand: providers: [ProductService] // -> when the token name is the same as the class name
+   ```
+
+   - This is used when the token name is not the same as the class name, or when you want to provide a different implementation of the class, other than the class itself.
+
+2. **`useFactory`**: Map a token to a factory function that instantiates objects based on criteria
+
+   ```ts
+   providers: [
+     {
+       provide: ProductService,
+       useFactory: isProd => {
+         return isProd ? new MockProductService() : new ProductService();
+       },
+       deps: ['IS_PROD_ENV'] // 👈 The dependencies for the factory function
+     }
+   ];
+   ```
+
+   > 💡 In general, factory functions are used when you need to apply some application logic prior to instantiating an object. For example, you may need to decide which object to instantiate, or your object may have a constructor with arguments that you need to initialize before creating an instance.
+
+3. **`useValue`**: Map a string or a special `InjectionToken` to an arbitrary value (non-class-based injection)
+
+   ```ts
+   providers: [{ provide: 'IS_PROD_ENV', useValue: environment.production }];
+   // or
+   providers: [{ provide: 'API_URL', useValue: 'https://api.example.com' }];
+   ```
+
+   - It's used when you want to inject a constant value or a configuration object into a component or service. Usually used with `useFactory` to provide dependencies for the factory function.
+
+#### Provider Location & Scope
+
+- **Component level**: `@Component({ providers: [...] })`
+  - Creates a new instance for that component and its children
+  - Each component instance gets its own service instance
+  - If a provider was specified at the component level, Angular will create and inject an instance of the service for that component and its children **during the component's creation**
+- **Module level**: `@NgModule({ providers: [...] })`
+  - Creates a singleton instance at the app level (shared across all components)
+  - All components in the module share the same instance
+- **Root level**: `@Injectable({ providedIn: 'root' })`
+  - Recommended approach - creates an app-wide singleton
+  - Tree-shakable (removed from bundle if not used)
+
+> **Note:** Eagerly loaded modules don't have their own injectors - lazy-loaded modules have their own subroot injector that's a direct child of the parent's module injector
+>
+> **Tip:** In Angular, you can only inject a service into a class via its constructor's arguments. If you see a class with a no-argument constructor, nothing is injected into it.
+
+---
+
+#### Switching injectables easily in Angular
+
+Let's imagine that we have a `ProductService` that fetches product data from an API, and we want to switch to a `MockProductService` for testing purposes. But the problem is that `ProductService` is used in multiple components, and we don't want to change the code in all of them to switch to `MockProductService`.
+
+- **Solution**: We can use the `providers` property in the `@NgModule()` decorator to switch between `ProductService` and `MockProductService` easily without changing the code in all components
+
+  ```ts
+  // app.module.ts 📄
+  import { NgModule } from '@angular/core';
+  import { BrowserModule } from '@angular/platform-browser';
+  import { AppComponent } from './app.component';
+  import { ProductService } from './services/product.service';
+  import { MockProductService } from './services/mock-product.service';
+
+  @NgModule({
+    declarations: [AppComponent],
+    imports: [BrowserModule],
+    providers: [
+      {
+        provide: ProductService,
+        useClass: MockProductService // switch to MockProductService for testing or other purposes
+      }
+    ],
+    bootstrap: [AppComponent]
+  })
+  export class AppModule {}
+
+  // ------------------------------------------------------------
+
+  // now any component that uses ProductService will automatically use MockProductService instead. without changing their code ✅
+  export class ProductComponent {
+    constructor(private productService: ProductService) {} // will use MockProductService instead of ProductService
+  }
+
+  export class AnotherComponent {
+    constructor(private anotherNameOfProductService: ProductService) {} // will also use MockProductService instead of ProductService
+  }
+  ```
+
+  - This will override the default provider for `ProductService` and use `MockProductService` instead
+  - Now, all components that use `ProductService` will automatically use `MockProductService` without changing their code.
+  - This is a powerful feature of Angular's Dependency Injection system that allows us to easily switch between different implementations of a service without changing the code in all components.
+
+- Notes:
+  - this technique is especially useful for testing, where we can use mock services to simulate different scenarios without making actual API calls or changing the production code.
+  - Also this pattern can be used when working with abstract classes or interfaces, where we can provide different implementations of the same interface based on the context or environment.
 
 ---
 
@@ -504,7 +752,7 @@ The `HttpClient` service is a built-in Angular service that provides a simplifie
 
   - In order to use the `HttpClient` service in Angular, we need to:
 
-    - If using modules
+    - If using **modules**
 
       - import the `HttpClientModule` from the `@angular/common/http` package and add it to the `imports` array of the `AppModule`.
 

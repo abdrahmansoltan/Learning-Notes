@@ -430,7 +430,9 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
     "styles": [
       "src/styles.css", // can contain multiple stylesheets by importing them inside this file
       "src/custom-styles.scss",
-      "node_modules/bootstrap/dist/css/bootstrap.min.css" // external library styles
+      "node_modules/bootstrap/dist/css/bootstrap.min.css" // external library styles,
+      "node_modules/font-awesome/css/font-awesome.min.css",
+      // ...
     ]
     ```
 
@@ -447,6 +449,7 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
       "node_modules/bootstrap/dist/js/bootstrap.min.js"
     ]
     ```
+
   - When you’re running the `ng serve` or `ng build` commands, the preceding scripts will be placed in the `scripts.bundle.js` file.
 
 ---
