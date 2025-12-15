@@ -337,6 +337,12 @@ It's a way to organize your `scss` files in a more structured way, where you hav
 
 ## Partials
 
+> Partials are just files with code fragments meant to be imported by other Sass files.
+>
+> **Partials must have names that start with an underscore**, such as `_theme.scss`. When you import a partial, the underscore isn’t needed, as in `@import './theme';`
+>
+> Partials aren’t compiled into separate CSS files—their content is compiled only as a part of `.scss` files that import them.
+
 These're `scss` files that starts with `_`, ex: `_layout.scss`
 
 - it's for instead of working with one long `css` file, you can actually **split up** your styles into multiple files and be more organized with sub-folders

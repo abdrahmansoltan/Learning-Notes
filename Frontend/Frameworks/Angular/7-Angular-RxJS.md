@@ -2,6 +2,7 @@
 
 - [INDEX](#index)
   - [RxJS](#rxjs)
+    - [Why use RxJS (reactive programming) instead of traditional Event Handling?](#why-use-rxjs-reactive-programming-instead-of-traditional-event-handling)
     - [RxJS Terminology](#rxjs-terminology)
     - [Reference \& Docs](#reference--docs)
   - [Observables](#observables)
@@ -12,6 +13,7 @@
       - [Subject Variations](#subject-variations)
     - [Observables with Typescript](#observables-with-typescript)
     - [Error Handling in Observables](#error-handling-in-observables)
+    - [Turning DOM events into observables](#turning-dom-events-into-observables)
   - [Operators](#operators)
     - [Transform Operators](#transform-operators)
     - [Flattening Operators](#flattening-operators)
@@ -23,6 +25,9 @@
     - [Required return value](#required-return-value)
   - [RxJS in Angular](#rxjs-in-angular)
     - [How to use RxJS in Angular](#how-to-use-rxjs-in-angular)
+      - [Handling observable events with the Forms API](#handling-observable-events-with-the-forms-api)
+      - [Async Pipe for subscribing to observables in templates](#async-pipe-for-subscribing-to-observables-in-templates)
+      - [Observables and the router](#observables-and-the-router)
     - [Example on how to use RxJS in Angular](#example-on-how-to-use-rxjs-in-angular)
       - [1️⃣ Fetching data from an API using an Angular service and an observable](#1️⃣-fetching-data-from-an-api-using-an-angular-service-and-an-observable)
       - [2️⃣ Authentication using an Angular service and an observable](#2️⃣-authentication-using-an-angular-service-and-an-observable)
@@ -46,6 +51,29 @@ It's a **functional reactive library** for filtering, sorting and coordinating d
   - handling HTTP requests
   - event handling
   - state management
+
+---
+
+### Why use RxJS (reactive programming) instead of traditional Event Handling?
+
+Using RxJS provides powerful, clean, and elegant solutions, especially for handling complex streams of user interface (UI) events like typing in an input field.
+
+- **⏳ Managing Event Frequency and Latency**
+
+  - When a user types quickly, traditional event handling runs the risk of sending a request **for every single keystroke**. Trying to fix this manually with `setTimeout()` and `clearTimeout()` (known as **debouncing**) is cumbersome and error-prone.
+
+  - RxJS Solution: The `debounceTime` operator automatically manages this. It ensures the observable only emits a value (and triggers the network request) after a specified time has passed **without any new keystrokes**, eliminating manual timer management.
+
+- **🗑️ Cancelling Outdated Requests**
+
+  - If a user continues typing, the requests for the earlier, incomplete search terms become obsolete. Traditional methods struggle to **cancel** these pending requests, which leads to network overload, wasted processing, and potentially processing an old result after a newer one.
+  - RxJS Solution: The `switchMap` operator is key here. When a new value is emitted, `switchMap` automatically **cancels any previous, pending inner observable** (like a pending HTTP request) and starts the new one. This guarantees that only the result from the **latest** user input is ever processed.
+    - it cancels the previous observable and the http request.
+      ![cancelled observable](./img/cancelled-observable.png)
+
+- **🔗 Streamlining Complex Operations**
+  - RxJS treats events as **observable streams of data**. This lets you easily chain multiple data-processing steps (operators) together in a declarative way (e.g., filter the input, apply `debounceTime`, then use `switchMap` to make the request).
+  - Result: You get **readable, maintainable, and highly composable code** for complex event flows.
 
 ---
 
@@ -116,6 +144,8 @@ It's a **functional reactive library** for filtering, sorting and coordinating d
 ## Observables
 
 It's wrapped around a data source that can emit data over time, and it allows us to listen to the data emitted by it (subscribe to it).
+
+> Angular offers ready-to-use observables for implementing various scenarios: handling events, subscribing to the route’s parameters, checking the status of a form, handling HTTP requests, and more.
 
 - **Observables** are used to handle asynchronous **data streams**.
 - In Angular, Observables are usually **subscribed to** in the component class to handle asynchronous data. (**the component subscribes to the observable and listens to the data emitted by it)**
@@ -495,6 +525,42 @@ It's important to handle errors in observables to prevent the application from c
 
 ---
 
+### Turning DOM events into observables
+
+In Angular apps, we can get direct access to any DOM element using a special class called `ElementRef`, and then we can turn its events into observables using the `fromEvent` operator from the `rxjs` package.
+
+```ts
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { fromEvent } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <input #inputElement type="text" placeholder="Type something..." />
+  `
+})
+export class AppComponent implements AfterViewInit {
+  @ViewChild('inputElement') inputElement!: ElementRef; // get a reference to the input element using `@ViewChild` decorator
+
+  ngAfterViewInit() {
+    // Create an observable from the input event of the input element, by providing a reference to the native element and the event name
+    const input$ = fromEvent(this.inputElement.nativeElement, 'input').pipe(
+      map((event: Event) => (event.target as HTMLInputElement).value)
+    );
+
+    input$.subscribe(value => console.log(value));
+  }
+}
+```
+
+- Notes:
+  - It's recommended to create the observable in the `ngAfterViewInit` lifecycle hook, because the DOM elements are not available in the `ngOnInit` lifecycle hook.
+  - We need to use `this.inputElement.nativeElement` to get the native DOM element from the `ElementRef` object.
+  - We use `@ViewChild` decorator to get a reference to the DOM element in the template.
+
+---
+
 ## Operators
 
 It's a function that takes an observable as input and returns a new observable as output. It allows us to transform the data emitted by the observable, filter it, or combine it with other observables.
@@ -617,67 +683,86 @@ It's a function that takes an observable as input and returns a new observable a
   - The `mergeMap` operator is used to subscribe to the inner observable and emit its data in the outer observable (without waiting for the inner observable to complete).
     ![nested](./img/nested-subscriptions-3.png)
 
-- `switchMap`: It is used to switch the data emitted by the observable.
+- `switchMap`:
+
+  - **(New and preferred)** It is used to switch the data emitted by the observable by cancelling the previous inner observable when a new inner observable is created.
+    - for example:
+      - when the user is typing fast in an input field and we want to make a request to the server for each input change, but we want to cancel the previous request when a new request is made.
+      - or when the form values change and we want to make a request to the server for each form value change, but we want to cancel the previous request when a new request is made.
+    - we often use the `switchMap` operator when the data generated by the outer observable (the `FormControl`, in this case) is given to the inner observable (the getWeather() function): Observable1 - > switchMap(function) - > Observable2 - > subscribe(). If Observable1 pushes the new value, but the inner Observable2 hasn’t finished yet, Observable2 gets cancelled. **We’re switching over from the current inner observable to the new one**, and **the switchMap operator unsubscribes from the pending Observable2 and resubscribes again to handle the new value produced by Observable1**.
+  - **(old and needs review)** It is used to switch the data emitted by the observable.
+
+    ```ts
+    import { of } from 'rxjs';
+    import { switchMap } from 'rxjs/operators';
+
+    const observable = of(1, 2, 3, 4, 5);
+    observable.pipe(switchMap(value => of(value * 2))).subscribe(console.log); // 10
+    ```
+
+    - It takes a value and returns a new observable.
+    - It's used when we have **nested subscriptions** and we want to avoid them **(observable inside an observable)**.
+      - It is used to subscribe to the **inner observable** and emit its data in the **outer observable** (but it only emits the data from the last inner observable).
+      - Meaning that is cancel the previous inner observable when a new inner observable is created.
+        ![nested](./img/nested-subscriptions-2.png)
+    - This way, we avoid nested subscriptions and the problems that come with them when a conflict occurs between the data emitted by the inner observables.
+    - It's commonly used with `http` requests to cancel the previous request when a new request is made.
+
+      - Example: (calling a http request when the route `id` parameter changes)
+
+        ```ts
+        ngOnInit() {
+          // Bad practice ❌ (nested subscription)
+          this.route.params.subscribe(params => {
+            this.emailService
+              .getEmail(params['id'])
+              .subscribe(email => (this.email = email));
+          });
+
+          // Good practice ✅ (using switchMap to avoid nested subscription and cancel the previous request when a new request is made)
+          this.route.params
+            .pipe(
+              switchMap(params => this.emailService.getEmail(params['id']))
+            )
+            .subscribe(email => (this.email = email));
+
+        }
+        ```
+
+        - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and **cancel the previous request** when a new request is made that **conflicts** with it.
+          ![nested](./img/nested-subscriptions-1.png)
+
+      - Example: (when the user is typing fast in an input field and we want to make a request to the server for each input change, but we want to cancel the previous request when a new request is made)
+
+        ```ts
+        import { fromEvent } from 'rxjs';
+        import { switchMap } from 'rxjs/operators';
+
+        const input = document.querySelector('input');
+        fromEvent(input, 'input')
+          .pipe(
+            // ... other operators, then switch to the fetch request and cancel any conflicting requests (like typing fast)
+            switchMap(params =>
+              this.http.get('https://api.openweathermap.org/data/2.5/weather', { params })
+            )
+          )
+          .subscribe(console.log);
+        ```
+
+        - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and cancel the previous request when a new request is made that **conflicts** with it.
+          ![nested](./img/nested-subscriptions-4.png)
+
+- `take`: It is used to take a specified number of values emitted by the observable and then complete the observable.
 
   ```ts
   import { of } from 'rxjs';
-  import { switchMap } from 'rxjs/operators';
+  import { take } from 'rxjs/operators';
 
   const observable = of(1, 2, 3, 4, 5);
-  observable.pipe(switchMap(value => of(value * 2))).subscribe(console.log); // 10
+  observable.pipe(take(3)).subscribe(console.log); // 1, 2, 3
   ```
 
-  - It takes a value and returns a new observable.
-  - It's used when we have **nested subscriptions** and we want to avoid them **(observable inside an observable)**.
-    - It is used to subscribe to the **inner observable** and emit its data in the **outer observable** (but it only emits the data from the last inner observable).
-    - Meaning that is cancel the previous inner observable when a new inner observable is created.
-      ![nested](./img/nested-subscriptions-2.png)
-  - This way, we avoid nested subscriptions and the problems that come with them when a conflict occurs between the data emitted by the inner observables.
-  - It's commonly used with `http` requests to cancel the previous request when a new request is made.
-
-    - Example: (calling a http request when the route `id` parameter changes)
-
-      ```ts
-      ngOnInit() {
-        // Bad practice ❌ (nested subscription)
-        this.route.params.subscribe(params => {
-          this.emailService
-            .getEmail(params['id'])
-            .subscribe(email => (this.email = email));
-        });
-
-        // Good practice ✅ (using switchMap to avoid nested subscription and cancel the previous request when a new request is made)
-        this.route.params
-          .pipe(
-            switchMap(params => this.emailService.getEmail(params['id']))
-          )
-          .subscribe(email => (this.email = email));
-
-      }
-      ```
-
-      - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and **cancel the previous request** when a new request is made that **conflicts** with it.
-        ![nested](./img/nested-subscriptions-1.png)
-
-    - Example: (when the user is typing fast in an input field and we want to make a request to the server for each input change, but we want to cancel the previous request when a new request is made)
-
-      ```ts
-      import { fromEvent } from 'rxjs';
-      import { switchMap } from 'rxjs/operators';
-
-      const input = document.querySelector('input');
-      fromEvent(input, 'input')
-        .pipe(
-          // ... other operators, then switch to the fetch request and cancel any conflicting requests (like typing fast)
-          switchMap(params =>
-            this.http.get('https://api.openweathermap.org/data/2.5/weather', { params })
-          )
-        )
-        .subscribe(console.log);
-      ```
-
-      - In this example, we use the `switchMap` operator to switch the data emitted by the observable to the data emitted by the `fetch` request, and cancel the previous request when a new request is made that **conflicts** with it.
-        ![nested](./img/nested-subscriptions-4.png)
+  - It's useful when we want to limit the number of values emitted by the observable.
 
 ---
 
@@ -708,6 +793,15 @@ It's a function that takes an observable as input and returns a new observable a
 
   const observable = of(1, 2, 3, 4, 5);
   observable.subscribe(console.log); // 1, 2, 3, 4, 5
+  ```
+
+- `interval`: It is used to create an observable that emits a value at a specified interval of time.
+
+  ```ts
+  import { interval } from 'rxjs';
+
+  const observable = interval(1000); // emit a value every second
+  observable.subscribe(console.log); // 0, 1, 2, 3, ...
   ```
 
 ---
@@ -1042,6 +1136,143 @@ It's a function that takes an observable as input and returns a new observable a
       }
     });
     ```
+
+---
+
+#### Handling observable events with the Forms API
+
+In Angular, we can use the **Forms API** to handle form events and turn them into observables using the `valueChanges` & `statusChanges` properties of the `FormControl` class.
+
+- It's covered here: [Watching/Reacting to form changes (RxJS in Reactive Forms)](./8-Angular-Forms.md#watchingreacting-to-form-changes-rxjs-in-reactive-forms)
+
+---
+
+#### Async Pipe for subscribing to observables in templates
+
+- The `async` pipe is a built-in Angular pipe that allows us to subscribe to an observable in the template and automatically unsubscribe from it when the component is destroyed.
+
+  ```html
+  <div *ngIf="data$ | async as data; else loading">
+    <pre>{{ data | json }}</pre>
+  </div>
+  <ng-template #loading>
+    <p>Loading...</p>
+  </ng-template>
+  ```
+
+  ```ts
+  export class AppComponent {
+    data$: Observable<any>;
+    constructor(private dataService: DataService) {
+      this.data$ = this.dataService.getData(); // no need to subscribe here
+    }
+  }
+  ```
+
+  - Here, we use the `async` pipe to subscribe to the `data$` observable and assign the emitted data to the `data` variable.
+  - We also use the `else` clause to display a loading message while waiting for the data to be emitted.
+  - The `async` pipe **automatically unsubscribes from the observable when the component is destroyed**, preventing memory leaks.
+
+- With `async` pipes , you can use the special syntax `async as` to **avoid creating multiple subscriptions in templates**. To fix this , you can use `async as` syntax to create a single subscription and assign the emitted data to a variable.
+
+  - `async`: It subscribes to the observable and returns the emitted data.
+  - `async as`: It subscribes to the observable and assigns the emitted data to a variable that can be used in the template.
+
+  ```html
+  <!-- Using async -->
+  <div *ngIf="data$ | async">
+    <pre>{{ data$ | async | json }}</pre>
+    <!-- ❌ This creates multiple subscriptions -->
+  </div>
+
+  <!-- Using async as -->
+  <div *ngIf="data$ | async as data">
+    <pre>{{ data | json }}</pre>
+    <!-- ✅ This creates a single subscription -->
+  </div>
+  ```
+
+---
+
+#### Observables and the router
+
+The Angular Router uses observables to handle route changes and navigation events.
+
+- We can subscribe to the `params`, `queryParams`, `fragment`, and `data` observables of the `ActivatedRoute` class to listen to route changes and access the route parameters, query parameters, fragment, and data.
+
+  ```ts
+  import { Component, OnInit } from '@angular/core';
+  import { ActivatedRoute } from '@angular/router';
+
+  @Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css']
+  })
+  export class AppComponent implements OnInit {
+    constructor(private route: ActivatedRoute) {}
+
+    ngOnInit() {
+      this.route.params.subscribe(params => {
+        console.log(params); // access route parameters
+      });
+
+      this.route.queryParams.subscribe(queryParams => {
+        console.log(queryParams); // access query parameters
+      });
+
+      this.route.fragment.subscribe(fragment => {
+        console.log(fragment); // access fragment
+      });
+
+      this.route.data.subscribe(data => {
+        console.log(data); // access route data
+      });
+    }
+  }
+  ```
+
+> Take in mind that we can access these data also using the `snapshot` property of the `ActivatedRoute` class, but using observables is preferred as it allows us to listen to changes in the route data, instead of accessing the data only once when the component is initialized.
+
+- Example: (when the route `id` parameter changes, we fetch the email with that id)
+
+  - When the user clicks the product for the first time, the router performs the following steps:
+
+    1. It navigates to the route `/products/1`.
+    2. It creates the `ProductDetailComponent` instance.
+    3. It attaches `ProductDetailComponent` to the DOM.
+    4. It renders the component template.
+    5. It passes the route parameters to the component using the `ActivatedRoute` service.
+    6. It fetches the product with id `1` and displays it.
+
+  - Now, when the user clicks another product (with id `2`), not all of the above steps are repeated. Instead, only the following steps are performed:
+
+    1. The router updates the route to `/products/2`.
+    2. It updates the `ActivatedRoute` service with the new route parameters.
+    3. It notifies the `ProductDetailComponent` about the change in the route parameters.
+    4. The component fetches the product with id `2` and displays it.
+
+  - So, in this case, we need to listen to the changes in the route parameters using the `params` observable of the `ActivatedRoute` service, instead of accessing the route parameters only once using the `snapshot` property.
+
+  ```ts
+  export class ProductDetailComponent implements OnInit {
+    product: any;
+
+    constructor(private route: ActivatedRoute, private productService: ProductService) {}
+
+    ngOnInit() {
+      // Bad practice ❌ (nested subscription)
+      this.route.params.subscribe(params => {
+        this.productService.getProduct(params['id']).subscribe(product => (this.product = product));
+      });
+
+      // Good practice ✅ (using switchMap to avoid nested subscription and cancel the previous request when a new request is made)
+      this.route.params
+        .pipe(switchMap(params => this.productService.getProduct(params['id'])))
+        .subscribe(product => (this.product = product));
+    }
+  }
+  ```
 
 ---
 

@@ -12,10 +12,26 @@
       - [ngOnDestroy()](#ngondestroy)
       - [ngOnChanges()](#ngonchanges)
     - [Presentational vs Smart components](#presentational-vs-smart-components)
+  - [Communication between Components](#communication-between-components)
+    - [Input \& Output Properties](#input--output-properties)
+      - [Input Properties](#input-properties)
+      - [Output Properties](#output-properties)
+    - [The Mediator Design Pattern](#the-mediator-design-pattern)
+      - [Using parent component as a mediator](#using-parent-component-as-a-mediator)
+      - [Using an injectable Service as a Mediator](#using-an-injectable-service-as-a-mediator)
+    - [Exposing a child component's API to the parent using ViewChild](#exposing-a-child-components-api-to-the-parent-using-viewchild)
+    - [Projecting templates at runtime using ng-content](#projecting-templates-at-runtime-using-ng-content)
+  - [Data flow between components](#data-flow-between-components)
+    - [Parent to Child (Passing data / Input / Props)](#parent-to-child-passing-data--input--props)
+    - [Child to Parent (Emitting events / Output)](#child-to-parent-emitting-events--output)
+    - [Template variable (Refs)](#template-variable-refs)
+    - [Content projection (Slots)](#content-projection-slots)
+      - [Single-slot content projection](#single-slot-content-projection)
+      - [Multi-slot content projection](#multi-slot-content-projection)
+      - [Handling projected content](#handling-projected-content)
   - [Standalone Components (NEW)](#standalone-components-new)
     - [Creating a standalone component](#creating-a-standalone-component)
     - [Using Services in Standalone Components](#using-services-in-standalone-components)
-    - [Routing with Standalone Components](#routing-with-standalone-components)
 
 ---
 
@@ -495,6 +511,734 @@ class MyComponent implements OnChanges {
 
 ---
 
+## Communication between Components
+
+> This section is similar to the [Data Binding section in Angular Notes](./1-Angular.md#data-binding), but here we will focus on the communication between components specifically.
+
+Components will usually have relationships with other components, and they will need to communicate with each other to share data and functionality.
+
+- The relationships between components can be classified into 3 types:
+
+  - **Parent-Child**: where one component is the parent of another component. The parent component can pass data to the child component via `@Input()` properties, and the child component can emit events to the parent component via `@Output()` properties.
+  - **Sibling-Sibling**: where two components are siblings, meaning they share the same parent component. Sibling components can communicate with each other via the parent component, by passing data and events through the parent component.
+  - **Unrelated Components**: where two components are not related to each other in any way. Unrelated components can communicate with each other via services, which can be used to share data and functionality between components.
+
+- Components can communicate with each other in several ways:
+
+  - **Input and Output properties**: using `@Input()` and `@Output()` decorators to pass data between parent and child components.
+  - **ViewChild and ContentChild**: using `@ViewChild()` and `@ContentChild()` decorators to access child components or elements in the template.
+  - **Services**: using services to share data between components that are not directly related.
+  - **Event Emitters**: using `EventEmitter` to emit events from child components to parent components.
+
+---
+
+### Input & Output Properties
+
+#### Input Properties
+
+**Input properties** are used to pass data from a parent component to a child component.
+
+- To create an input property, you need to use the `@Input()` decorator from the `@angular/core` package.
+
+  ```ts
+  // 📄 Child Component
+  import { Component, Input } from '@angular/core';
+
+  @Component({
+    selector: 'app-child',
+    template: `
+      <h1>{{ title }}</h1>
+    `
+  })
+  export class ChildComponent {
+    @Input() title: string; // input property
+  }
+  ```
+
+- To use the input property in the parent component, you need to bind the property to the child component using property binding syntax `[]`.
+
+  ```ts
+  // 📄 Parent Component
+  import { Component } from '@angular/core';
+  import { ChildComponent } from './child.component';
+  @Component({
+    selector: 'app-parent',
+    template: `
+      <app-child [title]="parentTitle"></app-child>
+    `
+  })
+  export class ParentComponent {
+    parentTitle = 'Hello from Parent Component'; // parent property
+  }
+  ```
+
+- If we want to intercept the value being passed to the input property, we can use a setter method, so we can manipulate the value before assigning it to the property.
+
+  ```ts
+  // 📄 Child Component
+  import { Component, Input } from '@angular/core';
+
+  @Component({
+    selector: 'app-child',
+    template: `
+      <h1>{{ title }}</h1>
+    `
+  })
+  export class ChildComponent {
+    private _title: string;
+
+    @Input()
+    set title(value: string) {
+      this._title = value.toUpperCase(); // intercepting the value
+    }
+
+    get title(): string {
+      return this._title;
+    }
+  }
+  ```
+
+  - ⚠️ Don't forget to also create a `getter` for the property to be able to access it in the template.
+  - It's useful when you want to perform some logic before assigning the value to the property, like formatting the value or validating it, or checking if the value is valid or defined before assigning it to the property.
+
+---
+
+#### Output Properties
+
+**Output properties** are used to emit events from a child component to a parent component.
+
+- To create an output property, you need to use the `@Output()` decorator from the `@angular/core` package, and you also need to create an instance of the `EventEmitter` class.
+
+  ```ts
+  // 📄 Child Component
+  import { Component, Output, EventEmitter } from '@angular/core';
+
+  @Component({
+    selector: 'app-child',
+    template: `
+      <button (click)="sendMessage()">Send Message</button>
+    `
+  })
+  export class ChildComponent {
+    @Output() messageEvent = new EventEmitter<string>(); // output property
+
+    sendMessage() {
+      this.messageEvent.emit('Hello from Child Component'); // emitting event
+    }
+  }
+  ```
+
+  - It's a good practice to specify the type of data that will be emitted by the `EventEmitter`, in this case, it's a `string`. This is because the `EventEmitter` is a generic class that can emit any type of data, so specifying the type helps to ensure type safety and makes it easier to understand the code.
+
+- To use the output property in the parent component, you need to bind the property to the child component using event binding syntax `()`.
+
+  ```ts
+  // 📄 Parent Component
+  import { Component } from '@angular/core';
+  import { ChildComponent } from './child.component';
+
+  @Component({
+    selector: 'app-parent',
+    template: `
+      <app-child (messageEvent)="receiveMessage($event)"></app-child>
+      <p>{{ message }}</p>
+    `
+  })
+  export class ParentComponent {
+    message: string;
+
+    receiveMessage(msg: string) {
+      this.message = msg; // receiving event
+    }
+  }
+  ```
+
+- When using the output property in the parent component, you can access the emitted data using the `$event` variable, which contains the data emitted by the `EventEmitter`.
+
+- Also, Don't worry about **"Event Bubbling"** here, because Angular handles event bubbling automatically for you, so you don't need to worry about it when using output properties.
+
+  - If "event bubbling" is important for your use case, you can always implement it manually using services or other techniques like: (`RxJS Subjects` or native DOM events).
+
+    ```ts
+    @Component({
+      selector: 'app-child',
+      template: `
+        <button (click)="sendMessage()">Send Message</button>
+      `
+    })
+    export class ChildComponent {
+      constructor(element: ElementRef) {
+        element.nativeElement.addEventListener('click', event => {
+          // Manually handle event bubbling
+          const customEvent = new CustomEvent('customClick', {
+            bubbles: true,
+            detail: 'Hello from Child Component'
+          });
+          element.nativeElement.dispatchEvent(customEvent);
+        });
+      }
+    }
+    ```
+
+---
+
+### The Mediator Design Pattern
+
+Communication between loosely coupled components can be implemented using **the Mediator design pattern**, which, according to Wikipedia, “defines how a set of objects interact”
+
+> The **Mediator Design Pattern** is a behavioral design pattern that defines an object that encapsulates how a set of objects interact. This pattern promotes loose coupling by keeping objects from referring to each other explicitly, and it allows their interaction to be varied independently.
+> ![mediator-pattern](./img/mediator-pattern.png)
+
+- In Angular, this pattern can be implemented in several ways, like:
+  - using a mediator parent component.
+  - using `Services` with `RxJS Subjects`
+  - using a dedicated `Mediator Service`.
+  - using `NgRx` or other state management libraries.
+
+#### Using parent component as a mediator
+
+In this example, we have a `AppComponent` that acts as a mediator between two child components: `ChildAComponent` and `ChildBComponent`. The `AppComponent` will handle the communication between the two child components.
+
+![mediator-component](./img/mediator-pattern-1.png)
+
+```ts
+// 📄 app.component.ts (Mediator Parent Component)
+import { Component } from '@angular/core';
+import { ChildAComponent } from './child-a.component';
+import { ChildBComponent } from './child-b.component';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <app-child-a (messageEvent)="receiveMessage($event)"></app-child-a>
+    <app-child-b [message]="messageFromA"></app-child-b>
+  `
+})
+export class AppComponent {
+  messageFromA: string;
+
+  receiveMessage(msg: string) {
+    this.messageFromA = msg; // receiving event from ChildAComponent
+  }
+}
+```
+
+```ts
+// 📄 child-a.component.ts
+import { Component, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-child-a',
+  template: `
+    <button (click)="sendMessage()">Send Message to Child B</button>
+  `
+})
+export class ChildAComponent {
+  @Output() messageEvent = new EventEmitter<string>();
+  sendMessage() {
+    this.messageEvent.emit('Hello from Child A Component');
+  }
+}
+```
+
+```ts
+// 📄 child-b.component.ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-child-b',
+  template: `
+    <h1>{{ message }}</h1>
+  `
+})
+export class ChildBComponent {
+  @Input() message: string;
+}
+```
+
+---
+
+#### Using an injectable Service as a Mediator
+
+Here, we can use an injectable service as a mediator between two components. The service will handle the communication between the components using `RxJS Subjects`.
+
+- Whenever the component is created, the mediator service is injected, and the component can subscribe to events emitted by the service (as opposed to using `@Input()` parameters).
+- This is used when the components are not directly related (not parent-child or siblings or have the same parent), and they need to communicate with each other.
+
+In this example, we have a `MediatorService` that acts as a mediator between two components: `ComponentA` and `ComponentB`. The `MediatorService` will handle the communication between the two components using `RxJS Subjects`.
+
+![mediator-service](./img/mediator-pattern-2.png)
+
+```ts
+// 📄 mediator.service.ts
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MediatorService {
+  private messageSubject = new Subject<string>();
+  // or we can use BehaviorSubject if we want to have an initial value + the last emitted value
+  // private messageSubject = new BehaviorSubject<string>('Initial Message');
+
+  message$ = this.messageSubject.asObservable();
+
+  sendMessage(message: string) {
+    this.messageSubject.next(message);
+  }
+}
+```
+
+```ts
+// 📄 component-a.ts
+import { Component } from '@angular/core';
+import { MediatorService } from './mediator.service';
+
+@Component({
+  selector: 'app-component-a',
+  template: `
+    <button (click)="sendMessage()">Send Message to Component B</button>
+  `
+})
+export class ComponentA {
+  constructor(private mediatorService: MediatorService) {}
+
+  sendMessage() {
+    this.mediatorService.sendMessage('Hello from Component A');
+  }
+}
+```
+
+```ts
+// 📄 component-b.ts
+import { Component, OnInit } from '@angular/core';
+import { MediatorService } from './mediator.service';
+
+@Component({
+  selector: 'app-component-b',
+  template: `
+    <h1>{{ message }}</h1>
+  `
+})
+export class ComponentB implements OnInit {
+  message: string;
+  constructor(private mediatorService: MediatorService) {}
+  ngOnInit() {
+    this.mediatorService.message$.subscribe(msg => {
+      this.message = msg; // receiving message from Component A
+    });
+  }
+}
+```
+
+- It's important to subscribe to the observable in the `ngOnInit` lifecycle hook to ensure that the component is fully initialized before receiving messages.
+- Also, don't forget to unsubscribe from the observable in the `ngOnDestroy` lifecycle hook to prevent memory leaks.
+- You can also use `BehaviorSubject` instead of `Subject` if you want to have an initial value and the last emitted value.
+  - The `BehaviorSubject` requires an initial value when created, and it will always emit the last emitted value to new subscribers. **so even if `ComponentB` subscribes to the observable after `ComponentA` has sent a message, it will still receive the last emitted message**.
+  - This is useful when you want to ensure that the component always has a value to display, even if it subscribes to the observable after the message has been sent.
+  - in this case the `ReplaySubject` can also be used, which is similar to `BehaviorSubject`, but it can store a buffer of the last `n` emitted values.
+
+---
+
+### Exposing a child component's API to the parent using ViewChild
+
+Another way for communication between parent and child components is by using the `@ViewChild()` decorator. This allows the parent component to access the child component's properties and methods directly.
+
+- It works by querying the child component from the parent component's template, and then accessing the child component's instance in the parent component's class.
+- This is useful when you want to call a method or access a property of the child component from the parent component.
+
+In this example, we have a `ChildComponent` that has a method called `greet()`. The `ParentComponent` uses the `@ViewChild()` decorator to access the `ChildComponent` instance and call the `greet()` method.
+
+![viewchild](./img/viewchild-1.png)
+
+```ts
+// 📄 child.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `
+    <h1>Child Component</h1>
+  `
+})
+export class ChildComponent {
+  greet() {
+    return 'Hello from Child Component';
+  }
+}
+```
+
+```ts
+// 📄 parent.component.ts
+import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { ChildComponent } from './child.component';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-child></app-child>
+    <button (click)="callGreet()">Call Greet Method</button>
+    <p>{{ message }}</p>
+  `
+})
+export class ParentComponent implements AfterViewInit {
+  @ViewChild(ChildComponent) childComponent: ChildComponent;
+  message: string;
+
+  ngAfterViewInit() {
+    this.message = this.childComponent.greet();
+  }
+
+  callGreet() {
+    this.message = this.childComponent.greet();
+  }
+}
+```
+
+- In this example, the `ParentComponent` uses the `@ViewChild()` decorator to query the `ChildComponent` instance. The `greet()` method of the `ChildComponent` is called in the `ngAfterViewInit()` lifecycle hook to ensure that the child component is fully initialized before accessing its properties and methods.
+  - If you try to access the child component in the `ngOnInit()` lifecycle hook, it will be `undefined` because the child component is not yet initialized at that point.
+  - **So it's important to use `ngAfterViewInit()` when using `@ViewChild()` to access child components.**
+
+---
+
+### Projecting templates at runtime using ng-content
+
+**Content Projection** is a powerful feature in Angular that allows you to insert dynamic content into a component's template at runtime. This is done using the `<ng-content>` directive, which acts as a placeholder for the projected content.
+
+- Using `<ng-content>`, you can create reusable components that can accept different content from their parent components, making them more flexible and adaptable to various use cases.
+
+> Check [Content Projection section](#content-projection-slots) and come back here for more details and examples.
+
+In this example, we have a `CardComponent` that uses `<ng-content>` to project content from its parent component.
+
+![ng-content](./img/ng-content-1.png)
+
+```ts
+// 📄 card.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-card',
+  template: `
+    <div class="card">
+      <ng-content></ng-content>
+      <!-- Placeholder for projected content -->
+    </div>
+  `
+})
+export class CardComponent {}
+```
+
+```ts
+// 📄 parent.component.ts
+import { Component } from '@angular/core';
+import { CardComponent } from './card.component';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <app-card>
+      <h2>Card Title</h2>
+      <p>This is some content inside the card.</p>
+    </app-card>
+  `
+})
+export class ParentComponent {}
+```
+
+- In this example, the `CardComponent` defines a `<ng-content>` directive in its template, which acts as a placeholder for the content projected from the `ParentComponent`. When the `ParentComponent` uses the `CardComponent`, it can insert any content between the opening and closing tags of the `app-card` component, and that content will be rendered inside the card.
+
+---
+
+## Data flow between components
+
+![communication](./img/data-flow-0.png)
+
+---
+
+### Parent to Child (Passing data / Input / Props)
+
+The parent component can pass data to the child component using `@Input()` decorator, and the child component can receive the data using property binding.
+
+![parent-child](./img/data-flow-1.png)
+
+- data (props) are passed using `property binding` in the parent component
+- we need to use `@Input()` decorator in the child component to receive the data (tell the child component that it will receive data from the parent component)
+
+- Example
+
+  ```ts
+  // in hero-child.component.ts
+  import { Component, Input } from '@angular/core';
+
+  import { Hero } from './hero';
+
+  @Component({
+    selector: 'app-hero-child',
+    template: `
+      <h3>{{ hero.name }} says:</h3>
+      <p>I, {{ hero.name }}, am at your service, {{ masterName }}.</p>
+    `
+  })
+  export class HeroChildComponent {
+    @Input() hero!: Hero; // "!" means that it's a required property
+    @Input('master') masterName = ''; // here we use an "alias" so that in the parent component we use the alias not the othername(masterName)
+  }
+  ```
+
+  ```ts
+  // in hero-parent.component.ts
+  import { Component } from '@angular/core';
+
+  @Component({
+    selector: 'app-hero-parent',
+    template: `
+      <h2>{{ master }} controls {{ heroes.length }} heroes</h2>
+
+      <app-hero-child *ngFor="let hero of heroes" [hero]="hero" [master]="master"></app-hero-child>
+    `
+  })
+  export class HeroParentComponent {
+    heroes = [{ name: 'Dr IQ' }, { name: 'Magneta' }, { name: 'Bombasto' }];
+    master = 'Master';
+  }
+  ```
+
+- To have an **alias** for the input property, you can use the `@Input('alias')` decorator
+
+  ```ts
+  @Input('master') masterName = '';
+  ```
+
+  - here we use an alias(`"master"`) so that in the parent component we use the alias not the other name (`"masterName"`), but in the child component we use the other name (`"masterName"`)
+
+- **To make a prop required**, you should:
+
+  - 1️⃣ use the `!` operator after the property name (To tell TypeScript that this property will be initialized later, and it will not be `undefined`)
+  - 2️⃣ use the `@Input({ required: true })` decorator
+
+    ```ts
+    @Input({ required: true }) hero!: Hero;
+    ```
+
+---
+
+### Child to Parent (Emitting events / Output)
+
+- To emit an event from a child component to a parent component, you can use the `@Output()` decorator
+
+  ```ts
+  // in child.component.ts
+  import { Component, Output, EventEmitter } from '@angular/core';
+
+  @Component({
+    selector: 'app-child',
+    template: `
+      <button (click)="sayHi()">Click me</button>
+    `
+  })
+  export class ChildComponent {
+    @Output() myEvent = new EventEmitter<string>(); // event will be emitted with a string as an argument and the name of the event is "myEvent"
+
+    sayHi() {
+      this.myEvent.emit('Hello');
+    }
+  }
+  ```
+
+  ```html
+  <!-- in parent.component.html -->
+  <app-child (myEvent)="onMyEvent($event)"></app-child>
+  ```
+
+  ```ts
+  // in parent.component.ts
+  onMyEvent(event: string) {
+    console.log(event);
+  }
+  ```
+
+  - The `@Output()` decorator is used to emit events from a child component to a parent component
+  - The `EventEmitter` class is used to emit events
+  - The `emit()` method is used to emit an event with a value
+  - The event name should be the same in the parent component as the name of the event in the child component
+
+- **Notes:**
+
+  - Make sure to handle **event bubbling** and **event propagation** in the parent component by using the `$event` object and the `stopPropagation()` method
+
+    ```html
+    <button (click)="sayHi(); $event.stopPropagation()">Click me</button>
+    ```
+
+  - When you know the type of value that will be emitted, you can specify the type of the `EventEmitter` in the `@Output()` decorator using TypeScript generics `<T>`:
+
+    ```ts
+    @Output() myEvent = new EventEmitter<string>(); // here we specify that the event will emit a string value
+    ```
+
+---
+
+### Template variable (Refs)
+
+It's a way to reference an element in the template so that you can access it in the template or in the component class.
+
+- it starts with `#`
+
+- to access it:
+
+  - in the template:
+
+    ```html
+    <input #nameInput />
+
+    <button (click)="fun(nameInput.value)"></button>
+    ```
+
+  - in the component class, you can use the `@ViewChild` decorator to get a reference to the element
+
+    ```ts
+    @ViewChild('nameInput') nameInput:ElementRef;
+    ```
+
+    > If you want to use signals, you can use `signal()` function to create a signal that holds the value of the input element
+
+- To select multiple elements, you can use the `@ViewChildren` decorator
+
+  ```ts
+  @ViewChildren('nameInput') nameInputs: QueryList<ElementRef>;
+  ```
+
+- To access content-projected (slots) elements, you can use the `@ContentChild` decorator
+
+  ```html
+  <!-- parent -->
+  <child-component>
+    <input #nameInput />
+  </child-component>
+  ```
+
+  ```html
+  <!-- child -->
+  <ng-content></ng-content>
+  ```
+
+  ```ts
+  @ContentChild('nameInput') nameInput: ElementRef;
+  ```
+
+- **Use cases:**
+
+  - To access the value of an input elements in a form instead of using `ngModel`
+
+    ```html
+    <form (submit)="submit(nameInput.value)">
+      <input #nameInput />
+      <button type="submit">Submit</button>
+    </form>
+    ```
+
+    ```ts
+    submit(name: string) {
+      console.log(name);
+    }
+    ```
+
+---
+
+### Content projection (Slots)
+
+**Content projection** is a pattern in which you `insert, or project`, the content you want to use inside another component.
+
+> This pattern is used as a replacement for using `properties/props` to pass data from a parent component to a child component and add special handling for the content based on the `properties/props`.
+>
+> Also, it's used when you want to pass content to a component and want to keep the outer/wrapper component clean and have fixed styles or behavior.
+
+- This is done using the `<ng-content>` element in the child component
+  ![content-projection](./img/content-projection-1.png)
+  - **`<ng-content>` is a placeholder for the content that will be projected into the component**
+
+#### Single-slot content projection
+
+```html
+<!-- child -->
+<h2>Single-slot content projection</h2>
+<ng-content></ng-content>
+
+<!-------------------------------------------->
+
+<!-- parent -->
+<child-component>
+  <p>the projected content</p>
+</child-component>
+```
+
+---
+
+#### Multi-slot content projection
+
+- A component can have multiple slots. Each slot can specify a CSS selector that determines which content goes into that slot. This pattern is referred to as multi-slot content projection. With this pattern, you must specify where you want the projected content to appear. You accomplish this task by using the `select` attribute of `<ng-content>`.
+
+  ```html
+  <!-- child -->
+  <h2>Multi-slot content projection</h2>
+  <ng-content select=".header"></ng-content>
+  <ng-content select="[mainContent]"></ng-content>
+  <ng-content select="#footer"></ng-content>
+  <ng-content></ng-content>
+  ```
+
+  ```html
+  <!-- parent -->
+  <child-component>
+    <p class="header">Header content</p>
+    <p mainContent>Main content</p>
+    <p id="footer">Footer content</p>
+  </child-component>
+  ```
+
+- Here, the `header` content will be projected into the first slot, and the `footer` content will be projected into the second slot.
+- The `select` attribute of `<ng-content>` is used to specify the CSS selector that determines which content goes into that slot.
+  - It can select by any selector type: `class`, `id`, `element name`, `attribute`, etc.
+- The `<ng-content>` element without the `select` attribute is the **default slot**, and it will project any content that doesn't match the other slots.
+
+---
+
+#### Handling projected content
+
+- Sometimes, you may want to show/hide a wrapper element that contains `<ng-content>`, based on if there's any projected content or not.
+
+  - To do so we may:
+
+    - 1️⃣ use `@ContentChild` decorator to check if there's any projected content or not, and `*ngIf` to show/hide the wrapper element
+
+      ```ts
+      @ContentChild('projectedContent') projectedContent!: ElementRef;
+      ```
+
+      ```html
+      <div *ngIf="projectedContent">
+        <ng-content></ng-content>
+      </div>
+      ```
+
+    - 2️⃣ use `:empty` CSS pseudo-class to style the wrapper element based on if there's any projected content or not
+
+      ```html
+      <div class="wrapper">
+        <ng-content></ng-content>
+      </div>
+      ```
+
+      ```css
+      .wrapper:empty {
+        display: none;
+      }
+      ```
+
+---
+
 ## Standalone Components (NEW)
 
 It's a new feature in Angular that allows you to create components **without the need for a module**. This means that you can create a component and use it directly in your application without having to create a module for it.
@@ -603,6 +1347,8 @@ It's a new feature in Angular that allows you to create components **without the
   }
   ```
 
+````
+
 - You also need to provide the service in the `providers` array of the component decorator.
 
   ```ts
@@ -634,3 +1380,4 @@ It's a new feature in Angular that allows you to create components **without the
 ### Routing with Standalone Components
 
 See this section: [Adding Routing to an Angular App](./4-Angular-Router.md#adding-routing-to-an-angular-app)
+````

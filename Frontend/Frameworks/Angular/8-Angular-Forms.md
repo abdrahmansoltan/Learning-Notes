@@ -1063,8 +1063,8 @@ Here, we can create custom validators to validate the form fields, and we can us
 
 - You can watch for changes in the form using the `valueChanges` or `statusChanges` **observables** from the form or form controls
 
-  - `valueChanges` emits the form value whenever it changes
-  - `statusChanges` emits the form status whenever it changes
+  - `valueChanges` emits the form value whenever it changes (form-control changes, form-group changes, or form-array changes)
+  - `statusChanges` emits the form status whenever it changes (valid, invalid, pending, or disabled)
 
 - Usually, we subscribe to these observables in the `ngOnInit` lifecycle hook, and unsubscribe from them in the `ngOnDestroy` lifecycle hook to avoid memory leaks
 
@@ -1121,6 +1121,13 @@ Here, we can create custom validators to validate the form fields, and we can us
         .pipe(delay(300)) // Delay the emission of the value by 300ms
         .subscribe(value => {
           console.log('Form value changed:', value);
+        });
+
+      // ------------------ or on a formControl ------------------ //
+      this.myForm.get('search').valueChanges
+        .pipe(debounceTime(300))
+        .subscribe(value => {
+          console.log('Search value changed:', value);
         });
     }
     ```

@@ -19,6 +19,7 @@
       - [Provider Configuration Methods](#provider-configuration-methods)
       - [Provider Location \& Scope](#provider-location--scope)
       - [Switching injectables easily in Angular](#switching-injectables-easily-in-angular)
+      - [Providers in lazy-loaded modules](#providers-in-lazy-loaded-modules)
     - [Singleton](#singleton)
     - [`@injectable`](#injectable)
   - [Services \& RxJS](#services--rxjs)
@@ -596,6 +597,7 @@ Angular uses a **hierarchical dependency injection system**, which means that it
   - Each component can have an `injector` instance capable of injecting objects or primitive values into it
   - Angular application has a root injector available to all its modules
   - To tell the injector what to inject, you specify the `provider` for the dependency
+  - Injectors form a hierarchy, and if Angular can’t find the provider for the requested type at the component level, it’ll try to find it by traversing parent injectors.
 - **Provider**: Maps a token (type) to a concrete implementation that the injector will use
   - An injector will inject the object or value specified in the provider into the constructor of a component
   - Providers allow you to map a custom type (or a token) to a concrete implementation of this type (or value)
@@ -704,6 +706,17 @@ Let's imagine that we have a `ProductService` that fetches product data from an 
 - Notes:
   - this technique is especially useful for testing, where we can use mock services to simulate different scenarios without making actual API calls or changing the production code.
   - Also this pattern can be used when working with abstract classes or interfaces, where we can provide different implementations of the same interface based on the context or environment.
+
+---
+
+#### Providers in lazy-loaded modules
+
+- When using lazy-loaded modules in Angular, each lazy-loaded module has its own injector that is a direct child of the parent module's injector
+- This means that services provided in a lazy-loaded module are scoped to that module and its components
+  - If a service is provided in both the parent module and the lazy-loaded module, the lazy-loaded module's service will take precedence for components within that module
+  - This allows for better encapsulation and separation of concerns, as services can be scoped to specific modules without affecting the global application state or other modules
+
+> providers of eagerly loaded modules are merged with providers of the root module. In other words, **Angular has a single injector for all eagerly loaded modules**.
 
 ---
 

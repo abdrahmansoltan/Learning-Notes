@@ -36,20 +36,13 @@
     - [Custom Directives](#custom-directives)
       - [Custom Attribute Directive](#custom-attribute-directive)
       - [Custom Structural Directive](#custom-structural-directive)
-  - [Data flow between components](#data-flow-between-components)
-    - [Parent to Child (Passing data / Input / Props)](#parent-to-child-passing-data--input--props)
-    - [Child to Parent (Emitting events / Output)](#child-to-parent-emitting-events--output)
-    - [Template variable (Refs)](#template-variable-refs)
-    - [Content projection (Slots)](#content-projection-slots)
-      - [Single-slot content projection](#single-slot-content-projection)
-      - [Multi-slot content projection](#multi-slot-content-projection)
-      - [Handling projected content](#handling-projected-content)
   - [Pipes](#pipes)
     - [How to use Pipes](#how-to-use-pipes)
     - [Custom Pipes](#custom-pipes)
     - [Chaining pipes](#chaining-pipes)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
+  - [Angular flex-layout](#angular-flex-layout)
   - [Angular Service Worker](#angular-service-worker)
   - [Notes](#notes)
     - [Expressions vs String Interpolation](#expressions-vs-string-interpolation)
@@ -74,7 +67,8 @@ Angular and TypeScript are excellent tools for developing web applications due t
 - **Concise and Readable Code**: TypeScript classes and interfaces make code easier to write and maintain.
 - **Flexible Compilation**: TypeScript compiles to various JavaScript versions, and ahead-of-time compilation improves app performance.
 - **Server-Side Rendering**: [Angular Universal](https://angular.io/guide/universal) enhances SEO and search engine indexing through server-side rendering.
-- **Modern UI Components**: [Angular Material](https://material.angular.dev/) provides a rich set of over 35 well-designed UI components.
+- **Modern UI Components**: [Angular Material (AM)](https://material.angular.dev/) provides a rich set of over 35 well-designed UI components.
+  - It's an official Angular component library that implements Google's Material Design guidelines.
 - **Completeness compared to other frameworks**: Angular is a full-fledged framework that provides everything you need to build a web application out of the box, unlike libraries like React or Vue which require additional libraries for routing, state management, forms, etc.
   - If you pick React or Vue.js for your project, you’ll also need to select other products that support routing, dependency injection, forms, bundling and deploying the app, and more. In the end, your app will consist of multiple libraries and tools picked by a senior developer or an architect. If this developer decides to leave the project, finding a replacement won’t be easy because the new hire may not be familiar with all the libraries and tools used in the project.
   - The Angular framework is a platform that includes all you need for developing and deploying a web app, batteries included. Replacing one Angular developer with another is easy, as long as the new person knows Angular.
@@ -644,6 +638,8 @@ Sometimes you want to apply styles to a component, but you don't want those styl
 > Angular has a mechanism called **data binding** that allows you to keep a component’s properties in sync with the view.
 >
 > Angular supports 2 types of data binding: **one-way (Unidirectional) data binding** and **two-way data binding**.
+>
+> There's actually a third way called **"Mediator Design Pattern"** which is used for communication between sibling components through a shared service (usually for components that are not directly related in the component tree -- parent-child relationship). This pattern helps manage complex interactions by centralizing communication in a mediator service, promoting loose coupling between components.
 
 ![data binding](./img/databinding2.PNG)
 ![data binding](./img/databinding.PNG)
@@ -1276,294 +1272,6 @@ Here, we use `TemplateRef` and `ViewContainerRef` to create a structural directi
 
 ---
 
-## Data flow between components
-
-![communication](./img/data-flow-0.png)
-
----
-
-### Parent to Child (Passing data / Input / Props)
-
-The parent component can pass data to the child component using `@Input()` decorator, and the child component can receive the data using property binding.
-
-![parent-child](./img/data-flow-1.png)
-
-- data (props) are passed using `property binding` in the parent component
-- we need to use `@Input()` decorator in the child component to receive the data (tell the child component that it will receive data from the parent component)
-
-- Example
-
-  ```ts
-  // in hero-child.component.ts
-  import { Component, Input } from '@angular/core';
-
-  import { Hero } from './hero';
-
-  @Component({
-    selector: 'app-hero-child',
-    template: `
-      <h3>{{ hero.name }} says:</h3>
-      <p>I, {{ hero.name }}, am at your service, {{ masterName }}.</p>
-    `
-  })
-  export class HeroChildComponent {
-    @Input() hero!: Hero; // "!" means that it's a required property
-    @Input('master') masterName = ''; // here we use an "alias" so that in the parent component we use the alias not the othername(masterName)
-  }
-  ```
-
-  ```ts
-  // in hero-parent.component.ts
-  import { Component } from '@angular/core';
-
-  @Component({
-    selector: 'app-hero-parent',
-    template: `
-      <h2>{{ master }} controls {{ heroes.length }} heroes</h2>
-
-      <app-hero-child *ngFor="let hero of heroes" [hero]="hero" [master]="master"></app-hero-child>
-    `
-  })
-  export class HeroParentComponent {
-    heroes = [{ name: 'Dr IQ' }, { name: 'Magneta' }, { name: 'Bombasto' }];
-    master = 'Master';
-  }
-  ```
-
-- To have an **alias** for the input property, you can use the `@Input('alias')` decorator
-
-  ```ts
-  @Input('master') masterName = '';
-  ```
-
-  - here we use an alias(`"master"`) so that in the parent component we use the alias not the other name (`"masterName"`), but in the child component we use the other name (`"masterName"`)
-
-- **To make a prop required**, you should:
-
-  - 1️⃣ use the `!` operator after the property name (To tell TypeScript that this property will be initialized later, and it will not be `undefined`)
-  - 2️⃣ use the `@Input({ required: true })` decorator
-
-    ```ts
-    @Input({ required: true }) hero!: Hero;
-    ```
-
----
-
-### Child to Parent (Emitting events / Output)
-
-- To emit an event from a child component to a parent component, you can use the `@Output()` decorator
-
-  ```ts
-  // in child.component.ts
-  import { Component, Output, EventEmitter } from '@angular/core';
-
-  @Component({
-    selector: 'app-child',
-    template: `
-      <button (click)="sayHi()">Click me</button>
-    `
-  })
-  export class ChildComponent {
-    @Output() myEvent = new EventEmitter<string>(); // event will be emitted with a string as an argument and the name of the event is "myEvent"
-
-    sayHi() {
-      this.myEvent.emit('Hello');
-    }
-  }
-  ```
-
-  ```html
-  <!-- in parent.component.html -->
-  <app-child (myEvent)="onMyEvent($event)"></app-child>
-  ```
-
-  ```ts
-  // in parent.component.ts
-  onMyEvent(event: string) {
-    console.log(event);
-  }
-  ```
-
-  - The `@Output()` decorator is used to emit events from a child component to a parent component
-  - The `EventEmitter` class is used to emit events
-  - The `emit()` method is used to emit an event with a value
-  - The event name should be the same in the parent component as the name of the event in the child component
-
-- **Notes:**
-
-  - Make sure to handle **event bubbling** and **event propagation** in the parent component by using the `$event` object and the `stopPropagation()` method
-
-    ```html
-    <button (click)="sayHi(); $event.stopPropagation()">Click me</button>
-    ```
-
-  - When you know the type of value that will be emitted, you can specify the type of the `EventEmitter` in the `@Output()` decorator using TypeScript generics `<T>`:
-
-    ```ts
-    @Output() myEvent = new EventEmitter<string>(); // here we specify that the event will emit a string value
-    ```
-
----
-
-### Template variable (Refs)
-
-It's a way to reference an element in the template so that you can access it in the template or in the component class.
-
-- it starts with `#`
-
-- to access it:
-
-  - in the template:
-
-    ```html
-    <input #nameInput />
-
-    <button (click)="fun(nameInput.value)"></button>
-    ```
-
-  - in the component class, you can use the `@ViewChild` decorator to get a reference to the element
-
-    ```ts
-    @ViewChild('nameInput') nameInput:ElementRef;
-    ```
-
-    > If you want to use signals, you can use `signal()` function to create a signal that holds the value of the input element
-
-- To select multiple elements, you can use the `@ViewChildren` decorator
-
-  ```ts
-  @ViewChildren('nameInput') nameInputs: QueryList<ElementRef>;
-  ```
-
-- To access content-projected (slots) elements, you can use the `@ContentChild` decorator
-
-  ```html
-  <!-- parent -->
-  <child-component>
-    <input #nameInput />
-  </child-component>
-  ```
-
-  ```html
-  <!-- child -->
-  <ng-content></ng-content>
-  ```
-
-  ```ts
-  @ContentChild('nameInput') nameInput: ElementRef;
-  ```
-
-- **Use cases:**
-
-  - To access the value of an input elements in a form instead of using `ngModel`
-
-    ```html
-    <form (submit)="submit(nameInput.value)">
-      <input #nameInput />
-      <button type="submit">Submit</button>
-    </form>
-    ```
-
-    ```ts
-    submit(name: string) {
-      console.log(name);
-    }
-    ```
-
----
-
-### Content projection (Slots)
-
-**Content projection** is a pattern in which you `insert, or project`, the content you want to use inside another component.
-
-> This pattern is used as a replacement for using `properties/props` to pass data from a parent component to a child component and add special handling for the content based on the `properties/props`.
->
-> Also, it's used when you want to pass content to a component and want to keep the outer/wrapper component clean and have fixed styles or behavior.
-
-- This is done using the `<ng-content>` element in the child component
-  ![content-projection](./img/content-projection-1.png)
-  - **`<ng-content>` is a placeholder for the content that will be projected into the component**
-
-#### Single-slot content projection
-
-```html
-<!-- child -->
-<h2>Single-slot content projection</h2>
-<ng-content></ng-content>
-
-<!-------------------------------------------->
-
-<!-- parent -->
-<child-component>
-  <p>the projected content</p>
-</child-component>
-```
-
----
-
-#### Multi-slot content projection
-
-- A component can have multiple slots. Each slot can specify a CSS selector that determines which content goes into that slot. This pattern is referred to as multi-slot content projection. With this pattern, you must specify where you want the projected content to appear. You accomplish this task by using the `select` attribute of `<ng-content>`.
-
-  ```html
-  <!-- child -->
-  <h2>Multi-slot content projection</h2>
-  <ng-content select=".header"></ng-content>
-  <ng-content select="[mainContent]"></ng-content>
-  <ng-content select="#footer"></ng-content>
-  <ng-content></ng-content>
-  ```
-
-  ```html
-  <!-- parent -->
-  <child-component>
-    <p class="header">Header content</p>
-    <p mainContent>Main content</p>
-    <p id="footer">Footer content</p>
-  </child-component>
-  ```
-
-- Here, the `header` content will be projected into the first slot, and the `footer` content will be projected into the second slot.
-- The `select` attribute of `<ng-content>` is used to specify the CSS selector that determines which content goes into that slot.
-  - It can select by any selector type: `class`, `id`, `element name`, `attribute`, etc.
-- The `<ng-content>` element without the `select` attribute is the **default slot**, and it will project any content that doesn't match the other slots.
-
----
-
-#### Handling projected content
-
-- Sometimes, you may want to show/hide a wrapper element that contains `<ng-content>`, based on if there's any projected content or not.
-
-  - To do so we may:
-
-    - 1️⃣ use `@ContentChild` decorator to check if there's any projected content or not, and `*ngIf` to show/hide the wrapper element
-
-      ```ts
-      @ContentChild('projectedContent') projectedContent!: ElementRef;
-      ```
-
-      ```html
-      <div *ngIf="projectedContent">
-        <ng-content></ng-content>
-      </div>
-      ```
-
-    - 2️⃣ use `:empty` CSS pseudo-class to style the wrapper element based on if there's any projected content or not
-
-      ```html
-      <div class="wrapper">
-        <ng-content></ng-content>
-      </div>
-      ```
-
-      ```css
-      .wrapper:empty {
-        display: none;
-      }
-      ```
-
----
-
 ## Pipes
 
 It's a way to transform data **in the template** before displaying it, and it's used to format data in a specific way.
@@ -1914,6 +1622,79 @@ A common problem in web development is how to create a modal dialog that is posi
   ```
 
   - Here, we are creating a modal component that will be rendered in the center of the page using the `Angular CDK` overlay service
+
+---
+
+## Angular flex-layout
+
+The **Angular Flex Layout library** ([https://github.com/angular/flex-layout](https://github.com/angular/flex-layout)) is a UI layout engine for implementing RWD without writing media queries in your CSS files. The library provides a set of simple Angular directives that internally apply the rules of the flexbox layout and offer you the `ObservableMedia` service that notifies your app about the current width of the viewport on the user’s device.
+
+> It was deprecated in favor of using CSS Flexbox and CSS Grid directly in your styles.
+>
+> You can find more here [in this article](https://blog.angular.dev/modern-css-in-angular-layouts-4a259dca9127)
+
+- Angular Flex Layout has the following advantages over the standard CSS API:
+
+  - It produces cross-browser-compatible CSS. (this is less relevant today as modern browsers have better support for flexbox and grid)
+  - It provides an Angular-friendly API for dealing with media queries using directives and observables.
+
+- Example of using Angular Flex Layout
+
+  - **Using Flex Layout directives**
+
+    ```html
+    <div fxLayout="row" fxLayout.sm="column" fxLayoutAlign="center center" fxLayoutGap="10px">
+      <div fxFlex="25%">Item 1</div>
+      <div fxFlex="25%">Item 2</div>
+      <div fxFlex="25%">Item 3</div>
+    </div>
+    ```
+
+    - Here, we are creating a row layout with three items that are centered and have a gap of `10px` between them.
+    - On small screens, the layout will change to a column layout.
+
+  - **Using `ObservableMedia` service to detect screen size changes**
+
+    - The `ObservableMedia` service enables subscribing to screen-size changes and programmatically changing the look and feel of your app.
+      - For example, on large screens, you may decide to display additional information. To avoid rendering unnecessary components on small screens, you may subscribe to events emitted by `ObservableMedia`, and if the screen size becomes larger, you can render more components.
+
+    ```ts
+    import { Component, OnInit } from '@angular/core';
+    import { ObservableMedia, MediaChange } from '@angular/flex-layout';
+    import { Subscription } from 'rxjs';
+
+    @Component({
+      selector: 'app-responsive',
+      template: `
+        <div *ngIf="isMobile">Mobile View</div>
+        <div *ngIf="!isMobile">Desktop View</div>
+      `
+    })
+    export class ResponsiveComponent implements OnInit {
+      isMobile = false;
+      mediaSub!: Subscription;
+
+      constructor(private media: ObservableMedia) {}
+
+      ngOnInit() {
+        this.mediaSub = this.media.asObservable().subscribe((change: MediaChange) => {
+          this.isMobile = change.mqAlias === 'xs' || change.mqAlias === 'sm';
+        });
+      }
+
+      ngOnDestroy() {
+        this.mediaSub.unsubscribe();
+      }
+    }
+    ```
+
+    - we can also use `media.isActive('xs')` method to check if the current screen size matches a specific media query alias without subscribing to the observable
+
+      ```ts
+      this.isMobile = this.media.isActive('xs') || this.media.isActive('sm');
+      ```
+
+⚠️ I won't add more notes or explanations here because it's deprecated, but it's good to know about it.
 
 ---
 
