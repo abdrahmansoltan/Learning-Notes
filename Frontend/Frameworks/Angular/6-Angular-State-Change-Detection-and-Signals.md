@@ -5,9 +5,11 @@
     - [State Management](#state-management)
   - [Angular Detection Mechanism](#angular-detection-mechanism)
     - [Zone.js](#zonejs)
+    - [Change Detection Strategies](#change-detection-strategies)
+    - [Catching changes](#catching-changes)
     - [Performance Optimization in Detection Mechanism](#performance-optimization-in-detection-mechanism)
       - [Avoiding heavy operations in the component's Getters and Setters](#avoiding-heavy-operations-in-the-components-getters-and-setters)
-      - [`OnPush` Strategy](#onpush-strategy)
+      - [Using `onPush` for optimization](#using-onpush-for-optimization)
       - [`ngZone.runOutsideAngular()`](#ngzonerunoutsideangular)
     - [Triggering Change Detection Manually](#triggering-change-detection-manually)
   - [Signals](#signals)
@@ -49,20 +51,126 @@ Angular uses a change detection mechanism to detect changes in the component sta
 ![change-detection](./img/change-detection-1.png)
 
 - When a property in the component class changes, Angular automatically updates the view to reflect the new value of the property, this is done by:
-  - Checking **all components in the Application's component tree** to see if any of their properties have changed
+  - Checking **all components in the Application's component tree (makes a single pass from top to bottom of the component-tree)** to see if any of their properties have changed
   - If a property has changed, Angular updates the view (DOM) accordingly
+
 - **Notes**
-  - Angular's change detection mechanism **runs twice in development mode** to help catch errors, but it only runs once in production mode
+  - The change-detection mechanism applies changes only in the UI (DOM), not in the component class properties
+  - Angular's change detection mechanism **runs twice in development mode** to help catch errors, but **it only runs once in production mode**
 
 ### Zone.js
 
 [`Zone.js`](https://www.npmjs.com/package/zone.js) is a library that Angular uses to detect changes in the component state and update the view accordingly. It **patches the `JavaScript` event loop and detects when an event occurs**, and then it triggers change detection in Angular.
+
+> Starting from Angular 16, Signals are introduced as a more efficient way to manage state, and they can be used as an alternative to relying on Zone.js for change detection. However, Zone.js is still used under the hood for other purposes, such as handling asynchronous operations.
 
 ![zone](./img/zone-1.webp)
 
 - This means that when an event occurs, Angular will check if any of the component properties have changed, and if so, it will update the view accordingly
   ![zone](./img/zone-2.webp)
 - This is done automatically, so you don't need to worry about it, but it's good to know how it works under the hood
+
+---
+
+### Change Detection Strategies
+
+Angular provides two change detection strategies:
+
+1. **Default**
+   - This is the default change detection strategy, which checks all components in the component tree on every change detection cycle, regardless of where the change occurred.
+2. **OnPush**
+   - This strategy tells Angular to check the component only when certain conditions are met, such as when the component's input properties change, or when an event occurs in the component (like a button click), or when signals or observables that the component is subscribed to emit a new value.
+
+![change-detection-strategies](./img/change-detection-strategies-1.png)
+
+> To debug changes or have custom control over change detection, you can use the `ngOnChanges` and `ngDoCheck` lifecycle hooks in your components.
+
+---
+
+### Catching changes
+
+- **Notes**
+
+  - Be aware of the "Mutable vs Immutable" data structures when detecting changes (using `ngOnChanges` or `ngDoCheck`). Angular only detects changes to input properties when the reference of the object changes.
+    - If you mutate an object or array without changing its reference, `ngOnChanges` will not be triggered.
+    - You will notice this if you're using `OnPush` change detection strategy, as it relies on reference checks to determine if a component needs to be checked for changes.
+    - But if you're using the `default` change detection strategy, Angular will still detect changes even if the reference doesn't change, because it checks all components in the tree on every change detection cycle.
+    - ⚠️ So make sure that you're passing the new object or array reference to the child component to trigger `ngOnChanges`. or use immutable data structures.
+
+- `ngOnChanges` hook
+
+  - The `ngOnChanges` lifecycle hook is called whenever one or more data-bound input properties change. It receives a `SimpleChanges` object that contains the previous and current values of the changed properties.
+
+    > More here in the [Angular Lifecycle section](./2-Angular-Components.md#ngonchanges)
+
+  - Example:
+
+    ```ts
+    import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+
+    @Component({
+      selector: 'app-child',
+      template: `
+        <p>Child Component</p>
+        <p>Input Value: {{ inputValue }}</p>
+      `
+    })
+    export class ChildComponent implements OnChanges {
+      @Input() inputValue: string;
+
+      ngOnChanges(changes: SimpleChanges) {
+        if (changes['inputValue']) {
+          const prevValue = changes['inputValue'].previousValue;
+          const currValue = changes['inputValue'].currentValue;
+          console.log(`inputValue changed from ${prevValue} to ${currValue}`);
+        }
+      }
+    }
+    ```
+
+- `ngDoCheck` hook
+
+  - The `ngDoCheck` lifecycle hook is called during every change detection cycle, and it allows you to implement your own change detection logic.
+  - ⚠️ Caution: only use `ngDoCheck` when you need to implement custom change detection logic that cannot be achieved using `ngOnChanges` or other lifecycle hooks, as **it can lead to performance issues** if not used carefully.
+
+  - Example:
+
+    ```ts
+    import { Component, DoCheck } from '@angular/core';
+
+    @Component({
+      selector: 'app-example',
+      template: `
+        <p>Example Component</p>
+        <p>Count: {{ count }}</p>
+        <button (click)="increment()">Increment</button>
+      `
+    })
+    export class ExampleComponent implements DoCheck {
+      count = 0;
+      private previousCount = 0;
+
+      ngDoCheck() {
+        if (this.count !== this.previousCount) {
+          console.log(`Count changed from ${this.previousCount} to ${this.count}`);
+          this.previousCount = this.count;
+        }
+      }
+
+      increment() {
+        this.count++;
+      }
+    }
+    ```
+
+- What are the differences between `ngOnChanges` and `ngDoCheck`?
+
+  | ngOnChanges                                    | ngDoCheck                                  |
+  | ---------------------------------------------- | ------------------------------------------ |
+  | Called only when input properties change       | Called during every change detection cycle |
+  | Receives SimpleChanges object                  | No parameters                              |
+  | Used for detecting changes in input properties | Used for custom change detection logic     |
+  | More efficient for input property changes      | More flexible, but can be less efficient   |
 
 ---
 
@@ -124,7 +232,7 @@ Angular uses a change detection mechanism to detect changes in the component sta
 
 ---
 
-#### `OnPush` Strategy
+#### Using `onPush` for optimization
 
 The `OnPush` change detection strategy is a way to optimize change detection in Angular by **telling Angular to check the component only when certain conditions are met, instead of checking it on every change detection cycle**.
 
@@ -135,7 +243,14 @@ The `OnPush` change detection strategy is a way to optimize change detection in 
 - It's different than the default change detection strategy, which checks all components in the component tree on every change detection cycle
   ![OnPush](./img/onpush-1.gif)
   ![OnPush](./img/onpush-2.gif)
+
   > Here's a great article about this topic: [Make Your Angular App 100+ Times Faster with ‘OnPush’ Change Detection Strategy](https://medium.com/@yar.dobroskok/make-your-angular-app-100-times-faster-with-onpush-change-detection-strategy-76a272cd0f0c)
+
+- Example:
+  ![Default vs OnPush](./img/default-vs-onpush-1.png)
+
+  - Here, a change-detection cycle caused by an event in the `GrandChild1` component. Even though this event happened in the bottom-left leaf component, the change-detection cycle starts from the top; it’s performed on each branch except the branches that originate from a component with the `OnPush` change-detection strategy and have no changes in the bindings to this component’s input properties. Components excluded from this change-detection cycle are shown on a white background.
+
 - This can significantly improve performance, especially in large applications with many components
   - This is because the `OnPush` strategy limits the things that can trigger change detection in the component, which can lead to better performance
 - To use the `OnPush` strategy, you can set the `changeDetection` property in the component's decorator to `ChangeDetectionStrategy.OnPush`

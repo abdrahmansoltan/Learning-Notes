@@ -21,6 +21,8 @@
       - [Using an injectable Service as a Mediator](#using-an-injectable-service-as-a-mediator)
     - [Exposing a child component's API to the parent using ViewChild](#exposing-a-child-components-api-to-the-parent-using-viewchild)
     - [Projecting templates at runtime using ng-content](#projecting-templates-at-runtime-using-ng-content)
+      - [ViewEncapsulation with ng-content (styling projected content)](#viewencapsulation-with-ng-content-styling-projected-content)
+      - [Projection vs. direct binding to innerHTML](#projection-vs-direct-binding-to-innerhtml)
   - [Data flow between components](#data-flow-between-components)
     - [Parent to Child (Passing data / Input / Props)](#parent-to-child-passing-data--input--props)
     - [Child to Parent (Emitting events / Output)](#child-to-parent-emitting-events--output)
@@ -301,10 +303,14 @@ Angular components have a lifecycle that consists of a series of events that occ
 
   - `constructor` : it's a method that runs when the component is created
   - `ngOnInit` : it's a lifecycle hook that runs after the constructor and after the first `ngOnChanges` (it's a good place to put initialization logic)
+    - By the time `ngOnInit()` is invoked, the component properties will have been initialized, which is why this method is mainly used for the initial data fetch.
   - `ngOnChanges` : it's a lifecycle hook that runs when the input properties of the component change
+  - `ngDoCheck` : it's a lifecycle hook that runs when the change detection runs (it's a good place to put custom change detection logic)
+    - ⚠️ Note: it's called a lot of times, so you should avoid doing heavy computations in it to prevent performance issues
   - `ngOnDestroy` : it's a lifecycle hook that runs when the component is destroyed (it's a good place to put cleanup logic)
-  - `ngAfterViewInit` : it's a lifecycle hook that runs after the view has been initialized (it's a good place to put logic that needs to run after the view has been initialized)
+  - `ngAfterViewInit` : it's a lifecycle hook that runs after the view has been fully initialized (it's a good place to put logic that needs to run after the view has been initialized, **like setting up Intersection Observers or querying for elements in the view**)
   - `ngAfterViewChecked` : it's a lifecycle hook that runs after the view has been checked (it's a good place to put logic that needs to run after the view has been checked)
+  - `ngAfterContentInit` : it's a lifecycle hook that runs after the content has been initialized and the projected content is available, so it's only used when using `ng-content` to project content into the component
   - **Notes:**
     - Don't use the constructor to fetch data from a server or to initialize the component. Use `ngOnInit` instead.
     - Don't use arrow functions when defining methods in a component. Use regular functions instead. (to avoid `this` keyword problems)
@@ -949,6 +955,92 @@ export class ParentComponent {}
 
 - In this example, the `CardComponent` defines a `<ng-content>` directive in its template, which acts as a placeholder for the content projected from the `ParentComponent`. When the `ParentComponent` uses the `CardComponent`, it can insert any content between the opening and closing tags of the `app-card` component, and that content will be rendered inside the card.
 
+#### ViewEncapsulation with ng-content (styling projected content)
+
+When using `<ng-content>` for content projection, it's important to understand how Angular's `ViewEncapsulation` affects the styling of the projected content.
+
+By default, Angular uses `ViewEncapsulation.Emulated`, which means that styles defined in a component are scoped to that component only. However, when using `<ng-content>`, the projected content is not affected by the component's styles, and it can inherit styles from the parent component or global styles.
+
+![view-encapsulation-ng-content](./img/view-encapsulation-ng-content.png)
+
+- To ensure that the projected content is styled correctly, you may need to adjust the styles in the parent component or use global styles.
+- Alternatively, you can change the `ViewEncapsulation` mode of the component to `None` or `ShadowDom`, depending on your requirements.
+- For example, if you want the projected content to inherit styles from the parent component, you can set the `ViewEncapsulation` mode to `None`.
+
+  ```ts
+  import { Component, ViewEncapsulation } from '@angular/core';
+
+  @Component({
+    selector: 'app-card',
+    template: `
+      <div class="card">
+        <ng-content></ng-content>
+      </div>
+    `,
+    encapsulation: ViewEncapsulation.None // 👈 Change to None to allow styles to cascade
+  })
+  export class CardComponent {}
+  ```
+
+- Modes:
+
+  - `Emulated` (default):
+
+    - Emulates a native Shadow DOM encapsulation behavior by adding a specific attribute to the component's host element and applying the same attribute to all the CSS selectors provided via `styles` or `styleUrls`.
+    - Styles are scoped to the component, but projected content is not affected.
+
+  - `None`:
+    - Doesn't provide any sort of CSS style encapsulation, meaning that all the styles provided via `styles` or `styleUrls` are applicable to any HTML element of the application regardless of their host Component.
+    - Styles are global and can affect projected content.
+  - `ShadowDom`:
+    - Uses the browser's native Shadow DOM API to encapsulate CSS styles, meaning that it creates a ShadowRoot for the component's host element which is then used to encapsulate all the Component's styling.
+
+#### Projection vs. direct binding to innerHTML
+
+- There's actually another way to project content into a component using `ngTemplateOutlet` or `innerHtml`, which allows you to pass a template reference or raw HTML string to the component and render it inside the component's template.
+
+  ```ts
+  // 📄 card.component.ts
+  import { Component, Input, TemplateRef } from '@angular/core';
+
+  @Component({
+    selector: 'app-card',
+    template: `
+      <div class="card">
+        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+      </div>
+    `
+  })
+  export class CardComponent {
+    @Input() contentTemplate!: TemplateRef<any>;
+  }
+  ```
+
+  ```ts
+  // 📄 parent.component.ts
+  import { Component } from '@angular/core';
+  import { CardComponent } from './card.component';
+
+  @Component({
+    selector: 'app-parent',
+    template: `
+      <ng-template #cardContent>
+        <h2>Card Title</h2>
+        <p>This is some content inside the card.</p>
+      </ng-template>
+
+      <app-card [contentTemplate]="cardContent"></app-card>
+    `
+  })
+  export class ParentComponent {}
+  ```
+
+- However, using `<ng-content>` is generally preferred for content projection because:
+  - it provides better separation of concerns and allows for more flexibility in how the content is structured and styled.
+  - it allows for more complex content structures, such as multiple slots for different types of content.
+  - `innerHTML` can introduce security risks if the content is not properly sanitized, as it can lead to cross-site scripting (XSS) attacks.
+  - `innerHTML` is a browser-specific API, while `<ng-content>` is a built-in Angular feature that works consistently across different browsers.
+
 ---
 
 ## Data flow between components
@@ -1178,7 +1270,7 @@ It's a way to reference an element in the template so that you can access it in 
 
 #### Multi-slot content projection
 
-- A component can have multiple slots. Each slot can specify a CSS selector that determines which content goes into that slot. This pattern is referred to as multi-slot content projection. With this pattern, you must specify where you want the projected content to appear. You accomplish this task by using the `select` attribute of `<ng-content>`.
+- A component can have multiple slots (multiple `<ng-content>` elements). Each slot can specify a CSS selector that determines which content goes into that slot. This pattern is referred to as multi-slot content projection. With this pattern, you must specify where you want the projected content to appear. You accomplish this task by using the `select` attribute of `<ng-content>`.
 
   ```html
   <!-- child -->
