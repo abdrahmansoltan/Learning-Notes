@@ -1192,6 +1192,28 @@ In Angular, we can use the **Forms API** to handle form events and turn them int
   </div>
   ```
 
+- Don't forget to catch errors also when using `async` pipe, by using `pipe()` and the `catchError` operator in the service that returns the observable.
+
+  ```ts
+  // 1️⃣ when using async pipe in the template
+  return this.http.get('https://api.example.com/data').pipe(
+    catchError(err => {
+      console.error(err);
+      return of([]); // return an empty array or any default value so that the observable completes successfully
+    })
+  );
+
+  // 2️⃣ when subscribing to the observable in the component
+  this.http.get('https://api.example.com/data').subscribe({
+    next: data => {
+      this.data = data;
+    },
+    error: err => {
+      console.error(err);
+    }
+  });
+  ```
+
 ---
 
 #### Observables and the router

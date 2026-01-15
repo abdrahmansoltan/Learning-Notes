@@ -220,6 +220,7 @@ Coming up with the `CSP` policies for your site can be a bit tricky as there are
 
   - For example, `Fetch API` follow the `same-origin policy`. So, a web application using those APIs can only request `HTTP` resources from the same origin the application was loaded from unless the response from the other origin includes the right CORS headers.
     - `same-origin policy`: is a policy that prevents a website from accessing data from another website.
+      - This restriction is set for clients that run in a browser as a security mechanism. Say you visited and logged in to bank.com, and then opened another tab and opened `badguys.com`. The same-origin policy ensures that scripts from `badguys.com` can’t access your account at bank.com.
   - Example of cross-origin request in the frontend from 2 different origins:
     ![CORS](./img/cors-1.png)
     - Here, the main origin is `domain-a.com` and the other origin is `domain-b.com`.

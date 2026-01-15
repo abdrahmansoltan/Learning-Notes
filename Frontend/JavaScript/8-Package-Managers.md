@@ -205,6 +205,14 @@ It's a simple command-line tool that automates the process of downloading and in
 
 It is a tool that automates different parts of the build process (Triggering Build Workflow). For frontend development, tasks include `minifying code`, `optimizing images`, `running tests`, etc.
 
+> npm allows you to add the scripts property in package.json, where you can define aliases for terminal commands. For example, instead of typing the long command `ng serve --app restclient --proxy-config proxy-conf.json`, you can define a start command in the scripts section of package.json as follows:
+>
+> ```json
+> "scripts": {
+>   "start": "ng serve --app restclient --proxy-config proxy-conf.json"
+> }
+> ```
+
 - The `"scripts"` property of your `package.json` file supports a number of built-in scripts and their preset life cycle events as well as arbitrary scripts. These all can be executed by running `npm run-script <stage>` or `npm run <stage>` for short.
 - Pre and post commands with matching names will be run for those as well (e.g. `premyscript`, `myscript`, `postmyscript`). Scripts from dependencies can be run with `npm explore <pkg> -- npm run <stage>`.
 

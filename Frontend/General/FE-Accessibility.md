@@ -30,6 +30,9 @@
       - [Accessibility in React](#accessibility-in-react)
       - [Accessibility in Vue](#accessibility-in-vue)
       - [Accessibility in Angular](#accessibility-in-angular)
+  - [Building Accessible Web Components](#building-accessible-web-components)
+    - [Accessible Tabs Components](#accessible-tabs-components)
+    - [Accessible Accordions Components](#accessible-accordions-components)
 
 ---
 
@@ -537,3 +540,138 @@ Each modern frontend framework offers unique challenges and solutions for implem
 #### Accessibility in Angular
 
 ---
+
+## Building Accessible Web Components
+
+> For components, accessibility must be a primary consideration during development. This includes ensuring that all users, regardless of ability, can interact with and understand the component. and we shouldn't just use accessibility for native HTML elements but also for custom elements like Web Components.
+
+- Simple vs Complex Components:
+
+  - **Simple Components:**
+    - Basic elements with one action, one focus-target, and built-in browser semantics
+    - They should adhere to standard accessibility practices, including proper labeling and keyboard navigation.
+    - Require minimal **ARIA** usage.
+    - Don't need custom focus management.
+    - Browser handles most accessibility features for you.
+    - like `buttons` or `input` fields
+  - **Complex Components:**
+    - Components with multiple interactive elements, states, or dynamic content.
+    - Require advanced accessibility techniques to ensure usability for all users.
+    - Need custom **ARIA** roles and properties.
+    - Require explicit focus management.
+    - Contain multiple interactive elements (controls)
+    - Behavior is not natively supported by browsers. and require custom implementation for accessibility.
+    - like `dropdowns`, `tabs`, or `accordions`, `carousels`, `modals`, `filters`, ...
+
+The focus in this section is on **Complex Components**:
+
+- [Tabs](#accessible-tabs-components)
+- [Accordions](#accessible-accordions-components)
+- [Modals](#accessible-modals-components)
+- [Dropdowns](#accessible-dropdowns-components)
+
+> You can find more details about the patterns and component here: [WAI-ARIA Authoring Patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)
+
+---
+
+### Accessible Tabs Components
+
+Tabs are a common UI component that allows users to switch between different views or sections of content. To make tabs accessible, we need to ensure that they can be navigated and activated using a keyboard and that screen readers can understand their structure and purpose.
+
+- Tabs structure:
+
+  - `role="tablist"`: Container for the tabs.
+  - `role="tab"`: Each individual tab (usually a `button` or `link`).
+  - `role="tabpanel"`: The content area associated with each tab.
+
+- Tabs states/values and properties:
+
+  - Each `role="tab"` should have an
+    - `aria-selected` attribute to indicate whether it is currently selected (`true` or `false`).
+    - `aria-controls` attribute that references the `id` of the corresponding `tabpanel`.
+  - The `role="tabpanel"` should have:
+    - `arial-labelledby` attribute that references the `id` of the associated tab (the id of the `role="tab"`).
+      > Pro-tip 💡: When tabs are visually **arranged vertically**, add `aria-orientation="vertical"` to the `role="tablist"` (wrapper element).
+      >
+      > This causes screen readers to announce the orientation of the tab list, providing additional context for users.
+
+- Keyboard interaction:
+
+  - `Tab` key: Moves focus to the next focusable element (including tabs).
+    > ⚠️DO NOT use `Tab` to switch between tabs, as it moves focus out of the tab list.
+    >
+    > This is a common issue you will find in many implementations of tabs. Because the correct way to switch between tabs is using the **arrow keys**.
+  - `Arrow keys` (Left/Right or Up/Down): Navigate between tabs.
+  - `Enter` or `Space`: Activates the focused tab, displaying its associated content.
+  - Active tabpanel should have `tabindex="0"` to make it focusable, while inactive tabpanels should have `tabindex="-1"`.
+
+- Example of an accessible tabs component:
+
+  ```html
+  <div role="tablist" aria-label="Sample Tabs">
+    <button role="tab" id="tab1" aria-selected="true" aria-controls="panel1" tabindex="0">
+      Tab 1
+    </button>
+    <button role="tab" id="tab2" aria-selected="false" aria-controls="panel2" tabindex="-1">
+      Tab 2
+    </button>
+    <button role="tab" id="tab3" aria-selected="false" aria-controls="panel3" tabindex="-1">
+      Tab 3
+    </button>
+  </div>
+
+  <div role="tabpanel" id="panel1" aria-labelledby="tab1" tabindex="0">
+    <p>Content for Tab 1</p>
+  </div>
+  <div role="tabpanel" id="panel2" aria-labelledby="tab2" tabindex="-1" hidden>
+    <p>Content for Tab 2</p>
+  </div>
+  <div role="tabpanel" id="panel3" aria-labelledby="tab3" tabindex="-1" hidden>
+    <p>Content for Tab 3</p>
+  </div>
+  ```
+
+---
+
+### Accessible Accordions Components
+
+Accordions are UI components that allow users to expand and collapse sections of content. To ensure accordions are accessible, we need to implement proper ARIA roles, states, and keyboard interactions.
+
+- Accordion structure:
+
+  - `role="button"`: Each accordion header that can be clicked to expand or collapse the content.
+  - `aria-expanded`: Indicates whether the accordion section is expanded (`true`) or collapsed (`false`).
+  - `aria-controls`: References the `id` of the associated content panel.
+  - Content panel should have `role="region"` and `aria-labelledby` referencing the header.
+  - If indicator-icons are used, they're hidden from the screen readers using the attribute `aria-hidden="true"`.
+
+- Keyboard interaction:
+
+  - `Tab` key: Moves focus to the next focusable element (including accordion headers).
+  - `Enter` or `Space`: Toggles the expanded/collapsed state of the focused accordion header.
+  - `Arrow Down` and `Arrow Up`: Navigate between accordion headers.
+
+- Example of an accessible accordion component:
+
+  ```html
+  <div>
+    <button role="button" aria-expanded="false" aria-controls="panel1" id="accordion1" tabindex="0">
+      Accordion 1
+    </button>
+    <div role="region" id="panel1" aria-labelledby="accordion1" hidden>
+      <p>Content for Accordion 1</p>
+    </div>
+
+    <button
+      role="button"
+      aria-expanded="false"
+      aria-controls="panel2"
+      id="accordion2"
+      tabindex="-1">
+      Accordion 2
+    </button>
+    <div role="region" id="panel2" aria-labelledby="accordion2" hidden>
+      <p>Content for Accordion 2</p>
+    </div>
+  </div>
+  ```

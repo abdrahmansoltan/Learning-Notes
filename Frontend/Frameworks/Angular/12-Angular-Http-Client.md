@@ -3,10 +3,20 @@
 - [INDEX](#index)
   - [HttpClient](#httpclient)
     - [Overview of the HttpClient Service](#overview-of-the-httpclient-service)
-    - [Angular HttpClient Service](#angular-httpclient-service)
+  - [Angular HttpClient Service](#angular-httpclient-service)
+    - [HTTPClient Methods](#httpclient-methods)
+      - [GET method](#get-method)
+      - [POST method](#post-method)
+      - [PUT method](#put-method)
+      - [DELETE method](#delete-method)
+    - [Injecting HttpClient](#injecting-httpclient)
+    - [Subscribing to HttpClient Observables](#subscribing-to-httpclient-observables)
   - [HttpClientModule Module](#httpclientmodule-module)
     - [HTTP Params](#http-params)
     - [HTTP Interceptors](#http-interceptors)
+      - [Interceptors real-life examples](#interceptors-real-life-examples)
+  - [Progress bar using HTTP Client](#progress-bar-using-http-client)
+  - [Proxying to a backend server](#proxying-to-a-backend-server)
 
 ---
 
@@ -40,32 +50,140 @@ Browser-based web applications run HTTP requests **asynchronously**, allowing th
 
 ---
 
-### Angular HttpClient Service
+## Angular HttpClient Service
 
 Angular supports HTTP communications via the `HttpClient` service from the `@angular/common/http` package.
 
+### HTTPClient Methods
+
 - If your app requires HTTP communications, you need to add `HttpClientModule` to the `imports` section of the `@NgModule()` decorator -> **see [HttpClientModule Module](#httpclientmodule-module) below**
-- The `HttpClient` service methods like `get()`, `post()`, `put()`, `delete()`, etc., return an `Observable`
-- An app needs to **subscribe** to the Observable to get the data
+- The `HttpClient` service methods like `get()`, `post()`, `put()`, `delete()`, etc. are used to perform HTTP requests.
+- Public methods of HttpClient return an Observable object, and only when the client subscribes to it is the request to the server made.
+
+#### GET method
+
+```ts
+this.http.get<T>(url, options?)
+```
+
+- `T`: The expected response type
+  > The type annotation doesn’t enforce or validate the shape of the data returned by the server; it just makes the other code aware of the expected server response. By default, the response type is `any`, and the TypeScript compiler won’t be able to type-check the properties you access on the returned object.
+- `url`: The URL to which the request is sent
+- `options`: An optional object containing request options such as headers, parameters, etc.
+
+#### POST method
+
+HTTP POST requests are used for sending new data to the server. With HttpClient,
+making POST requests is similar to making GET requests.
+
+- Invoking the `HttpClient.post()` method declares your intention to post data to the specified URL, but the request is made when you invoke `subscribe()`.
+
+```ts
+this.http.post<T>(url, body, options?)
+```
+
+- `body`: The request payload to be sent to the server
+- Other parameters are the same as in the `get()` method
+
+#### PUT method
+
+```ts
+this.http.put<T>(url, body, options?)
+```
+
+- Parameters are the same as in the `post()` method
+
+#### DELETE method
+
+```ts
+this.http.delete<T>(url, options?)
+```
+
+- Parameters are the same as in the `get()` method
+
+---
+
+### Injecting HttpClient
+
+We can use the `HttpClient` service to perform HTTP requests in Angular applications. and we can inject it into a service or component using Angular's dependency injection system.
+
 - To use the `HttpClient` service, you need to **inject** it into a service or component
 
 > **HttpClient Provider**
 >
 > Every injectable service requires a provider declaration. The providers for `HttpClient` are declared in `HttpClientModule`, so you don't need to declare them in your app.
 
-```ts
-import { HttpClient } from '@angular/common/http';
+- injecting `HttpClient` into a component requires one dependency injection, but we can also inject it into a service and then inject that service into a component (2 dependency injections (one for the service and one for the HttpClient))
+  ![httpclient injection](./img/httpclient-injection-1.png)
 
-export class AppComponent {
-  // Dependency Injection of HttpClient
-  constructor(private http: HttpClient) {
-    this.http.get('https://api/posts').subscribe(data => {
-      console.log(data);
-    });
-    // Note: calling just `get` method will not make the request, we need to subscribe to the observable to make the request
+- Example of injecting `HttpClient` into a component and using it to perform HTTP requests:
+
+  ```ts
+  import { HttpClient } from '@angular/common/http';
+
+  export class AppComponent {
+    // Dependency Injection of HttpClient
+    constructor(private http: HttpClient) {
+      // Example 1️⃣ of using HttpClient to perform an HTTP GET request without options or params
+      this.http.get('https://api/posts').subscribe(data => {
+        console.log(data);
+      });
+      // Note: calling just `get` method will not make the request, we need to subscribe to the observable to make the request
+
+
+      // Example 2️⃣ of using HttpClient to perform an HTTP GET request with options and params
+      const let httpHeaders = new HttpHeaders().set('Custom-Header', 'value');
+      const let httpParams = new HttpParams().set('userId', '1');
+      const options = {
+        headers: httpHeaders,
+        params: httpParams
+      };
+      this.http.get('https://api/posts', options).subscribe(data => {
+        console.log(data);
+      });
+    }
   }
-}
-```
+  ```
+
+- `HTTP Headers` and `HTTP Params` are explained in the [HTTP Params](#http-params) section below
+
+---
+
+### Subscribing to HttpClient Observables
+
+- The `HttpClient` service methods return an `Observable` that emits the server response when the request is complete, that's why:
+
+  - An app needs to **subscribe** to the Observable to get the data
+
+    ```ts
+    this.http.get<T>(url).subscribe(
+      (data: T) => {
+        // handle the data
+      },
+      (error: any) => {
+        // handle the error
+      }
+    );
+    ```
+
+    - The request is not made until the Observable is subscribed to, so you can either subscribe to it or use the `async` pipe in the template to subscribe to it automatically
+
+  - **⚠️ NOTE** you don't need to use `ngOnDestroy()` to explicitly unsubscribe from the observable because **once HttpClient gets the response (or an error), the underlying Observable completes, so the observer is unsubscribed automatically**.
+
+- By default, the `HttpClient` service returns the response body as a **JSON object**, and the **data is automatically parsed into a JavaScript object**
+
+  - You can specify a different response type using the `responseType` option in the request options object
+
+  ```ts
+  this.http.get<T>(url, { responseType: 'text' }).subscribe(
+    (data: T) => {
+      // handle the data
+    },
+    (error: any) => {
+      // handle the error
+    }
+  );
+  ```
 
 ---
 
@@ -174,17 +292,32 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
 
 ### HTTP Interceptors
 
-**HTTP Interceptor** is a middleware (function) that intercepts HTTP requests and responses from the client to the server and vice versa **(executes before the request is sent to the server and after the response is received from the server)**
-![http interceptor](./img/http-interceptor-1.png)
+> Is there a way to intercept all of them to provide some additional processing, like showing/hiding the progress bar, or logging requests? **Yes, we can use HTTP Interceptors for that.**
 
-![auth service](./img/auth-service-12.png)
+Angular allows you to create HTTP interceptors for pre- and post-processing of all HTTP requests and responses of your app. They can be useful for implementing such cross-cutting concerns as logging, global error handling, authentication, and others.
 
-- It is used to modify the request or response, add headers, handle errors, etc.
-- Usually, we use HTTP Interceptor to add the token to the request headers before sending the request to the server, ex:
+- **HTTP Interceptor** is a middleware (function) that intercepts HTTP requests and responses from the client to the server and vice versa **(executes before the request is sent to the server and after the response is received from the server)**
+  ![http interceptor](./img/http-interceptor-1.png)
 
-  - add the `JWT` token to the request headers before sending the request to the server
-  - set cookies in the request headers before sending the request to the server
-  - handle errors in the response before sending the response to the client
+  - It is used to modify the request or response, add headers, handle errors, etc. Examples:
+
+    - Adding an authentication token to the request headers (e.g., JWT token)
+    - set cookies in the request headers before sending the request to the server
+    - Logging request and response details
+    - Handling global errors (e.g., redirecting to a login page on 401 Unauthorized errors)
+
+- ⚠️ Note: The interceptors work before the request goes out or before a response is rendered on the UI.
+
+  - This gives you a chance to implement the fallback scenarios for certain errors or prevent attempts of unauthorized access.
+
+- **To create an interceptor**, you need to write a service that implements the `HttpInterceptor` interface, which requires you to implement one method: `intercept()`.
+
+  - Angular will provide two arguments to this callback: `HttpRequest` and `HttpHandler`.
+
+    - The first one contains the request object being intercepted, which you can clone and modify.
+    - The second argument is used to forward the modified request to the backend or another interceptor in the chain (if any) by invoking the `handle()` method.
+
+    > NOTE The `HttpRequest` and `HttpResponse` objects are immutable, and the word **modify** means creating and passing through the new instances of these objects.
 
 - Example of creating an HTTP Interceptor
 
@@ -228,11 +361,10 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       - `next`: the next interceptor in the chain
     - It returns an observable of the `HttpEvent` type
     - **Why we use `req.clone()` method?**
-      - Because the `HttpRequest` object is immutable (if you try to override it, Typescript will raise errors), which means that we cannot modify it directly, so we need to create a copy of the request object and modify the copy using the `clone()` method
+      - Because **the `HttpRequest` object is immutable** (if you try to override it, Typescript will raise errors), which means that we cannot modify it directly, so we need to create a copy of the request object and modify the copy using the `clone()` method
 
-  - 3️⃣ register the interceptor in the `app.module.ts` file / or the `app.config.ts` file (to make it available to the entire app)
+  - 3️⃣ Because an interceptor is an injectable service, don’t forget to declare its provider by either (registering it in the `app.module.ts` file or using standalone components using the `withInterceptors` method):
 
-    - The old way is to create a class for the interceptor and register it in the `app.module.ts` file, but now we can also use standalone components to register the interceptor using the `withInterceptors` method
     - **Module based:** Add the interceptor to the providers array in the `app.module.ts` file (to make it available to the entire app)
 
       ```ts
@@ -248,7 +380,7 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
           {
             provide: HTTP_INTERCEPTORS,
             useClass: AuthInterceptor,
-            multi: true
+            multi: true // this is important to allow multiple interceptors
           }
         ],
         bootstrap: [AppComponent]
@@ -371,3 +503,191 @@ To perform HTTP requests in Angular, we need to import the `HttpClientModule` in
       ```
 
 ---
+
+#### Interceptors real-life examples
+
+- **Example 1: Adding an Authorization header to every request**
+
+  ```ts
+  export class AuthInterceptor implements HttpInterceptor {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const modifiedRequest = req.clone({
+          headers: req.headers.set('Authorization', 'Bearer ' + token)
+        });
+        return next.handle(modifiedRequest);
+      } else {
+        return next.handle(req);
+      }
+    }
+  }
+  ```
+
+- **Example 2: Logging request and response details**
+
+  ```ts
+  export class LoggingInterceptor implements HttpInterceptor {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      console.log('Request URL:', req.url);
+      console.log('Request Headers:', req.headers);
+      return next.handle(req).pipe(
+        tap(event => {
+          if (event instanceof HttpResponse) {
+            console.log('Response Status:', event.status);
+            console.log('Response Body:', event.body);
+          }
+          return event;
+        })
+      );
+    }
+  }
+  ```
+
+- **Example 3: Handling global errors**
+
+  ```ts
+  export class ErrorInterceptor implements HttpInterceptor {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      return next.handle(req).pipe(
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 401) {
+            // Redirect to login page
+            window.location.href = '/login';
+          } else if (error.status === 500) {
+            // Show a generic error message
+            alert('An unexpected error occurred. Please try again later.');
+          }
+          return throwError(error);
+        })
+      );
+    }
+  }
+  ```
+
+- **Example 4: Showing a loading spinner during HTTP requests**
+
+  ```ts
+  export class LoadingInterceptor implements HttpInterceptor {
+    private requests: HttpRequest<any>[] = [];
+
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      this.requests.push(req);
+      // Show loading spinner
+      this.showSpinner();
+
+      return next.handle(req).pipe(
+        finalize(() => {
+          this.requests = this.requests.filter(r => r !== req);
+          if (this.requests.length === 0) {
+            // Hide loading spinner
+            this.hideSpinner();
+          }
+        })
+      );
+    }
+
+    private showSpinner() {
+      // Logic to show spinner by inserting DOM element to the body or using a service
+    }
+
+    private hideSpinner() {
+      // Logic to hide spinner by removing DOM element from the body or using a service
+    }
+  }
+  ```
+
+- **Example 5: Caching GET requests**
+
+  ```ts
+  export class CachingInterceptor implements HttpInterceptor {
+    private cache = new Map<string, HttpResponse<any>>();
+
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+      if (req.method === 'GET') {
+        const cachedResponse = this.cache.get(req.urlWithParams);
+        if (cachedResponse) {
+          return of(cachedResponse);
+        } else {
+          return next.handle(req).pipe(
+            tap(event => {
+              if (event instanceof HttpResponse) {
+                this.cache.set(req.urlWithParams, event);
+              }
+            })
+          );
+        }
+      } else {
+        return next.handle(req);
+      }
+    }
+  }
+  ```
+
+---
+
+## Progress bar using HTTP Client
+
+Sometimes uploading or downloading certain assets (like large data files or images) takes time, and you should keep the user informed about the progress. `HttpClient` offers progress events that contain information like total size of the asset, current number of bytes that are already uploaded or downloaded, and more.
+
+1. To enable progress events tracking, make your requests using the `HttpRequest` object with the option `{reportProgress: true}`.
+2. Then, instead of using methods like `http.get()` or `http.post()`, use the more general `http.request()` method that accepts an `HttpRequest` object.
+3. Finally, subscribe to the returned observable and check the type of each emitted event to determine whether it's a progress event or the final response.
+
+```ts
+const req = new HttpRequest('GET', 'https://api/large-file', { reportProgress: true });
+this.http.request(req).subscribe(event => {
+  if (event.type === HttpEventType.DownloadProgress) {
+    const percentDone = Math.round((100 * event.loaded) / event.total);
+    console.log(`File is ${percentDone}% downloaded.`);
+  } else if (event instanceof HttpResponse) {
+    console.log('File downloaded successfully!', event.body);
+  }
+});
+```
+
+---
+
+## Proxying to a backend server
+
+When developing an Angular application that communicates with a backend server, you may encounter issues related to `Cross-Origin Resource Sharing (CORS)`. This occurs when the frontend and backend are hosted on different domains or ports.
+
+To avoid CORS issues during development, you can set up a proxy configuration in your Angular application. This allows you to redirect API calls from the Angular development server to the backend server seamlessly.
+![proxy](./img/angular-proxy-1.png)
+
+- Steps to set up a proxy configuration:
+
+  1. Create a `proxy.conf.json` file in the root of your Angular project (or any other name you prefer).
+
+  2. Define the proxy configuration in the `proxy.conf.json` file. For example:
+
+     ```json
+     {
+       "/api": {
+         "target": "http://localhost:8000",
+         "secure": false,
+         "changeOrigin": true,
+         "logLevel": "debug"
+       }
+     }
+     ```
+
+     - In this example, any request made to `/api` will be proxied to `http://localhost:8000/api`.
+
+  3. Update the `angular.json` file to include the proxy configuration in the `serve` options:
+
+     ```json
+     "architect": {
+       "serve": {
+         "options": {
+           "proxyConfig": "proxy.conf.json"
+         }
+       }
+     }
+     ```
+
+  4. Start the Angular development server using the command:
+
+     ```bash
+     ng serve
+     ```

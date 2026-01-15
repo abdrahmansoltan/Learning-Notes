@@ -290,12 +290,17 @@ two ways of applying middleware:
 
 ## POST requests
 
+The posted data will arrive in the request body, and you need to be able to parse it to extract the data. The npm package `body-parser` knows how to do this in Express servers.
+
 - when we take data from the client it should be in `JSON` format, so we use `.json()` method from `Express`
   - The `express.json()` function is a built-in **middleware function** in Express.
   - It parses incoming requests with JSON payloads and is based on `body-parser`.
   - should be before any `routing` / `POST requests`
 
 ```js
+const app = express();
+// ...
+
 // this middleware is required to be able to access the request body
 app.use(express.json())
 
@@ -409,6 +414,8 @@ http://localhost:3000/index.html
   app.use(express.static(path.join(__dirname, 'public')));
   // now when importing the css file in html, we act as we're inside the "public" folder
   ```
+
+  > When the browser requests static assets, Node will look for them in the public subdirectory of the current one (`__dirname`) the build directory from which you started this server. Here, you use Node’s `path.join()` API to ensure that the absolute file path is created in a cross-platform way.
 
 - To create a virtual path prefix (where the path does not actually exist in the file system) for files that are served by the express.static function, specify a mount path for the static directory, as shown below:
 
