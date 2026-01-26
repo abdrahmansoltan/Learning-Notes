@@ -45,7 +45,6 @@
 or, it's a piece of software that can be used by another piece of software, in order to allow applications to talk to each other.
 
 - There're many types of APIs in web development, such as:
-
   - **DOM API**: to manipulate the DOM.
   - **Fetch API**: to make network requests.
   - **Web Storage API**: to store data in the browser.
@@ -53,31 +52,25 @@ or, it's a piece of software that can be used by another piece of software, in o
     - It's an application running on a server, that receives requests for data, and sends data back as a response.
 
 - **Endpoints**: are the locations (URL) where APIs can send and receive data.
-
   - Request: is the data sent to the API.
   - Response: is the data sent back from the API.
 
 - **API data format**
-
   - `XML`
     - stands for "eXtensible Markup Language". It's a markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.
     - it's a lightweight, text-based **format** that is used to store and transport data.
     - It's not used as much as it used to be. ❌
   - `JSON`
-
     - stands for "JavaScript Object Notation". It's a lightweight data-interchange format that is easy for humans to read and write, and easy for machines to parse and generate.
     - It's the most popular data format used in APIs. ✅
     - JSON is ideal for data exchange between JavaScript clients and servers in any language (e.g., Ruby, PHP, Java).
-
       - **No Comments**: JSON does not support comments. Use [JSON5](http://json5.org/) for features like comments and unquoted keys.
       - **Key Concepts**:
         - **Serialize**: Convert objects to JSON.
         - **Deserialize**: Convert JSON to objects.
 
     - JSON Methods
-
       - `JSON.stringify`: Converts objects to JSON.
-
         - Syntax: `JSON.stringify(value, replacer, space)`
         - Parameters:
           - `value`: The object to convert.
@@ -85,7 +78,6 @@ or, it's a piece of software that can be used by another piece of software, in o
           - `space`: Optional spaces for indentation.
 
       - `JSON.parse`: Converts JSON back to an object.
-
         - Syntax: `JSON.parse(str, reviver)`
         - Parameters:
           - `str`: The JSON string to parse.
@@ -123,7 +115,6 @@ Cookies are strings of data that are stored in the browser. They are a part of t
 - Cookies are usually set by a web-server using the response `Set-Cookie` HTTP-header. Then, the browser automatically **adds them to (almost) every request to the same domain** using the Cookie HTTP-header.
   ![cookies](./img/cookies-2.png)
 - One of the most widespread use cases is **authentication**:
-
   1. Upon **sign in**, the server uses the `Set-Cookie` HTTP-header in the response to set a cookie with a unique “session identifier”.
   2. Next time when the request is sent to the same domain, the browser sends the cookie over the net using the Cookie HTTP-header. **So the server knows who made the request**.
   3. When the user **signs out**, the cookie is deleted by the server as it sends the `Set-Cookie` HTTP-header with an expiration date in the past or it can be deleted by the client using JavaScript.
@@ -131,9 +122,7 @@ Cookies are strings of data that are stored in the browser. They are a part of t
 - We can also access cookies from the browser, using `document.cookie` property.
 
 - Writing to `document.cookie`:
-
   - A write operation to `document.cookie` updates only cookies mentioned in it, but doesn’t touch other cookies.
-
     - That’s because the `document.cookie=...` operation does not overwrite all cookies. It only sets the mentioned cookie
 
     ```js
@@ -156,7 +145,6 @@ Cookies are strings of data that are stored in the browser. They are a part of t
 - One cookie may not exceed `4KB` in size. The number of cookies allowed on a domain is around `20+` (varies by browser).
 
 - **Cookies Options:**
-
   - Cookies have several options, many of them are important and should be set. The options are listed after `key=value`, delimited by `;`, like this:
 
     ```js
@@ -164,7 +152,6 @@ Cookies are strings of data that are stored in the browser. They are a part of t
     ```
 
   - some options:
-
     - `path=/`, by default current path, makes the cookie visible only under that path.
 
     - domain=site.com`, by default a cookie is visible on the current domain only. If the domain is set explicitly, the cookie becomes visible on subdomains -> (We can’t set any domain)
@@ -191,7 +178,6 @@ Cookies are strings of data that are stored in the browser. They are a part of t
 Web storage objects `localStorage` and `sessionStorage` allow to save **key/value pairs** in the browser.
 
 - Persistence:
-
   - The data stored in `localStorage` persists even after the browser is closed and reopened. (persists across sessions)
   - `sessionStorage` is similar to `localStorage`; the difference is that while data stored in `localStorage` has no expiration time, data stored in `sessionStorage` gets cleared when the page session ends. A page session lasts as long as the browser is open, and survives over page reloads and restores.
     - works for single session (tab/window). even if the tabs opened from the same page, they have different `sessionStorage` **(different sessions)**.
@@ -204,7 +190,6 @@ Web storage objects `localStorage` and `sessionStorage` allow to save **key/valu
   - Also unlike cookies, the server can’t manipulate storage objects via `HTTP` headers. Everything’s done in JavaScript.
   - The storage is bound to the origin (domain/protocol/port triplet). That is, different protocols or subdomains infer different storage objects, they can’t access data from each other.
 - Both storage objects provide the same methods and properties:
-
   - `setItem(key, value)` – store key/value pair.
   - `getItem(key)` – get the value by key.
   - `removeItem(key)` – remove the key with its value.
@@ -220,12 +205,10 @@ Web storage objects `localStorage` and `sessionStorage` allow to save **key/valu
   ![local storage](./img/localStorage.png)
   - "Document's origin" means the( protocol, hostname, and port number) of the document (page) that loaded the script. This is the same rule as for `cookies`.
 - The main features of localStorage are:
-
   - Shared between all tabs and windows from the same origin.
   - The data does not expire. It remains after the browser restart and even OS reboot.
 
 - Object-like access
-
   - We can also use a plain object way of getting/setting keys, like this:
 
     ```js
@@ -244,9 +227,7 @@ Web storage objects `localStorage` and `sessionStorage` allow to save **key/valu
     2. There’s a storage event, it triggers when we modify the data. That event does not happen for object-like access. We’ll see that later in this chapter.
 
 - The keys and the values stored with localStorage are always in the `UTF-16 DOMString format`, which uses two bytes per character. As with objects, integer keys are automatically converted to strings.
-
   - > **Both key and value must be strings**
-
     - > If they were any other type, like a number, or an object, they would get converted to a string automatically:
 
   - We can use JSON to store objects though: So to store the data structure correctly in localStorage, store it as a **JSON-strings** with `JSON.stringify()`
@@ -297,7 +278,6 @@ const data = JSON.parse(localStorage.getItem('workouts'));
 ```
 
 - **What should & shouldn't be stored in localStorage?**
-
   - **Should**:
     - User preferences.
     - Analytics & Ad tracking.
@@ -317,9 +297,7 @@ const data = JSON.parse(localStorage.getItem('workouts'));
 The `sessionStorage` object is used much less often than `localStorage`
 
 - Properties and methods are the same, but it’s much more limited:
-
   - The `sessionStorage` exists only within the current browser tab.
-
     - Another tab with the same page will have a different storage.
     - But it is shared between `iframes` in the same tab (assuming they come from the same origin).
 
@@ -327,7 +305,6 @@ The `sessionStorage` object is used much less often than `localStorage`
     - That’s exactly because `sessionStorage` is bound not only to the origin, but also to the browser tab. For that reason, sessionStorage is used sparingly.
 
 - **sessionStorage** is more suited to information that:
-
   - Form data that is only needed for a single session
   - Changes frequently (each time the user visits the site - such as whether they are logged in or location data).
   - Is personal and should not be viewed by other users of the device.
@@ -338,7 +315,6 @@ The `sessionStorage` object is used much less often than `localStorage`
 #### Storage event
 
 - When the data gets updated in `localStorage` or `sessionStorage`, `storage` event triggers, with properties:
-
   - `key` – the key that was changed (`null` if `.clear()` is called).
   - `oldValue` – the old value (`null` if the key is newly added).
   - newValue – the new value (`null` if the key is removed).
@@ -359,9 +335,7 @@ localStorage.setItem('now', Date.now());
 ```
 
 - **Syncing tabs with `storage` event**:
-
   - The `storage` event is triggered when a storage area (`localStorage` or `sessionStorage`) has been modified in the context of another document.
-
     - This is common if you have multiple tabs open (of the same website) and one of them modifies the storage and reflects the changes in the other tabs.
     - This event is triggered on the `window` whenever `localStorage` is modified in another tab.
 
@@ -384,7 +358,6 @@ IndexedDB is a database that is built into a browser, much more powerful than `l
 
 - It allows to store and retrieve objects that are indexed with a key; it supports transactions for reliability, and can store much larger amounts of data.
 - It's **Asynchronous**. so it doesn't block the main thread. and as a drawback it doesn't support `promises` and heavily relies on `callbacks`.
-
   - It depends on callbacks, so it’s a bit more complex to use than `localStorage`. But it’s much more powerful.
   - There're libraries that wrap `IndexedDB` in promises, like [idb](https://github.com/jakearchibald/idb).
 
@@ -395,7 +368,6 @@ IndexedDB is a database that is built into a browser, much more powerful than `l
   - Can store much bigger volumes of data than localStorage (**Gigabytes** or more) as it's stored on the client-side (not on the server).
   - Supports versioning schemas, so you can update the database structure without losing the old data.
 - When to use it:
-
   - When you need to store a lot of data.
   - When you need to store big data, as you can't store big strings in `localStorage`.
 
@@ -408,7 +380,6 @@ IndexedDB is a database that is built into a browser, much more powerful than `l
   - That power is usually excessive for traditional client-server apps. IndexedDB is intended for **offline apps**, to be combined with **ServiceWorkers** and other technologies.
 
 - It's more complex than `localStorage`, a it requires these steps:
-
   1. Open a database with a `name` and a `version`.
   2. Create an object store in the database.
   3. Start a transaction and make a request to do some database operation, like adding or retrieving data.
@@ -513,7 +484,6 @@ It's a browser API that allows you to **detect when an element is visible (overl
 
 - It allows for **observing changes to how much of a `target` element’s area intersects with that of another element or the `viewport`**.
   ![intersection](./img/intersection4.png)
-
   - This is a replacement for the old way of doing this with the `scroll` event where you would listen for the scroll event and then check if an element is in the viewport (which is not efficient performance-wise).
 
 - **Use Cases**:
@@ -524,11 +494,8 @@ It's a browser API that allows you to **detect when an element is visible (overl
 - By default, the Intersection Observer API uses the **viewport** as the **intersection root**, and only executes the callback when the target element enters and exits the viewport.
   ![intersection](./img/intersection1.avif)
 - It takes 2 parameters:
-
   - A `callback function` that is executed whenever the intersection between the target element and the intersection root changes.
-
     - It takes 2 parameters:
-
       - An array of `entries` that contain information about the intersection between the target element and the intersection root. **Why?** Because the Intersection Observer can observe multiple target elements at once.
 
         ```js
@@ -547,11 +514,9 @@ It's a browser API that allows you to **detect when an element is visible (overl
         ```
 
   - An `options` object that specifies the configuration of the Intersection Observer.
-
     - A `threshold` is a value in which the Intersection Observer will execute the callback function whenever the intersection ratio reaches that value (the percentage of the target element that is visible in the intersection root).
       ![intersection](./img/intersection2.png)
       ![intersection](./img/intersection3.png)
-
       - It is also possible to set multiple threshold values by passing an array of threshold values in the `options` object.
 
       ```js
@@ -766,13 +731,11 @@ It's a web API that allows web applications to access the user's geographical lo
   - `Geolocation.getCurrentPosition()`: Gets the current location.
   - `Geolocation.watchPosition()`: Calls a handler whenever the device's position changes.
 - **Arguments**:
-
   - **Mandatory** `success callback`: Executes with `GeolocationPosition` object on success.
   - **Optional** `error callback`: Executes with `GeolocationPositionError` object on failure.
   - **Optional** `options` object for position retrieval settings.
 
 - There's 2 main methods to get the user's location:
-
   - `getCurrentPosition()`:
     - gets the current position of the device.
   - `watchPosition()`:
@@ -814,7 +777,6 @@ It's a web API that allows web applications to access the user's geographical lo
 It's a web API that provides access to performance-related information for the current page. It allows web developers to measure the performance of their applications.
 
 - Common use cases include:
-
   - **Measuring page load time**.
   - **Measuring resource load times (images, scripts, etc.)**.
   - **Measuring network performance**.
@@ -822,7 +784,6 @@ It's a web API that provides access to performance-related information for the c
   - **Measuring user interactions**.
 
 - Methods:
-
   - `performance.mark()`: Adds a timestamp to the browser's performance timeline with the given name.
   - `performance.measure()`: Measures the time between two marks.
   - `performance.getEntries()`: Returns a list of performance entries.
@@ -837,7 +798,6 @@ It's a web API that provides access to performance-related information for the c
   - `performance.clearResourceTimings()`: Removes all resource timings.
 
 - Measuring time is done by marking the start and end of an operation, then measuring the time between the two marks. Then you can get the performance entries to see the results.
-
   - usually the `performance.entries` are stored in an array of objects, each object represents a performance entry (like a mark or a measure).
   - or you can directly get the specific entry by its name using `performance.getEntriesByName('name')`.
 
@@ -913,7 +873,6 @@ It's a web API that provides access to performance-related information for the c
   - Each type has a lot of types, like `fetch`, `xmlhttprequest`, `img`, `script`, `css`, etc.
 
 - **Examples:**
-
   - Measuring page load time
 
     ```js
@@ -969,7 +928,6 @@ It's a high-level JavaScript API for processing and synthesizing audio in web ap
 - **Installation**: Native API, available in the browser as part of the global `AudioContext` object.
 - **Purpose**: Allows web apps to create, manipulate, and play audio.
 - **Usage**:
-
   - Create an `AudioContext` object.
   - Create audio sources (like `OscillatorNode` or `MediaElementAudioSourceNode`).
   - Connect audio nodes together to create an audio graph.
@@ -1020,14 +978,12 @@ It's a web API that allows you to draw graphics and animations on a web page usi
   - We can do more complex and creative things with the canvas API, like creating games, animations, data visualizations, etc. and also create animations and effects that are not possible with CSS.
 - Most of the charts and graphs libraries use the Canvas API to draw the charts.
 - **Usage**:
-
   - Create a `canvas` element in the HTML.
   - Get the `CanvasRenderingContext2D` object from the canvas element.
   - Use the `CanvasRenderingContext2D` object to draw shapes, images, and text on the canvas.
   - It's a common naming convention to use `ctx` for the `CanvasRenderingContext2D` object.
 
 - **Examples**:
-
   - Drawing a rectangle on the canvas:
 
     ```html
@@ -1151,14 +1107,12 @@ It's a web API that allows you to draw graphics and animations on a web page usi
 It's a web API that allows web applications to display system notifications to the user. It provides a way to show notifications outside the browser window.
 
 - Use cases:
-
   - **Real-time notifications**: Like new messages, friend requests, etc.
   - **Reminder notifications**: Like calendar events, to-do lists, etc.
   - **Error notifications**: Like form validation errors, network errors, etc.
 
 - **Installation**: Native API, available in the browser as part of the global `Notification` object.
 - **Usage**:
-
   - Check if the browser supports the Notifications API.
     ![notification](./img/notification-api-1.png)
   - Request permission to show notifications.
@@ -1167,7 +1121,6 @@ It's a web API that allows web applications to display system notifications to t
   - Optional: you can also control what to do when the notification is clicked using the `onclick` event or listen for the `click` event on the `notification` object.
 
 - **Methods**:
-
   - `Notification.requestPermission()`: Requests permission to show notifications.
   - `new Notification(title, options)`: Creates a new notification with the given title and options.
   - `notification.close()`: Closes the notification.
@@ -1218,7 +1171,6 @@ It's a web API that provides 2-way communication channels over a single `TCP` co
 - It's **persistent, bidirectional, and low-latency** communication.
 - It's a native API, available in the browser as part of the global `WebSocket` object.
 - Use cases:
-
   - Real-time chat applications.
   - Real-time notifications.
   - Multiplayer games.
@@ -1227,40 +1179,12 @@ It's a web API that provides 2-way communication channels over a single `TCP` co
 
 - Steps to create a WebSocket connection (client-server communication):
 
-  - Client Side
-
-    1. Create a new `WebSocket` object with the URL of the WebSocket server.
-       - url must start with `ws://` or `wss://` for secure connections.
-    2. Listen for the `open`, `message`, `close`, and `error` events on the WebSocket object.
-    3. Send messages to the server using the `send()` method.
-    4. Close the connection using the `close()` method.
-
-    ```js
-    // create a new WebSocket connection
-    const socket = new WebSocket('ws://localhost:3000');
-    // listen for the open event
-    socket.addEventListener('open', () => {
-      console.log('WebSocket connection is open');
-      // send a message to the server
-      socket.send('Hello from the client');
-    });
-    // listen for the message event
-    socket.addEventListener('message', event => {
-      console.log('Message from the server:', event.data);
-    });
-    // listen for the close event
-    socket.addEventListener('close', () => {
-      console.log('WebSocket connection is closed');
-    });
-    // listen for the error event
-    socket.addEventListener('error', event => {
-      console.log('WebSocket error:', event);
-    });
-    ```
-
+  > **The WebSocket protocol is based on events and callbacks**. For example, when your browser app establishes a connection with the server, it receives the connection event, and your app invokes a callback to handle this event.
+  >
+  > To handle the data that the server sends to the client, your app listens for the `message` event and invokes a callback to process the data. If the connection is closed, your app listens for the `close` event and invokes a callback to handle the disconnection.
   - Server Side
-
     1. Create a WebSocket server using a library like `ws` in Node.js.
+       - [https://www.npmjs.com/package/ws](https://www.npmjs.com/package/ws)
     2. Listen for the `connection`, `message`, and `close` events on the WebSocket server.
     3. Send messages to the client using the `send()` method.
     4. Close the connection using the `close()` method.
@@ -1283,6 +1207,58 @@ It's a web API that provides 2-way communication channels over a single `TCP` co
     });
     ```
 
+    - Note: In your app, the HTTP and WebSocket servers run on different ports, but you could reuse the same port by providing the newly created httpServer instance to the constructor of the WebSocket server, as shown in the following listing.
+
+      ```js
+      const http = require('http');
+      const WebSocket = require('ws');
+
+      const server = http.createServer();
+      const wss = new WebSocket.Server({ server });
+      server.listen(3000);
+      ```
+
+  - Client Side
+    1. Create a new `WebSocket` object with the URL of the WebSocket server.
+       - url must start with `ws://` or `wss://` for secure connections.
+    2. Listen for the `open`, `message`, `close`, and `error` events on the WebSocket object.
+    3. Send messages to the server using the `send()` method.
+    4. Close the connection using the `close()` method.
+
+    ```js
+    // create a new WebSocket connection
+    const socket = new WebSocket('ws://localhost:3000');
+
+    // listen for the open event
+    socket.addEventListener('open', () => {
+      console.log('WebSocket connection is open');
+      // send a message to the server
+      socket.send('Hello from the client');
+    });
+
+    // listen for the message event
+    socket.addEventListener('message', event => {
+      console.log('Message from the server:', event.data);
+    });
+    // ------- or using onmessage ------- //
+    socket.onmessage = function (event) {
+      console.log('Message from server ', event.data);
+    };
+
+    // listen for the close event
+    socket.addEventListener('close', () => {
+      console.log('WebSocket connection is closed');
+    });
+
+    // listen for the error event
+    socket.addEventListener('error', event => {
+      console.log('WebSocket error:', event);
+    });
+    ```
+
+    ![websocket-client-server](./img/websocket-2.png)
+    - Note that the status code for websocket closure is different from the HTTP status codes. You can find here [the list of WebSocket status codes](https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code).
+
 ---
 
 ### Realtime updates techniques
@@ -1298,11 +1274,9 @@ In the polling, we have two approaches:
 - **First one is the Short-Polling**
 
   ![short polling](./img/short%20polling.avif)
-
   1. Client requests the server
   2. Server can respond either with an empty object or with the data object
   3. After the client receives the response from the server, it will wait for a couple of seconds and then repeat the above process.
-
   - **Challenges**: Making repeated requests wastes the resources because:
     - New connection must be established & HTTP header must be passed
     - Query for the new data must be performed & Response for the query must be generated and delivered
@@ -1311,10 +1285,8 @@ In the polling, we have two approaches:
 - **Second one is the Long-Polling**
 
   ![long polling](./img/long%20polling.avif)
-
   1. Client requests the server
   2. Server can respond in two ways:
-
   - If it has any new data, it can respond right away.
   - If it doesn't have anything new data, it will keep that connection open until it receives new data, and then it will respond with updated data.
 
@@ -1369,7 +1341,6 @@ In development or testing, in order to debug pusher without waiting for backend 
 
 - You will find development instances inside it
 - Go to `App Keys` and make sure to match 2 things with each other:
-
   - `key` displayed in the page
   - `key` in the **console** in the `dashboard`
   - Add the `keys` in the `env` file
