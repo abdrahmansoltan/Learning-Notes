@@ -3,8 +3,11 @@
 - [INDEX](#index)
   - [Testing](#testing)
     - [Testing Pyramid](#testing-pyramid)
-    - [Snapshot Testing](#snapshot-testing)
-    - [Sanity Test](#sanity-test)
+    - [Testing types](#testing-types)
+      - [Unit testing](#unit-testing)
+      - [Snapshot Testing](#snapshot-testing)
+      - [Sanity Test](#sanity-test)
+  - [How to test](#how-to-test)
     - [(AAA) Pattern](#aaa-pattern)
     - [BDD vs TDD](#bdd-vs-tdd)
       - [Behavior Driven Development (BDD)](#behavior-driven-development-bdd)
@@ -14,7 +17,9 @@
       - [Black-box Testing](#black-box-testing)
     - [Test Design Best Practices](#test-design-best-practices)
     - [Testing Setup](#testing-setup)
-  - [Suites and Specs](#suites-and-specs)
+  - [Tests Structure](#tests-structure)
+    - [Suites and Specs](#suites-and-specs)
+    - [Assertions \& Expectations](#assertions--expectations)
     - [Matchers](#matchers)
       - [Comparisons](#comparisons)
       - [Truthiness](#truthiness)
@@ -42,14 +47,12 @@
 > Testing is the process of experimentally checking the correctness of a program, while debugging is the process of tracking the execution of a program and discovering the errors in it.
 
 - 2 Types of tests:
-
   - Manual
   - Automated
 
 - `Unit tests` test individual pieces of code.
 
   ![unit-test](./img/unit-test.PNG)
-
   - if there're dependencies, the unit test should [mock or stub](#mock-testing) them out
     - > it means to replace a dependency with something that pretends to be that dependency (ex: fake-API)
 
@@ -60,17 +63,53 @@
 - `UI testing` at the top is also known as **Manual Testing**
 - As we go up in the pyramid, the testing time is increased. as `unit-tests` take short time, and `manual-tests & E2E` take the longest time
 - Jasmine works well with `Unit Testing` and `Integration Testing (API Testing)`.
-
   - the difference between Unit Testing and Integration Testing is the use of third-party integration.
 
 - Jasmine/Jest can be used for `End-to-End Testing` with a tool call `Selenium` to emulate user interactions.
 
-### Snapshot Testing
+---
+
+### Testing types
+
+#### Unit testing
+
+**Unit testing** is the practice of testing the smallest pieces of code (units) in isolation—typically individual functions or methods. The goal is to verify that each unit behaves correctly on its own before integrating it with the rest of the application.
+
+> **Definition**: A unit test should verify that a known, fixed input produces a known, fixed output. If you provide a fixed input for a function that internally uses other dependencies, those dependencies should be mocked out, so a single unit test script tests an isolated unit of code. — _Elliotte Rusty Harold (Google Engineer)_
+
+- **Why Unit Testing Matters - A Real-World Example**
+  - A large app evolves over several years. Some of the developers who started writing the app are gone. A new developer joins the project and has to quickly learn the code and get up to speed.
+
+  - A new business requirement comes in, and the new team member starts working on it. They implement this requirement in the existing function `doSomething()`, but the QA team opens another issue, reporting that the app is broken in a seemingly unrelated area. After additional research, it becomes obvious that the app is broken because of the code change made in `doSomething()`. The new developer doesn't know about a certain business condition and can't account for it.
+
+  - This wouldn't have happened if unit (or e2e) tests were written with the original version of `doSomething()` and run as a part of each build. Besides, the original unit test would serve as documentation for `doSomething()`. Although writing unit tests seems like an additional, time-consuming task, it may save you a lot more time in the long run.
+
+- Unit tests should be **written in a natural language** that describes the behavior of the function being tested.
+  - Because it’s so easy to understand the meaning of tests, they can serve as your program documentation. If other developers need to become familiar with your code, they can start by reading the code for the unit tests to understand your intentions.
+  - Using natural language to describe tests has another advantage: it’s easy to reason about the test results
+
+  ```js
+  describe('add function', () => {
+    it('should return the sum of two numbers', () => {
+      expect(add(2, 3)).toBe(5);
+    });
+
+    it('should return a negative number when the sum is negative', () => {
+      expect(add(-2, -3)).toBe(-5);
+    });
+  });
+  ```
+
+---
+
+#### Snapshot Testing
 
 - Snapshot tests assert that the current output is same as the output before.
 - The main difference between snapshot testing and functional/unit tests is, snapshot tests never assert the correct behavior of the application functionality but does an output comparison instead.
 
-### Sanity Test
+---
+
+#### Sanity Test
 
 is just a casual term to mean that you're testing/confirming/validating something that should follow very clear and simple logic. It's asking someone else to confirm that you are not **insane** and that what seems to make sense to you also makes sense to them
 
@@ -81,6 +120,8 @@ expect(true).toBe(true);
 ```
 
 ---
+
+## How to test
 
 ### (AAA) Pattern
 
@@ -110,7 +151,6 @@ expect(true).toBe(true);
   ![alt](./img/tdd.png)
 
 - Benefits:
-
   - Ensure you're testing the right thing and avoid duplicate and unnecessary tests
     - think of it as you only write tests when you have failing test(red stage)
   - describe the "why" rather than the implementation
@@ -161,21 +201,60 @@ It's a way to describe the level of knowledge that the tester has about the syst
 
 ---
 
-## Suites and Specs
+## Tests Structure
 
-- `Spec`: an individual test
-- `Suite`: a collection of similar tests related to one function
+![test-structure](./img/test-structure.png)
+
+### Suites and Specs
+
+In BDD frameworks, a test is called a `"spec"`, and a combination of one or more specs is called a `"suite"`.
+
+- `Spec`
+  - an individual test
+  - `it()` function is used to define a spec
+- `Suite`
+  - a collection of similar tests related to one function
+  - `describe()` function is used to define a suite
 
 ![spec](./img/spec.PNG)
 
 ---
 
+### Assertions & Expectations
+
+Testing frameworks have the notion of an **assertion**, which is a way of questioning whether an expression under test is `true` or `false`. If the assertion returns `false`, the framework throws an error.
+
+- In Jasmine/Jest, assertions are specified using the `expect()` function, followed by **matchers** like `toBe()`, `toEqual()`, and so on.
+- It's as if you're writing a sentence: _"I expect 2 plus 2 to equal 4"_:
+
+  ```js
+  expect(2 + 2).toEqual(4);
+  ```
+
+---
+
 ### Matchers
+
+**Matchers** implement a Boolean comparison between the actual and expected values. If the matcher returns `true`, the spec passes.
+
+- If you expect a test result to have a certain value, you use a matcher like `toEqual()` or `toBe()`:
+
+  ```js
+  expect(2 + 2).toEqual(4);
+  ```
+
+- If you expect a test result **not** to have a certain value, just add the keyword `not` before the matcher:
+
+  ```js
+  expect(2 + 2).not.toEqual(5);
+  ```
+
+- But if the matcher returns `false`, the spec fails, and an error is thrown.
 
 #### Comparisons
 
 - **`.toEqual()`**
-  - checks if the tested object is the same object
+  - checks if the tested object is the same object in terms of value
   - used with reference-types like `objects`, `arrays`, `sets`
   - it's like `==`
 - **`toBe()`**
@@ -224,7 +303,6 @@ It's a way to describe the level of knowledge that the tester has about the syst
 `endpoint`: is the `URL` of the REST API with the method that (gets, adds to, or modifies) the data of an API in some way.
 
 - Testing APIs use tools together:
-
   - test runner -> jest
   - test fixtures -> a `fixture` is how your tests are setup and organized by modules
     - each test-fixture can run in its own **environment**
@@ -233,7 +311,6 @@ It's a way to describe the level of knowledge that the tester has about the syst
     - like when working with database-api, So we prevent the test from affecting the real database, so we mock the database
 
 - Benefits of Endpoint Testing
-
   - Confirms that the server is working.
   - Confirms that endpoints are configured properly.
   - More efficient than manual testing.
@@ -279,7 +356,6 @@ npm i --save-dev @types/supertest  #  compile without TypeScript errors.
 ### Teardown of Suites
 
 - These Jasmine features allow you to
-
   - Connect to a `database` before a test
   - Connect to a different database for specific tests
   - Run only a specific test

@@ -52,7 +52,7 @@
     - [Accessible Tabs Components](#accessible-tabs-components)
     - [Accessible Accordions Components](#accessible-accordions-components)
     - [Accessible Carousels Components](#accessible-carousels-components)
-    - [Accessible Modal/Dialog Components](#accessible-modaldialog-components)
+    - [Accessible Modal Components](#accessible-modal-components)
     - [Accessible Dropdown/Menu Components](#accessible-dropdownmenu-components)
     - [Accessible Tooltip Components](#accessible-tooltip-components)
     - [Accessible Date Picker Components](#accessible-date-picker-components)
@@ -1288,6 +1288,7 @@ The focus in this section is on **Complex Components**:
 - [Tabs](#accessible-tabs-components)
 - [Accordions](#accessible-accordions-components)
 - [Carousels](#accessible-carousels-components)
+- [Modals](#accessible-modal-components)
 
 > You can find more details about the patterns and component here: [WAI-ARIA Authoring Patterns](https://www.w3.org/WAI/ARIA/apg/patterns/)
 
@@ -1505,27 +1506,37 @@ Carousels are UI components that allow users to cycle through a series of conten
 
 ---
 
-### Accessible Modal/Dialog Components
+### Accessible Modal Components
 
 Modals (dialogs) are overlay components that require user interaction before returning to the main content. They present unique accessibility challenges around focus management.
 
 - Modal structure:
-  - `role="dialog"` or `role="alertdialog"`: Identifies the modal to assistive technologies
-    - Use `alertdialog` for important messages requiring immediate attention
-  - `aria-modal="true"`: Indicates that content behind the modal is inert
-  - `aria-labelledby`: References the modal's title element
-  - `aria-describedby`: References descriptive content (optional)
+  - The wrapper element should have:
+    - `role="dialog"` or `role="alertdialog"`: Identifies the modal to assistive technologies
+    - `aria-modal="true"`: Indicates that content behind the modal is inert
+    - `aria-labelledby`: References the modal's title element
+    - `aria-describedby`: References descriptive content (optional)
+    - `tabindex="-1"`: Makes the modal focusable
+  - The modal content should be contained within the dialog element.
 
 - Focus management requirements:
   - **Focus trap**: Focus must be contained within the modal while open
+    - For example when we reach the last focusable element in the modal and press `Tab`, focus should move to the first focusable element in the modal. **and not leave the modal.**
   - **Initial focus**: Move focus to the first focusable element or the modal itself
-  - **Return focus**: When closed, return focus to the element that triggered the modal
+  - **Return focus**: When closed, return focus to the element that triggered the modal, and visually hide the modal from view (e.g., using `hidden` attribute or CSS `display: none`)
 
 - Keyboard interaction:
   - `Tab`: Cycle through focusable elements within the modal
   - `Shift + Tab`: Reverse cycle through focusable elements
   - `Escape`: Close the modal and return focus to trigger
   - Focus must NOT leave the modal while it's open
+
+- **⚠️ Important notes only for modals:**
+  - Note that for accessibility context, we identify modals when:
+    - a backdrop is used to obscure the main content behind the modal.
+    - looks like a centered window, a docked side-panel, or a full-screen takeover.
+      - So note that **Drawers/Side panels** can also be considered modals if they obscure the main content and require user interaction before returning to the main content.
+  - If the modal is used for critical information or requires immediate attention, use `role="alertdialog"` instead of `role="dialog"`.
 
 - Example of an accessible modal:
 

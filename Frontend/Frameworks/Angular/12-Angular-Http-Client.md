@@ -638,6 +638,8 @@ this.http.request(req).subscribe(event => {
 
 **WebSocket** is a protocol that enables two-way communication between a client and a server over a single, long-lived connection. It allows real-time data transfer, making it suitable for applications that require instant updates, such as chat applications, live notifications, and online gaming.
 
+- You can create an Angular service that turns WebSocket events into an observable stream.
+
 > You can find more about WebSockets in the:
 >
 > - [System design/2-API-design.md#websockets](../../../System%20design/2-API-design.md#websockets) file.

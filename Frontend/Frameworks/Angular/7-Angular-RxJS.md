@@ -11,6 +11,7 @@
       - [Unicast (Cold) Observables](#unicast-cold-observables)
       - [Multicast (Hot) Observables](#multicast-hot-observables)
       - [Subject Variations](#subject-variations)
+    - [Dealing with multiple observables](#dealing-with-multiple-observables)
     - [Observables with Typescript](#observables-with-typescript)
     - [Error Handling in Observables](#error-handling-in-observables)
     - [Turning DOM events into observables](#turning-dom-events-into-observables)
@@ -43,7 +44,6 @@ It's a **functional reactive library** for filtering, sorting and coordinating d
 ![RxJS](./img/rxjs-1.png)
 
 - It's a library for composing asynchronous and event-based programs by using observable sequences.
-
   - It provides one core type, the Observable, satellite types `(Observer, Schedulers, Subjects)` and operators inspired by Array#extras `(map, filter, reduce, every, etc)` to allow handling asynchronous events as collections.
 
 - **It's a third-party library that is independent of Angular**, but it's used in Angular applications to handle asynchronous data streams.
@@ -59,13 +59,11 @@ It's a **functional reactive library** for filtering, sorting and coordinating d
 Using RxJS provides powerful, clean, and elegant solutions, especially for handling complex streams of user interface (UI) events like typing in an input field.
 
 - **⏳ Managing Event Frequency and Latency**
-
   - When a user types quickly, traditional event handling runs the risk of sending a request **for every single keystroke**. Trying to fix this manually with `setTimeout()` and `clearTimeout()` (known as **debouncing**) is cumbersome and error-prone.
 
   - RxJS Solution: The `debounceTime` operator automatically manages this. It ensures the observable only emits a value (and triggers the network request) after a specified time has passed **without any new keystrokes**, eliminating manual timer management.
 
 - **🗑️ Cancelling Outdated Requests**
-
   - If a user continues typing, the requests for the earlier, incomplete search terms become obsolete. Traditional methods struggle to **cancel** these pending requests, which leads to network overload, wasted processing, and potentially processing an old result after a newer one.
   - RxJS Solution: The `switchMap` operator is key here. When a new value is emitted, `switchMap` automatically **cancels any previous, pending inner observable** (like a pending HTTP request) and starts the new one. This guarantees that only the result from the **latest** user input is ever processed.
     - it cancels the previous observable and the http request.
@@ -96,7 +94,6 @@ Using RxJS provides powerful, clean, and elegant solutions, especially for handl
   ![RxJS](./img/rxjs-2.png)
 
 - How is this different in **RxJS**?
-
   - In RxJS, we have an **Observable** that wraps the input element and listens to the input event. **(instead of using `addEventListener` (imperative approach))**
 
     > **Observable:** Is something that emits data/events over time.
@@ -130,7 +127,6 @@ Using RxJS provides powerful, clean, and elegant solutions, especially for handl
   ```
 
   ![RxJS](./img/rxjs-3.png)
-
   - **Note:** for the `error` and `complete` methods, we should use **Arrow functions** to maintain the context of `this`. (because they are called by the observable, not by us)
 
 ---
@@ -159,7 +155,6 @@ It's wrapped around a data source that can emit data over time, and it allows us
 | `error`     | Used to indicate that an error has occurred while emitting data.                                                               |
 
 - Usually, we only focus on `next` and `subscribe` methods.
-
   - `complete` and `error` are used to handle the completion and error scenarios. (not used frequently)
 
   > It's similar to `then()...catch()...finally()` in promises, but with more flexibility and control over the data stream.
@@ -217,7 +212,6 @@ It's wrapped around a data source that can emit data over time, and it allows us
     - The second one is passed to the `subscribe` method, and it receives the data emitted by the observable. **It tells the observable what to do with the data emitted by it**.
 
 - Another way to create an observable is by using the built-in functions that return observables, such as:
-
   - `of` operator from the `rxjs` package.
 
     ```ts
@@ -336,7 +330,6 @@ There are two main types of observables: **(cold vs hot) and (unicast vs multica
   ```
 
 - One of the great features of the `subject` is that we can emit data from outside the observable (unlike the `observable` class which emits data from inside the observable).
-
   - It's like a mix between the `observable` and the `observer` classes.
     ![multicast](./img/observables-12.png)
 
@@ -416,6 +409,28 @@ There are two main types of observables: **(cold vs hot) and (unicast vs multica
 
   - Here, the `subject` **will emit the most previously and recent `2` emitted values** (`2, 3`) when a new subscriber subscribes to it.
   - It's commonly used ✅, when we want to emit a specified number of the most recent values of the observable to new subscribers.
+
+---
+
+### Dealing with multiple observables
+
+- `combineLatest`
+  - It is used to combine the latest values emitted by multiple observables.
+
+  ```ts
+  import { combineLatest, of } from 'rxjs';
+
+  const observable1 = of(1, 2, 3);
+  const observable2 = of('a', 'b', 'c');
+
+  const combined = combineLatest([observable1, observable2]);
+
+  combined.subscribe(value => console.log(value)); // [3, 'c']
+  ```
+
+  - Here, the `combineLatest` operator combines the latest values emitted by `observable1` and `observable2`, and emits them as an array.
+  - It only emits when all observables have emitted at least once.
+  - It's commonly used ✅, when we want to combine the latest values of multiple observables.
 
 ---
 
@@ -583,7 +598,6 @@ It's a function that takes an observable as input and returns a new observable a
 
 - **Operator Groups**
   ![operators](./img/operators-2.png)
-
   - **Generic operators:** These are the operators that can be used with any type of observable.
   - **Specific operators:** These are the operators that are used with specific types of observables.
     - **Creation operators:** These are the operators that are used to create observables.
@@ -684,7 +698,6 @@ It's a function that takes an observable as input and returns a new observable a
     ![nested](./img/nested-subscriptions-3.png)
 
 - `switchMap`:
-
   - **(New and preferred)** It is used to switch the data emitted by the observable by cancelling the previous inner observable when a new inner observable is created.
     - for example:
       - when the user is typing fast in an input field and we want to make a request to the server for each input change, but we want to cancel the previous request when a new request is made.
@@ -707,7 +720,6 @@ It's a function that takes an observable as input and returns a new observable a
         ![nested](./img/nested-subscriptions-2.png)
     - This way, we avoid nested subscriptions and the problems that come with them when a conflict occurs between the data emitted by the inner observables.
     - It's commonly used with `http` requests to cancel the previous request when a new request is made.
-
       - Example: (calling a http request when the route `id` parameter changes)
 
         ```ts
@@ -970,13 +982,11 @@ It's a function that takes an observable as input and returns a new observable a
   ```
 
   - This can cause problems, as if the first observable was delayed, the second observable will not wait for the first observable to complete.
-
     - This can lead to **out of order data from the observables** (especially in `http` requests where the data is not emitted immediately).
     - This can lead to performance issues and memory leaks.
     - This can lead to the creation of multiple subscriptions that are not needed.
 
 - **Solution**
-
   - Use **operators** to transform the data emitted by the observable instead of subscribing to it inside another subscription.
   - `mergeMap` operator
 
@@ -1039,13 +1049,11 @@ It's a function that takes an observable as input and returns a new observable a
 
 - Angular uses **RxJS** for handling asynchronous data streams (like HTTP requests, event handling, and state management).
 - Angular uses:
-
   - **Observables** to handle asynchronous data streams.
   - **Operators** to transform the data emitted by the observables.
   - **Subjects** to multicast the data emitted by the observables.
 
 - Usually, we use **Observables** in Angular to handle asynchronous data streams in services and components.
-
   - This is because most of the Angular APIs and services **return observables that emit data asynchronously**.
 
 > **Role of Observables in Angular:**
@@ -1086,7 +1094,6 @@ It's a function that takes an observable as input and returns a new observable a
   ```
 
   - Now we can do 2 things to access it in the template:
-
     - 1️⃣ Use the `async` pipe to automatically subscribe to the observable and display the data.
 
       ```html
@@ -1104,7 +1111,6 @@ It's a function that takes an observable as input and returns a new observable a
       ```
 
 - Note:
-
   - if you want to catch errors emitted by the observable, you can use the `catchError` operator in the service or the `error` method in the subscription. **Note that when using the `next` and `error` methods in the subscription, you should be careful about `this` keyword binding. so use arrow functions to avoid this issue.**
 
     ```ts
@@ -1174,7 +1180,6 @@ In Angular, we can use the **Forms API** to handle form events and turn them int
   - The `async` pipe **automatically unsubscribes from the observable when the component is destroyed**, preventing memory leaks.
 
 - With `async` pipes , you can use the special syntax `async as` to **avoid creating multiple subscriptions in templates**. To fix this , you can use `async as` syntax to create a single subscription and assign the emitted data to a variable.
-
   - `async`: It subscribes to the observable and returns the emitted data.
   - `async as`: It subscribes to the observable and assigns the emitted data to a variable that can be used in the template.
 
@@ -1257,9 +1262,7 @@ The Angular Router uses observables to handle route changes and navigation event
 > Take in mind that we can access these data also using the `snapshot` property of the `ActivatedRoute` class, but using observables is preferred as it allows us to listen to changes in the route data, instead of accessing the data only once when the component is initialized.
 
 - Example: (when the route `id` parameter changes, we fetch the email with that id)
-
   - When the user clicks the product for the first time, the router performs the following steps:
-
     1. It navigates to the route `/products/1`.
     2. It creates the `ProductDetailComponent` instance.
     3. It attaches `ProductDetailComponent` to the DOM.
@@ -1268,7 +1271,6 @@ The Angular Router uses observables to handle route changes and navigation event
     6. It fetches the product with id `1` and displays it.
 
   - Now, when the user clicks another product (with id `2`), not all of the above steps are repeated. Instead, only the following steps are performed:
-
     1. The router updates the route to `/products/2`.
     2. It updates the `ActivatedRoute` service with the new route parameters.
     3. It notifies the `ProductDetailComponent` about the change in the route parameters.
@@ -1280,7 +1282,10 @@ The Angular Router uses observables to handle route changes and navigation event
   export class ProductDetailComponent implements OnInit {
     product: any;
 
-    constructor(private route: ActivatedRoute, private productService: ProductService) {}
+    constructor(
+      private route: ActivatedRoute,
+      private productService: ProductService
+    ) {}
 
     ngOnInit() {
       // Bad practice ❌ (nested subscription)
@@ -1454,7 +1459,6 @@ export class AppComponent implements OnInit {
      >
      > - An `Observable` is not a good choice here because it doesn't have a way to emit new values. we need a way to update the authentication status when the user logs in or out (inside each auth method).
      > - A `BehaviorSubject` is a good choice because it allows us to emit new values and also allows other components to listen to the authentication status.
-
      - This way, we can easily manage the authentication status and update the UI accordingly.
 
 2. Then, we create a component that uses the service to handle the authentication logic and listen to the authentication status.
