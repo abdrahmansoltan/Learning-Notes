@@ -56,7 +56,6 @@
   ```
 
 - If you needed to use a third-party library, you would have to download the library `js` files and include it in the HTML file before your main script:
-
   - We can add `moment` library by downloading the `moment.min.js` file and including it in the `html` file as follows:
 
     ```html
@@ -107,8 +106,9 @@ It's a simple command-line tool that automates the process of downloading and in
     - it can be described as a manifest of your project that includes the packages and applications it depends on, information about its unique source control, and specific metadata like the project's name, description, and author.
     - it is always structured in the `JSON` format, which allows it to be easily read as metadata and parsed by machines.
   - > You can use `npm init --yes` to Instantly Initialize a Project
+- `package.json` file
+  - It's a simple JSON file that contains metadata about your project and its dependencies defining the packages required for your project to run.
 - `npm install package-name`
-
   - This command does two things:
     1. first, it downloads all the package-code from the **NPM Registry** into a folder called `node_modules`.
     2. Second, it automatically modifies the `package.json` file to keep track of the package as a project dependency.
@@ -116,9 +116,7 @@ It's a simple command-line tool that automates the process of downloading and in
 > This is useful later when sharing a project with others — instead of sharing the `node_modules` folder (which can get very large), you only need to share the `package.json` file and other developers can install the required packages automatically with the command `npm install`
 
 - now to use the library/package, we have 2 choices:
-
   1. **Use the `.js` file in the `node_modules/package_name` directory (not recommended ❌)**
-
      - This means we can link to the npm downloaded version of the package in the `index.html` file as follows:
 
      ```html
@@ -131,7 +129,6 @@ It's a simple command-line tool that automates the process of downloading and in
      - Instead we can use a way to automate that process, which is the second option.
 
   2. **Using a JavaScript module bundler (webpack) (recommended ✅)**
-
      - using `node.js` modules. Instead of loading all of `package_name.js` with an HTML script tag, you can load it directly in the JavaScript file as follow:
 
        ```js
@@ -150,7 +147,6 @@ It's a simple command-line tool that automates the process of downloading and in
        ```
 
 - `npx`
-
   - It's useful when you're running npm package that has some sort of executable script (or command line interface) that you want to run without having to install it globally.
   - It's a tool that comes with npm `5.2+` and higher. It allows you to run a command (from the package in `node_modules/.bin`) without having to install it globally.
   - It's useful for running packages that you don't want to install globally, or for running a package that you only need once.
@@ -223,11 +219,9 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
 > ![npm-scripts](./img/npm-scripts.png) > ![npm-lifecycle](./img/npm-lifecycle.png)
 >
 > - **shell/bash**: it's good at:
->
 >   - file i/o
 >   - chaining tasks
 >   - running tasks in series/parallel>
->
 > - **node**: we can replace shell commands with node-implementations, like
 >   - `bash` -> `node`
 >   - `cat` -> `catw`
@@ -284,7 +278,6 @@ it's the `entries` in the `scripts` field of the `package.json` file. The script
   ```
 
 - **`&` vs `&&`**
-
   - `&`: do the second command in the background and don't wait for the first one to finish
     - this is useful for commands with servers as servers stay working and don't finish
   - `&&`: do the second command after the first one finishes
@@ -321,7 +314,6 @@ Nowadays the most popular choice seems to be using the scripting capabilities bu
 2. Analyze its dependencies: imports and then imports of imports etc.
 3. Build a single file with all modules (or multiple files, that’s tunable), replacing native `import` calls with bundler functions, so that it works. “Special” module types like HTML/CSS modules are also supported.
 4. In the process, other transformations and optimizations may be applied:
-
    - Unreachable code removed.
    - Unused exports removed (“tree-shaking”).
    - Development-specific statements like `console` and `debugger` removed.

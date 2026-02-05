@@ -6,6 +6,7 @@
   - [File System vs Database](#file-system-vs-database)
   - [Using File System to Open and Write Files](#using-file-system-to-open-and-write-files)
     - [File System Flags](#file-system-flags)
+    - [Files Encoding](#files-encoding)
     - [Reading and Writing with File System](#reading-and-writing-with-file-system)
     - [Reading, Moving, Renaming and Deleting Files](#reading-moving-renaming-and-deleting-files)
   - [Streams](#streams)
@@ -17,6 +18,26 @@
 
 - Node.js introduced a `non-blocking I/O` environment to extend this concept to file access, network calls and so on.
   ![node async](./img/node-async-1.png)
+
+- You will see that most of the methods in the `fs` module have two versions:
+  - a `synchronous` version (ending with `Sync` ), e.g., `fs.readFileSync()`
+    - it requires a variable to store the result because it returns the data directly
+    - use it when you want to block the execution until the file is read as you need the data to continue
+  - an `asynchronous` version, e.g., `fs.readFile()`
+    - it requires a `callback function` to handle the result when it's ready because it doesn't return the data directly
+    - use it when you don't want to block the execution and let other code run while waiting for the file to be read and get back to you when it's done (using `callbacks`, `Promises`, or `Async/Await`)
+
+    ```js
+    // synchronous version
+    const data = fs.readFileSync('file.txt', 'utf-8');
+    console.log(data); // data is available here
+
+    // asynchronous version
+    fs.readFile('file.txt', 'utf-8', (err, data) => {
+      if (err) throw err;
+      console.log(data); // data is available here
+    });
+    ```
 
 ### callbacks
 
@@ -44,7 +65,6 @@
 ![databasevsfilesys](./img/databasevsfilesys.jpg)
 
 - databases are just files.
-
   - With Databases the content is structured, can be relational, and indexed.
 
 - With File System, you can only control where you write to the file, and where you read from the file
@@ -59,6 +79,18 @@
 File System Flags are used for identifying `read/write` operations available when **opening** a file.
 
 ![read/write](./img/Flags.PNG)
+
+---
+
+### Files Encoding
+
+Encoding is the way that characters are stored in a file. The most common encoding is `UTF-8`.
+
+- When reading or writing files, you can specify the encoding as an option.
+
+  ```js
+  const myFile = await fsPromises.readFile('myfile.txt', 'utf-8');
+  ```
 
 ---
 

@@ -58,10 +58,22 @@
 
 ## Node.js and the V8 Engine
 
-- `runtime` is the environment that `javascript` runs on. for example:
+Node.js is a `Javascript-Runtime` built on top of the `V8 engine` that allows us to run javascript outside browsers, with additional javascript-features (e.g. accessing file system files)
 
+> It was developed by **Ryan Dahl** in 2009, and it's an open-source, cross-platform runtime environment that allows us to run JavaScript code on the server-side (backend) and fix concurrency issues in web-servers
+>
+> It depends on NPM (Node Package Manager) to manage its packages and modules
+
+- `runtime` is the environment that `javascript` runs on. for example:
   - **V8 engine** on browsers(chrome) is used to run`javascript`on the **client-side** --> so **web-browser is a javascript runtime**
     ![engine](./img/how%20js%20works.jpg)
+- What is the difference between Node.js and the borwser javascript runtime?
+
+  | **Browser Javascript Runtime**                          | **Node.js Javascript Runtime**                          |
+  | ------------------------------------------------------- | ------------------------------------------------------- |
+  | It has access to the `DOM` and `BOM` objects            | It has access to `file system`, `networking`, ...       |
+  | It is mainly used for building interactive web pages    | It is mainly used for building server-side applications |
+  | It runs in a sandboxed environment for security reasons | It has more access to system resources and files        |
 
 - Benefits (features we get) of running Javascript in **Browser**:
   - devtools
@@ -74,6 +86,11 @@
   - accessing file system
   - better networking capabilities
   - These benefits enable us to have perfect conditions for using Node.js as a **web server**
+
+- What Node.js is used for:
+  1. Web services APIs such as REST APIs
+  2. Real-time applications such as chat applications and online gaming
+  3. Web-based applications
 
 ---
 
@@ -91,7 +108,6 @@
 
 - If it wasn't for `V8`, Node would have no way of understanding the javascript code, as `v8 engine` converts javascript code into machine code that the computer can understand
 - `libuv` is an open source library with a strong focus on **Asynchronous I/O**. This layer is what gives Node access to the underlying operating system (`file-system`, `networking`, ...)
-
   - Also, `libuv` implements 2 important features of Nodejs which are:
     1. **Event Loop** --> for handling easy tasks like executing callBacks and network I/O
     2. **Thread Pool** --> for more heavy work like file accessing or compression
@@ -99,12 +115,25 @@
 
 - This architecture provides us with a level of **Abstraction**, as the dependencies are written in `C++` but they make us have access to their functions in pure javascript
 
+- Thread model vs Event-Driven Model
+  ![thread vs event](./img/thread-vs-event.png)
+  - **Thread Model**: A request comes in to the server, and the server assigns a thread to handle that request. Then, the thread does all the work (in a linear way) to handle that request (reading files, querying the database, processing data, and so on) until the response is sent back to the client and the thread is freed up to handle another request.
+    ![thread model](./img/thread-model.png)
+    - **So, the order of execution is linear** in the thread model, as each task is executed one after the other in the order they are written even if some tasks take longer than others
+  - **Event-Driven Model**: A request comes in to the server, and the server assigns a callback function to handle that request. Then, the event-loop picks up that callback function and starts executing it. Whenever the callback function encounters a heavy task (like reading files, querying the database, processing data, and so on), it offloads that task to the thread-pool and continues executing other code. Once the heavy task is done, the thread-pool notifies the event-loop, which then picks up the callback function again and continues executing it until the response is sent back to the client.
+    ![event-driven model](./img/event-driven-model.png)
+    - **So, the order of execution is not linear** in the event-driven model, as the order is based on how quickly the tasks are done (some tasks may take longer than others)
+
+- Node.js depends on the **"Event-Driven Model"**
+  - It's based on the idea of **"Events"** where an event is emitted when a certain action occurs, and the event-loop picks it up and calls the necessary callback functions
+  - So instead of executing all work for each request on individual threads, Node.js uses the event-loop to handle multiple requests in a single thread by offloading heavy tasks to the thread-pool using the "Event-Driven Model"
+  - This is because Node.js has a `single-threaded` architecture which is good for resources but can be bad if the thread is slowed or blocked
+
 ---
 
 #### More about Node.js and libuv
 
 - Node uses `libuv` so that if `V8 engine` didn't find a `js` syntax like `process module` --> it goes to `libuv`
-
   - > **libuv** is a multi-platform C library that provides support for Asynchronous I/O based on event loops
 
 - `libuv` abstracts away all specific way do deal with `files` in different `Operation-Systems`, so that `node.js` can work on any system/platform, it does so by `binding` these ways to `node`
@@ -126,7 +155,6 @@ When we use Node on a computer, it means that there's a Node `process` running o
 ![node process](./img/node-process.png)
 
 - In that process, Node.js runs in a single thread (sequence of instructions). And this is what happen in a thread when starting a Node application
-
   1. all the top level code is executed (not inside any callback function)
   2. all the modules that the app needs are required
   3. all callbacks are registered
@@ -134,7 +162,6 @@ When we use Node on a computer, it means that there's a Node `process` running o
      - Some tasks are too heavy (expensive to be executed) in the event loop, because they would block the single thread. That's where the **thread pool** comes in
 
 - The thread pool is provided to Node.js by the `libuv` library, and it gives us **4 additional threads** that are separate from the main single-thread (we can configure it up to 128 threads)
-
   - The event loop can **offload** heavy tasks to the thread pool (behind the scenes)
     - > More [here](#thread-pool-asynchronous-io)
   - the more threads we have the faster we get the (tasks offloaded to the thread pool) to be executed
@@ -152,7 +179,6 @@ When we use Node on a computer, it means that there's a Node `process` running o
 
 - Node.js is build around callback functions, as it uses **"Event-driven Architecture"** with "Observer Pattern" where:
   ![events](./img/node-events.png)
-
   1. events are emitted
   2. the event-loop picks them up when they're emitted, and the more expensive tasks go to thread-pool
   3. then, the necessary callbacks are called.
@@ -170,12 +196,10 @@ When we use Node on a computer, it means that there's a Node `process` running o
 
 - The event-loop is what makes Asynchronous programming possible in Node.js, making it the most important feature in Node.js design and this is what makes it different from other BE languages
   ![event loop](./img/event-loop-2.png)
-
   - **node.js** -> single thread which is good for resources but can be bad if the thread is slowed or blocked
   - **php** -> multiple threads which is more resources-intensive but no danger of blocking
 
 - In addition to the main 4 callback queues, there're also 2 other queues (`nextTick` queue and the **microtasks** queue -> for resolved promises)
-
   - if there's any callback to be processed in one of these 2 queues, they will be executed right after the current phase of the event loop finishes instead of waiting for the entire loop to finish
   - So, callbacks from these 2 queues will be **executed right away**
 
@@ -208,14 +232,12 @@ When we use Node on a computer, it means that there's a Node `process` running o
 - `Node` runs on a `single thread` even if you have millions of users, so make sure you don't **block that thread**, --> here comes the rule of `Libuv` which gives us **4** additional threads **(or more)**
 
   ![pool-thread](./img/poolthread.PNG)
-
   - so `node` takes care of heavy things by `offloading` them to the `thread pool`
   - it simulates `asynchronous` task by doing each task in a single `call-stack (thread)`
 
 - `Libuv Library` : A library written in `C` that provides **multithreading** to Node.js and allows for heavy processing.
   ![libuv](./img/libuv.jpg)
 - The thread-pool(collection of threads) in `libuv` are se-up ahead of time and are ready to take on work as it comes in
-
   - libuv is written in C++, that's why it have threads
     ![multi-thread](./img/multithread.PNG)
 
@@ -245,7 +267,6 @@ When we use Node on a computer, it means that there's a Node `process` running o
   - `emit` is used to trigger an event
   - `on` is used to add a callback function that's going to be executed when the event is triggered
 - it works on the idea of **Observer Pattern** where
-
   - `emit` triggers an event
   - `on` observes an event and wait until it occurs
 
@@ -273,7 +294,6 @@ eventEmitter.emit('new song released');
 - **REPL** stands for [`Read`, `Evaluate`, `Print`, `Loop`] (the place we write js code in terminal after writing `$node`)
 
   ![repl](./img/repl.PNG)
-
   - To access the Node.js REPL environment, run: `$node`
   - To exit node => `ctrl`+`d`
   - To run `index.js` use:
@@ -292,6 +312,21 @@ eventEmitter.emit('new song released');
 
 The module system creates the ability to `export` and `import` JavaScript from separate files.
 
+Node.js has a built-in module system that allows us to break our code into smaller, reusable pieces called `modules`.
+
+- Node.js comes with set of built-in modules (core-modules) like `fs`, `http`, `path`, `os`, `url`, `events`, `process`, ... that can be used without any installation
+  - They need to be required before using them
+  - You can find the list of core-modules [here in the official Node.js documentation](https://nodejs.org/api/)
+
+  ```js
+  const fs = require('fs');
+
+  fs.readFile('./file.txt', 'utf-8', (err, data) => {
+    if (err) throw err;
+    console.log(data);
+  });
+  ```
+
 - Node Modules are used to:
   1. Reuse existing code
   2. Organize code
@@ -299,8 +334,7 @@ The module system creates the ability to `export` and `import` JavaScript from s
 
 ### Common-JS Module System
 
-- Node.js uses the `Common JS module` system to break code into smaller chunks.
-
+- Node.js uses the `Common JS module` system to break code into smaller chunks -> **"Reusability"**
   - TypeScript compiles to the Common JS Module System.
 
 - **`export`**
@@ -326,19 +360,18 @@ The module system creates the ability to `export` and `import` JavaScript from s
   ```
 
 - **`require()`**
-
   - When using `require`, a preceding `slash (/)` must come before a locally created module name; otherwise, Node.js will search the `core modules` and then `node_modules`.
   - also by default, `require()` doesn't need `.js` extension for javascript file as it's set to look for these extensions in this order:
     1. `.js`
     2. `.json`
     3. `.node`
 
-  ```js
-  const logger = require('./util/logger.js');
+    ```js
+    const logger = require('./util/logger.js');
 
-  // using ES6 object destructuring, to only get (myFirstFunction)
-  const { myFirstFunction } = require('./util/logger.js');
-  ```
+    // using ES6 object destructuring, to only get (myFirstFunction)
+    const { myFirstFunction } = require('./util/logger.js');
+    ```
 
 - `__dirname` and `__filename`
 
@@ -360,7 +393,6 @@ The module system creates the ability to `export` and `import` JavaScript from s
    ![modules](./img/modules-1.png)
 2. **Wrapping the module in a function**
    ![modules](./img/modules-2.png)
-
    - The module's code is wrapped into an **IIFE**, which will give us access to a couple of special objects and methods like `require()`
    - This is why in every module, we automatically have access to stuff like `require` function and global variables that are injected into every module
    - All the module code is executed inside a function body
@@ -383,7 +415,6 @@ Starting from `Node.js 13.2.0`, `Node.js` supports ECMAScript modules, known for
 ![es-module](./img/es-modules.webp)
 
 - Additional Steps in order to use `ECMAScript-modules` :
-
   - The module's file extension is `.mjs`, if not using a special compiler that handles this
   - Or the module's nearest parent folder has `{ "type": "module" }` in `package.json`
 
@@ -415,7 +446,6 @@ It's not found in the browser APIs, `Process` relates to the global node executi
 - The `process` object is a **global** that provides information about (and control) the current Node.js process.
   - As it's a `global`, it's always available to Node.js applications without using `require()`. It can also be explicitly accessed using `require()`
 - The Process module contains the ability to perform tasks immediately before the process exits, and when it exits.
-
   - `beforeExit` allows for asynchronous calls which can make the process continue.
   - `exit` only happens once all synchronous and asynchronous code is complete.
 
@@ -435,10 +465,8 @@ It's not found in the browser APIs, `Process` relates to the global node executi
     ```
 
 - `process.env` -> **(ENVIRONMENT VARIABLES)**
-
   - `Process.env` gives you access to the environment information of your Node.js application. It also allows you to add environment variables that can be used if your code is dependent on the environment it is run in.
   - To add new environment-variables in our Node process, we have 2 ways:
-
     1. manually in terminal before the start script:
 
        ```sh
@@ -462,7 +490,6 @@ It's not found in the browser APIs, `Process` relates to the global node executi
 - `process.stdout` it's like `console.log` but it does not force a new line break. This allows you to create helpful tools like progress bars.
 
 - `process.argv`
-
   - An array containing your console arguments information for your executed process.
 
 - `process.nextTick()`
@@ -497,6 +524,8 @@ console.log(path.join('/app', 'src', 'util', '..', '/index.js'));
 
 ### Core-modules : File System Module
 
+> More in the [Node-FileSystem](./3-Node-FileSystem.md) file
+
 - `const fs = require('fs');`
 - allows for reading and writing to files with many options.
 
@@ -517,7 +546,6 @@ npm i --save-dev module-name@1.19 # install a specific version (1.19 here) of mo
 ```
 
 - `package-lock.json`
-
   - contains all of the information for the dependencies of the modules you have installed.
   - it has the dependencies for the package you installed so that the main `package.json` is clean.
   - it's important to get the exact `semantic versioning`
@@ -632,7 +660,6 @@ This is what happens when we access a webpage or accessing a wep API:
    - **Communication Protocols**: are system of rules that allows 2 or more parties to communicate
      - > They are the ones that set the rules on how data moves on the internet
 3. After establishing the connection, We make a **HTTP Request**, and the request message contains multiple sections (start line, request headers, request body)
-
    - **HTTP:** is a communication protocol that allows clients and web servers to communicate by sending requests and response messages from client to server and back
 
 4. After the request hits the server and the server has the data ready to be send back, The server will send back a **HTTP Response**, and the response message will look similar to the request message
@@ -651,15 +678,12 @@ Node.js makes it easy to create a simple web server that processes incoming requ
 - `res`is a writable stream, which we can be listened to by using the `write` functions to write data to it like (headers, body, etc)
 
 - explanation of code below :
-
   - `requestListener` function is the callback function that takes a request `object` and a response `object` as parameters.
 
   - The `request` object contains things such as the `requested URL`, but in this example we ignore it and always return "Hello World".
-
     - when using `request` with other servers, you must `end` it in order to be sent ---> `req.end()`
 
   - The `response` object is how we send the headers and contents of the response back to the user making the request.
-
     - Here we return a `200` response code (signaling a `successful response`) with the body "Hello World".
 
   - `http.createServer` method creates(returns) a **server** that calls `requestListener` whenever a request comes in.
@@ -741,7 +765,6 @@ response.writeHead(404, {
 - when you have a `server` that has different `URLs` that response differently on which one is being requested --> we call these different `URLs` : `EndPoints`
 - `Routing` refers to how an application’s endpoints (`URIs`) respond to client `requests`.
 - There are two ways to implement routing in node.js which are :
-
   - Without using Framework: based on the request-url, we will send corresponding response
 
     ```js
@@ -774,7 +797,6 @@ response.writeHead(404, {
 > **Streams:** Used to process (read/write) data piece by piece (chunks), without completing the whole read or write operation, and therefore without keeping all the data in memory
 
 - **Stream**: is an ongoing process, as the request is read by Node.js **in chunks**
-
   - This is done so that we can start working on the individual chunks without having to wait for the full request being read
     - Ex: uploading a file or streaming-services like netflix, youtube
   - streams are perfect for handling large volumes of data like videos
@@ -785,7 +807,6 @@ response.writeHead(404, {
   ![streams](./img/streams-1.png)
 
 - **streams & `pipe()`**
-
   - sometimes, there's a problem when reading streams, as the readable stream used to read file from the disk is much faster than sending the result with the response writable stream over the network, and this will overwhelm the response-stream which can't handle all the incoming data so fast. This problem is called "Back Pressure"
     - **"Back Pressure"**: It's when the response can't send the data nearly as fast as it's receiving it from the file
   - `pipe` operator is available in all readable streams and allows us to pipe the output of a readable stream into the input of a writable stream
@@ -825,7 +846,6 @@ response.writeHead(404, {
 #### Buffer
 
 - **Buffer**
-
   - It's like a bus-stop, as buses are always driving, but "it's for users", and so to climb on the bus and leave the bus, you need bus-stops where you can track the bus, and that is what the `buffer` is
   - It's a construct which allows you to hold multiple chunks and work with them before they are released once you are done
 
@@ -924,7 +944,6 @@ When dealing with servers that are overloaded with so much work, it's best to di
 ![model](./img/model.PNG)
 
 - node.js runs on a single thread, So to do multi-threading we can:
-
   - run node on multiple processes side-by-side to share the `work`
     - spreading the request between multiple node.js processes that response to the same request in the same way, So that they share the load evenly
   - it means that instead of taking each request and handling it in `one node server (process)`, we instead `spread` the requests out between multiple node.js processes
@@ -943,7 +962,6 @@ The Node.js Cluster module enables the creation of child processes (workers) tha
 ![cluster](./img/cluster.PNG)
 
 - How it works:
-
   1. when running node.js application, the main node process is created which is called: **"master process"**
   2. Inside of the cluster module, we have access to a function called `fork()`, which is used to create copies of the `master` process called **"worker processes**
   3. the worker-processes are responsible for doing the heavy work of (taking HTTP requests, process them and respond to them)
@@ -1022,7 +1040,6 @@ pm2 start server.js -l logs.txt -i max
 The `worker_threads` module enables the use of threads that execute javascript in parallel
 
 - worker-threads are useful for performing CPU-intensive javascript operations
-
   - They don't help much with I/O operations, as the Node.js built-in asynchronous I/O operations are more efficient than worker-threads can be
 
 - worker-threads is a new feature coming from a new feature in the V8 engine called: **"V8-isolates"**, they're like VMs running js-code together which enables us to mimic having multiple threads in javascript

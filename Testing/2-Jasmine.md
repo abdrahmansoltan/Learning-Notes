@@ -7,6 +7,9 @@
   - [Jasmine Syntax](#jasmine-syntax)
   - [Testing examples and tips](#testing-examples-and-tips)
     - [Testing classes](#testing-classes)
+      - [First Attempt - Code Duplication](#first-attempt---code-duplication)
+      - [Second Attempt - Moving Instantiation Outside ❌ Wrong](#second-attempt---moving-instantiation-outside--wrong)
+      - [Correct Approach - Using `beforeEach()` ✓](#correct-approach---using-beforeeach-)
   - [Testing Asynchronous Code](#testing-asynchronous-code)
     - [Using async/await](#using-asyncawait)
     - [Using promise](#using-promise)
@@ -66,9 +69,10 @@ It's a behavior-driven development framework for testing JavaScript code. It doe
   └── tsconfig.json
   ```
 
-- configure the reporter to display Jasmine results to your terminal application -> [reporter.ts](../1-Backend%20Development%20with%20Node.js/Configuring%20Jasmine/reporter.ts)
+- Configuration
+  - configure the reporter to display Jasmine results to your terminal application -> [reporter.ts](../1-Backend%20Development%20with%20Node.js/Configuring%20Jasmine/reporter.ts)
 
-- configurations for a basic Jasmine configuration -> [jasmine.json](../1-Backend%20Development%20with%20Node.js/Configuring%20Jasmine/jasmine.json)
+  - configurations for a basic Jasmine configuration -> [jasmine.json](../1-Backend%20Development%20with%20Node.js/Configuring%20Jasmine/jasmine.json)
 
 - In the `tsconfig.json` file, add "`spec`" to the list of folders that we want to exclude as it doesn't have `ts` files it it
 
@@ -88,6 +92,28 @@ It's a behavior-driven development framework for testing JavaScript code. It doe
   ```js
   describe('suite description', () => {
     it('describes the spec', () => {
+      const myVar = true;
+      expect(myVar).toBe(true);
+    });
+  });
+  ```
+
+- To run only specific specs or suites, you can use `fdescribe` and `fit` instead of `describe` and `it`. This is useful for focusing on a particular test during development.
+
+  ```js
+  fdescribe('Focused Suite', () => {
+    fit('Focused Spec', () => {
+      const myVar = true;
+      expect(myVar).toBe(true);
+    });
+  });
+  ```
+
+- To exclude specific specs or suites from running, you can use `xdescribe` and `xit`. This is helpful when you want to temporarily skip certain tests.
+
+  ```js
+  xdescribe('Excluded Suite', () => {
+    xit('Excluded Spec', () => {
       const myVar = true;
       expect(myVar).toBe(true);
     });

@@ -71,6 +71,12 @@
 
 ### Testing types
 
+> Unit tests run quickly, but most application business logic should be tested with E2E tests.
+>
+> While you’re writing tests, make them fail to see that their failure report is easy to understand.
+>
+> Running unit tests should be part of your automated build process, but E2E tests shouldn’t.
+
 #### Unit testing
 
 **Unit testing** is the practice of testing the smallest pieces of code (units) in isolation—typically individual functions or methods. The goal is to verify that each unit behaves correctly on its own before integrating it with the rest of the application.
