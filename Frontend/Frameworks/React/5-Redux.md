@@ -46,8 +46,9 @@
 
 It's a **state management system** for cross-component or app-wide state
 
-- Redux is really:
+> Redux is an open-source JavaScript library for managing application state. It is often used with React, but can be used with any JavaScript framework or library. Redux provides a way to manage the state of an application in a predictable way, making it easier to debug and maintain.
 
+- Redux is really:
   - A single store containing "global" state
   - Dispatching plain action-objects to the store when something happens in the app
   - Pure reducer functions looking at those actions and **returning immutably updated state**
@@ -59,6 +60,15 @@ It's a **state management system** for cross-component or app-wide state
 - We can use Redux in 2 ways:
   1. Classic Redux
   2. Redux Toolkit (recommended + modern way)
+
+- **Redux is based on the following three principles:**
+  ![redux principles](./img/redux-principles.png)
+  - **There’s a single source of truth**.
+    - There’s a single store where your app contains the state that can be represented by an object tree.
+  - **State is read-only**.
+    - The only way to change the state is to emit an action, an object describing what happened.
+  - **Changes are made with pure functions**.
+    - To specify how the state tree is transformed by actions, you write pure reducers which are just functions that take the previous state and an action, and return the next state.
 
 ---
 
@@ -98,7 +108,6 @@ It's a **state management system** for cross-component or app-wide state
 ![redux](./img/redux-vs-reducers-0.png)
 
 - Redux is very similar to `useReducer`, but there's some differences:
-
   - `useReducer`
     ![alt](./img/redux-vs-reducers.png)
     ![alt](./img/redux-vs-reducers-3.png)
@@ -110,7 +119,6 @@ It's a **state management system** for cross-component or app-wide state
       ![alt](./img/redux-vs-reducers-5.png)
 
 - `useContext` vs `Redux`
-
   - **Context + Reducers**
     ![Context](./img/redux3.PNG)
   - **Redux**
@@ -258,7 +266,6 @@ Steps:
 
 1. import `useSelector` hook from `react-redux` in the component that needs to access some state
 2. call the hook, passing in a selector function
-
    - selector function -> it's a function that takes the entire state object and returns the slice of the state that we want
 
 3. Anytime state changes, the component will automatically re-render
@@ -277,7 +284,6 @@ const counter = useSelector(state => state.counter); // selecting specific slice
 ## Folder structure
 
 - When using Redux, we have 2 options: **organize by function** or **organize by feature**
-
   1. **organize by function**
      ![redux structure](./img/redux-structure-1.png)
      ![redux structure](./img/redux-structure-4.png)
@@ -311,11 +317,9 @@ const counter = useSelector(state => state.counter); // selecting specific slice
 - inside the `slices` there's a `reducers` property which combines `mini reducer functions` into a big reducer function
   ![store](./img/store-6.png)
   ![store](./img/store-7.png)
-
   - we can view each of these functions here as being like an individual `case` statement inside of a larger `switch` statement
 
 - it creates a set of **action creator** functions
-
   - the `action` type is created from the (slice name + name of reducer function)
 
     ```js
@@ -495,19 +499,15 @@ As we can't do async operations in the `reducer function` (because it's a pure f
   - this is not a good solution because we will have a lot of logic in the component and it will be hard to test **(Not ideal)**
 - **Any asynchronous code has to happen outside the `reducer-function`**. -> So, we use `middleware` to do that
   ![redux middleware](./img/redux-middleware-1.png)
-
   - **Redux Middleware**: It's a function that gets called with every action we dispatch
 
 - By using a middleware, we can do something with the `action` before that `action` gets into the `reducer`
-
   - This is the perfect place for us to do any `async` logic
 
 - We can write middleware from scratch, but there're some libraries that help us with that like `redux-thunk` and `redux-saga`
-
   - Most popular is `redux-thunk`
 
 - Options for data fetching in **Redux Toolkit**:
-
   1. Async Thunk Functions
   2. Redux Toolkit Query
 
@@ -526,13 +526,11 @@ It's a middleware that allows us to receive `actions` that are function
   ![Redux Async Data Flow](./img/Redux%20Async%20Data%20Flow.gif)
 - it receives `async-actions` in the form of `functions`
   ![redux async](./img/async-redux-3.png)
-
   - Redux takes the function and passes into it a `dispatch` as a parameter
   - now we can dispatch new actions in this Thunk, so that we can abstract some logic in the Thunk and so that Actions can be dispatched outside the component
 
 - All `Redux Thunk` really does is: **allow actions to be passed as functions**
 - **Creating an Async Thunk Steps:**
-
   1. Install `redux-thunk` package
   2. Apply the middleware to the store
 
@@ -546,7 +544,6 @@ It's a middleware that allows us to receive `actions` that are function
      ```
 
   3. use the middleware in the `action-creator` function
-
      - We do this by returning a function that takes `dispatch` as a parameter
      - By returning a function, Redux will automatically pass:
        - `dispatch` as the first parameter to this function
@@ -572,7 +569,6 @@ It's a middleware that allows us to receive `actions` that are function
      ```
 
 - Note:
-
   - We can dispatch anywhere in the thunk function, not just at the end of the function after the async operation
 
     ```js
@@ -601,7 +597,6 @@ In most middlewares, actions hit `middleware` before they hit the `reducer`, **B
   ![saga](./img/saga.PNG)
 
 - **NOTE**: Actions fired by sagas can trigger another sagas:
-
   - Actions triggered by sagas can also flow through the saga again
 
 - Saga uses [Generator Functions](https://javascript.info/generators)
@@ -920,12 +915,10 @@ export const setCurrentUser = user => createAction(USER_ACTION_TYPES.SET_CURRENT
 - It's a browser extension that allows us to see the state of the store at any point in time
 - It also allows us to see the `actions` that are being dispatched to the store
   ![redux devtools](./img/redux-devtools-1.png)
-
   - We can `jump` to any point in time and see the state of the store at that point
   - We can manually dispatch actions to the store in the `dispatch` tab
 
 - To use it:
-
   1. we need to install `redux-devtools-extension` package
 
      ```sh
