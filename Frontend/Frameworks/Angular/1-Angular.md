@@ -52,6 +52,8 @@
 
 ## Why Use Angular for Web Applications
 
+> Angular as a framework provides a few significant advantages while also providing a common structure for developers on a team to work with. It allows us to develop large applications in a maintainable manner.
+
 Angular and TypeScript are excellent tools for developing web applications due to the following reasons:
 
 - **Separation of Concerns**: Angular ensures a clean separation between UI rendering and application logic. It even supports native UI rendering for platforms like iOS and Android.
@@ -93,7 +95,6 @@ Angular is a `framework` for building **reactive** web applications.
 
 1. Angular was created by Google in 2010 as a JavaScript framework called `AngularJS` (or Angular 1)
 2. In 2016, Google released a complete rewrite of AngularJS called `Angular` (or Angular 2+), which is a TypeScript-based framework
-
    - Angular 2+ is a complete rewrite of AngularJS, and it's not backward compatible with AngularJS
    - It's based on **Modules** and **Components** architecture, which makes it more modular and easier to maintain
 
@@ -110,18 +111,15 @@ Angular is a `framework` for building **reactive** web applications.
 Angular is a component-based framework where an application is structured as a tree of components. Each Angular app starts with a root component, which can have child components, and those children can have their own descendants, forming a hierarchy.
 
 - Component Communication
-
   - **Parent to Child**: Data flows from parent to child components via property binding. The child component remains unaware of the data's origin.
   - **Child to Parent**: Child components can emit events to pass data back to the parent, without knowing the parent's implementation.
 
 - Business logic is typically implemented in **services**, which are plain classes without a UI. Angular uses dependency injection (DI) to provide instances of these services to components or other services. This promotes modularity and testability.
 
 - Components, services, and other artifacts are grouped into Angular **modules**. A module is a class annotated with `@NgModule()`, which organizes the app's building blocks
-
   - Modules help manage the app's structure and dependencies, making it easier to scale and maintain.
 
 - **Components** are the core building blocks of Angular applications. Each component consists of:
-
   - **HTML Template**: Defines the UI, either inline (`template`) or in a separate file (`templateUrl`).
   - **CSS Styles**: Defines the styling, either inline (`styles`) or in a separate file (`styleUrls`).
   - **Logic**: Encapsulated in a TypeScript class.
@@ -140,7 +138,6 @@ Angular is a component-based framework where an application is structured as a t
 - A component is a class with a UI, and a service is a class where you implement the business logic of your app
 
 - **Single-Page Applications (SPAs) and Angular Router**
-
   - Angular is ideal for building SPAs, where only parts of the page update dynamically without a full page reload. This is achieved using the Angular Router, which manages client-side navigation.
 
   - Use `<router-outlet>` to define where child components will render within a parent component.
@@ -152,14 +149,11 @@ Angular is a component-based framework where an application is structured as a t
 #### App bootstrap process
 
 - **This is how Angular works under the hood (App bootstrap process)**
-
   1. When you run the `ng serve` command, Angular CLI starts a development server that serves the app, and compiles the app code into JavaScript code that the browser can understand
      ![compilation](./img/compilation-1.png)
-
      - The `ng serve` command builds the bundles **in memory** without generating files.
 
      - When you modify and save a file, Angular CLI rebuilds the bundles in memory, allowing you to see changes instantly. The following JavaScript bundles are generated:
-
        - `inline.bundle.js`: Used by Webpack loader to load other files.
        - `main.bundle.js`: Contains your application code (components, services, etc.).
        - `polyfills.bundle.js`: Includes polyfills for older browsers.
@@ -170,8 +164,7 @@ Angular is a component-based framework where an application is structured as a t
 
   2. The server sends the `index.html` file to the browser **(Angular injects a `<script>` tag into the `index.html` file that loads the `main.ts` file)**
      ![compilation](./img/compilation-2.png)
-
-     - The `main.ts` file bootstraps the `AppModule` and starts the app (or if using standalone components, it bootstraps the main component directly)
+     - **The `main.ts` file is the entry point of the application**. It bootstraps the `AppModule` and starts the app (or if using standalone components, it bootstraps the main component directly)
 
        ```ts
        // main.ts 📄
@@ -198,7 +191,6 @@ Angular is a component-based framework where an application is structured as a t
      ```
 
   4. The `<app-root>` component is the main component of the app, and it is defined in the `app.component.ts` file. It serves as the entry point for the application and contains the HTML template for the app.
-
      - Angular creates an **instance** of the `AppComponent` class and inserts it into the DOM at the location of the `<app-root>` tag.
      - Then it turns the instance's template into HTML and inserts it into the DOM (into the `host` element)
 
@@ -300,7 +292,6 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 - `polyfills.ts` : contains the polyfills for the app (features that are not supported in all browsers)
 - `tsconfig.json` : contains the typescript configuration for the app
 - `angular.json` : contains the configuration for the app (like build settings, etc.)
-
   - The most important part in this file is the `"architect"` object, which contains the build configurations for the app
     ![file-structure](./img/config-1.png)
 
@@ -308,7 +299,6 @@ In Angular, the `src` folder is the main folder that contains all the files of t
   ![structure](./img/file-structure-1.png)
 
 - **Images**
-
   - external images (hosted on different server) -> just need `url` in the `src` attribute
 
     ```html
@@ -316,7 +306,6 @@ In Angular, the `src` folder is the main folder that contains all the files of t
     ```
 
   - local images
-
     - **(assets folder)** -> need to use `src` attribute with the path of the image in the `assets` folder
 
       ```html
@@ -357,6 +346,13 @@ In Angular, the `src` folder is the main folder that contains all the files of t
 it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `Typescript`, etc.) that are needed for Angular development.
 
 ![cli](./img/cli.PNG)
+
+- Angular CLI does the following:
+  - Bootstrapping your application
+  - Serving the application
+  - Running the tests (both unit and end-to-end)
+  - Creating a build for distribution
+  - Generating new components, services, routes and more for your application
 
 ### Installation
 
@@ -408,7 +404,6 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
 
 - It contains information about the project structure, build options, and other settings
 - You can configure various aspects of your Angular project using this file, such as:
-
   - **Build options**: You can specify the build options for your project, such as the output directory, optimization settings, and more.
   - **Serve options**: You can configure the development server settings, such as the port number, proxy settings, and more.
   - **Test options**: You can specify the test options for your project, such as the test framework, code coverage settings, and more.
@@ -417,7 +412,6 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
 - **Styles configuration**
 
   > Usually in order to add global styles or external library styles to your Angular project, you need to add them to the `.html` file using the `<link>` tag. But in Angular, you can also add them to the `angular.json` file in the `styles` array.
-
   - You can add global styles to your project by specifying the stylesheets in the `styles` array
 
     ```json
@@ -433,7 +427,6 @@ it's a utility tool for managing projects and tools (like `webpack`, `Babel`, `T
 - **Scripts configuration**
 
   > Usually in order to add global scripts or external library scripts to your Angular project, you need to add them to the `.html` file using the `<script>` tag. But in Angular, you can also add them to the `angular.json` file in the `scripts` array.
-
   - You can add global scripts to your project by specifying the script files in the `scripts` array
 
     ```json
@@ -521,12 +514,13 @@ The `style` attribute can be used to add inline styles to an element
   }
   ```
 
+  - `styleUrls` is the styling counterpart to the template, encapsulating all the styles for this component. Angular ensures that the styles are encapsulated, so you don’t have to worry about your CSS classes from one component affecting another. Unlike `templateUrl`, `styleUrls` is an array.
+
   - How does Angular scope styles for each component?
     - Angular uses a technique called **View Encapsulation** to scope styles for each component. This means that styles defined in a component's CSS file will only apply to that component and its children, not to other components in the application.
 
 - **Host Element**
   ![Host Element](./img/host-element.png)
-
   - Every component has a **host element** that is the root element of the component in the DOM
   - The host element is the element that is used to render the component in the DOM, and it can be selected using the `:host` pseudo-class in the CSS file of the component
 
@@ -737,7 +731,6 @@ It's the ability to being able to listen to events and update a property simulta
 
 - It's usually used with form elements like `input`, `select`, and `textarea`
 - It's a combination of property binding and event binding, and it's done using the `ngModel` directive
-
   - Remember, **square brackets represent property binding**, and **parentheses represent event binding**. To denote two-way binding, surround a template element’s ngModel with both square brackets and parentheses.
 
     ```html
@@ -772,7 +765,6 @@ It's the ability to being able to listen to events and update a property simulta
 #### Custom 2-way binding
 
 - You can create a custom 2-way binding using the `@Input()` and `@Output()` decorators in the component class
-
   - The trick here is the naming of the `@Output()` property, which should be named with the `Change` suffix to indicate that it is a 2-way binding -> **(e.g. `value` and `valueChange`)**
 
     ```ts
@@ -879,7 +871,6 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 - **Directives Types**
   ![Directives](./img/Directives.png)
   ![Directives](./img/Directives-1.png)
-
   - [Structural directives](#structural-directives): Change the DOM (component's template) structure by adding/removing elements.
     - `*ngIf`: Conditionally remove/recreate DOM.
     - `*ngFor`: Repeat DOM for each list item.
@@ -947,11 +938,9 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 - it starts with `*` and it's a `directive` that changes the structure of the DOM
 - Angular makes the content inside of `<ng-template>` become hidden but Angular will be aware of it so that it can be used based on condition
 - **⚠️ You can only apply one structural directive per element**
-
   - To do so, you can wrap the element with a `<ng-container>` or `<ng-template>` -> [see more here](#multiple-directives)
 
 - **Angular <= 16**
-
   - `*ngIf`
 
     ```html
@@ -987,7 +976,6 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   > **Note:** You need to import `CommonModule` in your component to use structural directives.
 
 - **Angular >= 17**
-
   - with the new syntax, we can use structural directives without the `*ng` prefix, and we can use them with the `@` prefix
   - It's better because it makes the code cleaner and easier to read, and it allows us to use structural directives in a more consistent way, also it has better TypeScript support.
 
@@ -1042,7 +1030,6 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 ### Multiple Directives
 
 - `ng-container`
-
   - it's a grouping element that doesn't add any extra element to the DOM, and it can be used to group multiple elements together and apply a structural directive to them
   - It's like an **invisible element**
 
@@ -1071,7 +1058,6 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
     - `<Fragment>` in **React**
 
 - `ng-template`
-
   - it's a grouping element that doesn't add any extra element to the DOM, and it can be used to group multiple elements together and apply a structural directive to them
   - It allows us to **define a template that can be used later** in the component, and it can be used with structural directives like `*ngIf` and `*ngFor`
   - It can be used to be a placeholder for content that will be rendered later **(lazy loaded)**
@@ -1124,7 +1110,10 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
     standalone: true // makes the directive standalone
   })
   export class HighlightDirective {
-    constructor(private el: ElementRef, private renderer: Renderer2) {}
+    constructor(
+      private el: ElementRef,
+      private renderer: Renderer2
+    ) {}
   }
   ```
 
@@ -1146,7 +1135,10 @@ Here, we use `ElementRef` and `Renderer2` to create an attribute directive and *
     selector: '[appHighlight]'
   })
   export class HighlightDirective {
-    constructor(private el: ElementRef, private renderer: Renderer2) {
+    constructor(
+      private el: ElementRef,
+      private renderer: Renderer2
+    ) {
       this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', 'yellow'); // recommended ✅
       // or
       this.el.nativeElement.style.backgroundColor = 'yellow'; // it's not recommended ❌
@@ -1173,7 +1165,10 @@ Here, we use `ElementRef` and `Renderer2` to create an attribute directive and *
   export class HighlightDirective {
     @Input() color = 'yellow'; // we can pass the color as a property to the directive
 
-    constructor(private el: ElementRef, private renderer: Renderer2) {
+    constructor(
+      private el: ElementRef,
+      private renderer: Renderer2
+    ) {
       this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', this.color);
       // or
       this.el.nativeElement.style.backgroundColor = this.color;
@@ -1227,7 +1222,10 @@ Here, we use `ElementRef` and `Renderer2` to create an attribute directive and *
       this.renderer.setAttribute(this.el.nativeElement, 'class', classList.join(' '));
     }
 
-    constructor(private el: ElementRef, private renderer: Renderer2) {}
+    constructor(
+      private el: ElementRef,
+      private renderer: Renderer2
+    ) {}
   }
   ```
 
@@ -1258,7 +1256,10 @@ Here, we use `TemplateRef` and `ViewContainerRef` to create a structural directi
       }
     }
 
-    constructor(private templateRef: TemplateRef<any>, private viewContainer: ViewContainerRef) {}
+    constructor(
+      private templateRef: TemplateRef<any>,
+      private viewContainer: ViewContainerRef
+    ) {}
   }
   ```
 
@@ -1287,9 +1288,7 @@ It's a way to transform data **in the template** before displaying it, and it's 
 In order to use a pipe, you need 2 steps:
 
 1. **Import the Pipe in the component/module** where you want to use it
-
    - If you're using a built-in pipe, you need to import the `CommonModule` in the `app.module.ts` file or in the component that uses the pipe
-
      - **Using modules:** you need to import the `CommonModule` in the `app.module.ts` file, and other pipes like `currency`, `date`, `decimal`, etc. are already included in the `CommonModule`, so you don't need to import them separately.
 
        ```ts
@@ -1327,7 +1326,6 @@ In order to use a pipe, you need 2 steps:
    - If you're creating a custom pipe, you need to import it in the `app.module.ts` file or in the component that uses the pipe
 
 2. **Use the Pipe in the template**
-
    - You can use the pipe in the template by using the `|` (pipe) operator followed by the pipe name and optional arguments
 
    ```html
@@ -1430,7 +1428,6 @@ In order to use a pipe, you need 2 steps:
   - the class will have a `transform()` method that takes a value and **returns a value after transforming it**
 
 - **Examples:**
-
   - creating a custom pipe to shorten a text **(Truncate text)**
 
     ```ts
@@ -1498,7 +1495,6 @@ In order to use a pipe, you need 2 steps:
     ```
 
 - Notes:
-
   - There's the `pure` option that can be used to make the pipe pure or impure
     - **Pure pipes**: are only called when the input value changes, and they are **more performant (Cached)**
     - **Impure pipes**: are called on every change detection cycle, and they are less performant (Not Cached)
@@ -1577,7 +1573,6 @@ A common problem in web development is how to create a modal dialog that is posi
 ### Angular CDK (Component Dev Kit)
 
 - The `Angular CDK` provides a set of tools to help you create custom components that can be rendered in a different part of the DOM tree.
-
   - This is useful for creating components like modals, tooltips, and popovers.
 
   ```ts
@@ -1609,7 +1604,10 @@ A common problem in web development is how to create a modal dialog that is posi
     ]
   })
   export class ModalComponent implements OnInit {
-    constructor(private overlay: Overlay, private elementRef: ElementRef) {}
+    constructor(
+      private overlay: Overlay,
+      private elementRef: ElementRef
+    ) {}
 
     ngOnInit() {
       const overlayRef = this.overlay.create({
@@ -1634,12 +1632,10 @@ The **Angular Flex Layout library** ([https://github.com/angular/flex-layout](ht
 > You can find more here [in this article](https://blog.angular.dev/modern-css-in-angular-layouts-4a259dca9127)
 
 - Angular Flex Layout has the following advantages over the standard CSS API:
-
   - It produces cross-browser-compatible CSS. (this is less relevant today as modern browsers have better support for flexbox and grid)
   - It provides an Angular-friendly API for dealing with media queries using directives and observables.
 
 - Example of using Angular Flex Layout
-
   - **Using Flex Layout directives**
 
     ```html
@@ -1654,7 +1650,6 @@ The **Angular Flex Layout library** ([https://github.com/angular/flex-layout](ht
     - On small screens, the layout will change to a column layout.
 
   - **Using `ObservableMedia` service to detect screen size changes**
-
     - The `ObservableMedia` service enables subscribing to screen-size changes and programmatically changing the look and feel of your app.
       - For example, on large screens, you may decide to display additional information. To avoid rendering unnecessary components on small screens, you may subscribe to events emitted by `ObservableMedia`, and if the screen size becomes larger, you can render more components.
 

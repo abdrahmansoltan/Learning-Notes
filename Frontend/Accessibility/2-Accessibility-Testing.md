@@ -7,6 +7,7 @@
     - [How to test accessibility? (Types of Accessibility Testing)](#how-to-test-accessibility-types-of-accessibility-testing)
   - [Automated Accessibility Testing](#automated-accessibility-testing)
     - [How to read automated testing results?](#how-to-read-automated-testing-results)
+  - [Manual Accessibility Testing](#manual-accessibility-testing)
 
 ---
 
@@ -71,7 +72,9 @@ By using automated accessibility testing tools, developers can quickly identify 
     - If you found that you have a lot of issues, try to toggle the "Best Practices: Off" button as it may help reduce noise in the report. and only show the critical issues.
     - Also you can control the WCAG standards that the tool checks against. (e.g., `WCAG 2.1`, `WCAG 2.0`)
   - [aXe CLI](https://www.npmjs.com/package/axe-cli)
-  - [WebAIM - WAVE evaluation tool](https://wave.webaim.org/)
+  - [WebAIM - WAVE evaluation tool](https://wave.webaim.org/) ✅
+    - **Recommended**
+    - It provides visual feedback about the accessibility of your web content by overlaying icons and indicators directly on the page.
   - [Lighthouse](https://developers.google.com/web/tools/lighthouse)
   - [IBM Equal Access Accessibility Checker](https://www.ibm.com/able/toolkit/)
   - [Siteimprove Accessibility Checker](https://siteimprove.com/en-us/accessibility-checker/)
@@ -104,3 +107,36 @@ By using automated accessibility testing tools, developers can quickly identify 
 - Check affected elements to understand the context of the issue and how it may impact users with disabilities.
 - Use the recommendations provided in the report to guide your efforts in fixing the identified accessibility issues. This may involve making changes to the code, adding alternative text for images, improving color contrast, or implementing keyboard navigation, among other adjustments to enhance accessibility.
 - Not all errors will be valid issues, so it's important to review the results carefully and use your judgment to determine which issues need to be addressed based on the specific context of your application and its users.
+
+---
+
+## Manual Accessibility Testing
+
+Manual accessibility testing involves evaluating a web application or website by manually interacting with it to identify accessibility issues that automated tools may not catch. This type of testing is essential for ensuring that all users, including those with disabilities, can effectively use the application.
+
+> It's used because as discussed before: Automated testing tools don't catch all accessibility issues, especially those that require human judgment or context.
+
+- Best practices:
+  - Use a screen reader to navigate your application and ensure that all content is accessible.
+  - Test keyboard navigation to ensure that all interactive elements can be accessed and operated using only the keyboard.
+  - Check for sufficient color contrast to ensure that text is readable for users with visual impairments.
+  - Ensure that all interactive elements have accessible names and roles, and that dynamic content updates are announced to screen readers.
+  - Test with different assistive technologies to ensure compatibility and accessibility across various tools.
+
+  ![What to cover](./img/manual-testing-coverage.png)
+
+- Instructions:
+  - **Make it easy to users to see the content separating foreground from background**
+    - Text
+      - Text should be easily resizable, test up to 200% for no loss of content
+      - Ensure usage of actual text instead of images of text
+    - Colors
+      - Contrast ratio of text to background should be at least `4.5:1` for normal text and `3:1` for large text, preferable `7:1` for enhanced accessibility
+        - Use tools like **WebAIM contrast checker**, **TPGI color contrast checker**
+      - Don't use color alone to convey meaning (example: using red text to indicate an error, or background color to indicate selection) as it may not be perceivable by users with color vision deficiencies
+        - Try to use both color indication and text labels or patterns to convey information
+  - **Testing with keyboard**
+    ![Keyboard Testing](./img/keyboard-testing.png)
+
+  - **Testing with screen reader**
+    ![Screen Reader Testing](./img/screen-reader-testing.png)

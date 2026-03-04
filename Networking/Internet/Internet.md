@@ -14,6 +14,7 @@
     - [ISP](#isp)
     - [SSL](#ssl)
     - [TCP/IP](#tcpip)
+      - [TCP Slow Start](#tcp-slow-start)
       - [TCP vs UDP](#tcp-vs-udp)
     - [Domain and DNS](#domain-and-dns)
       - [DNS Records (not important 🚫)](#dns-records-not-important-)
@@ -57,7 +58,6 @@ When entering a website, the data goes through all the layers of the OSI model l
 1. **Application layer** -> the data is in the form of a message (ex: `HTTP` request)
    - Here, it processes the data and adds the **header** to it + it resolves the `domain` name to the `ip` address
 2. **Presentation layer** -> It's the layer that converts the data to a format that the application can understand
-
    - The encryption happens here (if the website is using `HTTPS`) using **TLS** (formerly known as **SSL**) protocol
 
    ```sh
@@ -75,27 +75,22 @@ When entering a website, the data goes through all the layers of the OSI model l
    ```
 
 3. **Session layer** -> It's the layer that creates and manages (opens / closes) the connection between the client and the server
-
    - It's possible to directly work with this layer to handle the connection (as a frontend developer)
 
 4. **Transport layer** -> It's the layer that is responsible for the **End to End** connection between devices (Making sure that the actual communication happens after the connection is established in the `session` layer)
-
    - It splits the data into `packets` and sends them to the server
    - this is done in the `TCP` protocol (it's a protocol that ensures that the data is sent and received correctly)
    - the size of the `TCP` packet (segment) is `64kb` (it's the maximum size of the packet) and sometimes it's less than that based on the network speed and the size of the data
 
 5. **Network layer** -> It's the layer that is responsible for the communication between **inter & intra** networks (it's the layer that connects the `local` network to the `internet`)
-
    - It adds the `ip` address to the `packet` and sends it to the server
 
 6. **Data-link layer** -> It's the layer that facilitates the communication between the **devices in the same network**.
-
    - It connects the `switch` to the `router` using the `mac` address
      - `mac` address is the address of the device (it's unique for each device)
    - It adds the `mac` address to the `packet` and sends it to the server
 
 7. **Physical layer** -> It's the layer that is responsible for transferring `bits` of data over the network using the `cable`.
-
    - It sends the `packet` to the server using the `cable`
    - At this stage the data is in this form:
      ![packet](./img/osi-model-1.png) 1. `http data` -> from the `application` layer 2. `tcp segment` -> from the `transport` layer 3. `ip packet` -> from the `network` layer 4. `Ethernet frame` -> from the `data link` layer
@@ -117,7 +112,6 @@ The internet is a global network of computers that communicate with each other (
 - **Network**: is a group of computers / systems that can communicate with each other.
 
 - The internet has **three** basic parts: (Not important 🚫)
-
   - **The last mile**
     - is the part of the internet that connects homes and small businesses to the internet.
     - it's called **last mile** as it's the last (outer) layer of the internet where user can access
@@ -170,6 +164,7 @@ They communicate using [Application Protocols](#application-protocols)
   - It's the amount of data that can be transferred in a certain amount of time
 
   > it's the width of the pipe that the data is traveling through
+
 - **Latency**: is the time it takes for a data packet to travel from one point to another.
   - It's measured in `milliseconds` (ms)
   - It's the time it takes for the data to travel from the client to the server and back
@@ -198,7 +193,6 @@ Internet Protocol addresses are unique identifiers assigned to every device conn
 It's a small piece of data that is sent over the internet.
 
 - it contains **MetaData** (where to/from the data is sent and headers ..)
-
   1. breaking message into small parts
   2. labeling these parts individually
   3. then throwing them into the shared network (the cloud)
@@ -244,10 +238,16 @@ SSL, short for **Secure Sockets Layer**, is a family of encryption technologies 
 
 When building applications with `TCP/IP`, We need to ensure that the application is designed to work with the appropriate `ports`, `sockets`, and `connections`.
 
+#### TCP Slow Start
+
+It's a congestion control algorithm used by TCP to avoid network congestion by gradually increasing the amount of data sent over the network until it finds the optimal transmission rate.
+![TCP Slow Start](./img/tcp_slow_start.png)
+
+- By doing this we're avoiding data-loss due to network congestion (when too many packets are sent at once, the network can become overwhelmed and start dropping packets)
+
 #### TCP vs UDP
 
 - `TCP` is a **connection**-oriented protocol (it's like saying "hi" and wait to see if the other side heard it)
-
   - TCP do this by checking the packets in the receiver part and see if they're complete and all is there and in the right order
     ![TCP](./img/tcp.png)
   - It provides **reliability** and **error checking**
@@ -396,7 +396,6 @@ One-way-hash functions differ from the above two forms of `encryption` in the se
 
 1. You can use the `password` but it can be compromised by hacker
 2. You can Create SSH Keys -> **rsa**
-
    - create a public key and a private key to use them to connect to the server
    - `rsa` is a type of encryption algorithm that uses 2 keys (public and private)
    - you can create them using `ssh-keygen` command

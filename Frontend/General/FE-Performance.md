@@ -1,7 +1,9 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Performance](#performance)
+  - [Frontend Performance](#frontend-performance)
+    - [Frontend performance introduction](#frontend-performance-introduction)
+    - [Frontend Performance Issues](#frontend-performance-issues)
     - [Performance Types](#performance-types)
     - [Performance Metrics](#performance-metrics)
     - [The importance of measurement](#the-importance-of-measurement)
@@ -33,12 +35,18 @@
 
 ---
 
-## Performance
+## Frontend Performance
 
 ![performance](./img/performance.PNG)
 
-- Why does performance matter?
+### Frontend performance introduction
 
+- **What do we mean by frontend performance**
+  ![frontend performance](./img/fe-performance-1.png)
+  - Frontend performance refers to how quickly and efficiently a web application responds to user interactions smoothly and loads content.
+  - It encompasses various aspects such as page load time, rendering speed, and responsiveness to user input.
+
+- **Why does performance matter?**
   - **User experience**: A slow website can lead to a poor user experience, which can lead to a loss of customers.
     - `0.1` second is about the limit for having the user feel that the system is reacting instantaneously, meaning that no special feedback is necessary except to display the result.
     - `1` second is about the limit for the user's flow of thought to stay uninterrupted, even though the user will notice the delay. No special feedback during delays of more than `0.1` but less than `1` second is necessary. But the user loses the feeling of operating directly on the data.
@@ -67,6 +75,35 @@
   - for `gmail`, usually the page is loaded and user will leave it open for a long time, so the most important thing is to handle `memory leaks` and `performance` of the application
   - `Twitter` might care about time to first tweet, but not about time to first interaction
   - So, You should ask yourself: _"What does my product care about? What does my user care about?"_
+
+> These sections are very important to understand how the browser works and the interaction between the client and the server in order to fully understand how performance optimization works.
+>
+> - [What happens when we access a web server?](./Frontend.md#what-happens-when-we-access-a-web-server)
+> - [How web pages are built in the browser](./Frontend.md#how-web-pages-are-built-in-the-browser)
+
+---
+
+### Frontend Performance Issues
+
+The majority of the frontend issues come from 2 reasons: **network** and **rendering (thread blocking)**.
+![frontend performance issues](./img/fe-performance-2.png)
+
+- **Network Latency**
+  - It's the time it takes for a request to travel from the client to the server and back.
+  - Mainly any issue here will be related to **either the size of the payload or the network conditions**.
+- **Rendering (Thread Blocking)**
+  ![rendering performance issues](./img/fe-performance-3.png)
+  - As we know, browsers use a single thread to handle rendering and JavaScript execution. So when the browser's main thread is blocked, it prevents the browser from rendering the page or responding to user interactions.
+  - So the browser handles sync operations sequentially even if they are independent or some operations are very small compared to others.
+  - It's noticed from the user side when for example, the user clicks a button and the page doesn't respond immediately.
+  - Common causes include heavy JavaScript execution, large CSS files, and complex layouts.
+
+- Here're some other issues to consider (but mainly the ones mentioned above are the most common)
+  - **Render-blocking resources**: CSS and JavaScript files that block the rendering of the page.
+  - **Large JavaScript bundles**: Heavy JavaScript files that take a long time to download and execute.
+  - **Inefficient CSS**: Unused or overly complex CSS that slows down rendering.
+  - **Slow network requests**: Delays in fetching resources from the server.
+  - **Memory leaks**: Inefficient memory usage that can slow down the application over time.
 
 ---
 
@@ -112,7 +149,6 @@ Don't go just blindly applying performance optimizations, you need to measure fi
 There's a cost to every optimization, so you need to measure to know if the optimization is worth it or not (trade-offs)
 
 - Things to think about while measuring:
-
   - Are we testing on a fancy computer or a slow phone?
   - Are we simulating less than ideal network conditions?
   - What is our performance budget?
@@ -147,20 +183,16 @@ There's a cost to every optimization, so you need to measure to know if the opti
 We can't buy faster servers to improve performance of **client-side** applications, so we need to make the client-side applications as fast as possible.
 
 - A lot of time and effort is spent on compressing assets, removing requests, and reducing latency, but what about the cost of the JavaScript itself once the assets are downloaded and the application is running?
-
   - Sometimes, the `js` files are the most expensive part of the application (parse, compile, execute, etc.)
     ![performance](./img/performance-8.png)
   - That's where the `cost of JavaScript` comes in to play and it's the most important thing to focus on to improve the performance of the client-side applications
 
 - **Okay, so what is happening in the yellow part?**
   ![performance](./img/performance-13.png)
-
   - **Parse**: The browser has to read the `js` file and convert it into a format it can understand
-
     - parsing is slow, especially on mobile (as slow as `1MB/s` on mobile)
 
   - **AST**
-
     - After parsing, code is turned into an **abstract syntax tree (AST)** and then into bytecode
 
     > `AST` is a tree representation of the abstract syntactic structure of source code written in a programming language.
@@ -206,7 +238,6 @@ We can't buy faster servers to improve performance of **client-side** applicatio
 
 - The native optimization-compiler from the engine (`V8`) that happens behind the scenes is super useful, here's a comparison of the `duration` with & without it:
   ![performance](./img/performance-16.png)
-
   - It optimizes the code by detecting repeated calls to the same function and inlining the function to avoid the overhead of calling the function
 
 - We can get more insights from the engine about the performance of the code using the `--trace-opt` flag in `node` to see the `V8` engine optimizations and the `--trace-deopt` flag to see the `V8` engine de-optimizations
@@ -221,7 +252,6 @@ The code you write is not always the code that `V8` executes, as it sometimes re
 So, our job is to write as much readable code as possible, and `V8` job is to optimize it for us
 
 - **Shipping less JS code**
-
   - When we use `Babel`, it adds a lot of `polyfills` and `shims` to the code to make it work in older browsers (which increases the size of the code), but we don't need all of them in the modern browsers
   - So, we can use `@babel/preset-env` to only include the `polyfills` and `shims` that we need in the code
 
@@ -256,7 +286,6 @@ So, our job is to write as much readable code as possible, and `V8` job is to op
     ```
 
 - **Parsing**
-
   - One way to reduce the parsing time is to reduce the size of the `js` file **(have less code to parse)**
   - Another way is to do as much parsing as you need and as little as you can by doing other parsing later **(lazy parsing)** -> Things that you don't need to parse immediately, you can parse them later when you need them
     ![performance](./img/performance-10.png)
@@ -273,9 +302,7 @@ So, our job is to write as much readable code as possible, and `V8` job is to op
     ![performance](./img/performance-12.png)
 
 - **Compiling**
-
   - Optimize objects
-
     - The `V8` engine has a hidden class mechanism that it uses to optimize the objects in the `js` code
     - It does so by checking if objects have the same `map` using `%HaveSameMap` method to avoid repeating the same map for the same objects and to avoid creating a new map for the same objects, so that functions can be optimized when they are called with the same map (same object structure)
 
@@ -290,7 +317,6 @@ So, our job is to write as much readable code as possible, and `V8` job is to op
       ```
 
   - Scoping and Prototypes
-
     - The `V8` engine uses `hidden classes` to optimize Scoping and Prototypes when looking for properties in the `prototype chain`
     - Takeaways:
       - Initialize your properties at creation time and in the same order
@@ -335,16 +361,13 @@ To also improve the performance from the `css` side:
 
 - Use simple class-names or `BEM` methodology
 - Remove unused `css` using `purgecss` or `uncss` or `purifycss` or `cssnano` libraries
-
   - Because the browser has to parse and compile and execute the `css` files / rules, and check if the rules are applied to the `DOM` elements or not (which takes time)
   - The less styles you have, the less there is to check.
 
 - [Critical render path](#critical-render-path) for `css` files
-
   - The browser has to parse and compile and execute the `css` files to build the `CSSOM` tree and then combine the `CSSOM` tree with the `DOM` tree to form the render tree and then compute the layout of each visible element and paint them on the screen
 
 - Avoid **Reflow** by:
-
   - Change `classes` at the lowest level of the `DOM` tree (not at the top level)
   - Avoid repeatedly modifying `inline styles`
 
@@ -384,7 +407,6 @@ To also improve the performance from the `css` side:
   - Trade smoothness for speed when animating (use bigger `steps` instead of smaller `steps`)
   - Avoid `table layouts` (they are slow)
   - Batch your `DOM` changes (use `requestAnimationFrame`) -> comes out of the box when using frameworks like `React`
-
     - It's used to batch the `DOM` changes to avoid multiple re-rendering and to avoid blocking the main thread
     - We use it to tell the browser to do the `DOM` changes in the next frame instead of doing them immediately
 
@@ -433,7 +455,6 @@ To also improve the performance from the `css` side:
 - `Minimize`: It's the process of reducing the size of the file by changing the format of the file.
 
 - **Minify tools**
-
   - usually done in frameworks automatically to minify the javascript and css files into one file in the build phase to reduce the size/number of the files and the number of requests
   - used in `webpack`, `gulp`, `rollup`, `parcel`, etc.
 
@@ -459,9 +480,7 @@ The font file contains a lot of characters for different languages (which increa
 So, It's good to say that the `Google Fonts` service is doing a lot of optimizations to reduce the size of the font files 🚀
 
 - But what if you want to manually optimize the font files? or want to use google fonts optimization but also serve the font files from your server? That's where the `font subsetting` comes in.
-
   - **Font subsetting**: It's the process of removing the unused characters from the font file to reduce the size of the font file
-
     - It's used to reduce the size of the font file by removing the characters that are not used in the website (ex: `Arabic` characters in an `English` website)
 
     - Google uses "unicode-range subsetting" to serve only the characters that are used on the website, as you will notice that when using font from google fonts, you will use 2 `<link>` tags one for the font file and one for the `css` file, and the `css` file contains the `unicode-range` property to serve only the characters that are used on the website (css file contains the optimization)
@@ -492,7 +511,6 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
 ![Critical Render PATCH](./img/critical%20render%20path.PNG)
 
 - To improve the critical render path, we need to handle the way the browser handles the files downloading process and the way it parses the files
-
   - Ex: we can use `async` and `defer` attributes in the `script` tag to handle the way the browser handles the files downloading process to prevent blocking the `DOM` tree from being built
 
     ```html
@@ -500,7 +518,6 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
     ```
 
   - Ex: CSS is considered a **render-blocking resource**. This means that the browser will not render any processed content until the `CSSOM` is constructed.
-
     - To prevent this, we can use the `preload` attribute in the `link` tag to tell the browser to download the CSS file as soon as possible without blocking the `DOM` tree from being built
 
       ```html
@@ -518,7 +535,6 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
       ```
 
 - How to measure the performance of the `js` part in the critical render path?
-
   - We can use the `Performance` API to measure the performance of the `js` part in the critical render path
 
     ```js
@@ -532,7 +548,6 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
   - We can also use the browser `devtools` to measure the performance of the `js` part in the critical render path
 
     ![performance](./img/performance-1.png)
-
     - The `yellow` part is the `js` scripting part, it includes the **(parsing, compiling, executing)** parts
     - most of this time is from compiling and executing the code
       - for `compiling`, we can use "Ahead of Time `AOT`" compilation to reduce the time needed to compile the code instead of using "Just in Time `JIT`" compilation, like `Angular` does
@@ -555,7 +570,6 @@ It's an optimization technique to improve the performance of the web application
 - It's done using `webpack`, `rollup`, `parcel`, etc.
   ![code splitting](./img/code-splitting-3.jpeg)
 - Types:
-
   1. **Route-based code splitting**: splitting the code based on the routes
   2. **Component-based code splitting**: splitting the code based on the components
   3. **Dynamic code splitting**: splitting the code based on the user's actions
@@ -604,13 +618,11 @@ Caching in client-side applications is the process of storing data in the browse
 - It's used to reduce the number of requests to the server and to reduce the time needed to fetch the data from the server
 
 - For example, caching the `js` files downloaded from the server to reduce the number of requests to the server and to reduce the time needed to fetch the `js` files from the server
-
   - if the bundle changed or updated, the server will send the new bundle and the browser will download it and cache it again. This is called **"cache busting"**
     ![cache busting](./img/cache-busting-1.avif)
     ![cache busting](./img/cache-busting-2.png)
 
 - Also, when serving static `SSR` files, they will have a different **response status codes** based on if it's cached or not
-
   - `200` -> modified (First time the file is requested)
   - `304` -> not modified (The file is cached)
 
@@ -624,7 +636,6 @@ Caching in client-side applications is the process of storing data in the browse
 - Cashing doesn't affect the "unsafe" `HTTP` methods like: `POST`, `PUT`, `DELETE`, `PATCH` **(because they change the state of the server)**
 
 - cache-control headers
-
   - `no-store`: The response can't be cached, because:
     - The response contains sensitive data
     - The response contains data that changes frequently
@@ -643,7 +654,6 @@ Caching in client-side applications is the process of storing data in the browse
 
 - It's a way to cache the files/scripts in the browser using a `content-addressable` storage
 - It depend on hashing the files to generate a unique hash for each file and then use this hash as the file name to store the file in the browser
-
   - ex: `file.js` -> `file-<hash>.js` -> `file-32523jfj3.js`
 
 ---
@@ -695,11 +705,9 @@ They are a set of metrics that Google uses to measure the performance of a websi
 - **Largest Contentful Paint (LCP)**: measures loading performance. To provide a good user experience, LCP should occur within 2.5 seconds of when the page first starts loading.
 - **First Input Delay (FID)**: measures interactivity. To provide a good user experience, pages should have a FID of less than 100 milliseconds.
 - **Cumulative Layout Shift (CLS)**: measures visual stability. To provide a good user experience, pages should maintain a CLS of less than 0.1.
-
   - It is a measure of how much movement there is on the page, typically in the first few seconds as the page is loading.
   - The CLS metric measures two things: how many items move, and how significant the shift is. A small icon moving by a few pixels won't be judged as harshly as a big element popping into view and pushing all of the content down.
   - There are two reasons that it's important to optimize for CLS:
-
     - **Layout shifts** are unpleasant! They're jarring and chaotic, and they can cause you to accidentally click on the wrong thing.
     - Starting in 2021, Google has incorporated CLS into its search ranking algorithm, meaning that focusing on CLS can help improve SEO.
 

@@ -27,11 +27,9 @@
 - A **module** is a container for a set of related components, services, directives, and pipes
 - An app can have multiple modules, each containing related components and services.
   ![structure](./img/modules-1.png)
-
   - Instead of importing each component or service individually, you import the module that contains them, making your code cleaner and easier to manage.
 
 - There're **built-in modules** in Angular like:
-
   - `BrowserModule` **(⚠️ Required for every Angular app that uses modules)**
     - provides services that are essential to launch the app in the browser _(e.g., Pipes, Directives, etc.)_
     - it's imported in the `app.module.ts` file
@@ -62,31 +60,29 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
 
   - `declarations`
     ![declarations](./img/modules-5.png)
-
     - It's used to declare components, directives, and pipes that belong to this module and need to be compiled
+    - It defines all the components that are allowed to be used in the scope of the HTML within this module. Any component that you create must be declared before it can be used.
     - A **feature module** may **declare** its own components and services, but to make all or some of them visible to other modules, you need to **export** them.
     - when using `ng generate component` command, the new component will be automatically added to the `declarations` array of the module
 
   - `imports` & `exports`
     ![imports](./img/modules-6.png)
-
     - `imports` is used to import other modules/components that we will depend on (inside the module)
+      - It allows you to import other Angular application and library modules and thus leverage the components, services, and other capabilities that have already been created in those modules.
       - Usually, we import `CommonModule` in feature modules to have access to common directives like `ngIf` and `ngFor`, and we import `BrowserModule` in the root module to have access to all the features of Angular for web applications
     - `exports` is used to export components/directives/pipes that we want to make available to other modules that will import this module
       - External modules will see only those members of the shipping module that were explicitly mentioned in exports.
 
   - `providers`
-
     - It's an **old way** of providing services
 
   - `bootstrap`
-
     - It's used to bootstrap the application with the root module
+    - It defines the component that acts as the entry point to your application. If the main component is not added here, your application will not kick-start, as Angular will not know what elements to look for in your `index.html`.
     - It's only used in the **root module** (usually `app.module.ts`)
     - **Feature modules** doesn’t include the `bootstrap` property, because bootstrapping the entire app is the responsibility of the **root module**.
 
 - **Notes:**
-
   - You can't add a standalone component to the `declarations` array, as standalone components are not part of a module
   - You can add a standalone component to the `imports` array, as it can be used in the module without the need for a module
   - If you're using module for the root and not standalone components, you need to add the `bootstrap` property to the `@NgModule` decorator, which tells Angular which component to bootstrap when the app starts, and bootstrap the app with that module
@@ -205,7 +201,6 @@ export class ExampleModule {}
 One of the main advantages of using modules is that they can be reused in different parts of the application. This is done by exporting the components from the module and importing the module in the required module.
 
 - **Steps to use a module in another module**
-
   - **First step** is to manually list all the components/services that you want to export in the `exports` array of the module
 
     ```ts
@@ -259,7 +254,6 @@ It's a module that provides the `routing` functionality to the Angular app and i
   ```
 
 - This will generate 2 files `cart-routing.module.ts` and `cart.module.ts`
-
   - `cart-routing.module.ts`
     - It will contain the routes of the app
   - `cart.module.ts`
@@ -269,7 +263,6 @@ It's a module that provides the `routing` functionality to the Angular app and i
 
 - Example
   ![router-module-example](./img/router-2.png)
-
   - Here, we have 2 `Routing modules` and 2 `Domain modules` that are imported in the `AppModule`
   - The `Domain modules` contain the `Routing modules`, and then the `Routing modules` contain the `Routes` and the `RouterModule`
   - The main `App module` imports the `Domain modules` and the `RouterModule` is imported in the `AppRoutingModule`, so that now the `App module` contains all the routes
@@ -278,7 +271,6 @@ It's a module that provides the `routing` functionality to the Angular app and i
     - the `<router-outlet>` directive will be in the `AppComponent` template, and not in the `Domain modules`
 
 - **Common Router Modules Issue**
-
   - When we have multiple `Routing modules`, we need to ensure that order of imports is correct to avoid any issues with route resolution.
     ![router-module-issue](./img/router-3.png)
   - Angular uses a hierarchical dependency injection system, and the order of module imports in the @NgModule decorator matters. If the routing modules are not imported in the correct order, it can lead to route resolution conflicts or unexpected behavior.
@@ -343,7 +335,6 @@ A shared module is a module that contains the common components, directives, and
   - The shared module can contain the common components, directives, and pipes that are used in multiple modules
 
 - **Exporting the common components**
-
   - To export the common components, add them to the `exports` array of the module
 
     ```ts

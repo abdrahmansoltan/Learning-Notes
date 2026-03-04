@@ -39,14 +39,13 @@
 
 ## Components
 
-**Components** are just exported `classes` that are decorated with the `@Component` decorator.
+A component in Angular is nothing but a TypeScript class, decorated with some attributes and metadata (`@Component` decorator with `selector`, `templateUrl`, `styleUrls`, etc.). The class encapsulates all the data and functionality of the component, while the decorator specifies how it translates into the HTML.
 
 ![component](./img/component-1.png)
 
 A component should present properties and methods for data binding, in order to mediate between the **view (rendered by the template)** and the **application logic (services) (which often includes some notion of a model)**.
 
 - **What does a component consist of?**
-
   - `Component Metadata` : it's the information that Angular needs to create the component and render it to the DOM, like the `selector`, `template`, and `styles`
   - `Component Template` : it's the view of the component, and contains the HTML that will be rendered to the user
   - `Component Class` : it's the code that supports the view, and contains the properties and methods that the view uses
@@ -140,7 +139,6 @@ A component should present properties and methods for data binding, in order to 
   ```
 
 - **Notes:**
-
   - We can write the `HTML` code directly in the component file using the `template` property instead of using the `templateUrl` property
 
     ```ts
@@ -177,7 +175,6 @@ A component should present properties and methods for data binding, in order to 
   - When using the component, you must match the `selector` with the name of the component -> `app-nav`
 
 - **Selector Prefix:**
-
   - The `selector` property in the `@Component` decorator defines the custom HTML tag for the component. By default, Angular uses the `app-` prefix for selectors in applications and `lib-` for libraries.
 
   - **Custom Prefix**: You can specify a custom prefix for your components to better identify them. For example, if your project is named `Hello CLI`, you might use the `hello-` prefix.
@@ -203,7 +200,6 @@ A component should present properties and methods for data binding, in order to 
   - **Best Practice**: Use prefixes like `app-` or `hello-` to avoid conflicts with native HTML elements. like `app-header` instead of `header`.
 
 - **Selector Types**: You can use different types of selectors:
-
   - **Tag Selector**: `<app-nav></app-nav>`
   - **Class Selector**: `<div class="app-nav"></div>`
   - **Attribute Selector**: `<div app-nav></div>`
@@ -262,7 +258,6 @@ A component should present properties and methods for data binding, in order to 
   ```
 
 - It's declared in the component class using 2 ways:
-
   - **Class Access Modifiers**: `public`, `private`, `protected`
 
     ```ts
@@ -291,7 +286,6 @@ Angular components have a lifecycle that consists of a series of events that occ
 ![lifeCycle](./img/life-cycle-hooks-1.png)
 
 - A component instance has a lifecycle that
-
   - **starts** when Angular instantiates the component class and renders the component view along with its child views.
   - The lifecycle **continues** with "change detection" (reactivity), as Angular checks to see when data-bound properties change, and updates both the view and the component instance as needed.
   - The lifecycle **ends** when Angular destroys the component instance and removes its rendered template from the DOM.
@@ -300,7 +294,6 @@ Angular components have a lifecycle that consists of a series of events that occ
   ![lifeCycle](./img/life-cycle-hooks-2.png)
 
 - **Lifecycles:**
-
   - `constructor` : it's a method that runs when the component is created
   - `ngOnInit` : it's a lifecycle hook that runs after the constructor and after the first `ngOnChanges` (it's a good place to put initialization logic)
     - By the time `ngOnInit()` is invoked, the component properties will have been initialized, which is why this method is mainly used for the initial data fetch.
@@ -358,12 +351,10 @@ Angular components have a lifecycle that consists of a series of events that occ
   ```
 
 - Why use `ngOnInit` instead of `constructor`?
-
   - The `ngOnInit` hook is called after the component is initialized, and **all the component's input properties are set**. This is unlike `constructor`, which is called before the component is initialized and before the input properties are set.
   - So, if you need to access the input properties of the component, you should use `ngOnInit` instead of `constructor`.
 
 - **Useful Links:**
-
   - [lifecycle hooks guide](https://angular.io/guide/lifecycle-hooks)
   - [lifecycle events sequence](https://angular.io/guide/lifecycle-hooks#sequence-and-frequency-of-all-lifecycle-events)
 
@@ -385,7 +376,6 @@ class MyComponent implements OnInit {
 ```
 
 - **Difference between `Constructor` and `ngOnInit`**
-
   - The `Constructor` is a default method of the class that is executed when the class is instantiated and ensures proper initialization of fields in the class and its subclasses.
   - `ngOnInit` is a life cycle hook called by Angular to indicate that Angular is done creating the component (data is passed between components).
   - Mostly we use `ngOnInit` for all the initialization/declaration and avoid stuff to work in the constructor. The `constructor` should only be used to initialize class members but shouldn't do actual "work".
@@ -455,7 +445,6 @@ class MyComponent implements OnInit {
   ```
 
 - `destroyRef`
-
   - It's a reference to the component instance that is being destroyed, and it can be used to perform cleanup logic before the component is destroyed.
 
   ```ts
@@ -524,13 +513,11 @@ class MyComponent implements OnChanges {
 Components will usually have relationships with other components, and they will need to communicate with each other to share data and functionality.
 
 - The relationships between components can be classified into 3 types:
-
   - **Parent-Child**: where one component is the parent of another component. The parent component can pass data to the child component via `@Input()` properties, and the child component can emit events to the parent component via `@Output()` properties.
   - **Sibling-Sibling**: where two components are siblings, meaning they share the same parent component. Sibling components can communicate with each other via the parent component, by passing data and events through the parent component.
   - **Unrelated Components**: where two components are not related to each other in any way. Unrelated components can communicate with each other via services, which can be used to share data and functionality between components.
 
 - Components can communicate with each other in several ways:
-
   - **Input and Output properties**: using `@Input()` and `@Output()` decorators to pass data between parent and child components.
   - **ViewChild and ContentChild**: using `@ViewChild()` and `@ContentChild()` decorators to access child components or elements in the template.
   - **Services**: using services to share data between components that are not directly related.
@@ -662,7 +649,6 @@ Components will usually have relationships with other components, and they will 
 - When using the output property in the parent component, you can access the emitted data using the `$event` variable, which contains the data emitted by the `EventEmitter`.
 
 - Also, Don't worry about **"Event Bubbling"** here, because Angular handles event bubbling automatically for you, so you don't need to worry about it when using output properties.
-
   - If "event bubbling" is important for your use case, you can always implement it manually using services or other techniques like: (`RxJS Subjects` or native DOM events).
 
     ```ts
@@ -983,9 +969,7 @@ By default, Angular uses `ViewEncapsulation.Emulated`, which means that styles d
   ```
 
 - Modes:
-
   - `Emulated` (default):
-
     - Emulates a native Shadow DOM encapsulation behavior by adding a specific attribute to the component's host element and applying the same attribute to all the CSS selectors provided via `styles` or `styleUrls`.
     - Styles are scoped to the component, but projected content is not affected.
 
@@ -1106,7 +1090,6 @@ The parent component can pass data to the child component using `@Input()` decor
   - here we use an alias(`"master"`) so that in the parent component we use the alias not the other name (`"masterName"`), but in the child component we use the other name (`"masterName"`)
 
 - **To make a prop required**, you should:
-
   - 1️⃣ use the `!` operator after the property name (To tell TypeScript that this property will be initialized later, and it will not be `undefined`)
   - 2️⃣ use the `@Input({ required: true })` decorator
 
@@ -1157,7 +1140,6 @@ The parent component can pass data to the child component using `@Input()` decor
   - The event name should be the same in the parent component as the name of the event in the child component
 
 - **Notes:**
-
   - Make sure to handle **event bubbling** and **event propagation** in the parent component by using the `$event` object and the `stopPropagation()` method
 
     ```html
@@ -1179,7 +1161,6 @@ It's a way to reference an element in the template so that you can access it in 
 - it starts with `#`
 
 - to access it:
-
   - in the template:
 
     ```html
@@ -1221,7 +1202,6 @@ It's a way to reference an element in the template so that you can access it in 
   ```
 
 - **Use cases:**
-
   - To access the value of an input elements in a form instead of using `ngModel`
 
     ```html
@@ -1300,9 +1280,7 @@ It's a way to reference an element in the template so that you can access it in 
 #### Handling projected content
 
 - Sometimes, you may want to show/hide a wrapper element that contains `<ng-content>`, based on if there's any projected content or not.
-
   - To do so we may:
-
     - 1️⃣ use `@ContentChild` decorator to check if there's any projected content or not, and `*ngIf` to show/hide the wrapper element
 
       ```ts
@@ -1359,7 +1337,6 @@ It's a new feature in Angular that allows you to create components **without the
 ### Creating a standalone component
 
 - **Creating a standalone component**
-
   - To create a standalone component, use the `--standalone` flag with the `ng generate component` command
 
     ```bash
@@ -1388,7 +1365,6 @@ It's a new feature in Angular that allows you to create components **without the
     - To use it now, you can import it directly into another component or module without the need for a module.
 
 - **Using a standalone component**
-
   - To use a standalone component, you can import it directly into another component or module without the need for a module
   - It will be imported in the `imports` array of the component/module decorator
 
@@ -1412,7 +1388,6 @@ It's a new feature in Angular that allows you to create components **without the
   - In order to use comopnents in the template of a standalone component, you need to import them in the `imports` array of the component decorator. This is similar to how you would import modules in a module file. Also you can import `modules` in the `imports` array of the component decorator, which allows you to use the directives and pipes provided by those modules in the template of the standalone component.
 
 - Notes:
-
   - You can import other `components/modules` in the standalone component's `imports` array.
 
 ---
