@@ -42,6 +42,7 @@
     - [Chaining pipes](#chaining-pipes)
   - [Modals (Portals and Overlays)](#modals-portals-and-overlays)
     - [Angular CDK (Component Dev Kit)](#angular-cdk-component-dev-kit)
+  - [Helper Classes](#helper-classes)
   - [Angular flex-layout](#angular-flex-layout)
   - [Angular Service Worker](#angular-service-worker)
   - [Notes](#notes)
@@ -635,6 +636,8 @@ Sometimes you want to apply styles to a component, but you don't want those styl
 >
 > There's actually a third way called **"Mediator Design Pattern"** which is used for communication between sibling components through a shared service (usually for components that are not directly related in the component tree -- parent-child relationship). This pattern helps manage complex interactions by centralizing communication in a mediator service, promoting loose coupling between components.
 
+- The square bracket and parentheses notation also makes it very obvious about the flow of data. Any time you see the square bracket notation, you can be assured that it is data flowing from the component into the HTML. Any time you see the parentheses notation, you are guaranteed that it refers to an event and flows from a user action to the component.
+
 ![data binding](./img/databinding2.PNG)
 ![data binding](./img/databinding.PNG)
 
@@ -672,6 +675,8 @@ It's a way to bind the properties of an HTML element to the properties of the co
 
   <p>{{ property_x }}</p>
 
+  <p [class]="property_x ? 'class-true' : 'class-false'"></p>
+
   <p [innerText]="property_x"></p>
   ```
 
@@ -687,6 +692,10 @@ It's a way to bind the properties of an HTML element to the properties of the co
   <!-- in child component -->
   <p>{{ childProperty }}</p>
   ```
+
+> **Note:** Angular data binding only works with DOM properties, and not with HTML attributes.
+>
+> _The difference is that DOM properties are part of the DOM API and reflect the current state of the element, while HTML attributes are part of the HTML markup and represent the initial state of the element._
 
 ---
 
@@ -856,6 +865,8 @@ It's the ability to being able to listen to events and update a property simulta
 
 ## Directives
 
+A directive in Angular allows you to attach some custom functionality to elements in your HTML.
+
 It's a way to extend the HTML with custom behavior and functionality **(Enhancements to HTML)**, allowing you to create reusable components and manipulate the DOM in a declarative way.
 
 > Think of an Angular directive as an HTML enhancer. Directives allow you to teach an old HTML element new tricks. A directive is a class annotated with the `@Directive()` decorator.
@@ -871,7 +882,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 - **Directives Types**
   ![Directives](./img/Directives.png)
   ![Directives](./img/Directives-1.png)
-  - [Structural directives](#structural-directives): Change the DOM (component's template) structure by adding/removing elements.
+  - [Structural directives](#structural-directives): Change the DOM (component's template) structure/layout by adding/removing elements.
     - `*ngIf`: Conditionally remove/recreate DOM.
     - `*ngFor`: Repeat DOM for each list item.
     - `*ngSwitch`: Swap DOM based on expression.
@@ -892,7 +903,44 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 
 - look here for full types and documentation [Attribute Directives](https://angular.io/guide/attribute-directives)
 
-- `ngStyle` : it sets inline styles on an HTML element
+- `ngClass` : it adds and removes CSS classes on an HTML element based on a condition
+  - Example:
+
+    ```html
+    <!-- in css-file we have class ".error" -->
+    <button [ngClass]="{error: isError}">Error Button</button>
+    ```
+
+    - Here, we are adding the `error` class to the button element if the `isError` property is `true`
+
+  - ⚠️ Another thing to note is that unlike class binding, where the **class binding was overwriting our initial class from the element, the `NgClass` directive retains the classes on the element**.
+    - this is the case for `[class]` binding but for `[class.className]` binding, it only adds/removes the specific class without affecting other classes.
+  - 💡 if an element have multiple dynamic classes, it's a good pattern to have all the conditions for the classes in one place like an object property in the component:
+
+    ```ts
+    class MyComponent {
+      ngOnInit() {
+        this.classConditions = {
+          error: this.isError,
+          positive: this.myService.isPositive()
+          // add more conditions here
+        };
+      }
+    }
+    ```
+
+    ```html
+    <button [ngClass]="classConditions">Error Button</button>
+    ```
+
+  - **class binding** (`[class]`) is also a way to add/remove classes dynamically but it requires more boilerplate code, or it can be used when you want to bind a single class conditionally
+
+    ```html
+    <button [class]="isError ? 'error' : ''">Error Button</button>
+    <p [class.error]="isError">Error Paragraph</p>
+    ```
+
+- `ngStyle` : it adds/removes inline styles on an HTML element based on a condition
 
   ```html
   <button [ngStyle]="{color: 'red', 'font-size': '20px'}">Click me</button>
@@ -907,19 +955,22 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
   ```
 
   - Here, we are setting the color and font-size of the button element dynamically using the `isRed` and `isBig` properties from the component class
+  - Unlike style binding, where the **style binding was overwriting our initial styles from the element**, the `NgStyle` directive retains the styles on the element.
+  - It's also a best practice to define all style conditions in one place, like an object property in the component class, for better readability and maintainability.
 
-- `ngClass` : it adds and removes CSS classes on an HTML element
-
-  ```html
-  <!-- in css-file we have class ".error" -->
-  <button [ngClass]="{error: isError}">Error Button</button>
-  ```
-
-  - Here, we are adding the `error` class to the button element if the `isError` property is `true`
-  - `[class]` is also a way to add/remove classes dynamically but it requires more boilerplate code
+    ```ts
+    class MyComponent {
+      ngOnInit() {
+        this.styleConditions = {
+          color: this.isRed ? 'red' : 'blue',
+          'font-size': this.isBig ? '20px' : '10px'
+        };
+      }
+    }
+    ```
 
     ```html
-    <button [class]="isError ? 'error' : ''">Error Button</button>
+    <button [ngStyle]="styleConditions">Click me</button>
     ```
 
 - `ngModel` : it creates a two-way data binding on form elements
@@ -938,15 +989,48 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 - it starts with `*` and it's a `directive` that changes the structure of the DOM
 - Angular makes the content inside of `<ng-template>` become hidden but Angular will be aware of it so that it can be used based on condition
 - **⚠️ You can only apply one structural directive per element**
+  - Why? (how angular under the hood transforms the template)
+    - Angular transforms the template by wrapping the element with an `<ng-template>` and applying the directive to the `<ng-template>`. If you try to apply multiple structural directives to the same element, Angular won't know how to transform the template correctly.
+
+      ```html
+      <!-- When angular sees this: -->
+      <div *ngIf="condition">
+        <p>Item</p>
+      </div>
+      <!-- Then, Angular transforms it to: -->
+      <ng-template [ngIf]="condition">
+        <div>
+          <p>Item</p>
+        </div>
+      </ng-template>
+
+      <!-- --------------------------------------------------------- -->
+
+      <!-- So if you try to apply multiple structural directives to the same element, Angular won't know how to transform the template correctly. -->
+      <div *ngIf="condition" *ngFor="let item of items">{{ item }}</div>
+
+      <!-- ✅ -->
+      <ng-container *ngIf="condition">
+        <div *ngFor="let item of items">{{ item }}</div>
+      </ng-container>
+      <!-- Which now angular can transform correctly like this: -->
+      ```
+
   - To do so, you can wrap the element with a `<ng-container>` or `<ng-template>` -> [see more here](#multiple-directives)
 
 - **Angular <= 16**
+
+  > All these directives start with `"*ng"`
   - `*ngIf`
 
     ```html
     <!-- this element "<p>" will only show if the property "blueClass=True" -->
     <p *ngIf="blueClass">the button is blue</p>
     ```
+
+    - Why Remove Versus Hide Element?
+      - Removing an element from the DOM (`*ngIf`) means it is completely destroyed so angular will stop listening to its events and will not keep its state.
+      - Hiding an element (`[hidden]`) means it is still in the DOM, so angular will continue listening to its events and will keep its state.
 
   - `*ngFor`
 
@@ -961,6 +1045,8 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 
     <app-card *ngFor="let card of cards" [title]="card.title" [content]="card.content"></app-card>
     ```
+
+    > It was sometimes called `NgForOf` under the hood before Angular 17.
 
   - `*ngSwitch`
 
@@ -1620,6 +1706,51 @@ A common problem in web development is how to create a modal dialog that is posi
   ```
 
   - Here, we are creating a modal component that will be rendered in the center of the page using the `Angular CDK` overlay service
+
+---
+
+## Helper Classes
+
+Sometimes, it's useful to create helper classes to encapsulate common logic or functionality that can be reused across multiple components or services. This helps keep your code DRY (Don't Repeat Yourself) and maintainable.
+
+- You can create the class normally, or you can use the Angular CLI to generate it:
+
+  ```sh
+  ng generate class helper/my-helper
+  ```
+
+- You can then import and use the helper class in your components or services:
+
+  ```ts
+  // 📄 helper/my-helper.ts
+  export class MyHelper {
+    someMethod() {
+      console.log('Helper method called');
+    }
+  }
+
+  // ---------------------------------------------------------------------
+
+  // 📄 in some-component.ts
+  import { MyHelper } from './helper/my-helper';
+
+  @Component({
+    selector: 'app-some-component',
+    templateUrl: './some-component.html',
+    styleUrls: ['./some-component.css']
+  })
+  export class SomeComponent {
+    private helper = new MyHelper();
+
+    someMethod() {
+      this.helper.someMethod();
+    }
+  }
+  ```
+
+- You might think: _Why not just use a service instead of a helper class?_
+  - Services are typically used for shared state or logic that needs to be injected into multiple components.
+  - Helper classes are useful for encapsulating reusable logic that doesn't require dependency injection.
 
 ---
 

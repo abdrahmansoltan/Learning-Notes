@@ -16,7 +16,7 @@
   - [Minify / Minimize files](#minify--minimize-files)
     - [Minimize images](#minimize-images)
     - [Font Optimization (minimize font files)](#font-optimization-minimize-font-files)
-  - [Critical Render Path](#critical-render-path)
+  - [Critical Render Path Optimization](#critical-render-path-optimization)
   - [Code Splitting (Lazy Loading)](#code-splitting-lazy-loading)
   - [Tree Shaking](#tree-shaking)
   - [Avoid blocking main thread](#avoid-blocking-main-thread)
@@ -502,13 +502,14 @@ So, It's good to say that the `Google Fonts` service is doing a lot of optimizat
 
 ---
 
-## Critical Render Path
+## Critical Render Path Optimization
 
 It's how the files are handled after being downloaded from the source
 
 It's a step in the [rendering process in the browser](./Frontend.md#web-browsers) where the browser parses the `HTML` and `CSS` files and builds the DOM and `CSSOM` trees. The browser then combines the DOM and `CSSOM` trees to form the render tree. The render tree is then used to compute the layout of each visible element and paints them on the screen.
 
 ![Critical Render PATCH](./img/critical%20render%20path.PNG)
+![Critical Render Path](./img/cretical-render-path.png)
 
 - To improve the critical render path, we need to handle the way the browser handles the files downloading process and the way it parses the files
   - Ex: we can use `async` and `defer` attributes in the `script` tag to handle the way the browser handles the files downloading process to prevent blocking the `DOM` tree from being built

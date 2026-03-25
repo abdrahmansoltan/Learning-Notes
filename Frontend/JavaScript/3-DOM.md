@@ -70,7 +70,6 @@ The JavaScript language was initially created for **web browsers**. Since then, 
 ![host environment](./img/host-environment.png)
 
 - There’s a “root” object called **window**. It has two roles:
-
   1. First, it is a `global object` for JavaScript code.
 
      ```js
@@ -106,9 +105,7 @@ is a group of objects, each of which represent related things from the real worl
 
 - **BOM (Browser Object Model)**: contains objects that represent the current `browser window` or `tab`. It contains objects that model things like `browser history` and the `device's screen`.
   ![object-model](./img/object-model.png)
-
   - `window object` is treated as the default object if nothing is specified. ex: `alert()` is used instead of `window.alert()`
-
     - this is as if a property or a method is not found, javascript looks it up in the `window` object:
       - ex:
         - `document` property in `document.getElementBy...` instead of `window.document.getElementBy...`
@@ -134,7 +131,6 @@ is a group of objects, each of which represent related things from the real worl
     ```
 
 - **DOCUMENT OBJECT MODEL**:
-
   - It's an interface that allows Javascript to interact with the HTML content of a webpage in browsers.
     ![object-model](./img/object-model-1.png)
   - It's a structured representation of an HTML document. Allowing javascript to **access**, **manipulate** and **delete** HTML elements; set **styles**, **attributes**; **listen** and **respond** to events.
@@ -146,7 +142,6 @@ is a group of objects, each of which represent related things from the real worl
   - The DOM is not a part of HTML or Javascript, It's a part of the **WEB APIs**, and it contains lots of methods and properties that we can use to interact with the DOM tree.
     ![DOM](./img/dom-2.png)
   - The DOM is called an object model because the model (the DOM tree) is made of objects.
-
     - All these objects are accessible using JavaScript, and we can use them to modify the page.
     - The topmost tree nodes are available directly as `document` properties:
     - For example:
@@ -156,12 +151,10 @@ is a group of objects, each of which represent related things from the real worl
     - In the DOM-world, `null` means “doesn’t exist” or “no such node”.
 
   - **Autocorrection:**
-
     - If the browser encounters malformed HTML, it automatically corrects it when making the DOM.
     - For instance, the top tag is always `<html>`. Even if it doesn’t exist in the document, it will exist in the DOM, because the browser will create it. The same goes for `<body>`.
 
   - **Node Types:**
-
     - Tags become element nodes and form the structure of the DOM tree.
     - There are 12 node types. In practice we usually work with 4 of them:
       - `document` – the “entry point” into DOM.
@@ -173,7 +166,6 @@ is a group of objects, each of which represent related things from the real worl
   - > The DOM an Application Programming Interface (**API**). User interfaces let humans interact with programs; APls let programs (and scripts) talk to each other. The DOM states what your script can "ask the browser about the current page, and how to tell the browser to update what is being shown to the user
 
 - **GLOBAL JAVASCRIPT OBJECTS**: represent things that the JavaScript language needs to create a model of. For example, there is an object that deals only with dates and times.
-
   - The names of the global objects usually start with a capital letter, e.g., `String`, `Date`, `Math` objects
 
   - allows us to make `javascript` interact with the browser by creating a model of the page and stores it **in memory**
@@ -219,7 +211,6 @@ message.remove();
 ```
 
 - Notes:
-
   - if you inserted a text-node with `<` or `>` like:
 
     ```html
@@ -238,7 +229,6 @@ message.remove();
     ```
 
   - if we want to move an element to another place – there’s no need to remove it from the old one.
-
     - All insertion methods automatically remove the node from the old place.
 
       ```html
@@ -277,13 +267,10 @@ message.remove();
   | `getElementsByClassName()` `getElementsByTagName()` `children`                                                               | `querySelector()` `querySelectorAll()` `childNodes`                                                                                                 |
 
 - **Notes:**
-
   - It’s iterable -> we can use `for..of` to iterate over it
-
     - Don’t use `for..in` to loop over collections, as it iterates over all enumerable properties. And collections have some “extra” rarely used properties that we usually do not want to get
 
   - For **NodeLists**, some Array methods won’t work, because it’s not an array
-
     - We can use `Array.from` to create a “real” array from the collection, if we want array methods:
 
       ```js
@@ -316,7 +303,6 @@ let p_prime = p.cloneNode(true);
 ```
 
 - `document.importNode(node, deep)`
-
   - The `importNode()` method creates a copy of a node from another document and returns it.
   - The `deep` parameter specifies whether to clone the node's descendants (children) as well.
 
@@ -349,7 +335,6 @@ It's a way to navigate between elements in the DOM tree based on their relations
   ```
 
 - **Element-only navigation**
-
   - Standard properties include all nodes (text, element, comment).
 
   - navigation links that only take element nodes into account:
@@ -357,7 +342,6 @@ It's a way to navigate between elements in the DOM tree based on their relations
     ![element-only-navigation](./img/element-only-navigation.png)
 
 - **Closest parent**
-
   - The `closest` method looks up the DOM tree and returns the first element that matches the selector.
   - It's instead of going up the tree multiple times with `parentNode`.
 
@@ -388,7 +372,6 @@ There are many methods to search for nodes in the DOM tree: by their `id`, `tag`
 
 - **Methods**:
   ![dom-search](./img/dom-search.png)
-
   - `document.getElementById(id)`: Returns the element with the specified `id`.
     - The `id` must be unique.
   - `document.getElementsByTagName(name)`: Returns a `NodeList` of elements with the specified tag name.
@@ -414,10 +397,14 @@ Different DOM nodes may have different properties. For instance, an element node
   - `console.log(elem)`: shows the element as a DOM object, good to explore its properties.
   - For instance, if the tag is `<body id="page">`, then the DOM object has `body.id="page"`.
 
+> **Interview Question**
+>
+> What's the difference between an "attribute" and a "property" in the DOM?
+> **Answer:** An attribute is defined in the HTML markup and represents the initial state of an element, while a property is a representation of the current state of the element in the DOM. (example: `<input value="Hello">` has an attribute `value="Hello"` (initial state) and a property `input.value` which can change (current state))
+
 ### `innerHTML` vs `innerText`
 
 - `innerHTML`
-
   - allows to get the HTML inside the element as a string.
   - only valid for element nodes.
     - Other node types, such as text nodes, have their counterpart: `nodeValue` and `data` properties.
@@ -433,7 +420,6 @@ Different DOM nodes may have different properties. For instance, an element node
   - > **Scripts don’t execute:** If `innerHTML` inserts a `<script>` tag into the document – it becomes a part of HTML, but doesn’t execute.
 
 - `outerHTML`
-
   - contains the full HTML of the element. That’s like (innerHTML plus the element itself).
   - unlike `innerHTML`, writing to `outerHTML` does not change the element. Instead, it replaces it in the DOM.
 
@@ -465,7 +451,6 @@ Different DOM nodes may have different properties. For instance, an element node
 In HTML tags may have attributes. The browser recognizes **standard attributes** and creates DOM properties from them.
 
 - when an element has `id` or another **standard attribute**, the corresponding property gets created. But that doesn’t happen if the attribute is **non-standard**.
-
   - if an attribute is **non-standard**, there won’t be a DOM-property for it.
 
   ```html
@@ -482,7 +467,6 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
   ```
 
 - All attributes (standard and non-standard) are accessible by using the following methods:
-
   - `elem.hasAttribute(name)`
   - `elem.getAttribute(name)`
 
@@ -502,12 +486,10 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
   - Their name is case-insensitive (`id` is same as `ID` or `Id`).
   - Their values are always strings.
 - Note:
-
   - **Attributes** – is what’s written in HTML.
   - **Properties** – is what’s in DOM objects.
 
 - to get a non standard Attribute :
-
   - Before you work with an attribute, it is good practice to check whether it exists. This will save resources if the attribute cannot be found. -> `.hasAttribute()`
 
   ```js
@@ -517,9 +499,7 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
   ```
 
 - Difference between getting an attribute through `getAttribute` and `element.attribute`:
-
   - `src` attribute
-
     - `element.src` returns the full URL, while `element.getAttribute('src')` returns the URL as it was written in the HTML.
 
       ```html
@@ -533,7 +513,6 @@ In HTML tags may have attributes. The browser recognizes **standard attributes**
       ```
 
   - `href` attribute
-
     - `element.href` returns the full URL, while `element.getAttribute('href')` returns the URL as it was written in the HTML.
 
       ```html
@@ -632,7 +611,6 @@ It's a standard way to store custom data in HTML, and it's a good practice to us
 The property `elem.style` is an **object** that corresponds to what’s written in the "`style`" attribute **(inline styles)**.
 
 - **Reading style values:**
-
   - `elem.style` only reflects **inline styles**, not CSS classes.
 
     ```js
@@ -659,7 +637,6 @@ The property `elem.style` is an **object** that corresponds to what’s written 
   - `getComputedStyle` returns resolved values, usually in `px` for geometry.
 
 - **Writing style values:**
-
   - `elem.style.property = value` : to change a style, assign a new value to a property.
 
     ```js
@@ -674,7 +651,6 @@ The property `elem.style` is an **object** that corresponds to what’s written 
     ```
 
   - `cssText` property
-
     - This property is rarely used, because such assignment removes all existing styles: it does not add, but replaces them.
 
     ```js
@@ -696,7 +672,6 @@ The property `elem.style` is an **object** that corresponds to what’s written 
 In javascript, classes are represented by the `classList` object. It provides methods to add, remove and toggle classes. or a `cl
 
 - `className`
-
   - `className` was introduced because `class` was a reserved word in JavaScript.
   - `elem.className` corresponds to the `class` attribute.
 
@@ -711,7 +686,6 @@ In javascript, classes are represented by the `classList` object. It provides me
   - Assigning to `elem.className` replaces all classes.
 
 - `classList`:
-
   - It's a special object to manage classes.
 
     ```html
@@ -724,7 +698,6 @@ In javascript, classes are represented by the `classList` object. It provides me
     ```
 
   - Methods of `classList`:
-
     - `add/remove("class")`: Adds/removes a class.
     - `toggle("class")`: Adds
       if absent, removes if present.
@@ -754,7 +727,6 @@ To get the size of an element and its position relative to the window, the docum
 
 - **offsetParent**
   ![Geometry](./img/geometry2.png)
-
   - Properties `offsetLeft`/`offsetTop` provide x/y coordinates relative to `offsetParent` upper-left corner
 
     ```html
@@ -785,13 +757,11 @@ To get the size of an element and its position relative to the window, the docum
   ```
 
 - **clientWidth/Height**
-
   - These properties provide the size of the area **inside** the element borders. They include the content width together with paddings, but without the scrollbar
     ![Geometry](./img/geometry3.png)
     ![Geometry](./img/geometry4.png)
 
 - **scrollWidth/Height**
-
   - These properties are like clientWidth/clientHeight, but they also include the scrolled out (hidden) parts
     ![Geometry](./img/geometry5.png)
   - We can use these properties to expand the element wide to its full width/height.
@@ -802,7 +772,6 @@ To get the size of an element and its position relative to the window, the docum
     ```
 
 - **scrollLeft/scrollTop**
-
   - Properties `scrollLeft`/`scrollTop` are the `width`/`height` of the hidden, scrolled out part of the element.
     ![Geometry](./img/geometry6.png)
     - In other words, `scrollTop` is “how much is scrolled up”.
@@ -839,7 +808,6 @@ To get the size of an element and its position relative to the window, the docum
     - > unlike **`window.innerWidth/innerHeight`** which includes the scrollbar.
   - In most cases, we need the available window width in order to draw or position something within scrollbars (if there are any), so we should use **`documentElement.clientHeight/clientWidth`**.
 - **Width/height of the document**
-
   - as the root document element is `document.documentElement`, and it encloses all the content
   - To reliably obtain the full document height, we should take the maximum of these properties:
 
@@ -857,7 +825,6 @@ To get the size of an element and its position relative to the window, the docum
     ```
 
 - **Get the current scroll**
-
   - For document scroll, `document.documentElement.scrollLeft/scrollTop` works in most browsers, except older
   - but the scroll is available in the special properties, **`window.pageXOffset/pageYOffset`**:
 
@@ -876,7 +843,6 @@ To get the size of an element and its position relative to the window, the docum
 
 - **Coordinate Systems**:
   ![coordinates](./img/coordinates1.png)
-
   1. **Window-relative** (`clientX`/`clientY`): From the window's top/left edge.
   2. **Document-relative** (`pageX`/`pageY`): From the document's top/left edge.
 
@@ -895,7 +861,6 @@ To get the size of an element and its position relative to the window, the docum
 #### Manual Scrolling
 
 - **OLD WAY**: Use `scrollTop`/`scrollLeft` or:
-
   - `scrollBy(x,y)`: Scrolls relative to current position.
   - `scrollTo(pageX,pageY)`: Scrolls to absolute coordinates.
 
@@ -911,9 +876,7 @@ To get the size of an element and its position relative to the window, the docum
     ```
 
 - **NEW WAY**: `scrollIntoView`
-
   - `elem.scrollIntoView(top)`: Scrolls to make element visible.
-
     - `top=true` (default): Aligns element with the window top.
     - `top=false`: Aligns element with the window bottom.
 
@@ -933,7 +896,6 @@ To get the size of an element and its position relative to the window, the docum
 | good for scrolling users to the very top of the page | good for scrolling users to a specific element |
 
 - **Forbid Scrolling**
-
   - To make the document unscrollable:
 
     ```js
@@ -950,9 +912,7 @@ To get the size of an element and its position relative to the window, the docum
 Sometimes we find websites & landing pages with beautiful scrolling effects. This is achieved by using `scroll-behavior` property in CSS,or by using JavaScript to do some effects on scrolling.
 
 - **Smooth Scrolling**:
-
   - With CSS
-
     - `scroll-behavior: smooth` property in CSS provides smooth scrolling.
 
       ```css
@@ -962,7 +922,6 @@ Sometimes we find websites & landing pages with beautiful scrolling effects. Thi
       ```
 
   - With JavaScript
-
     - `scrollIntoView` method with `behavior: 'smooth'` option provides smooth scrolling.
 
       ```js
@@ -970,7 +929,6 @@ Sometimes we find websites & landing pages with beautiful scrolling effects. Thi
       ```
 
 - **Parallax Scrolling**:
-
   - Parallax scrolling is a technique where the background content moves at a different speed than the foreground content while scrolling.
 
     ```css
@@ -983,7 +941,6 @@ Sometimes we find websites & landing pages with beautiful scrolling effects. Thi
     ```
 
 - **Effects on Scroll**:
-
   - We can add effects on scroll by listening to the `scroll` event and changing the styles of elements.
 
     ```js
@@ -1013,7 +970,6 @@ More [here](./5-Web-APIs.md#intersection-observer-api)
 We use them to create advanced scrolling effects like parallax scrolling, sticky navigation, and more. Because they are more efficient and easier to use than writing custom JavaScript code.
 
 - **ScrollMagic**:
-
   - A popular JavaScript library for creating scroll animations.
   - It allows you to create animations that trigger based on the scroll position of the user.
   - [ScrollMagic](https://scrollmagic.io/)
@@ -1056,7 +1012,6 @@ A DOM can have 2 types of subtrees:
 - **Light tree**:
   - a regular DOM subtree, made of HTML children of the element.
 - **Shadow tree**:
-
   - a separate DOM subtree, hidden from the main document, created by `attachShadow()` method.
 
   ```html
@@ -1075,16 +1030,13 @@ A DOM can have 2 types of subtrees:
   ```
 
   ![Shadow DOM](./img/shadow-dom-3.png)
-
   - There are two limitations:
-
     1. We can create only one shadow root per element.
     2. The elem must be either a custom element, or one of: “article”, “aside”, “blockquote”, “body”, “div”, “footer”, “h1…h6”, “header”, “main” “nav”, “p”, “section”, or “span”. Other elements, like `<img>`, can’t host shadow tree.
 
 ### Encaosulation of the Shadow DOM
 
 - Shadow DOM is strongly delimited from the main document:
-
   - Shadow DOM elements are not visible to `querySelector` from the light DOM. In particular, Shadow DOM elements may have ids that conflict with those in the light DOM. They must be unique only within the shadow tree.
   - Shadow DOM has own stylesheets. Style rules from the outer DOM don’t get applied.
 
@@ -1179,7 +1131,6 @@ Events signal that something has happened. All DOM nodes generate such signals.
 ### Event Handling / Binding
 
 - **Binding events** -> 3 ways to assign handlers:
-
   - **HTML Event Handlers (Bad Practice ❌)**
 
     ```html
@@ -1201,7 +1152,6 @@ Events signal that something has happened. All DOM nodes generate such signals.
       - Avoid `setAttribute()` for handlers; it converts functions to strings.
 
   - **DOM Property Event Handlers (❌)**
-
     - Only one function per event.
     - Assign handler without parentheses.
     - Use `elem.onclick` (case-sensitive).
@@ -1211,7 +1161,6 @@ Events signal that something has happened. All DOM nodes generate such signals.
       ```
 
   - **`addEventListener` ✅**
-
     - Syntax:
 
       ```js
@@ -1224,13 +1173,11 @@ Events signal that something has happened. All DOM nodes generate such signals.
       ```
 
       - `options`: An additional optional object with properties:
-
         - `once`: Auto-removes after trigger.
         - `capture`: Event phase (bubbling/capturing).
         - `passive`: Prevents preventDefault.
 
       - Notes:
-
         - It's the only way that supports multiple functions per event.
 
           ```js
@@ -1240,12 +1187,10 @@ Events signal that something has happened. All DOM nodes generate such signals.
         - It's the only way that supports removing an event listener.
 
 - `this` in callbacks:
-
   - if callback function is a regular function, `this` refers to the element that the event listener was attached to.
   - if callback function is an arrow function, `this` refers to the window object. So we can use `event.currentTarget` instead of `this` or use `.bind(this)`.
 
 - Removing Event Listeners:
-
   - It's important to remove event listeners when they are no longer needed to prevent memory leaks.
   - Must pass the exact same function.
 
@@ -1279,14 +1224,12 @@ When an event occurs, the `event` object tells you information about the event, 
 
 - Key Properties:
   ![event-object](./img/event-object.png)
-
   - `event.currentTarget`: Element that handled the event (same as this in non-arrow functions).
   - `event.target`: Element that triggered the event.
   - `event.key`: Key pressed (for keyboard events).
   - `event.clientX`, `event.clientY`: Coordinates of the click in the viewport.
 
 - `event.target` vs (`this` | `event.currentTarget`):
-
   - `event.target`: Element that **initiated** the event, unchanged through bubbling.
 
     ```js
@@ -1316,7 +1259,6 @@ When an event occurs, the `event` object tells you information about the event, 
       ```
 
 - To pass arguments to an event handler, we can:
-
   - Use a wrapper function.
 
     ```js
@@ -1344,7 +1286,6 @@ It's the process of event flow from the root element to the target element and b
 - HTML elements nest. Hovering or clicking a link also affects its parent elements.
 
 - The standard DOM Events describes 3 phases of event propagation:
-
   1. Capturing phase – the event goes down to the element.
   2. Target phase – the event reached the target element.
   3. Bubbling phase – the event bubbles up from the element.
@@ -1356,7 +1297,6 @@ It's the process of event flow from the root element to the target element and b
 #### Event Bubbling
 
 - Events trigger handlers on the target element, then bubble up to ancestors.
-
   - Most events bubble, but some like `focus` do not.
 
 - Example: Clicking `<p>` alerts `"p"`, then `"div"`, then `"form"`.
@@ -1370,7 +1310,6 @@ It's the process of event flow from the root element to the target element and b
   ```
 
 - **Stopping Bubbling**
-
   - A bubbling event goes from the target element up, calling all handlers on the path. Any handler can stop this with **`event.stopPropagation()`**.
 
     ```js
@@ -1383,7 +1322,6 @@ It's the process of event flow from the root element to the target element and b
   - `event.stopImmediatePropagation()`: Stops bubbling and prevents handlers on the current element from running.
 
   - When not to stop bubbling:
-
     - Nested menus: Submenus handle clicks and stop propagation to prevent outer menu triggers.
     - Analytics: Track user clicks across the window using `document.addEventListener('click', ...)`.
 
@@ -1411,7 +1349,6 @@ It's the process of event flow from the root element to the target element and b
 It's the opposite of bubbling. The event goes down to the element, then triggers handlers on the way up.
 
 - the final parameter in the `addEventListener()` method lets you choose the direction to trigger events
-
   - `true` -> capturing phase
   - `false` -> bubbling phase (default value)
 
@@ -1432,19 +1369,16 @@ It's a technique to add a single event listener to a parent element to handle al
 - It's like that we are **delegating** the job of the event listener to a parent of the elements. because the event bubbles up to the parent element.
 
 - **Advantages**:
-
   - Simplifies initialization and saves memory.
   - Improves performance with fewer event listeners.
   - Less code for adding/removing elements.
   - Easy DOM modifications.
 
 - **Limitations**:
-
   - Requires bubbling events.
   - May add CPU load due to container-level handling.
 
 - **Steps**:
-
   1. Add event listener to common parent.
   2. Use `e.target` to find the event origin (where it happened).
   3. Use `.closest(element)` to prevent wrong selection.
@@ -1515,7 +1449,6 @@ There are two ways to tell the browser we don’t want it to act:
    ```
 
 2. If the handler is assigned using `on<event>` (not by `addEventListener`), then returning `false` also works the same.
-
    - The value returned by an event handler is usually ignored.
 
    - The only exception is `return false` from a handler assigned using `on<event>`.
@@ -1613,7 +1546,6 @@ More reference and info about (mouse events, drag & drop, pointer events, keyboa
 #### CSS Animation Events
 
 - **`transitionend`**:
-
   - Fires when a CSS transition completes.
   - The event object has the `propertyName` property.
   - It’s useful for animations that change properties over time.
@@ -1653,7 +1585,6 @@ More reference and info about (mouse events, drag & drop, pointer events, keyboa
 Scripts are often heavier than HTML, causing delays in DOM building. When the browser encounters a `<script>` tag, it must execute it immediately, blocking further DOM processing.
 
 - **Issues**:
-
   - Scripts can't see DOM elements below them.
   - Bulky scripts at the top block page content and DOM building.
 
@@ -1687,7 +1618,6 @@ Scripts are often heavier than HTML, causing delays in DOM building. When the br
 The `defer` attribute allows the browser to continue processing HTML and building the DOM while the script loads in the background.
 
 - **Key Points**:
-
   - Scripts with `defer` never block the page.
   - They execute when the DOM is ready, before `DOMContentLoaded`.
   - Deferred scripts maintain their order.
@@ -1701,7 +1631,6 @@ The `defer` attribute allows the browser to continue processing HTML and buildin
       > That is important for cases when we need to load a JavaScript library and then a script that depends on it.
 
 - Notes:
-
   - The `defer` attribute is only for external scripts
   - The `defer` attribute is ignored if the `<script>` tag has no `src`.
 
@@ -1712,7 +1641,6 @@ The `defer` attribute allows the browser to continue processing HTML and buildin
 The `async` attribute makes scripts non-blocking and independent.
 
 - **Behavior**:
-
   - Scripts load and run **independently** (load in the background and run when ready).
   - The browser doesn’t block the page on `async` scripts.
   - Other scripts and `DOMContentLoaded` don't wait for `async` scripts.
@@ -1734,7 +1662,6 @@ The `async` attribute makes scripts non-blocking and independent.
     3. Scripts run in the order they load, not their sequence in HTML.
 
 - **Use Cases:**
-
   - Ideal for independent third-party scripts (e.g., ads, analytics). **(where the relative execution order doesn't matter)**.
 
     ```html
@@ -1742,7 +1669,6 @@ The `async` attribute makes scripts non-blocking and independent.
     ```
 
 - **Dynamic scripts**
-
   - Default to `async`, but can be changed to `defer` by setting `script.async = false`.
 
     ```js
@@ -1764,7 +1690,6 @@ The `async` attribute makes scripts non-blocking and independent.
 The lifecycle of an HTML page has three important events:
 
 - `DOMContentLoaded`
-
   - Fires on the `document` when **(HTML & External JS scripts)** is fully loaded and the DOM tree is built, but external resources may not be loaded.
     - `<script>` tags block `DOMContentLoaded` unless they have `async` or are dynamically created.
     - External CSS stylesheets don't block `DOMContentLoaded`, but scripts after stylesheets wait for them to load.
@@ -1782,7 +1707,6 @@ The lifecycle of an HTML page has three important events:
     ```
 
 - `load`
-
   - Fires on the `window` when the entire page, including all resources (images, styles etc), is fully loaded.
     - so styles are applied, image sizes are known etc.
   - Handlers can access fully loaded resources.
@@ -1802,18 +1726,14 @@ The lifecycle of an HTML page has three important events:
   ```
 
 - `beforeunload` / `unload`
-
   - Fires on the `window` when the user is leaving the page.
   - `beforeunload`: Check if the user saved changes and confirm leaving.
-
     - `event.preventDefault()` doesn't work in `beforeunload` to prevent the user from leaving the page.
 
   - `unload`: Perform cleanup or send data to the server.
 
 - Notes:
-
   - We can see how much time it took to load the page by:
-
     - Measuring the time between `DOMContentLoaded` and `load` events.
 
       ```js

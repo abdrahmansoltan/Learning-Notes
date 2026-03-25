@@ -9,7 +9,7 @@
   - [Web Browsers](#web-browsers)
     - [Architecture of web browser](#architecture-of-web-browser)
     - [Roles of Rendering Engine](#roles-of-rendering-engine)
-    - [How web pages are built in the browser](#how-web-pages-are-built-in-the-browser)
+  - [Critical Render Path (How web pages are built in the browser)](#critical-render-path-how-web-pages-are-built-in-the-browser)
   - [Web Components](#web-components)
     - [Web Components Core Technologies](#web-components-core-technologies)
     - [Using Web Components](#using-web-components)
@@ -139,7 +139,16 @@ The four basic steps include:
 
 ---
 
-### How web pages are built in the browser
+## Critical Render Path (How web pages are built in the browser)
+
+It's how the files are handled after being downloaded from the source
+
+It's a step in the [rendering process in the browser](./Frontend.md#web-browsers) where the browser parses the `HTML` and `CSS` files and builds the DOM and `CSSOM` trees. The browser then combines the DOM and `CSSOM` trees to form the render tree. The render tree is then used to compute the layout of each visible element and paints them on the screen.
+
+![Critical Render PATCH](./img/critical%20render%20path.PNG)
+![Critical Render Path](./img/cretical-render-path.png)
+
+> This is the step after the [rendering engine has fetched the content of the requested document](#what-happens-when-we-access-a-web-server)
 
 ![Web Pages](./img/web-pages-0.png)
 
@@ -148,14 +157,23 @@ The four basic steps include:
 2. The received `HTML` file is a `text` file that contains the structure of the web page, and the other files are linked to it (like `CSS`, `JS`, `images`, etc.)
    ![Web Pages](./img/web-pages-2.png)
    - 💡 The browser uses the `content-type` header to determine how to process each file
-3. The `HTML` file is parsed by the browser to create the `DOM` tree, which is a **representation of the structure of the web page in a tree-like structure**
-   ![Web Pages](./img/web-pages-3.png)
+3. **Parsing Step:**
+   ![Web Pages](./img/web-pages-7.png)
+   - The `HTML` file is parsed by the browser to create the `DOM` tree, which is a **representation of the structure of the web page in a tree-like structure**.
+     ![Web Pages](./img/web-pages-3.png)
+     - Start with **tokenization** of the HTML file, which breaks the HTML into tokens (like start tags, end tags, and text nodes), Then, the tokens are used to create the `DOM` tree.
+     - This happens **recursively**, meaning that the browser will continue to parse and create nodes until the entire HTML file is processed.
+       - Whenever it encounters elements with external resources/links (like `CSS` or `JS`), it may need to fetch and process them before continuing. (Render Blocking Resources)
+       - But actually there's a fix for this to prevent render blocking, which is to use `async` or `defer` attributes for JavaScript files which is done by the **"Preload Scanner"**
+         > **Preload Scanner**: A mechanism that allows the browser to discover resources that will be needed soon and start fetching them in advance, without blocking the rendering of the page.
+         > ![Web Pages](./img/web-pages-preload-scanner.png)
+     - Note that the more nested the HTML elements are, the more work the browser has to do to create the `DOM` tree.
 
-4. The `CSS` file is parsed by the browser to create the `CSSOM` tree, which is a **representation of the styles of the web page in a tree-like structure**
-   ![Web Pages](./img/web-pages-4.png)
-   ![Web Pages](./img/web-pages-5.png)
+   - The `CSS` file is parsed by the browser to create the `CSSOM` tree, which is a **representation of the styles of the web page in a tree-like structure**
+     ![Web Pages](./img/web-pages-4.png)
+     ![Web Pages](./img/web-pages-5.png)
 
-5. The `DOM` tree and the `CSSOM` tree are combined to create the `Render Tree`, which is a **representation of the structure of the web page with the styles applied to it**
+4. **Render Tree Construction Step:** The `DOM` tree and the `CSSOM` tree are combined to create the `Render Tree`, which is a **representation of the structure of the web page with the styles applied to it**
    ![Web Pages](./img/web-pages-6.png)
    - it's what is actually shown on the page (`structure` + `rules` on how they should look like)
    - it has a one-to-one mapping with the visible objects on the page
@@ -176,7 +194,7 @@ The four basic steps include:
      }
      ```
 
-6. **Layout (Reflow):** The `Render Tree` is used to calculate the layout of each visible object on the page (where it should be and how big it should be)
+5. **Layout (Reflow):** The `Render Tree` is used to calculate the layout of each visible object on the page (where it should be and how big it should be)
    - It's the process of calculating the exact position and size of each element on the page
    - Reflow happens whenever:
      - the geometry of the page changes (like when the window is resized)
@@ -191,7 +209,7 @@ The four basic steps include:
    >
    > Generally, a `reflow` is followed by a `repaint` (which is also expensive)
 
-7. **Paint:** The layout is used to paint each element on the page
+6. **Paint:** The layout is used to paint each element on the page
    - After knowing how things should look like and where they should be, Then the browser draws the pixels for each element on the screen
    - Anytime you change something other than the `opacity`, `transform`, or `filter` properties, the browser will have to trigger a **repaint**
    - Triggering a `layout / reflow` will always trigger a `repaint`, but triggering a `repaint` will not always trigger a `layout / reflow`
@@ -200,26 +218,27 @@ The four basic steps include:
      ![Web Pages](./img/web-pages-12.png)
      ![Web Pages](./img/web-pages-13.gif)
 
-8. **Composite:** After painting multiple layers, the browser **combines** them into a single layer and displays it on the screen
+7. **Composite:** After painting multiple layers, the browser **combines** them into a single layer and displays it on the screen
 
-9. Now initial render is done and page is displayed to the user 🎉
+8. Now initial render is done and page is displayed to the user 🎉
    - Are we finally done 😮‍💨? No, we're not done yet 🥲
 
-10. **JavaScript:** The `JS` files are parsed and executed to add interactivity to the page
-    - It can change all the previous steps (the `DOM` tree, `CSSOM` tree, and `Render Tree`), which means that we might have to redo all the previous steps again after the `JS` is executed 🥲
+9. **JavaScript:** The `JS` files are parsed and executed to add interactivity to the page
 
-      ![Web Pages](./img/web-pages-7.gif)
+- It can change all the previous steps (the `DOM` tree, `CSSOM` tree, and `Render Tree`), which means that we might have to redo all the previous steps again after the `JS` is executed 🥲
 
-    - This is called **reflow** or **repaint** and it's very expensive
-      ![Web Pages](./img/web-pages-8.png)
-    - Does all the steps need to happen again every time a `JS` file is executed? **No**, not all the steps, only the steps that are affected by the `JS` file
-      - By focusing on only changing the things that need to be changed, we can avoid redoing all the previous steps, which is good for performance 🚀
-      - Read more about it in [What to animate? (Animation Performance)](../HTML-CSS/2-CSS.md#what-to-animate-animation-performance)
+  ![Web Pages](./img/web-pages-7.gif)
 
-    > **"Layout Trashing"** is the term used to describe the situation when the browser has to redo the layout process multiple times in a very short period of time due to javascript changes
-    > ![Web Pages](./img/web-pages-9.png)
-    >
-    > ![Web Pages](./img/web-pages-10.png)
+- This is called **reflow** or **repaint** and it's very expensive
+  ![Web Pages](./img/web-pages-8.png)
+- Does all the steps need to happen again every time a `JS` file is executed? **No**, not all the steps, only the steps that are affected by the `JS` file
+  - By focusing on only changing the things that need to be changed, we can avoid redoing all the previous steps, which is good for performance 🚀
+  - Read more about it in [What to animate? (Animation Performance)](../HTML-CSS/2-CSS.md#what-to-animate-animation-performance)
+
+> **"Layout Trashing"** is the term used to describe the situation when the browser has to redo the layout process multiple times in a very short period of time due to javascript changes
+> ![Web Pages](./img/web-pages-9.png)
+>
+> ![Web Pages](./img/web-pages-10.png)
 
 ---
 
