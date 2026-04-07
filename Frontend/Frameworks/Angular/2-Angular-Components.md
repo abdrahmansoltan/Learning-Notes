@@ -3,8 +3,10 @@
 - [INDEX](#index)
   - [Components](#components)
     - [Creating Components](#creating-components)
-    - [Component example](#component-example)
-    - [Component Selector](#component-selector)
+    - [Defining a Component](#defining-a-component)
+      - [Component Selector](#component-selector)
+      - [Component Template](#component-template)
+      - [Component Styles](#component-styles)
     - [Component properties](#component-properties)
     - [Component Lifecycles](#component-lifecycles)
       - [ngOnInit()](#ngoninit)
@@ -111,7 +113,11 @@ A component should present properties and methods for data binding, in order to 
 
 ---
 
-### Component example
+### Defining a Component
+
+We define a component using the TypeScript decorator Component. This allows us to annotate any class with some metadata that teaches Angular how the component works, what to render, and so on.
+
+> The very basic component only needs a [selector](#component-selector) (to tell Angular how to find instances of the component being used) and a [template](#component-template) (that Angular has to render when it finds the element). All other attributes in the Component decorator are optional.
 
 - Component as html element
 
@@ -138,30 +144,7 @@ A component should present properties and methods for data binding, in order to 
   }
   ```
 
-- **Notes:**
-  - We can write the `HTML` code directly in the component file using the `template` property instead of using the `templateUrl` property
-
-    ```ts
-    @Component({
-      template: `<h1>{{ title }}</h1> <ul> <li *ngFor="let link of links">{{ link }}</li> </ul>`,
-      // or
-      templateUrl: './nav.component.html'
-    })
-    ```
-
-  - We can write the `CSS` code directly in the component file using the `styles` property instead of using the `styleUrls` property
-
-    ```ts
-    @Component({
-      styles: [`h1 { color: red; }`],
-      // or
-      styleUrls: ['./nav.component.css']
-    })
-    ```
-
----
-
-### Component Selector
+#### Component Selector
 
 - The `selector` property in the `@Component` decorator defines the custom HTML tag that represents the component.
 - This selector can be used in the component's template to include the component itself.
@@ -232,6 +215,38 @@ A component should present properties and methods for data binding, in order to 
       selector: ['app-nav', '.app-nav', '[app-nav]'] // multiple selectors
     })
     ```
+
+#### Component Template
+
+- The `template` property in the `@Component` decorator defines the HTML that will be rendered for the component. It can be defined inline using a string or in a separate HTML file using the `templateUrl` property.
+
+  ```ts
+  @Component({
+    template: `<h1>{{ title }}</h1> <ul> <li *ngFor="let link of links">{{ link }}</li> </ul>`,
+    // or
+    templateUrl: './nav.component.html'
+   })
+  ```
+
+- The `templateUrl` must point to a valid HTML file that contains the template for the component. The file should be located in the same directory as the component's TypeScript file or in a subdirectory.
+  - we can't use an absolute path for the `templateUrl`, it must be a relative path from the component's TypeScript file.
+  - ⚠️ Angular builds does not load the template by URL at runtime. Instead, Angular precompiles a build and ensures that the template is inlined as part of the build process.
+- We can only use either `template` or `templateUrl` in the component, not both. If we use both, Angular will throw an error.
+
+#### Component Styles
+
+- The `styles` property in the `@Component` decorator defines the CSS styles that will be applied to the component. It can be defined inline using a string or in a separate CSS file using the `styleUrls` property.
+
+  ```ts
+  @Component({
+    styles: [`h1 { color: red; }`],
+    // or
+    styleUrls: ['./nav.component.css']
+   })
+  ```
+
+- Angular promotes encapsulation out of the box and isolation of styles. That means by default, the styles you define and use in one component will not affect/impact any other parent or child component.
+- ⚠️ Do not use both `styles` and `styleUrls` together. Angular will end up picking one or the other and will lead to unexpected behavior.
 
 ---
 

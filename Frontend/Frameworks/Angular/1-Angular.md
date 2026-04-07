@@ -1059,6 +1059,9 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
     </div>
     ```
 
+    - 💡 Actually `*ngSwitch` is not a structural directive, as it's an attribute directive, but it uses structural directives (`*ngSwitchCase` and `*ngSwitchDefault`) to change the structure of the DOM based on the value of an expression.
+    - It's used when you have multiple elements/ templates, of which one has to be rendered based on conditions.
+
   > **Note:** You need to import `CommonModule` in your component to use structural directives.
 
 - **Angular >= 17**
@@ -1114,6 +1117,10 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 ---
 
 ### Multiple Directives
+
+You might run into a case at some point where you want to run an *ngFor on a tem‐ plate, but only if some condition is met. Your instinctive reaction in that case might be to add both *ngFor and *ngIf on the same element. Angular will not let you. 
+
+You can only have one structural directive on an element. The reason is that Angular needs to know which directive is responsible for adding or removing the element from the DOM, and if you have multiple structural directives on the same element, Angular won't know which one to use.
 
 - `ng-container`
   - it's a grouping element that doesn't add any extra element to the DOM, and it can be used to group multiple elements together and apply a structural directive to them

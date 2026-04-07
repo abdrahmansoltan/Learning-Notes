@@ -145,7 +145,6 @@ It's how the files are handled after being downloaded from the source
 
 It's a step in the [rendering process in the browser](./Frontend.md#web-browsers) where the browser parses the `HTML` and `CSS` files and builds the DOM and `CSSOM` trees. The browser then combines the DOM and `CSSOM` trees to form the render tree. The render tree is then used to compute the layout of each visible element and paints them on the screen.
 
-![Critical Render PATCH](./img/critical%20render%20path.PNG)
 ![Critical Render Path](./img/cretical-render-path.png)
 
 > This is the step after the [rendering engine has fetched the content of the requested document](#what-happens-when-we-access-a-web-server)
@@ -170,75 +169,103 @@ It's a step in the [rendering process in the browser](./Frontend.md#web-browsers
      - Note that the more nested the HTML elements are, the more work the browser has to do to create the `DOM` tree.
 
    - The `CSS` file is parsed by the browser to create the `CSSOM` tree, which is a **representation of the styles of the web page in a tree-like structure**
-     ![Web Pages](./img/web-pages-4.png)
-     ![Web Pages](./img/web-pages-5.png)
 
-4. **Render Tree Construction Step:** The `DOM` tree and the `CSSOM` tree are combined to create the `Render Tree`, which is a **representation of the structure of the web page with the styles applied to it**
-   ![Web Pages](./img/web-pages-6.png)
-   - it's what is actually shown on the page (`structure` + `rules` on how they should look like)
-   - it has a one-to-one mapping with the visible objects on the page
-   - Style calculations are done to:
-     - figure out the styles that should be applied to each element
-     - when there're multiple `rules` that need to be applied to the same element, we need to figure that all out here (the most specific rule is applied)
-   - The more complicated your `CSS` selectors are, the more work the browser has to do to figure out what styles to apply to each element, which takes more time (BAD for performance) -> use simple selectors as much as possible or `BEM` methodology
+     ![Web Pages](./img/web-pages-cssom.png)
+     - Here, for each node in the `DOM` tree, the browser will look for the corresponding styles in the `CSSOM` tree and apply them to the node. This is done by matching the selectors in the `CSSOM` tree with the nodes in the `DOM` tree
+       ![Web Pages](./img/web-pages-4.png)
+       ![Web Pages](./img/web-pages-5.png)
 
-     ```css
-     /* BAD ❌ */
-     .sidebar > .menu-item:nth-child(4n + 1) {
-       color: red;
-     }
+     - ⚠️ CSSOM Notes:
+       - **Building the CSSOM tree is a very fast process**
+         ![Web Pages](./img/web-pages-cssom-speed.png)
+       - But the more complicated your `CSS` selectors are, the more work the browser has to do to figure out what styles to apply to each element, which takes more time (BAD for performance) --> this is called **Cascading** (when there are multiple rules that apply to the same element, the most specific rule is applied) -> use simple selectors as much as possible or `BEM` methodology
 
-     /* GOOD ✅ */
-     .menu-item {
-       color: red;
-     }
-     ```
+       ```css
+       /* BAD ❌ */
+       .sidebar > .menu-item:nth-child(4n + 1) {
+         color: red;
+       }
 
-5. **Layout (Reflow):** The `Render Tree` is used to calculate the layout of each visible object on the page (where it should be and how big it should be)
-   - It's the process of calculating the exact position and size of each element on the page
-   - Reflow happens whenever:
-     - the geometry of the page changes (like when the window is resized)
-     - the geometry of an element changes (like when the size/styles of an element changes or when an element is added/removed from the page)
-       - changing the `font`, `content`, `orientation`, `size`, `position`, ... of an element
-   - A reflow of an element causes a reflow of all the elements that are affected by it (like its children, siblings, and ancestors)
-   - It's a **blocking operation**, which means that the browser can't do anything else while it's happening
-   - It consumes a lot of resources (CPU, memory, etc.)
-   - It will definitely be noticeable by the user if it happens frequently
+       /* GOOD ✅ */
+       .menu-item {
+         color: red;
+       }
+       ```
 
-   > **It's the most expensive part of the rendering process and one of the main causes of slow DOM scripts specially on devices with low processing power (like mobile devices)**
+       - Also note that during the parsing of the `CSS` file, no element is ignored even if it doesn't match any selector in the `CSS` file, or it has a `display: none` property, or it's hidden by any other means. This is because the browser needs to know about all the elements in the `DOM` tree to be able to apply the styles correctly when needed (like when the user interacts with the page and changes the styles of some elements).
+
+   - 💡 While the `DOM` and `CSSOM` trees are being built, there're some other processes that are done in parallel, such as:
+     - other assets like javascript files and images are also being fetched and processed by the browser, which can affect the rendering of the page (like blocking the rendering until the `JS` file is executed or the image is loaded). -> **Thanks to the "Preload Scanner", the browser can start fetching these assets in advance without blocking the rendering of the page**
+     - Building the **Accessibility Tree (AOM)** which is a tree-like structure that represents the accessibility information of the web page, which is used by assistive technologies (like screen readers) to provide a better experience for users with disabilities.
+       - It's like a semantic version of the `DOM` tree that contains only the elements that are relevant for accessibility and their properties (like role, name, state, etc.)
+
+4. **Rendering Step**
+   - It consists of 4 main steps (style calculations, layout, paint, and composite) that are done in parallel with the parsing step to render the page as soon as possible. The browser can start rendering the page before the entire `DOM` and `CSSOM` trees are built, which is good for performance 🚀
+     ![Web Pages](./img/web-pages-rendering.png)
+   1. **Style Calculations:** The browser creates the `Render Tree` by combining the `DOM` tree and the `CSSOM` tree. The `Render Tree` is a representation of the structure of the web page with the styles applied to it. It's what is actually shown on the page (structure + rules on how they should look like).
+      ![Web Pages](./img/web-pages-render-tree.png)
+      - ⚠️ Unlike the `DOM` tree, the `Render Tree` does not include all the elements in the `DOM` tree, it only includes the elements that are visible on the page (like elements with `display: none` or `visibility: hidden` are not included in the `Render Tree`).
+        > Notice this on the image above, the `DOM` tree has 2 nodes, but the `Render Tree` has only 1 node because the `span` element with `display: none` is not included in the `Render Tree`.
+   2. **Layout (Reflow):**
+      ![Web Pages](./img/web-pages-layout.png)
+      - The `Render Tree` is used to calculate the layout of each visible object on the page (where it should be and how big it should be)
+      - It's the process of calculating the exact position and size of each element on the page starting from the root element (the `html` element) and going down to the leaf elements (the elements that have no children).
+      - **It depends on the size of the viewport** (the visible area of the page). So if the viewport size changes (like when the window is resized), the layout will be recalculated to fit the new size of the viewport.
+      - A "reflow" of an element causes a reflow of all the elements that are affected by it (like its children, siblings, and ancestors)
+        ![Web Pages](./img/web-pages-layout-vs-reflow.png)
+        - "Reflow" happens whenever:
+          - the geometry of the page changes (like when the window is resized)
+          - the geometry of an element changes (like when the size/styles of an element changes or when an element is added/removed from the page)
+            - changing the `font`, `content`, `orientation`, `size`, `position`, ... of an element
+
+      - Notes:
+        - It's a **blocking operation**, which means that the browser can't do anything else while it's happening
+        - It consumes a lot of resources (CPU, memory, etc.)
+        - It will definitely be noticeable by the user if it happens frequently
+
+        > **It's the most expensive part of the rendering process and one of the main causes of slow DOM scripts specially on devices with low processing power (like mobile devices)**
+        >
+        > Generally, a `reflow` is followed by a `repaint` (which is also expensive)
+
+   3. **Paint:**
+
+      ![Web Pages](./img/web-pages-paint.png)
+      - It's the process of painting the pixels for each element on the screen after knowing how things should look like and where they should be (after the layout is done)
+      - It works by getting the box model of each element and painting it on the screen according to the styles applied to it (like background color, border, text color, etc.)
+      - Notes:
+        - The first paint/pixel is called **First Contentful Paint (FCP)**, which is the time it takes for the first pixel to be painted on the screen after the user requests the page. It's a very important metric for measuring the performance of a web page because it gives an indication of how quickly the user can see something on the screen after requesting the page.
+        - Anytime you change something other than the `opacity`, `transform`, or `filter` properties, the browser will have to trigger a **repaint**
+        - Triggering a `layout / reflow` will always trigger a `repaint`, but triggering a `repaint` will not always trigger a `layout / reflow`
+          ![Web Pages](./img/web-pages-11.png)
+      - When debugging performance, to see if a `repaint` is happening, you can use the `paint flashing` feature in the `DevTools` (it will show you what's being repainted by flashing it).
+        ![Web Pages](./img/web-pages-12.png)
+        ![Web Pages](./img/web-pages-13.gif)
+
+   4. **Composite:**
+
+      ![Web Pages](./img/web-pages-composite.png)
+      - It's the process of **combining** all the layers of the page into a single layer and displaying it on the screen
+      - It handles the overlapping of elements and the **stacking context** (the order in which elements are displayed on the screen) by using the `z-index` property and the `position` property of the elements
+      - Notes:
+        - It's a very fast process because it only involves combining the layers and doesn't involve any calculations or painting
+
+   5. **JavaScript:** The `JS` files are parsed and executed to add interactivity to the page
+   - It can change all the previous steps (the `DOM` tree, `CSSOM` tree, and `Render Tree`), which means that we might have to redo all the previous steps again after the `JS` is executed 🥲
+
+     ![Web Pages](./img/web-pages-7.gif)
+
+   - This is called **reflow** or **repaint** and it's very expensive
+     ![Web Pages](./img/web-pages-8.png)
+   - Does all the steps need to happen again every time a `JS` file is executed? **No**, not all the steps, only the steps that are affected by the `JS` file
+     - By focusing on only changing the things that need to be changed, we can avoid redoing all the previous steps, which is good for performance 🚀
+     - Read more about it in [What to animate? (Animation Performance)](../HTML-CSS/2-CSS.md#what-to-animate-animation-performance)
+
+   > **"Layout Trashing"** is the term used to describe the situation when the browser has to redo the layout process multiple times in a very short period of time due to javascript changes
+   > ![Web Pages](./img/web-pages-9.png)
    >
-   > Generally, a `reflow` is followed by a `repaint` (which is also expensive)
+   > ![Web Pages](./img/web-pages-10.png)
 
-6. **Paint:** The layout is used to paint each element on the page
-   - After knowing how things should look like and where they should be, Then the browser draws the pixels for each element on the screen
-   - Anytime you change something other than the `opacity`, `transform`, or `filter` properties, the browser will have to trigger a **repaint**
-   - Triggering a `layout / reflow` will always trigger a `repaint`, but triggering a `repaint` will not always trigger a `layout / reflow`
-     ![Web Pages](./img/web-pages-11.png)
-   - When debugging performance, to see if a `repaint` is happening, you can use the `paint flashing` feature in the `DevTools` (it will show you what's being repainted by flashing it).
-     ![Web Pages](./img/web-pages-12.png)
-     ![Web Pages](./img/web-pages-13.gif)
-
-7. **Composite:** After painting multiple layers, the browser **combines** them into a single layer and displays it on the screen
-
-8. Now initial render is done and page is displayed to the user 🎉
-   - Are we finally done 😮‍💨? No, we're not done yet 🥲
-
-9. **JavaScript:** The `JS` files are parsed and executed to add interactivity to the page
-
-- It can change all the previous steps (the `DOM` tree, `CSSOM` tree, and `Render Tree`), which means that we might have to redo all the previous steps again after the `JS` is executed 🥲
-
-  ![Web Pages](./img/web-pages-7.gif)
-
-- This is called **reflow** or **repaint** and it's very expensive
-  ![Web Pages](./img/web-pages-8.png)
-- Does all the steps need to happen again every time a `JS` file is executed? **No**, not all the steps, only the steps that are affected by the `JS` file
-  - By focusing on only changing the things that need to be changed, we can avoid redoing all the previous steps, which is good for performance 🚀
-  - Read more about it in [What to animate? (Animation Performance)](../HTML-CSS/2-CSS.md#what-to-animate-animation-performance)
-
-> **"Layout Trashing"** is the term used to describe the situation when the browser has to redo the layout process multiple times in a very short period of time due to javascript changes
-> ![Web Pages](./img/web-pages-9.png)
->
-> ![Web Pages](./img/web-pages-10.png)
+And that's how the "Critical Render Path" works in the browser to render a web page on the screen after the user requests it. and when we optimize each step of the "Critical Render Path", we can improve the performance of the web page and make it load faster for the users 🚀
 
 ---
 

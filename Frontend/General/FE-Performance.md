@@ -3,7 +3,7 @@
 - [INDEX](#index)
   - [Frontend Performance](#frontend-performance)
     - [Frontend performance introduction](#frontend-performance-introduction)
-    - [Frontend Performance Issues](#frontend-performance-issues)
+    - [Frontend Performance Issues (Main challenges)](#frontend-performance-issues-main-challenges)
     - [Performance Types](#performance-types)
     - [Performance Metrics](#performance-metrics)
     - [The importance of measurement](#the-importance-of-measurement)
@@ -44,7 +44,8 @@
 - **What do we mean by frontend performance**
   ![frontend performance](./img/fe-performance-1.png)
   - Frontend performance refers to how quickly and efficiently a web application responds to user interactions smoothly and loads content.
-  - It encompasses various aspects such as page load time, rendering speed, and responsiveness to user input.
+  - It encompasses various aspects such as **page load time, rendering speed, and responsiveness to user input**.
+  - To better understand this, make sure to check the sections about [what happens when we access a web server?](./Frontend.md#what-happens-when-we-access-a-web-server) and [Critical Render Path (How web pages are built in the browser)](./Frontend.md#critical-render-path-optimization)
 
 - **Why does performance matter?**
   - **User experience**: A slow website can lead to a poor user experience, which can lead to a loss of customers.
@@ -83,7 +84,7 @@
 
 ---
 
-### Frontend Performance Issues
+### Frontend Performance Issues (Main challenges)
 
 The majority of the frontend issues come from 2 reasons: **network** and **rendering (thread blocking)**.
 ![frontend performance issues](./img/fe-performance-2.png)
@@ -701,32 +702,7 @@ Tool to Visualize and analyze your Rollup bundle to see which modules are taking
 
 ### Web Vitals
 
-They are a set of metrics that Google uses to measure the performance of a website. They are a subset of the Core Web Vitals, which are a set of metrics that Google uses to measure the performance of a website.
-
-- **Largest Contentful Paint (LCP)**: measures loading performance. To provide a good user experience, LCP should occur within 2.5 seconds of when the page first starts loading.
-- **First Input Delay (FID)**: measures interactivity. To provide a good user experience, pages should have a FID of less than 100 milliseconds.
-- **Cumulative Layout Shift (CLS)**: measures visual stability. To provide a good user experience, pages should maintain a CLS of less than 0.1.
-  - It is a measure of how much movement there is on the page, typically in the first few seconds as the page is loading.
-  - The CLS metric measures two things: how many items move, and how significant the shift is. A small icon moving by a few pixels won't be judged as harshly as a big element popping into view and pushing all of the content down.
-  - There are two reasons that it's important to optimize for CLS:
-    - **Layout shifts** are unpleasant! They're jarring and chaotic, and they can cause you to accidentally click on the wrong thing.
-    - Starting in 2021, Google has incorporated CLS into its search ranking algorithm, meaning that focusing on CLS can help improve SEO.
-
-  - How to improve it:
-    - [Scroll Optimization in CSS file](../HTML-CSS/2-CSS.md#scroll-optimization)
-    - Fixed image sizes
-      - Unless you give images a `width` and `height`, the browser won't know their dimensions until the image finishes loading. As a result, images will default to being `0px` wide and `0px` tall, and a big layout shift will occur when the image loads!
-      - To prevent this, we need to specify two of the following CSS properties: `width`, `height`, `aspect-ratio`
-        - It does mean that you'll need to know the image's intrinsic dimensions before the image loads. This can be tricky if the image is dynamic, but you can solve this by storing the image dimensions in your data model (eg. if blog posts have images, **be sure to store the width and height in the DB, not just the `src`!**).
-      - If all else fails, you can always prescribe a fixed size, and use `object-fit: cover` to ensure it doesn't get squashed!
-    - Grouped loading
-      - If you're loading in a bunch of content at once, try to group it together so that the layout shift is contained to a single area.
-      - For example, if you're loading in a bunch of images, try to load them all in a single container, rather than sprinkling them throughout the page.
-      - This is a tradeoff; we reduce the number of layout shifts, but it also means that the user won't get to see any images until they've all loaded; on a slow connection, this can make a big difference!
-      - In the future, tools like **React Suspense** will help with this problem. For now, you'll need to come up with the right tradeoff for your particular use case.
-
-- **Total Blocking Time (TBT)**: measures responsiveness. To provide a good user experience, pages should have a TBT of less than 300 milliseconds.
-- **Time to First Byte (TTFB)**: measures the time from the start of the initial navigation until the browser receives the first byte of the response.
+Moved to a separate file: [Web Vitals](./Web-Vitals.md)
 
 ---
 

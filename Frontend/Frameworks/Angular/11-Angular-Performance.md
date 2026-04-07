@@ -15,6 +15,20 @@ Performance in Angular can be optimized through various techniques, such as:
 
 - **Change Detection Strategy**: Use `OnPush` change detection strategy to reduce the number of checks Angular performs.
 - **TrackBy in ngFor**: Use `trackBy` to optimize rendering of lists by tracking items by a unique identifier.
+
+  ```html
+  <div *ngFor="let item of items; trackBy: trackById">{{ item.name }}</div>
+  ```
+
+  ```ts
+  trackById(index: number, item: any): number {
+    return item.id; // or any unique identifier
+  }
+  ```
+
+  - This helps Angular to identify which items have changed, added, or removed, and only update those items in the DOM, improving performance.
+  - Angular calls `trackById` function to know which item has changed, added, or removed. It uses the unique identifier returned by the function to track the items in the list.
+
 - [Lazy Loading](#lazy-loading): Load feature modules only when needed to reduce the initial load time.
 - **AOT Compilation**: Use Ahead-of-Time (AOT) compilation to pre-compile templates and reduce runtime overhead.
 - **Tree Shaking**: Remove unused code during the build process to reduce bundle size.
@@ -35,21 +49,18 @@ Lazy loading is a design pattern that defers the loading of resources until they
 > The default way of loading route's modules/components is called **Eager Loading**. In this case, all modules are loaded at the start of the application, which can lead to longer initial load times and larger bundle sizes.
 
 - Advantages of Lazy Loading:
-
   - **Smaller Initial Bundle Size**: Reduces the amount of code loaded at startup, leading to faster initial rendering.
   - **Improved Initial Load Time**: Reduces the amount of code loaded at startup, leading to faster initial rendering.
   - **Reduced Memory Usage**: Only loads the necessary modules, which can lower memory consumption.
   - **Better User Experience**: Users can start interacting with the application sooner, as not all features are loaded upfront.
 
 - How to Implement Lazy Loading in Angular:
-
   - Angular provides 3 ways to implement lazy loading:
     1. **Using the Angular Router**: Define routes with the `loadChildren` property to specify the module to be lazy loaded.
     2. **Using Dynamic Imports**: Use dynamic imports in your code to load modules on demand.
     3. **Deferrable Views**: Use Angular's `ngIf` or `ngSwitch` directives to conditionally load components or modules based on user interaction.
 
 - When to Use Lazy Loading:
-
   - Use lazy loading when you have large feature modules that are not needed immediately on application startup.
   - It is particularly useful for applications with multiple features or sections that can be loaded independently.
 
@@ -64,13 +75,11 @@ Lazy loading is a design pattern that defers the loading of resources until they
 Route-based lazy loading is the most common method in Angular, where feature modules are loaded when the user navigates to a specific route.
 
 - To implement route-based lazy loading, you need to:
-
   1. Create a feature module that you want to lazy load.
   2. Define a route in your main routing module that uses the `loadChildren` property to specify the path to the feature module.
   3. Use the `import()` syntax to dynamically import the module.
 
 - Example of Route-based Lazy Loading:
-
   - Lazy loading modules: (old way)
 
     ```ts
@@ -123,7 +132,6 @@ Route-based lazy loading is the most common method in Angular, where feature mod
   > **Note:** Here `m` stands for the module or component that is being imported. This syntax allows Angular to load the specified module or component only when the user navigates to the `feature` route.
 
 - **Notes:**
-
   - If you faced issue with the (`service` used in the lazy-loaded component/module) not being found, you can fix it by providing the service in the `providers` array of the lazy-loaded module.
 
     ```ts
@@ -163,7 +171,6 @@ Deferrable views are a new feature introduced in Angular 17 that allows develope
 > You can find all the examples in the [official documentation](https://angular.dev/guide/templates/defer#on).
 
 - **Deferrable View when idle**
-
   - Here, the component will be loaded when the browser is idle.
   - Here, no condition/parameter is specified to the `@defer` directive.
   - We must provide a `@placeholder` component to be displayed while the deferrable view is loading.
@@ -181,9 +188,9 @@ Deferrable views are a new feature introduced in Angular 17 that allows develope
 
       <!-- Deferrable View that will load when the browser is idle -->
       @defer {
-      <app-feature-component />
+        <app-feature-component />
       } @placeholder {
-      <p>We are loading the feature component...</p>
+        <p>We are loading the feature component...</p>
       }
     `
   })
@@ -193,7 +200,6 @@ Deferrable views are a new feature introduced in Angular 17 that allows develope
   ```
 
 - **Deferrable View when component is visible in the viewport:**
-
   - Here, the component will be loaded when it becomes visible in the viewport.
   - We must provide a `@placeholder` component to be displayed while the deferrable view is loading.
 
@@ -209,10 +215,10 @@ Deferrable views are a new feature introduced in Angular 17 that allows develope
       </section>
 
       <!-- Deferrable View that will load when it's visible in the viewport -->
-      @defer(on viewport) {
-      <app-feature-component />
+      @defer (on viewport) {
+        <app-feature-component />
       } @placeholder {
-      <p>We are loading the feature component...</p>
+        <p>We are loading the feature component...</p>
       }
     `
   })
@@ -222,7 +228,6 @@ Deferrable views are a new feature introduced in Angular 17 that allows develope
   ```
 
 - **Deferrable View on interaction:**
-
   - Here, the component will be loaded when the user interacts with the `@placeholder` component.
   - We must provide a `@placeholder` component to be displayed while the deferrable view is loading.
 
@@ -237,10 +242,10 @@ Deferrable views are a new feature introduced in Angular 17 that allows develope
       </section>
 
       <!-- Deferrable View that will load on interaction -->
-      @defer(on interaction) {
-      <app-feature-component />
+      @defer (on interaction) {
+        <app-feature-component />
       } @placeholder {
-      <button>Load Feature Component</button>
+        <button>Load Feature Component</button>
       }
     `
   })
