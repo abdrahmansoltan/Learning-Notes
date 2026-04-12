@@ -76,12 +76,12 @@ Angular uses a change detection mechanism to detect changes in the component sta
 
 Angular provides two change detection strategies:
 
+![change-detection-strategies](./img/change-detection-strategies-1.png)
+
 1. **Default**
-   - This is the default change detection strategy, which checks all components in the component tree on every change detection cycle, regardless of where the change occurred.
+   - This is the default change detection strategy, which checks all components in the component tree on every change detection cycle, regardless of where the change occurred (in the current component or in any of its children). This means that if an event occurs in a child component, Angular will check all components in the tree to see if any of their properties have changed, and update the view accordingly.
 2. **OnPush**
    - This strategy tells Angular to check the component only when certain conditions are met, such as when the component's input properties change, or when an event occurs in the component (like a button click), or when signals or observables that the component is subscribed to emit a new value.
-
-![change-detection-strategies](./img/change-detection-strategies-1.png)
 
 > To debug changes or have custom control over change detection, you can use the `ngOnChanges` and `ngDoCheck` lifecycle hooks in your components.
 
@@ -90,7 +90,6 @@ Angular provides two change detection strategies:
 ### Catching changes
 
 - **Notes**
-
   - Be aware of the "Mutable vs Immutable" data structures when detecting changes (using `ngOnChanges` or `ngDoCheck`). Angular only detects changes to input properties when the reference of the object changes.
     - If you mutate an object or array without changing its reference, `ngOnChanges` will not be triggered.
     - You will notice this if you're using `OnPush` change detection strategy, as it relies on reference checks to determine if a component needs to be checked for changes.
@@ -98,7 +97,6 @@ Angular provides two change detection strategies:
     - ⚠️ So make sure that you're passing the new object or array reference to the child component to trigger `ngOnChanges`. or use immutable data structures.
 
 - `ngOnChanges` hook
-
   - The `ngOnChanges` lifecycle hook is called whenever one or more data-bound input properties change. It receives a `SimpleChanges` object that contains the previous and current values of the changed properties.
 
     > More here in the [Angular Lifecycle section](./2-Angular-Components.md#ngonchanges)
@@ -129,7 +127,6 @@ Angular provides two change detection strategies:
     ```
 
 - `ngDoCheck` hook
-
   - The `ngDoCheck` lifecycle hook is called during every change detection cycle, and it allows you to implement your own change detection logic.
   - ⚠️ Caution: only use `ngDoCheck` when you need to implement custom change detection logic that cannot be achieved using `ngOnChanges` or other lifecycle hooks, as **it can lead to performance issues** if not used carefully.
 
@@ -178,7 +175,6 @@ Angular provides two change detection strategies:
 
 - As the application grows, the number of components in the component tree increases, and this can lead to performance issues because Angular has to check all components in the tree to see if any of their properties have changed
 - So, it's important to optimize the change detection mechanism to improve performance, and there are several ways to do this:
-
   - Avoid heavy-operations in the component's Getters and Setters, as they are called during change detection
   - Use `OnPush` change detection strategy
   - Use `trackBy` function in `*ngFor` directive
@@ -248,7 +244,6 @@ The `OnPush` change detection strategy is a way to optimize change detection in 
 
 - Example:
   ![Default vs OnPush](./img/default-vs-onpush-1.png)
-
   - Here, a change-detection cycle caused by an event in the `GrandChild1` component. Even though this event happened in the bottom-left leaf component, the change-detection cycle starts from the top; it’s performed on each branch except the branches that originate from a component with the `OnPush` change-detection strategy and have no changes in the bindings to this component’s input properties. Components excluded from this change-detection cycle are shown on a white background.
 
 - This can significantly improve performance, especially in large applications with many components
@@ -289,7 +284,6 @@ This is called **"Avoiding Zone Pollution"** and it helps to improve performance
 - It's similar to **Web Workers** in that it allows you to run code outside of Angular's zone, but it's not a separate thread, it's just a way to run code without triggering change detection
 
 - Examples
-
   - Simple example of using `ngZone.runOutsideAngular()`:
 
     ```ts
@@ -438,7 +432,6 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
   ```
 
 - You can update the signal value using:
-
   - `.set()` method to set a new value
 
     ```ts
@@ -456,7 +449,6 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
     ```
 
 - **Note for reference-type signals**
-
   - when working with `Arrays` or `Objects`, you should replace the entire array or object to trigger change detection, as signals do not track changes to the properties of an object or the elements of an array
 
     ```ts
@@ -613,7 +605,6 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 | Best for local, synchronous state management          | Best for handling events & asynchronous data streams                                              |
 
 - **Signals**
-
   - More efficient for local state management.
   - More efficient than Observables as they only update the view when the signal value changes. unlike Observables which update the view whenever an event occurs
   - Best for simple, synchronous state management inside components (no need for subscription management).
@@ -622,7 +613,6 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
   - Not designed for handling streams or async data.
 
 - **Observables**
-
   - Best for handling asynchronous data streams (e.g., HTTP requests, user events).
   - Can emit multiple values over time.
   - Support powerful operators for data transformation.
@@ -664,7 +654,6 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
   ```
 
 - **How to convert from Signals to Observables and vice versa?**
-
   - **From Signals to Observables**: You can use the `toObservable()` method on a signal to convert it to an observable
 
     ```ts
@@ -697,7 +686,6 @@ This is done using `RxJS` Observables, `ChangeDetectorRef`, or `ApplicationRef`
 
 - It helps with the management of more complex (application-wide) state.
 - **Benefits of Using NgRx**
-
   - Centralized state management
   - Predictable state changes
   - Time-travel debugging
@@ -1012,7 +1000,10 @@ This structure promotes:
 
    @Injectable()
    export class UserEffects {
-     constructor(private actions$: Actions, private userService: UserService) {}
+     constructor(
+       private actions$: Actions,
+       private userService: UserService
+     ) {}
 
      loadUser$ = createEffect(() =>
        this.actions$.pipe(

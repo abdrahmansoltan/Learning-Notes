@@ -7,12 +7,14 @@
       - [Component Selector](#component-selector)
       - [Component Template](#component-template)
       - [Component Styles](#component-styles)
+      - [Other Component Metadata Properties](#other-component-metadata-properties)
     - [Component properties](#component-properties)
     - [Component Lifecycles](#component-lifecycles)
       - [ngOnInit()](#ngoninit)
       - [ngAfterViewInit()](#ngafterviewinit)
       - [ngOnDestroy()](#ngondestroy)
       - [ngOnChanges()](#ngonchanges)
+    - [Component Module Connection](#component-module-connection)
     - [Presentational vs Smart components](#presentational-vs-smart-components)
   - [Communication between Components](#communication-between-components)
     - [Input \& Output Properties](#input--output-properties)
@@ -246,7 +248,20 @@ We define a component using the TypeScript decorator Component. This allows us t
   ```
 
 - Angular promotes encapsulation out of the box and isolation of styles. That means by default, the styles you define and use in one component will not affect/impact any other parent or child component.
+  - In order to control the encapsulation of styles -> see [Encapsulated styles section](./1-Angular.md#encapsulated-styles)
 - ⚠️ Do not use both `styles` and `styleUrls` together. Angular will end up picking one or the other and will lead to unexpected behavior.
+
+#### Other Component Metadata Properties
+
+- `providers`, `imports`, `exports`, etc.
+- `preserveWhitespace`
+  - it's a property that tells Angular whether to preserve whitespace in the template or not. By default, Angular removes extra whitespace from the template, but if you set this property to `true`, Angular will preserve the whitespace as it is in the template.
+- `animations`
+  - it's a property that allows you to define animations for the component using the Angular Animation API. You can define animations in the component and then use them in the template to animate elements when they enter or leave the view, or when they change state.
+- `changeDetection`
+  - it's a property that allows you to specify the change detection strategy for the component. By default, Angular uses the `Default` change detection strategy, which checks for changes in the component and its children whenever an event occurs. However, you can set this property to `OnPush` to optimize change detection by only checking for changes when the component's input properties change or when an event is emitted from the component.
+- `encapsulation`
+  - it's a property that allows you to specify the encapsulation strategy for the component's styles. By default, Angular uses `Emulated` encapsulation, which means that the styles defined in the component will only apply to the component and its children. However, you can set this property to `None` to make the styles global and apply to all components, or to `ShadowDom` to use the native Shadow DOM for encapsulation.
 
 ---
 
@@ -301,7 +316,7 @@ Angular components have a lifecycle that consists of a series of events that occ
 ![lifeCycle](./img/life-cycle-hooks-1.png)
 
 - A component instance has a lifecycle that
-  - **starts** when Angular instantiates the component class and renders the component view along with its child views.
+  - **starts** when Angular instantiates the component class **(using the `constructor()`)** and renders the component view along with its child views.
   - The lifecycle **continues** with "change detection" (reactivity), as Angular checks to see when data-bound properties change, and updates both the view and the component instance as needed.
   - The lifecycle **ends** when Angular destroys the component instance and removes its rendered template from the DOM.
 
@@ -310,10 +325,12 @@ Angular components have a lifecycle that consists of a series of events that occ
 
 - **Lifecycles:**
   - `constructor` : it's a method that runs when the component is created
-  - `ngOnInit` : it's a lifecycle hook that runs after the constructor and after the first `ngOnChanges` (it's a good place to put initialization logic)
-    - By the time `ngOnInit()` is invoked, the component properties will have been initialized, which is why this method is mainly used for the initial data fetch.
+  - `ngOnInit` : it's a lifecycle hook that runs after the constructor and **after the first `ngOnChanges`**
+    - it's a good place to put initialization logic that requires the component's input properties to be set, such as fetching data from a server or initializing the component's state based on the input properties **(one time initialization logic)**
+    - By the time `ngOnInit()` is invoked, the component properties will have been initialized, which is why this method is mainly used for the initial data fetch. So it's better to use `ngOnInit` instead of `constructor` for any initialization logic that requires the component's input properties to be set, because the input properties are not yet available in the `constructor`.
   - `ngOnChanges` : it's a lifecycle hook that runs when the input properties of the component change
   - `ngDoCheck` : it's a lifecycle hook that runs when the change detection runs (it's a good place to put custom change detection logic)
+    - It's usually used to give the component a custom way to detect changes **specially when using `OnPush` change detection strategy**, but it can also be used with the default change detection strategy to perform custom change detection logic that Angular's default change detection does not cover.
     - ⚠️ Note: it's called a lot of times, so you should avoid doing heavy computations in it to prevent performance issues
   - `ngOnDestroy` : it's a lifecycle hook that runs when the component is destroyed (it's a good place to put cleanup logic)
   - `ngAfterViewInit` : it's a lifecycle hook that runs after the view has been fully initialized (it's a good place to put logic that needs to run after the view has been initialized, **like setting up Intersection Observers or querying for elements in the view**)
@@ -513,6 +530,14 @@ class MyComponent implements OnChanges {
 
 ---
 
+### Component Module Connection
+
+For any component to be used within the context of a module, it has to be imported into your module declaration file and declared in the declarations array. This ensures that the component is visible to all other components within the module. However, if you want to use that component in another module, you need to export it from the current module and import the module that contains it into the other module.
+
+Here're some attributes in the `@NgModule` decorator that are related to components: (`declarations`, `exports`, `imports`) -> For more details about modules, see [Angular Modules Notes](./3-Angular-Modules.md)
+
+---
+
 ### Presentational vs Smart components
 
 - **Presentational components**: are responsible for only displaying data, without knowing where the data comes from. They receive the data via an `@Input()`, and return modified data through `@Output()` events
@@ -615,7 +640,7 @@ Components will usually have relationships with other components, and they will 
 
 **Output properties** are used to emit events from a child component to a parent component.
 
-- To create an output property, you need to use the `@Output()` decorator from the `@angular/core` package, and you also need to create an instance of the `EventEmitter` class.
+- To create an output property, you need to use the `@Output()` decorator from the `@angular/core` package, and register and create an instance of the `EventEmitter` class to be able to emit events from the child component to the parent component.
 
   ```ts
   // 📄 Child Component
@@ -960,6 +985,8 @@ export class ParentComponent {}
 
 When using `<ng-content>` for content projection, it's important to understand how Angular's `ViewEncapsulation` affects the styling of the projected content.
 
+> More here: [Encapsulated styles section](./1-Angular.md#encapsulated-styles)
+
 By default, Angular uses `ViewEncapsulation.Emulated`, which means that styles defined in a component are scoped to that component only. However, when using `<ng-content>`, the projected content is not affected by the component's styles, and it can inherit styles from the parent component or global styles.
 
 ![view-encapsulation-ng-content](./img/view-encapsulation-ng-content.png)
@@ -1184,37 +1211,37 @@ It's a way to reference an element in the template so that you can access it in 
     <button (click)="fun(nameInput.value)"></button>
     ```
 
-  - in the component class, you can use the `@ViewChild` decorator to get a reference to the element
+- `ViewChildren` and `ContentChild` decorators
+  - are used to access the template variable in the component class, and they are used to access the element or component that is referenced by the template variable.
 
     ```ts
+    // To select a single element, you can use the `@ViewChild` decorator
     @ViewChild('nameInput') nameInput:ElementRef;
+
+    // To select multiple elements, you can use the `@ViewChildren` decorator
+    @ViewChildren('nameInput') nameInputs: QueryList<ElementRef>;
     ```
 
     > If you want to use signals, you can use `signal()` function to create a signal that holds the value of the input element
 
-- To select multiple elements, you can use the `@ViewChildren` decorator
+- `ContentChild` and `ContentChildren` decorators
+  - are used to access the content-projected (slots) elements in the component class, and they are used to access the element or component that is projected into the component using `<ng-content>`.
 
-  ```ts
-  @ViewChildren('nameInput') nameInputs: QueryList<ElementRef>;
-  ```
+    ```html
+    <!-- parent -->
+    <child-component>
+      <input #nameInput />
+    </child-component>
+    ```
 
-- To access content-projected (slots) elements, you can use the `@ContentChild` decorator
+    ```html
+    <!-- child -->
+    <ng-content></ng-content>
+    ```
 
-  ```html
-  <!-- parent -->
-  <child-component>
-    <input #nameInput />
-  </child-component>
-  ```
-
-  ```html
-  <!-- child -->
-  <ng-content></ng-content>
-  ```
-
-  ```ts
-  @ContentChild('nameInput') nameInput: ElementRef;
-  ```
+    ```ts
+    @ContentChild('nameInput') nameInput: ElementRef;
+    ```
 
 - **Use cases:**
   - To access the value of an input elements in a form instead of using `ngModel`

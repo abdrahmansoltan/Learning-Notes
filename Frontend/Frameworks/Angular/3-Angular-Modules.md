@@ -72,6 +72,7 @@ The `@NgModule` decorator of the Module is used to define the module and its pro
       - Usually, we import `CommonModule` in feature modules to have access to common directives like `ngIf` and `ngFor`, and we import `BrowserModule` in the root module to have access to all the features of Angular for web applications
     - `exports` is used to export components/directives/pipes that we want to make available to other modules that will import this module
       - External modules will see only those members of the shipping module that were explicitly mentioned in exports.
+      - Unless you export a component, it cannot be accessed or used outside of the direct module where the component is declared
 
   - `providers`
     - It's an **old way** of providing services

@@ -622,7 +622,7 @@ Sometimes you want to apply styles to a component, but you don't want those styl
 - It has 3 possible values:
   - `ViewEncapsulation.Emulated` (default): styles are encapsulated and don't affect other components
   - `ViewEncapsulation.None`: styles are applied **globally** and affect all components
-  - `ViewEncapsulation.ShadowDom`: styles are encapsulated using Shadow DOM, which is a web standard that allows you to create a separate DOM tree for the component
+  - `ViewEncapsulation.ShadowDom`: styles are encapsulated using Shadow DOM, which is a web standard that allows you to create a separate DOM tree for the component -> styles are encapsulated and don't affect other components, but it has better performance than `Emulated` because it doesn't use the emulation technique to scope styles
 
 ---
 
@@ -1118,7 +1118,7 @@ It's a way to extend the HTML with custom behavior and functionality **(Enhancem
 
 ### Multiple Directives
 
-You might run into a case at some point where you want to run an *ngFor on a tem‐ plate, but only if some condition is met. Your instinctive reaction in that case might be to add both *ngFor and *ngIf on the same element. Angular will not let you. 
+You might run into a case at some point where you want to run an *ngFor on a tem‐ plate, but only if some condition is met. Your instinctive reaction in that case might be to add both*ngFor and \*ngIf on the same element. Angular will not let you.
 
 You can only have one structural directive on an element. The reason is that Angular needs to know which directive is responsible for adding or removing the element from the DOM, and if you have multiple structural directives on the same element, Angular won't know which one to use.
 
