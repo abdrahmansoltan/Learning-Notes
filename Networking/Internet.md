@@ -1,13 +1,10 @@
 # INDEX
 
 - [INDEX](#index)
-  - [Networking](#networking)
-    - [OSI Model](#osi-model)
   - [Internet](#internet)
     - [What is Internet](#what-is-internet)
     - [How internet works](#how-internet-works)
   - [Important Concepts](#important-concepts)
-    - [Client / Server](#client--server)
     - [Bandwidth \& Latency](#bandwidth--latency)
     - [IP address](#ip-address)
     - [Packet](#packet)
@@ -33,71 +30,6 @@
     - [Configuration](#configuration)
     - [Web server vs Application server](#web-server-vs-application-server)
   - [Performance](#performance)
-
----
-
-## Networking
-
-- Here's the network steps in order:
-  ![networking](./img/networking-1.jfif)
-  1. `Modem` -> converts the signal from the `ISP` to a signal that the router can understand.
-  2. `Router` -> it's the device that connects your devices to the internet
-  3. `Switch` -> it's the device that connects your devices to the router (it's like a router but for local network) -> it sends the data to the right device
-  4. `Network Interface Card (NIC)` -> it's the device that connects your device to the switch
-  5. `Home router` -> it's the device that connects your devices to the internet
-     - It's a multi-functional device -> `modem` + `router` + `switch`
-
-### OSI Model
-
-**Open System Interconnection (OSI)**: : It's a standard that defines the steps of the network communication between two systems.
-
-![OSI Model](./img/osi-model.png)
-
-When entering a website, the data goes through all the layers of the OSI model like this:
-
-1. **Application layer** -> the data is in the form of a message (ex: `HTTP` request)
-   - Here, it processes the data and adds the **header** to it + it resolves the `domain` name to the `ip` address
-2. **Presentation layer** -> It's the layer that converts the data to a format that the application can understand
-   - The encryption happens here (if the website is using `HTTPS`) using **TLS** (formerly known as **SSL**) protocol
-
-   ```sh
-    # Before encryption
-    GET / HTTP/1.1
-    Host: www.example.com
-    User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0
-    Upgrade-Insecure-Requests: 1
-
-    # After encryption
-    GET / HTTP/1.1
-    JRPKJSDFDAADSFHDUASFHADJSHFDSALFGUEAHGFJDSEANFJADHUFHEUFGAESYBFGHES
-    Host: 196.145.54.11
-    JRPKJSDFDAADSFHDUASFHADJSHFDSALFGUEAHGFJDSEANFJADHUFHEUFGAESYBFGHES
-   ```
-
-3. **Session layer** -> It's the layer that creates and manages (opens / closes) the connection between the client and the server
-   - It's possible to directly work with this layer to handle the connection (as a frontend developer)
-
-4. **Transport layer** -> It's the layer that is responsible for the **End to End** connection between devices (Making sure that the actual communication happens after the connection is established in the `session` layer)
-   - It splits the data into `packets` and sends them to the server
-   - this is done in the `TCP` protocol (it's a protocol that ensures that the data is sent and received correctly)
-   - the size of the `TCP` packet (segment) is `64kb` (it's the maximum size of the packet) and sometimes it's less than that based on the network speed and the size of the data
-
-5. **Network layer** -> It's the layer that is responsible for the communication between **inter & intra** networks (it's the layer that connects the `local` network to the `internet`)
-   - It adds the `ip` address to the `packet` and sends it to the server
-
-6. **Data-link layer** -> It's the layer that facilitates the communication between the **devices in the same network**.
-   - It connects the `switch` to the `router` using the `mac` address
-     - `mac` address is the address of the device (it's unique for each device)
-   - It adds the `mac` address to the `packet` and sends it to the server
-
-7. **Physical layer** -> It's the layer that is responsible for transferring `bits` of data over the network using the `cable`.
-   - It sends the `packet` to the server using the `cable`
-   - At this stage the data is in this form:
-     ![packet](./img/osi-model-1.png) 1. `http data` -> from the `application` layer 2. `tcp segment` -> from the `transport` layer 3. `ip packet` -> from the `network` layer 4. `Ethernet frame` -> from the `data link` layer
-   - The cable is made of `copper` or `fiber` (fiber is faster than copper)
-
-After all of this, the server receives the data and it goes through the same steps **but in reverse order**
-![packet](./img/osi-model-2.png)
 
 ---
 
@@ -144,17 +76,6 @@ The internet works by connecting devices and systems together through a series o
 ---
 
 ## Important Concepts
-
-### Client / Server
-
-- **Client**: is a device that requests data from a server.
-  - it's not only a browser, it can be a mobile app, a desktop app, another server, ...
-- **Server**: is a device that provides data to clients (responds to requests from clients)
-  - it's not only a server, it can be a database, a file, another client, ...
-
-They communicate using [Application Protocols](#application-protocols)
-
----
 
 ### Bandwidth & Latency
 

@@ -64,7 +64,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
 ![compiled](./img/Compiled%20Language.png)
 
 - **Compiled Language**
-
   - The compiler works ahead of time to convert instructions into a machine-code or lower-level form so that they can be read and executed by a computer. It runs all of the code and tries to figure out what the code does and then compiles it down into another language that is easier for the computer to read.
   - Language is written and compiled to machine code inside of an application (before it's run).
   - Errors are detected during compiling
@@ -76,7 +75,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
     - Both of these do exactly what compilers do. Take one language and convert into a different one!
 
 - **Interpreted Language**
-
   - An interpreter directly executes each line of code line by line, without requiring them to be compiled into a machine language program.
   - The interpreter translates and runs code **one statement at a time (line-by-line)**.
     - each line of code is translated to machine-code one-by-one as the script is run.
@@ -91,7 +89,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
   > Node.js Is an Interpreter
 
 - **Just-In-Time (JIT) Compilation**
-
   - It's a combination of both compilers and interpreters.
   - It compiles the code into machine code at runtime, and then executes it immediately.
   - It's a hybrid approach that combines the best of both worlds.
@@ -137,7 +134,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
 > the browser's **Console** is a live interpreter of the javascript engine
 
 - What is that `AST` step?
-
   - it's the **Abstract Syntax Tree** which is a tree representation of the abstract syntactic structure of source code written in a programming language.
   - It's a tree graph of the source code that does not show every detail of the original syntax, but contains structural or content-related details. Certain things are implicit in the tree and do not need to be shown, hence the title abstract.
   - Each node of the tree denotes a construct occurring in the source code.
@@ -145,7 +141,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
     ![ast](./img/ast-2.png)
 
 - What is the `Profiler` step?
-
   - It's a tool that helps to analyze the performance of the code and to identify the parts of the code that are slow and need to be optimized, and **pass them to the `compiler` to be optimized**.
     - It's used to monitor the code execution and to identify the parts of the code that are executed frequently.
   - For example, if a function is called many times, the profiler will flag it and pass it to the compiler to be optimized.
@@ -177,7 +172,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
   - error-> `memory leak`
 
 - **call-stack**
-
   - It's a data structure that indicates where the program is in its execution.
   - It keeps track of where the program is in its execution, and what functions are currently
   - The call stack keeps track of where we are in the code, so we can run the program in order.
@@ -258,12 +252,11 @@ The JavaScript engine is a program or an interpreter that reads and executes the
   ![types](./img/types-1.png)
 
 - **Types:**
-
-  1. **primitive values** : they are the most basic data types in the language. They are **immutable** (cannot be changed) and **copied by value** (when assigning or passing).
+  1. **primitive values** : they are the most basic (simplest) data types in the language. They are **immutable** (cannot be changed) and **copied by value** (when assigning or passing).
      - There are 7 primitive types
        ![types](./img/types-2.png)
-  2. **reference values** : they are more complex data types. They are **mutable** (can be changed), **copied by reference** (when assigning or passing).
-
+     - 💡 it's immutable because we can't change their values, you might think that we can, but when you change a character in a string value, it creates a new string and points to it and doesn't modify the original one.
+  2. **reference/object-type values** : they are more complex data types. They are **mutable** (can be changed), **copied by reference** (when assigning or passing).
      - `reference-type` are stored in the `Heap` as we don't know how big its size would be so it's like if the `Heap` has unlimited storage unlike `call stack` which has a limited size (`4-8MB`)
        ![types](./img/types-3.png)
      - There are 3 types of objects: `object`, `function`, `array`.
@@ -286,7 +279,6 @@ The JavaScript engine is a program or an interpreter that reads and executes the
        ```
 
 - `typeof` operator:
-
   - It's used to get the type of a variable or an expression.
   - It returns a string indicating the type of the unevaluated operand.
   - It's useful when you want to check the type of a variable before performing an operation on it.
@@ -401,9 +393,7 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
 - if `===` would always be equivalent to `==` in your code, using it everywhere sends a wrong semantic signal : **protecting myself since I don't know'trust the types**
 
 - How "Double equal" works:
-
   - If the types differ, try to convert them to the same type by using coercion to:
-
     - convert to previous type (if possible) then compare -> `[] -> "" -> 0 -> false`
     - that's why it's not recommended to use `==` with `true / false` as it will convert it to `1 / 0` and compare it with the other value
 
@@ -420,7 +410,6 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
 > **Note:** It's a myth that `===` is slower than `==` in modern browsers.
 >
 > - Some argue that using `===` everywhere implies a lack of understanding or trust in your code's types.
->
 > - Clear and obvious types lead to better code. Use `==` when types are known, otherwise use `===`.
 
 ---
@@ -430,7 +419,6 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
 **Explicit Type Conversion (Type Casting)**: is when data type is converted by the programmer using type casting.
 
 - Here are some examples of explicit type conversion:
-
   - `Number()`, `String()`, `Boolean()`
   - `parseInt()`, `parseFloat()`
   - `toString()`, `toFixed()`
@@ -444,7 +432,6 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
   ```
 
 - **Truthy & Falsy values:**
-
   - **Falsy values**: `false`, `0`, `""`, `null`, `undefined`, `NaN`
   - **Truthy values**: `true`, `1`, `"hello"`, `[]`, `{}`, `function(){}`
 
@@ -481,19 +468,16 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
 - **Operator overloading:** `+` vs `-` :
 
   ![type coercion](./img/TypeCoercion2.PNG)
-
   - `-` : if one of the operands is not a number, it tries to convert it to a number and subtracts it
   - `+` : if one of the operands is a string, it converts the other operand to a string and concatenates them
 
 - convert string to number using :
-
   - `unary` operator
     - it's a `+` or `-` before the string number => `console.log(+"565")`
     - it's a `!` before something => `console.log(! (x > 4) )`
   - `parseint()` or `parsefloat()` => `parseint(100Ahmed)` = 100
 
 - `string to boolean`: ![coercion](./img/coercion2.png)
-
   - `Boolean("0");` --> **true**
 
 - **Coercion Corner Cases**
@@ -523,12 +507,9 @@ It's the environment in which javascript code is executed, it stores all the nec
 
 - There're 2 types of execution contexts:
   ![execution context](./img/execution-context-5.jpeg)
-
   - **Global Execution Context**:
-
     - It's the default execution context, and it's created when the script is loaded.
     - It has 2 phases:
-
       1. **Creation phase**:
          - Creation of the `global object` ( `window` object in the browser)
          - Creation of the `this` keyword (points to the `global object`) -> `this` keyword will be automatically defined with value `window` in the global execution context.
@@ -539,7 +520,6 @@ It's the environment in which javascript code is executed, it stores all the nec
 
     - It consists of these parts:
       ![execution context](./img/execution-context-3.png)
-
       - Local **Thread of execution** -> code that is being executed
       - Local **Memory** -> `local variables`, `arguments passed to the function`
       - **Scope chain** -> where the function was written -> **Lexical / Variable Environment**
@@ -547,16 +527,13 @@ It's the environment in which javascript code is executed, it stores all the nec
       - **`this`** keyword -> how the function was called (not in `arrow functions`)
 
   - **Functional Execution Context**:
-
     - Created when a function is called.
     - It consists of these parts:
       ![execution context](./img/execution-context-3.png)
-
       - Local **Thread of execution** -> code that is being executed
       - Local **Memory** -> `local variables`, `arguments passed to the function`
       - **Scope chain** -> where the function was written -> **Lexical / Variable Environment**
         ![execution context](./img/execution-context-6.png)
-
         - This is slightly different from `closure`, the scope chain is where the function was written, while the closure is what allows a function to access variables from an outer function, even after the outer function has finished executing. it's stored in the `_proto_` property of the function.
 
       - **`this`** keyword -> how the function was called (not in `arrow functions`)
@@ -575,7 +552,6 @@ It's the environment in which a variable is declared and accessible.
 Javascript doesn't have **dynamic scope** (where the scope is determined by the calling context), it has **lexical (static) scope** (where the scope is determined by the location of the variable declaration).
 
 - Types of scopes:
-
   1. **Global scope**: Variables declared outside functions, accessible anywhere.
   2. **Function scope**: Variables declared inside a function, accessible only within.
   3. **Block scope (ES6)**: Variables declared inside a block, accessible only within.
@@ -583,24 +559,20 @@ Javascript doesn't have **dynamic scope** (where the scope is determined by the 
      - `functions` are also `block-scoped` in `strict mode`, otherwise they are `function-scoped`.
 
 - Types of variables based on scope:
-
   - **Local variables**: Created and removed within a function, no naming conflicts between functions.
   - **Global variables**: Persist in memory while the page is loaded, higher memory usage, risk of naming conflicts.
 
 - **Scope chain**: The order the interpreter searches for variables, from innermost to global scope.
   ![scope](./img/scope-1.png)
-
   - Scope chain has nothing to do with the order of function calls in the code.
     ![scope](./img/scope-2.png)
     - Here, even though the `third()` function is called in the `second()` function's body, it won't have access to the `first()` function's variables, because it's not in the `scope chain` of the `third()` function.
 
 - **Scope Variables** are properties of a special internal object.
-
   - Accessing a variable means accessing a property of this object.
 
 - Variables defined outside a function are accessible inside functions defined after them even if they are called before the function definition.
   ![scope](./img/fig2.png)
-
   - This is called a **Backpack** or **Persistent Lexical Scope Referenced Data (PLSRD)**.
   - Each function execution gets its own Backpack.
 
@@ -651,12 +623,10 @@ It is the process of putting all variable and function declarations into memory 
 - It makes some types of variables accessible/usable in the code before they are actually declared by initializing them with `undefined`.
 
 - It's to make space in memory for a variable to be able to:
-
   - Call functions before they have been declared
   - Assign a value to a variable that has not yet been declared
 
 - In JavaScript, `functions` are fully hoisted, `var` variables are hoisted and initialized to `undefined`, and `let` and `const` variables are hoisted but not initialized a value.
-
   - Note that the declaration is hoisted, but the initialization/value is not.
 
   ```js
@@ -668,7 +638,6 @@ It is the process of putting all variable and function declarations into memory 
   ![hoisting](./img/hoisting-1.png)
 
   > Variable are **partially hoisted** (only the declaration is hoisted, not the initialization), while functions are **fully hoisted** (both declaration and initialization).
-
   - `var` hoisting: usually bad, as **with `var`, you can access declaration, but not the value**
 
     ```js
@@ -708,12 +677,10 @@ It is the process of putting all variable and function declarations into memory 
 
   - `let / const` hoisting:
     ![let-hoisting](./img/let-hoisting.png)
-
     - it gets **hoisted but not initialized** (it's not assigned a value) -> so you can't access it before the initialization -> `TDZ (Temporal Dead Zone) Error`
     - Javascript knows that the variable is declared but not initialized, so it throws an error, if the variable wasn't declared, it would have thrown a `ReferenceError (not defined)`
 
 - **How hoisting works ?**
-
   - Before the code is executed, code is scanned for variable declarations, and for each variable, a new property is created in the variable environment object and added to the memory
     ![hoisting](./img/hoisting.png)
 
@@ -721,22 +688,18 @@ It is the process of putting all variable and function declarations into memory 
   - It happens in every execution context, not just the global one.
 
 - Why Hoisting is useful ?
-
   - Using functions before actual declaration
   - `var` hoisting can be useful in some cases, but it's usually better to use `let` or `const` instead.
 
 - **Temporal Dead Zone (TDZ)**
-
   - It's the time between the variable creation and initialization, where you can't access the variable.
   - It only happens with `let` and `const` variables, not with `var` variables. because `var` is initialized with `undefined` by default.
     ![hoisting](./img/hoisting-2.png)
 
   - Why TDZ is useful ?
-
     - It helps to catch errors in the code, as it throws an error if you try to access a variable before it's initialized.
 
 - **Notes**
-
   - What will be the result of this code?
 
     ```js
@@ -779,21 +742,17 @@ It's a special variable that is created for every execution context (every funct
 > Remember the rule: **`this` is determined by the left of the dot at the call time**, if there's no dot, it points to the global object (`window`) as `someFunction()` is the same as `window.someFunction()`
 
 - `this` is handled differently based on the type of function:
-
   - **Arrow functions**:
-
     - `this`: Defined by where it was written, not called **(lexical scope)**.
     - No `this`: Taken from the outer scope (global scope, `window` object).
     - Object methods: Still point to the global object.
     - **Avoid using arrow functions as methods inside objects**: `this` will refer to the upper scope, usually the global object.
 
   - **Normal functions**:
-
     - `this` refers to the caller **(dynamic scope)**.
     - `this` is `undefined` if called globally if in strict mode, otherwise it points to the global `window` object.
 
 - Benefits of `this` in functions:
-
   - gives methods access to their object
   - reusability: execute same code for multiple objects (use `this` to refer to the object that the function is a property of) allowing us to save memory.
 
@@ -818,7 +777,6 @@ It's a special variable that is created for every execution context (every funct
     ```
 
 - **Notes**
-
   - When chaining multiple methods (functions) that uses `this` keyword, you can return `this` at the end to make it chainable.
 
     ```js
@@ -933,7 +891,6 @@ It's the process of building software with small **pure functions**, avoiding **
   ![functional programming](./img/functional-programming.png)
 
 - Functional programming is about **Verbs** (actions)
-
   - it's like a black box that takes something in and returns something out
   - it depends on **Tiny functions**: Save every single line (or few lines) as its own function
   - **Recombine/compose** Build up our application by using these small blocks of self-contained code combining them up line-by-line by referring to their human-readable name
@@ -1080,7 +1037,6 @@ It's just a name for binding some of the function’s arguments to a specific va
   - The call to `mul.bind(null, 2)` **creates a new function** `double` that passes calls to `mul`, fixing `mull` as the context and `2` as the first argument. Further arguments are passed “as is”.
 
 - **Going partial without context ("`this`")**
-
   - What if we’d like to fix some arguments, but not the context `this`? For example, for an object method.
     - The native `bind()` does not allow that. We can’t just omit the context and jump to arguments.
   - Fortunately, a function `partial()` for binding only arguments can be easily implemented:
@@ -1109,7 +1065,6 @@ It's just a name for binding some of the function’s arguments to a specific va
   - Also there’s a ready [`_.partial`](https://lodash.com/docs#partial) implementation from **lodash** library.
 
 - **Why do we usually make a partial function?**
-
   - The benefit is that we can create an independent function with a readable name (`double`, `triple`). We can use it and not provide the first argument every time as it’s fixed with `bind`.
   - In other cases, **partial application** is useful when we have a very generic function and want a less universal variant of it for convenience.
     - For instance, we have a function `send(from, to, text)`. Then, inside a user object we may want to use a partial variant of it: `sendTo(to, text)` that sends from the current user.
@@ -1126,21 +1081,17 @@ A closure allows a function to remember variables from its creation context, **e
 > Javascript engine makes sure that the function has access to all the variables that were in its scope when the function was created, even if the outer function has finished executing.
 
 - Why we have closures in JS?
-
   - Because in JS, functions are **first-class citizens** (can be passed around and returned like any other value), and has **lexical scope** (where the function was written, not called)
   - and **closures / backpacks** allow us to keep the variables in the function's scope even after the function has finished executing
 
 - It's a closed-over **(variable environment)** of the execution context in which the function was created, even after that execution context is gone.
   ![closure](./img/closure-5.png)
-
   - **Function's `[[Environment]]` property**:
-
     - References the Lexical Environment (in the scope chain) where the function was created.
     - functions created with `new Function()` always references the global Lexical Environment, not the outer one, preventing access to outer variables.
     - **Benefit**: Access outer function's scope from an inner function, even after the outer function has returned.
 
 - How does it work ?
-
   - When a function is created, it keeps a reference to its outer lexical environment (where it was created), even if the outer function has finished executing.
     - The function keeps a reference to its outer lexical environment in a hidden property `[[Environment]]`.
       ![closure](./img/closure-6.png)
@@ -1171,9 +1122,7 @@ A closure allows a function to remember variables from its creation context, **e
     ```
 
 - **Notes:**
-
   - Benefits of closures:
-
     - Memory-efficient: Closures allow us to cache the values inside its block-scoped (where it was called) in case that it was called again.
 
       ```js
@@ -1223,7 +1172,6 @@ A closure allows a function to remember variables from its creation context, **e
     - Module pattern: Closures allow us to create modules that have private variables and methods that can't be accessed directly from outside the module.
 
   - One of the biggest examples of closures are:
-
     - **timers**
 
       ```js
@@ -1345,7 +1293,6 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 ![pure function](./img/pure-functions.png)
 
 - It's a function that has the following properties:
-
   - **Deterministic / Predictable**: Always returns the same result for the same input.
   - **No side-effects**: Doesn't change anything outside of the function.
   - **No shared state**: Doesn't depend on the state of the program.
@@ -1355,14 +1302,12 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 - **side-effects**: are about MODIFICATION and doesn't count if we created new item
   - usually it's anything that the function does other that returning a value
 - **Benefits of pure functions**:
-
   - **Self-documenting**: Easier to understand and debug.
   - **Testable**: Easier to test, as they don't depend on external state.
   - **Concurrency**: Easier to run in parallel, as they don't depend on shared state.
   - **Memoization**: the return value can be cached or memoized for performance optimization.
 
 - Examples:
-
   - Pure functions
 
     ```js
@@ -1384,7 +1329,6 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 **Decorator** is a wrapper around a function that alters its behavior. The main job is still carried out by the function.
 
 - Ex: create a wrapper-function around another function (Pure function) to cache its (behavior or the return-value) for multiple use
-
   - here: The result of `cachingDecorator(func)` is a "wrapp"r”: function(x) that “wraps” the call of func(x) into caching logic:
 
     ```js
@@ -1426,7 +1370,6 @@ this is a form of **Closure**, as in this example:![func calls func](./img/closu
 The caching decorator mentioned above is not suited to work with **object methods**. The reason is that the **wrapper** calls the original function as `func(x)`. And, when called like that, the function gets `this = undefined`.
 
 - To solve this, we need to do one of the followings
-
   - using the built-in function method **func.call(context, …args)** that allows to call a function explicitly setting **this** keyword.
     - It runs func providing the first argument as `this`, and the next as the arguments.
 
@@ -1460,7 +1403,6 @@ Difference between iteration and recursion:
 recursion sometimes take long time as it calls multiple functions at the same time which occupies the **call stack**
 
 - one solution is to use **memoization (caching)**
-
   - A loop-based algorithm is more memory-saving.
   - The iterative solution uses a single context (place in memory which is the iteration index) changing `i` and result in the process. Its memory requirements are small, fixed and do not depend on `n`.
 
@@ -1478,14 +1420,12 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 ![first class functions](./img/first-class-functions.png)
 
 - **First-class objects**: Functions are values that can:
-
   - Be assigned to variables
   - Be passed as arguments to other functions
   - Be returned from functions (enables **closures**)
 
 - **Higher Order Functions**: Functions that accept or return other functions
   ![higher order functions](./img/higher-order-functions.png)
-
   - e.g., `map`, `filter`, `reduce`, `sort`, `forEach`
   - It gives us ability to not just tell the function what data to use, but also how to use it (by passing the function that will be used on the data)
   - Benefits: makes functions:
@@ -1519,7 +1459,6 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 > More [Here](https://javascript.plainenglish.io/quick-guide-to-call-apply-and-bind-methods-in-javascript-5c00cd856cfa)
 
 - `call`
-
   - Invokes a function with a specified `this` context.
 
   ```js
@@ -1531,7 +1470,6 @@ recursion sometimes take long time as it calls multiple functions at the same ti
   ```
 
 - `apply`
-
   - Similar to `call`, but different on how the arguments are passed.
   - it takes arguments as an **array** which is useful when the method has multiple arguments.
 
@@ -1559,7 +1497,6 @@ recursion sometimes take long time as it calls multiple functions at the same ti
     ```
 
 - `bind`
-
   - **Returns a new function** with `this` bounded to a specified context.
 
     ```js
@@ -1575,7 +1512,6 @@ recursion sometimes take long time as it calls multiple functions at the same ti
   - Used for later use, not immediate invocation.
   - Takes arguments like `call`.
   - **Common use cases**:
-
     - callbacks (event listeners or timers)
 
       ```js
@@ -1591,7 +1527,6 @@ recursion sometimes take long time as it calls multiple functions at the same ti
       - Note that we don't use `call` or `apply` here because we don't want to call the function immediately, we just want to bind the `this` keyword and the arguments to the function. as when we pass a function to an event listener, we pass it for future use, not for immediate invocation.
 
     - partial application
-
       - Allows setting arguments for reuse
 
         ```js
@@ -1623,7 +1558,6 @@ recursion sometimes take long time as it calls multiple functions at the same ti
         ```
 
 - **Notes:**
-
   - These functions are accessible from `Function.prototype`.
 
   - There're other higher order functions like (`map`, `filter`, `reduce`, `sort`, `forEach`).
@@ -1688,7 +1622,6 @@ It's the combination of multiple functions to create a more complicated one. It'
   - **But that’s risky, people can overwrite**, So we can use **composition** to make it more readable and less risky.
 
 - Composition is a fancy term which means **"combining pure functions to build more complicated ones"** (make complex programs out of simple functions).
-
   - Useful when you want to have specific order to run the (operations / steps / functions) on the data
 
   ![composition](./img/composition.png)
@@ -1737,7 +1670,6 @@ It's the combination of multiple functions to create a more complicated one. It'
   - Here, we use (spread operator, `reduce()`)
 
 - Why use composition?
-
   - **Easier to add features**: We can list our units of code by name and have them run one by one as independent, self-contained pieces.
   - **More readable**: `reduce` is often wrapped in compose to say ‘combine up’ the functions to run our data through them one by one. The style is ‘point free’.
   - **Easier to debug**: I know exactly the line of code my bug is in - it’s got a label!
@@ -1807,10 +1739,8 @@ They differ from Regular functions which return only single value (or nothing). 
 ### Generator Methods
 
 - The main method of a generator is `next()`. When called, it runs the execution until the nearest `yield <value>` statement (value can be omitted, then it’s `undefined`). Then the function execution pauses, and the yielded value is returned to the outer code.
-
   - The result of `next()` is always an object with two properties:
     ![generator](./img/iterators-1.png)
-
     - `value`: the yielded value.
     - `done`: `true` if the function code has finished, otherwise `false`.
       - When the generator is done. We should see it from `done: true` and `value: undefined`, and New calls to `generator.next()` don’t make sense any more. If we do them, they return the same object: `{done: true}`.
@@ -1830,7 +1760,6 @@ They differ from Regular functions which return only single value (or nothing). 
     ```
 
   - **"yield" is a two-way street**: That’s because `yield` is a two-way street: it not only returns the result to the outside, but also can pass the value inside the generator.
-
     - when we pass a value to the `next()` method, it will be evaluated as the yielded value and we will continue the function until we find another yield
 
     ```js
@@ -1846,7 +1775,6 @@ They differ from Regular functions which return only single value (or nothing). 
     ```
 
 - `generator.return(value)`
-
   - it finishes the generator execution and return the given value.
 
     ```js
@@ -1904,12 +1832,10 @@ They differ from Regular functions which return only single value (or nothing). 
 ### Generators in Async Code
 
 - `returnNextElement` is a special object (a **generator object**) that when its `next` method is run starts (or continues) running createFlow **execution-context** until it hits `yield` and returns out the value being yielded **without continuing the function**
-
   - We end up with a ‘stream’/flow of values that we can get one-by-one by running `returnNextElement.next()`
   - And most importantly, for the first time we get to pause (‘suspend’) a function being run and then return to it by calling `returnNextElement.next()`
 
 - This is actually what happens behind the scene in **Asynchronous javascript**, as we want to:
-
   1. Initiate a task that takes a long time (e.g. requesting data from the server)
   2. Move on to more synchronous regular code in the meantime
   3. Run some functionality once the requested data has come back
@@ -1931,7 +1857,6 @@ They differ from Regular functions which return only single value (or nothing). 
     ![generator](./img/generator-example.png)
 
 - **Async/await** simplifies all this and finally fixes the inversion of control problem of callbacks
-
   - as it automatically triggers the function on the promise-resolution **(this functionality is still added to the micro-task queue though)**
 
   ```js
@@ -1975,7 +1900,6 @@ They differ from Regular functions which return only single value (or nothing). 
 ### Numbers
 
 - **NaN**:
-
   - `typeof NaN` = `Number` --> as it's **invalid number**
   - example of `NaN` -> **division on strings** -> `"apple" / 3`
   - `Nan === NaN` --> **false**
@@ -1984,10 +1908,8 @@ They differ from Regular functions which return only single value (or nothing). 
     - behind the scenes, `isNaN()` converts its argument to a number, so `isNaN("str")` converts `"str"` to a number and then checks the result for being `NaN`, which is `true`.
 
 - **BigInt**:
-
   - `BigInt` is a special numeric type that provides support for integers of arbitrary length.
   - BigInt can mostly be used like a regular number,
-
     - All operations on `bigints` return `bigints`.
     - it ends with `n` -> `1234567890123456789012345678901234567890n;`
     - for example:
@@ -2109,7 +2031,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
 - `Refactoring the code` : means the process of restructuring code without changing or adding to its external behavior and functionality.
 - in `DOM` => `:root` element is called `document.documentElement`
 - to make anything `immutable` : `Object.freeze(obj)`
-
   - it **only** freezes the first level of an object (not a `deep-freeze`)
 
   ```js
@@ -2142,7 +2063,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   ```
 
 - **How is every thing is an Object ?** --> If one would want to do something with a primitive, like a `string` or a `number`. It would be great to access them using **methods**.
-
   - The language allows access to **methods** and **properties** of `strings`, `numbers`, `booleans` and `symbols`.
   - In order for that to work, a special “**object wrapper**” that provides the extra functionality is created, and then is destroyed.
   - you can also create this wrapper-object using constructor like `new`, but it's highly unrecommended. Things will go crazy in several places.
@@ -2167,7 +2087,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   - The special primitives `null` and `undefined` are exceptions. They have no corresponding “wrapper objects” and provide no methods. In a sense, they are “the most primitive”.
 
 - **NO JAVASCRIPT**
-
   - If you have an `accordion menu`, `tabbed panels`, and `responsive slider` all hide some of their content by default. This content would be inaccessible to **visitors that do not have JavaScript enabled** if we didn't provide alternative styling.
   - One way to solve this is by adding a class attribute whose value is **"no-js"** to the opening `<html>` tag. This class is then removed by JavaScript (using the `replace()` method of the String object)
   - if JavaScript is enabled. The **"no-js"** class can then be used to provide styles targeted to visitors who do not have JavaScript enabled.
@@ -2183,9 +2102,7 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   ```
 
 - **polyfills**
-
   - We use the **global object** to test for support of modern language features.
-
     - If there’s none (say, we’re in an old browser), we can create “polyfills”: add functions that are not supported by the environment, but exist in the modern standard.
 
   ```js
@@ -2197,7 +2114,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   ```
 
 - In JavaScript, **functions are objects**.
-
   - Function objects contain some useable properties; For instance, a function’s name is accessible as the `“name”` property:
 
     ```js
@@ -2219,7 +2135,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
     ```
 
   - **The “length” property**
-
     - built-in property `“length”` that returns the number of function parameters, for instance:
 
     ```js
@@ -2238,7 +2153,6 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
     > - A function with arguments, which is called in either case and returns an answer.
 
 - **eval()** built-in function
-
   - it allows to execute a string of code.
 
   ```js
@@ -2247,6 +2161,5 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   ```
 
 - pre-increment `++i` vs post-increment `i++`
-
   - `++i` => first increment then return
   - `i++` => first return then increment

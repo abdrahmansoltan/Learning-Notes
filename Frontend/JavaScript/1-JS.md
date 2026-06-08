@@ -2,6 +2,7 @@
 
 - [INDEX](#index)
   - [JavaScript](#javascript)
+    - [Lexical Structure](#lexical-structure)
     - [ECMA Script (ES)](#ecma-script-es)
     - [Adding javascript file in html](#adding-javascript-file-in-html)
   - [Variables](#variables)
@@ -46,7 +47,12 @@
       - [WeakMap](#weakmap)
   - [Numbers](#numbers)
     - [Math operations](#math-operations)
-    - [Special numbers](#special-numbers)
+    - [Special numbers \& Math quirks](#special-numbers--math-quirks)
+      - [Math Quirks: Infinity and NaN](#math-quirks-infinity-and-nan)
+      - [The Famous Floating-Point Rounding Error](#the-famous-floating-point-rounding-error)
+      - [BigInt (Arbitrary Precision Integers)](#bigint-arbitrary-precision-integers)
+      - [Numeric Separators](#numeric-separators)
+      - [Maximum numbers in JavaScript](#maximum-numbers-in-javascript)
     - [Numbers Internationalization](#numbers-internationalization)
   - [Date](#date)
     - [Operations with Dates](#operations-with-dates)
@@ -83,7 +89,7 @@
 
 ## JavaScript
 
-JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded**, **Object-oriented** programming language. It is **weakly typed** and **dynamically typed** language.
+JavaScript is the programming language of the web, meaning the vast majority of websites use it to make pages interactive, It's a **high-level**, **interpreted**, **dynamic**, **single-threaded**, **Object-oriented** programming language. It is **weakly typed** and **dynamically typed** language.
 
 - **high-level** : it provides abstractions that allow us to ignore machine-level details like memory-management.
 - **interpreted** : it doesn't need to be compiled, it's executed directly by the browser (line by line);
@@ -93,6 +99,106 @@ JavaScript is a **high-level**, **interpreted**, **dynamic**, **single-threaded*
 - **weakly typed** : it doesn't require us to declare the type of variables. ex: `let x = 5;` or `let x = "John";`
 - **dynamically typed** : it means that the type of a variable is checked during runtime rather than in advance. ex: `let x = 5;` or `let x = "John";`
 - **Multi-paradigm** : it supports different styles of programming like **procedural programming**, **object-oriented programming**, and **functional programming**.
+
+**Where does JavaScript run?**
+
+- Every programming language needs a "host environment" to do things like input and output. JavaScript has two main environments:
+  - Web Browsers: This is the original environment. It allows your code to get input from a user's mouse or keyboard and display output using HTML and CSS.
+  - Node.js: This is an environment that lets you run JavaScript completely outside the browser. It gives JavaScript access to your computer's operating system, allowing you to read files or run web servers
+
+---
+
+### Lexical Structure
+
+- **Whitespace**: JavaScript ignores whitespace (spaces, tabs, newlines) except when it separates tokens. For example, `let x = 5;` and `letx=5;` are different because the first has whitespace separating the tokens, while the second does not.
+- **Comments**: JavaScript supports single-line comments using `//` and multi-line comments using `/* ... */`. Comments are ignored by the JavaScript engine and are used to explain code or make it more readable.
+
+  ```js
+  // This is a single-line comment
+
+  /*
+    This is a multi-line comment
+    that spans multiple lines
+  */
+  ```
+
+- **Identifiers**: These are names used to identify variables, functions, and other entities in JavaScript. They must start with a letter, underscore (\_), or dollar sign ($) and can contain letters, digits, underscores, or dollar signs. They can't begin with a digit and can't be a reserved keyword.
+
+  ```js
+  let myVariable = 10;
+  function myFunction() {
+    // ...
+  }
+
+  // Invalid identifiers
+  let 1stVariable = 5; // starts with a digit
+  let my-variable = 5; // contains a hyphen
+  let if = 5; // reserved keyword
+  ```
+
+- **Case Sensitivity**: JavaScript is case-sensitive, meaning that `myVariable` and `myvariable` are considered different identifiers.
+
+- **Reserved Words**: JavaScript has a set of reserved words that cannot be used as identifiers. These include keywords like `if`, `else`, `while`, `for`, `function`, `return`, and many others.
+
+- **Literals**: These are fixed data values that are directly written in the code. Examples include string literals (`"Hello"`), numeric literals (`42`), boolean literals (`true` or `false`), and object literals (`{ name: "John", age: 30 }`).
+
+  ```js
+  let name = 'Alice'; // string literal
+  let age = 25; // numeric literal
+  let isStudent = true; // boolean literal
+  let person = { name: 'Bob', age: 40 }; // object literal
+  ```
+
+- **Operators**: These are symbols that perform operations on operands. Examples include arithmetic operators (`+`, `-`, `*`, `/`), assignment operators (`=`, `+=`, `-=`), comparison operators (`==`, `===`, `!=`), and logical operators (`&&`, `||`, `!`).
+
+  ```js
+  let a = 5;
+  let b = 10;
+  let sum = a + b; // sum is 15
+  let isEqual = a == b; // isEqual is false
+  ```
+
+- **Unicode**: JavaScript source code is written in Unicode, which means it can include characters from many different languages and symbol sets, not just English alphabet.
+
+  ```js
+  let greeting = 'こんにちは'; // Japanese for "Hello"
+  let emoji = '😊'; // Unicode emoji character
+  const π = 3.14; // Using a Unicode character as an identifier
+  ```
+
+- **Semicolons**: JavaScript uses semicolons to terminate statements, **but they are optional** in many cases due to a feature called "Automatic Semicolon Insertion (ASI)". However, relying on ASI can lead to unexpected behavior, so it's generally recommended to use semicolons explicitly.
+
+  ```
+  let x = 5; // semicolon used
+  let y = 10 // semicolon omitted (not recommended)
+
+  // It will be read like this:
+  let x = 5; let y = 10;
+  ```
+
+  - Note that it can leads to bugs for cases like this:
+
+    ```
+    let y = x + f
+    (a+b).toString()
+
+    // It will be read like this: (which is not what we want as it will assume that f is a function and it will try to call it with (a+b).toString() as an argument)
+    let y = x + f(a+b).toString();
+
+
+    // ------------------------------------------ //
+
+    function g() {
+      return
+      true;
+    }
+
+    // It will be read like this: (which is not what we want as it will assume that the function returns undefined and the true is just a statement that will never be executed)
+    function g() {
+      return;
+      true;
+    }
+    ```
 
 ---
 
@@ -119,7 +225,6 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
 ```
 
 - There're 2 ways to include JavaScript in an HTML document:
-
   - **Inline script**: The script is directly written in the HTML document in the `<script>` tag
 
     ```html
@@ -135,7 +240,6 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
     ```
 
 - Why use separate `js` file in `<script>` tags
-
   - The benefit of a separate file is that the browser will download it and store it in its **cache**.
   - Other pages that reference the same script will take it from the cache instead of downloading it, so the file is actually downloaded only once. --> That reduces traffic and makes pages faster.
 
@@ -170,9 +274,7 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
 ![var-let-const](./img/var-let-const-2.jpg)
 
 - **Var**
-
   - is function-scoped (`“var”` has no block scope) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
-
     - Variables, declared with `var`, are either function-scoped or global-scoped. They are visible through blocks.
 
       ```js
@@ -224,7 +326,6 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
   - variable defined with `var` is an `window` object property, meaning that it can be accessed from anywhere in the code **(global scope)**
 
   - `“var”` variables can be declared below their use
-
     - `var` declarations are processed when the function starts (or script starts for globals). In other words, `var` variables are defined from the beginning of the function, no matter where the definition is
 
       ```js
@@ -239,7 +340,6 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
       ```
 
     - **Important Note**: Declarations are hoisted, but assignments are not.
-
       - Because all `var` declarations are processed at the function start, we can reference them at any place. But variables are `undefined` until the assignments.
 
         ```js
@@ -291,7 +391,6 @@ JavaScript is a garbage collected language. If you allocate memory inside of a f
   - Unreachable objects become garbage-collected.
     ![unreachable](./img/unreachable.png)
 - Modern engines use advanced garbage collection algorithms.
-
   - to remove something from memory in garbage-collection, we need to make it **unreachable**, ex:
 
     ```js
@@ -311,7 +410,6 @@ JavaScript is a garbage collected language. If you allocate memory inside of a f
 **Memory leak** is a common problem in programming, where the application uses more memory than it should, and it doesn't release the memory that is no longer needed.
 
 - **Causes of memory leaks:**
-
   - **Global variables**: if you declare a variable in the global scope, it will be available throughout the application, and it will not be garbage collected until the application is closed.
   - **Event listeners**: if you add an event listener to an element, and you don't remove it, it will keep a reference to the element in memory, even if the element is removed from the DOM.
   - **Closures**: if you create a closure inside a function, and you don't remove it, it will keep a reference to the outer function, and it will not be garbage collected.
@@ -336,14 +434,14 @@ JavaScript is a garbage collected language. If you allocate memory inside of a f
 
 ## Function
 
-It's a block of code that can be reused and called by name. The code inside a function is executed when the function is invoked.
+A function is a named, parameterized block of code that you define once and can invoke (run) over and over
 
-![function](./img/function-1.png)
+- It's a block of code that can be reused and called by name. The code inside a function is executed when the function is invoked.
+  ![function](./img/function-1.png)
 
 - when you use a function that do a calculation process, you should put the invocation of this function in a variable and not invoking it many time => **for performance**
 
 - **Default parameters**:
-
   - If a parameter is not provided, then its value becomes `undefined`.
   - We can set a default value for a parameter if it's not provided.
 
@@ -355,6 +453,8 @@ It's a block of code that can be reused and called by name. The code inside a fu
     showMessage('Ann'); // Ann: no text given
     ```
 
+- When a function is assigned to the property of an object, we call it a **method**. Inside a method, the `this` keyword refers to the object the method was called on
+
 ---
 
 ### Function declaration vs Function expression
@@ -362,7 +462,6 @@ It's a block of code that can be reused and called by name. The code inside a fu
 ![function declaration vs function expression](./img/function-declaration-vs-function-expression.png)
 
 - **Function Declarations**:
-
   - Can be called before they are defined (hoisted).
   - Interpreter processes them before executing the script.
   - Instantly fully initialized when the Lexical Environment is created.
@@ -380,7 +479,6 @@ It's a block of code that can be reused and called by name. The code inside a fu
     ```
 
 - **Function Expressions**:
-
   - Cannot be called before they are defined.
   - Treated as expressions and known as function expressions.
   - Can be anonymous or named which is used for recursion or self-calling.
@@ -427,7 +525,6 @@ let func = function (arg1, arg2) {
 
 - if you use declaration block `{}` then you should use the word `return` to return something
 - **Arrow functions** have no `this`:
-
   - They don’t have their `own this`. If we reference `this` from an arrow function, it’s taken from the outer “normal” function.
   - There’s a difference between an `arrow function` => and a regular function called with `.bind(this)`:
     - `.bind(this)` creates a “bound version” of the function.
@@ -470,7 +567,6 @@ let func = function (arg1, arg2) {
   ```
 
 - **Why IIFE ?**:
-
   - Turns block-scope into functional-scope.
   - Prevents global scope pollution (`var`).
   - Avoids variable name conflicts.
@@ -609,7 +705,6 @@ When passing object methods as callbacks, there’s a known problem: **"losing "
   ```
 
 - **Notes:**
-
   - The `.bind()` method creates a new function
   - The `.bind()` method requires passing value/reference for `this`, so we must put in something like `null`.
   - A function cannot be **re-bound**.
@@ -661,7 +756,6 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
 - If you pass too few, the missing parameters get assigned the value **undefined**.
 
 - **The `arguments` keyword**:
-
   - Special array-like object containing all function arguments by index.
   - Example:
 
@@ -679,11 +773,9 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
     - Not a true array; lacks array methods like `map`.
     - Always contains all arguments; can't capture partially like `rest` parameters.
   - **Arrow functions**:
-
     - No `arguments` object; inherits from the outer function.
 
 - **Spread syntax**
-
   - When `...arr` is used in the function call, it “expands” an iterable object arr into the list of arguments.
 
     ```js
@@ -744,7 +836,6 @@ for (let i = 0; i < 3; i++) {
 ```
 
 - in `for` block we use `let` and not (`const` or `var`) because:
-
   - `let` is block-scoped, so it's better to use it in loops
   - `var` is function-scoped, so it's better to avoid it in loops, as it will be available outside the loop
   - `const` is not suitable for loops, as it can't be reassigned
@@ -879,12 +970,17 @@ They are a way of organizing and storing data so that we can access and modify i
 
 ### Strings
 
-- `.length` returns the number of bytes, not characters (e.g., emojis require 2 bytes).
+A string is an immutable (unchangeable) sequence of 16-bit values, where each value usually represents a Unicode character.
+
+- However, some characters—like **emojis** or rare characters—don't fit into a single 16-bit value. JavaScript handles these using a "surrogate pair" of two 16-bit values. This creates an interesting quirk when checking string length:
 
   ```js
   alert('Hello'.length); // 5
+  alert('H'.length); // 1
   alert('😂'.length); // 2
   ```
+
+  - 💡 Luckily, modern JavaScript (ES6) made strings "iterable." If you use a `for/of` loop on a string, it will intelligently iterate over the actual characters (so it will treat the emoji as one character), rather than blindly looping over the raw 16-bit values
 
 - **Multiline strings**:
 
@@ -905,7 +1001,6 @@ They are a way of organizing and storing data so that we can access and modify i
   ```
 
 - quotes inside strings:
-
   - In order to use quotes inside a string, you can use the **opposite** quotes or use the **backslash** `\` to escape the quotes.
 
     ```js
@@ -916,18 +1011,59 @@ They are a way of organizing and storing data so that we can access and modify i
     let str4 = 'Steve Jobs once said: "something"';
     ```
 
-  - or use **backticks** ` "``" ` to avoid using quotes inside the string.
+  - or use **backticks** `"``"` to avoid using quotes inside the string.
 
     ```js
     let str = `I'm the Walrus!`;
     let str2 = `Steve Jobs once said: "something"`;
     ```
 
+- **Escape Sequences in Strings** - It's a way to include special characters in strings that would otherwise be difficult to represent. They are denoted by a backslash `\` followed by a character or a sequence of characters. Some common escape sequences include:
+  - `\n` - Newline
+  - `\t` - Tab
+  - `\\` - Backslash
+  - `\'` - Single quote
+  - `\"` - Double quote
+
+  ```js
+  let str = 'Hello\nWorld'; // This will create a string with a newline between "Hello" and "World"
+  let str2 = 'This is a tab:\tHere'; // This will create a string with a tab between "This is a tab:" and "Here"
+  let str3 = 'This is a backslash: \\'; // This will create a string with a backslash at the end
+  let str4 = 'She said: "Hello"'; // This will create a string with double quotes around "Hello"
+  let str5 = "It's a nice day"; // This will create a string with a single quote in "It's"
+  ```
+
+- **Template Literals (String Interpolation)**:
+  - Template literals are a way to create strings that can contain embedded expressions. They are denoted by backticks `` ` `` and can include placeholders for variables or expressions using `${...}`. (everything inside `${...}` is evaluated as a JavaScript expression and its result is included in the string)
+
+    ```js
+    let name = 'John';
+    let greeting = `Hello, ${name}!`; // This will create a string "Hello, John!"
+    ```
+
+- **Working with strings**:
+  - We can concatenate (join) strings using the `+` operator or template literals, or using methods like `concat()`.
+
+    ```js
+    let str1 = 'Hello';
+    let str2 = 'World';
+
+    // Using + operator
+    let result = str1 + ' ' + str2; // "Hello World"
+
+    // Using template literals
+    let result2 = `${str1} ${str2}`; // "Hello World"
+
+    // Using concat method
+    let result3 = str1.concat(' ', str2); // "Hello World"
+    ```
+
+---
+
 #### String Methods
 
 - Strings have methods like `length`, `toUpperCase()`, and `indexOf` despite being primitive types.
-
-  - This is due to **"Boxing"**: JavaScript temporarily converts the string to a `String` object to access its methods and properties using the `prototype` chain.
+  - 💡 This is due to **"Boxing"**: JavaScript temporarily converts the string to a `String` object to access its methods and properties using the `prototype` chain.
     ![string-methods](./img/string-methods.avif)
 
 - **convert number to a string**
@@ -939,7 +1075,6 @@ They are a way of organizing and storing data so that we can access and modify i
   ```
 
 - **Access characters using index**
-
   - Use `[]` or `charAt(pos)`:
 
     ```js
@@ -958,7 +1093,6 @@ They are a way of organizing and storing data so that we can access and modify i
     ```
 
 - **Slicing and Substrings**
-
   - `substring(start, end)`: Similar to `slice()`, but allows `start` to be greater than `end`.
 
     ```js
@@ -981,9 +1115,7 @@ They are a way of organizing and storing data so that we can access and modify i
     ```
 
 - **Split & Join**
-
   - `split(separator, limit)`: Splits a string into an array of substrings using a separator.
-
     - `separator` is a string or a regular expression.
     - `limit` is the number of splits to make.
     - If `separator` is an empty string, the string is split into an array of characters.
@@ -994,7 +1126,6 @@ They are a way of organizing and storing data so that we can access and modify i
       ```
 
   - `join(separator)`: Creates a string from an array by joining all elements with a separator.
-
     - If `separator` is omitted, the array elements are separated with a comma.
 
       ```js
@@ -1013,6 +1144,8 @@ They are a way of organizing and storing data so that we can access and modify i
   const newStr = str.replaceAll('cat', 'dog'); // using replaceAll method
   ```
 
+  - 💡 Important Reminder: Strings in JavaScript are immutable. Methods like `replace()  and`toUpperCase()` do not alter the original string; instead, they compute and return a brand-new string
+
 - **Capitalizing the first letter**
 
   ```js
@@ -1024,7 +1157,6 @@ They are a way of organizing and storing data so that we can access and modify i
 
 - **Padding a string**
   ![padding](./img/padding-1.avif)
-
   - `padStart(targetLength, padString)`: Pads the current string with another string (repeated, if needed) so that the resulting string reaches the given length.
 
     ```js
@@ -1046,7 +1178,6 @@ They are a way of organizing and storing data so that we can access and modify i
     ![padding](./img/padding-2.png)
 
 - **Chaining methods**
-
   - String methods can be chained because they return a string.
 
     ```js
@@ -1126,7 +1257,6 @@ const [firstName, surname] = arr;
   ```
 
 - Use cases:
-
   - switching values of 2 variables :
 
     ```js
@@ -1146,9 +1276,7 @@ const [firstName, surname] = arr;
 
 - **`slice` vs `splice`**
   ![slice-splice](./img/slice-splice.jpg)
-
   - `slice()` (makes a copy)
-
     - the slicing happens from `start` to `end` **(not including `end`)**, so `end` is not included in the result.
     - `-1` in `slice` means the last element, but in `splice` it means the last element will be removed.
 
@@ -1162,7 +1290,6 @@ const [firstName, surname] = arr;
     ```
 
   - `splice()` (modifies the array)
-
     - `splice` returns an array of removed elements.
     - `splice` can remove and insert elements at the same time.
     - `splice` can remove elements from the beginning and end of an array.
@@ -1199,7 +1326,6 @@ const [firstName, surname] = arr;
     - These methods return the removed element.
 
 - **(`delete` vs `splice`)**
-
   - always use `slice` to remove element from an array, because `delete` will leave an empty slot in the array.
 
   ```js
@@ -1219,21 +1345,17 @@ const [firstName, surname] = arr;
   ```
 
 - **`indexOf` vs `findIndex`**:
-
   - `indexOf(value)`: Finds index of a primitive value, returns `-1` if not found.
   - `findIndex(callback)`: Finds index using a callback function, useful for objects or complex conditions.
 
 - **`flat` and `flatMap`**:
-
   - `flat(depth)`: Flattens nested arrays up to the specified depth **recursively**.
     ![flat](./img/flat.png)
   - `flatMap(callback)`: Maps and flattens the array **one level deep** with customization of the mapping.
     ![flatmap](./img/flatmap.png)
 
 - **Sorting**
-
   - The `.sort()` method works as follows:
-
     - without condition -> it will sort based on the default comparator which assumes **string operations** (all values are coerced and compared as string)
 
       ```js
@@ -1241,7 +1363,6 @@ const [firstName, surname] = arr;
       ```
 
     - with condition -> it will sort based on the provided comparator function
-
       - **Comparator function** should return a negative value if `a` should come before `b`, a positive value if `b` should come before `a`, and `0` if they are equal.
 
         ```js
@@ -1260,7 +1381,6 @@ const [firstName, surname] = arr;
         ```
 
       - Example:
-
         - sorting numbers:
 
           ```js
@@ -1300,7 +1420,6 @@ const [firstName, surname] = arr;
     ```
 
 - methods for creating arrays with filled values
-
   - `Array.fill(value, start, end)`
 
     ```js
@@ -1340,7 +1459,6 @@ const [firstName, surname] = arr;
       ```
 
 - `some` & `every` methods
-
   - `some` : returns `true` if at least one element in the array passes the test implemented by the provided function.
   - `every` : returns `true` if all elements in the array pass the test implemented by the provided function.
 
@@ -1355,7 +1473,6 @@ const [firstName, surname] = arr;
     ```
 
 - Notes:
-
   - operations on array:
 
     ```js
@@ -1375,9 +1492,7 @@ const [firstName, surname] = arr;
 ![methods](./img/array-methods-2.png)
 
 - `map`
-
   - It's a method used to **transform** an array by **applying a function** to each element of the array.
-
     - it creates a new array with the results of calling a provided function on every element in the calling array.
 
       ```js
@@ -1386,9 +1501,7 @@ const [firstName, surname] = arr;
       ```
 
 - `filter`
-
   - It's a method used to **filter** an array by **applying a function** to each element of the array.
-
     - it creates a new array with all elements that pass the test implemented by the provided function.
 
       ```js
@@ -1403,15 +1516,12 @@ const [firstName, surname] = arr;
     - `findIndex`: Returns the index of the **first** item matching a condition or `-1`.
 
 - `reduce`
-
   - It's a method used to **reduce** an array to a single value by **executing a reducer function** for each element of the array.
 
     ![reduce](./img/reduce-method-1.png)
-
     - it uses an **accumulator** and **current value** to return a single value
 
   - Examples:
-
     - Sum of all elements in an array
 
       ```js
@@ -1444,7 +1554,6 @@ const [firstName, surname] = arr;
 It's a data structure that can store a collection of **key-value pairs**.
 
 - There're 3 ways to create an object:
-
   - **Object Literals**: `let obj = {};`
   - **Constructor Literals**: `let obj = new Object();`
   - **use a function as a template for creating objects**:
@@ -1602,7 +1711,6 @@ It's a way to extract multiple values from an object and assign them to variable
   ```
 
 - Use cases:
-
   - extracting function parameters
 
     ```js
@@ -1620,7 +1728,6 @@ It's a way to extract multiple values from an object and assign them to variable
 A **Set** is a collection of unique values (no duplicates).
 
 - **Methods**:
-
   - `new Set(iterable)`: Creates a set, optionally from an iterable (e.g., array).
   - `set.add(value)`: Adds a value.
   - `set.delete(value)`: Removes a value, returns `true` if it existed.
@@ -1727,7 +1834,6 @@ A **Set** is a collection of unique values (no duplicates).
   ```
 
 - The main differences with `Objects` are:
-
   - `Map` allows keys of **any type**
   - `Map` is **ordered** (the keys are iterated in the same order as they were inserted).
 
@@ -1735,7 +1841,6 @@ A **Set** is a collection of unique values (no duplicates).
   ![objects](./img/maps-vs-obj.jpg)
 
 - **Map Methods**:
-
   - `new Map()`: Creates a map.
   - `map.set(key, value)`: Adds a key-value pair. Can chain calls:
 
@@ -1818,10 +1923,21 @@ A **Set** is a collection of unique values (no duplicates).
 
 ## Numbers
 
-- All numbers in JavaScript are of type `Number`, whether integer or floating-point.
+Unlike many other programming languages that have separate types for integers and floating-point (decimal) numbers, JavaScript represents almost all numbers using a single 64-bit floating-point format (IEEE 754 standard). This means that all numbers in JavaScript, whether they are integers or floating-point, are of the same type: `Number`.
+
+```js
+132 === 132.0; // true
+```
+
+- You can write numbers in your code (called numeric literals) in several ways, and modern JavaScript even lets you use underscores as separators to make long numbers easier to read:
 
   ```js
-  132 === 132.0; // true
+  let billion = 1_000_000_000; // 1 billion
+  let million = 1_000_000; // 1 million
+  let bytes = 0x89_ab_cd_ef; // Hexadecimal (base-16) starts with 0x [8]
+  let bits = 0b0001_1101_0111; // Binary (base-2) starts with 0b [8]
+  let fraction = 0.123_456_789; // Works in the fractional part, too [8]
+  let exponent = 6.02e23; // Scientific notation (6.02 × 10²³) [8]
   ```
 
 - Use `Number.isFinite()` or `Number.isNaN()` to check if a number is a finite number or `NaN`.
@@ -1852,7 +1968,6 @@ A **Set** is a collection of unique values (no duplicates).
   ```
 
 - **Format/Parse Numbers**
-
   - Parse numbers:
 
     ```js
@@ -1870,9 +1985,7 @@ A **Set** is a collection of unique values (no duplicates).
   - Format currency: [Formatting](https://www.samanthaming.com/tidbits/30-how-to-format-currency-in-es6/)
 
 - **Notes**
-
   - `toFixed()`
-
     - returns a `string`, so if you need a number, use `+` or `Number()` to convert it.
 
       ```js
@@ -1884,11 +1997,9 @@ A **Set** is a collection of unique values (no duplicates).
   - `Math.round()` and `toFixed()`
     - both round to the nearest number: `0..4` **lead down** while `5..9` **lead up**.
   - `toString()`
-
     - can take a base to convert to (The base can vary from `2` to `36`. By default it’s `10`)
 
   - **calculations**:
-
     - floating-point numbers are not precise, so it's better to use `toFixed()` to round the result.
 
       ```js
@@ -1921,6 +2032,10 @@ A **Set** is a collection of unique values (no duplicates).
 
 ### Math operations
 
+To do math, JavaScript gives us basic arithmetic operators: `+` (addition), `-` (subtraction), `*` (multiplication), `/` (division), `%` (modulo/remainder), and `**` (exponentiation).
+
+For more complex calculations, JavaScript provides a built-in `Math` object full of mathematical functions and constants.
+
 ```js
 // Rounding
 alert(Math.floor(3.1)); // 3 (round down)
@@ -1940,41 +2055,42 @@ alert(Math.random()); // random number from 0 to 1
 
 ---
 
-### Special numbers
+### Special numbers & Math quirks
 
-- `Infinity`, `-Infinity`
-- `NaN`
+#### Math Quirks: Infinity and NaN
 
-  - `0 / 0` = `NaN`
-  - `Infinity - Infinity` = `NaN`
-  - `console.log("five" * 2)` ->`NaN`
+In JavaScript, arithmetic doesn't cause the program to crash or raise errors in extreme cases like division by zero or invalid operations. Instead, it returns special values: (`Infinity`, `-Infinity`, and `NaN`).
 
-- Numeric Separators:
+- `Infinity`
+  - represents a value that is greater than any finite number **(too big to represent - overflow)**. It can be positive or negative (`-Infinity`).
+- `NaN` (Not-a-Number)
+  - represents a value that is not a valid number. It is the result of an invalid or undefined mathematical operation. like `0 / 0` or `'hello' / 2`.
 
-  - It's a syntactic sugar to write big numbers.
+  > **⚠️ A major "Gotcha!":** `NaN` is the only value in JavaScript that is not equal to itself. So, `NaN === NaN` returns `false`. To check if a value is `NaN`, use `Number.isNaN(value)` instead of equality checks.
+
+#### The Famous Floating-Point Rounding Error
+
+- Due to the way numbers are represented in binary, some decimal fractions cannot be represented precisely, leading to rounding errors.
 
   ```js
-  let num = 1_000_000; // 1 million -> JavaScript ignores underscores (_)
-  let numFromStr = +'1_00'; // NaN ❌ (string with `_` is not a number)
-  let numFromStr = num + 20; // 1000020 ✅
+  alert(0.1 + 0.2); // 0.30000000000000004
+  alert(0.1 + 0.2 === 0.3); // false
   ```
 
-- Ways to write big numbers:
+#### BigInt (Arbitrary Precision Integers)
 
-  - `1e3` = `1 * 10^3` = `1000`
-  - `1e-6` = `1 * 10^-6` = `0.000001`
-  - `1_000_000` = `1000000`
-  - `BigInt` = `9007199254740991n` (ends with `n`)
+To safely work with incredibly large integers, ES2020 introduced a new numeric type called **BigInt**. It can represent integers with arbitrary precision, meaning it can handle numbers larger than `Number.MAX_SAFE_INTEGER` without losing accuracy.
 
-    - `BigInt` is a special numeric type that provides support for integers of arbitrary length.
+```js
+const bigInt = 9007199254740991n; // BigInt literal (ends with 'n')
+const bigIntFromConstructor = BigInt(9007199254740991); // Using the BigInt constructor
 
-    ```js
-    1n + 2n; // 3n
-    BigInt(352); // 352n
-    typeof 1n; // bigint
-    20n === 20; // false -> strict equality
-    20n == 20; // true -> loose equality
-    ```
+1n + 2n; // 3n
+BigInt(352); // 352n
+typeof 1n; // bigint
+20n === 20; // false -> strict equality
+20n == 20; // true -> loose equality
+```
 
 - Big numbers can't be used with normal numbers:
 
@@ -1983,19 +2099,27 @@ alert(Math.random()); // random number from 0 to 1
   alert(1n + 2n); // 3
   ```
 
-- Maximum numbers in JavaScript:
+#### Numeric Separators
 
-  - JavaScript can’t represent all numbers precisely. There’s a limit for the maximum number that can be represented precisely, and it’s called `Number.MAX_SAFE_INTEGER`.
+- It's a syntactic sugar to write big numbers.
 
-    ```js
-    alert(Number.MAX_SAFE_INTEGER); // 9007199254740991
-    alert(Number.MIN_SAFE_INTEGER); // -9007199254740991
+```js
+let num = 1_000_000; // 1 million -> JavaScript ignores underscores (_)
+let numFromStr = +'1_00'; // NaN ❌ (string with `_` is not a number)
+let numFromStr = num + 20; // 1000020 ✅
+```
 
-    // also the maximum number
-    alert(Number.MAX_VALUE); // 1.7976931348623157e+308
-    ```
+#### Maximum numbers in JavaScript
 
-> There is only one value in JavaScript that is not equal to itself, and that is **NaN** > `console.log(NaN == NaN)` -> false
+- JavaScript can’t represent all numbers precisely. There’s a limit for the maximum number that can be represented precisely, and it’s called `Number.MAX_SAFE_INTEGER`.
+
+  ```js
+  alert(Number.MAX_SAFE_INTEGER); // 9007199254740991
+  alert(Number.MIN_SAFE_INTEGER); // -9007199254740991
+
+  // also the maximum number
+  alert(Number.MAX_VALUE); // 1.7976931348623157e+308
+  ```
 
 ---
 
@@ -2004,7 +2128,6 @@ alert(Math.random()); // random number from 0 to 1
 It's a modern way to work with numbers that adapts to the user's locale (country & language).
 
 - **Intl.NumberFormat**:
-
   - It's a constructor for objects that enable language-sensitive number formatting.
 
 - Currency formatting:
@@ -2039,6 +2162,8 @@ It's a modern way to work with numbers that adapts to the user's locale (country
 
 ## Date
 
+For working with time, JavaScript has a built-in `Date` object that provides methods for creating, manipulating, and formatting dates and times.
+
 To create a new Date object call: `new Date()`
 
 - `new Date()` -> Without arguments – create a Date object for the current date and time:
@@ -2068,7 +2193,6 @@ To create a new Date object call: `new Date()`
   ![date](./img/date.png)
 
 - **Notes**:
-
   - Don't use `getYear()`, but use `getFullYear()`, because `getYear()` is deprecated and it returns 2-digit year sometimes.
     - `getYear()` returns year minus `1900`. This has been deprecated for a while now, it's best to use `getFullYear()`.
   - `month` is **zero-based** so we add `1` to it to get the correct month
@@ -2082,7 +2206,6 @@ To create a new Date object call: `new Date()`
   - when you perform operations on `dates`, the result is in form of `milliSeconds`
 
 - **Dates Autocorrelation**
-
   - It's a very handy feature of `Date` objects. We can set out-of-range values, and it will auto-adjust itself.
 
     ```js
@@ -2095,7 +2218,6 @@ To create a new Date object call: `new Date()`
 ### Operations with Dates
 
 - **Date to number, date diff**
-
   - When a Date object is converted to number, it becomes the timestamp same as `date.getTime()`:
 
     ```js
@@ -2104,7 +2226,6 @@ To create a new Date object call: `new Date()`
     ```
 
 - **Parsing date from a string**
-
   - `Date.parse(str)` reads a date from a string and returns the timestamp (milliseconds since 1 Jan 1970 UTC+0).
     - Returns **NaN** if the format is invalid.
   - Format: `YYYY-MM-DDTHH:mm:ss.sssZ`
@@ -2127,7 +2248,6 @@ It's a modern way to work with dates and times that adapts to the user's locale 
 > [`Intl.DateTimeFormat` cheatsheet](https://devhints.io/wip/intl-datetime)
 
 - **Intl.DateTimeFormat**:
-
   - It's a constructor for objects that enable language-sensitive date and time formatting.
 
   ```js
@@ -2155,7 +2275,6 @@ It's a modern way to work with dates and times that adapts to the user's locale 
 ### Dates Third-party Libraries
 
 - **Moment.js**:
-
   - It's a popular library for parsing, validating, manipulating, and formatting dates.
 
     ```js
@@ -2164,7 +2283,6 @@ It's a modern way to work with dates and times that adapts to the user's locale 
     ```
 
 - **Day.js**:
-
   - It's a minimalist JavaScript library that parses, validates, manipulates, and displays dates and times.
 
     ```js
@@ -2181,8 +2299,12 @@ It's a modern way to work with dates and times that adapts to the user's locale 
 
 ### Types of Operators
 
-- There're many types of operators in JavaScript, but we can classify them into 3 main types:
+- **Arithmetic Operators:** `+` (add), `-` (subtract), `*` (multiply), `/` (divide).
+- **Shorthand Math:** `count++` adds 1 to a variable, and `count += 2` adds 2.
+- **Relational Operators:** These test relationships and evaluate to `true` or `false`. For example, `x === y` checks if two values are exactly equal, while `x !== y` checks if they are unequal. We also use `<`, `>`, `<`, and `>=`.
+- **Logical Operators:** Combine boolean (`true`/`false`) values. `&&` means AND, `||` means OR, and `!` means NOT (which inverts the boolean).
 
+- There're also other types of operators in JavaScript, but we can classify them into 3 main types:
   - **Unary** operators -> is for 1 operand
 
     ```js
@@ -2220,7 +2342,6 @@ It's a modern way to work with dates and times that adapts to the user's locale 
     ```
 
 - **Notes:**
-
   - logical operators (like `&&`) allow you to compare the results of more than one comparison operator (like `===`).
   - The values `undefined` & `NaN` shouldn’t be compared to other values:
 
@@ -2249,7 +2370,6 @@ It's a modern way to work with dates and times that adapts to the user's locale 
 **Operator precedence** determines the order in which operators are evaluated in an expression. Operators with higher precedence are evaluated first.
 
 - Order:
-
   - **Parentheses** have the highest precedence and can be used to force an expression to evaluate in the order you want.
 
   - **Unary operators**
@@ -2298,7 +2418,6 @@ alert(Math.max(...arr)); // 5
   ```
 
 - Use cases:
-
   - **Copying an array**
 
     ```js
@@ -2355,7 +2474,6 @@ It's used to **collect** a **variable number of arguments** into an array.
   ```
 
 - Use cases:
-
   - Collect elements that aren't used in destructuring
 
     ```js
@@ -2404,7 +2522,6 @@ It's used to **collect** a **variable number of arguments** into an array.
 ### Short circuiting - Nullish coalescing operator `??`
 
 - **Short-circuiting**
-
   - It's a technique used to avoid unnecessary work or evaluation.
   - It's used in logical operations to skip the evaluation of the right-hand operand when the left-hand operand is enough to determine the outcome of the operation.
 
@@ -2425,7 +2542,6 @@ It's used to **collect** a **variable number of arguments** into an array.
     ```
 
   - The result of this is not a `boolean`, but the value of the last evaluated expression.
-
     - `OR` -> returns the first truthy value or the last value if no truthy value is found.
 
     ```js
@@ -2443,7 +2559,6 @@ It's used to **collect** a **variable number of arguments** into an array.
       ```
 
 - **Nullish coalescing operator**
-
   - It's a logical operator that returns its right-hand side operand when its left-hand side operand is `null` or `undefined`, and otherwise returns its left-hand side operand.
     ![nullish coalescing operator](./img/nullish%20coalescing%20operator.webp)
     - if `a` is defined, then `a`.
@@ -2471,7 +2586,6 @@ It's used to **collect** a **variable number of arguments** into an array.
 
 - **Optional chaining** `?.`
   ![Optional chaining](./img/Optional%20chaining.webp)
-
   - It's a safe way to access nested object properties, even if an intermediate property doesn’t exist.
   - It allows reading the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
   - enables you to read the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
@@ -2614,7 +2728,6 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
 ```
 
 - creating **new option** element:
-
   - We can use `document.createElement('option')` and set attributes manually
   - or we can use the `Option` constructor:
 
@@ -2629,7 +2742,6 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
     ```
 
 - Dealing with numbers in `<input>`
-
   - The value of an `<input>` is always a **string**. If we need to get a number, we can use `parseInt` or `parseFloat`:
 
     ```js
@@ -2647,13 +2759,10 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
     ```
 
   - Questions for further understanding:
-
     - Why is this better than using `typeof`?
-
       - `typeof` checks the type of the variable, but it doesn't validate the content. For example, `typeof input.value === "number"` would be false for a numeric string like `"123"`, while `parseInt` can extract the number from it.
 
     - Why is using `parseInt` is better than using `Number()`?
-
       - `parseInt` can handle strings with non-numeric characters more gracefully, returning the integer value it can parse, while `Number()` will return `NaN` if the entire string is not a valid number.
 
         ```js
@@ -2669,7 +2778,6 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
 ### event handler in forms
 
 - **form input**:
-
   - The `input` event triggers when any of the form fields are changed, usually it's used to validate the form in real-time.
   - It's a modern replacement for `change` event, as it triggers immediately after the value changes, not when the field is blurred.
 
@@ -2692,11 +2800,9 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
   ```
 
 - **form submission**:
-
   - The `submit` event triggers when the form is submitted, it is usually used to validate the form before sending it to the server or to abort the submission and process it in JavaScript.
 
   - There are two main ways to submit a form:
-
     1. click on `<input type="submit">` or `<input type="image">`
     2. press **Enter** on an input field.
 
@@ -2704,7 +2810,6 @@ More details in the [ASYNC.md](./04-ASYNC.md) file
   >
   > - it creates a params string for the inputs in the form-body, then make a network request to the current address in the URL with these params
   >   ![form submission](./img/form-submission.png)
-
   - always use `e.preventDefault();` on form buttons as it defaults to refresh the page
   - try not to give a name attribute with value `"submit"` to a button as it might conflict and override with a `form.submit()` method
   - to remove focus from input field : `inputLogin.blur();`
@@ -2773,14 +2878,12 @@ Modern HTML allows us to do many validations using input attributes: required, p
 #### Events: change, input, cut, copy, paste
 
 - Event: `change`
-
   - The change event triggers when the element has finished changing.
   - For text inputs that means that the event occurs when it loses focus.
 
 - Event: `input`
   - The input event triggers **every time** after a value is modified by the user.
 - Events: `cut`, `copy`, `paste`
-
   - They belong to `ClipboardEvent` class and provide access to the data that is cut/copied/pasted.
   - We also can use `event.preventDefault()` to **abort the action**, then nothing gets copied/pasted.
 
@@ -2802,7 +2905,6 @@ Modern HTML allows us to do many validations using input attributes: required, p
 ---
 
 - Provide meaningful error messages
-
   - error messages are not identical in every browser. How can you show the same message to everyone?
     - To achieve this, use the `setCustomValidity()`
 
@@ -2886,7 +2988,6 @@ const data = Object.fromEntries(dataArr); // convert arrays into key-value-pairs
 
 - is a strategy to identify resources as non-blocking (non-critical) and load these only when needed. It's a way to shorten the length of the critical rendering path, which translates into reduced page load times.
 - `Steps`
-
   - HTML :
 
     ```html
