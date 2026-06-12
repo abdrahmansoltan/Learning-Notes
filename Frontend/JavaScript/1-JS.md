@@ -6,11 +6,12 @@
     - [ECMA Script (ES)](#ecma-script-es)
     - [Adding javascript file in html](#adding-javascript-file-in-html)
   - [Variables](#variables)
-    - [`Var` vs `const` \& `let`](#var-vs-const--let)
+    - [Variable Declaration (`var` vs `const` \& `let`)](#variable-declaration-var-vs-const--let)
     - [Memory Management](#memory-management)
       - [Garbage collection](#garbage-collection)
       - [Memory Leak](#memory-leak)
   - [Function](#function)
+    - [Invocation Expressions](#invocation-expressions)
     - [Function declaration vs Function expression](#function-declaration-vs-function-expression)
     - [Arrow function](#arrow-function)
     - [IIFE](#iife)
@@ -23,20 +24,23 @@
       - [Solution 3 (better): Arrow functions](#solution-3-better-arrow-functions)
     - [Arguments](#arguments)
   - [Iteration \& Loops](#iteration--loops)
+    - [Do While Loop](#do-while-loop)
     - [For loop](#for-loop)
     - [For..of loop (looping over iterables)](#forof-loop-looping-over-iterables)
-    - [For..in loop (looping over object keys) (Old way)](#forin-loop-looping-over-object-keys-old-way)
-    - [For await..of loop](#for-awaitof-loop)
+    - [For..in loop (looping over object keys)](#forin-loop-looping-over-object-keys)
+    - [For await..of loop (Async Iteration)](#for-awaitof-loop-async-iteration)
+  - [Jump Statements](#jump-statements)
   - [Data Structures](#data-structures)
     - [Strings](#strings)
       - [String Methods](#string-methods)
       - [Operations on strings](#operations-on-strings)
-      - [Regular expressions](#regular-expressions)
+      - [Regular expressions (Pattern Matching)](#regular-expressions-pattern-matching)
     - [Arrays](#arrays)
       - [Array Destructuring](#array-destructuring)
       - [Array methods](#array-methods)
         - [Array Data Transformation Methods (`map`, `filter`, `reduce`)](#array-data-transformation-methods-map-filter-reduce)
     - [Object](#object)
+      - [Properties Accessing \& Modification \& Deletion](#properties-accessing--modification--deletion)
       - [Object Methods](#object-methods)
       - [Object.keys, values, entries](#objectkeys-values-entries)
       - [Transforming objects (operations on objects)](#transforming-objects-operations-on-objects)
@@ -58,12 +62,15 @@
     - [Operations with Dates](#operations-with-dates)
     - [Dates Internationalization](#dates-internationalization)
     - [Dates Third-party Libraries](#dates-third-party-libraries)
-  - [Operators](#operators)
+  - [Symbols](#symbols)
+  - [Operators \& Expressions](#operators--expressions)
     - [Types of Operators](#types-of-operators)
     - [Operator Precedence](#operator-precedence)
     - [Spread Operator](#spread-operator)
     - [Rest Parameters](#rest-parameters)
     - [Short circuiting - Nullish coalescing operator `??`](#short-circuiting---nullish-coalescing-operator-)
+  - [Statements](#statements)
+    - [Conditional Statements (`if` - `else`)](#conditional-statements-if---else)
   - [Errors](#errors)
     - [Error object](#error-object)
       - [Custom Errors](#custom-errors)
@@ -84,6 +91,7 @@
     - [Lazy loading](#lazy-loading)
     - [Slider (pagination)](#slider-pagination)
   - [Writing Documentation](#writing-documentation)
+  - [Writing Documentation](#writing-documentation-1)
 
 ---
 
@@ -268,111 +276,122 @@ To add a script to an HTML page, we use the `<script>` tag. The `type` attribute
 
 ---
 
-### `Var` vs `const` & `let`
+### Variable Declaration (`var` vs `const` & `let`)
 
 ![var-let-const](./img/var-let-const.png)
 ![var-let-const](./img/var-let-const-2.jpg)
 
 - **Var**
-  - is function-scoped (`“var”` has no block scope) this means that if you used it in a block-scope it will also be available outside of this block-scope, **means you can't use the function-level variables outside the function-scope**
-    - Variables, declared with `var`, are either function-scoped or global-scoped. They are visible through blocks.
+  Before modern JavaScript (ES6) introduced `let` and `const`, the only way to declare a variable was with the `var` keyword. While it looks exactly like `let` in simple assignments, it behaves very differently and can be a common source of bugs. Here are the three main differences:
+  1. **Function Scope instead of Block Scope**:
+     Variables declared with `let` and `const` are contained within the block `{}` they are defined in. Variables declared with `var` are scoped to the entire body of the containing function (or global scope if declared outside functions), no matter how deeply nested they are inside loops or `if` statements (i.e., `var` has no block scope).
+
+     ```js
+     function f() {
+       // It can be accessible anywhere within this function
+       var a = 10;
+       console.log(a); // 10
+     }
+     f();
+
+     // "a" cannot be accessed outside of the function
+     console.log(a); // ReferenceError: a is not defined
+
+     // ---------------------------------------------------------------
+
+     if (true) {
+       // "a" is accessible anywhere outside the if-block because var ignores block scope
+       var a = 10;
+       console.log(a); // 10
+     }
+     console.log(a); // 10
+
+     // ---------------------------------------------------------------
+
+     for (var i = 0; i < 10; i++) {
+       var one = 1;
+     }
+     alert(i); // 10, "i" is visible after the loop
+     alert(one); // 1, "one" is visible after the loop
+     ```
+
+  2. **Global Object Properties**:
+     If you declare a global variable with `var` outside of any function, it actually becomes a property of the global object (which you can access via `window` in browsers or `globalThis` / `global` in Node.js). Variables declared with `let` or `const` do not do this.
+
+     ```js
+     var x = 5;
+     console.log(window.x); // 5
+     console.log(globalThis.x); // 5
+
+     let y = 10;
+     console.log(window.y); // undefined
+     ```
+
+  3. **Hoisting**:
+     This is the most unusual feature of `var`. When you declare a variable with `var`, JavaScript lifts (or "hoists") the declaration to the very top of its containing function or global scope. The initialization (the value assignment) stays right where you typed it, but the variable itself exists throughout the entire scope. This means you can use a `var` variable before you assign it a value, and instead of throwing a `ReferenceError`, it will just evaluate to `undefined`.
+
+     ```js
+     function sayHi() {
+       phrase = 'Hello'; // Assignment works
+       alert(phrase); // "Hello"
+       var phrase; // Declaration is hoisted to the top
+     }
+     sayHi();
+
+     // Behind the scenes, the engine processes sayHi like this:
+     function sayHi() {
+       var phrase; // declaration works at the start...
+       alert(phrase); // undefined (if alert runs before assignment)
+       phrase = 'Hello'; // ...assignment - when execution reaches it.
+     }
+     ```
+  - Other Quirks of `var`:
+    - **Tolerates Re-declarations**:
+      Unlike `let` or `const`, a variable declared with `var` can be re-declared in the same scope without triggering an error.
 
       ```js
-      function f() {
-        // It can be accessible any where (within) this function
-        //
-        var a = 10;
-        console.log(a); // 10
-      }
-      f();
+      let user;
+      let user; // SyntaxError: 'user' has already been declared
 
-      // A cannot be accessible
-      // outside of function
-      console.log(a); // ReferenceError: a is not defined
-
-      // ---------------------------------------------------------------
-
-      if (true) {
-        // It can be accessible any where
-        var a = 10;
-        console.log(a); // 10
-      }
-      console.log(a); // 10
-
-      // ---------------------------------------------------------------
-
-      for (var i = 0; i < 10; i++) {
-        var one = 1;
-        // ...
-      }
-      alert(i); // 10, "i" is visible after loop, it's a global variable
-      alert(one); // 1, "one" is visible after loop, it's a global variable
+      var user = 'Pete';
+      var user = 'John'; // this "var" does nothing (already declared), it just re-assigns
+      alert(user); // John
       ```
 
-  - `var` tolerates re-declarations
-
-    ```js
-    let user;
-    let user; // SyntaxError: 'user' has already been declared
-
-    var user = 'Pete';
-    var user = 'John'; // this "var" does nothing (already declared)
-    // ...it doesn't trigger an error
-
-    alert(user); // John
-    ```
-
-  - `var` is the old way to declare a variable in JavaScript (before ES6), it's not used anymore, it's better to use `let` and `const` instead.
-  - variable defined with `var` is an `window` object property, meaning that it can be accessed from anywhere in the code **(global scope)**
-
-  - `“var”` variables can be declared below their use
-    - `var` declarations are processed when the function starts (or script starts for globals). In other words, `var` variables are defined from the beginning of the function, no matter where the definition is
-
-      ```js
-      function sayHi() {
-        phrase = 'Hello';
-
-        alert(phrase);
-
-        var phrase;
-      }
-      sayHi();
-      ```
-
-    - **Important Note**: Declarations are hoisted, but assignments are not.
-      - Because all `var` declarations are processed at the function start, we can reference them at any place. But variables are `undefined` until the assignments.
-
-        ```js
-        function sayHi() {
-          var phrase; // declaration works at the start...
-
-          alert(phrase); // undefined
-
-          phrase = 'Hello'; // ...assignment - when the execution reaches it.
-        }
-
-        sayHi();
-        ```
-
-  - `var` variable can be **re-declared (re-defined)** without errors:
-
-    ```js
-    var num = 20;
-    num = 15; // Ok
-    var num = 50; // Ok
-    ```
-
-  - variables declared with `var` are in the global scope, and are accessible through the `window` object.
-
-    ```js
-    var x = 5;
-    console.log(window.x); // 5
-
-    let y = 10;
-    console.log(window.y); // undefined
-    ```
+  > 💡 Because of these quirks, there is almost no good reason to use `var` in modern JavaScript. The author advises using `let` and `const` instead, but you must know how `var` works because you will see it constantly in older legacy codebases!
 
 - **let & const** are both function-scoped and block-scoped (anything within `{}`), **means you can't use it outside the function-scope & block-scope**
+
+- `const`
+  - A variable declared with `const` must be initialized with a value at the exact moment of declaration, and any attempt to change the value later will throw a `SyntaxError: Assignment to constant variable`
+    - Example:
+
+      ```js
+      const name; // SyntaxError: Missing initializer in const declaration
+      ```
+
+  - It can't be re-assigned a value
+
+    ```js
+    const name = 'John';
+    name = 'Jane'; // SyntaxError: Assignment to constant variable.
+    ```
+
+- `let`
+  - A variable declared with `let` can be re-assigned a value
+    - Example:
+
+      ```js
+      let name = 'John';
+      name = 'Jane'; // Ok
+      ```
+
+  - A variable declared with `let` can be declared without a value
+    - Example:
+
+      ```js
+      let name; // Ok
+      ```
 
 ---
 
@@ -454,6 +473,29 @@ A function is a named, parameterized block of code that you define once and can 
     ```
 
 - When a function is assigned to the property of an object, we call it a **method**. Inside a method, the `this` keyword refers to the object the method was called on
+
+---
+
+### Invocation Expressions
+
+- Calling a function is also called an **invocation expression**.
+- When JS encounters an invocation, it first evaluates the function name to make sure that it's really a function and it can be called. Then it execute the code inside the function.
+  - If the value is not a function, it will throw a `TypeError`.
+  - If it's a function, it will execute the code inside the function, and the **value of the invocation expression is the return value of the function**.
+
+- **Conditional Invocation:**
+  - Starting from ES2020, we can invoke a function conditionally using the optional chaining operator `?.`.
+  - Example:
+
+    ```js
+    function square(x, logFn) {
+      // if logFn is a function, invoke it with the result of x * x
+      logFn?.(x * x);
+      return x * x;
+    }
+    ```
+
+  - Like conditional property access (optional chaining operator `?.`), if the function doesn't exist, it will return `undefined` instead of throwing an error -> **short-circuiting**
 
 ---
 
@@ -825,9 +867,44 @@ JavaScript is extremely broad-minded about the number of arguments you pass to a
 
 ---
 
+### Do While Loop
+
+- The `do` `while` loop is a control flow statement that allows you to execute a block of code **at least once**, even if the condition is false.
+- `do` block executes first then the condition is checked.
+
+  ```js
+  let i = 0;
+  do {
+    alert(i);
+    i++;
+  } while (i < 3);
+  ```
+
+- Because the test happens at the end, the body of the loop will execute **at least once**, even if the condition is false.
+
+```js
+// Examples
+
+let num = 0;
+do {
+  num += 2;
+  console.log(num); // 2, 4, 6, 8
+} while (num < 7); // condition is checked after the block is executed
+```
+
+---
+
 ### For loop
 
 It's used when you know the number of iterations.
+
+**Syntax:**
+
+```js
+for (initialization; condition; afterthought) {
+  statement;
+}
+```
 
 ```js
 for (let i = 0; i < 3; i++) {
@@ -877,14 +954,19 @@ for (let i = 0; i < 3; i++) {
   }
   ```
 
+> 💡 You can actually leave any of these three expressions blank, but the **two semicolons** inside the parentheses are always strictly required. If you write `for(;;)`, you have created an **infinite loop**!
+
 ---
 
 ### For..of loop (looping over iterables)
 
-It's a modern way to iterate over **iterables** like (`Array`, `Map`, `Set`, `String`, etc), except `objects`.
+It's a modern way to iterate over **iterables** like (`Array`, `Map`, `Set`, `String`, etc), except `objects` **(Because objects are not iterable by default).**
 
+> "Iterable" simply means the object represents a **sequence or set of elements** that can be **stepped through one by one**.
+>
 > An **iterator** must have the method named `next()` that returns an object `{done: Boolean, value: any}`, here `done:true` denotes the end of the iteration process, otherwise the value is the next value.
 
+- **Usage with Arrays**:
 - It doesn't give access to the index of the current element by default, but in case you need it, you can use the `Array.prototype.entries()` method.
 
   ```js
@@ -900,9 +982,81 @@ It's a modern way to iterate over **iterables** like (`Array`, `Map`, `Set`, `St
   }
   ```
 
+  - ⚠️ Note that here arrays are iterated **"live"**. This means that if added elements to the array while iterating over it, the loop will behave differently than the `for..in` loop. and might cause an infinite loop.
+
+- **Usage with Strings**:
+  - Strings are iterable, so we can use `for..of` loop to iterate over them.
+
+    ```js
+    let str = 'Apple';
+
+    for (let char of str) {
+      alert(char); // A, p, p, l, e
+    }
+    ```
+
+- **Usage with Maps**:
+  - Maps are iterable, so we can use `for..of` loop to iterate over them. and each element is a **[key, value]** pair. that's why we use `[key, value]` destructuring in the `for..of` loop.
+
+    ```js
+    let map = new Map();
+    map.set('Apple', 1);
+    map.set('Orange', 2);
+    map.set('Pear', 3);
+
+    for (let [key, value] of map) {
+      alert(`${key}: ${value}`); // Apple: 1, Orange: 2, Pear: 3
+    }
+    ```
+
+- **Usage with Sets**:
+  - Sets are iterable, so we can use `for..of` loop to iterate over them.
+
+    ```js
+    let set = new Set();
+    set.add('Apple');
+    set.add('Orange');
+    set.add('Pear');
+
+    for (let value of set) {
+      alert(value); // Apple, Orange, Pear
+    }
+    ```
+
+- **Usage with Objects**:
+  - By default, objects are not iterable. That's why we can't use `for..of` loop to iterate over objects.
+  - If you try to use `for..of` loop to iterate over objects, you will get a `TypeError: object is not iterable`.
+  - If you want to iterate over objects, you can use `Object.keys()` , `Object.values()`, `Object.entries()`, `Symbol.iterator()` methods.
+
+  ```js
+  let obj = {
+    name: 'John',
+    age: 30,
+    isAdmin: true
+  };
+
+  for (let value of obj) {
+    alert(value); // Error: obj is not iterable
+  }
+
+  for (let [key, value] of Object.entries(obj)) {
+    alert(`${key}: ${value}`); // name: John, age: 30, isAdmin: true
+  }
+
+  for (let key of Object.keys(obj)) {
+    alert(key); // name, age, isAdmin
+  }
+
+  for (let value of Object.values(obj)) {
+    alert(value); // John, 30, true
+  }
+  ```
+
 ---
 
-### For..in loop (looping over object keys) (Old way)
+### For..in loop (looping over object keys)
+
+> It was used before ES6 to loop over objects, and now it is recommended to use `Object.keys()` , `Object.values()`, `Object.entries()` methods instead with `for..of` loop.
 
 To walk over all **keys of an object**, there exists a special form of the loop: `for..in`.
 
@@ -933,11 +1087,15 @@ for (let key in user) {
 
   - The `for..in` loop is optimized for generic objects, not arrays, and thus is 10-100 times slower. Of course, it’s still very fast. The speedup may only matter in bottlenecks. But still we should be aware of the difference.
 
+  - ⚠️ A very common bug is accidentally using `for..in` with arrays when you meant to use `for..of`. Because arrays are technically just objects where the indexes are property names, `for..in` will loop over the indexes (`0`, `1`, `2`) rather than the actual values inside the array, and it might even catch inherited properties you didn't expect. **Always use `for..of` with arrays!**
+
 ---
 
-### For await..of loop
+### For await..of loop (Async Iteration)
 
-It's a new way to loop over async iterables. It's used to iterate over async iterables like `fetch`, `readableStream`, etc.
+Introduced in ES2018. It allows you to iterate over async iterables, such as streams, file streams, and network streams.
+
+It's a new way to iterate over async iterables. It's used to iterate over async iterables like `fetch`, `readableStream`, etc.
 
 ```js
 const asyncIterable = {
@@ -958,6 +1116,76 @@ const asyncIterable = {
 for await (let value of asyncIterable) {
   // code
 }
+```
+
+---
+
+## Jump Statements
+
+Jump statements are statements that are used to control the flow of execution of a program. There are three types of jump statements: `break`, `continue`, and `return`.
+
+These commands force the JavaScript interpreter to immediately jump to a new location in the source code
+
+- `break`: Exits the current loop or switch statement.
+- `continue`: Skips the current iteration of a loop and proceeds to the next iteration.
+- `return`: Exits the current function and returns a value to the caller.
+- `yield`: Pauses the execution of a generator function and returns a value to the caller.
+- `throw`: Throws an error. It is used to handle errors and exceptions.
+
+```js
+// break example: the loop will terminate immediately when i becomes 5
+
+for (let i = 0; i < 10; i++) {
+  if (i === 5) {
+    break;
+  }
+  console.log(i);
+}
+
+// continue example: the loop will skip the current iteration when i becomes 5
+
+for (let i = 0; i < 10; i++) {
+  if (i === 5) {
+    continue;
+  }
+  console.log(i);
+}
+
+// return example: it will exit the function when i becomes 5
+
+function example() {
+  for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+      return;
+    }
+    console.log(i);
+  }
+}
+
+example();
+
+// yield example: it will pause the execution of the generator function when i becomes 5 and return the value to the caller.
+
+function* example() {
+  for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+      yield i;
+    }
+  }
+}
+
+// throw example: it will throw an error when i becomes 5
+
+function example() {
+  for (let i = 0; i < 10; i++) {
+    if (i === 5) {
+      throw new Error('i is 5');
+    }
+    console.log(i);
+  }
+}
+
+example();
 ```
 
 ---
@@ -1205,7 +1433,7 @@ A string is an immutable (unchangeable) sequence of 16-bit values, where each va
 
 ---
 
-#### Regular expressions
+#### Regular expressions (Pattern Matching)
 
 Regular expressions search for characters that form a pattern. They can also replace those characters with new ones.
 
@@ -1217,6 +1445,18 @@ Regular expressions search for characters that form a pattern. They can also rep
   ```js
   let str = 'We will, we will rock you';
   let result = str.match(/we/gi); // ["We", "we", "we"]
+  ```
+
+- Once you define a pattern, you can use it to search, test, or replace text within strings
+
+  ```js
+  let text = 'testing: 1, 2, 3'; // Sample text.
+  let pattern = /\d+/g; // A pattern that matches one or more digits.
+
+  pattern.test(text); // => true: a match exists.
+  text.search(pattern); // => 9: position of first match.
+  text.match(pattern); // => ["1", "2", "3"]: array of all matches.
+  text.replace(pattern, '#'); // => "testing: #, #, #".
   ```
 
 ---
@@ -1231,16 +1471,33 @@ Regular expressions search for characters that form a pattern. They can also rep
 
 #### Array Destructuring
 
+Introduced in ES6, destructuring assignment is a compound syntax that lets you extract ("destructure") values from arrays or objects and assign them to individual variables in a single line of code.
+
 It's a way to extract multiple values from an array or object and assign them to variables in a single statement.
 
 ```js
 let arr = ['Ilya', 'Kantor'];
 
+// destructuring assignment
 const [firstName, surname] = arr;
+
 // instead of
 // let firstName = arr[0];
 // let surname = arr[1];
 ```
+
+- **This is incredibly useful when a function returns an array of values**
+
+  ```js
+  function getCoords() {
+    return [10, 20];
+  }
+
+  // Destructuring makes this easy and readable
+  const [x, y] = getCoords();
+  console.log(x); // 10
+  console.log(y); // 20
+  ```
 
 - default values in **destructuring** -> (it's usually when we don't know the array is complete or not, like from API)
 
@@ -1254,6 +1511,28 @@ const [firstName, surname] = arr;
   ```js
   // skipping the second array-item
   const [one, , three] = [1, 2, 3];
+  ```
+
+- Using `...` to **collect remaining elements**: (usually used with API)
+
+  ```js
+  let menu = ['Pizza', 'Burger', 'Fries', 'Salad', 'Drink'];
+
+  // The first is the main course, the rest are sides
+  const [mainCourse, ...sides] = menu;
+
+  console.log(mainCourse); // "Pizza"
+  console.log(sides); // ["Burger", "Fries", "Salad", "Drink"]
+
+  const [first, second, ...rest] = items;
+
+  // `rest` is now a new array containing the 3rd item onwards
+  console.log(rest); // ["C", "D", "E"]
+
+  // ---------------------------------------------------------------------------------------------------
+  // ⚠️ note that it's different from this
+  const [mainCourse, sides] = menu;
+  // now -> sides will have only "Burger"
   ```
 
 - Use cases:
@@ -1555,7 +1834,8 @@ It's a data structure that can store a collection of **key-value pairs**.
 
 - There're 3 ways to create an object:
   - **Object Literals**: `let obj = {};`
-  - **Constructor Literals**: `let obj = new Object();`
+  - **Constructor Literals (`new` keyword)**: `let obj = new Object() || new Array() || new Set();`
+  - **Object.create() method**: `let obj = Object.create({});` (creates an object from scratch, and the first argument is the prototype of the object)
   - **use a function as a template for creating objects**:
 
     ```js
@@ -1569,9 +1849,6 @@ It's a data structure that can store a collection of **key-value pairs**.
     var hotel_1 = new Hotel('park', 120);
     ```
 
-- Object access rules
-  ![objectRules](./img/objectRules.png)
-
 - To create a new object from an existing object: [How to deep copy an object](./12-JS-interviews-questions-tricks.md#how-to-deep-copy-an-object)
 
 - All Object keys are "stringified" (converted to strings) except for Symbols.
@@ -1583,6 +1860,149 @@ It's a data structure that can store a collection of **key-value pairs**.
   ```
 
   - Note that it won't be type-coerced to a boolean, so `obj[true]` is converted to `obj['true']`.
+
+#### Properties Accessing & Modification & Deletion
+
+- To check if property exists in object:
+  - `hasOwn(obj, property)` -> ignores inherited properties, and it's the recommended way
+
+    ```js
+    const person = {
+      name: 'John',
+      age: 30
+    };
+
+    console.log(Object.hasOwn(person, 'name')); // true
+    ```
+
+  - `in` operator -> checks own and inherited properties
+
+    ```js
+    const person = {
+      name: 'John',
+      age: 30
+    };
+
+    console.log('name' in person); // true
+    ```
+
+  - `hasOwnProperty(property)` -> ignores inherited properties, but it's not recommended to use it as it's not a static method (i.e., it belongs to the object instance, not to the Object constructor)
+
+    ```js
+    const person = {
+      name: 'John',
+      age: 30
+    };
+
+    console.log(person.hasOwnProperty('name')); // true
+    ```
+  
+  - `obj.x !== undefined` or `obj.x !== null` -> It's a common pattern used by developers but it's not recommended to use it as it's not a reliable way to check if a property exists in an object (i.e., it might return false positives).
+
+- we can access object properties using "dot notation" and "bracket notation"
+  ![objectRules](./img/objectRules.png)
+
+  ```js
+  const jonas = {
+    firstName: 'Jonas',
+    birthYear: 1991,
+
+    calcAge: function () {
+      this.age = 2037 - this.birthYear;
+      return this.age;
+    }
+  };
+
+  // dot notation
+  console.log(jonas.firstName); // 'Jonas'
+
+  // bracket notation
+  console.log(jonas['firstName']); // 'Jonas'
+  ```
+
+- Note that we cannot use dot notation to access object properties with special characters or spaces in their names.
+
+  ```js
+  const jonas = {
+    first-Name: 'Jonas', // this is invalid syntax
+    birthYear: 1991,
+
+    calcAge: function () {
+      this.age = 2037 - this.birthYear;
+      return this.age;
+    }
+  };
+
+  console.log(jonas.first-Name); // undefined
+  console.log(jonas['first-Name']); // 'Jonas'
+  ```
+
+- Also the only way to add new properties to object as a variable value is to use bracket notation
+
+  ```js
+  const jonas = {
+    firstName: 'Jonas',
+    birthYear: 1991,
+
+    calcAge: function () {
+      this.age = 2037 - this.birthYear;
+      return this.age;
+    }
+  };
+
+  const property = 'lastName';
+  jonas[property] = 'Smith';
+  // ⚠️Different from -> jonas.property = 'Smith'
+  // Because the first one is using the value of the variable "property" as the key
+  // And the second one is using the string "property" as the key
+
+  console.log(jonas[property]); // 'Smith'
+  console.log(jonas.property); // undefined -> because it's looking for a property named "property", not the value of the variable "property"
+  ```
+
+- If you attempt to query a property that does not exist, JavaScript will return `undefined` (not an error).
+
+  ```js
+  const jonas = {
+    firstName: 'Jonas',
+    birthYear: 1991
+  };
+
+  console.log(jonas.middleName); // undefined
+  ```
+
+- If you attempt to query a property on `null` or `undefined`, JavaScript will throw a `TypeError` (not `undefined`). To handle this, use either `optional chaining` or `check if the object is not null or undefined`.
+
+  ```js
+  let jonas = null;
+  console.log(jonas.firstName); // TypeError: Cannot read properties of null (reading 'firstName')
+
+  // Optional chaining
+  console.log(jonas?.firstName); // undefined
+
+  // Check if the object is not null or undefined
+  console.log(jonas && jonas.firstName); // undefined
+  ```
+
+- To delete a property from an object:
+
+  ```js
+  delete jonas.age;
+  ```
+
+  - Gotcha: `delete` only delets `own` properties, not inherited properties.
+
+    ```js
+    delete person.job; // ✅ it will delete it as it's its own property
+
+    delete person.toString; // ❌ it won't delete it as it's not its own property, it's inherited from Object.prototype
+    ```
+
+- To change a property from an object:
+
+  ```js
+  jonas.age = 25;
+  ```
 
 ---
 
@@ -1685,6 +2105,14 @@ It's a way to extract multiple values from an object and assign them to variable
 
   ```js
   const { menu = [], starterMenu: starters = [] } = restaurant;
+  ```
+
+- Destructuring with different names for the same property
+
+  ```js
+  const { name: restaurantName, openingHours: hours, categories: tags } = restaurant;
+  // Now, we can use 'restaurantName' instead of 'name', 'hours' instead of 'openingHours', and 'tags' instead of 'categories'
+  console.log(restaurantName, hours, tags);
   ```
 
 - Destructuring values from nested objects
@@ -1980,6 +2408,10 @@ Unlike many other programming languages that have separate types for integers an
     // parseFloat -> returns a floating-point number
     parseFloat('12.34'); // 12.34
     parseFloat('100px'); // 100
+
+    // toFixed -> returns a string with a specified number of decimal places
+    (12.34).toFixed(1); // "12.3"
+    (12.34).toFixed(4); // "12.3400"
     ```
 
   - Format currency: [Formatting](https://www.samanthaming.com/tidbits/30-how-to-format-currency-in-es6/)
@@ -1997,7 +2429,9 @@ Unlike many other programming languages that have separate types for integers an
   - `Math.round()` and `toFixed()`
     - both round to the nearest number: `0..4` **lead down** while `5..9` **lead up**.
   - `toString()`
+    - Used for object-to-primitive conversion, and returns a string representation of the object, for example `[2, 3].toString()` returns `"2,3"`
     - can take a base to convert to (The base can vary from `2` to `36`. By default it’s `10`)
+      > ⚠️ Watch out from this JS quirck: `[].toString()` returns `""` which is empty string, not `null`, `undefined` or `"undefined"`.
 
   - **calculations**:
     - floating-point numbers are not precise, so it's better to use `toFixed()` to round the result.
@@ -2052,6 +2486,35 @@ alert(Math.min(1, 2, 3, 4, 5)); // 1
 
 alert(Math.random()); // random number from 0 to 1
 ```
+
+- Dividing by zero in JS doesn't crash the program, it returns `Infinity`, and dividing zero by zero returns `NaN`.
+
+  ```js
+  alert(1 / 0); // Infinity
+  alert(0 / 0); // NaN
+  ```
+
+- Arithmetic operations are evaluated from left to right (except for exponentiation `**` which is evaluated from right to left):
+
+  ```js
+  alert(5 + 2 * 3); // 5 + (2 * 3) = 5 + 6 = 11
+  alert(5 * 2 + 3); // (5 * 2) + 3 = 10 + 3 = 13
+
+  // exponentiation is evaluated from right to left
+  alert(2 ** (2 ** 3)); // 2 ** (2 ** 3) = 2 ** 8 = 256
+  ```
+
+- The Quirks of the `+` Operator
+  - it can be used for both addition and string concatenation.
+
+    ```js
+    alert(1 + 1); // 2 (addition)
+    alert('1' + '1'); // "11" (concatenation)
+    alert(1 + '1'); // "11" (concatenation)
+
+    alert(1 + {}); // "1[object Object]" - objects are converted to strings
+    alert(1 + []); // "1" - empty arrays are converted to empty strings
+    ```
 
 ---
 
@@ -2292,10 +2755,42 @@ It's a modern way to work with dates and times that adapts to the user's locale 
 
 ---
 
-## Operators
+## Symbols
+
+A **Symbol** is a unique and immutable primitive value **(non-string identifier)** that can be used as a key for object properties. It was introduced in ES6 to provide a way to create unique identifiers for object properties, ensuring that they do not conflict with other property keys.
+
+- **Creating Symbols**:
+  - You can create a symbol using the `Symbol()` function. Each time you call `Symbol()`, it returns a new, unique symbol. _Don't use `new Symbol()` as it will throw an error._
+
+    ```js
+    const sym1 = Symbol('description');
+    const sym2 = Symbol('description');
+    console.log(sym1 === sym2); // false -> each symbol is unique
+    ```
+
+> If you actually want to share a Symbol across different parts of your program, JavaScript provides a Global Symbol Registry. You can use `Symbol.for("shared")` which will create a new symbol the first time, and then return that exact same symbol whenever you call it again with the same string
+
+- **Using Symbols as Object Keys**:
+  - Symbols can be used as keys for object properties, and they do not conflict with string keys.
+
+    ```js
+    const sym = Symbol('key');
+    const obj = {
+      [sym]: 'value'
+    };
+    console.log(obj[sym]); // 'value'
+    ```
+
+---
+
+## Operators & Expressions
 
 - **Operator** is a special symbol that performs specific operations on one, two, or three operands, and then returns a result.
 - **operand** is what operators are applied to
+- **Expression** is a piece of code that evaluates to a value.
+  - Most of operators are expressions, but not all expressions are operators.
+    - `a + 2` is an expression because it evaluates to a value, but it is not an operator
+    - `a++` is an expression because it evaluates to a value, and it is an operator
 
 ### Types of Operators
 
@@ -2303,9 +2798,41 @@ It's a modern way to work with dates and times that adapts to the user's locale 
 - **Shorthand Math:** `count++` adds 1 to a variable, and `count += 2` adds 2.
 - **Relational Operators:** These test relationships and evaluate to `true` or `false`. For example, `x === y` checks if two values are exactly equal, while `x !== y` checks if they are unequal. We also use `<`, `>`, `<`, and `>=`.
 - **Logical Operators:** Combine boolean (`true`/`false`) values. `&&` means AND, `||` means OR, and `!` means NOT (which inverts the boolean).
+  - It does "short-circuiting", meaning that it will stop evaluating the expression as soon as it finds a value that determines the result.
+- **Ternary Operator:** `condition ? value1 : value2`, or known as **"The conditional (`?:`) operator**".
+  - It is a concise way to write a simple if-else statement.
+- `in` operator: `prop in object`
+  - Returns `true` if the specified property is in the specified object.
+
+    ```js
+    const obj = {
+      name: 'John',
+      age: 30
+    };
+    console.log('name' in obj); // true
+    console.log('age' in obj); // true
+    console.log('address' in obj); // false
+    ```
+
+- `instanceof` operator: `object instanceof Constructor`
+  - Returns `true` if the specified object is an instance of the specified constructor.
+
+    ```js
+    const obj = {
+      name: 'John',
+      age: 30
+    };
+    console.log(obj instanceof Object); // true
+    ```
 
 - There're also other types of operators in JavaScript, but we can classify them into 3 main types:
   - **Unary** operators -> is for 1 operand
+    - **Pre-increment/decrement** -> `++x`, `--x` (increments/decrements the value before using it)
+    - **Post-increment/decrement** -> `x++`, `x--` (increments/decrements the value after using it)
+    - **Unary plus** -> `+x` (converts the value to a number)
+    - **Unary minus** -> `-x` (converts the value to a number and negates it)
+    - **Logical NOT** -> `!x` (inverts the boolean value)
+    - **Bitwise NOT** -> `~x` (inverts the bits of the operand)
 
     ```js
     // Increment/decrement a variable
@@ -2329,7 +2856,7 @@ It's a modern way to work with dates and times that adapts to the user's locale 
     // Addition
     console.log(5 + 2); // 7
 
-    // Logical / Boolean operators
+    // (Logical / Boolean / Bitwise) operators
     console.log(true && false); // false
     console.log(true || false); // true
     ```
@@ -2362,6 +2889,32 @@ It's a modern way to work with dates and times that adapts to the user's locale 
     ```
 
   - There're new **"logical assignment operators"** like `**=`, `??=`, `&&=`, `||=` introduced in ES6, where `a ??= b` means `a = a ?? b`.
+  - Be careful when using comparison-operators with mixing strings and numbers, as JS will convert strings to numbers when comparing them to numbers, and it may not always work as expected.
+
+    ```js
+    alert(5 > '4'); // true
+    alert('5' > 4); // true
+    alert(5 < '6'); // true
+    alert('5' < 6); // true
+
+    alert('one' > 0); // false -> "one" is converted to NaN, and NaN > 0 is false
+    alert('one' < 0); // false -> "one" is converted to NaN, and NaN < 0 is false
+    alert('one' == 0); // false -> "one" is converted to NaN, and NaN == 0 is false
+    alert('one' === 0); // false -> "one" is converted to NaN, and NaN === 0 is false
+    ```
+
+  - Note that logical operators don't actually return `true` or `false`, but rather the value of the last operand that was evaluated. and this value is converted to `true` or `false` when needed (when using it in an if statement for example)
+
+    ```js
+    console.log(true && 5); // 5 because 5 is the last evaluated operand
+    console.log(true || false); // true because true is the last evaluated operand
+    ```
+
+  - OR `||` operator is commonly used by developers to assign default values to variables:
+
+    ```js
+    let maxValue = maxWidth || 100;
+    ```
 
 ---
 
@@ -2558,8 +3111,10 @@ It's used to **collect** a **variable number of arguments** into an array.
       console.log(undefined && null); // undefined
       ```
 
-- **Nullish coalescing operator**
-  - It's a logical operator that returns its right-hand side operand when its left-hand side operand is `null` or `undefined`, and otherwise returns its left-hand side operand.
+- **Nullish coalescing operator `??`** - First-Defined Operator
+  - It's introduced in ES2020.
+  - It returns the first **defined value** (non-nullish or non-undefined value).
+  - It evaluates the expression from left to right and stops when it finds the first value that is not `null` or `undefined`.
     ![nullish coalescing operator](./img/nullish%20coalescing%20operator.webp)
     - if `a` is defined, then `a`.
     - if `a` isn’t defined, then `b`.
@@ -2588,6 +3143,8 @@ It's used to **collect** a **variable number of arguments** into an array.
   ![Optional chaining](./img/Optional%20chaining.webp)
   - It's a safe way to access nested object properties, even if an intermediate property doesn’t exist.
   - It allows reading the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
+  - If the value is `undefined` or `null` at any point in the chain, it will stop and return `undefined` instead of throwing an error.
+    - This is called **short-circuiting** because it stops evaluating the expression as soon as it finds a `null` or `undefined` value.
   - enables you to read the value of a property located deep within a chain of connected objects without having to check that each reference in the chain is valid.
 
     ```js
@@ -2603,6 +3160,68 @@ It's used to **collect** a **variable number of arguments** into an array.
   - We can use `?.` for safe reading and deleting, but not writing
 
   - it works well with `nullish coalescing operator` `??`:
+
+---
+
+## Statements
+
+Expressions are evaluated to produce a value, but statements are executed to actually make something happen.
+
+For example: `a + b` is an expression, but `if (a > b)` is a statement.
+
+- There are a few basic types of statements:
+  - Expression statements:
+    - most of what we’ve seen in the previous chapters: variable assignments, function calls, etc.
+  - Compound statements:
+    - a group of statements that are executed together, like multiple statements wrapped inside curly braces `{}`
+  - Control flow statements:
+    - statements that control the flow of execution
+    - e.g. `if` statement, `for` statement, `while` statement, `switch` statement, `try` statement, etc.
+
+### Conditional Statements (`if` - `else`)
+
+They act as decision points that can branch the path of code to be executed based on the result of a condition.
+
+- `if () {}`
+  - the code inside the curly braces will be executed if the condition is true.
+
+- `else {}`
+  - the code inside the curly braces will be executed if the condition is false.
+
+- `else if () {}`
+  - the code inside the curly braces will be executed if the previous conditions are false and the current condition is true. instead of having multiple nested `if` statements.
+
+- `switch () {}`
+  - the code inside the curly braces will be executed if the current value matches the value of the switch.
+  - It uses strict comparison (`===`) to match the value with the cases. meaning that `switch` will not do type coercion.
+
+```js
+// Examples
+
+let time = 9;
+
+if (time < 10) {
+  greeting = 'Good morning';
+} else if (time < 20) {
+  greeting = 'Good day';
+} else {
+  greeting = 'Good evening';
+}
+console.log(greeting); // Good morning
+
+let day = 'Monday';
+
+switch (day) {
+  case 'Monday':
+    console.log('Start of the week');
+    break;
+  case 'Friday':
+    console.log('End of the week');
+    break;
+  default:
+    console.log('Midweek');
+}
+```
 
 ---
 
@@ -2678,7 +3297,7 @@ try {
 
 ### Error Handling
 
-More details in the [ASYNC.md](./04-ASYNC.md) file
+More details in the [ASYNC.md](./4-ASYNC.md) file
 
 ---
 
@@ -3023,4 +3642,13 @@ const data = Object.fromEntries(dataArr); // convert arrays into key-value-pairs
 
 [jsdoc](https://jsdoc.app/)
 
+- before any function(the line above it) write `/**` and vsCode will configure it
+
+## Writing Documentation
+
+[jsdoc](https://jsdoc.app/)
+
+- before any function(the line above it) write `/**` and vsCode will configure it
+- before any function(the line above it) write `/**` and vsCode will configure it
+- before any function(the line above it) write `/**` and vsCode will configure it
 - before any function(the line above it) write `/**` and vsCode will configure it

@@ -10,6 +10,13 @@
       - [Shortcomings of the OSI model](#shortcomings-of-the-osi-model)
     - [TCP/IP Model](#tcpip-model)
   - [Host to Host Communication](#host-to-host-communication)
+  - [IP Protocol](#ip-protocol)
+    - [IP Address](#ip-address)
+    - [Port Number](#port-number)
+    - [Subnet Mask](#subnet-mask)
+    - [Default Gateway](#default-gateway)
+    - [IP Packet](#ip-packet)
+    - [Internet Control Message Protocol (ICMP)](#internet-control-message-protocol-icmp)
 
 ---
 
@@ -135,6 +142,7 @@ They communicate using **[Application Protocols](./Internet.md#application-proto
         ![OSI Model](./img/osi-sender-receiver-3.png)
       - **Proxy/Firewall** is a layer 4 device, it cares about the order of the packets and if they arrive or not and the connection details (ports, headers), but it doesn't care about the `ip` address and how to route the packets to the right destination.
       - **Load Balancer/CDN** is a layer 7 device, it cares about the content of the packets and how to route the packets to the right destination based on the content of the packets (like the URL, headers, ...), but it doesn't care about the `ip` address and how to route the packets to the right destination.
+        - CDNs need to cache the data retrieved from the backend server and to do that it needs to fully decrypt the content and understand it so it has to be a Layer 7 application
         - CDN or Load Balancer are layer 7 devices because they need to look at the content of the packets to decide where to route them, for example if the URL is `/images` it will route the packet to the image server, if the URL is `/api` it will route the packet to the API server, and so on.
           ![OSI Model](./img/osi-sender-receiver-4.png)
       - **VPN** is a layer 3 device, it takes the ip and wraps it in another ip and encrypts the data, so it cares about the `ip` address and how to route the packets to the right destination based on the `ip` address, but it doesn't care about the order of the packets and if they arrive or not.
@@ -247,3 +255,122 @@ They communicate using **[Application Protocols](./Internet.md#application-proto
   - Because `mac` address is only used for communication within the local network, while `ip` address is used for communication between different networks (like the internet). The `ip` address allows us to route the messages to the right destination based on the `ip` address, while the `mac` address only allows us to identify the device in the local network.
   - Without `ip` address, we don't know where to send the message in the world, because most likely the recipient is not in the same local network as the sender, so we need a way to route the message to the right destination, and that's where the `ip` address comes in.
   - Think of it as "index in databases", we need an index to quickly find the data we want, without it we would have to scan the entire database to find the data we want, which is inefficient and slow. Similarly, without `ip` address, we would have to send the message to everyone in the local network and hope that the intended recipient receives it and processes it, which is inefficient and slow.
+
+---
+
+## IP Protocol
+
+### IP Address
+
+![IP Address](./img/ip-address-1.png)
+
+- A protocol that provides logical addressing to devices on a network.
+- It's a layer 3 protocol (Network layer)
+- Used for routing packets across networks.
+- It's built in 2 parts:
+  1. Network part: Identifies the network to which the device belongs -> **To eliminate many networks when sending messages to each other -> We need to know the network part of the ip address to route the message to the right network**
+  2. Host part: Identifies the device within the network -> **To identify the device within the network** (each network has a finite range of host ip addresses)
+
+> 💡 **To know the network part and the host part of an ip address, we use the subnet mask** -> In IPv4, subnet mask is 32-bits long, it's built in 2 parts, network part and host part, the network part is the part that identifies the network to which the device belongs, and the host part is the part that identifies the device within the network. In IPv6, subnet mask is 128-bits long, it's built in 2 parts, network part and host part, the network part is the part that identifies the network to which the device belongs, and the host part is the part that identifies the device within the network.
+
+- Two main versions: IPv4 and IPv6.
+  - **IPv4**: 32-bit addresses, commonly written in dotted-decimal notation (e.g., 192.168.1.1).
+  - **IPv6**: 128-bit addresses, written in hexadecimal notation (e.g., 2001:0db8:85a3:0000:0000:8a2e:0370:7334).
+
+> 💡 I think that it's clear now what is `localhost` that we see when running a server on our machine -> It's just the `ip` address of our machine `127.0.0.1` (for IPv4) or `[IP_ADDRESS]` (for IPv6). meaning that we're sending/receiving messages to our own machine and nobody else can access it even in the same network.
+
+- Example: Host `192.168.1.3` wants to talk to `192.168.2.2`.
+
+  ![IP Address](./img/ip-address-2.png)
+  - If they are in the same local network (subnet), then the host can send the message directly to the recipient using the `mac` address.
+  - If they are in different local networks (subnets), then the host needs to send the message to the router, which will then forward the message to the recipient's local network.
+  - **What is `/24` in `192.168.1.0/24`? -> see image above**
+    - It's a **subnet mask**, it tells us the network part and the host part of the ip address.
+    - 💡 Note that each 4 digits/bits are 1 byte, so each part between the dot `.` is 1 byte.
+    - `/24` tells us that the first 24 bits **(3 bytes)** are the **network part**, and the remaining 8 bits are the **host part** -> `IPV4`
+    - `/64` tells us that the first 64 bits are the **network part**, and the remaining 64 bits are the **host part** -> `IPV6`
+
+- **"But my host has many apps, how do I know which app to send the message to?"** -> **Port Number** ⬇️
+
+### Port Number
+
+![Port Number](./img/port-number-1.png)
+
+- It's an integer number that identifies the **application** that the message should be sent to -> `1-65535`
+- Each app has a unique port number, and the operating system uses the port number to deliver the message to the correct application.
+- You can send an HTTP request on port `80`, a DNS query on port `53`, an SSH connection on port `22`, ...
+- Example: Host `192.168.1.3` has 2 apps: App A on port `80` and App B on port `443`.
+
+### Subnet Mask
+
+It's a 32-bit number (for IPv4) that is used to determine the network part and the host part of an IP address.
+
+- The subnet is **`192.168.0.0/24`**
+- The subnet haas a mask **`255.255.255.0`**
+- The subnet mas is used to determine whether an IP is in the same subnet or not.
+  ![Subnet Mask](./img/subnet-mask-1.png)
+  - 💡 Two IPs are in the same subnet if their network part is the same.
+  - if it has the same subnet, it's then in the same network as the sender, so we can send the message directly to the recipient using the `mac` address.
+  - if it has a different subnet, it's then in a different network from the sender, so we need to send the message to the router, which will then forward the message to the recipient's network.
+
+### Default Gateway
+
+![Default Gateway](./img/default-gateway-1.png)
+
+- It's the **IP address of the router** that the host uses to send messages to recipients in different networks.
+- It's the **entry point to the internet** for the host.
+
+### IP Packet
+
+> See [Packet](./Internet.md#packet) to understand what is packet and how it works
+
+- **IP Packet** is just a **Packet** with **Header IP**
+  ![packet-1](./img/packet-1.png)
+
+- The `ip` header is 20 bytes long and contains the following information:
+  ![packet-2](./img/packet-2.png)
+  - **Version**: The version of the IP protocol (IPv4 or IPv6)
+  - **IHL**: Header Length
+  - **DSCP**: Differentiated Services Code Point -> for Quality of Service (QoS)
+  - **ECN**: Explicit Congestion Notification -> to notify the sender about congestion (which is the condition when too much data is sent to a network)
+  - **Total Length**: The total length of the IP packet (header + data)
+  - **Identification**: A unique identifier for the IP packet
+  - **Flags**: Flags that control the behavior of the IP packet
+  - **Fragment Offset**: The offset of the fragment
+  - **Time to Live**: The time to live of the IP packet
+  - **Protocol**: The protocol that the IP packet is carrying (TCP, UDP, etc.)
+  - **Header Checksum**: The checksum of the IP header
+  - **Source IP Address**: The IP address of the sender
+  - **Destination IP Address**: The IP address of the recipient
+  - **Options**: Optional fields
+
+### Internet Control Message Protocol (ICMP)
+
+![ICMP](./img/icmp-1.png)
+
+- It's a protocol that is used to send error messages and other information between IP hosts
+  - Errors like (Host unreachable, network unreachable, TTL expired, Packet expired, etc)
+- It's a layer 3 protocol (Network layer)
+  - Doesn't require listeners or ports to be opened because it's not a transport layer protocol.
+- It's built in 2 parts:
+  1. Message Type: Identifies the type of the ICMP message
+  2. Message Code: Identifies the code of the ICMP message
+
+- **Ping** is an application that uses ICMP to test the reachability of a host.
+  - It sends an `ICMP Echo Request` to the destination host and waits for an `ICMP Echo Reply`.
+  - If the destination host is reachable, it will send an `ICMP Echo Reply` back to the sender.
+  - If the destination host is not reachable, it will send an `ICMP Echo Reply` back to the sender with an error message.
+
+  ```bash
+  ping 192.168.1.1 # Send a ping to the default gateway (first router ip in the network -> Your router ip)
+
+  ping 192.168.1.1 -c 4 # Send a ping to the default gateway (first router ip in the network) 4 times
+
+  ping google.com # Send a ping to google.com (it will resolve the ip address of google.com and send a ping to it)
+  ```
+
+  ![ping](./img/ping-1.png)
+
+  > As you can see from the image below of an example of using `ping`, everything in the layer 3 is dealing with **IP Packets** only.
+  > ![ping](./img/ping-2.png)
+  > ![ping](./img/ping-3.png)

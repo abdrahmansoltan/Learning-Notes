@@ -111,7 +111,9 @@ Internet Protocol addresses are unique identifiers assigned to every device conn
 
 ### Packet
 
-It's a small piece of data that is sent over the internet.
+It's a small piece of data that is sent over the internet with source IP and destination IP addresses.
+
+![packet-1](./img/packet-1.png)
 
 - it contains **MetaData** (where to/from the data is sent and headers ..)
   1. breaking message into small parts

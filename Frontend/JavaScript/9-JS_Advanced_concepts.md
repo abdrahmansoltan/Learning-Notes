@@ -11,8 +11,9 @@
     - [Pass by Value vs Pass by Reference (Memory Alocation)](#pass-by-value-vs-pass-by-reference-memory-alocation)
     - [`null` vs `undefined`](#null-vs-undefined)
     - [Strict vs Loose Equality (`===` \& `==`)](#strict-vs-loose-equality---)
-    - [Type Conversion](#type-conversion)
-    - [Type Coercion](#type-coercion)
+    - [Type Conversion (Explicit - by programmer)](#type-conversion-explicit---by-programmer)
+    - [Type Coercion (Implicit - by JS engine)](#type-coercion-implicit---by-js-engine)
+  - [The Global Object](#the-global-object)
   - [Execution context](#execution-context)
     - [Scope](#scope)
       - [Lexical Scope (Environment)](#lexical-scope-environment)
@@ -352,9 +353,26 @@ The JavaScript engine is a program or an interpreter that reads and executes the
     - **Why this might be good:** it saves memory space, as it doesn't need to store the same value in multiple locations.
     - **Why this might be bad:** it can lead to unexpected behavior if you're not careful. like if you want to copy the value of the object to another object, you need to do a `deep copy` not a `shallow copy`.
 
+> The distinction between copying by value (primitives) and copying by reference (objects) is the source of many bugs for new JavaScript developers.
+>
+> - When you assign a primitive value to a variable, it creates a new copy of that value in memory. So when you change the value of that variable, it doesn't affect the original value.
+> - When you assign an object to a variable, it creates a reference to that object in memory. So when you change the value of that variable, it affects the original object.
+>
+> This is why it's important to understand the difference between primitive and reference types in JavaScript, and to be careful when working with objects to avoid unintended side effects.
+
 ---
 
 ### `null` vs `undefined`
+
+JavaScript has two special values that indicate the absence of a value:
+
+- `null`
+  - is a value that represents the intentional absence of any object value. It is a primitive value that can be assigned to a variable as a representation of no value.
+  - 💡 If you use the `typeof` operator on `null`, it will return `"object"` (a known bug in JavaScript). _indicating it can be thought of as a special object that indicates "no object"_.
+- `undefined`
+  - is a value that represents the absence of a value. It's the value of variables that have not been initialized or assigned a value yet. It is also the default value of function arguments that are not provided, and the value of object properties that do not exist.
+
+> Both `null` and `undefined` are "falsy" values. Because they are so similar, the non-strict equality operator considers them equal (`null == undefined` is `true`), but you can distinguish between them using strict equality (`null === undefined` is `false`)
 
 To remember the difference, use the song "I want it that way"
 ![null-undefined](./img/null-undefined-1.png)
@@ -407,14 +425,26 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
     false;
     ```
 
-> **Note:** It's a myth that `===` is slower than `==` in modern browsers.
->
-> - Some argue that using `===` everywhere implies a lack of understanding or trust in your code's types.
-> - Clear and obvious types lead to better code. Use `==` when types are known, otherwise use `===`.
+- **Notes:**
+  - It's a myth that `===` is slower than `==` in modern browsers.
+    - Some argue that using `===` everywhere implies a lack of understanding or trust in your code's types.
+    - Clear and obvious types lead to better code. Use `==` when types are known, otherwise use `===`.
+  - Objects and arrays are compared **by reference** not by value. so 2 distict objects are never equal to each other even if they have the same values
+    ```js
+    const obj1 = { name: 'John' };
+    const obj2 = { name: 'John' };
+
+    obj1 === obj2; // false
+    obj1 == obj2; // false
+    
+    const obj3 = obj1;
+    obj1 === obj3; // true
+    obj1 == obj3; // true
+    ```
 
 ---
 
-### Type Conversion
+### Type Conversion (Explicit - by programmer)
 
 **Explicit Type Conversion (Type Casting)**: is when data type is converted by the programmer using type casting.
 
@@ -423,6 +453,29 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
   - `parseInt()`, `parseFloat()`
   - `toString()`, `toFixed()`
   - `JSON.stringify()`, `JSON.parse()`
+
+| Value                           | to String           | to Number    | to Boolean  |
+| :--------------------------------| :--------------------| :-------------| :------------|
+| `undefined`                     | `"undefined"`       | `NaN`        | `false`     |
+| `null`                          | `"null"`            | **`0`**      | `false`     |
+| `true`                          | `"true"`            | **`1`**      |             |
+| `false`                         | `"false"`           | `0`          |             |
+| `""` (empty string)             |                     | `0`          | **`false`** |
+| `"1.2"` (nonempty, numeric)     |                     | `1.2`        | `true`      |
+| `"one"` (nonempty, non-numeric) |                     | `NaN`        | `true`      |
+| `0`                             | `"0"`               |              | **`false`** |
+| `-0`                            | `"0"`               |              | **`false`** |
+| `1` (finite, non-zero)          | `"1"`               |              | `true`      |
+| `Infinity`                      | `"Infinity"`        |              | `true`      |
+| `-Infinity`                     | `"-Infinity"`       |              | `true`      |
+| `NaN`                           | `"NaN"`             |              | **`false`** |
+| `{}` (any object)               | *see §3.9.3*        | *see §3.9.3* | `true`      |
+| `[]` (empty array)              | `""`                | **`0`**      | `true`      |
+| `[9]` (one numeric element)     | `"9"`               | **`9`**      | `true`      |
+| `['a']` (any other array)       | *use join() method* | `NaN`        | `true`      |
+| `function(){}` (any function)   | *see §3.9.3*        | `NaN`        | `true`      |
+
+- **Shorthand Idioms**: Developers also use quick shorthand idioms for type conversion, such as `x + ""` to convert a value to a string, `+x` to convert to a number, and `!!x` to convert to a boolean.
 
 - When the conversion fails, the result is `NaN` (Not a Number).
 
@@ -445,7 +498,7 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
 
 ---
 
-### Type Coercion
+### Type Coercion (Implicit - by JS engine)
 
 **Type coercion** is the process of implicitly converting value from one type to another by the JavaScript engine.
 
@@ -494,6 +547,19 @@ The difference is that `==` will do **type coercion** before comparing, whereas 
   { x: 1 } == { x: 1 }; // false
   { x: 1 } === { x: 1 }; // false
   ```
+
+---
+
+## The Global Object
+
+When the JavaScript interpreter starts up, it automatically creates a global object. This object contains all the built-in identifiers you use in your code, such as:
+
+- Global constants like `undefined`, `Infinity`, and `NaN`.
+- Global functions like `isNaN()`.
+- Constructor functions like `Date()`, `String()`, and `Object()`.
+- Global objects like `Math` and `JSON`.
+
+In web browsers, the global object is known as `window`. In Node.js, it is known as `global`. Because this was confusing, ES2020 standardized the name `globalThis` so you can safely refer to the global object in any environment.
 
 ---
 
@@ -2007,13 +2073,16 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
   - `BigInt`
   - `Symbol` -> (new in ES6)
   - some of them may have object-like features, but they are not objects. An object is a collection of key-value pairs. And the value can be accessed by using the key of the object.
-- **Statements Vs Expressions** :
+- **Statements vs Expressions vs Declarations** :
   - `Expression`: it's a piece of code that produces a value and expected to be used in places where values are expected
     - Ex: `5+4` or `Ternary Operator` or `short circuiting` and then you can use it in a `${}`
-  - `Statements`: it's a piece of code that does something and doesn't produce a value
+  - `Statements`: it's a piece of code that does something and doesn't produce a value (make things happen)
     - Ex: `if` statement or `for` loop
+  - `Declaration`: it's a statement that declares a variable or function. (Defign variables and give them names)
+    - 💡 It runs in the **Compile time** before the runtime of the program.
+    - Ex: `let x;` or `function foo() {}`
 - **Strict mode**:
-  - `"use strict"` enables secure coding by enforcing stricter parsing and error handling.
+  - `"use strict"` It's a directive that tells the browser to run the JavaScript code in "strict mode" that enforces stricter parsing and error handling.
   - Place `"use strict"` at the top of your scripts to enable it.
   - Benefits:
     1. Forbids certain operations, ex:
@@ -2152,13 +2221,15 @@ It's an advance topic and you can find it here [Selection and Range](https://jav
     > - A zero-argument function, which is only called when the user gives a positive answer.
     > - A function with arguments, which is called in either case and returns an answer.
 
-- **eval()** built-in function
+- `eval()` built-in function
   - it allows to execute a string of code.
 
   ```js
   let code = 'alert("Hello")';
   eval(code); // Hello
   ```
+  - ⚠️ It's powerful, it is almost never necessary and should be avoided, as it opens a huge security hole and performance bottleneck. if you pass a string derived from user input into it, an attacker can execute any code on your site.
+  - Furthermore, using `eval()` prevents the JavaScript interpreter from properly optimizing your code, making your program run slower.
 
 - pre-increment `++i` vs post-increment `i++`
   - `++i` => first increment then return

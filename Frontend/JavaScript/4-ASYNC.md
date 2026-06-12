@@ -1686,6 +1686,19 @@ By default, the `fetch()` API doesn't consider `HTTP` status codes in the `4xx` 
 
 `try...catch` can only handle errors that occur in valid code. Such errors are called **“runtime errors”** or, sometimes, **“exceptions”**.
 
+```js
+try {
+    // Normally, this code runs from the top to the bottom.
+    // But it can sometimes throw an exception.
+} catch(e) {
+    // The statements in this block are executed if, and only if, the try
+    // block throws an exception. We can use the variable 'e' to see the error.
+} finally {
+    // This block contains statements that are always executed, regardless of
+    // what happens in the try block.
+}
+```
+
 - If a promise resolves normally, then `await promise` returns the result. But in the case of a `rejection`, it throws the error, just as if there were a throw statement at that line.
 
   ```javascript
