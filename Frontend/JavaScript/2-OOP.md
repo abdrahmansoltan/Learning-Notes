@@ -196,6 +196,7 @@ user.name = ''; // Name is too short...
 
 ## Prototypes (OOP in Javascript)
 
+
 ### How Prototypal Inheritance Works
 
 Each object has a `prototype`, which contains **methods** and **properties** that are **shared** among all instances of that object.
@@ -428,6 +429,8 @@ It's a function that creates an object type, and prepares the object for use. wh
 
 It's a keyword that automates the hard work (process of creating an object and linking it to the `prototype` of the `constructor function`).
 
+When you call a constructor with **`new`** keyword, the newly created object automatically inherits from the object specified by that constructor's `prototype` property.
+
 ![new-keyword](./img/new-keyword.png)
 
 - When a function is executed with **`new`** keyword, it does the following **steps**:
@@ -620,6 +623,8 @@ sarah.calcAge();
 ---
 
 ## ES6 Classes
+
+Before **ES6** introduced the `class` keyword, **JavaScript** used a way to define objects using [constructor functions](#constructor-function) and using the [`object.create()`](#objectcreate) method. But now we can use the `class` keyword to define objects which is more readable and easier to understand. **But know that ES6 class is just a syntactic sugar for constructor functions**.
 
 > In object-oriented programming, a `class` is an extensible program-code-template for creating objects, providing initial values for state (member variables) and implementations of behavior (member functions or methods).
 

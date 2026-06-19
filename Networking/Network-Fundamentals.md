@@ -346,6 +346,8 @@ It's a 32-bit number (for IPv4) that is used to determine the network part and t
 
 ### Internet Control Message Protocol (ICMP)
 
+It's a IP-level protocol used to send information from the source host to the destination host about the status of the IP packet.
+
 ![ICMP](./img/icmp-1.png)
 
 - It's a protocol that is used to send error messages and other information between IP hosts
@@ -355,6 +357,8 @@ It's a 32-bit number (for IPv4) that is used to determine the network part and t
 - It's built in 2 parts:
   1. Message Type: Identifies the type of the ICMP message
   2. Message Code: Identifies the code of the ICMP message
+
+> 💡 If it's blocked by a firewall or any router in the path, then we won't get any response from the destination host. -> so we know that the host is unreachable or blocked.
 
 - **Ping** is an application that uses ICMP to test the reachability of a host.
   - It sends an `ICMP Echo Request` to the destination host and waits for an `ICMP Echo Reply`.
@@ -374,3 +378,45 @@ It's a 32-bit number (for IPv4) that is used to determine the network part and t
   > As you can see from the image below of an example of using `ping`, everything in the layer 3 is dealing with **IP Packets** only.
   > ![ping](./img/ping-2.png)
   > ![ping](./img/ping-3.png)
+
+- **Traceroute** is a tool that uses ICMP to trace the route that packets take to reach a destination host.
+  - It sends a series of `ICMP Echo` Requests to the destination host with increasing Time to Live (TTL) values.
+  - Each router along the path forwards the packet and decrements the TTL value. When the TTL value reaches 0, the router sends an ICMP Time Exceeded message back to the sender.
+  - This allows the sender to see the IP addresses of all the routers along the path to the destination.
+
+  ```bash
+  traceroute google.com # Trace the route to google.com (it will resolve the ip address of google.com and trace the route to it)
+
+  traceroute google.com -m 10 # Trace the route to google.com with a maximum of 10 hops
+  ```
+
+---
+
+### ARP (Address Resolution Protocol)
+
+> In most of the situations, you know the IP address, but you need to know the MAC address to send the message to the recipient.
+> You need the MAC address because you are in the same local network (subnet), so you can send the message directly to the recipient using the MAC address.
+> 
+> That's when ARP comes in handy.
+
+It's a layer 2 (Data Link layer) protocol used to resolve the MAC address of a host given its IP address.
+
+![arp](./img/arp-2.png) 
+
+- In the beginning, hosts have no information about the MAC addresses of other hosts. Then they need to send an **ARP Request/Broadcast** to the network to know the MAC address of the destination host, and then it's going to respond with an **ARP Reply** containing its MAC address and caching it in the ARP table. After that, we can send messages directly to the recipient using the MAC address as the MAC address of the destination host is now known and added to the frames (packets).
+
+
+
+
+- **ARP Table:** It's a table that stores/caches the IP address and MAC address mappings of the hosts in the local network.
+
+  ```bash
+  arp -a # Show the ARP table
+  ```
+
+- How it works
+  ![arp](./img/arp-1.png)
+
+- **ARP Poisoning:** It's a type of attack that exploits the ARP protocol to send spoofed ARP messages to a LAN (local area network) and associate the attacker's MAC address with the IP address of another host. (The attacker impersonates the gateway (Default Router)) → Man in the middle)
+  - It can be used to intercept network traffic, modify it, or inject malicious data into it.
+  

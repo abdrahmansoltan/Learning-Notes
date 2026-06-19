@@ -591,7 +591,7 @@ let arr = [1, 2, 3, 4];
 
 > This is usually used when you want to create a copy of an object (that contains nested objects) without modifying the original object.
 
-1. You can use `JSON.parse()` and `JSON.stringify()` to deep copy an object.
+1. You can use `JSON.parse()` and `JSON.stringify()` to deep copy an object -> **Serialization**
 
    ```js
    const obj = { a: 1, b: { c: 2 } };
@@ -625,6 +625,13 @@ let arr = [1, 2, 3, 4];
    const obj = { a: 1, b: { c: 2 } };
    const deepCopy = Object.assign({}, obj);
    ```
+
+   - Note that it's also used to **extend** an object with another object's properties.
+
+     ```js
+     const obj = { a: 1, b: { c: 2 } };
+     const extendedObj = Object.assign({}, obj, { d: 4 });
+     ```
 
 4. You can use the `spread` operator to copy the properties of the object to a new object.
 
@@ -1027,6 +1034,8 @@ async function getUser() {
 ---
 
 ### (var vs let vs const) in loops
+
+![var-vs-let-vs-const-in-loops](./img/var-vs-let-vs-const-in-loops.png) 
 
 1. **What will be the result of this code?**
 

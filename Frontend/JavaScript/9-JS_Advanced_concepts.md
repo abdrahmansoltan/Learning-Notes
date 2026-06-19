@@ -988,7 +988,7 @@ It's the process of building software with small **pure functions**, avoiding **
 
 ---
 
-### currying & partial Application
+### currying & partial Application & Memoization
 
 ![currying-vs-partialapplication](./img/currying-vs-partialapplication.jpeg)
 
@@ -1060,9 +1060,11 @@ It's the process of converting a function that takes multiple arguments into a f
 
 #### Partial Application
 
-It's the process of applying a function to **some/part of** its arguments. The partially applied function gets returned for later use
+It's a technique that involves taking a function and returning a new version of it with some of its arguments pre-filled or **bound** to specific values. **(binding arguments to a function)**
 
-It's just a name for binding some of the function’s arguments to a specific value and returning a new function that takes the rest of the arguments. **(Binding arguments to a function)**
+  - It's often utalized in Javascript using `bind()` method to create partial functions.
+
+> It's just a name for binding some of the function’s arguments to a specific value and returning a new function that takes the rest of the arguments. **(Binding arguments to a function)**
 
 > see it's use in [`bind` section](#examples-of-higher-order-functions-call-apply-bind)
 
@@ -1135,11 +1137,51 @@ It's just a name for binding some of the function’s arguments to a specific va
   - In other cases, **partial application** is useful when we have a very generic function and want a less universal variant of it for convenience.
     - For instance, we have a function `send(from, to, text)`. Then, inside a user object we may want to use a partial variant of it: `sendTo(to, text)` that sends from the current user.
 
+#### Memoization
+
+In functional programming, memoization is the practice of caching previously computed results and returning the cached result when the same inputs occur again.
+
+Example:
+
+```js
+// Without memoization
+function slowSquare(n) {
+  // Simulate a slow operation
+  for (let i = 0; i < 100000000; i++) {}
+  return n * n;
+}
+
+// With memoization
+function memoize(fn) {
+  // Note that it's a higher-order function, it takes a function as an argument and returns a function
+  const cache = new Map();
+  return function(...args) {
+    const key = JSON.stringify(args);
+    
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
+const memoizedSquare = memoize(slowSquare);
+
+console.log(memoizedSquare(2)); // 4 (computes)
+console.log(memoizedSquare(2)); // 4 (from cache)
+```
+
 ---
 
 ### Closure
 
-A closure allows a function to remember variables from its creation context, **even after the outer function has returned** (after leaving the scope it was declared in).
+> JavaScript uses **lexical scoping**, which means that functions are executed using the variable scope that was in effect when they were **defined**, **not** when they are **invoked**. this leads to the concept of **closures**.
+
+**Closure** is the combination of a function object and the scope (the variable bindings) in which it was defined.
+
+- A closure allows a function to remember variables from its creation context, **even after the outer function has returned** (after leaving the scope it was declared in).
 
 ![closure](./img/closure.PNG)
 ![closure](./img/closure1.png)
@@ -1291,6 +1333,27 @@ A closure allows a function to remember variables from its creation context, **e
       counter.getCount(); // 2
       counter.count; // undefined (can't access count directly) ❌ (private variable)
       ```
+
+  - A classic bug occurs when you create multiple closures inside a loop using the old `var` keyword. Because `var` is scoped to the whole function, every closure in the loop will accidentally share the exact same variable. Modern JavaScript fixes this: if you use `let` or `const`, they are block-scoped, so each iteration of the loop gets its own independent variable binding.
+    
+    ```js
+    // bad ❌ (closures share the same variable because var is function-scoped)
+    for (var i = 0; i < 3; i++) {
+      setTimeout(function () {
+        alert(i);
+      }, 1000);
+    }
+    // output: 3, 3, 3 (all three alerts show 3 because i becomes 3 after the loop finishes)
+
+    // good ✅ (closures have their own independent variable because let is block-scoped)
+    for (let i = 0; i < 3; i++) {
+      setTimeout(function () {
+        alert(i);
+      }, 1000);
+    }
+    // output: 0, 1, 2 (each alert shows the value of i at the time it was created)
+    ```
+    ![closure loop](./img/closure-loop.png) 
 
   - When on an interview, a frontend developer gets a question about “what’s a closure?”, a valid answer would be a definition of the closure and an explanation that all functions in JavaScript are closures, and maybe a few more words about technical details: the **`[[Environment]]`** property and how Lexical Environments work (Where the function was created, not where it was called).
   - We can't manually create closures, they are a natural part of the language that happens automatically when a function is created.
@@ -1521,6 +1584,14 @@ recursion sometimes take long time as it calls multiple functions at the same ti
 `call`, `apply`, `bind` are higher order functions **used to set the `this` keyword and arguments of a (function / method) manually**.
 
 ![call-apply-bind](./img/call-apply-bind.webp)
+
+
+- These methods allow you to execute a function as if it were a method of a completely different object.
+  - `Function.prototype.apply()` and `Function.prototype.call()`
+    - allow you to explicitly set the value of the **`this`** keyword for a function when you invoke it, as well as provide arguments to the function.
+  - `Function.prototype.bind()`
+    - does something slightly different: it doesn’t invoke the function immediately but instead returns a **new function** that, when called, will have its `this` set to the value you provided.
+
 
 > More [Here](https://javascript.plainenglish.io/quick-guide-to-call-apply-and-bind-methods-in-javascript-5c00cd856cfa)
 

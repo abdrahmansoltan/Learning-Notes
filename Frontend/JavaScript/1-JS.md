@@ -11,8 +11,8 @@
       - [Garbage collection](#garbage-collection)
       - [Memory Leak](#memory-leak)
   - [Function](#function)
+    - [Defining functions (Function declaration vs Function expression)](#defining-functions-function-declaration-vs-function-expression)
     - [Invocation Expressions](#invocation-expressions)
-    - [Function declaration vs Function expression](#function-declaration-vs-function-expression)
     - [Arrow function](#arrow-function)
     - [IIFE](#iife)
     - [Function Constructor](#function-constructor)
@@ -38,13 +38,22 @@
     - [Arrays](#arrays)
       - [Array Destructuring](#array-destructuring)
       - [Array methods](#array-methods)
+        - [Subarrays (`slice` and `splice`)](#subarrays-slice-and-splice)
+        - [Flatten and Concatenate Array](#flatten-and-concatenate-array)
         - [Array Data Transformation Methods (`map`, `filter`, `reduce`)](#array-data-transformation-methods-map-filter-reduce)
+        - [Array Predicates (`every`, `some`)](#array-predicates-every-some)
+        - [Array Sorting](#array-sorting)
     - [Object](#object)
       - [Properties Accessing \& Modification \& Deletion](#properties-accessing--modification--deletion)
       - [Object Methods](#object-methods)
       - [Object.keys, values, entries](#objectkeys-values-entries)
       - [Transforming objects (operations on objects)](#transforming-objects-operations-on-objects)
-      - [Object Destructuring](#object-destructuring)
+      - [ES6 Object Features](#es6-object-features)
+        - [Shorthand properties \& Methods](#shorthand-properties--methods)
+        - [Computed property names](#computed-property-names)
+        - [Spread Operator on Objects](#spread-operator-on-objects)
+        - [Object Destructuring](#object-destructuring)
+        - [Property getter and setter](#property-getter-and-setter)
     - [Sets](#sets)
       - [WeakSet](#weakset)
     - [Maps](#maps)
@@ -453,7 +462,9 @@ JavaScript is a garbage collected language. If you allocate memory inside of a f
 
 ## Function
 
-A function is a named, parameterized block of code that you define once and can invoke (run) over and over
+A function is a named, parameterized block of code that is defined once and can be invoked (run) as many times as needed.
+
+> "parameterized" => it can take parameters/arguments to use as local variables in the function body
 
 - It's a block of code that can be reused and called by name. The code inside a function is executed when the function is invoked.
   ![function](./img/function-1.png)
@@ -476,35 +487,19 @@ A function is a named, parameterized block of code that you define once and can 
 
 ---
 
-### Invocation Expressions
+### Defining functions (Function declaration vs Function expression)
 
-- Calling a function is also called an **invocation expression**.
-- When JS encounters an invocation, it first evaluates the function name to make sure that it's really a function and it can be called. Then it execute the code inside the function.
-  - If the value is not a function, it will throw a `TypeError`.
-  - If it's a function, it will execute the code inside the function, and the **value of the invocation expression is the return value of the function**.
+There're 3 ways to define a function:
 
-- **Conditional Invocation:**
-  - Starting from ES2020, we can invoke a function conditionally using the optional chaining operator `?.`.
-  - Example:
-
-    ```js
-    function square(x, logFn) {
-      // if logFn is a function, invoke it with the result of x * x
-      logFn?.(x * x);
-      return x * x;
-    }
-    ```
-
-  - Like conditional property access (optional chaining operator `?.`), if the function doesn't exist, it will return `undefined` instead of throwing an error -> **short-circuiting**
-
----
-
-### Function declaration vs Function expression
+1. **Function declaration**
+2. **Function expression**
+3. **Arrow function** (syntactic sugar for function expression)
 
 ![function declaration vs function expression](./img/function-declaration-vs-function-expression.png)
 
 - **Function Declarations**:
   - Can be called before they are defined (hoisted).
+    - "hoisted" means that the function declaration is moved to the top of the code block it is in, before any other code is executed.
   - Interpreter processes them before executing the script.
   - Instantly fully initialized when the Lexical Environment is created.
     ![function-declaration](./img/function-declaration.png)
@@ -550,6 +545,43 @@ A function is a named, parameterized block of code that you define once and can 
     - More debuggable stack traces.
     - Self-documenting code.
 
+- **Arrow functions**
+  - It's a newer, more concise way to write function expressions.
+  - It inherits `this` from the outer lexical environment, so it doesn't have its own `this`. unlike function expressions.
+  - Example:
+
+    ```js
+    let sayHi = () => alert('Hello');
+    ```
+
+---
+
+### Invocation Expressions
+
+Calling a function is also called an **invocation expression**. When JavaScript encounters an invocation, it first evaluates the target to ensure it is actually a callable function (throwing a `TypeError` if not), runs the body of the function, and evaluates the expression to the function's return value.
+
+- **Four Ways to Invoke Functions:**
+  - The way a function is invoked determines its execution context (the value of the `this` keyword):
+  1. **As Functions**: Standard calls like `square(2)`.
+     - In `"use strict"`, `this` is `undefined`.
+     - In non-strict mode, `this` points to the global object (`window` / `globalThis`).
+  2. **As Methods**: Assigned to an object property and called on it (e.g., `calculator.add()`).
+     - `this` refers to the object itself (`calculator`).
+  3. **As Constructors**: Preceded by the `new` keyword (e.g., `new User()`).
+     - Creates a new empty object, binds it to `this`, and returns it when the function ends.
+  4. **Indirectly**: Explicitly setting the `this` context using `.call()` or `.apply()` methods.
+
+- **Conditional Invocation (`?.()`)**:
+  - Starting from ES2020, you can invoke a function conditionally using the optional chaining operator. If the function doesn't exist, it short-circuits and safely returns `undefined` instead of throwing an error.
+
+  ```js
+  function square(x, logFn) {
+    // only calls logFn if it exists
+    logFn?.(x * x);
+    return x * x;
+  }
+  ```
+
 ---
 
 ### Arrow function
@@ -571,6 +603,30 @@ let func = function (arg1, arg2) {
   - There’s a difference between an `arrow function` => and a regular function called with `.bind(this)`:
     - `.bind(this)` creates a “bound version” of the function.
     - The `arrow =>` doesn’t create any binding. The function simply doesn’t have `this`. The lookup of this is made exactly the same way as a regular variable search: in the outer lexical environment.
+  - **The Nested Function `this` Flaw**:
+    A regular function nested inside an object method does *not* inherit the method's `this` context (its `this` drops back to `undefined` or the global object).
+    - *Old workaround*: Saving `this` to a variable (e.g., `let self = this;`).
+    - *Modern fix*: Use an **arrow function** for the nested function, since it automatically inherits `this` from the outer method.
+
+    ```js
+    const user = {
+      name: 'John',
+      greet() {
+        // Nested regular function
+        function nestedRegular() {
+          console.log(this); // undefined (or window) ❌
+        }
+        nestedRegular();
+
+        // Nested arrow function
+        const nestedArrow = () => {
+          console.log(this.name); // 'John' ✅ (inherits 'this' from greet)
+        };
+        nestedArrow();
+      }
+    };
+    ```
+
 
 - **Limitations:**
   - It's shorter but at a cost of it will be **anonymous function** and not a **named function**, which means that it will need you to read the function body to understand what it does instead of figuring out this from its name
@@ -580,7 +636,9 @@ let func = function (arg1, arg2) {
 
 ---
 
-### IIFE
+### IIFE (Function as Namespace)
+
+> Variables declared inside a function are strictly local to that function and are completely hidden from the outside world. Developers often exploit this to create temporary private namespaces. By defining an anonymous function and immediately invoking it.
 
 **Immediately Invoked Function Expression** (IIFE) is a function that runs as soon as it is defined - It is an inline function expression. which create its own scope
 
@@ -1089,6 +1147,25 @@ for (let key in user) {
 
   - ⚠️ A very common bug is accidentally using `for..in` with arrays when you meant to use `for..of`. Because arrays are technically just objects where the indexes are property names, `for..in` will loop over the indexes (`0`, `1`, `2`) rather than the actual values inside the array, and it might even catch inherited properties you didn't expect. **Always use `for..of` with arrays!**
 
+- Sometimes you don't want to include the inherited properties of the object when iterating over it, in that case you can either:
+  - use `Object.keys()`, `Object.values()`, `Object.entries()` methods instead with `for..of` loop.
+  - have extra checks using `hasOwnProperty` method.
+
+    ```js
+    let user = {
+      name: 'John',
+      age: 30,
+      isAdmin: true
+    };
+
+    for (let key in user) {
+      if (user.hasOwnProperty(key)) {
+        alert(key);
+        alert(user[key]);
+      }
+    }
+    ```
+
 ---
 
 ### For await..of loop (Async Iteration)
@@ -1361,6 +1438,14 @@ A string is an immutable (unchangeable) sequence of 16-bit values, where each va
       let str = arr.join(', '); // John, Pete, Mary
       ```
 
+    - Without a separator, it's similar to `toString()` method:
+
+      ```js
+      let arr = [1, 2, 3];
+      let str = arr.join(); // "1,2,3"
+      let str2 = arr.toString(); // "1,2,3"
+      ```
+
 - **Replacing words in a string**
 
   ```js
@@ -1463,11 +1548,78 @@ Regular expressions search for characters that form a pattern. They can also rep
 
 ### Arrays
 
-**Array** is a data structure that can store a collection of items. The items can be of any type.
+**Array** is an ordered collection of values, where each value is called an **element**, and each element has a numeric position known as an **index**
 
-- It's a special kind of object, with numbered indexes.
+- It's a special kind of object, with numbered indexes. when you use index to access array elements, it behaves like an object.
+  - Also it's special because JS store `length` of array as a property of array
 
-- To check if a value is an array, use `Array.isArray(value)`.
+    ```js
+    let fruits = ['apple', 'banana', 'orange'];
+
+    fruits[0]; // JS reads it as fruits['0'], which is a property of the fruits object -> 'apple'
+    fruits['length']; // '3' -> length is a property of array
+    ```
+
+- To create an array in JS:
+  - Using literal notation (recommended):
+
+    ```js
+    let fruits = ['apple', 'banana', 'orange'];
+    ```
+
+  - Using `Array` constructor:
+
+    ```js
+    let fruits = new Array('apple', 'banana', 'orange');
+    ```
+
+  - Using `Array.of()` constructor:
+
+    ```js
+    let fruits = Array.of('apple', 'banana', 'orange');
+    ```
+
+  - Using `Array.from()` constructor:
+
+    ```js
+    let fruits = Array.from('apple', 'banana', 'orange');
+
+    // It can take a second argument as a map function
+    let numbers = Array.from([1, 2, 3], x => x * x); // [1, 4, 9]
+    ```
+
+- There's a quirk with `new Array(number)`, where it creates an array of that size with empty slots, and `Array.of()` was introduced in ES6 to overcome this issue as it creates an array of the given size with the given values
+
+  ```js
+  let arr = new Array(5);
+  console.log(arr); // [empty × 5] and length 5
+
+  let arr2 = Array.of(5);
+  console.log(arr2); // [5] and length 1
+  ```
+
+- **To check if a value is an array, use `Array.isArray(value)`**.
+
+- **"Sparse Array"**: It's an array with empty slots, meaning it has gaps in its indices (the length of the array is not equal to the number of actual values in the array)
+
+  ```js
+  const sparseArray = [1, , 3];
+  console.log(sparseArray.length); // 3
+  console.log(sparseArray[1]); // undefined
+
+  // creating a sparse array
+  const sparseArray = new Array(5);
+  const sparseArray2 = Array.of(1, , 3);
+  ```
+
+- **The `length` property**: Every array has a `length` property that automatically updates as elements are added.
+  - **Truncating arrays**: It works in reverse too! If you manually set the `length` property to a number _smaller_ than its current value, JavaScript instantly truncates the array, permanently deleting any elements whose index is greater than or equal to the new length.
+
+    ```js
+    let fruits = ['apple', 'banana', 'orange'];
+    fruits.length = 2; // Truncate
+    console.log(fruits); // ['apple', 'banana'] (orange is permanently deleted)
+    ```
 
 #### Array Destructuring
 
@@ -1553,56 +1705,27 @@ const [firstName, surname] = arr;
 - When we call these methods on a "Array", JavaScript will use the properties and methods in the `Array` object to perform the operation and then return the result (using `prototype` chain).
   ![array-methods](./img/array-methods-1.png)
 
-- **`slice` vs `splice`**
-  ![slice-splice](./img/slice-splice.jpg)
-  - `slice()` (makes a copy)
-    - the slicing happens from `start` to `end` **(not including `end`)**, so `end` is not included in the result.
-    - `-1` in `slice` means the last element, but in `splice` it means the last element will be removed.
-
-    ```js
-    let arr = ['t', 'e', 's', 't'];
-
-    arr.slice(1, 3); // e,s (copy from 1 to 3)
-    arr.slice(-2); // s,t (copy from -2 to the end)
-    arr.slice(1, -1); // e,s (copy from 1 to -1) not including -1
-    arr.slice(); // t,e,s,t (copy the whole array)
-    ```
-
-  - `splice()` (modifies the array)
-    - `splice` returns an array of removed elements.
-    - `splice` can remove and insert elements at the same time.
-    - `splice` can remove elements from the beginning and end of an array.
-    - it takes `start` and `deleteCount` as parameters. and not `end`.
-
-    ```js
-    let arr = ['I', 'study', 'JavaScript'];
-
-    // from index 1 remove 1 element
-    arr.splice(1, 1); // ["study"]
-
-    // from index 0 remove 3 elements and replace them with another
-    arr.splice(0, 3, "Let's", 'dance'); // ["I", "study", "JavaScript"] -> ["Let's", "dance"]
-    ```
-
 - **Adding / Removing elements from beginning and end**
 
   ```js
   let arr = ['I', 'study', 'JavaScript'];
 
-  // remove 2 first elements
-  arr.shift();
-  arr.shift();
+  // Add elements to the end of the array
+  arr.push('hello', 'world'); // ['I', 'study', 'JavaScript', 'hello', 'world']
+
+  // remove 2 first elements from the front
+  arr.shift(); // ['study', 'JavaScript', 'hello', 'world']
+  arr.shift(); // ['JavaScript', 'hello', 'world']
 
   // add the new element at the beginning
-  arr.unshift("Let's", 'dance');
-
-  console.log(arr); // now ["Let's", "dance", "JavaScript"]
+  arr.unshift("Let's", 'dance'); // ["Let's", "dance", "JavaScript", "hello", "world"]
   ```
 
   - `push()` and `unshift()` methods are used to add elements to the end and beginning of an array.
     - These methods return the new length of the array.
   - `pop()` and `shift()` methods are used to remove elements from the end and beginning of an array.
     - These methods return the removed element.
+  - `splice` can add and remove elements from the array at the same time, by taking `start`, `deleteCount`, and `items` as parameters.
 
 - **(`delete` vs `splice`)**
   - always use `slice` to remove element from an array, because `delete` will leave an empty slot in the array.
@@ -1627,79 +1750,8 @@ const [firstName, surname] = arr;
   - `indexOf(value)`: Finds index of a primitive value, returns `-1` if not found.
   - `findIndex(callback)`: Finds index using a callback function, useful for objects or complex conditions.
 
-- **`flat` and `flatMap`**:
-  - `flat(depth)`: Flattens nested arrays up to the specified depth **recursively**.
-    ![flat](./img/flat.png)
-  - `flatMap(callback)`: Maps and flattens the array **one level deep** with customization of the mapping.
-    ![flatmap](./img/flatmap.png)
-
-- **Sorting**
-  - The `.sort()` method works as follows:
-    - without condition -> it will sort based on the default comparator which assumes **string operations** (all values are coerced and compared as string)
-
-      ```js
-      [1, 30, 4, 21].sort(); // results: [1, 21, 30, 4]
-      ```
-
-    - with condition -> it will sort based on the provided comparator function
-      - **Comparator function** should return a negative value if `a` should come before `b`, a positive value if `b` should come before `a`, and `0` if they are equal.
-
-        ```js
-        // compare function
-        const compare_1 = (a, b) => {
-          if (a > b) return 1;
-          if (a == b) return 0;
-          if (a < b) return -1;
-        };
-        // or
-        const compare_2 = (a, b) => a - b;
-
-        // if return is (< 0), show A before B
-        // if return is (> 0), show B before A
-        // if return is (0), items should remain in the same order
-        ```
-
-      - Example:
-        - sorting numbers:
-
-          ```js
-          [1, 30, 4, 21].sort((a, b) => a - b); // results: [1, 4, 21, 30]
-          // 1 - 30 = -29 (negative) -> `a` should come before `b` -> [1, 30]
-          // 30 - 4 = 26 (positive) -> `b` should come before `a` -> [1, 4, 30]
-          // 30 - 21 = 9 (positive) -> `b` should come before `a` -> [1, 4, 21, 30]
-          ```
-
-        - sorting dates:
-
-          ```js
-          const holidays = ['2014-12-25', '2014-01-01'];
-          holidays.sort(function (a, b) {
-            const dateA = new Date(a);
-            const dateB = new Date(b);
-            return dateA - dateB;
-          });
-          ```
-
-        - sorting string characters:
-
-          ```js
-          const data = ['t', 'A', 'a', 'B', 'b'];
-          data.sort((a, b) => {
-            return a.localeCompare(b);
-          }); // ["a", "A", "b", "B", "t"]
-          ```
-
-  - Note that `sort` method modifies the original array. If you want to keep the original array unchanged, you can use `slice` method to create a copy of the array and then sort the copy.
-
-    ```js
-    const arr = [1, 30, 4, 21];
-    const sorted = arr.slice().sort((a, b) => a - b);
-    // or
-    const sorted = [...arr].sort((a, b) => a - b);
-    ```
-
 - methods for creating arrays with filled values
-  - `Array.fill(value, start, end)`
+  - `Array.fill(value, start, end)` -> it fills an array with a static value by replacing the empty slots or already filled slots in the array
 
     ```js
     const x = new Array(7); // [empty × 7]
@@ -1737,20 +1789,6 @@ const [firstName, surname] = arr;
       const movementsUI = Array.from('abcd', x => x.toUpperCase()); // ['A', 'B', 'C', 'D']
       ```
 
-- `some` & `every` methods
-  - `some` : returns `true` if at least one element in the array passes the test implemented by the provided function.
-  - `every` : returns `true` if all elements in the array pass the test implemented by the provided function.
-
-    ```js
-    const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
-    // some
-    const anyDeposits = movements.some(mov => mov > 0); // true
-
-    // every
-    const allDeposits = movements.every(mov => mov > 0); // false
-    ```
-
 - Notes:
   - operations on array:
 
@@ -1763,6 +1801,67 @@ const [firstName, surname] = arr;
   - Methods cheat sheets
     ![array](./img/array.jpg)
     ![methods](./img/array%20methods.jpg)
+
+---
+
+##### Subarrays (`slice` and `splice`)
+
+![slice-splice](./img/slice-splice.jpg)
+
+- `slice()` (returns a new subarray or a slice of the original array)
+  - the slicing happens from `start` to `end` **(not including `end`)**, so `end` is not included in the result.
+  - `-1` in `slice` means the last element, but in `splice` it means the last element will be removed.
+
+  ```js
+  let arr = ['t', 'e', 's', 't'];
+
+  arr.slice(1, 3); // e,s (copy from 1 to 3)
+  arr.slice(-2); // s,t (copy from -2 to the end)
+  arr.slice(1, -1); // e,s (copy from 1 to -1) not including -1
+  arr.slice(); // t,e,s,t (copy the whole array)
+  ```
+
+- `splice()` (modifies the original array **by inserting/removing elements**)
+  - it takes `start`, `deleteCount`, and `items` (optional) as parameters.
+
+  ```js
+  let arr = ['I', 'study', 'JavaScript'];
+
+  // from index 1 remove 1 element
+  arr.splice(1, 1); // ["study"]
+
+  // from index 0 remove 3 elements and replace them with another
+  arr.splice(0, 3, "Let's", 'dance'); // ["I", "study", "JavaScript"] -> ["Let's", "dance"]
+  ```
+
+---
+
+##### Flatten and Concatenate Array
+
+- `flat(depth)`: Flattens nested arrays up to the specified depth **recursively**.
+  ![flat](./img/flat.png)
+  - By default it only flattens one level deep.
+  - `Infinity` can be passed as an argument to flatten all levels.
+
+    ```js
+    const arr = [1, [2, [3, [4]]]];
+    console.log(arr.flat()); // [1, 2, [3, [4]]]
+    console.log(arr.flat(2)); // [1, 2, 3, [4]]
+    console.log(arr.flat(Infinity)); // [1, 2, 3, 4]
+    ```
+
+- `flatMap(callback)`: Maps and flattens the array **one level deep** with customization of the mapping.
+  ![flatmap](./img/flatmap.png)
+  - It works like a `map()` method, then flattens the result by one level.
+
+- `concat()`: Joins two or more arrays.
+
+  ```js
+  const arr1 = [1, 2, 3];
+  const arr2 = [4, 5, 6];
+  const arr3 = [7, 8, 9];
+  const result = arr1.concat(arr2, arr3);
+  ```
 
 ---
 
@@ -1780,7 +1879,7 @@ const [firstName, surname] = arr;
       ```
 
 - `filter`
-  - It's a method used to **filter** an array by **applying a function** to each element of the array.
+  - It's a method used to **filter** an array by **applying a predicate function (func that returns boolean values)** to each element of the array.
     - it creates a new array with all elements that pass the test implemented by the provided function.
 
       ```js
@@ -1795,10 +1894,11 @@ const [firstName, surname] = arr;
     - `findIndex`: Returns the index of the **first** item matching a condition or `-1`.
 
 - `reduce`
-  - It's a method used to **reduce** an array to a single value by **executing a reducer function** for each element of the array.
+  - It's a method used to **reduce** an array to a single value by **executing a "reducer function"** for each element of the array.
 
     ![reduce](./img/reduce-method-1.png)
-    - it uses an **accumulator** and **current value** to return a single value
+
+  - It takes two arguments: a function that performs the reduction, and an **optional initial value** (if not provided, the first element of the array will be used as the initial value).
 
   - Examples:
     - Sum of all elements in an array
@@ -1825,6 +1925,123 @@ const [firstName, surname] = arr;
     const arr = [1, 2, 3, 4];
     const sum = arr.reduce((acc, cur, i, arr) => acc + cur, 0); // 10
     ```
+
+  - `reduceRight`: Same as `reduce`, but it iterates through the array from **right to left**.
+
+---
+
+##### Array Predicates (`every`, `some`)
+
+Like `filter()`, these methods iterate through your array and apply a **predicate function** (a function that **returns true or false**) to each element:
+
+- `some` & `every` methods
+  - `some` : returns `true` if **at least one** element in the array **satisfies** the condition defined by the predicate.
+  - `every` : returns `true` if **all** elements in the array **satisfy** the condition defined by the predicate.
+
+    ```js
+    const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+    // some
+    const anyDeposits = movements.some(mov => mov > 0); // true
+
+    // every
+    const allDeposits = movements.every(mov => mov > 0); // false
+    ```
+
+- `find` & `findIndex` methods
+  - `find`: Returns the **first** element in the array that **satisfies** the condition defined by the predicate.
+    - If no match is found, `find()` returns `undefined`.
+  - `findIndex`: Returns the **index** of the **first** element in the array that **satisfies** the condition defined by the predicate.
+    - If no match is found, `findIndex()` returns `-1`.
+
+    ```js
+    const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
+    // find
+    const firstWithdrawal = movements.find(mov => mov < 0); // -400
+
+    // findIndex
+    const firstWithdrawalIndex = movements.findIndex(mov => mov < 0); // 2
+    ```
+
+---
+
+##### Array Sorting
+
+- The `.sort()` method works as follows:
+  - without condition -> it will sort based on the default comparator which assumes **string operations** (all values are coerced and compared as string)
+
+    ```js
+    [1, 30, 4, 21].sort(); // results: [1, 21, 30, 4]
+    // because 1 < 21 < 30 < 4 (as strings)
+    ```
+
+  - with condition -> it will sort based on the provided comparator function
+    - **Comparator function** should return a negative value if `a` should come before `b`, a positive value if `b` should come before `a`, and `0` if they are equal.
+
+      ```js
+      // compare function
+      const compare_1 = (a, b) => {
+        if (a > b) return 1;
+        if (a == b) return 0;
+        if (a < b) return -1;
+      };
+      // or
+      const compare_2 = (a, b) => a - b;
+
+      // if return is (< 0), show A before B
+      // if return is (> 0), show B before A
+      // if return is (0), items should remain in the same order
+      ```
+
+    - Example:
+      - sorting numbers:
+
+        ```js
+        [1, 30, 4, 21].sort((a, b) => a - b); // results: [1, 4, 21, 30]
+        // 1 - 30 = -29 (negative) -> `a` should come before `b` -> [1, 30]
+        // 30 - 4 = 26 (positive) -> `b` should come before `a` -> [1, 4, 30]
+        // 30 - 21 = 9 (positive) -> `b` should come before `a` -> [1, 4, 21, 30]
+        ```
+
+      - sorting dates:
+
+        ```js
+        const holidays = ['2014-12-25', '2014-01-01'];
+        holidays.sort(function (a, b) {
+          const dateA = new Date(a);
+          const dateB = new Date(b);
+          return dateA - dateB;
+        });
+        ```
+
+      - sorting string characters:
+
+        ```js
+        const data = ['t', 'A', 'a', 'B', 'b'];
+        data.sort((a, b) => {
+          return a.localeCompare(b);
+        }); // ["a", "A", "b", "B", "t"]
+        ```
+
+- `reverse`
+  - Reverses the order of the elements in an array.
+  - Modifies the original array (in-place).
+  - returns the reversed array.
+
+    ```js
+    const arr = [1, 2, 3];
+    arr.reverse(); // [3, 2, 1]
+    ```
+
+- Note that `sort` method modifies the original array (in-place). If you want to keep the original array unchanged, you can use `slice` method to create a copy of the array and then sort the copy.
+
+  ```js
+  const arr = [1, 30, 4, 21];
+  const sorted = arr.slice().sort((a, b) => a - b);
+  // or
+  const sorted = [...arr].sort((a, b) => a - b);
+  ```
 
 ---
 
@@ -1896,7 +2113,7 @@ It's a data structure that can store a collection of **key-value pairs**.
 
     console.log(person.hasOwnProperty('name')); // true
     ```
-  
+
   - `obj.x !== undefined` or `obj.x !== null` -> It's a common pattern used by developers but it's not recommended to use it as it's not a reliable way to check if a property exists in an object (i.e., it might return false positives).
 
 - we can access object properties using "dot notation" and "bracket notation"
@@ -2088,9 +2305,130 @@ Objects lack many methods that exist for arrays, e.g. `map`, `filter` and others
   alert(doublePrices.meat); // 8
   ```
 
+- Serialization:
+  - "Serializing" means **converting data structures** — arrays, objects, Maps, Sets, etc. — into a format that can be:
+    - stored (in `localStorage`, `IndexedDB`)
+    - or transmitted (sending an object to a server in an HTTP request)
+  - `JSON.stringify()`: Converts a value to a JSON string. (Serialization)
+  - `JSON.parse()`: Converts a JSON string to a value. (Deserialization)
+
+  ```js
+  // 1. To Store in LocalStorage
+  const userData = { name: 'John', age: 30 };
+  localStorage.setItem('user', JSON.stringify(userData)); // Convert to string
+
+  // 2. To Retrieve from LocalStorage (then use in your JS)
+  const savedUser = JSON.parse(localStorage.getItem('user')); // Convert back to object
+  console.log(savedUser.name); // "John"
+  ```
+
 ---
 
-#### Object Destructuring
+#### ES6 Object Features
+
+##### Shorthand properties & Methods
+
+Before ES6, if we had variables with the same name as the object property name, we had to write the property name twice:
+
+Before ES6:
+
+```js
+const name = 'Jonas';
+const age = 30;
+
+const jonas = {
+  name: name,
+  age: age
+};
+```
+
+After ES6:
+
+```js
+const name = 'Jonas';
+const age = 30;
+
+const jonas = {
+  name,
+  age
+};
+```
+
+- Also we can use method shorthand syntax in ES6:
+  - Before ES6:
+
+    ```js
+    const jonas = {
+      name: 'Jonas',
+      age: 30,
+      calcAge: function () {
+        this.age = 2037 - this.birthYear;
+        return this.age;
+      }
+    };
+    ```
+
+  - After ES6:
+
+    ```js
+    const jonas = {
+      name: 'Jonas',
+      age: 30,
+      calcAge() {
+        this.age = 2037 - this.birthYear;
+        return this.age;
+      }
+    };
+    ```
+
+##### Computed property names
+
+Sometimes you don't know the name of a property until the program is running (for example if the property name is stored in a variable), previously we had to create an empty object first and then use square brackets to add the property, but with ES6 we can use computed property names:
+
+```js
+// Old way
+const key = 'role'; // could be from user input 'role' value
+const user = {};
+user[key] = 'Admin';
+user[key + 'Id'] = 42;
+
+// New way (ES6 Computed Property Names)
+const key = 'role'; // could be from user input 'role' value
+const user = {
+  [key]: 'Admin',
+  [key + 'Id']: 42
+};
+```
+
+- This syntax also makes it possible to use `Symbols` as computed property names:
+
+```js
+const roleSymbol = Symbol('role');
+const user = {
+  [roleSymbol]: 'Admin',
+  [roleSymbol + 'Id']: 42
+};
+```
+
+##### Spread Operator on Objects
+
+- The spread operator `...` can be used to copy all the properties of an object into another object.
+
+```js
+const jonas = { name: 'Jonas', birthYear: 1991 };
+const jonasCopy = { ...jonas };
+console.log(jonasCopy); // { name: 'Jonas', birthYear: 1991 }
+```
+
+- It can also be used to merge two objects:
+
+```js
+const jonas = { name: 'Jonas', birthYear: 1991 };
+const jonasCopy = { ...jonas, age: 30 };
+console.log(jonasCopy); // { name: 'Jonas', birthYear: 1991, age: 30 }
+```
+
+##### Object Destructuring
 
 It's a way to extract multiple values from an object and assign them to variables in a single statement.
 
@@ -2148,6 +2486,31 @@ It's a way to extract multiple values from an object and assign them to variable
 
     console.log(calcAge({ birthYear: 1991 }));
     ```
+
+##### Property getter and setter
+
+- The **getter** method allows you to execute code when a property is accessed.
+- The **setter** method allows you to execute code when a property is assigned.
+
+- Example:
+
+  ```js
+  const jonas = {
+    firstName: 'Jonas',
+    lastName: 'Smith',
+    birthYear: 1991,
+    // getter
+    get fullName() {
+      return `${this.firstName} ${this.lastName}`;
+    },
+    // setter
+    set fullName(name) {
+      const [firstName, lastName] = name.split(' ');
+      this.firstName = firstName;
+      this.lastName = lastName;
+    }
+  };
+  ```
 
 ---
 
@@ -2702,6 +3065,19 @@ To create a new Date object call: `new Date()`
   alert(ms); // 1327611110417 (timestamp)
   ```
 
+- **Comparing dates**
+  - As dates are objects, we can't compare them with `==` or `===` or `<` or `>`
+  - So we convert them to numbers first, or we use `.valueOf()` method, or we use `date.getTime()` method
+
+  ```js
+  let d1 = new Date(2012, 0, 3);
+  let d2 = new Date(2012, 0, 3);
+  alert(d1 == d2); // false ❌
+  alert(d1.getTime() == d2.getTime()); // true ✅
+  alert(d1.valueOf() == d2.valueOf()); // true ✅
+  alert(+d1 == +d2); // true ✅
+  ```
+
 ---
 
 ### Dates Internationalization
@@ -3051,6 +3427,20 @@ It's used to **collect** a **variable number of arguments** into an array.
     alert(sumAll(1, 2)); // 3
     alert(sumAll(1, 2, 3)); // 6
     ```
+
+    - Prior to ES6, we used the `arguments` object to achieve the same result. However, the `arguments` object is not a real array, so we need to convert it to an array using `Array.from()` or the spread syntax `...`.
+
+      ```js
+      function sumAll() {
+        let sum = 0;
+
+        for (let i = 0; i < arguments.length; i++) {
+          sum += arguments[i];
+        }
+
+        return sum;
+      }
+      ```
 
   - **Function that accepts a fixed number of arguments**
 
