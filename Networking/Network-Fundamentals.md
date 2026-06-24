@@ -17,6 +17,7 @@
     - [Default Gateway](#default-gateway)
     - [IP Packet](#ip-packet)
     - [Internet Control Message Protocol (ICMP)](#internet-control-message-protocol-icmp)
+    - [ARP (Address Resolution Protocol)](#arp-address-resolution-protocol)
 
 ---
 
@@ -396,17 +397,14 @@ It's a IP-level protocol used to send information from the source host to the de
 
 > In most of the situations, you know the IP address, but you need to know the MAC address to send the message to the recipient.
 > You need the MAC address because you are in the same local network (subnet), so you can send the message directly to the recipient using the MAC address.
-> 
+>
 > That's when ARP comes in handy.
 
 It's a layer 2 (Data Link layer) protocol used to resolve the MAC address of a host given its IP address.
 
-![arp](./img/arp-2.png) 
+![arp](./img/arp-2.png)
 
 - In the beginning, hosts have no information about the MAC addresses of other hosts. Then they need to send an **ARP Request/Broadcast** to the network to know the MAC address of the destination host, and then it's going to respond with an **ARP Reply** containing its MAC address and caching it in the ARP table. After that, we can send messages directly to the recipient using the MAC address as the MAC address of the destination host is now known and added to the frames (packets).
-
-
-
 
 - **ARP Table:** It's a table that stores/caches the IP address and MAC address mappings of the hosts in the local network.
 
@@ -417,6 +415,10 @@ It's a layer 2 (Data Link layer) protocol used to resolve the MAC address of a h
 - How it works
   ![arp](./img/arp-1.png)
 
-- **ARP Poisoning:** It's a type of attack that exploits the ARP protocol to send spoofed ARP messages to a LAN (local area network) and associate the attacker's MAC address with the IP address of another host. (The attacker impersonates the gateway (Default Router)) → Man in the middle)
+- **ARP Poisoning:** It's a type of attack that exploits the ARP protocol to send spoofed ARP messages to a LAN (local area network) and associate the attacker's MAC address with the IP address of another host. (The attacker impersonates the gateway (Default Router) → Man in the middle)
   - It can be used to intercept network traffic, modify it, or inject malicious data into it.
-  
+
+- **ARP Dump:** It's a tool that is used to capture and display ARP messages on the network.
+  ```bash
+  tcpdump -i eth0 arp # Capture and display ARP messages on eth0
+  ```
