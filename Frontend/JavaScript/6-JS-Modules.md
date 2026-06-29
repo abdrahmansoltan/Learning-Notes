@@ -17,7 +17,7 @@
 
 ---
 
-## Notes
+## Introduction Note
 
 As our program grows bigger, it may contain many lines of code. Instead of putting everything in a single file, you can use `modules` to separate codes in separate files as per their functionality. This makes our code organized and easier to maintain.
 
@@ -31,9 +31,11 @@ As our program grows bigger, it may contain many lines of code. Instead of putti
 
 ## Modular pattern
 
-The module pattern is a special Design pattern in which we use IFFI (Immediately invoked function expression), and we return an object. Inside of that object, we can have functions as well as variables.
+> **Modularity** is primarily about encapsulating private implementation details and keeping the global namespace clean so that different chunks of code don't accidentally modify each other's variables.
 
-> note that the thing that make this possible (reaching what the IIFE-function returns after it was self-invoked) is => `closures`
+- The module pattern is a special Design pattern in which we use IFFI (Immediately invoked function expression), and we return an object. Inside of that object, we can have functions as well as variables.
+
+> **Note**: that the thing that make this possible (reaching what the IIFE-function returns after it was self-invoked) is => `closures`
 
 - Private methods or functions are members of given entity than can be seen only within said entity. Public ones can be accessed from the outside of given entity.
 

@@ -32,6 +32,10 @@
 
 As our application grows bigger, we want to split it into multiple files, so called “modules”. A module may contain a class or a library of functions for a specific purpose.
 
+> Until ES6, JavaScript had no built-in support for modules, meaning developers had to get creative to split their large codebases into manageable pieces.
+>
+> This led to the emergence of various patterns and tools over the years, such as **IIFEs**, **AMD**, **CommonJS**, and ultimately the native **ES6 modules** we use today.
+
 ### Problems with script loading (Before modules)
 
 - We have some problems when trying to run javascript in the browser:
@@ -41,8 +45,10 @@ As our application grows bigger, we want to split it into multiple files, so cal
   - unmaintainable scripts
     - `scope`, `size`, `readability`, `fragility`, `monolith files`
 
-- solution:
+- solution: **(Old Way)**
   - using **IIFE's**, as we treat each file as IIFE (revealing module), also this enables us to (**concatenate** files together): we can safely combine files without concern of scope collision!
+    - While classes and objects provide a basic level of modularity, they don't actually hide internal implementation details from the outside world. To truly hide details, developers historically used **Immediately Invoked Function Expressions (IIFEs)** and **closures**
+      - By defining variables and helper functions inside an IIFE, they remain completely private, while the function's return value (usually an object containing the public methods) serves as the module's public API
 - we had other problems:
   - "Full rebuilds every time there's a change"
   - lots of IIFE's are **slow** -> [The cost of small modules](https://nolanlawson.com/2016/08/15/the-cost-of-small-modules/)
@@ -75,6 +81,8 @@ When scripts became more and more complex, so the community invented a variety o
 
 ##### CommonJS
 
+> Node.js pioneered a practical module system where each JavaScript file is treated as an independent module with its own private namespace. In Node, any constants, variables, functions, or classes you define in a file are completely private to that file unless you explicitly export them.
+
 - With the creation of `Node.js`, we needed a way to run Javascript outside of the browser, this is where `commonJS` was born
 
   ```js
@@ -82,6 +90,80 @@ When scripts became more and more complex, so the community invented a variety o
   ```
 
 - `NPM` was created as a package strategy to share **commonJS node modules** across the entire ecosystem
+
+- **Node Exports**
+
+  - Node provides two ways to export values from a file — think of a file as a "module" with its own private scope:
+
+  - **Multiple Exports** — use the global `exports` object, assigning each value as a property:
+
+    ```js
+    // stats.js
+    const mean = (data) => data.reduce((a, b) => a + b, 0) / data.length;
+
+    const stddev = (data) => {
+      const avg = mean(data);
+      return Math.sqrt(data.map(x => (x - avg) ** 2).reduce((a, b) => a + b) / data.length);
+    };
+
+    // Attach to exports — these become the module's public API
+    exports.mean = mean;
+    exports.stddev = stddev;
+    ```
+
+  - **Single Export** — if your module exports only one value (a class, a function, or an object), assign it directly to `module.exports`:
+
+    ```js
+    // formatter.js
+    class Formatter {
+      static format(value) {
+        return `[${value}]`;
+      }
+    }
+
+    // Replace exports entirely with a single value
+    module.exports = Formatter;
+    ```
+
+  - > 💡 `exports` is just a shorthand reference to `module.exports`. When you do `exports.foo = ...` you're adding to the same object. But if you reassign `exports = something`, it breaks the link — use `module.exports = something` for single exports instead.
+
+- **Node Imports (`require`)**
+
+  - To import a module in Node, use the `require()` function — it runs the file and returns whatever that module exported.
+
+  - **Built-in and Third-Party Modules** — use the unqualified package name (no path):
+
+    ```js
+    const fs = require('fs');           // Node built-in
+    const express = require('express'); // Third-party (installed via npm)
+    ```
+
+  - **Your Own Modules** — use a relative path (must start with `./` or `../`):
+
+    ```js
+    const stats = require('./stats.js'); // your own file
+
+    console.log(stats.mean([1, 2, 3, 4]));   // 2.5
+    console.log(stats.stddev([1, 2, 3, 4])); // ~1.118
+    ```
+
+  - **Destructuring** — if a module exports multiple values, destructure to import only what you need directly into your local namespace:
+
+    ```js
+    // Instead of stats.mean() and stats.stddev()...
+    const { mean, stddev } = require('./stats.js');
+
+    console.log(mean([1, 2, 3, 4]));   // 2.5
+    console.log(stddev([1, 2, 3, 4])); // ~1.118
+    ```
+
+  - **Single export** — if the module used `module.exports = Formatter`, you get that value directly:
+
+    ```js
+    const Formatter = require('./formatter.js');
+    console.log(Formatter.format('hello')); // [hello]
+    ```
+
 - It works okay in server-side, but it doesn't work in the browser
 
   - This is because:

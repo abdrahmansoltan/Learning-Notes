@@ -334,6 +334,8 @@ Node.js has a built-in module system that allows us to break our code into small
 
 ### Common-JS Module System
 
+> 📄 For the historical context of CommonJS (why it was created, how it compares to AMD and ES modules, and its browser limitations), see [Modules & Bundlers.md](../../Frontend/DEV/Modules%20&%20Bundlers.md#commonjs)
+
 - Node.js uses the `Common JS module` system to break code into smaller chunks -> **"Reusability"**
   - TypeScript compiles to the Common JS Module System.
 
